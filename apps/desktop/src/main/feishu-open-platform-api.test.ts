@@ -10,7 +10,7 @@ import { ProvisioningTimingRecorder } from './feishu-provisioning-timing'
 
 const configuration: FeishuMemberBotConsoleConfiguration = {
   appName: '叮叮',
-  appDescription: 'Rovai AI Teammate · 游学者',
+  appDescription: 'Coaxi Teammate · 游学者',
   avatarUrl: 'https://sf3-cn.feishucdn.com/obj/avatar.png',
   tenantScopes: [
     'im:message',

@@ -1,13 +1,13 @@
 import { describe, expect, it } from 'vitest'
 import { hasReleaseNotesContent, parseReleaseNotesLanguages, selectReleaseNotesLanguage } from './release-notes-localization'
 
-const bilingual = '# Rovai AI v0.0.3\n\n<!-- lang:en -->\n\n## What’s new\n\n- English notes\n\n<!-- lang:zh-CN -->\n\n## 更新内容\n\n- 中文说明\n'
+const bilingual = '# Coaxi v0.0.3\n\n<!-- lang:en -->\n\n## What’s new\n\n- English notes\n\n<!-- lang:zh-CN -->\n\n## 更新内容\n\n- 中文说明\n'
 
 describe('Release Notes 语言选择', () => {
   it('仅选择匹配的语言正文，保留公共前言及原始 Markdown', () => {
     const english = selectReleaseNotesLanguage(bilingual, 'en')
     const chinese = selectReleaseNotesLanguage(bilingual, 'zh-CN')
-    expect(english).toContain('# Rovai AI v0.0.3')
+    expect(english).toContain('# Coaxi v0.0.3')
     expect(english).toContain('- English notes')
     expect(english).not.toContain('中文说明')
     expect(chinese).toContain('- 中文说明')
@@ -101,7 +101,7 @@ describe('Release Notes 语言选择', () => {
     '**说明文字 <!-- lang:fr -->**',
     '| 内容 |\n| --- |\n| 说明文字 <!-- lang:fr --> |'
   ])('正文内混行语言注释使整份说明回退：%s', (mixed) => {
-    const source = `# Rovai AI v0.0.3\n\n<!-- lang:en -->\n\nEnglish\n\n${mixed}\n\n<!-- lang:zh-CN -->\n\n中文`
+    const source = `# Coaxi v0.0.3\n\n<!-- lang:en -->\n\nEnglish\n\n${mixed}\n\n<!-- lang:zh-CN -->\n\n中文`
     expect(parseReleaseNotesLanguages(source)).toBeNull()
     expect(selectReleaseNotesLanguage(source, 'en')).toBe(source)
     expect(selectReleaseNotesLanguage(source, 'zh-CN')).toBe(source)

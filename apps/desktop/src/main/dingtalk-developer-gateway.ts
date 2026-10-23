@@ -409,7 +409,7 @@ export function dingTalkApplicationPresentation(name: string, description: strin
   else if ([...safeName].length < 2) safeName += 'Bot'
   let safeDescription = description.replace(/[^\u4e00-\u9fa5a-zA-Z0-9,.!:\-，。！：、 ]/gu, ' ')
     .replace(/ +/gu, ' ').trim().slice(0, 200)
-  if (safeDescription.length < 4) safeDescription = 'Rovai AI Member'
+  if (safeDescription.length < 4) safeDescription = 'Coaxi Member'
   return { name: safeName, description: safeDescription }
 }
 

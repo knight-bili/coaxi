@@ -177,7 +177,7 @@ struct RootView: View {
                     actionTitle: "Manage Servers",
                     action: { model.serversSheetPresented = true }
                 )
-                .navigationTitle(model.selectedServer?.name ?? "Codeg")
+                .navigationTitle(model.selectedServer?.name ?? "Coaxi")
                 .toolbarTitleDisplayMode(.inlineLarge)
                 .toolbarTitleMenu { serverSwitcherMenu }
             } else {
@@ -191,7 +191,7 @@ struct RootView: View {
                     actionTitle: "Manage Servers",
                     action: { model.serversSheetPresented = true }
                 )
-                .navigationTitle("Codeg")
+                .navigationTitle("Coaxi")
             }
         }
     }
@@ -414,7 +414,7 @@ private struct SplitSidebar: View {
                 .tag(SidebarSection.activity)
                 .badge(model.activity.running.count)
         }
-        .navigationTitle(model.selectedServer?.name ?? "Codeg")
+        .navigationTitle(model.selectedServer?.name ?? "Coaxi")
         .navigationSplitViewColumnWidth(min: 220, ideal: 260, max: 320)
         .toolbarTitleMenu {
             Picker("Server", selection: $model.selectedServerID) {

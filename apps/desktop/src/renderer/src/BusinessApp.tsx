@@ -1,3 +1,4 @@
+import { BrandMark } from './BrandMark'
 import { PetExtensionHost } from './PetExtensionHost'
 import {useDesktopDeepLinks} from './useDesktopDeepLinks'
 import { useShortcutActions } from './useShortcutActions'
@@ -511,7 +512,7 @@ export function ControlledShutdownOverlay({
           </span>
           <div className="shutdown-card-content">
             <h2 id="controlled-shutdown-title"><UiText zh={"正在安全退出"} /></h2>
-            <p id="controlled-shutdown-description"><UiText zh={"Rovai 正在保存本地状态并关闭后台服务。"} /></p>
+            <p id="controlled-shutdown-description"><UiText zh={"Coaxi 正在保存本地状态并关闭后台服务。"} /></p>
             <span className="shutdown-progress-track" role="progressbar" aria-label={uiAttribute("正在完成安全退出")}>
               <i />
             </span>
@@ -675,9 +676,9 @@ export function BootstrapShell({
   return (
     <div className="bootstrap-shell" data-runtime-mode={snapshot?.runtimeMode ?? 'bootstrap_only'}>
       <WindowDragStrip page="settings" />
-      <header className="bootstrap-shell-brand" aria-label="Rovai AI">
-        <span className="bootstrap-shell-mark" aria-hidden="true">R</span>
-        <span>Rovai AI</span>
+      <header className="bootstrap-shell-brand" aria-label="Coaxi">
+        <BrandMark className="bootstrap-shell-mark" />
+        <span>Coaxi</span>
       </header>
       <main className="bootstrap-shell-main">
         <section className="bootstrap-authority-card" aria-live="polite">
@@ -4276,7 +4277,7 @@ function BusinessAppContent({
               : [...document.querySelectorAll<HTMLButtonElement>('.app-shell [aria-label="打开主菜单"]')].find(button => button.getClientRects().length)
             visibleTrigger?.focus({ preventScroll: true })
           }}>
-            <header className="app-menu-heading"><Dialog.Title>Rovai AI</Dialog.Title>
+            <header className="app-menu-heading"><Dialog.Title>Coaxi</Dialog.Title>
               <Dialog.Close asChild><button className="mobile-icon-button" type="button" aria-label={uiAttribute("关闭主菜单")}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.65" strokeLinecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg></button></Dialog.Close>
             </header>
             {renderNavigation(true)}

@@ -52,7 +52,7 @@ export function feishuPageFailure(error: unknown): {
     reason: unavailable ? 'core_unavailable' : timeout ? 'callback_timeout' : 'card_response_failed',
     ...(providerCode === undefined ? {} : { providerCode }),
     response: { toast: { type: 'error', content: unavailable
-      ? 'Rovai 执行服务暂不可用，请检查本机 Rovai 状态后重试'
+      ? 'Coaxi 执行服务暂不可用，请检查本机 Coaxi 状态后重试'
       : timeout ? '翻页响应超时，请稍后重试' : '执行记录暂时无法翻页，请稍后重试' } }
   }
 }

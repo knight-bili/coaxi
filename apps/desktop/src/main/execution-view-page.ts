@@ -6,7 +6,7 @@ export const EXECUTION_VIEW_PAGE = String.raw`<!doctype html>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="color-scheme" content="light dark">
-  <title>Rovai AI · 只读执行台</title>
+  <title>Coaxi · 只读执行台</title>
   <script>document.documentElement.dataset.theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'night' : 'day'</script>
   <link rel="stylesheet" href="/assets/execution.css">
   <script type="module" src="/assets/execution.js"></script>

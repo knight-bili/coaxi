@@ -1,3 +1,4 @@
+import { BrandMark } from '../../desktop/src/renderer/src/BrandMark'
 import { useEffect, useRef, useState } from 'react'
 
 type LoginStatus = 'restoring' | 'scanning' | 'submitting' | null
@@ -22,12 +23,8 @@ export function WebLogin({ hostKind, status, error, onLogin }: {
     <div className="web-login-stage">
       <section className="web-login" aria-labelledby="web-login-title">
         <header className="web-login-identity">
-          <svg className="web-login-mark" viewBox="0 0 24 24" aria-hidden="true" data-brand-mark="horizon" data-brand-layout="separated">
-            <path d="M12 2 L13.16 7.3 L17.76 8.84 L13.16 10.38 L12 15.68 L10.84 10.38 L6.24 8.84 L10.84 7.3 Z" fill="currentColor" />
-            <path d="M3 20.96 Q12 15.96 21 20.96" fill="none" stroke="currentColor" strokeWidth="2.08" strokeLinecap="round" />
-            <circle className="brand-rendezvous-point" data-brand-point="rendezvous" cx="12" cy="18.46" r="1.05" />
-          </svg>
-          <h1 id="web-login-title">登录 Rovai AI</h1>
+          <BrandMark className="web-login-mark" />
+          <h1 id="web-login-title">登录 Coaxi</h1>
           <p className="web-login-description">继续你的协作。</p>
         </header>
         {pending ? <div className="web-login-pending" role="status">

@@ -80,7 +80,7 @@ struct AboutView: View {
                         in: RoundedRectangle(cornerRadius: Theme.Radius.md, style: .continuous)
                     )
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Codeg")
+                    Text("Coaxi")
                         .font(.title2.weight(.bold))
                         .foregroundStyle(Theme.textPrimary)
                     Text("codeg agent client for iOS")

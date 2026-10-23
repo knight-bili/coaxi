@@ -329,7 +329,7 @@ function DiagnosticsLoading(): React.JSX.Element {
   return (
     <section className="diagnostics-state" aria-live="polite">
       <span className="diagnostics-spinner" aria-hidden="true" />
-      <div><h2><UiText zh={"正在读取诊断事实"} /></h2><p><UiText zh={"Rovai AI 正在读取当前 Core 快照；不会在加载时运行修复。"} /></p></div>
+      <div><h2><UiText zh={"正在读取诊断事实"} /></h2><p><UiText zh={"Coaxi 正在读取当前 Core 快照；不会在加载时运行修复。"} /></p></div>
     </section>
   )
 }
@@ -355,7 +355,7 @@ function DiagnosticsSummary({ report, recovery }: { report: DiagnosticsReport; r
         <div className="is-attention"><dt><UiText zh={"需要处理"} /></dt><dd>{summary.attention}</dd></div>
         <div className="is-unknown"><dt><UiText zh={"暂时无法确认"} /></dt><dd>{summary.unknown}</dd></div>
       </dl>
-      <p className="diagnostics-summary-boundary"><UiText zh={"Rovai 只在你明确点击单项操作后修复可安全重建的受管状态；不会自动修改 SQLite、覆盖损坏的 MCP 配置、登录或替换智能体。"} /></p>
+      <p className="diagnostics-summary-boundary"><UiText zh={"Coaxi 只在你明确点击单项操作后修复可安全重建的受管状态；不会自动修改 SQLite、覆盖损坏的 MCP 配置、登录或替换智能体。"} /></p>
     </section>
   )
 }
@@ -527,7 +527,7 @@ export function diagnosticIssueCopy(check: DiagnosticCheck): { title: string; re
   if (check.id === 'database') return {
     title:uiAttribute("SQLite 数据需要人工检查"),
     reason: check.code === 'database_integrity_issue' ?uiAttribute("只读 quick_check 报告了完整性问题。") :uiAttribute("本次无法完成 SQLite 完整性确认。"),
-    impact:uiAttribute("Rovai 不会自动修改或重建权威数据；请先导出诊断信息再进行人工处置。")
+    impact:uiAttribute("Coaxi 不会自动修改或重建权威数据；请先导出诊断信息再进行人工处置。")
   }
   if (check.subjectKind === 'runtime') return {
     title: uiAttribute("{0} 当前不可用", String(check.label)),
@@ -537,7 +537,7 @@ export function diagnosticIssueCopy(check: DiagnosticCheck): { title: string; re
   return {
     title: uiAttribute("{0} 需要处理", String(check.label)),
     reason: diagnosticCheckDetail(check),
-    impact:uiAttribute("相关本机能力可能无法用于后续执行；Rovai 不会自动修改外部状态。")
+    impact:uiAttribute("相关本机能力可能无法用于后续执行；Coaxi 不会自动修改外部状态。")
   }
 }
 

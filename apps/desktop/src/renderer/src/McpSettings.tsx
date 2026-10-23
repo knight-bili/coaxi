@@ -950,7 +950,7 @@ export function McpImportPanel({
                 </div>
                 {draft.selected && candidate.conflict === 'name_conflict' && (
                   <div className="capability-import-resolution">
-                    <span className="capability-note"><UiText zh={"Rovai 中的同名配置与此处不同"} /></span>
+                    <span className="capability-note"><UiText zh={"Coaxi 中的同名配置与此处不同"} /></span>
                     <div className="capability-actions">
                       <button
                         type="button"

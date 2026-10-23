@@ -16,15 +16,13 @@ struct OnboardingView: View {
             VStack(spacing: 0) {
                 Spacer()
 
-                Image(systemName: "chevron.left.forwardslash.chevron.right")
-                    .font(.system(size: 34, weight: .semibold))
-                    .foregroundStyle(Theme.accent)
+                Image("CoaxiBrand")
+                    .resizable()
+                    .scaledToFit()
                     .frame(width: 84, height: 84)
-                    .glassEffect(.regular.tint(Theme.accentDim), in: RoundedRectangle(cornerRadius: Theme.Radius.xl, style: .continuous))
-                    .hairlineBorder(Theme.Radius.xl, color: Theme.accent.opacity(0.3))
                     .padding(.bottom, 24)
 
-                Text("Codeg")
+                Text("Coaxi")
                     .font(.largeTitle.weight(.bold))
                     .foregroundStyle(Theme.textPrimary)
                 Text("Your coding agents, in your pocket.")
@@ -48,7 +46,7 @@ struct OnboardingView: View {
                 PrimaryGlassButton(title: "Add Your Server", systemImage: "plus") {
                     showEditor = true
                 }
-                Text("Codeg connects to a codeg server you run — usually on your dev machine.")
+                Text("Coaxi connects to a codeg server you run — usually on your dev machine.")
                     .font(.caption)
                     .foregroundStyle(Theme.textTertiary)
                     .multilineTextAlignment(.center)

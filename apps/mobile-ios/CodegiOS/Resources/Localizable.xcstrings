@@ -2959,7 +2959,7 @@
         }
       }
     },
-    "Codeg" : {},
+    "Coaxi" : {},
     "codeg agent client for iOS" : {
       "localizations" : {
         "zh-Hans" : {
@@ -2970,12 +2970,12 @@
         }
       }
     },
-    "Codeg connects to a codeg server you run — usually on your dev machine." : {
+    "Coaxi connects to a codeg server you run — usually on your dev machine." : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Codeg 连接到你运行的 codeg 服务器——通常在你的开发机上。"
+            "value" : "Coaxi 连接到你运行的 codeg 服务器——通常在你的开发机上。"
           }
         }
       }

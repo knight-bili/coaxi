@@ -868,7 +868,7 @@ export class OpenPlatformApiClient {
         body: {
           autoPublish: false,
           remark: input.remark ?? `${FEISHU_MEMBER_BOT_LABEL} Bot 首次发布`,
-          changeLog: input.changeLog ?? '由 Rovai AI 配置 Bot、权限、事件与长连接。',
+          changeLog: input.changeLog ?? '由 Coaxi 配置 Bot、权限、事件与长连接。',
           appVersion,
           visibleSuggest: {
             departments: [],

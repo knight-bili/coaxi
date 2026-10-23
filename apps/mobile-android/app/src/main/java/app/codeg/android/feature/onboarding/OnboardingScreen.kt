@@ -11,7 +11,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Bolt
-import androidx.compose.material.icons.rounded.Code
+import androidx.compose.foundation.Image
+import androidx.compose.ui.res.painterResource
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.Visibility
 import androidx.compose.material3.Icon
@@ -43,12 +44,7 @@ fun OnboardingScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-        Icon(
-            Icons.Rounded.Code,
-            contentDescription = null,
-            tint = colors.accent,
-            modifier = Modifier.size(56.dp),
-        )
+        Image(painterResource(R.drawable.coaxi_brand), contentDescription = null, modifier = Modifier.size(56.dp))
         Text(
             stringResource(R.string.onboarding_title),
             style = MaterialTheme.typography.titleLarge,

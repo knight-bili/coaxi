@@ -101,7 +101,7 @@ export class EvaluationHostService {
       if (this.#live.size) throw new Error('Wait for the active evaluation before changing its installation')
       const params = input(value, ['source', 'node'])
       const source = await realpath(absolute(params.source)), node = await realpath(absolute(params.node))
-      if (JSON.parse(await readFile(join(source, 'package.json'), 'utf8')).name !== 'rovai-ai') throw new Error('Expected a Rovai developer checkout')
+      if (!['coaxi', 'codeg-rovai-workbench', 'rovai-ai'].includes(JSON.parse(await readFile(join(source, 'package.json'), 'utf8')).name)) throw new Error('Expected a Coaxi or compatible Rovai developer checkout')
       if (!(await lstat(join(source, 'scripts/eval-host.mjs'))).isFile()) throw new Error('Evaluation Host entry is missing')
       const version = await exec(node, ['--version'], { timeout: 5000, maxBuffer: 1024 })
       if (!/^v(2[4-9]|[3-9]\d)\./.test(version.stdout.trim())) throw new Error('Evaluation requires Node >=24')

@@ -753,21 +753,21 @@ export function skillSourcePresentation(skill: SkillView): SkillSourcePresentati
       return {
         kind: 'bundled',
         badgeLabel: 'Rovai',
-        sourceLabel:uiAttribute("随 Rovai 安装"),
+        sourceLabel:uiAttribute("随 Coaxi 安装"),
         repositoryUrl: repository.url,
         repositoryLabel: repository.label,
         revisionLabel: shortGitRevision(revision),
-        detailNote:uiAttribute("由 Rovai 维护并随应用更新；包内保留上游来源、许可与署名。")
+        detailNote:uiAttribute("由 Coaxi 维护并随应用更新；包内保留上游来源、许可与署名。")
       }
     }
     return {
       kind: 'bundled',
       badgeLabel: 'Rovai',
-      sourceLabel:uiAttribute("随 Rovai 安装"),
+      sourceLabel:uiAttribute("随 Coaxi 安装"),
       repositoryUrl: null,
       repositoryLabel: null,
       revisionLabel: internalRevision,
-      detailNote:uiAttribute("随 Rovai 发布并由应用更新；启用不代表获得额外工具或权限。")
+      detailNote:uiAttribute("随 Coaxi 发布并由应用更新；启用不代表获得额外工具或权限。")
     }
   }
 
@@ -786,7 +786,7 @@ export function skillSourcePresentation(skill: SkillView): SkillSourcePresentati
     repositoryUrl: repository?.url ?? null,
     repositoryLabel: repository?.label ?? null,
     revisionLabel: revision ? shortGitRevision(revision) : internalRevision,
-    detailNote:uiAttribute("Rovai 已保存独立副本，不依赖原始来源；后续不会自动同步，启停和生效范围仍由你管理。")
+    detailNote:uiAttribute("Coaxi 已保存独立副本，不依赖原始来源；后续不会自动同步，启停和生效范围仍由你管理。")
   }
 }
 
@@ -851,7 +851,7 @@ export function importActionLabel(action: SkillImportCandidate['importAction']):
       create: '新 Skill',
       update: '同名 Skill 已存在，将创建新 Revision',
       unchanged: '内容与当前 Revision 相同',
-      official_conflict: '不能覆盖 Rovai 内置 Skill'
+      official_conflict: '不能覆盖 Coaxi 内置 Skill'
     } as const
   )[action])
 }
@@ -878,7 +878,7 @@ export function formatBytes(value: number): string {
 function sourceTypeLabel(sourceType: SkillView['currentRevision']['sourceType']): string {
   return uiAttribute((
     {
-      bundled: '随 Rovai 安装',
+      bundled: '随 Coaxi 安装',
       local_folder: '本地文件夹导入',
       github: 'GitHub 导入'
     } as const

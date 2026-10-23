@@ -1,6 +1,6 @@
 import type { ChannelKind } from '@contracts'
 
-export const FEISHU_MEMBER_BOT_LABEL = 'Rovai AI Teammate'
+export const FEISHU_MEMBER_BOT_LABEL = 'Coaxi Teammate'
 const MEMBER_BOT_LABELS = {
   feishu: FEISHU_MEMBER_BOT_LABEL,
   lark: FEISHU_MEMBER_BOT_LABEL,

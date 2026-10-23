@@ -1,3 +1,4 @@
+import { BrandMark } from './BrandMark'
 import { canvasComposerContextKey, canvasComposerDraftStorage, canvasComposerDraftCopies, type CanvasComposerContext } from './canvas-composer-drafts'
 import { readCanvasViewScope } from './canvas-view-state'
 import { groupExecutionEventsByRunId } from './execution-events'
@@ -862,7 +863,7 @@ export function agentRunTerminalNote(
   run: Pick<AgentRunView, 'terminalReasonCode'>
 ): string | null {
   if (run.terminalReasonCode === 'planned_shutdown_cancelled') {
-    return uiAttribute("因 Rovai 计划关闭，执行引擎已确认取消本次执行。")
+    return uiAttribute("因 Coaxi 计划关闭，执行引擎已确认取消本次执行。")
   }
   if (run.terminalReasonCode === 'runtime_interrupted') {
     return uiAttribute("执行连续性已中断，最终结果无法确认；本次执行未被记为已取消。")
@@ -1580,11 +1581,7 @@ export function QuickChatWorkspace({
         <div className="new-conversation-stage">
           {project && <header className="project-home-heading"><h2>{project.name}</h2><p className="quick-chat-subline" title={project.projectPath}>{project.projectPath}</p></header>}
           {recentThreads.length === 0 && <>
-          <svg className="quick-chat-mark" data-brand-mark="horizon" data-brand-layout="separated" width="96" height="66" viewBox="0 0 72 56" aria-hidden="true">
-            <path d="M36 4 L39.6 16.7 L53.9 20.4 L39.6 24.1 L36 36.8 L32.4 24.1 L18.1 20.4 L32.4 16.7 Z" fill="currentColor" />
-            <path d="M8 49.5 Q36 37.5 64 49.5" stroke="currentColor" strokeWidth="5" fill="none" strokeLinecap="round" />
-            <circle className="brand-rendezvous-point" data-brand-point="rendezvous" cx="36" cy="43.5" r="2.6" />
-          </svg>
+          <BrandMark className="quick-chat-mark" width="96" height="66" />
           <h2>{hasAvailableMember ? uiAttribute("开始一段协作") : uiAttribute("还没有可用的队员")}</h2>
           <p className="quick-chat-subline">{hasAvailableMember ? uiAttribute("选好队员，写下你想完成的事。") : uiAttribute("先添加队员或完成运行配置。")}</p>
           <div className="quick-chat-empty">
@@ -10861,7 +10858,7 @@ function RunExecutionContent({
         <div className="process-recovery-blocker" role="status">
           <div>
             <strong><UiText zh={"自动恢复已停止"} /></strong>
-            <p><UiText zh={"恢复前的安全条件已经变化，Rovai AI 不会自动重发原请求。\n              请检查执行记录；需要继续时可停止本次运行，再发送后续任务。"} /></p>
+            <p><UiText zh={"恢复前的安全条件已经变化，Coaxi 不会自动重发原请求。\n              请检查执行记录；需要继续时可停止本次运行，再发送后续任务。"} /></p>
           </div>
         </div>
       )}

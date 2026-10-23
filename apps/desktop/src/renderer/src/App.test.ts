@@ -759,7 +759,7 @@ describe('cold startup route presentation', () => {
     expect(loading).toContain('class="startup-loading-canvas"')
     expect(loading).toContain('role="status"')
     expect(loading).toContain('aria-busy="true"')
-    expect(loading).toContain('data-brand-mark="horizon"')
+    expect(loading).toContain('data-brand-mark="coaxi"')
     expect(loading).toContain('正在打开会话')
     expect(loading).not.toContain('准备好后会自动打开')
     expect(loading).not.toContain('startup-route-status')
@@ -1736,7 +1736,7 @@ describe('task event projections', () => {
 
     const operationOnlyMarkup = renderReview('src/path-only.ts')
     expect(operationOnlyMarkup).toContain('没有可审查的差异内容')
-    expect(operationOnlyMarkup).toContain('Rovai 不读取当前文件，也不推测修改内容')
+    expect(operationOnlyMarkup).toContain('Coaxi 不读取当前文件，也不推测修改内容')
   })
 
   it('keeps ordinary directories quiet and presents Git detection metadata and warnings', () => {
@@ -2728,8 +2728,9 @@ describe('task event projections', () => {
     }))
 
     expect(markup).toContain('aria-label="快速对话"')
-    expect(markup).toContain('class="quick-chat-mark" data-brand-mark="horizon" data-brand-layout="separated"')
-    expect(markup).toContain('data-brand-point="rendezvous"')
+    expect(markup).toContain('class="quick-chat-mark"')
+    expect(markup).toContain('data-brand-layout="flat"')
+    expect(markup).toContain('data-brand-mark="coaxi"')
     expect(markup).toContain('还没有可用的队员')
     expect(markup).not.toContain('Arctic Dawn')
     expect(markup).not.toContain('在晨光里')
@@ -3107,11 +3108,11 @@ describe('task event projections', () => {
     expect(markup).toContain('新对话')
     expect(markup).toContain('<kbd aria-hidden="true">Ctrl+K</kbd>')
     expect(markup).not.toContain('⌘K')
-    expect(markup).toContain('aria-label="Rovai AI"')
-    expect(markup).toContain('data-brand-mark="horizon"')
-    expect(markup).toContain('data-brand-layout="separated"')
-    expect(markup).toContain('data-brand-point="rendezvous"')
-    expect(markup).toContain('<strong>Rovai AI</strong>')
+    expect(markup).toContain('aria-label="Coaxi"')
+    expect(markup).toContain('data-brand-mark="coaxi"')
+    expect(markup).toContain('data-brand-layout="flat"')
+    expect(markup).toContain('data-brand-mark="coaxi"')
+    expect(markup).toContain('<strong>Coaxi</strong>')
     expect(markup).toContain('队员')
     expect(markup).toContain('记忆，2 条普通提案待确认')
     expect(markup).toContain('使命板，3 个使命有未读回复')
@@ -3297,7 +3298,7 @@ describe('task event projections', () => {
     }))
     expect(ordinary).toContain('role="group" aria-label="设置与应用更新"')
     expect(ordinary).toContain('aria-label="设置，打开上次保留的设置页面"')
-    expect(ordinary).toContain('aria-label="打开关于与更新，Rovai AI v0.0.3 更新可用"')
+    expect(ordinary).toContain('aria-label="打开关于与更新，Coaxi v0.0.3 更新可用"')
     expect(ordinary).toContain('>有更新</span>')
 
     const settings = renderToStaticMarkup(createElement(ThreadNavigation, {
@@ -3305,7 +3306,7 @@ describe('task event projections', () => {
       view: 'settings',
       settingsSection: 'general'
     }))
-    expect(settings).toContain('aria-label="关于与更新，Rovai AI v0.0.3 更新可用"')
+    expect(settings).toContain('aria-label="关于与更新，Coaxi v0.0.3 更新可用"')
     expect(settings).toContain('settings-app-update-badge')
   })
 
@@ -3476,7 +3477,7 @@ describe('task event projections', () => {
     }))
 
     expect(markup).toContain('aria-label="设置分类"')
-    expect(markup).toContain('aria-label="Rovai AI"')
+    expect(markup).toContain('aria-label="Coaxi"')
     expect(markup).toContain('返回 App')
     expect(markup).toContain('应用级偏好与本机能力')
     expect(markup.match(/class="settings-sidebar-group"/g)).toHaveLength(3)
@@ -3609,7 +3610,7 @@ describe('task event projections', () => {
       onAppearanceChange: async (preferences: import('@contracts').AppearancePreferences) => ({ ...preferences, resolvedTheme: 'day' as const })
     }))
 
-    expect(markup).toContain('调整 Rovai AI 的界面主题、文字大小与阅读体验。')
+    expect(markup).toContain('调整 Coaxi 的界面主题、文字大小与阅读体验。')
     expect(markup).not.toContain('当前 · Steel Night')
     expect(markup).not.toContain('当前呈现')
     expect(markup).not.toContain('已生效')
@@ -5628,7 +5629,7 @@ describe('task event projections', () => {
     })
     expect(agentRunTerminalNote({
       terminalReasonCode: 'planned_shutdown_cancelled'
-    })).toBe('因 Rovai 计划关闭，执行引擎已确认取消本次执行。')
+    })).toBe('因 Coaxi 计划关闭，执行引擎已确认取消本次执行。')
     expect(agentRunPresentation({
       status: 'failed',
       waitReason: null,
@@ -6366,7 +6367,7 @@ describe('task event projections', () => {
         progress,
         threadId: 'camp-1'
       }))
-      expect(englishMarkup).toContain('The Agent accepted the task, but Rovai AI cannot confirm its final result after restart.')
+      expect(englishMarkup).toContain('The Agent accepted the task, but Coaxi cannot confirm its final result after restart.')
       expect(englishMarkup).toContain('Execution exception, cleaning up')
       expect(englishMarkup).toContain('The original request will not be sent again automatically.')
       expect(englishMarkup).toContain('仅在详情激活后渲染')
@@ -8333,8 +8334,8 @@ describe('task event projections', () => {
 
   it('renders Windows not-qualified rows without machine checks or rescan actions', () => {
     const health: HealthStatus = {
-      core: { ok: true, version: '0.0.1', dataDir: 'C:\\Users\\test\\AppData\\Local\\Rovai AI' },
-      database: { ok: true, path: 'C:\\Users\\test\\AppData\\Local\\Rovai AI\\Core\\rovai.db' },
+      core: { ok: true, version: '0.0.1', dataDir: 'C:\\Users\\test\\AppData\\Local\\Coaxi' },
+      database: { ok: true, path: 'C:\\Users\\test\\AppData\\Local\\Coaxi\\Core\\rovai.db' },
       git: { installed: true, version: 'git version 2.0' },
       hostPlatform: 'windows-x64',
       runtimeCatalog: [],

@@ -36,7 +36,7 @@ function service(
 ): AppUpdatesService {
   return new AppUpdatesService({
     currentVersion: () => '0.0.2',
-    bundledReleaseNotes: options.bundledReleaseNotes ?? '# Rovai AI v0.0.2\n\n- Installed release',
+    bundledReleaseNotes: options.bundledReleaseNotes ?? '# Coaxi v0.0.2\n\n- Installed release',
     bundledReleaseMetadata: options.bundledReleaseMetadata,
     isPackaged: () => options.isPackaged ?? true,
     updater: updater as unknown as DesktopAutoUpdater | null,
@@ -95,9 +95,9 @@ describe('AppUpdatesService', () => {
       currentVersion: '0.0.2',
       currentRelease: {
         version: '0.0.2',
-        releaseName: 'Rovai AI v0.0.2',
+        releaseName: 'Coaxi v0.0.2',
         releaseDate: null,
-        releaseNotes: '# Rovai AI v0.0.2\n\n- Installed release'
+        releaseNotes: '# Coaxi v0.0.2\n\n- Installed release'
       },
       status: 'idle',
       availableRelease: null,
@@ -135,7 +135,7 @@ describe('AppUpdatesService', () => {
   })
 
   it('does not attach a stale or malformed bundled date to another version', () => {
-    const notes = '# Rovai AI v0.0.2\n\n- Installed release'
+    const notes = '# Coaxi v0.0.2\n\n- Installed release'
     expect(currentReleaseFromBundledSources('0.0.2', notes, {
       version: '0.0.1', releaseDate: '2026-08-24T08:00:00.000Z'
     }).releaseDate).toBeNull()
@@ -403,14 +403,14 @@ describe('AppUpdatesService', () => {
     await expect(updates.check()).resolves.toMatchObject({
       status: 'up_to_date',
       availableRelease: null,
-      currentRelease: { version: '0.0.2', releaseNotes: '# Rovai AI v0.0.2\n\n- Installed release' },
+      currentRelease: { version: '0.0.2', releaseNotes: '# Coaxi v0.0.2\n\n- Installed release' },
       pendingPrompt: null,
       lastSuccessfulCheckAt: NOW.toISOString()
     })
   })
 
   it('does not present bundled notes from a different installed version', () => {
-    const updates = service(null, { bundledReleaseNotes: '# Rovai AI v0.0.1\n\n- Older release' })
+    const updates = service(null, { bundledReleaseNotes: '# Coaxi v0.0.1\n\n- Older release' })
     expect(updates.get()).toMatchObject({
       currentVersion: '0.0.2',
       currentRelease: { version: '0.0.2', releaseNotes: null },

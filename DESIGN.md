@@ -61,19 +61,11 @@ use decoration to soften or obscure commands, diffs, approvals, errors or uncert
 
 ## Brand Mark
 
-The canonical Rovai mark is a four-point star held above a curved horizon. The star means direction;
-the horizon means a shared world and a common plane for collaboration. Their deliberate gap keeps
-both ideas legible at Dock and rail sizes. Both shapes remain present in production brand lockups—the
-four-point star alone is not the Rovai brand mark.
-
-The theme-independent App icon uses a deep charcoal carrier that descends from `#2b2b2c` through
-`#1a1a1b` to `#0c0c0d`, a Steel horizon (`#7897ae`) and a Porcelain star (`#e7ecef`), with no outline
-around the carrier. Its star-to-horizon gap remains pure negative space: the App icon does not
-include a rendezvous point. Compact in-app marks omit the carrier, render the separated
-star-and-horizon geometry in `--rail-logo`, and place an Ember rendezvous point (`--ember`) at the
-center of the horizon. Day and Night keep one silhouette while using their own contrast-safe Steel
-and Ember values. The rendezvous point is brand geometry and never indicates status, identity,
-approval or evidence.
+The customer-approved Coaxi mark is the flat white double wing with a gold accent on a
+dark rounded carrier. `build/icon.png` is the canonical unmodified artwork. Every product
+lockup uses the shared `BrandMark` component; do not redraw the symbol, add depth, or use
+the retired star-and-horizon mark. Preserve the existing UI dimensions and fit the artwork
+inside them without distortion. Asset provenance is recorded in `build/ASSET-NOTICE.md`.
 
 ## Colors
 

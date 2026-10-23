@@ -64,7 +64,7 @@ struct RovaiWorkspaceRoot: View {
     private var splitShell: some View {
         NavigationSplitView(columnVisibility: $columns) {
             List(selection: Binding<Int?>(get: {tab}, set: {value in if let value {tab = value}})) { Label("对话", systemImage: "message").tag(0); Label("使命", systemImage: "flag").tag(1); Label("队员", systemImage: "person.2").tag(2); Label("画布", systemImage: "map").tag(3); Label("设置", systemImage: "gearshape").tag(4) }
-                .navigationTitle(profile?.name ?? "Rovai Workbench")
+                .navigationTitle(profile?.name ?? "Coaxi")
                 .navigationSplitViewColumnWidth(min: 220, ideal: 260, max: 320)
                 .toolbarTitleMenu { Picker("服务器", selection: $selectedServerID) { ForEach(store.servers) { server in Text(server.name).tag(Optional(server.id)) } }; Divider(); Button("管理服务器", action: onManageServers) }
         } content: {
@@ -75,7 +75,7 @@ struct RovaiWorkspaceRoot: View {
                 if let issue = model.issue { Text(issue).font(.caption).foregroundStyle(Theme.warning).padding(12) }
                     if model.pending != nil { HStack { Text("原操作待核对").font(.caption); Spacer(); Button("核对") { Task { await model.reconcile() } }; Button("重试原操作") { Task { await model.retry() } } }.padding(12).disabled(model.busy) }
                     if model.connected { switch tab { case 0: threadList; case 1: missionList; case 2: memberList; case 3: canvasList; default: settings } }
-                    else { ContentUnavailableView { Label("连接工作区", systemImage: "network") } description: { Text(profile?.name ?? "Rovai Workbench") } actions: { Button("连接") { Task { await model.authenticate() } }.disabled(model.busy); Button("管理服务器", action: onManageServers) } }
+                    else { ContentUnavailableView { Label("连接工作区", systemImage: "network") } description: { Text(profile?.name ?? "Coaxi") } actions: { Button("连接") { Task { await model.authenticate() } }.disabled(model.busy); Button("管理服务器", action: onManageServers) } }
                 }.navigationTitle(["对话", "使命", "队员", "画布", "设置"][tab])
                     .toolbar { ToolbarItemGroup(placement: .topBarTrailing) { Button { notifications = true } label: { Image(systemName: "bell") }.disabled(!model.connected); if tab == 2 { Button { memberEditor = MemberEditorSelection(value: nil) } label: { Image(systemName: "person.badge.plus") }.disabled(!model.connected || model.pending != nil) }; if tab == 0 || tab == 1 { Button { create = tab == 1 ? "mission" : "thread" } label: { Image(systemName: "plus") }.disabled(!model.connected || model.pending != nil) }; Button { Task { await model.refresh() } } label: { Image(systemName: "arrow.clockwise") }.disabled(!model.connected) } }
             }.navigationSplitViewColumnWidth(min: 340, ideal: 400, max: 520)
@@ -95,7 +95,7 @@ struct RovaiWorkspaceRoot: View {
             VStack(spacing: 0) {
                 if let issue = model.issue { Text(issue).font(.caption).foregroundStyle(Theme.warning).frame(maxWidth: .infinity, alignment: .leading).padding(12) }
                 if model.pending != nil { HStack { Text("原操作待核对").font(.caption); Spacer(); Button("核对") { Task { await model.reconcile() } }; Button("重试原操作") { Task { await model.retry() } } }.padding(12).disabled(model.busy) }
-                if model.connected { content() } else { ContentUnavailableView { Label("连接工作区", systemImage: "network") } description: { Text(profile?.name ?? "Rovai Workbench") } actions: { Button("连接") { Task { await model.authenticate() } }.buttonStyle(.borderedProminent).disabled(model.busy); Button("管理服务器", action: onManageServers) } }
+                if model.connected { content() } else { ContentUnavailableView { Label("连接工作区", systemImage: "network") } description: { Text(profile?.name ?? "Coaxi") } actions: { Button("连接") { Task { await model.authenticate() } }.buttonStyle(.borderedProminent).disabled(model.busy); Button("管理服务器", action: onManageServers) } }
             }
             .navigationTitle(title)
             .toolbar { ToolbarItem(placement: .topBarLeading) { Menu { ForEach(store.servers) { profile in Button(profile.name) { selectedServerID = profile.id } }; Divider(); Button("管理服务器", action: onManageServers) } label: { Label(profile?.name ?? "工作区", systemImage: "server.rack") } }; ToolbarItemGroup(placement: .topBarTrailing) { Button { notifications = true } label: { Image(systemName: "bell") }.disabled(!model.connected); if value == 2 { Button { memberEditor = MemberEditorSelection(value: nil) } label: { Image(systemName: "person.badge.plus") }.disabled(!model.connected || model.pending != nil) }; if value == 0 || value == 1 { Button { create = value == 1 ? "mission" : "thread" } label: { Image(systemName: "plus") }.disabled(!model.connected || model.pending != nil) }; Button { Task { await model.refresh() } } label: { Image(systemName: "arrow.clockwise") }.disabled(!model.connected) } }

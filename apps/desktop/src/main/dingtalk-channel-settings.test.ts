@@ -369,7 +369,7 @@ describe('DingTalk channel account connection', () => {
     await expect(fixture.service.publish('agent-a')).resolves.toBeUndefined()
 
     expect(fixture.provision).toHaveBeenCalledWith(expect.objectContaining({
-      description: 'Rovai AI Teammate · 鉴定士',
+      description: 'Coaxi Teammate · 鉴定士',
       frozen: {
         unifiedAppId: 'u-app-a', appKey: 'ding-app-a',
         robotCode: 'robot-a', versionId: 'version-a'

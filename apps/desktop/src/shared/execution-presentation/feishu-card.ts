@@ -345,7 +345,7 @@ function renderCompactLiveExecutionCard(snapshot: ExecutionConsoleSnapshot): Rec
   }
   if (!fits(card)) {
     // An indivisible command can itself exceed a whole card. Do not silently rewrite it.
-    card = render('当前指令超出飞书卡片大小限制，请在 Rovai 查看。')
+    card = render('当前指令超出飞书卡片大小限制，请在 Coaxi 查看。')
   }
   return card
 }
@@ -497,11 +497,11 @@ function paginateTerminalTimeline(snapshot: ExecutionConsoleSnapshot): TerminalT
     if (block.kind === 'command') {
       const withoutResult = {
         ...block,
-        element: { ...block.element, elements: [resultFrame('（结果过长，请在 Rovai 查看）')] }
+        element: { ...block.element, elements: [resultFrame('（结果过长，请在 Coaxi 查看）')] }
       }
       if (fits([withoutResult], true)) return withoutResult
     }
-    return textBlock('这条执行记录超出飞书单卡大小限制，请在 Rovai 查看完整记录。')
+    return textBlock('这条执行记录超出飞书单卡大小限制，请在 Coaxi 查看完整记录。')
   })
   if (fits(blocks, false)) return { pages: [blocks], commandCount }
   const pages: TimelineBlock[][] = []

@@ -3,16 +3,16 @@ import { memberBotAppDescription, memberBotWelcomeCopy } from './channel-member-
 
 describe('member Bot application copy', () => {
   it('uses the same Feishu description for publishing and the local preview', () => {
-    expect(memberBotAppDescription('feishu', '代码审阅')).toBe('Rovai AI Teammate · 代码审阅')
+    expect(memberBotAppDescription('feishu', '代码审阅')).toBe('Coaxi Teammate · 代码审阅')
   })
 
   it.each(['', null, undefined])('preserves the fallback role for %s', (role) => {
-    expect(memberBotAppDescription('feishu', role)).toBe('Rovai AI Teammate · 协作者')
+    expect(memberBotAppDescription('feishu', role)).toBe('Coaxi Teammate · 协作者')
   })
 
   it('uses the same teammate prefix for DingTalk', () => {
-    expect(memberBotAppDescription('dingtalk', '鉴定士')).toBe('Rovai AI Teammate · 鉴定士')
-    expect(memberBotAppDescription('dingtalk', '')).toBe('Rovai AI Teammate · 协作者')
+    expect(memberBotAppDescription('dingtalk', '鉴定士')).toBe('Coaxi Teammate · 鉴定士')
+    expect(memberBotAppDescription('dingtalk', '')).toBe('Coaxi Teammate · 协作者')
   })
 
   it('welcomes the Owner as the newly published teammate', () => {

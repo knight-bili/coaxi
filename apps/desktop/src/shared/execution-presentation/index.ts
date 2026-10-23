@@ -324,11 +324,11 @@ export function agentRunStateTag(
 
 export function agentRunWaitDetail(waitReason: string | null): string | null {
   return ({
-    delivery_unknown: '智能体是否接收输入尚不可确认；为避免重复执行，Rovai AI 不会盲目重发。',
+    delivery_unknown: '智能体是否接收输入尚不可确认；为避免重复执行，Coaxi 不会盲目重发。',
     runtime_recovery: '正在从已保存的执行、运行会话与输入回执恢复。',
-    network_recovery: '连接中断，等待恢复。确认输入未被接收后，Rovai AI 会自动重试。',
+    network_recovery: '连接中断，等待恢复。确认输入未被接收后，Coaxi 会自动重试。',
     network_recovery_blocked: '自动恢复的安全条件已经变化，需要处理。请检查执行记录；确认后可停止本次运行并发送后续任务。',
-    recovery_blocked: '智能体已接受任务，但 Rovai AI 重启后无法确认原任务的最终结果。原请求不会自动重发。',
+    recovery_blocked: '智能体已接受任务，但 Coaxi 重启后无法确认原任务的最终结果。原请求不会自动重发。',
     approval: '受限动作正在等待用户处理。',
     user_input: 'Agent 已暂停，等待用户补充信息。'
   } as Record<string, string>)[waitReason ?? ''] ?? null
@@ -1545,7 +1545,7 @@ function rovaiCommandCursor(tokens: ShellPreviewToken[]): number | null {
 }
 
 /** Omit Rovai stdin before the one-line tokenizer can expose its JSON as commands.
- * Preserve every independent command and non-Rovai heredoc, including mixed Shells. */
+ * Preserve every independent command and non-Coaxi heredoc, including mixed Shells. */
 function omitBuiltinStdin(command: string): { command: string; complete: boolean; hasExpansion: boolean } {
   const lines = command.split(/\r?\n/u)
   const output: string[] = []

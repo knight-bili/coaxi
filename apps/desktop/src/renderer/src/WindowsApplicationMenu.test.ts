@@ -17,7 +17,7 @@ describe('Windows application menu', () => {
     expect(markup).toContain('>Window<')
     expect(markup).toContain('accessKey="f"')
     expect(markup).toContain('accessKey="w"')
-    expect(markup).not.toContain('Rovai AI')
+    expect(markup).not.toContain('Coaxi')
     expect(markup).not.toContain('<img')
     expect(markup).not.toContain('<svg')
   })

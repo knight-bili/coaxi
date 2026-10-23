@@ -142,7 +142,7 @@ export function AboutUpdatesSettingsView({
             <div className="about-identity">
               <svg className="about-mark" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 L13.16 7.3 L17.76 8.84 L13.16 10.38 L12 15.68 L10.84 10.38 L6.24 8.84 L10.84 7.3 Z" fill="currentColor"/><path d="M3 20.96 Q12 15.96 21 20.96" fill="none" stroke="currentColor" strokeWidth="2.08" strokeLinecap="round"/><circle className="brand-rendezvous-point" data-brand-point="rendezvous" cx="12" cy="18.46" r="1.05" fill="currentColor"/></svg>
               <div>
-                <strong>Rovai AI{product === 'server' ? ' Server' : ''}</strong>
+                <strong>Coaxi{product === 'server' ? ' Server' : ''}</strong>
                 <p><UiText zh={"当前版本 "} /><span data-installed-version>{snapshot ? displayVersion(snapshot.currentVersion) : loading ? uiAttribute("读取中…") : uiAttribute("暂不可用")}</span></p>
               </div>
             </div>
@@ -241,7 +241,7 @@ export function AboutUpdatesSettingsView({
             <dl className="about-facts" aria-label={uiAttribute("更新检查记录")}>
               <div><dt><UiText zh={"本次检查"} /></dt><dd>{formatCheckAttempt(snapshot)}</dd></div>
               <div><dt><UiText zh={"上次成功"} /></dt><dd>{formatTimestamp(snapshot.lastSuccessfulCheckAt)}</dd></div>
-              <div><dt><UiText zh={"更新来源"} /></dt><dd><UiText zh={"Rovai AI 正式 GitHub Releases"} /></dd></div>
+              <div><dt><UiText zh={"更新来源"} /></dt><dd><UiText zh={"Coaxi 正式 GitHub Releases"} /></dd></div>
             </dl>
           </details>
         )}
@@ -419,7 +419,7 @@ function checkFailure(snapshot: AppUpdateSnapshot): {
   if (snapshot.failureReason === 'invalid_release') {
     return {
       tone: 'error', pageLabel:uiAttribute("信息无效"), title:uiAttribute("发布信息暂不可用"),
-      detail: uiAttribute("请稍后重新检查；Rovai AI 不会引导安装未经验证的包。{0}", String(retained)).trim()
+      detail: uiAttribute("请稍后重新检查；Coaxi 不会引导安装未经验证的包。{0}", String(retained)).trim()
     }
   }
   return {

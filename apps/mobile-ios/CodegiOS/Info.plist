@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Codeg</string>
+	<string>Coaxi</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -43,11 +43,11 @@
 		<true/>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>Codeg uses the camera to take photos for your messages and to scan a server's QR code.</string>
+	<string>Coaxi uses the camera to take photos for your messages and to scan a server's QR code.</string>
 	<key>NSLocalNetworkUsageDescription</key>
-	<string>Codeg connects to your codeg server, which may run on your local network.</string>
+	<string>Coaxi connects to your codeg server, which may run on your local network.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Codeg attaches photos you pick to your message to the agent.</string>
+	<string>Coaxi attaches photos you pick to your message to the agent.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

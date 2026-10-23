@@ -43,7 +43,7 @@ function Chevron({ open = false }: { open?: boolean }): React.JSX.Element {
 
 function Mark(): React.JSX.Element {
   return <svg data-brand-mark="horizon" className="brand-mark" viewBox="0 0 24 24"
-    aria-label="Rovai AI" role="img">
+    aria-label="Coaxi" role="img">
     <path d="M12 2 L13.16 7.3 L17.76 8.84 L13.16 10.38 L12 15.68 L10.84 10.38 L6.24 8.84 L10.84 7.3 Z" fill="currentColor" />
     <path d="M3 20.96 Q12 15.96 21 20.96" fill="none" stroke="currentColor" strokeWidth="2.08" strokeLinecap="round" />
     <circle cx="12" cy="18.46" r="1.05" fill="var(--ember)" stroke="var(--surface)" strokeWidth=".65" />
@@ -413,7 +413,7 @@ function App(): React.JSX.Element {
           <h2>{error === 'expired' ? '此执行台链接已失效'
             : error === 'unavailable' ? '暂时无法读取执行记录' : '正在读取执行记录'}</h2>
           {error && <p>{error === 'expired' ? '请回到渠道会话，重新打开执行台。'
-            : '确认与 Rovai 位于同一局域网后重试。'}</p>}
+            : '确认与 Coaxi 位于同一局域网后重试。'}</p>}
           {error === 'unavailable' && <button className="web-retry" type="button"
             onClick={() => { setError(null); setAttempt((value) => value + 1) }}>重新读取</button>}
         </div></main>}

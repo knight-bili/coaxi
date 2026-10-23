@@ -62,7 +62,7 @@ function BoardCard({ board, summary, name, now, blocked, onOpen, onEdit, onDelet
         {items}
       </DropdownMenu.Content></DropdownMenu.Portal>
     </DropdownMenu.Root>
-    {/* Reuse Rovai ImageContextMenu's viewport anchor and Escape focus return. */}
+    {/* Reuse Coaxi ImageContextMenu's viewport anchor and Escape focus return. */}
     <DropdownMenu.Root open={Boolean(context)} onOpenChange={open => { if (!open) setMenu(current => typeof current === 'object' ? null : current) }}>
       {context && createPortal(<DropdownMenu.Trigger asChild><span className="attachment-context-anchor" style={{ left: context.x, top: context.y }} /></DropdownMenu.Trigger>, document.body)}
       <DropdownMenu.Portal><DropdownMenu.Content className="canvas-card-menu canvas-board-context-menu" aria-label={uiAttribute('画板操作：{0}', name)}

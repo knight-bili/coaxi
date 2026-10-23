@@ -58,10 +58,10 @@ export function AppUpdatePrompt({
     <aside
       className={`app-update-prompt ${campComposerVisible ? 'is-above-composer' : ''}`}
       aria-live="polite"
-      aria-label={uiAttribute("Rovai AI 应用更新提醒")}
+      aria-label={uiAttribute("Coaxi 应用更新提醒")}
     >
       <div className="app-update-prompt-copy">
-        <strong>Rovai AI v{release.version}<UiText zh={" 可用"} /></strong>
+        <strong>Coaxi v{release.version}<UiText zh={" 可用"} /></strong>
         <span><UiText zh={"当前版本 v"} />{snapshot.currentVersion}</span>
         {actionFailed && <small role="alert"><UiText zh={"操作未完成，更新提醒仍然保留。"} /></small>}
       </div>

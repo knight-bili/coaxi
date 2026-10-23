@@ -242,8 +242,8 @@ printf '%s\\n' '${JSON.stringify({ kind: 'core_startup', schemaVersion: 1, ...re
       join('/tmp/rovai-accept/user-data', 'managed-skill-library')
     )
     expect(desktopSkillLibraryRoot('/daily/user-data', false, 'darwin')).toBeNull()
-    expect(desktopSkillLibraryRoot('C:\\Rovai AI\\Core', false, 'win32')).toBe(
-      'C:\\Rovai AI\\Core\\managed-skill-library'
+    expect(desktopSkillLibraryRoot('C:\\Coaxi\\Core', false, 'win32')).toBe(
+      'C:\\Coaxi\\Core\\managed-skill-library'
     )
     expect(coreLaunchArguments(
       '/tmp/rovai-accept/user-data',
@@ -268,10 +268,10 @@ printf '%s\\n' '${JSON.stringify({ kind: 'core_startup', schemaVersion: 1, ...re
       '--use-default-skill-library'
     ])
     expect(runtimeThreadFilesRoot(
-      'C:\\Rovai AI\\Core',
+      'C:\\Coaxi\\Core',
       'C:\\Users\\test',
       'win32'
-    )).toBe('C:\\Rovai AI\\Core\\runtime-files')
+    )).toBe('C:\\Coaxi\\Core\\runtime-files')
     const macRoot = runtimeThreadFilesRoot(
       '/tmp/rovai-accept/user-data',
       '/tmp/rovai-home',

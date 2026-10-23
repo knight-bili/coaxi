@@ -495,10 +495,10 @@ export class FeishuWebSessionMemberBotProvisioner implements FeishuMemberBotProv
               appId: input.remoteAppId,
               ownerUserId: identity.userId,
               appVersion: repairVersion,
-              remark: needsReadinessRepair ? '修复飞书 Bot 接收配置' : '同步 Rovai 队员头像',
+              remark: needsReadinessRepair ? '修复飞书 Bot 接收配置' : '同步 Coaxi 队员头像',
               changeLog: needsReadinessRepair
                 ? '补全消息权限、事件订阅与长连接在线配置。'
-                : '使用当前 Rovai 队员头像修正飞书 Bot 身份。',
+                : '使用当前 Coaxi 队员头像修正飞书 Bot 身份。',
               reuseExisting: true,
               signal: input.signal
             })
@@ -750,7 +750,7 @@ function incrementPatchVersion(version: string): string {
 
 function consoleAppName(value: string): string {
   const normalized = value.trim()
-  if (!normalized) return 'Rovai Bot'
+  if (!normalized) return 'Coaxi Bot'
   return [...normalized].length >= 2 ? normalized : `${normalized} Bot`
 }
 

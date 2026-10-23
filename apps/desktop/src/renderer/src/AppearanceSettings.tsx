@@ -1,3 +1,4 @@
+import { BrandMark } from './BrandMark'
 import { PetSettings } from './PetSettings'
 import { AppearanceExtensionsSettings } from './AppearanceExtensionsSettings'
 import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent } from 'react'
@@ -30,9 +31,7 @@ function Icon({ name }: { name: 'check' | 'reset' | 'minus' | 'plus' | 'arrow' |
   return <svg className="icon" viewBox="0 0 24 24" aria-hidden="true"><path d={paths[name]} /></svg>
 }
 
-function BrandMark(): React.JSX.Element {
-  return <svg className="sample-mark" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 13.16 7.3 17.76 8.84 13.16 10.38 12 15.68 10.84 10.38 6.24 8.84 10.84 7.3Z" fill="currentColor"/><path d="M3 20.96Q12 15.96 21 20.96" fill="none" stroke="currentColor" strokeWidth="2.08" strokeLinecap="round"/></svg>
-}
+
 
 function SizeSetting({ kind, value, disabled, onChange }: {
   kind: Preview; value: number; disabled: boolean; onChange(value: number): void
@@ -149,7 +148,7 @@ export function AppearanceSettings({ appearance, disabled, platform = 'darwin', 
   return <div className="appearance-settings-page" style={style}>
     <AppearanceExtensionsSettings/>
     <PetSettings/>
-    <SettingsPageHeader eyebrow="Settings / Appearance" title={uiAttribute("外观")} description={uiAttribute("调整 Rovai AI 的界面主题、文字大小与阅读体验。")} aside={<div className="heading-actions">
+    <SettingsPageHeader eyebrow="Settings / Appearance" title={uiAttribute("外观")} description={uiAttribute("调整 Coaxi 的界面主题、文字大小与阅读体验。")} aside={<div className="heading-actions">
       <span className="save-state" role="status" aria-live="polite">{!saving && !saveError && !sourceDegraded && <Icon name="check" />}{saving ? uiAttribute("保存中…") : saveError || sourceDegraded ? uiAttribute("未保存") : uiAttribute("已保存")}</span>
       <button className="quiet-button" type="button" disabled={disabled || (!saveError && !sourceDegraded && appearancePreferencesEqual(draft, DEFAULT_APPEARANCE))} onClick={() => void change(DEFAULT_APPEARANCE)}><Icon name="reset"/><UiText zh={"恢复默认"} /></button>
     </div>} />
@@ -179,7 +178,7 @@ export function AppearanceSettings({ appearance, disabled, platform = 'darwin', 
         </div>
         <div className="preview-panel" role="tabpanel" id="appearance-preview-document" aria-labelledby="appearance-tab-document" tabIndex={0} hidden={preview !== 'document'}><article className="document-sample"><h3><UiText zh={"开始协作"} /></h3><p><UiText zh={"在 Thread 中与队员一起完成任务。阅读过程，查看结果，随时补充新的想法。"} /></p><h4><UiText zh={"查看项目结构"} /></h4><p><UiText zh={"先阅读 "} /><code className="inline-code">README.md</code><UiText zh={"，再确认目录与入口。"} /></p><pre><code>{'pnpm install\npnpm dev'}</code></pre><table className="sample-table"><caption className="sr-only"><UiText zh={"示例目录说明"} /></caption><tbody><tr><td>apps/desktop</td><td><UiText zh={"桌面应用"} /></td></tr><tr><td>packages</td><td><UiText zh={"共享模块"} /></td></tr></tbody></table></article></div>
         <div className="preview-panel" role="tabpanel" id="appearance-preview-code" aria-labelledby="appearance-tab-code" tabIndex={0} hidden={preview !== 'code'}><div className="file-label"><Icon name="code"/>workspace.ts</div><div className="code-lines" aria-label={uiAttribute("TypeScript 代码示例")}>{[
-          <span className="token-comment"><UiText zh={"// 为新任务准备工作区"} /></span>, <><span className="token-keyword">const</span>{' workspace = {'}</>, <>  name: <span className="token-string">'Rovai AI'</span>,</>, <>  members: [<span className="token-string"><UiText zh={"'设计'"} /></span>, <span className="token-string"><UiText zh={"'开发'"} /></span>],</>, <>  ready: <span className="token-keyword">true</span></>, '}', ' ', <><span className="token-keyword">await</span> openThread(workspace)</>
+          <span className="token-comment"><UiText zh={"// 为新任务准备工作区"} /></span>, <><span className="token-keyword">const</span>{' workspace = {'}</>, <>  name: <span className="token-string">'Coaxi'</span>,</>, <>  members: [<span className="token-string"><UiText zh={"'设计'"} /></span>, <span className="token-string"><UiText zh={"'开发'"} /></span>],</>, <>  ready: <span className="token-keyword">true</span></>, '}', ' ', <><span className="token-keyword">await</span> openThread(workspace)</>
         ].map((line, index) => <div className="code-line" key={index}><span className="line-number" aria-hidden="true">{index + 1}</span><code>{line}</code></div>)}</div></div>
         <div className="preview-caption"><span>{uiAttribute(previewScopes[preview])}</span><output>{draft[sizeKeys[preview]]} px · {draft.readingDensity === 'standard' ? uiAttribute("标准") : uiAttribute("宽松")}</output></div>
       </div></div>

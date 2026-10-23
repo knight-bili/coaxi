@@ -165,7 +165,7 @@ export function AutomationEditor({ draft, onChange, agents, projects, automation
   const selectableMembers = agents.filter((agent) => agent.presence === 'present')
   const project = draft.projectRef.kind === 'directory' ? projects.find((item) => item.projectPath === projectValue(draft.projectRef)) : null
   const projectName = draft.projectRef.kind === 'quick_chat' ? uiAttribute('快速对话') : project?.name ?? draft.projectRef.path.split(/[\\/]/).filter(Boolean).at(-1) ?? draft.projectRef.path
-  const projectDetail = draft.projectRef.kind === 'quick_chat' ? uiAttribute('Rovai AI 管理的快速对话目录') : draft.projectRef.path
+  const projectDetail = draft.projectRef.kind === 'quick_chat' ? uiAttribute('Coaxi 管理的快速对话目录') : draft.projectRef.path
   const schedule = draft.schedule
   const scheduleError = automationScheduleError(schedule)
   const cronId = useId()
@@ -182,7 +182,7 @@ export function AutomationEditor({ draft, onChange, agents, projects, automation
       {member?.presence !== 'present' && <p className="automation-field-note" role="status">{selectableMembers.length ? uiAttribute("原队员不可用，请重新选择。") : uiAttribute("请先在队员页添加一位队员。")}</p>}
       <div className="automation-context-field"><span><UiText zh={"运行项目"} /></span>
         <Picker label={uiAttribute("运行项目：{0}", String(projectName))} value={projectValue(draft.projectRef)} disabled={busy} onChange={(value) => onChange((current) => ({ ...current, projectRef: projectFromValue(value) }))} options={[
-          { value: 'quick-chat', label: <><AutomationGlyph name="chat" /><span className="automation-picker-copy"><strong><UiText zh={"使用快速对话"} /></strong><small><UiText zh={"Rovai AI 管理的快速对话目录"} /></small></span></> },
+          { value: 'quick-chat', label: <><AutomationGlyph name="chat" /><span className="automation-picker-copy"><strong><UiText zh={"使用快速对话"} /></strong><small><UiText zh={"Coaxi 管理的快速对话目录"} /></small></span></> },
           ...projects.map((item) => ({ value: item.projectPath, label: <><AutomationGlyph name="folder" /><span className="automation-picker-copy"><strong>{item.name}</strong><small>{item.projectPath}</small></span></> }))
         ]}>
           <span className="automation-project-icon"><AutomationGlyph name={draft.projectRef.kind === 'quick_chat' ? 'chat' : 'folder'} /></span><span className="automation-picker-copy" title={projectDetail}><strong>{projectName}</strong><small>{projectDetail}</small></span>

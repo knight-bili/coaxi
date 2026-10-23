@@ -348,7 +348,7 @@ export function ChannelSettingsView({
       <SettingsPageHeader
         eyebrow="Settings / Channels"
         title={uiAttribute("渠道")}
-        description={desktopManagedWeb ? uiAttribute("渠道由运行此服务的 Rovai Desktop 管理。连接、切换账号和重新登录，请在该电脑的桌面应用中完成；已有账号的 Bot 发布和重试可以在此操作。") : uiAttribute("连接飞书、Lark 或钉钉，让队员在你常用的平台协作。")}
+        description={desktopManagedWeb ? uiAttribute("渠道由运行此服务的 Coaxi Desktop 管理。连接、切换账号和重新登录，请在该电脑的桌面应用中完成；已有账号的 Bot 发布和重试可以在此操作。") : uiAttribute("连接飞书、Lark 或钉钉，让队员在你常用的平台协作。")}
         aside={<span className="settings-page-note">{desktopManagedWeb ? uiAttribute("宿主 Desktop 管理") : uiAttribute("本机管理")}</span>}
       />
 
@@ -422,7 +422,7 @@ export function ChannelSettingsView({
                   {uiAttribute(qualificationNote)}
                 </p>
               )}
-              <details className="settings-disclosure channel-policy"><summary><OwnerShieldIcon /><span><UiText zh={"连接与权限"} /></span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m6 8 4 4 4-4" /></svg></summary><div><p><UiText zh={"只有 Rovai Owner 可以从外部渠道触发队员；项目选择与执行管理仍由运行服务的 Desktop 掌控。"} /></p><p><UiText zh={"连接只决定后续 Bot 的发布目标，切换连接不会迁移或停用已发布 Bot。"} /></p><p><UiText zh={"账号会话和应用凭据保存在运行服务的 Desktop 所在设备。项目绝对路径不会发送到外部渠道。"} /></p><p>{localizedChannelCopy('{0}中的 Owner 消息不获得本机管理权限。', channelCopy`${providerName}中的 Owner 消息不获得本机管理权限。`, providerName)}</p></div></details>
+              <details className="settings-disclosure channel-policy"><summary><OwnerShieldIcon /><span><UiText zh={"连接与权限"} /></span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m6 8 4 4 4-4" /></svg></summary><div><p><UiText zh={"只有 Coaxi Owner 可以从外部渠道触发队员；项目选择与执行管理仍由运行服务的 Desktop 掌控。"} /></p><p><UiText zh={"连接只决定后续 Bot 的发布目标，切换连接不会迁移或停用已发布 Bot。"} /></p><p><UiText zh={"账号会话和应用凭据保存在运行服务的 Desktop 所在设备。项目绝对路径不会发送到外部渠道。"} /></p><p>{localizedChannelCopy('{0}中的 Owner 消息不获得本机管理权限。', channelCopy`${providerName}中的 Owner 消息不获得本机管理权限。`, providerName)}</p></div></details>
             </section>
 
             <section className="channel-settings-section" aria-labelledby="channel-member-bots-heading">
@@ -664,7 +664,7 @@ export function ChannelConnectionRow({
       <div className="channel-connection-label">
         <strong>{localizedChannelCopy('{0}开放平台', channelCopy`${providerName}开放平台`, providerName)}</strong>
         <span>{hostReady
-          ? uiAttribute("开发者账号会话 · 保存在 Rovai 本地数据库")
+          ? uiAttribute("开发者账号会话 · 保存在 Coaxi 本地数据库")
           : uiAttribute("渠道宿主尚未就绪")}</span>
       </div>
       {account ? (
@@ -1002,7 +1002,7 @@ function PublishBotDialog({
                     </option>
                   ))}
                 </select>
-                <small><UiText zh={"钉钉要求由 Owner 明确选择，Rovai 不会自动代选。"} /></small>
+                <small><UiText zh={"钉钉要求由 Owner 明确选择，Coaxi 不会自动代选。"} /></small>
               </label>
             )}
             {provisioning ? (
@@ -1033,7 +1033,7 @@ function PublishBotDialog({
               ? uiAttribute("已保留原应用绑定；关闭后可以稍后重试。")
               : localizedChannelCopy('{0}连接异常；关闭后可以稍后重试。', channelCopy`${providerName}连接异常；关闭后可以稍后重试。`, providerName)
             : retryLocked
-              ? uiAttribute("创建结果无法确认。Rovai 已锁定再次创建，避免产生重复应用。")
+              ? uiAttribute("创建结果无法确认。Coaxi 已锁定再次创建，避免产生重复应用。")
             : effectiveAppId
               ? uiAttribute("重新发布始终复用已绑定应用，不提供换绑入口。")
               : null}>
@@ -1216,7 +1216,7 @@ export function channelErrorMessage(error: unknown): string | null {
     dingtalk_login_identity_unavailable: '暂时未能读取完整的钉钉账号与企业身份，请稍后重试。',
     dingtalk_account_identity_changed: '钉钉账号或企业已经变化，请重新连接账号。',
     dingtalk_app_create_unknown_remote_state:
-      '无法确认钉钉应用是否已经创建；Rovai 已锁定再次创建，避免产生重复应用。',
+      '无法确认钉钉应用是否已经创建；Coaxi 已锁定再次创建，避免产生重复应用。',
     dingtalk_version_not_released: '钉钉应用版本尚未确认发布；原应用已保留，可以稍后继续。'
   }
   if (dingtalkFailures[message]) return uiAttribute(dingtalkFailures[message])

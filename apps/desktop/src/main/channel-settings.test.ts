@@ -2228,7 +2228,7 @@ describe('channel settings service', () => {
       publicationIntentId: 'intent-unknown',
       remoteAppId: 'cli-published-remotely',
       expectedDeveloperIdentity: { userId: owner.userId, tenantId: owner.tenantId },
-      appDescription: 'Rovai AI Teammate · 代码审阅',
+      appDescription: 'Coaxi Teammate · 代码审阅',
       avatarSource
     }))
     expect(intentCreates).toBe(0)
@@ -3255,7 +3255,7 @@ describe('channel settings service', () => {
       conversationKind,
       expectedVersion: 1,
       nonce: `nonce-${conversationKind}`,
-      projectOptions: hasProjects ? [{ projectId: 'project-safe', displayName: 'Rovai AI' }] : []
+      projectOptions: hasProjects ? [{ projectId: 'project-safe', displayName: 'Coaxi' }] : []
     })
     const service = new ChannelSettingsService({
       credentialStore: memoryCredentialStore({
@@ -3342,7 +3342,7 @@ describe('channel settings service', () => {
       width: 'fill',
       placeholder: { tag: 'plain_text', content: '选择项目' },
       options: [{
-        text: { tag: 'plain_text', content: 'Rovai AI' },
+        text: { tag: 'plain_text', content: 'Coaxi' },
         value: 'project-safe'
       }],
       behaviors: [{

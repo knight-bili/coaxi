@@ -296,7 +296,7 @@ export function NewConversationDialog({
       ?? workspace?.name ?? uiAttribute('使用快速对话')
     : uiAttribute('正在载入项目…')
   const projectDetail = projectAccessReady
-    ? workspace ? displayProjectPath(workspace.projectPath) : uiAttribute('Rovai AI 管理的快速对话目录')
+    ? workspace ? displayProjectPath(workspace.projectPath) : uiAttribute('Coaxi 管理的快速对话目录')
     : uiAttribute('正在确认本机项目访问状态')
   const gitPresentation = workspaceGitPresentation(workspace, gitInspectionStatus)
 
@@ -343,7 +343,7 @@ export function NewConversationDialog({
                   menu={<DropdownMenu.Content onCloseAutoFocus={(event) => event.preventDefault()} className="compact-menu workspace-menu" align="end" sideOffset={6} collisionPadding={12} aria-label={uiAttribute("选择工作目录")} loop>
                       <DropdownMenu.RadioGroup value={workspace?.projectPath ?? ''}>
                         <DropdownMenu.RadioItem className="compact-option" value="" disabled={projectActionsDisabled} onSelect={() => { setWorkspace(null); setProjectMenuOpen(false) }}>
-                          <WorkspaceIcon kind="quick-chat" /><span><UiText zh={"使用快速对话"} /><small><UiText zh={"由 Rovai AI 管理工作目录"} /></small></span><DropdownMenu.ItemIndicator><DialogControlIcon name="check" /></DropdownMenu.ItemIndicator>
+                          <WorkspaceIcon kind="quick-chat" /><span><UiText zh={"使用快速对话"} /><small><UiText zh={"由 Coaxi 管理工作目录"} /></small></span><DropdownMenu.ItemIndicator><DialogControlIcon name="check" /></DropdownMenu.ItemIndicator>
                         </DropdownMenu.RadioItem>
                         <DropdownMenu.Separator className="compact-separator" />
                         {projects.map((project) => <DropdownMenu.RadioItem key={project.projectKey} className="compact-option" value={project.projectPath} disabled={projectActionsDisabled} onSelect={() => selectKnownWorkspace(project)}>
@@ -354,7 +354,7 @@ export function NewConversationDialog({
                       <DropdownMenu.Item className="compact-option" disabled={projectActionsDisabled} onSelect={() => void chooseWorkspaceDirectory()}><DialogControlIcon name="plus" /><span><UiText zh={"选择工作目录…"} /></span></DropdownMenu.Item>
                     </DropdownMenu.Content>}>
                   <button type="button" className="compact-option" aria-pressed={!workspace} disabled={projectActionsDisabled} onClick={() => { setWorkspace(null); setProjectMenuOpen(false) }}>
-                    <WorkspaceIcon kind="quick-chat" /><span><UiText zh={"使用快速对话"} /><small><UiText zh={"由 Rovai AI 管理工作目录"} /></small></span>{!workspace && <DialogControlIcon name="check" />}
+                    <WorkspaceIcon kind="quick-chat" /><span><UiText zh={"使用快速对话"} /><small><UiText zh={"由 Coaxi 管理工作目录"} /></small></span>{!workspace && <DialogControlIcon name="check" />}
                   </button>
                   {projects.map(project => <button type="button" className="compact-option" key={project.projectKey} aria-pressed={workspace?.projectPath === project.projectPath} disabled={projectActionsDisabled} onClick={() => selectKnownWorkspace(project)}>
                     <WorkspaceIcon kind="project" /><span>{project.name}<small>{displayProjectPath(project.projectPath)}</small></span>{workspace?.projectPath === project.projectPath && <DialogControlIcon name="check" />}
@@ -513,7 +513,7 @@ function MissionProjectPicker({
   const searchRef = useRef<HTMLInputElement>(null)
   const normalized = query.trim().toLocaleLowerCase()
   const matchingProjects = projects.filter(project => `${project.name}\n${project.projectPath}`.toLocaleLowerCase().includes(normalized))
-  const quickChatMatches = !normalized || uiAttribute('使用快速对话 Rovai AI 管理的快速对话目录').toLocaleLowerCase().includes(normalized)
+  const quickChatMatches = !normalized || uiAttribute('使用快速对话 Coaxi 管理的快速对话目录').toLocaleLowerCase().includes(normalized)
   return <Popover.Root open={open} onOpenChange={next => { if (!disabled) onOpenChange(next); if (!next) setQuery('') }}>
     <Popover.Trigger asChild><MissionPropertyChip className="mission-editor-project-property" icon={<ProjectGlyph/>} disabled={disabled} aria-label={uiAttribute("项目：{0}", String(projectLabel))}>{projectLabel}</MissionPropertyChip></Popover.Trigger>
     <Popover.Portal container={portalContainer}><Popover.Content className="compact-menu mission-editor-project-popover" align="start" sideOffset={6} collisionPadding={12}
@@ -521,7 +521,7 @@ function MissionProjectPicker({
       <label className="mission-picker-search"><NavigationIcon name="search"/><input ref={searchRef} value={query} onChange={event => setQuery(event.target.value)} aria-label={uiAttribute("搜索项目")} placeholder={uiAttribute("搜索项目…")}
         onKeyDown={event => { if (event.key === 'ArrowDown' && !event.nativeEvent.isComposing) { event.preventDefault(); event.currentTarget.closest('.mission-editor-project-popover')?.querySelector<HTMLButtonElement>('.mission-editor-project-list button:not(:disabled)')?.focus() } }}/></label>
       <div className="mission-editor-project-list" role="group" aria-label={uiAttribute("可选项目")}>
-        {quickChatMatches && <button type="button" className="compact-option" aria-pressed={!workspace} disabled={disabled} onClick={onQuickChat}><WorkspaceIcon kind="quick-chat"/><span><UiText zh={"使用快速对话"} /><small><UiText zh={"由 Rovai AI 管理工作目录"} /></small></span>{!workspace && <DialogControlIcon name="check"/>}</button>}
+        {quickChatMatches && <button type="button" className="compact-option" aria-pressed={!workspace} disabled={disabled} onClick={onQuickChat}><WorkspaceIcon kind="quick-chat"/><span><UiText zh={"使用快速对话"} /><small><UiText zh={"由 Coaxi 管理工作目录"} /></small></span>{!workspace && <DialogControlIcon name="check"/>}</button>}
         {matchingProjects.map(project => <button type="button" className="compact-option" key={project.projectKey} aria-pressed={workspace?.projectPath === project.projectPath} disabled={disabled} title={displayProjectPath(project.projectPath)} onClick={() => onProject(project)}><WorkspaceIcon kind="project"/><span>{project.name}<small>{displayProjectPath(project.projectPath)}</small></span>{workspace?.projectPath === project.projectPath && <DialogControlIcon name="check"/>}</button>)}
         {!quickChatMatches && !matchingProjects.length && <p className="mission-picker-empty" role="status"><UiText zh={"没有匹配的项目"} /></p>}
       </div>

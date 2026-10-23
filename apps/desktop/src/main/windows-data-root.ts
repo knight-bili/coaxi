@@ -67,7 +67,7 @@ export function resolveWindowsDataRoot(
   const normalized = win32.normalize(native)
   if (normalized.toLowerCase() === win32.parse(normalized).root.toLowerCase()) {
     throw new Error(
-      'windows_storage.path_outside_tested_envelope: a volume root cannot be used as the Rovai data root'
+      'windows_storage.path_outside_tested_envelope: a volume root cannot be used as the Coaxi data root'
     )
   }
   return normalized

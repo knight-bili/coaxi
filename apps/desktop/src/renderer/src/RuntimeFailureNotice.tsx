@@ -8,9 +8,9 @@ export function runtimeFailureTitle(failure: RuntimeFailureView): string {
   }
   return ({
     runtime: uiAttribute("{0} 返回错误", String(runtimeLabel)),
-    compatibility: uiAttribute("{0} 与当前 Rovai 版本不兼容", String(runtimeLabel)),
+    compatibility: uiAttribute("{0} 与当前 Coaxi 版本不兼容", String(runtimeLabel)),
     environment: uiAttribute("{0} 的本机运行环境不可用", String(runtimeLabel)),
-    rovai: 'Rovai 内部错误',
+    rovai: 'Coaxi 内部错误',
     unknown: uiAttribute("{0} 未能完成运行", String(runtimeLabel))
   } as const)[failure.origin]
 }

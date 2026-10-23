@@ -22,7 +22,7 @@ type InProgress = Extract<OnboardingSnapshot, { status: 'in_progress' }>
 describe('first-run onboarding flow', () => {
   it('renders a mandatory welcome with read-only progress and no skip', () => {
     const markup = renderOnboarding(snapshot('welcome'))
-    expect(markup).toContain('欢迎来到 Rovai')
+    expect(markup).toContain('欢迎来到 Coaxi')
     expect(markup).toContain('选择队员')
     expect(markup).not.toContain('跳过')
     expect(markup).not.toContain('onboarding-step')

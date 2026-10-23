@@ -1,14 +1,14 @@
 <resources>
-    <string name="app_name">Rovai Workbench</string>
+    <string name="app_name">Coaxi</string>
 
     <!-- Onboarding -->
-    <string name="onboarding_title">Codeg</string>
+    <string name="onboarding_title">Coaxi</string>
     <string name="onboarding_tagline">实时观察你的 codeg 智能体工作，随时随地进行引导。</string>
     <string name="onboarding_feature_watch">实时查看任务</string>
     <string name="onboarding_feature_steer">随时随地引导</string>
     <string name="onboarding_feature_start">开启新任务</string>
     <string name="onboarding_add_server">添加你的服务器</string>
-    <string name="onboarding_footnote">Codeg 连接到你自行运行的 codeg 服务器。</string>
+    <string name="onboarding_footnote">Coaxi 连接到你自行运行的 codeg 服务器。</string>
 
     <!-- Servers -->
     <string name="servers_title">服务器</string>
@@ -28,7 +28,7 @@
     <string name="server_none_selected">未选择服务器</string>
 
     <!-- Home (smoke screen) -->
-    <string name="home_title">Codeg</string>
+    <string name="home_title">Coaxi</string>
     <string name="home_status_checking">正在检查连接…</string>
     <string name="home_status_online">在线 · codeg %1$s</string>
     <string name="home_status_offline">离线</string>

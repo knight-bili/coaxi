@@ -18,8 +18,8 @@ function removeReleaseTitle(source: string, release: AppUpdateRelease): string {
   const version = release.version.replace(/^v/iu, '')
   const equivalentTitles = [
     release.releaseName,
-    `Rovai AI v${version}`,
-    `Rovai AI ${version}`,
+    `Coaxi v${version}`,
+    `Coaxi ${version}`,
     `v${version}`,
     version
   ].filter((value): value is string => Boolean(value)).map(normalizedTitle)

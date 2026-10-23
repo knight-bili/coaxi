@@ -1119,5 +1119,5 @@ function resolveBundledSidecar(binary: 'rovai-host' | 'rovai', overrides: Array<
     }
   }
 
-  throw new Error(`Rovai AI ${binary === 'rovai-host' ? 'Rust Host binary' : 'Desktop bootstrap helper'} was not found. Checked: ${candidates.filter(Boolean).map((candidate) => resolve(candidate as string)).join(', ')}`)
+  throw new Error(`Coaxi ${binary === 'rovai-host' ? 'Rust Host binary' : 'Desktop bootstrap helper'} was not found. Checked: ${candidates.filter(Boolean).map((candidate) => resolve(candidate as string)).join(', ')}`)
 }

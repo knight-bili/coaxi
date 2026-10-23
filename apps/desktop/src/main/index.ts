@@ -499,7 +499,7 @@ if (process.platform === 'win32') {
     // No safe Chromium profile exists. Do not silently switch to a broad-ACL
     // default or write authority into a fallback folder. This is a native dialog,
     // not a thrown module-load exception or a Full Core crash/restart loop.
-    dialog.showErrorBox('Rovai 无法准备安全的桌面存储',
+    dialog.showErrorBox('Coaxi 无法准备安全的桌面存储',
       `Core 未启动，也没有创建替代工作区。\n\n${windowsBootstrap.error.message}`)
   }
 } else {
@@ -1004,7 +1004,7 @@ function createWindow(): void {
     window,
     () => requestRendererQuitPreparation(window, () => new MessageChannelMain()),
     (error) => {
-      console.error('Rovai Renderer window-close preparation failed; the window remains open', error)
+      console.error('Coaxi Renderer window-close preparation failed; the window remains open', error)
     }
   )
   let sessionEnding = false
@@ -1089,7 +1089,7 @@ async function openThreadFromAutomation(threadId: string): Promise<{ threadId: s
 }
 
 if (primaryInstance) void app.whenReady().then(async () => {
-  if(app.isPackaged&&!isolatedAcceptanceInstance)app.setAsDefaultProtocolClient('rovai')
+  if(app.isPackaged&&!isolatedAcceptanceInstance){app.setAsDefaultProtocolClient('coaxi');app.setAsDefaultProtocolClient('rovai')}
   console.info(
     `[startup] stage=electron_ready elapsed_ms=${(performance.now() - mainStartupStartedAt).toFixed(1)}`
   )
@@ -2728,12 +2728,12 @@ ipcMain.handle('rovai:reveal-mcp-config', async () => {
 ipcMain.handle('rovai:export-diagnostics', async () => {
   const result = mainWindow
     ? await dialog.showSaveDialog(mainWindow, {
-        title: '导出 Rovai AI 诊断数据',
+        title: '导出 Coaxi 诊断数据',
         defaultPath: `rovai-diagnostics-${new Date().toISOString().slice(0, 10)}.json`,
         filters: [{ name: 'JSON', extensions: ['json'] }]
       })
     : await dialog.showSaveDialog({
-        title: '导出 Rovai AI 诊断数据',
+        title: '导出 Coaxi 诊断数据',
         defaultPath: `rovai-diagnostics-${new Date().toISOString().slice(0, 10)}.json`,
         filters: [{ name: 'JSON', extensions: ['json'] }]
   })
@@ -2805,12 +2805,12 @@ ipcMain.handle('rovai:export-usage-activity', async (event, query: unknown) => {
 ipcMain.handle('rovai:export-monitoring', async (_event, filter: MonitoringFilter) => {
   const result = mainWindow
     ? await dialog.showSaveDialog(mainWindow, {
-        title: '导出 Rovai AI 运行监控数据',
+        title: '导出 Coaxi 运行监控数据',
         defaultPath: `rovai-runtime-monitoring-${new Date().toISOString().slice(0, 10)}.json`,
         filters: [{ name: 'JSON', extensions: ['json'] }]
       })
     : await dialog.showSaveDialog({
-        title: '导出 Rovai AI 运行监控数据',
+        title: '导出 Coaxi 运行监控数据',
         defaultPath: `rovai-runtime-monitoring-${new Date().toISOString().slice(0, 10)}.json`,
         filters: [{ name: 'JSON', extensions: ['json'] }]
       })
@@ -2846,7 +2846,7 @@ ipcMain.handle('rovai:reveal-monitoring-export', (_event, path: unknown) => {
 
 ipcMain.handle('rovai:export-memory', async () => {
   const options = {
-    title: '导出 Rovai AI 记忆',
+    title: '导出 Coaxi 记忆',
     defaultPath: `rovai-memory-${new Date().toISOString().slice(0, 10)}.json`,
     filters: [{ name: 'JSON', extensions: ['json'] }]
   }
@@ -2898,16 +2898,16 @@ const appQuitCoordinator = new AppQuitCoordinator({
         executionView.stop()
       ])
     } catch (error) {
-      console.error('Rovai application services shutdown failed', error)
+      console.error('Coaxi application services shutdown failed', error)
     }
     const result = await core.shutdown()
     console.error(`[rovai-core] controlled shutdown result ${JSON.stringify(result)}`)
   },
   reportFailure: (error) => {
-    console.error('Rovai Core controlled shutdown failed', error)
+    console.error('Coaxi Core controlled shutdown failed', error)
   },
   reportPreparationFailure: (error) => {
-    console.error('Rovai Renderer quit preparation failed; the App remains open', error)
+    console.error('Coaxi Renderer quit preparation failed; the App remains open', error)
     windowsWindowClose?.quitPreparationFailed()
   },
   finish: () => {

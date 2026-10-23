@@ -1,3 +1,4 @@
+import { BrandMark } from './BrandMark'
 import { useState, type KeyboardEvent } from 'react'
 import { runtimeInstallGuide } from './runtime-install-guide'
 import type {
@@ -187,9 +188,9 @@ export function OnboardingFlow({
   return (
     <div className="onboarding-shell">
       <header className="onboarding-header">
-        <div className="onboarding-lockup" aria-label="Rovai AI">
+        <div className="onboarding-lockup" aria-label="Coaxi">
           <OnboardingBrandMark compact />
-          <strong>Rovai AI</strong>
+          <strong>Coaxi</strong>
         </div>
         <div className="onboarding-header-actions">
           {backAction && (
@@ -273,7 +274,7 @@ function WelcomeStep({
   return (
     <section className="onboarding-welcome" aria-labelledby="onboarding-welcome-title">
       <div className="onboarding-welcome-mark"><OnboardingBrandMark /></div>
-      <h1 id="onboarding-welcome-title">{t('欢迎来到 Rovai')}</h1>
+      <h1 id="onboarding-welcome-title">{t('欢迎来到 Coaxi')}</h1>
       <p>{t('选一位队员，开始你的第一次协作。')}</p>
       <button className="primary-button conversation-primary-button onboarding-primary" type="button" disabled={busy} onClick={onContinue}>
         {t('选择队员')}
@@ -798,19 +799,7 @@ function runtimeRowDetail(presentation: RuntimeStatusPresentation): string {
 }
 
 function OnboardingBrandMark({ compact = false }: { compact?: boolean }): React.JSX.Element {
-  return (
-    <svg
-      className={compact ? 'onboarding-brand-mark compact' : 'onboarding-brand-mark'}
-      data-brand-mark="horizon"
-      data-brand-layout="separated"
-      viewBox="0 0 72 56"
-      aria-hidden="true"
-    >
-      <path d="M36 4 L39.6 16.7 L53.9 20.4 L39.6 24.1 L36 36.8 L32.4 24.1 L18.1 20.4 L32.4 16.7 Z" />
-      <path d="M8 49.5 Q36 37.5 64 49.5" fill="none" />
-      <circle className="brand-rendezvous-point" cx="36" cy="43.5" r="2.6" />
-    </svg>
-  )
+  return <BrandMark className={compact ? 'onboarding-brand-mark compact' : 'onboarding-brand-mark'} />
 }
 
 function RefreshIcon(): React.JSX.Element {

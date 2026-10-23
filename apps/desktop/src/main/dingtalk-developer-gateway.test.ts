@@ -62,11 +62,11 @@ describe('DingTalk Web Session developer gateway', () => {
     const f = fixture()
     f.request.mockResolvedValueOnce({ unifiedAppId: 'u-app' })
     await f.gateway.execute({ operation: 'app.create', expectedIdentity: owner,
-      values: { appName: '芝士 🧀', description: 'Rovai AI Teammate · 鉴定士；开发测试。' } })
+      values: { appName: '芝士 🧀', description: 'Coaxi Teammate · 鉴定士；开发测试。' } })
     expect(f.request.mock.calls[0]![1]?.body).toEqual({
-      appType: 2, appName: '芝士', appDesc: 'Rovai AI Teammate 鉴定士 开发测试。'
+      appType: 2, appName: '芝士', appDesc: 'Coaxi Teammate 鉴定士 开发测试。'
     })
-    expect(dingTalkApplicationPresentation('惠', 'x')).toEqual({ name: '惠Bot', description: 'Rovai AI Member' })
+    expect(dingTalkApplicationPresentation('惠', 'x')).toEqual({ name: '惠Bot', description: 'Coaxi Member' })
     expect(dingTalkApplicationPresentation('a'.repeat(25), 'b'.repeat(205)))
       .toEqual({ name: 'a'.repeat(20), description: 'b'.repeat(200) })
     expect(f.request).toHaveBeenCalledOnce()
@@ -104,7 +104,7 @@ describe('DingTalk Web Session developer gateway', () => {
       .mockResolvedValueOnce(app({ appIcon: 'new-media', iconUrl }))
     await run(f, 'app.update', { iconMediaId: 'new-media', iconUrl })
     expect(f.request.mock.calls[3]![1]?.body).toEqual({
-      unifiedAppId: 'u-app', appName: '芝士', appDesc: 'Rovai AI 鉴定士', appIcon: 'new-media', iconUrl
+      unifiedAppId: 'u-app', appName: '芝士', appDesc: 'Coaxi 鉴定士', appIcon: 'new-media', iconUrl
     })
     expect(posts(f).map(([path]) => path)).toEqual([
       '/microapp/uploadPic/logo.json', '/openapp/unifiedapp/u-app/update'
@@ -155,7 +155,7 @@ describe('DingTalk Web Session developer gateway', () => {
       .mockResolvedValueOnce(app()).mockResolvedValueOnce(inner()).mockResolvedValueOnce(robot())
     await run(f, 'app.robot.config', { iconMediaId: 'media-1', mode: 'STREAM' })
     expect(posts(f)).toEqual([['/openapp/inner/robot/create', expect.objectContaining({ body: {
-      appId: '12345', appKey: 'ding-key', name: '芝士', brief: '芝士', description: 'Rovai AI 鉴定士',
+      appId: '12345', appKey: 'ding-key', name: '芝士', brief: '芝士', description: 'Coaxi 鉴定士',
       iconMediaId: 'media-1', previewMediaId: 'media-1', mode: 1, requestType: 'json',
       i18nName: {}, i18nBrief: {}, i18nDescription: {}
     } })]])
@@ -232,9 +232,9 @@ describe('DingTalk Web Session developer gateway', () => {
     const f = fixture()
     f.request.mockResolvedValueOnce(draft()).mockResolvedValueOnce({ requiredApproval: false, approvalMode: 'DING_BPMS' })
       .mockResolvedValueOnce(prepared())
-    await run(f, 'app.version.configure', { versionId: 'version-1', versionDescription: 'Rovai AI 鉴定士' })
+    await run(f, 'app.version.configure', { versionId: 'version-1', versionDescription: 'Coaxi 鉴定士' })
     expect(posts(f)).toEqual([['/openapp/unifiedapp/u-app/commitVersion', expect.objectContaining({ body: {
-      unifiedAppId: 'u-app', versionId: 'version-1', version: '1.0.0', description: 'Rovai AI 鉴定士',
+      unifiedAppId: 'u-app', versionId: 'version-1', version: '1.0.0', description: 'Coaxi 鉴定士',
       scopeVO: { deptId: '', uid: '67890', roleId: '', dynamicGroup: '', isHidden: false },
       scopeSelf: true, relatedAbility: {}
     } })]])
@@ -243,7 +243,7 @@ describe('DingTalk Web Session developer gateway', () => {
   it('does not recommit an already prepared frozen draft after a lost response', async () => {
     const f = fixture()
     f.request.mockResolvedValueOnce(prepared())
-    await run(f, 'app.version.configure', { versionId: 'version-1', versionDescription: 'Rovai AI 鉴定士' })
+    await run(f, 'app.version.configure', { versionId: 'version-1', versionDescription: 'Coaxi 鉴定士' })
     expect(posts(f)).toEqual([])
   })
 
@@ -254,7 +254,7 @@ describe('DingTalk Web Session developer gateway', () => {
   ])('does not overwrite a divergent prepared draft: %j', async (change) => {
     const f = fixture()
     f.request.mockResolvedValueOnce(prepared(change))
-    await expect(run(f, 'app.version.configure', { versionId: 'version-1', versionDescription: 'Rovai AI 鉴定士' }))
+    await expect(run(f, 'app.version.configure', { versionId: 'version-1', versionDescription: 'Coaxi 鉴定士' }))
       .rejects.toThrow()
     expect(posts(f)).toEqual([])
   })
@@ -378,7 +378,7 @@ describe('DingTalk Web Session developer gateway', () => {
 
 const iconUrl = 'https://i01.lw.aliimg.com/media/member.png'
 function app(change: Record<string, unknown> = {}) {
-  return { unifiedAppId: 'u-app', appType: 2, appName: '芝士', appDesc: 'Rovai AI 鉴定士',
+  return { unifiedAppId: 'u-app', appType: 2, appName: '芝士', appDesc: 'Coaxi 鉴定士',
     providerAppId: '12345', clientId: 'ding-key', appIcon: 'media-1', iconUrl, versionId: 'version-1', ...change }
 }
 function credentials() {
@@ -397,7 +397,7 @@ function draft(change: Record<string, unknown> = {}) {
     approvalMode: 'DING_BPMS', requiredApproval: false, enterpriseSelfBuiltAudit: false, sensitiveScopeList: [], ...change }
 }
 function prepared(change: Record<string, unknown> = {}) {
-  return draft({ version: '1.0.0', description: 'Rovai AI 鉴定士', scopeSelf: true,
+  return draft({ version: '1.0.0', description: 'Coaxi 鉴定士', scopeSelf: true,
     visibleScopes: [{ uid: 67890, staffId: owner.userId, name: 'Owner' }], ...change })
 }
 function scopes(names: string[], authed: string[], change: Record<string, unknown> = {}) {

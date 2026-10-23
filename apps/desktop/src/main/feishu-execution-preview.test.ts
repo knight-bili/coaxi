@@ -58,7 +58,7 @@ function harness(counts = [100, 200]) {
 
 describe('opt-in Feishu execution-card previews', () => {
   it('does nothing without an explicit bounded local request', () => {
-    expect(parseFeishuPreviewRequest(['Rovai AI'])).toBeNull()
+    expect(parseFeishuPreviewRequest(['Coaxi'])).toBeNull()
     expect(createFeishuExecutionPreviewHost([], '/does-not-exist')).toBeUndefined()
     expect(parseFeishuPreviewRequest([`--feishu-execution-preview=${requestId}/agent_8/100,200`]))
       .toEqual({ requestId, agentId, commandCounts: [100, 200] })
