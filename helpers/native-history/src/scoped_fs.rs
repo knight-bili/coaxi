@@ -12,7 +12,7 @@ pub fn initialize(path:&Path)->io::Result<()>{
     reject_links(&root)?;SCOPE.set(Scope{root,read:AtomicU64::new(0)}).map_err(|_|denied())
 }
 pub fn root()->PathBuf{SCOPE.get().map(|scope|scope.root.clone()).unwrap_or_default()}
-fn reject_links(path:&Path)->io::Result<()>{let mut current=PathBuf::new();for part in path.components(){current.push(part);let value=std::fs::symlink_metadata(&current)?;if value.file_type().is_symlink(){return Err(denied())}#[cfg(windows)]{use std::os::windows::fs::MetadataExt;if value.file_attributes()&0x400!=0{return Err(denied())}}}Ok(())}
+fn reject_links(path:&Path)->io::Result<()>{let mut current=PathBuf::new();for part in path.components(){current.push(part);if matches!(part,std::path::Component::Prefix(_)){continue}let value=std::fs::symlink_metadata(&current)?;if value.file_type().is_symlink(){return Err(denied())}#[cfg(windows)]{use std::os::windows::fs::MetadataExt;if value.file_attributes()&0x400!=0{return Err(denied())}}}Ok(())}
 fn checked(path:&Path)->io::Result<PathBuf>{
     let scope=SCOPE.get().ok_or_else(denied)?;let path=if path.is_absolute(){path.to_owned()}else{scope.root.join(path)};
     if !path.starts_with(&scope.root)||path.components().any(|component|matches!(component,std::path::Component::ParentDir)){return Err(denied())}reject_links(&path)?;let resolved=std::fs::canonicalize(path)?;if !resolved.starts_with(&scope.root){return Err(denied())}Ok(resolved)
