@@ -13,6 +13,16 @@ pub(crate) fn require_scope(connection:&Connection,scope:&ScopeV1)->Result<()>{
 pub(crate) struct RunLease{
     pub run_id:String,pub epoch:i64,pub frozen:FrozenConversationToolsV1,
 }
+/// 仅供已认证User核对原记录；结束运行后仍可读取回执，不能据此调用模型工具。
+pub(crate) fn retained_run(connection:&Connection,id:&str,epoch:i64)->Result<RunLease>{
+    let raw:String=connection.query_row("SELECT owned.frozen_json FROM conversation_tool_run owned JOIN agent_run r ON r.id=owned.agent_run_id JOIN conversation c ON c.id=r.conversation_id JOIN camp ON camp.id=c.camp_id WHERE owned.agent_run_id=?1 AND owned.execution_epoch=?2 AND owned.thread_id=camp.id AND owned.agent_id=c.agent_id AND camp.deletion_operation_id IS NULL",params![id,epoch],|row|row.get(0)).context("conversation_tools.original_run_unavailable")?;
+    let frozen:FrozenConversationToolsV1=serde_json::from_str(&raw)?;frozen.validate()?;Ok(RunLease{run_id:id.into(),epoch,frozen})
+}
+pub(crate) fn request_owner(connection:&Connection,id:&str)->Result<Option<RunLease>>{
+    uuid::Uuid::parse_str(id)?;
+    let owner:Option<(String,i64)>=connection.query_row("SELECT agent_run_id,execution_epoch FROM conversation_tool_request WHERE id=?1",[id],|row|Ok((row.get(0)?,row.get(1)?))).optional()?;
+    owner.map(|(run,epoch)|retained_run(connection,&run,epoch)).transpose()
+}
 pub(crate) fn require_run(connection:&Connection,id:&str,epoch:i64)->Result<RunLease>{
     uuid::Uuid::parse_str(id)?;ensure!((0..=9_007_199_254_740_991).contains(&epoch),"conversation_tools.epoch_invalid");
     let row:Option<(String,String)>=connection.query_row(r#"
