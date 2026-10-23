@@ -3,7 +3,7 @@ use super::*;
 use super::{questions::NativeQuestionTarget,scope::RunLease};
 use rusqlite::{params,Connection,OptionalExtension,TransactionBehavior};
 
-fn target(connection:&Connection,id:&str,lease:&RunLease,expected:&NativeQuestionTarget)->Result<()>{
+pub(super) fn require_target(connection:&Connection,id:&str,lease:&RunLease,expected:&NativeQuestionTarget)->Result<()>{
     let stored:Option<(String,String,i64)>=connection.query_row("SELECT q.target_digest,r.agent_run_id,r.execution_epoch FROM conversation_tool_question q JOIN conversation_tool_request r ON r.id=q.request_id WHERE q.request_id=?1",[id],|row|Ok((row.get(0)?,row.get(1)?,row.get(2)?))).optional()?;
     let(stored,run,epoch)=stored.context("conversation_tools.question_unavailable")?;
     ensure!(run==lease.run_id&&epoch==lease.epoch&&stored==digest(&serde_json::to_value(expected)?)?,"conversation_tools.original_native_call_changed");Ok(())
@@ -11,7 +11,7 @@ fn target(connection:&Connection,id:&str,lease:&RunLease,expected:&NativeQuestio
 /// 仅供认证后的原MCP调用轮询。已经领取的结果不再次返回可发送正文。
 pub(crate) fn claim(connection:&mut Connection,lease:&RunLease,id:&str,expected:&NativeQuestionTarget)->Result<Value>{
     let tx=connection.transaction_with_behavior(TransactionBehavior::Immediate)?;
-    target(&tx,id,lease,expected)?;questions::close_unavailable(&tx)?;
+    require_target(&tx,id,lease,expected)?;questions::close_unavailable(&tx)?;
     let status=requests::status(&tx,lease,id)?;
     if status["state"]!="answered"{tx.commit()?;return Ok(json!({"requestId":id,"state":status["state"]}))}
     let current=scope::require_run(&tx,&lease.run_id,lease.epoch)?;
@@ -27,7 +27,7 @@ pub(crate) fn claim(connection:&mut Connection,lease:&RunLease,id:&str,expected:
 }
 /// 连接已flush后才提交written；未知只保留原记录，不能把新prompt当作补发。
 pub(crate) fn receipt(connection:&mut Connection,lease:&RunLease,id:&str,expected:&NativeQuestionTarget,receipt_digest:&str,result_digest:&str,written:bool)->Result<Value>{
-    let tx=connection.transaction_with_behavior(TransactionBehavior::Immediate)?;target(&tx,id,lease,expected)?;
+    let tx=connection.transaction_with_behavior(TransactionBehavior::Immediate)?;require_target(&tx,id,lease,expected)?;
     let(state,original_receipt,original_result):(String,Option<String>,String)=tx.query_row("SELECT state,receipt_digest,result_digest FROM conversation_tool_delivery WHERE request_id=?1 AND bridge_instance_id=?2",params![id,expected.bridge_instance_id],|row|Ok((row.get(0)?,row.get(1)?,row.get(2)?)))?;
     ensure!(original_receipt.as_deref()==Some(receipt_digest)&&original_result==result_digest,"conversation_tools.delivery_receipt_changed");
     ensure!(matches!(state.as_str(),"claimed"|"delivered"|"outcome_unknown"),"conversation_tools.delivery_not_claimed");
