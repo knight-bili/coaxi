@@ -2,6 +2,7 @@ import { useThreadClient } from './camp-client'
 import { MobileBack, useMobileLayout } from './MobileLayout'
 import { newCommandId } from '../../shared/command-id'
 import { readErrorMessage } from './error-message'
+import { readCanvasViewScope } from './canvas-view-state'
 import type { MemoryNavigationTarget } from './desktop-navigation'
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
@@ -67,6 +68,18 @@ interface MemorySnapshot {
   reviewItems: HearthReviewItem[]
 }
 
+interface MemoryCreateRequest {
+  commandId: string
+  command: CreateMemoryCommand
+}
+
+interface PendingMemoryCreate {
+  schemaVersion: 1
+  key: string
+  editorId: 'memory-create'
+  request: MemoryCreateRequest
+}
+
 type ReviewScheduleAction = 'save' | 'clear'
 type ReviewScheduleBusyAction = ReviewScheduleAction | 'refresh'
 
@@ -89,6 +102,41 @@ const initialDraft: Draft = {
   secondAgentId: '',
   direction: 'mutual',
   directedActorAgentId: ''
+}
+
+function restorePendingMemoryCreate(value: unknown, key: string): PendingMemoryCreate {
+  if (!value || typeof value !== 'object') throw new Error('记忆原请求记录损坏，已保留记录。')
+  const saved = value as Partial<PendingMemoryCreate>
+  const request = saved.request as Partial<MemoryCreateRequest> | undefined
+  const command = request?.command as Partial<CreateMemoryCommand> | undefined
+  if (saved.schemaVersion !== 1 || saved.key !== key || saved.editorId !== 'memory-create'
+    || !request || typeof request.commandId !== 'string' || !request.commandId
+    || !command || !['hearth', 'companion', 'relationship'].includes(command.scope ?? '')
+    || !['agreement', 'preference', 'lesson'].includes(command.kind ?? '')
+    || typeof command.body !== 'string' || !Array.isArray(command.retrievalKeys)
+    || !command.retrievalKeys.every((item) => typeof item === 'string')
+    || command.companionAgentId !== null && typeof command.companionAgentId !== 'string'
+    || !Array.isArray(command.relationshipAgentIds)
+    || !command.relationshipAgentIds.every((item) => typeof item === 'string')
+    || command.direction !== null && !['mutual', 'directed'].includes(command.direction ?? '')
+    || command.directedActorAgentId !== null && typeof command.directedActorAgentId !== 'string'
+    || !('reviewAfter' in command)) {
+    throw new Error('记忆原请求归属或正文损坏，已保留原记录。')
+  }
+  return structuredClone(saved as PendingMemoryCreate)
+}
+
+function memoryDraftFromCreate(command: CreateMemoryCommand): Draft {
+  return {
+    scope: command.scope,
+    kind: command.kind,
+    body: command.body,
+    retrievalKeys: command.retrievalKeys.join(', '),
+    firstAgentId: command.scope === 'companion' ? command.companionAgentId ?? '' : command.relationshipAgentIds[0] ?? '',
+    secondAgentId: command.relationshipAgentIds[1] ?? '',
+    direction: command.direction ?? 'mutual',
+    directedActorAgentId: command.directedActorAgentId ?? ''
+  }
 }
 
 const scopeTabs: Array<[MemoryScopeKind, string]> = [
@@ -132,6 +180,8 @@ export function MemoryLibrary({
   const client = useThreadClient()
   const libraryGeneration = useRef(0)
   const reviewGeneration = useRef(0)
+  const createRecoveryGeneration = useRef(0)
+  const pendingCreateRef = useRef<PendingMemoryCreate | null>(null)
   useEffect(() => () => { libraryGeneration.current++; reviewGeneration.current++ }, [client])
   const [library, setLibrary] = useState<MemoryLibraryView | null>(null)
   const mobile = useMobileLayout()
@@ -161,6 +211,9 @@ export function MemoryLibrary({
   const [reviewDrawerOpen, setReviewDrawerOpen] = useState(false)
   const [editor, setEditor] = useState<Editor>(null)
   const [draft, setDraft] = useState<Draft>(initialDraft)
+  const [pendingCreate, setPendingCreate] = useState<PendingMemoryCreate | null>(null)
+  const [createRecoveryKey, setCreateRecoveryKey] = useState<string | null>(null)
+  const [createRecoveryReadyFor, setCreateRecoveryReadyFor] = useState<string | null>(null)
   const [forgetTarget, setForgetTarget] = useState<MemoryRecord | null>(null)
   const [reviewScheduleEditor, setReviewScheduleEditor] = useState<ReviewScheduleEditor | null>(null)
   const [reviewScheduleBusyAction, setReviewScheduleBusyAction] = useState<ReviewScheduleBusyAction | null>(null)
@@ -168,6 +221,11 @@ export function MemoryLibrary({
   const [error, setError] = useState<string | null>(null)
   const [feedback, setFeedback] = useState<string | null>(null)
   const startupContentVisible = startupFeedbackVisible || Boolean(error)
+  const createRecoveryReady = createRecoveryKey !== null && createRecoveryReadyFor === createRecoveryKey
+  const updatePendingCreate = (value: PendingMemoryCreate | null): void => {
+    pendingCreateRef.current = value
+    setPendingCreate(value)
+  }
 
   const loadMemoryLibrary = useCallback(async (): Promise<MemoryLibraryView> => {
     const request = ++libraryGeneration.current
@@ -321,6 +379,8 @@ export function MemoryLibrary({
       secondAgentId: agents.find((agent) => agent.agentId !== firstAgentId)?.agentId ?? '',
       directedActorAgentId: firstAgentId
     })
+    setCreateRecoveryReadyFor(null)
+    setError(null)
     setEditor({ kind: 'create' })
   }
 
@@ -350,6 +410,44 @@ export function MemoryLibrary({
     setEditor({ kind: 'reviewItem', reviewItem })
   }
 
+  useEffect(() => {
+    if (editor?.kind !== 'create') return
+    const observed = ++createRecoveryGeneration.current
+    setCreateRecoveryReadyFor(null)
+    void (async () => {
+      const identity = await readCanvasViewScope(client)
+      if (!identity) throw new Error('客户端或 Core 实例身份尚未确定，无法安全恢复记忆原请求。')
+      const recoveryKey = 'memory-create:' + JSON.stringify([identity.host, identity.core])
+      if (observed !== createRecoveryGeneration.current) return
+      setCreateRecoveryKey(recoveryKey)
+      let raw: unknown
+      if (client.workbenchEditorRecovery) {
+        const value = await client.workbenchEditorRecovery.get(recoveryKey)
+        if (value !== null) {
+          const record = value as { schemaVersion?: number; key?: string; editorId?: string; pending?: unknown }
+          if (record.schemaVersion !== 1 || record.key !== recoveryKey || record.editorId !== 'memory-create' || !('pending' in record)) {
+            throw new Error('记忆原请求记录归属不同，已保留原记录。')
+          }
+          raw = record.pending
+        }
+      } else if (client.editingRecovery) {
+        raw = client.editingRecovery.get(recoveryKey)
+      } else {
+        throw new Error('原请求恢复存储尚不可用，暂不能安全保存记忆。')
+      }
+      if (observed !== createRecoveryGeneration.current) return
+      const pending = raw == null
+        ? pendingCreateRef.current?.key === recoveryKey ? pendingCreateRef.current : null
+        : restorePendingMemoryCreate(raw, recoveryKey)
+      updatePendingCreate(pending)
+      if (pending) setDraft(memoryDraftFromCreate(pending.request.command))
+      setCreateRecoveryReadyFor(recoveryKey)
+    })().catch((nextError) => {
+      if (observed === createRecoveryGeneration.current) setError(errorMessage(nextError))
+    })
+    return () => { createRecoveryGeneration.current++ }
+  }, [client, editor?.kind])
+
   const retrievalKeys = (): string[] => draft.retrievalKeys
     .split(',')
     .map((value) => value.trim())
@@ -371,16 +469,37 @@ export function MemoryLibrary({
     reviewAfter: null
   })
 
+  const persistPendingCreate = async (value: PendingMemoryCreate | null): Promise<void> => {
+    if (!createRecoveryKey || value && value.key !== createRecoveryKey) throw new Error('工作区身份尚未确定，原请求未发送。')
+    if (client.workbenchEditorRecovery) {
+      await client.workbenchEditorRecovery.put({ schemaVersion: 1, key: createRecoveryKey, editorId: 'memory-create', pending: value })
+      return
+    }
+    if (!client.editingRecovery) throw new Error('原请求恢复存储尚不可用，原请求未发送。')
+    client.editingRecovery.set(createRecoveryKey, value)
+  }
+
   const submitEditor = async (event: React.FormEvent): Promise<void> => {
     event.preventDefault()
     if (!editor) return
     await run(`editor-${editor.kind}`, async () => {
       let result: StoredCommandResult
       if (editor.kind === 'create') {
-        result = await client.request('memory.create', {
-          commandId: newCommandId(),
-          command: createCommand()
-        })
+        if (!createRecoveryReady || !createRecoveryKey) throw new Error('原请求恢复存储尚未就绪，本次未发送。')
+        let pending = pendingCreateRef.current?.key === createRecoveryKey ? pendingCreateRef.current : null
+        if (!pending) {
+          pending = {
+            schemaVersion: 1,
+            key: createRecoveryKey,
+            editorId: 'memory-create',
+            request: { commandId: newCommandId(), command: structuredClone(createCommand()) }
+          }
+          await persistPendingCreate(pending)
+          updatePendingCreate(pending)
+        }
+        result = await client.request<StoredCommandResult>('memory.create', structuredClone(pending.request))
+        await persistPendingCreate(null)
+        if (pendingCreateRef.current?.request.commandId === pending.request.commandId) updatePendingCreate(null)
       } else if (editor.kind === 'revise') {
         if (!editor.memory.currentRevisionId) throw new Error(uiAttribute('当前记忆没有可修订的版本。'))
         result = await client.request('memory.revise', {
@@ -652,7 +771,7 @@ export function MemoryLibrary({
 
       {topNotices && <div className="memory-page-notices">{topNotices}</div>}
 
-      {error && <div className="memory-error" role="alert"><strong><UiText zh={"操作未完成"} /></strong><span>{error}</span>{!library && <button className="quiet-button compact" type="button" onClick={() => { setError(null); void load().catch((nextError) => setError(errorMessage(nextError))) }}><UiText zh={"重试"} /></button>}</div>}
+      {error && !editor && <div className="memory-error" role="alert"><strong><UiText zh={"操作未完成"} /></strong><span>{error}</span>{!library && <button className="quiet-button compact" type="button" onClick={() => { setError(null); void load().catch((nextError) => setError(errorMessage(nextError))) }}><UiText zh={"重试"} /></button>}</div>}
       {feedback && <div className="memory-feedback" role="status">{feedback}</div>}
 
       <div className="memory-summary-strip" aria-label={uiAttribute("记忆概览")}>
@@ -767,7 +886,7 @@ export function MemoryLibrary({
         onRetryRefresh={retryReviewScheduleRefresh}
       />
 
-      <MemoryEditorDialog editor={editor} draft={draft} agents={agents} busy={busy !== null} onDraft={setDraft} onClose={() => setEditor(null)} onSubmit={submitEditor} />
+      <MemoryEditorDialog editor={editor} draft={draft} agents={agents} busy={busy !== null} recoveryReady={editor?.kind !== 'create' || createRecoveryReady} pendingCreate={pendingCreate?.key === createRecoveryKey} error={error} onDraft={setDraft} onClose={() => setEditor(null)} onSubmit={submitEditor} />
 
       <Dialog.Root open={forgetTarget !== null} onOpenChange={(open) => { if (!open) setForgetTarget(null) }}>
         <Dialog.Portal>
@@ -1287,6 +1406,9 @@ function MemoryEditorDialog({
   draft,
   agents,
   busy,
+  recoveryReady,
+  pendingCreate,
+  error,
   onDraft,
   onClose,
   onSubmit
@@ -1295,11 +1417,16 @@ function MemoryEditorDialog({
   draft: Draft
   agents: AgentProfile[]
   busy: boolean
+  recoveryReady: boolean
+  pendingCreate: boolean
+  error: string | null
   onDraft(value: Draft): void
   onClose(): void
   onSubmit(event: React.FormEvent): void
 }): React.JSX.Element {
   const identityLocked = editor?.kind === 'revise' || editor?.kind === 'reviewItem'
+  const createLocked = editor?.kind === 'create' && (!recoveryReady || pendingCreate)
+  const frozenCreate = editor?.kind === 'create' && pendingCreate
   const keys = draft.retrievalKeys.split(',').map((key) => key.trim()).filter(Boolean)
   const keyBytes = keys.reduce((total, key) => total + new TextEncoder().encode(key).length, 0)
   const identityValid = draft.scope === 'hearth'
@@ -1309,6 +1436,8 @@ function MemoryEditorDialog({
   const bodyBytes = new TextEncoder().encode(draft.body).length
   const reviewItemEditable = editor?.kind !== 'reviewItem'
     || (editor.reviewItem.status === 'pending' && !editor.reviewItem.stale)
+  const submitDisabled = busy || editor?.kind === 'create' && !recoveryReady
+    || !frozenCreate && (!draft.body.trim() || bodyBytes > 2048 || !identityValid || !keysValid || !reviewItemEditable)
   return (
     <Dialog.Root open={editor !== null} onOpenChange={(open) => { if (!open) onClose() }}>
       <Dialog.Portal>
@@ -1323,24 +1452,27 @@ function MemoryEditorDialog({
           />
           <form className="app-dialog-form" onSubmit={onSubmit}>
             <AppDialogBody>
+              {error && <p role="alert" className="memory-error">{error}</p>}
+              {editor?.kind === 'create' && !recoveryReady && <p role="status"><UiText zh={"正在读取原保存状态…"} /></p>}
+              {frozenCreate && <p role="status"><UiText zh={"上次保存结果待核对。重试会使用同一编号和完整请求，不会重复创建。"} /></p>}
               <div className="memory-editor-grid">
-                <label className="field-label"><UiText zh={"范围"} /><select value={draft.scope} disabled={identityLocked || busy} onChange={(event) => onDraft({ ...draft, scope: event.target.value as MemoryScopeKind })}><option value="hearth"><UiText zh={"共同记忆"} /></option><option value="companion"><UiText zh={"队员记忆"} /></option><option value="relationship"><UiText zh={"队员间记忆"} /></option></select></label>
-                <label className="field-label"><UiText zh={"类型"} /><select value={draft.kind} disabled={identityLocked || busy} onChange={(event) => onDraft({ ...draft, kind: event.target.value as MemoryKind })}><option value="preference" disabled={draft.scope === 'relationship'}><UiText zh={"偏好"} /></option><option value="agreement"><UiText zh={"约定"} /></option><option value="lesson"><UiText zh={"经验"} /></option></select></label>
-                {draft.scope === 'companion' && <AgentSelect label={uiAttribute("队员")} value={draft.firstAgentId} agents={agents} disabled={identityLocked || busy} onChange={(firstAgentId) => onDraft({ ...draft, firstAgentId })} />}
+                <label className="field-label"><UiText zh={"范围"} /><select value={draft.scope} disabled={identityLocked || busy || createLocked} onChange={(event) => onDraft({ ...draft, scope: event.target.value as MemoryScopeKind })}><option value="hearth"><UiText zh={"共同记忆"} /></option><option value="companion"><UiText zh={"队员记忆"} /></option><option value="relationship"><UiText zh={"队员间记忆"} /></option></select></label>
+                <label className="field-label"><UiText zh={"类型"} /><select value={draft.kind} disabled={identityLocked || busy || createLocked} onChange={(event) => onDraft({ ...draft, kind: event.target.value as MemoryKind })}><option value="preference" disabled={draft.scope === 'relationship'}><UiText zh={"偏好"} /></option><option value="agreement"><UiText zh={"约定"} /></option><option value="lesson"><UiText zh={"经验"} /></option></select></label>
+                {draft.scope === 'companion' && <AgentSelect label={uiAttribute("队员")} value={draft.firstAgentId} agents={agents} disabled={identityLocked || busy || createLocked} onChange={(firstAgentId) => onDraft({ ...draft, firstAgentId })} />}
                 {draft.scope === 'relationship' && <>
-                  <AgentSelect label={uiAttribute("队员 A")} value={draft.firstAgentId} agents={agents} disabled={identityLocked || busy} onChange={(firstAgentId) => onDraft({ ...draft, firstAgentId })} />
-                  <AgentSelect label={uiAttribute("队员 B")} value={draft.secondAgentId} agents={agents.filter((agent) => agent.agentId !== draft.firstAgentId)} disabled={identityLocked || busy} onChange={(secondAgentId) => onDraft({ ...draft, secondAgentId })} />
-                  <label className="field-label"><UiText zh={"方向"} /><select value={draft.direction} disabled={identityLocked || busy} onChange={(event) => onDraft({ ...draft, direction: event.target.value as MemoryDirection })}><option value="mutual"><UiText zh={"双方共同"} /></option><option value="directed"><UiText zh={"单向"} /></option></select></label>
-                  {draft.direction === 'directed' && <AgentSelect label={uiAttribute("责任方")} value={draft.directedActorAgentId} agents={agents.filter((agent) => [draft.firstAgentId, draft.secondAgentId].includes(agent.agentId))} disabled={identityLocked || busy} onChange={(directedActorAgentId) => onDraft({ ...draft, directedActorAgentId })} />}
+                  <AgentSelect label={uiAttribute("队员 A")} value={draft.firstAgentId} agents={agents} disabled={identityLocked || busy || createLocked} onChange={(firstAgentId) => onDraft({ ...draft, firstAgentId })} />
+                  <AgentSelect label={uiAttribute("队员 B")} value={draft.secondAgentId} agents={agents.filter((agent) => agent.agentId !== draft.firstAgentId)} disabled={identityLocked || busy || createLocked} onChange={(secondAgentId) => onDraft({ ...draft, secondAgentId })} />
+                  <label className="field-label"><UiText zh={"方向"} /><select value={draft.direction} disabled={identityLocked || busy || createLocked} onChange={(event) => onDraft({ ...draft, direction: event.target.value as MemoryDirection })}><option value="mutual"><UiText zh={"双方共同"} /></option><option value="directed"><UiText zh={"单向"} /></option></select></label>
+                  {draft.direction === 'directed' && <AgentSelect label={uiAttribute("责任方")} value={draft.directedActorAgentId} agents={agents.filter((agent) => [draft.firstAgentId, draft.secondAgentId].includes(agent.agentId))} disabled={identityLocked || busy || createLocked} onChange={(directedActorAgentId) => onDraft({ ...draft, directedActorAgentId })} />}
                 </>}
               </div>
-              <label className="field-label memory-body-field"><UiText zh={"正文"} /><textarea autoFocus data-dialog-autofocus value={draft.body} rows={7} disabled={busy} onChange={(event) => onDraft({ ...draft, body: event.target.value })} /><small>{bodyBytes}/2048 bytes</small></label>
-              <label className="field-label memory-body-field">Retrieval Keys<input value={draft.retrievalKeys} disabled={busy} placeholder={uiAttribute("1–3 个关键词，使用逗号分隔")} onChange={(event) => onDraft({ ...draft, retrievalKeys: event.target.value })} /><small>{keys.length}<UiText zh={"/3 项 · "} />{keyBytes}/48 bytes</small></label>
+              <label className="field-label memory-body-field"><UiText zh={"正文"} /><textarea autoFocus data-dialog-autofocus value={draft.body} rows={7} disabled={busy || createLocked} onChange={(event) => onDraft({ ...draft, body: event.target.value })} /><small>{bodyBytes}/2048 bytes</small></label>
+              <label className="field-label memory-body-field">Retrieval Keys<input value={draft.retrievalKeys} disabled={busy || createLocked} placeholder={uiAttribute("1–3 个关键词，使用逗号分隔")} onChange={(event) => onDraft({ ...draft, retrievalKeys: event.target.value })} /><small>{keys.length}<UiText zh={"/3 项 · "} />{keyBytes}/48 bytes</small></label>
               {!reviewItemEditable && <div className="memory-review-warning" role="status"><UiText zh={"权威审核状态已变化。草稿仍保留，但这条审核不能再接受；请关闭后查看最新记录。"} /></div>}
             </AppDialogBody>
             <AppDialogFooter>
               <Dialog.Close asChild><button className="quiet-button" type="button" disabled={busy}><UiText zh={"取消"} /></button></Dialog.Close>
-              <button className="primary-button" type="submit" disabled={!draft.body.trim() || bodyBytes > 2048 || !identityValid || !keysValid || !reviewItemEditable || busy}>{busy ? uiAttribute("正在保存…") : editor?.kind === 'reviewItem' ? uiAttribute("接受最终内容") : editor?.kind === 'revise' ? uiAttribute("保存修订") : uiAttribute("保存记忆")}</button>
+              <button className="primary-button" type="submit" disabled={submitDisabled}>{busy ? uiAttribute("正在保存…") : frozenCreate ? uiAttribute("核对原保存") : editor?.kind === 'reviewItem' ? uiAttribute("接受最终内容") : editor?.kind === 'revise' ? uiAttribute("保存修订") : uiAttribute("保存记忆")}</button>
             </AppDialogFooter>
           </form>
         </AppDialogContent>
