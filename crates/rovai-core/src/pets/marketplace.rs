@@ -649,7 +649,7 @@ fn write_staging(
 ) -> Result<(), AppCommandError> {
     use std::io::Write;
     let json = serde_json::to_string_pretty(manifest)
-        .map_err(|e| AppCommandError::io_error(format!("Failed to serialize manifest: {e}")))?;
+        .map_err(|e| AppCommandError::io(format!("Failed to serialize manifest: {e}")))?;
     {
         let mut f =
             fs::File::create(dir.join(PET_MANIFEST_FILENAME)).map_err(AppCommandError::io)?;
