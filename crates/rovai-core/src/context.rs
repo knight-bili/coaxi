@@ -169,7 +169,8 @@ pub const fn charter_delivery_mode_for_adapter(adapter_kind: AdapterKind) -> Cha
         | AdapterKind::OpenClawCli
         | AdapterKind::TraeCnCli
         | AdapterKind::CursorAgent
-        | AdapterKind::KimiCodeCli => CharterDeliveryMode::FirstPayload,
+        | AdapterKind::KimiCodeCli
+        | AdapterKind::CustomAcp => CharterDeliveryMode::FirstPayload,
     }
 }
 

@@ -12671,6 +12671,9 @@ impl Core {
         let attempted_at = chrono::Utc::now().to_rfc3339();
         let registry = AgentRuntimeAdapterRegistry::default();
         let (snapshot, failure) = match adapter_kind {
+            rovai_core::agent_profile::AdapterKind::CustomAcp => {
+                anyhow::bail!("custom_runtime.definition_reference_required");
+            }
             rovai_core::agent_profile::AdapterKind::CodexCli => {
                 let probe = health::codex_runtime_probe_at(executable_path).await;
                 let authentication_status = probe_authentication_status(probe.status).to_string();
@@ -18904,7 +18907,8 @@ impl Core {
             | rovai_core::agent_profile::AdapterKind::DeepseekHarness
             | rovai_core::agent_profile::AdapterKind::CommandCodeCli
             | rovai_core::agent_profile::AdapterKind::ClineCli
-            | rovai_core::agent_profile::AdapterKind::ZcodeApp) => {
+            | rovai_core::agent_profile::AdapterKind::ZcodeApp
+            | rovai_core::agent_profile::AdapterKind::CustomAcp) => {
                 if let Some(adapter) = self.acp_adapter(kind) {
                     adapter
                         .forget_agent_run(&execution.agent_run_id, execution.execution_epoch)
