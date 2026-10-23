@@ -41,13 +41,21 @@ impl Core{
                 tasks.spawn(async move{let _permit=permit;let _=serve_conversation_connection(core,stream).await;});
             }
             tasks.abort_all();drop(listener);
-            if let Some(core)=weak.upgrade(){core.conversation_tools_transports.lock().await.remove(&cache_key);let _=core.conversation_tools.remove(&bridge);}
+            if let Some(core)=weak.upgrade(){
+                {let mut database=core.database.lock().await;let _=core.conversation_tools.revoke(database.connection(),&binding);let _=conversation_tools::user_api::maintain(&mut database,false);}
+                core.conversation_tools_transports.lock().await.remove(&cache_key);let _=core.conversation_tools.remove(&bridge);
+                emit(&core.output,"conversationTools.changed",json!({"agentRunId":binding.agent_run_id}));
+            }
+            // 只移除该原桥的临时认证文件；结果与业务历史继续保留。
+            let _=std::fs::remove_file(&path);
             #[cfg(unix)]if let Some(parent)=Path::new(&endpoint).parent(){let _=std::fs::remove_dir(parent);}
         });
         let result=(definition,frozen_digest);cache.insert(key,result.clone());Ok(result)
     }
     pub(super) async fn conversation_tools_access(&self,method:&str,value:Value,client:&crate::draft_client::DraftClient)->Result<Value>{
         let mut database=self.database.lock().await;
+        let closed=conversation_tools::user_api::maintain(&mut database,false)?;
+        if closed>0{emit(&self.output,"conversationTools.changed",json!({}));}
         let result=rovai_core::conversation_tools::user_api::call(&mut database,&self.data_dir,method,value,client)?;
         drop(database);
         if matches!(method,"conversationTools.policy.set"|"conversationTools.questions.answer"|"conversationTools.questions.decline"|"conversationTools.grants.confirm"|"conversationTools.grants.revoke"|"conversationTools.requests.resolve"|"conversationTools.automationOwner.set"){
