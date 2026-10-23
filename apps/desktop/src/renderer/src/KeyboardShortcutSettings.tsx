@@ -10,7 +10,7 @@ const labels:Record<ShortcutActionId,string>={toggle_search:'搜索会话',toggl
 export function KeyboardShortcutSettings():React.JSX.Element{
   const state=useKeyboardShortcuts(),client=useThreadClient(),t=useUiText()
   const [recording,setRecording]=useState<ShortcutActionId|null>(null),[busy,setBusy]=useState(false),[error,setError]=useState('')
-  const isMac=client.platform==='darwin'
+  const isMac=Boolean(client.keyboardShortcuts)&&client.platform==='darwin'
   const save=async(action:ShortcutActionId|null,shortcut:string):Promise<void>=>{if(busy)return;setBusy(true);setError('');try{await state.save(action?{...state.bindings,[action]:shortcut}:{...DEFAULT_SHORTCUTS});setRecording(null)}catch(error){setError(String(error))}finally{setBusy(false)}}
   useEffect(()=>{setShortcutRecorderArmed(Boolean(recording));void client.keyboardShortcuts?.recording?.(Boolean(recording)).catch(error=>setError(String(error)));return()=>{setShortcutRecorderArmed(false);void client.keyboardShortcuts?.recording?.(false).catch(()=>undefined)}},[recording,client.keyboardShortcuts])
   useEffect(()=>{if(!recording||busy)return;const record=(event:KeyboardEvent):void=>{
