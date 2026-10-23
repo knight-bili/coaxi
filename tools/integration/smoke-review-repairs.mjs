@@ -319,6 +319,48 @@ try {
     replayChanged: viewedReplay.changed
   })
 
+  stage = 'issue_77_external_directory_alias_read_and_search'
+  const externalDirectory = path.join(fixture, 'external specs')
+  await mkdir(externalDirectory)
+  await writeFile(path.join(externalDirectory, 'guide.txt'), 'SAFE_EXTERNAL_ALIAS_MARKER\n')
+  assert(!path.resolve(externalDirectory).startsWith(path.resolve(repository)))
+  const organizerBeforeAlias = await call('workbench.organizer.get', {
+    scope: organizerScope, level: 'thread'
+  })
+  const aliasSaved = await call('workbench.organizer.set', {
+    scope: organizerScope,
+    level: 'thread',
+    expectedDigest: organizerBeforeAlias.digest,
+    value: {
+      ...organizerBeforeAlias.value,
+      directoryAliases: [{ path: externalDirectory, name: 'external-specs', group: 'acceptance' }]
+    }
+  })
+  assert.equal(aliasSaved.value.directoryAliases[0].name, 'external-specs')
+  const linkedEntries = await call('workbench.files.list', { scope: organizerScope, path: '' })
+  const linkedDirectory = linkedEntries.entries.find(entry => entry.name === 'external-specs')
+  assert.equal(linkedDirectory?.managedAlias, true)
+  assert.equal(linkedDirectory?.directory, true)
+  const aliasedFile = await call('workbench.files.read', {
+    scope: organizerScope, path: 'external-specs/guide.txt'
+  })
+  assert.equal(aliasedFile.text, 'SAFE_EXTERNAL_ALIAS_MARKER\n')
+  const search = await call('workbench.files.tools', {
+    scope: organizerScope,
+    operation: 'search',
+    path: 'external-specs',
+    query: 'SAFE_EXTERNAL_ALIAS_MARKER',
+    content: true,
+    caseSensitive: true
+  })
+  assert(search.results.some(item => item.path === 'external-specs/guide.txt'))
+  record('issue_77_external_alias_is_scoped_and_searchable_from_isolated_fixture', {
+    aliasPath: externalDirectory,
+    aliasReadMatched: true,
+    searchMatched: true,
+    externalFixtureOnly: true
+  })
+
   finalResult = {
     status: 'passed',
     scope: 'real_host_core_isolated_git_fixture_no_model_execution',
