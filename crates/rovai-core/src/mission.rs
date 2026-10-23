@@ -1152,7 +1152,7 @@ fn normalize_tags(tags: &[String]) -> Result<Vec<String>> {
 
 /// Bind a Host-frozen upload through the caller's existing command transaction.
 /// Uses the same detail version, attachment validation and activity as Mission update.
-pub(crate) fn bind_uploaded_attachment(tx:&rusqlite::Connection,camp_id:&str,mission_id:&str,expected_version:i64,source:LocalAttachmentSourceRef,actor:&ActorRef)->Result<Option<CommandHandlerResult>>{
+pub(crate) fn bind_uploaded_attachment(tx:&rusqlite::Transaction<'_>,camp_id:&str,mission_id:&str,expected_version:i64,source:LocalAttachmentSourceRef,actor:&ActorRef)->Result<Option<CommandHandlerResult>>{
     if !matches!(actor,ActorRef::User{..}){return Ok(Some(reject("mission.forbidden")))}
     let Some(current)=load_record(tx,mission_id)?else{return Ok(Some(reject("mission.not_found")))};
     if current.camp_id!=camp_id{return Ok(Some(reject("mission.thread_mismatch")))}
