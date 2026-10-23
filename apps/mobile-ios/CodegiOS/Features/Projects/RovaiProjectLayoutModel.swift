@@ -17,7 +17,7 @@ struct RovaiProjectLayout: Equatable {
         guard let source = locate(item),target.index>=0,item.kind != "group" || target.groupId == nil,target.groupId == nil || members[target.groupId!] != nil else {return self}
         var next = self
         if let id = source.groupId {next.members[id]?.remove(at: source.index)} else {next.top.remove(at: source.index)}
-        if let id = target.groupId {next.members[id]?.insert(item.target,at: min(target.index,next.members[id]?.count ?? 0))} else {next.top.insert(item,at: min(target.index,next.top.count))}
+        if let id = target.groupId {let index = min(target.index,next.members[id]?.count ?? 0);next.members[id]?.insert(item.target,at: index)} else {next.top.insert(item,at: min(target.index,next.top.count))}
         return next
     }
 }
