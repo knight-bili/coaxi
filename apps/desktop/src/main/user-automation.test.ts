@@ -408,9 +408,19 @@ describe('User Automation transport', () => {
   )
 
   it('keeps Windows Automation behind the explicit local qualification gate', () => {
-    expect(userAutomationAvailableOnPlatform('win32', undefined)).toBe(false)
-    expect(userAutomationAvailableOnPlatform('win32', '0')).toBe(false)
-    expect(userAutomationAvailableOnPlatform('win32', '1')).toBe(true)
-    expect(userAutomationAvailableOnPlatform('darwin', undefined)).toBe(true)
+    const previousQualification = process.env[WINDOWS_USER_AUTOMATION_QUALIFICATION_ENV]
+    delete process.env[WINDOWS_USER_AUTOMATION_QUALIFICATION_ENV]
+    try {
+      expect(userAutomationAvailableOnPlatform('win32', undefined)).toBe(false)
+      expect(userAutomationAvailableOnPlatform('win32', '0')).toBe(false)
+      expect(userAutomationAvailableOnPlatform('win32', '1')).toBe(true)
+      expect(userAutomationAvailableOnPlatform('darwin', undefined)).toBe(true)
+    } finally {
+      if (previousQualification === undefined) {
+        delete process.env[WINDOWS_USER_AUTOMATION_QUALIFICATION_ENV]
+      } else {
+        process.env[WINDOWS_USER_AUTOMATION_QUALIFICATION_ENV] = previousQualification
+      }
+    }
   })
 })
