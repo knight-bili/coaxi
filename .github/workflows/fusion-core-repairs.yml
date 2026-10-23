@@ -24,7 +24,6 @@ jobs:
       CARGO_PROFILE_TEST_DEBUG: 0
       ROVAI_HOST_BIN: ${{ github.workspace }}/target/debug/rovai-host
       ROVAI_WEB_UI: ${{ github.workspace }}/out/web
-      WORKBENCH_EVIDENCE_ROOT: ${{ runner.temp }}/fusion-core-repair-evidence
     steps:
       - name: Check out repository
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
@@ -61,6 +60,7 @@ jobs:
         shell: bash
         env:
           HOME: ${{ runner.temp }}/fusion-core-repair-home
+          WORKBENCH_EVIDENCE_ROOT: ${{ runner.temp }}/fusion-core-repair-evidence
         run: |
           set -Eeuo pipefail
           mkdir -p "$HOME" "$WORKBENCH_EVIDENCE_ROOT"

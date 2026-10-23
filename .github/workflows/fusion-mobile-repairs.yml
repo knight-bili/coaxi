@@ -23,8 +23,6 @@ jobs:
     if: github.event.pull_request.draft == false
     runs-on: ubuntu-24.04
     timeout-minutes: 35
-    env:
-      GRADLE_USER_HOME: ${{ runner.temp }}/fusion-mobile-gradle
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
         with:
@@ -44,6 +42,8 @@ jobs:
         run: pnpm install --frozen-lockfile --ignore-scripts
       - name: Compile integrated Android and run unit tests
         working-directory: apps/mobile-android
+        env:
+          GRADLE_USER_HOME: ${{ runner.temp }}/fusion-mobile-gradle
         run: |
           chmod +x gradlew
           ./gradlew --no-daemon --console=plain :app:assembleDebug :app:testDebugUnitTest :app:lintDebug
