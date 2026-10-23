@@ -173,7 +173,12 @@ pub(super) fn verify_fixture(database: &mut Database) {
         .execute_batch("DROP TRIGGER reject_automation_stop_migration;")
         .unwrap();
     migrate(database).unwrap();
-    assert!(connection_has_current_data_contract(database.connection()).unwrap());
+    assert!(schema_matches(database.connection()).unwrap());
+    assert!(matches!(
+        classify_database_contract(database.connection()).unwrap(),
+        DatabaseContractClassification::SupportedMigrationSource(ref marker)
+            if marker.projection_schema_version == 159
+    ));
     for (table, expected) in tables.iter().zip(&before) {
         assert_eq!(&rows(database.connection(), table), expected);
     }
@@ -208,4 +213,9 @@ pub(super) fn verify_fixture(database: &mut Database) {
         .connection
         .execute_batch("PRAGMA foreign_keys=ON;")
         .unwrap();
+    database.migrate(false).unwrap();
+    assert!(connection_has_current_data_contract(database.connection()).unwrap());
+    for (table, expected) in tables.iter().zip(&before) {
+        assert_eq!(&rows(database.connection(), table), expected);
+    }
 }
