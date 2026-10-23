@@ -43,8 +43,11 @@ impl Core{
                 let scope:native::NativeSteerScopeV1=serde_json::from_value(value["scope"].clone())?;native::target::scope(&scope)?;
                 let database=self.database.lock().await;let mut query=database.connection().prepare("SELECT p.id,p.value_json,i.command_id FROM native_lifecycle_preview p LEFT JOIN native_lifecycle_intent i ON i.preview_id=p.id WHERE p.kind='steer' AND p.client_id=?1 AND p.owner_thread_id=?2 AND json_extract(p.value_json,'$.target.scope.scopeKind')=?3 AND json_extract(p.value_json,'$.target.scope.conversationId') IS ?4 AND (?5 IS NULL OR p.id>?5) ORDER BY p.id LIMIT ?6")?;
                 let limit=value["limit"].as_u64().context("native_lifecycle.limit_invalid")?;
-                let mut rows=query.query_map(rusqlite::params![client.id(),scope.thread_id,scope.scope_kind,scope.conversation_id,value["after"].as_str(),limit+1],|row|Ok((row.get::<_,String>(0)?,row.get::<_,String>(1)?,row.get::<_,Option<String>>(2)?)))?.collect::<rusqlite::Result<Vec<_>>>()?;
-                let more=rows.len()>limit as usize;rows.truncate(limit as usize);let next=more.then(||rows.last().map(|row|row.0.clone())).flatten();
+                let sql_limit=i64::try_from(limit).context("native_lifecycle.limit_invalid")?;
+                let fetch_limit=sql_limit.checked_add(1).context("native_lifecycle.limit_invalid")?;
+                let limit=usize::try_from(limit).context("native_lifecycle.limit_invalid")?;
+                let mut rows=query.query_map(rusqlite::params![client.id(),scope.thread_id,scope.scope_kind,scope.conversation_id,value["after"].as_str(),fetch_limit],|row|Ok((row.get::<_,String>(0)?,row.get::<_,String>(1)?,row.get::<_,Option<String>>(2)?)))?.collect::<rusqlite::Result<Vec<_>>>()?;
+                let more=rows.len()>limit;rows.truncate(limit);let next=more.then(||rows.last().map(|row|row.0.clone())).flatten();
                 let items=rows.into_iter().map(|(_,raw,command)|Ok(json!({"preview":serde_json::from_str::<Value>(&raw)?,"receipt":command.map(|command|native::steer_delivery::receipt(database.connection(),&command,client.id(),self.interaction_tools.core_instance())).transpose()?}))).collect::<Result<Vec<_>>>()?;
                 Ok(json!({"schemaVersion":1,"items":items,"next":next}))
             },

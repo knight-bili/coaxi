@@ -56,7 +56,9 @@ pub(crate) fn begin_intent(tx:&Transaction<'_>,command:&str,owner:&str,client:&s
 }
 pub(crate) fn reserve_images(tx:&Transaction<'_>,command:&str,target:&NativeSteerTargetV1,input:&NativeSteerInputV1)->Result<()>{
     validate_shape("NativeSteerTargetV1",&serde_json::to_value(target)?)?;let bytes=input.image_bytes()?;let turn=digest(&serde_json::to_value(target)?)?;
-    let previous:u64=tx.query_row("SELECT COALESCE(SUM(byte_size),0) FROM native_lifecycle_image_reservation WHERE turn_digest=?1 AND state<>'not_consumed'",[&turn],|row|row.get(0))?;
+    let previous_raw:i64=tx.query_row("SELECT COALESCE(SUM(byte_size),0) FROM native_lifecycle_image_reservation WHERE turn_digest=?1 AND state<>'not_consumed'",[&turn],|row|row.get(0))?;
+    let previous=u64::try_from(previous_raw).context("native_lifecycle.image_reservation_invalid")?;
     ensure!(previous.checked_add(bytes).is_some_and(|total|total<=32*1024*1024),"native_lifecycle.image_budget_exceeded");
-    tx.execute("INSERT INTO native_lifecycle_image_reservation(command_id,turn_digest,byte_size,state) VALUES(?1,?2,?3,'reserved')",params![command,turn,bytes])?;Ok(())
+    let byte_size=i64::try_from(bytes).context("native_lifecycle.image_budget_exceeded")?;
+    tx.execute("INSERT INTO native_lifecycle_image_reservation(command_id,turn_digest,byte_size,state) VALUES(?1,?2,?3,'reserved')",params![command,turn,byte_size])?;Ok(())
 }

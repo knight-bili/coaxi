@@ -17,7 +17,8 @@ pub fn prepare(connection:&mut Connection,binding:&Binding,core_instance:&str,rp
         return Ok(prepared(&id,&binding_digest,&serde_json::from_str::<Value>(&ids)?,&serde_json::from_str::<Value>(&result)?,&result_digest))
     }
     let attempts:i64=tx.query_row("SELECT count(*) FROM ui_feedback_attempt WHERE bridge_instance_id=?1",[&binding.bridge_instance_id],|row|row.get(0))?;ensure!(attempts<16384,"original_request_pending");
-    let candidates={let mut query=tx.prepare("SELECT id,text,created_at FROM ui_feedback_entry WHERE agent_run_id=?1 AND execution_epoch=?2 AND status='pending' AND thread_id=?3 AND conversation_id IS ?4 AND scope_kind=?5 AND agent_id=?6 ORDER BY created_at,id LIMIT 256")?;query.query_map(params![binding.agent_run_id,binding.execution_epoch,binding.scope.thread_id,binding.scope.conversation_id,binding.scope.scope_kind,binding.agent_id],|row|Ok(ModelNote{id:row.get(0)?,text:row.get(1)?,created_at:row.get(2)?}))?.collect::<rusqlite::Result<Vec<_>>>()?};
+    let execution_epoch=i64::try_from(binding.execution_epoch).context("binding_changed")?;
+    let candidates={let mut query=tx.prepare("SELECT id,text,created_at FROM ui_feedback_entry WHERE agent_run_id=?1 AND execution_epoch=?2 AND status='pending' AND thread_id=?3 AND conversation_id IS ?4 AND scope_kind=?5 AND agent_id=?6 ORDER BY created_at,id LIMIT 256")?;query.query_map(params![binding.agent_run_id,execution_epoch,binding.scope.thread_id,binding.scope.conversation_id,binding.scope.scope_kind,binding.agent_id],|row|Ok(ModelNote{id:row.get(0)?,text:row.get(1)?,created_at:row.get(2)?}))?.collect::<rusqlite::Result<Vec<_>>>()?};
     let mut notes=Vec::new();let mut result=render_feedback_result(&json!({"feedback":[]}));
     for note in candidates{
         validate_shape("modelNote",&serde_json::to_value(&note)?)?;notes.push(note);
@@ -52,7 +53,8 @@ pub fn wrote(connection:&mut Connection,binding:&Binding,attempt:&str,binding_di
     tx.commit()?;Ok(json!({"schemaVersion":1,"attemptId":attempt,"writeStatus":status}))
 }
 pub fn revoke(connection:&Connection,binding:&Binding)->Result<()>{
-    connection.execute("UPDATE ui_feedback_entry SET receipt_json=json_set(receipt_json,'$.status',CASE WHEN status='pending' THEN 'requires_user_review' ELSE 'unknown' END),status=CASE WHEN status='pending' THEN 'requires_user_review' ELSE 'unknown' END WHERE agent_run_id=?1 AND execution_epoch=?2 AND status IN ('pending','response_prepared')",params![binding.agent_run_id,binding.execution_epoch])?;Ok(())
+    let execution_epoch=i64::try_from(binding.execution_epoch).context("binding_changed")?;
+    connection.execute("UPDATE ui_feedback_entry SET receipt_json=json_set(receipt_json,'$.status',CASE WHEN status='pending' THEN 'requires_user_review' ELSE 'unknown' END),status=CASE WHEN status='pending' THEN 'requires_user_review' ELSE 'unknown' END WHERE agent_run_id=?1 AND execution_epoch=?2 AND status IN ('pending','response_prepared')",params![binding.agent_run_id,execution_epoch])?;Ok(())
 }
 pub fn recover_after_restart(connection:&Connection)->Result<()>{
     connection.execute("UPDATE ui_feedback_entry SET receipt_json=json_set(receipt_json,'$.status',CASE WHEN status='pending' THEN 'requires_user_review' ELSE 'unknown' END),status=CASE WHEN status='pending' THEN 'requires_user_review' ELSE 'unknown' END WHERE status IN ('pending','response_prepared')",[])?;

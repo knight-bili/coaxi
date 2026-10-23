@@ -45,9 +45,12 @@ pub(crate) fn list(connection:&Connection,input:&Value)->Result<Value>{
     validate_operation("conversationTools.grants.list",input)?;let scope:ScopeV1=serde_json::from_value(input["scope"].clone())?;
     scope::require_scope(connection,&scope)?;let key=digest(&serde_json::to_value(&scope)?)?;
     let limit=input["limit"].as_u64().context("conversation_tools.limit_required")?;
+    let sql_limit=i64::try_from(limit).context("conversation_tools.limit_required")?;
+    let fetch_limit=sql_limit.checked_add(1).context("conversation_tools.limit_required")?;
+    let limit=usize::try_from(limit).context("conversation_tools.limit_required")?;
     let mut query=connection.prepare("SELECT value_json FROM conversation_tool_source_grant WHERE scope_digest=?1 AND revoked_at IS NULL AND expires_at_ms>?2 AND (?3 IS NULL OR id>?3) ORDER BY id LIMIT ?4")?;
-    let mut values=query.query_map(params![key,chrono::Utc::now().timestamp_millis(),input["after"].as_str(),limit+1],|row|row.get::<_,String>(0))?.map(|row|Ok(serde_json::from_str::<SourceGrantV1>(&row?)?)).collect::<Result<Vec<_>>>()?;
-    let more=values.len()>limit as usize;values.truncate(limit as usize);
+    let mut values=query.query_map(params![key,chrono::Utc::now().timestamp_millis(),input["after"].as_str(),fetch_limit],|row|row.get::<_,String>(0))?.map(|row|Ok(serde_json::from_str::<SourceGrantV1>(&row?)?)).collect::<Result<Vec<_>>>()?;
+    let more=values.len()>limit;values.truncate(limit);
     for grant in &values{ensure!(grant.scope==scope,"conversation_tools.scope_changed");validate("SourceGrantV1",&serde_json::to_value(grant)?)?;}
     let next=if more{values.last().map(|value|value.grant_id.clone())}else{None};Ok(json!({"items":values,"next":next}))
 }

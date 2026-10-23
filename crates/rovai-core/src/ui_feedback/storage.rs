@@ -10,7 +10,8 @@ pub fn set_policy(connection:&mut Connection,expected:u64,members:Vec<MemberPoli
     if serde_json::to_value(&current)?==serde_json::to_value(&value)?{return Ok(current)}
     ensure!(current.revision==expected,"policy_changed");
     for member in &value.members{let exists:bool=tx.query_row("SELECT EXISTS(SELECT 1 FROM agent_profile WHERE id=?1)",[&member.agent_id],|row|row.get(0))?;ensure!(exists,"member_changed")}
-    tx.execute("UPDATE ui_feedback_policy SET revision=?1,value_json=?2 WHERE singleton=1",params![value.revision,serde_json::to_string(&value)?])?;
+    let revision=i64::try_from(value.revision).context("feedback.invalid_revision")?;
+    tx.execute("UPDATE ui_feedback_policy SET revision=?1,value_json=?2 WHERE singleton=1",params![revision,serde_json::to_string(&value)?])?;
     // 撤权后的未写出原文保留，不允许旧凭据领取另一份新反馈。
     tx.execute("UPDATE ui_feedback_entry SET receipt_json=json_set(receipt_json,'$.status',CASE WHEN status='pending' THEN 'requires_user_review' ELSE 'unknown' END),status=CASE WHEN status='pending' THEN 'requires_user_review' ELSE 'unknown' END WHERE status IN ('pending','response_prepared')",[])?;
     tx.commit()?;Ok(value)
@@ -21,7 +22,7 @@ pub fn scope(connection:&Connection,target:&Scope,agent:&str)->Result<()>{
     ensure!(allowed,"scope_changed");Ok(())
 }
 pub fn run_guard(connection:&Connection,target:&Scope,agent:&str,run:&str,epoch:u64)->Result<Value>{
-    scope(connection,target,agent)?;ensure!(epoch<=MAX_SAFE_INTEGER,"epoch_changed");let current_policy=policy(connection)?;ensure!(current_policy.enabled(agent),"feature_disabled");
+    scope(connection,target,agent)?;ensure!(epoch<=MAX_SAFE_INTEGER,"epoch_changed");let epoch=i64::try_from(epoch).context("epoch_changed")?;let current_policy=policy(connection)?;ensure!(current_policy.enabled(agent),"feature_disabled");
     let guard:Option<Value>=connection.query_row(r#"
         SELECT c.native_binding_id,c.native_binding_generation,c.native_session_id,camp.membership_generation,m.version
         FROM agent_run r JOIN conversation c ON c.id=r.conversation_id JOIN camp ON camp.id=c.camp_id
@@ -79,10 +80,11 @@ pub fn submit(connection:&mut Connection,input:SubmitRequest)->Result<Receipt>{
     if let Source::GeneratedCard{origin}=&source.source{super::cards::require_card_fields(&tx,&source,origin)?}
     let existing:Option<String>=tx.query_row("SELECT id FROM ui_feedback_entry WHERE preview_id=?1",[&input.preview_id],|row|row.get(0)).optional()?;
     let response=if let Some(id)=existing{receipt(&tx,&id)?}else{
-        let pending:i64=tx.query_row("SELECT count(*) FROM ui_feedback_entry WHERE agent_run_id=?1 AND execution_epoch=?2 AND status IN ('pending','response_prepared')",params![source.agent_run_id,source.execution_epoch],|row|row.get(0))?;ensure!(pending<MAX_PENDING as i64,"feedback.pending_capacity");
+        let execution_epoch=i64::try_from(source.execution_epoch).context("epoch_changed")?;
+        let pending:i64=tx.query_row("SELECT count(*) FROM ui_feedback_entry WHERE agent_run_id=?1 AND execution_epoch=?2 AND status IN ('pending','response_prepared')",params![source.agent_run_id,execution_epoch],|row|row.get(0))?;ensure!(pending<MAX_PENDING as i64,"feedback.pending_capacity");
         let id=uuid::Uuid::new_v4().to_string();let created=Utc::now().to_rfc3339();let source_kind=match source.source{Source::LiveNote=>"live_note",Source::GeneratedCard{..}=>"generated_card"};
         let record=Receipt{schema_version:1,feedback_id:id.clone(),scope:source.scope.clone(),agent_id:source.agent_id.clone(),source_agent_run_id:source.agent_run_id.clone(),source_execution_epoch:source.execution_epoch,source_kind:source_kind.into(),text_digest:digest(&Value::String(result.text.clone()))?,status:"pending".into(),delivery_channel:"none".into(),bridge_instance_id:None,transport_rpc_id:Value::Null,native_tool_call_id:None,result_digest:None,written_at:None,continued_message_id:None};
-        tx.execute("INSERT INTO ui_feedback_entry(id,preview_id,thread_id,conversation_id,scope_kind,agent_id,agent_run_id,execution_epoch,text,created_at,status,receipt_json,source_json) VALUES(?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,'pending',?11,?12)",params![id,input.preview_id,source.scope.thread_id,source.scope.conversation_id,source.scope.scope_kind,source.agent_id,source.agent_run_id,source.execution_epoch,result.text,created,serde_json::to_string(&record)?,raw])?;record
+        tx.execute("INSERT INTO ui_feedback_entry(id,preview_id,thread_id,conversation_id,scope_kind,agent_id,agent_run_id,execution_epoch,text,created_at,status,receipt_json,source_json) VALUES(?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,'pending',?11,?12)",params![id,input.preview_id,source.scope.thread_id,source.scope.conversation_id,source.scope.scope_kind,source.agent_id,source.agent_run_id,execution_epoch,result.text,created,serde_json::to_string(&record)?,raw])?;record
     };
     tx.execute("INSERT INTO ui_feedback_command(command_id,input_digest,feedback_id,created_at) VALUES(?1,?2,?3,?4)",params![input.command_id,input_digest,response.feedback_id,Utc::now().to_rfc3339()])?;
     tx.commit()?;Ok(response)

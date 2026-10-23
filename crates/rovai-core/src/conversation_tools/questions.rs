@@ -104,8 +104,11 @@ pub(crate) fn list(connection:&Connection,input:&Value)->Result<Value>{
     }
     let mut query=connection.prepare("SELECT q.request_id FROM conversation_tool_question q JOIN conversation_tool_request r ON r.id=q.request_id JOIN conversation_tool_run owned ON owned.agent_run_id=r.agent_run_id AND owned.execution_epoch=r.execution_epoch WHERE owned.thread_id=?1 AND owned.scope_kind=?2 AND owned.conversation_id IS ?3 AND (?4 IS NULL OR(q.created_at,q.request_id)<(SELECT created_at,request_id FROM conversation_tool_question WHERE request_id=?4)) ORDER BY q.created_at DESC,q.request_id DESC LIMIT ?5")?;
     let limit=input["limit"].as_u64().context("conversation_tools.limit_required")?;
-    let mut ids=query.query_map(params![scope.thread_id,scope::kind(&scope.scope_kind),scope.conversation_id,input["after"].as_str(),limit+1],|row|row.get::<_,String>(0))?.collect::<rusqlite::Result<Vec<_>>>()?;
-    let more=ids.len()>limit as usize;ids.truncate(limit as usize);let next=if more{ids.last().cloned()}else{None};
+    let sql_limit=i64::try_from(limit).context("conversation_tools.limit_required")?;
+    let fetch_limit=sql_limit.checked_add(1).context("conversation_tools.limit_required")?;
+    let limit=usize::try_from(limit).context("conversation_tools.limit_required")?;
+    let mut ids=query.query_map(params![scope.thread_id,scope::kind(&scope.scope_kind),scope.conversation_id,input["after"].as_str(),fetch_limit],|row|row.get::<_,String>(0))?.collect::<rusqlite::Result<Vec<_>>>()?;
+    let more=ids.len()>limit;ids.truncate(limit);let next=if more{ids.last().cloned()}else{None};
     let values=ids.into_iter().map(|id|set_view(connection,&id)).collect::<Result<Vec<_>>>()?;Ok(json!({"items":values,"next":next}))
 }
 /// Core生命周期事务调用；停止与到期只取消投递，不能伪造用户拒答或默认选择。
