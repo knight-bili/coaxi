@@ -53,3 +53,4 @@ describe('NativeTranscriptBody', () => {
     expect(renderedText).not.toContain('查看下级帮手会话')
   })
 })
+// @vitest-environment jsdom
