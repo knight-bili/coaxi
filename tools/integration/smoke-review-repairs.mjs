@@ -408,6 +408,26 @@ try {
     secondParentChangeVisible: true
   })
 
+  stage = 'issue_79_branch_comparison'
+  git('switch', '-c', 'review-branch-compare')
+  await writeFile(path.join(repository, 'branch-only.txt'), 'branch comparison target\n')
+  gitCommit('建立分支比较目标改动')
+  const comparisonBranch = git('rev-parse', 'HEAD').trim()
+  git('switch', 'main')
+  const branchDiff = await call('workbench.git.read', {
+    scope,
+    action: 'diff_compare',
+    target: 'refs/heads/main...refs/heads/review-branch-compare'
+  })
+  assert.equal(branchDiff.success, true, branchDiff.error)
+  assert(branchDiff.output.includes('branch-only.txt'), '分支比较应显示目标分支新增内容')
+  record('issue_79_branch_comparison_executes_against_validated_target', {
+    baseBranch: 'refs/heads/main',
+    targetBranch: 'refs/heads/review-branch-compare',
+    targetCommit: comparisonBranch,
+    changedPathVisible: true
+  })
+
   finalResult = {
     status: 'passed',
     scope: 'real_host_core_isolated_git_fixture_no_model_execution',
