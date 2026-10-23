@@ -296,6 +296,12 @@ importers:
         specifier: 7.3.0
         version: 7.3.0
 
+  apps/server-channels:
+    dependencies:
+      tough-cookie:
+        specifier: 5.1.2
+        version: 5.1.2
+
 packages:
 
   html-to-image@1.11.13:
