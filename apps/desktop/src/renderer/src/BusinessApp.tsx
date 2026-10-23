@@ -3619,7 +3619,7 @@ function BusinessAppContent({
     if(link.kind==='thread'){if(!await activateThread(link.value,{reconcileDefaultLead:false}))unavailable();return}
     if(link.kind==='mission'){
       const mission=await client.request<MissionRecord>('missions.get',{missionId:link.value})
-      if(mission.id!==link.value)unavailable()
+      if(mission.missionId!==link.value)unavailable()
       await openMission(mission);return
     }
     if(link.kind==='canvas'){
