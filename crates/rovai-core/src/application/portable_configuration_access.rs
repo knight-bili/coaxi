@@ -31,9 +31,9 @@ impl Core{
         let execution=match method{
             "configuration.migration.confirm"=>{let mut input:migration::Confirm=serde_json::from_value(value)?;input.client=client.clone();input.core_instance=self.interaction_tools.core_instance().into();migration::confirm(&mut database,&self.data_dir,&user_command_envelope(command.clone(),input))?},
             "configuration.migration.undoConfirm"=>{let mut input:migration::Confirm=serde_json::from_value(value)?;input.client=client.clone();input.core_instance=self.interaction_tools.core_instance().into();migration::undo_confirm(&mut database,&self.data_dir,&user_command_envelope(command.clone(),migration::UndoConfirm(input)))?},
-            "configuration.providers.upsert"=>{let mut input:providers::Upsert=serde_json::from_value(value)?;input.client=client.clone();providers::upsert(&mut database,&user_command_envelope(command,input))?},
-            "configuration.providers.remove"=>{let mut input:providers::Remove=serde_json::from_value(value)?;input.client=client.clone();providers::remove(&mut database,&user_command_envelope(command,input))?},
-            "configuration.memberConnection.set"=>{let mut input:members::SetConnection=serde_json::from_value(value)?;input.client=client.clone();members::set(&mut database,&user_command_envelope(command,input))?},
+            "configuration.providers.upsert"=>{let mut input:providers::Upsert=serde_json::from_value(value)?;input.client=client.clone();providers::upsert(&mut database,&user_command_envelope(command.clone(),input))?},
+            "configuration.providers.remove"=>{let mut input:providers::Remove=serde_json::from_value(value)?;input.client=client.clone();providers::remove(&mut database,&user_command_envelope(command.clone(),input))?},
+            "configuration.memberConnection.set"=>{let mut input:members::SetConnection=serde_json::from_value(value)?;input.client=client.clone();members::set(&mut database,&user_command_envelope(command.clone(),input))?},
             _=>anyhow::bail!("configuration.operation_unknown"),
         };
         let is_migration=matches!(method,"configuration.migration.confirm"|"configuration.migration.undoConfirm");
