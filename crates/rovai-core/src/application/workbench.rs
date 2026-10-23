@@ -282,7 +282,11 @@ fn git_arguments(request: &GitRequest, write: bool) -> Result<Vec<String>> {
             ],
             "file_at" => {
                 ensure!(request.paths.len() == 1, "workbench.paths_required");
-                vec!["show".into(), format!("{}:{}", target()?, request.paths[0])]
+                vec![
+                    "cat-file".into(),
+                    "blob".into(),
+                    format!("{}:{}", target()?, request.paths[0]),
+                ]
             }
             "diff_compare" => {
                 let mut args = vec![
