@@ -9,6 +9,7 @@ import * as Dialog from '@radix-ui/react-dialog'
 import type {
   AcceptHearthReviewItemCommand,
   AgentProfile,
+  CoreMethod,
   CreateMemoryCommand,
   HearthReviewItem,
   MemoryCapacity,
@@ -299,7 +300,7 @@ export function MemoryLibrary({
     }
   }, [isCurrentOwner, resolveOwner])
 
-  const requestForOwner = async <T,>(owner: MemoryOwnerToken, method: string, params?: unknown): Promise<T> => {
+  const requestForOwner = async <T,>(owner: MemoryOwnerToken, method: CoreMethod, params?: unknown): Promise<T> => {
     if (!isCurrentOwner(owner)) throw new Error('工作区已切换，本次操作结果已忽略。')
     const value = await owner.client.request<T>(method, params)
     if (!await verifyOwner(owner)) throw new Error('工作区已切换，本次操作结果已忽略。')
