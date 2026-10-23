@@ -128,7 +128,7 @@ export function NativeTranscriptBody({ data, reader, target, live, visible, onFo
       undefined, { commitOnSuccess: true, revalidateSource: true })
     if (outcome.kind === 'error') throw new Error('native_child.file_unavailable')
   }, [reader, previewOpen])
-  const source = reader?.fileSource()
+  const source = reader?.fileSource() ?? null
   const client = useThreadClient(), local = client.attachments?.kind !== 'download'
   const scope = useMemo(() => ({ source, api: fileApi, theme: filePreview?.resolvedTheme ?? 'day' as const, visible, local, open: filePreview && source ? openFile : null }),
     [source?.threadId, source?.readId, fileApi, filePreview?.resolvedTheme, visible, local, Boolean(previewOpen), openFile])
