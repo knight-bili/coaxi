@@ -20,7 +20,7 @@ export interface CustomRuntimeInstallReceipt{
 }
 export interface CustomRuntimeInspection{
   reference:CustomRuntimeRefV1;definition:CustomRuntimeDefinition;platform:CustomRuntimePlatform
-  installation:{status:string;qualification:'not_verified';installationId?:string|null;operationId?:string|null;receipt?:CustomRuntimeInstallReceipt|null;launchLock?:CustomAcpLaunchLockV1|null;launchLockDigest?:string|null}
+  installation:{status:string;qualification:'not_verified';installationId?:string|null;operationId?:string|null;receipt?:CustomRuntimeInstallReceipt|null;launchLock?:CustomAcpLaunchLockV1|null;launchLockDigest?:string|null;environment?:{status:'not_installed'|'artifacts_current'|'needs_environment'|'unreadable';unresolvedLinkCount:number|null;qualification:'not_verified'}}
 }
 export interface CustomRuntimeDefinitionPage{items:CustomRuntimeDefinition[];next:string|null}
 export const customRuntimeReference=(definition:CustomRuntimeDefinition):CustomRuntimeRefV1=>({id:definition.id,definitionRevision:definition.revision,definitionDigest:definition.definitionDigest})

@@ -32,8 +32,9 @@ impl Core{
                 drop(database);
                 let detail=if let Some((installation_id,operation_id,lock,status))=installation{
                     let receipt=operation_id.as_deref().map(|id|custom::installer::receipt(&self.data_dir,id)).transpose()?;let lock=lock.map(|raw|serde_json::from_str::<Value>(&raw)).transpose()?;let lock_digest=lock.as_ref().map(custom::digest).transpose()?;
-                    json!({"installationId":installation_id,"operationId":operation_id,"status":status,"receipt":receipt,"launchLock":lock,"launchLockDigest":lock_digest,"qualification":"not_verified"})
-                }else{json!({"status":"not_installed","qualification":"not_verified"})};
+                    let environment=custom::availability::inspect(&self.data_dir,&reference,platform,operation_id.as_deref(),lock.as_ref()).await?;
+                    json!({"installationId":installation_id,"operationId":operation_id,"status":status,"receipt":receipt,"launchLock":lock,"launchLockDigest":lock_digest,"qualification":"not_verified","environment":environment})
+                }else{json!({"status":"not_installed","qualification":"not_verified","environment":{"status":"not_installed","unresolvedLinkCount":0,"qualification":"not_verified"}})};
                 Ok(json!({"reference":reference,"definition":definition,"platform":platform,"installation":detail}))
             },
             _=>anyhow::bail!("custom_runtime.operation_unknown")

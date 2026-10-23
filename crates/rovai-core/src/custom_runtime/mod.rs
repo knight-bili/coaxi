@@ -55,3 +55,4 @@ pub(crate) fn environments(value:&Value)->Vec<String>{
     if let Some(platforms)=value["spec"]["binary"].as_object(){for platform in platforms.keys(){paths.push(format!("/spec/binary/{platform}/env"))}}paths
 }
 pub fn default_definition()->Value{json!({"schemaVersion":1,"id":uuid::Uuid::new_v4().to_string(),"registryId":"custom-agent","name":"","description":"","version":"1.0.0","distributionKind":"npx","spec":{"npx":{"package":"","args":[],"env":{},"cmd":null,"nodeRequired":null},"uvx":null,"binary":{}},"iconUrl":null,"skillsSharedStore":false,"skillsDir":null,"source":"manual","sourceRef":null,"versionProbe":null,"supportsMcp":true,"enabled":true})}
+pub(crate) mod availability;
