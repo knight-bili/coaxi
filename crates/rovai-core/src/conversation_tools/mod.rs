@@ -13,6 +13,7 @@ pub(crate) mod sources;
 pub(crate) mod source_projection;
 pub(crate) mod grants;
 pub(crate) mod questions;
+pub(crate) mod question_delivery;
 pub mod storage;
 pub use model::*;
 pub const SERVER_NAME:&str="rovai-conversation-tools";

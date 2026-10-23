@@ -9,7 +9,7 @@ pub(crate) struct NativeQuestionTarget{
     pub bridge_instance_id:String,pub native_binding_id:String,pub native_binding_generation:i64,pub locator:Value,
 }
 fn context(id:&str,part:&str)->String{format!("conversation-tool-question:{id}:{part}")}
-fn target_guard(connection:&Connection,lease:&RunLease,target:&NativeQuestionTarget)->Result<()>{
+pub(super) fn target_guard(connection:&Connection,lease:&RunLease,target:&NativeQuestionTarget)->Result<()>{
     scope::require_run(connection,&lease.run_id,lease.epoch)?;
     uuid::Uuid::parse_str(&target.bridge_instance_id)?;
     ensure!(target.native_binding_generation>=0&&serde_json::to_vec(&target.locator)?.len()<=8192,"conversation_tools.native_target_invalid");
