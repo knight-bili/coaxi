@@ -180,7 +180,6 @@ impl DeepSeekParser {
     /// real layout puts the two beside each other under `$DSH_HOME` instead,
     /// which is why production resolves them separately — the sessions root is
     /// independently relocatable via `DEEPSEEK_ACP_SESSIONS_ROOT`.
-    #[cfg(any(test, feature = "test-utils"))]
     pub fn with_base_dir(base_dir: PathBuf) -> Self {
         let attachments_root = base_dir.join("attachments").join("v1");
         Self {

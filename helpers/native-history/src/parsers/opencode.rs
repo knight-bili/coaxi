@@ -40,7 +40,6 @@ impl OpenCodeParser {
     /// It reads nothing else: no OpenCode config or catalog from the machine
     /// running the test, so a context window comes only from the model-name
     /// guess.
-    #[cfg(any(test, feature = "test-utils"))]
     pub fn with_base_dir(base_dir: PathBuf) -> Self {
         Self {
             base_dir,
