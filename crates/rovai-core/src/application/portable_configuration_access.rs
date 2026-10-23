@@ -47,10 +47,15 @@ impl Core{
         emit(&self.output,"portableConfiguration.filesChanged",json!({"commandId":command,"readReceipt":true,"requiresAttention":result.as_ref().map_or(true,|items|items.iter().any(|item|item["state"]!="applied"))}));
     }
     pub(super) async fn portable_configuration_recover_outbox(&self){
-        let commands={let database=self.database.lock().await;(||->Result<Vec<String>>{
-            let mut query=database.connection().prepare("SELECT DISTINCT command_id FROM configuration_file_outbox WHERE state='pending' ORDER BY command_id LIMIT 1000")?;
-            Ok(query.query_map([],|row|row.get::<_,String>(0))?.collect::<rusqlite::Result<Vec<_>>>()?)
-        })()};
-        if let Ok(commands)=commands{for command in commands{self.portable_configuration_drain(&command).await;}}
+        let mut after=String::new();
+        loop{
+            let commands={let database=self.database.lock().await;(||->Result<Vec<String>>{
+                let mut query=database.connection().prepare("SELECT DISTINCT command_id FROM configuration_file_outbox WHERE state='pending' AND command_id>?1 ORDER BY command_id LIMIT 100")?;
+                Ok(query.query_map([&after],|row|row.get::<_,String>(0))?.collect::<rusqlite::Result<Vec<_>>>()?)
+            })()};
+            let Ok(commands)=commands else{return};let Some(last)=commands.last()else{return};after=last.clone();
+            for command in commands{self.portable_configuration_drain(&command).await;}
+            tokio::task::yield_now().await;
+        }
     }
 }
