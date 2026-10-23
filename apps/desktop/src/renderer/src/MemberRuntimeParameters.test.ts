@@ -568,6 +568,7 @@ function runtimePermissionDefaults(kind: AdapterKind): Record<string, unknown> {
     case 'cline-cli':
       return { mode: 'act', auto_approve: 'true' }
     case 'pi':
+    case 'custom':
       return {}
     case 'opencode-cli':
       return { permission: 'allow' }
