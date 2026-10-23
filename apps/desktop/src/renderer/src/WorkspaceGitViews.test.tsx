@@ -96,7 +96,7 @@ describe('WorkspaceGitViews 提交文件历史', () => {
     expect(screen.getByText('说明 文件.md')).toBeTruthy()
     expect(screen.getByText(/old name\.txt/)).toBeTruthy()
     expect(screen.getByText(/已重命名|Renamed/i)).toBeTruthy()
-    expect(screen.getByText(/已删除|Deleted/i)).toBeTruthy()
+    expect(screen.getByText(/^(已删除|Deleted)$/i)).toBeTruthy()
     expect(screen.getByText(/二进制|binary/i)).toBeTruthy()
     expect((screen.getByRole('button', { name: /unsafe\.txt/ }) as HTMLButtonElement).disabled).toBe(true)
 
