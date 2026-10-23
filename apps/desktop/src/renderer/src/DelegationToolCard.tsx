@@ -35,7 +35,8 @@ function DelegationToolCardContent({ target, revision, children }: Props): React
       {view?.state === 'refused' && (view.operation === 'delegation.resume' ? <div className="codeg-native-rich"><CodegMcpToolCard
         tool="resume_delegation"
         state="output-error" errorText={t(view.code === 'delegation.cleanup_pending'
-          ? '原任务还在清理，请稍后再恢复。' : '这次委派或恢复请求未被接受。')} /></div>
+          ? '原任务还在清理，请稍后再恢复。' : view.code === 'delegation.native_session_rebuild_required'
+            ? '这次任务的工具连接不能安全续接，历史已保留。你可以接管后继续聊天。' : '这次委派或恢复请求未被接受。')} /></div>
         : <p className="delegation-read-error" role="status">{t('这次委派或恢复请求未被接受。')}</p>)}
       {state.error && <div className="delegation-read-error" role="alert">{t('工具来源暂时无法核对。')}<button type="button" onClick={() => void controller.refresh()}>{t('重试')}</button></div>}
       {view?.state === 'unresolved' && <div className="delegation-status">{t('工具来源尚未确认。')}<button type="button" className="quiet-button compact" onClick={() => void controller.refresh()}>{t('重新核对')}</button></div>}

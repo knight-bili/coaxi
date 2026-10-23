@@ -192,7 +192,7 @@ function DelegationDrawer({ target, open, visible, onOpenChange, onLeaveGuardCha
         {detail.takenOver && detail.cleanupPending && <p role="status">{t('正在停止和清理原任务，完成后可继续聊天。')}</p>}
         {detail.takenOver && !detail.cleanupPending && !ownerMember && <p role="status">{t('发起队员当前不可用，已保留原会话供查看。')}</p>}
         {action.pending && <div role="status">{t('原操作尚未确认，请先核对。')}<button type="button" disabled={action.busy} onClick={() => void recover(false).catch(() => undefined)}>{t('核对原操作')}</button>{action.unknown && <button type="button" disabled={action.busy} onClick={() => void recover(true).catch(() => undefined)}>{t('重试原操作')}</button>}</div>}
-        {action.error && !action.pending && <p role="alert">{t(action.error === 'delegation.not_resumable' ? '原任务当前不能恢复，你仍可接管后继续聊天。' : '操作未完成，请刷新状态后再试。')}</p>}
+        {action.error && !action.pending && <p role="alert">{t(action.error === 'delegation.native_session_rebuild_required' ? '这次任务的工具连接不能安全续接，历史已保留。你可以接管后继续聊天。' : action.error === 'delegation.not_resumable' ? '原任务当前不能恢复，你仍可接管后继续聊天。' : '操作未完成，请刷新状态后再试。')}</p>}
       </section>}
       {open && <div className={`delegation-drawer-body${chatReady ? ' has-chat' : ''}`}>
         {state.loading && <p className="delegation-empty" role="status"><Loader2 size={15} className="native-spinner" />{t('正在读取帮手会话…')}</p>}
