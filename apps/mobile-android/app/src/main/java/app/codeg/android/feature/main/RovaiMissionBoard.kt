@@ -3,6 +3,7 @@ package app.codeg.android.feature.main
 import androidx.compose.ui.res.stringResource
 import app.codeg.android.R
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
@@ -26,6 +27,7 @@ import kotlinx.serialization.json.*
 
 val rovaiMissionStatuses=listOf("needs_you" to "需要你","not_started" to "未开始","in_progress" to "进行中","completed" to "已完成")
 fun missionStatusName(value:String)=rovaiMissionStatuses.firstOrNull{it.first==value}?.second?:value
+@OptIn(ExperimentalFoundationApi::class)
 @Composable fun RovaiMissionBoard(model:RovaiWorkspaceViewModel,state:RovaiWorkspaceState){
     var creating by remember{mutableStateOf(false)}
     if(creating)RovaiMissionCreator(model){creating=false}

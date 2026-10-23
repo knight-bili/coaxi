@@ -4,6 +4,7 @@ import androidx.compose.ui.res.stringResource
 import app.codeg.android.R
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.*
@@ -24,6 +25,7 @@ import java.util.UUID
 val rovaiCanvasColors=listOf("" to "默认","neutral" to "中性","zinc" to "锌灰","slate" to "蓝灰","stone" to "石灰","gray" to "灰色","red" to "红色","rose" to "玫瑰","orange" to "橙色","green" to "绿色","blue" to "蓝色","yellow" to "黄色","violet" to "紫色")
 
 /** Codeg BoardCard's footprint, copy and separate action menu; summaries must match the board revision. */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable fun RovaiCanvasBoards(model:RovaiWorkspaceViewModel,onOpen:(JsonObject)->Unit){
     val state=model.state.collectAsState().value;var search by remember{mutableStateOf("")};var creating by remember{mutableStateOf(false)};var editing by remember{mutableStateOf<JsonObject?>(null)};var deleting by remember{mutableStateOf<JsonObject?>(null)};var managingGroups by remember{mutableStateOf(false)}
     val blocked=state.busy||state.pending!=null||!state.connected
