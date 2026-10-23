@@ -20,6 +20,8 @@ CREATE TABLE conversation_tool_source (
  CHECK((source_kind='imported' AND import_id IS NOT NULL AND import_revision IS NOT NULL AND conversation_id IS NULL)
     OR (source_kind<>'imported' AND conversation_id IS NOT NULL AND import_id IS NULL AND import_revision IS NULL))
 );
+CREATE UNIQUE INDEX conversation_tool_import_source ON conversation_tool_source(owner_thread_id,import_id,import_revision)
+ WHERE source_kind='imported';
 CREATE TABLE conversation_tool_grant_preview (
  id TEXT PRIMARY KEY NOT NULL,client_id TEXT NOT NULL,scope_digest TEXT NOT NULL,source_id TEXT NOT NULL REFERENCES conversation_tool_source(id),
  digest TEXT NOT NULL,value_json TEXT NOT NULL CHECK(json_valid(value_json) AND length(value_json)<=131072),
