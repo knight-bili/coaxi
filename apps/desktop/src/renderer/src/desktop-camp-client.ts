@@ -1,32 +1,34 @@
 import type { ThreadClient } from './camp-client'
 import { dispatchShortcutAction } from './shortcut-action-driver'
 
+const desktopBridge = () => typeof window === 'undefined' ? undefined : window.rovai
+
 /** Lazy Desktop-only compatibility adapter; importing it never accesses Electron. */
 export const desktopThreadClient: ThreadClient = {
   presentationScope: 'desktop',
-  get computerWorkspace() { return window.rovai.computerWorkspace },
-  get nativePets() { return window.rovai.nativePets },
-  get webdavWorkspace() { return window.rovai.webdavWorkspace },
-  get nativeBackups() { return window.rovai.nativeBackups },
-  get portableConfiguration() { return window.rovai.portableConfiguration },
-  get keyboardShortcuts(){return window.rovai.keyboardShortcuts},
-  get workbenchEditorRecovery(){return window.rovai.workbenchEditorRecovery},
-  get nativeCustomSkills() { return window.rovai.nativeCustomSkills },
-  get nativeHistory() { return window.rovai.nativeHistory },
-  get officeWorkspace() { return window.rovai.officeWorkspace },
-  get interactionComputer(){return window.rovai.interactionComputer},
-  get interactionWorkspace() { return window.rovai.interactionWorkspace },
-  get browserWorkspace() { return window.rovai.browserWorkspace },
-  get privateInputRecovery() { return window.rovai.privateInputRecovery },
+  get computerWorkspace() { return desktopBridge()?.computerWorkspace },
+  get nativePets() { return desktopBridge()?.nativePets },
+  get webdavWorkspace() { return desktopBridge()?.webdavWorkspace },
+  get nativeBackups() { return desktopBridge()?.nativeBackups },
+  get portableConfiguration() { return desktopBridge()?.portableConfiguration },
+  get keyboardShortcuts(){return desktopBridge()?.keyboardShortcuts},
+  get workbenchEditorRecovery(){return desktopBridge()?.workbenchEditorRecovery},
+  get nativeCustomSkills() { return desktopBridge()?.nativeCustomSkills },
+  get nativeHistory() { return desktopBridge()?.nativeHistory },
+  get officeWorkspace() { return desktopBridge()?.officeWorkspace },
+  get interactionComputer(){return desktopBridge()?.interactionComputer},
+  get interactionWorkspace() { return desktopBridge()?.interactionWorkspace },
+  get browserWorkspace() { return desktopBridge()?.browserWorkspace },
+  get privateInputRecovery() { return desktopBridge()?.privateInputRecovery },
   exportMonitoring: async filter => { const path = await window.rovai.exportMonitoring(filter); return { exported: Boolean(path), ...(path ? { path } : {}) } },
   exportUsageActivityReport: async query => { const path = await window.rovai.exportUsageActivityReport?.(query); return {exported:Boolean(path),...(path?{path}:{})} },
-  get usageCard() { return window.rovai.usageCard },
+  get usageCard() { return desktopBridge()?.usageCard },
   syncNativeHistoryUsage: input => window.rovai.request('history.usage.local',input),
   exportNativeHistoryUsage: async query => {const path=await window.rovai.exportNativeHistoryUsage?.(query);return {exported:Boolean(path),...(path?{path}:{})}},
   revealMonitoringExport: path => window.rovai.revealMonitoringExport(path),
   exportDiagnostics: async () => { const path = await window.rovai.exportDiagnostics(); return { exported: Boolean(path), ...(path ? { path } : {}) } },
   revealDiagnosticsExport: path => window.rovai.revealDiagnosticsExport(path),
-  get memberAvatars() { return window.rovai.memberAvatars },
+  get memberAvatars() { return desktopBridge()?.memberAvatars },
   selectSkillImportDirectory: () => window.rovai.selectSkillImportDirectory(),
   selectRuntimeExecutable: () => window.rovai.selectRuntimeExecutable(),
   revealMcpConfig: () => window.rovai.revealMcpConfig(),
@@ -43,9 +45,9 @@ export const desktopThreadClient: ThreadClient = {
   request: (method, params) => window.rovai.request(method, params),
   onEvent: (listener) => window.rovai.onEvent(listener),
   onClosePreviewRequested: listener => window.rovai.windowControls.onCloseTabRequested(()=>dispatchShortcutAction('close_current_tab')||listener()),
-  get singleChatAttachments() { return window.rovai.singleChatAttachments },
-  get missionAttachments() { return window.rovai.missionAttachments },
-  get composerAttachments() { return window.rovai.composerAttachments },
+  get singleChatAttachments() { return desktopBridge()?.singleChatAttachments },
+  get missionAttachments() { return desktopBridge()?.missionAttachments },
+  get composerAttachments() { return desktopBridge()?.composerAttachments },
   attachmentLocation: async locator => {
     if (locator.owner === 'composer') {
       const path = await window.rovai.composerAttachments.location?.(locator)
@@ -58,5 +60,5 @@ export const desktopThreadClient: ThreadClient = {
     open: locator => window.rovai.attachments.open(locator),
     reveal: locator => window.rovai.attachments.reveal(locator)
   },
-  get platform() { return window.rovai.platform }
+  get platform() { return desktopBridge()?.platform }
 }
