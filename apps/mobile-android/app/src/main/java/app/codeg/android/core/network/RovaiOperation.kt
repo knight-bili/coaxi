@@ -2,6 +2,20 @@ package app.codeg.android.core.network
 
 /** Generated from the explicit public Host enum; private Core methods are not admitted. */
 enum class RovaiOperation(val wire:String) {
+    CONVERSATIONTOOLS_POLICY_GET("conversationTools.policy.get"),
+    CONVERSATIONTOOLS_POLICY_SET("conversationTools.policy.set"),
+    CONVERSATIONTOOLS_QUESTIONS_LIST("conversationTools.questions.list"),
+    CONVERSATIONTOOLS_QUESTIONS_ANSWER("conversationTools.questions.answer"),
+    CONVERSATIONTOOLS_QUESTIONS_DECLINE("conversationTools.questions.decline"),
+    CONVERSATIONTOOLS_QUESTIONS_RECONCILE("conversationTools.questions.reconcile"),
+    CONVERSATIONTOOLS_GRANTS_PREVIEW("conversationTools.grants.preview"),
+    CONVERSATIONTOOLS_GRANTS_CONFIRM("conversationTools.grants.confirm"),
+    CONVERSATIONTOOLS_GRANTS_REVOKE("conversationTools.grants.revoke"),
+    CONVERSATIONTOOLS_GRANTS_LIST("conversationTools.grants.list"),
+    CONVERSATIONTOOLS_REQUESTS_GET("conversationTools.requests.get"),
+    CONVERSATIONTOOLS_REQUESTS_RESOLVE("conversationTools.requests.resolve"),
+    CONVERSATIONTOOLS_AUTOMATIONOWNER_GET("conversationTools.automationOwner.get"),
+    CONVERSATIONTOOLS_AUTOMATIONOWNER_SET("conversationTools.automationOwner.set"),
     CONFIGURATION_MIGRATION_ARCHIVES("configuration.migration.archives"),
     CONFIGURATION_MIGRATION_TARGETS("configuration.migration.targets"),
     CONFIGURATION_MIGRATION_PREVIEW("configuration.migration.preview"),

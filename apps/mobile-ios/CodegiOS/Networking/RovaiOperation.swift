@@ -2,6 +2,20 @@ import Foundation
 
 /// Generated from the explicit public Host enum; private Core methods never cross this seam.
 enum RovaiOperation: String, Sendable {
+    case conversationToolsPolicyGet = "conversationTools.policy.get"
+    case conversationToolsPolicySet = "conversationTools.policy.set"
+    case conversationToolsQuestionsList = "conversationTools.questions.list"
+    case conversationToolsQuestionsAnswer = "conversationTools.questions.answer"
+    case conversationToolsQuestionsDecline = "conversationTools.questions.decline"
+    case conversationToolsQuestionsReconcile = "conversationTools.questions.reconcile"
+    case conversationToolsGrantsPreview = "conversationTools.grants.preview"
+    case conversationToolsGrantsConfirm = "conversationTools.grants.confirm"
+    case conversationToolsGrantsRevoke = "conversationTools.grants.revoke"
+    case conversationToolsGrantsList = "conversationTools.grants.list"
+    case conversationToolsRequestsGet = "conversationTools.requests.get"
+    case conversationToolsRequestsResolve = "conversationTools.requests.resolve"
+    case conversationToolsAutomationOwnerGet = "conversationTools.automationOwner.get"
+    case conversationToolsAutomationOwnerSet = "conversationTools.automationOwner.set"
     case configurationMigrationArchives = "configuration.migration.archives"
     case configurationMigrationTargets = "configuration.migration.targets"
     case configurationMigrationPreview = "configuration.migration.preview"

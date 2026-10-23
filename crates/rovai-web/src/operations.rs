@@ -5,6 +5,35 @@ use serde::{Deserialize, Serialize};
 /// and the legacy shared draft remain outside the network capability.
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 pub enum Operation {
+    #[serde(rename="conversationTools.policy.get")]
+    ConversationPolicyGet,
+    #[serde(rename="conversationTools.policy.set")]
+    ConversationPolicySet,
+    #[serde(rename="conversationTools.questions.list")]
+    ConversationQuestionsList,
+    #[serde(rename="conversationTools.questions.answer")]
+    ConversationQuestionsAnswer,
+    #[serde(rename="conversationTools.questions.decline")]
+    ConversationQuestionsDecline,
+    #[serde(rename="conversationTools.questions.reconcile")]
+    ConversationQuestionsReconcile,
+    #[serde(rename="conversationTools.grants.preview")]
+    ConversationGrantsPreview,
+    #[serde(rename="conversationTools.grants.confirm")]
+    ConversationGrantsConfirm,
+    #[serde(rename="conversationTools.grants.revoke")]
+    ConversationGrantsRevoke,
+    #[serde(rename="conversationTools.grants.list")]
+    ConversationGrantsList,
+    #[serde(rename="conversationTools.requests.get")]
+    ConversationRequestsGet,
+    #[serde(rename="conversationTools.requests.resolve")]
+    ConversationRequestsResolve,
+    #[serde(rename="conversationTools.automationOwner.get")]
+    ConversationAutomationOwnerGet,
+    #[serde(rename="conversationTools.automationOwner.set")]
+    ConversationAutomationOwnerSet,
+
     #[serde(rename="configuration.migration.archives")]
     PortableMigrationArchives,
     #[serde(rename="configuration.migration.targets")]
@@ -627,6 +656,15 @@ impl Operation {
     pub fn project(self, mut value: serde_json::Value) -> serde_json::Value {
         use serde_json::json;
         match self {
+            Self::ConversationPolicyGet|Self::ConversationPolicySet=>if value.is_null(){value}else{select_fields(&value,&["schemaVersion","revision","globalFlags","feedbackGate","members"])},
+            Self::ConversationQuestionsList|Self::ConversationGrantsList=>if value.is_null(){value}else{select_fields(&value,&["items","next"])},
+            Self::ConversationQuestionsAnswer|Self::ConversationQuestionsDecline|Self::ConversationQuestionsReconcile|Self::ConversationRequestsGet=>if value.is_null(){value}else{select_fields(&value,&["request_id","state","outcome","note"])},
+            Self::ConversationGrantsPreview=>if value.is_null(){value}else{select_fields(&value,&["previewId","previewDigest","expiresAt","grant"])},
+            Self::ConversationGrantsConfirm=>if value.is_null(){value}else{select_fields(&value,&["grantId","revision","scope","sourceSessionId","sourceKind","sourceDigest","throughSequence","expiresAt","legacySessionId"])},
+            Self::ConversationGrantsRevoke=>if value.is_null(){value}else{select_fields(&value,&["grantId","revoked"])},
+            Self::ConversationRequestsResolve=>if value.is_null(){value}else{select_fields(&value,&["commandId","agentRunId","executionEpoch","revoked","request_id","state","outcome","note"])},
+            Self::ConversationAutomationOwnerGet|Self::ConversationAutomationOwnerSet=>if value.is_null(){value}else{select_fields(&value,&["automationId","revision","automationVersion","action","timezone","sourceRequestId"])},
+
             Self::NativeCreationRecords => select_fields(&value,&["schemaVersion","items","next"]),
             Self::PortableMigrationPreview|Self::PortableMigrationUndoPreview=>select_fields(&value,&["schemaVersion","previewId","previewDigest","expiresAt","archiveId","sourceDigest","localDigest","selections","members","rows","canApply"]),
             Self::PortableMigrationConfirm|Self::PortableMigrationUndoConfirm|Self::PortableMigrationReceipt=>select_fields(&value,&["schemaVersion","commandId","previewId","previewDigest","state","counts","changedMembers","errorCode","historyPreserved","files"]),
@@ -738,6 +776,21 @@ impl Operation {
 
     pub fn method(self) -> &'static str {
         match self {
+            Self::ConversationPolicyGet=>"conversationTools.policy.get",
+            Self::ConversationPolicySet=>"conversationTools.policy.set",
+            Self::ConversationQuestionsList=>"conversationTools.questions.list",
+            Self::ConversationQuestionsAnswer=>"conversationTools.questions.answer",
+            Self::ConversationQuestionsDecline=>"conversationTools.questions.decline",
+            Self::ConversationQuestionsReconcile=>"conversationTools.questions.reconcile",
+            Self::ConversationGrantsPreview=>"conversationTools.grants.preview",
+            Self::ConversationGrantsConfirm=>"conversationTools.grants.confirm",
+            Self::ConversationGrantsRevoke=>"conversationTools.grants.revoke",
+            Self::ConversationGrantsList=>"conversationTools.grants.list",
+            Self::ConversationRequestsGet=>"conversationTools.requests.get",
+            Self::ConversationRequestsResolve=>"conversationTools.requests.resolve",
+            Self::ConversationAutomationOwnerGet=>"conversationTools.automationOwner.get",
+            Self::ConversationAutomationOwnerSet=>"conversationTools.automationOwner.set",
+
             Self::NativeSteerPolicyGet => "runtime.steer.policy.get",
             Self::NativeContinuationPreview => "history.execution.preview",
             Self::NativeCreationRecords => "history.execution.records",

@@ -9,6 +9,7 @@ export type * from './native-history-usage'
 export type * from './user-feedback'
 export type * from './native-lifecycle'
 export type * from './portable-configuration'
+export type * from './conversation-tools'
 
 export interface NativeHistoryUsageReport {
   schemaVersion:1;source:'imported_native_history';report:import('./native-history-usage').TokenUsageReport
@@ -4794,6 +4795,7 @@ export interface ResolveRuntimeInteractionParams {
 }
 
 export type CoreMethod =
+  | keyof import('./conversation-tools').ConversationToolsInputs
   | 'configuration.providers.list' | 'configuration.providers.upsert' | 'configuration.providers.remove'
   | 'configuration.migration.preview' | 'configuration.migration.confirm' | 'configuration.migration.receipt' | 'configuration.migration.undoPreview' | 'configuration.migration.undoConfirm'
   | 'configuration.migration.archives' | 'configuration.migration.targets'
