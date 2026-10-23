@@ -710,7 +710,8 @@ impl Operation {
             Self::WorkbenchFilesRead => select_fields(&value, &["path", "text", "digest"]),
             Self::WorkbenchEditor=>select_fields(&value,&["revision","value","updatedAt","workspaceRoot"]),
             Self::WorkbenchFilesMutate => select_fields(&value, &["applied", "digest"]),
-            Self::WorkbenchGitRead | Self::WorkbenchGitExecute => select_fields(&value, &["success", "exitCode", "output", "error"]),
+            Self::WorkbenchGitRead => select_fields(&value, &["success", "exitCode", "output", "error"]),
+            Self::WorkbenchGitExecute => select_fields(&value, &["success", "exitCode", "output", "error", "workingDirectory"]),
             Self::WorkbenchGitPreview => select_fields(&value, &["revision", "action", "arguments", "cleanPreview"]),
             Self::DelegationSource => select_fields(&value,
                 &["state", "source", "operation", "attemptNo", "detail", "task", "reason", "code"]),
@@ -1215,6 +1216,16 @@ fn filter_actions(value: &mut serde_json::Value, task_updates: bool) {
 mod tests {
     use super::Operation;
     use serde_json::json;
+
+    #[test]
+    fn worktree_command_projection_retains_owned_working_directory() {
+        let result = json!({"success":true,"exitCode":0,"output":"created","error":"",
+            "workingDirectory":"/fixture/core/workspace-trees/owned","futureSecret":"private"});
+        let mut expected = result.clone();
+        expected.as_object_mut().unwrap().remove("futureSecret");
+        assert_eq!(Operation::WorkbenchGitExecute.project(result), expected);
+        assert!(Operation::WorkbenchGitRead.project(expected).get("workingDirectory").is_none());
+    }
 
     // Owns the network projection boundary, not Core's internal MCP model.
     #[test]
