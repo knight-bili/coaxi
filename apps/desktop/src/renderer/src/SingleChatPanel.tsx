@@ -71,6 +71,7 @@ import { ComposerPrimaryAction } from './ComposerPrimaryAction'
 import { SafeMarkdown } from './SafeMarkdown'
 import { UserFeedbackDock } from './UserFeedbackDock'
 import { ConversationQuestionsDock } from './ConversationQuestionsDock'
+import { ConversationSources, conversationSourceReference } from './ConversationSources'
 import { CoreFeedbackMarkdown } from './CoreFeedbackMarkdown'
 import { shouldSubmitStructuredComposerOnEnter } from './StructuredMentionComposer'
 import { readErrorMessage } from './error-message'
@@ -1807,6 +1808,10 @@ export function SingleChatPanel({
         disabled={!visible || sending || quoteBusy || returningPending || preparingAttachments.some((item) => !item.error)}
         onAdd={(selection) => mutateDraftQuote({ type: 'add', selection })} />}
       {currentSnapshot&&<ConversationQuestionsDock key={`questions:${currentSnapshot.conversation.id}`} scope={{threadId,conversationId:currentSnapshot.conversation.id,scopeKind:conversationKind}} members={members}/>}
+      {currentSnapshot&&<ConversationSources key={`sources:${currentSnapshot.conversation.id}`} scope={{threadId,conversationId:currentSnapshot.conversation.id,scopeKind:conversationKind}} disabled={!sharedDraftState.ready||sending||returningPending||ending||!!inputState.pending} onInsert={async source=>{
+        if(!draftStore.update(current=>{const body=current[bodyDraftKey]??'';return body.includes(`rovai-source:${source.sourceSessionId}`)?current:{...current,[bodyDraftKey]:`${body}${body?'\n':''}${conversationSourceReference(source)}`}}))throw new Error(uiAttribute('当前输入已变化，资料授权记录已保留。'));
+        if(input)await input.prepareBody();
+      }/>}
       {currentSnapshot&&<UserFeedbackDock key={`feedback:${currentSnapshot.conversation.id}`} scope={{threadId,conversationId:currentSnapshot.conversation.id,scopeKind:conversationKind}} agentId={currentSnapshot.conversation.agentId} members={members}
         materials={currentSnapshot.draft.attachments} composerScope={input?.origin.scope??null}
         getPrivateInput={()=>{

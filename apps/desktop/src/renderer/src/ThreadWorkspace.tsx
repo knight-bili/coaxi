@@ -170,6 +170,7 @@ import { mentionCandidateRuntime } from './mention-runtime'
 import { SafeMarkdown } from './SafeMarkdown'
 import { UserFeedbackDock } from './UserFeedbackDock'
 import { ConversationQuestionsDock } from './ConversationQuestionsDock'
+import { ConversationSources, conversationSourceReference } from './ConversationSources'
 import { CoreFeedbackMarkdown } from './CoreFeedbackMarkdown'
 import type { FeedbackMessageSource } from './CardFeedbackFields'
 import { RuntimeInteractionDock } from './RuntimeInteractionDock'
@@ -5886,6 +5887,11 @@ function ThreadWorkspaceContent({
 
           <UserFeedbackDock key={`feedback:${snapshot.thread.id}`} scope={{threadId:snapshot.thread.id,conversationId:null,scopeKind:'public'}} members={snapshot.members} materials={composerDraft?.attachments??[]}/>
           <ConversationQuestionsDock key={`questions:${snapshot.thread.id}`} scope={{threadId:snapshot.thread.id,conversationId:null,scopeKind:'public'}} members={snapshot.members}/>
+          <ConversationSources key={`sources:${snapshot.thread.id}`} scope={{threadId:snapshot.thread.id,conversationId:null,scopeKind:'public'}} disabled={composerInteractionDisabled} onInsert={async source=>{
+            const handle=composerHandleRef.current;if(!handle||composerInteractionDisabled)throw new Error(uiAttribute('当前输入尚未就绪，资料授权记录已保留。'));
+            const before=await handle.flush();if(!JSON.stringify(before.document).includes(`rovai-source:${source.sourceSessionId}`)&&!handle.appendText(conversationSourceReference(source)))throw new Error(uiAttribute('当前输入已锁定，资料授权记录已保留。'));
+            await handle.flush();handle.focus('end');
+          }}/>
           <form
         className={[
           'composer',
