@@ -13,6 +13,12 @@ pub fn migrate(database:&mut crate::db::Database)->Result<()>{
 fn installed(connection:&Connection)->rusqlite::Result<Vec<(String,String)>>{let mut statement=connection.prepare("SELECT name,sql FROM sqlite_schema WHERE lower(name) GLOB 'native_lifecycle_*' AND sql IS NOT NULL ORDER BY name")?;statement.query_map([],|row|Ok((row.get(0)?,row.get(1)?)))?.collect()}
 pub(crate) fn absent(connection:&Connection)->rusqlite::Result<bool>{Ok(installed(connection)?.is_empty())}
 pub(crate) fn schema_matches(connection:&Connection)->rusqlite::Result<bool>{let reference=Connection::open_in_memory()?;reference.execute_batch(include_str!("schema.sql"))?;Ok(installed(connection)?==installed(&reference)?)}
+#[cfg(test)]
+pub(crate) fn downgrade_for_test(connection:&Connection)->anyhow::Result<()>{
+    let objects=installed(connection)?;
+    if !objects.is_empty(){anyhow::ensure!(schema_matches(connection)?,"Native Lifecycle fixture reset requires the exact owned schema");}
+    crate::db::downgrade_owned_migration_for_test(connection,215,165,164,&objects,&[],|_|Ok(()))
+}
 
 pub fn policy(connection:&Connection)->Result<Value>{
     let raw:Option<String>=connection.query_row("SELECT value_json FROM native_lifecycle_steer_policy WHERE singleton=1",[],|row|row.get(0)).optional()?;

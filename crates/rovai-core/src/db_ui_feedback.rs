@@ -12,3 +12,15 @@ pub(super) fn migrate(database:&mut Database)->Result<()>{
     anyhow::ensure!(matches!(classify_feedback_163_contract(&tx)?,DatabaseContractClassification::Current(ref marker) if marker.projection_schema_version==163),"Feedback target admission failed");
     tx.commit()?;Ok(())
 }
+#[cfg(test)]
+pub(super) fn downgrade_for_test(connection:&Connection)->Result<()>{
+    let objects=installed(connection)?;
+    if !objects.is_empty(){
+        anyhow::ensure!(schema_matches(connection)?,"Feedback fixture reset requires the exact owned schema");
+        let policy:Option<(i64,i64,String)>=connection.query_row("SELECT singleton,revision,value_json FROM ui_feedback_policy",[],|row|Ok((row.get(0)?,row.get(1)?,row.get(2)?))).optional()?;
+        anyhow::ensure!(policy==Some((1,0,r#"{"schemaVersion":1,"revision":0,"members":[]}"#.into())),"Cannot discard edited feedback policy in a fixture");
+        let other_rows:bool=connection.query_row("SELECT EXISTS(SELECT 1 FROM ui_feedback_preview) OR EXISTS(SELECT 1 FROM ui_feedback_entry) OR EXISTS(SELECT 1 FROM ui_feedback_command) OR EXISTS(SELECT 1 FROM ui_feedback_attempt) OR EXISTS(SELECT 1 FROM ui_feedback_continuation)",[],|row|row.get(0))?;
+        anyhow::ensure!(!other_rows,"Cannot discard feedback fixture data");
+    }
+    crate::db::downgrade_owned_migration_for_test(connection,213,163,162,&objects,&["ui_feedback_policy"],|_|Ok(()))
+}

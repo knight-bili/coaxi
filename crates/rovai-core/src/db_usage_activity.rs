@@ -35,3 +35,9 @@ pub(super) fn migrate(database:&mut Database)->Result<()>{
     anyhow::ensure!(matches!(classify_database_contract(&tx)?,DatabaseContractClassification::Current(ref marker) | DatabaseContractClassification::SupportedMigrationSource(ref marker) if marker.projection_schema_version==162),"Usage activity target admission failed");
     tx.commit()?;Ok(())
 }
+#[cfg(test)]
+pub(super) fn downgrade_for_test(connection:&Connection)->Result<()>{
+    let objects=objects(connection)?;
+    if !objects.is_empty(){anyhow::ensure!(schema_matches(connection)?,"Usage activity fixture reset requires the exact owned schema");}
+    crate::db::downgrade_owned_migration_for_test(connection,212,162,161,&objects,&[],|_|Ok(()))
+}

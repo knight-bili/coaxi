@@ -70,6 +70,160 @@ pub(crate) fn verify_canvas_object_fixture(database: &mut Database) {
 }
 
 #[cfg(test)]
+pub(crate) fn downgrade_owned_migration_for_test(
+    connection: &Connection,
+    version: i64,
+    source_projection: i64,
+    target_projection: i64,
+    objects: &[(String, String)],
+    allowed_nonempty_tables: &[&str],
+    prepare_downgrade: impl FnOnce(&Transaction<'_>) -> Result<()>,
+) -> Result<()> {
+    anyhow::ensure!(
+        connection.is_autocommit(),
+        "Migration fixture reset requires an idle connection"
+    );
+    let has_migration_table: bool = connection.query_row(
+        "SELECT EXISTS(SELECT 1 FROM sqlite_schema WHERE type='table' AND name='schema_migration')",
+        [],
+        |row| row.get(0),
+    )?;
+    if !has_migration_table {
+        anyhow::ensure!(objects.is_empty(), "Unreceipted migration objects remain");
+        return Ok(());
+    }
+    let applied: bool = connection.query_row(
+        "SELECT EXISTS(SELECT 1 FROM schema_migration WHERE version=?1)",
+        [version],
+        |row| row.get(0),
+    )?;
+    if !applied {
+        anyhow::ensure!(objects.is_empty(), "Unreceipted migration objects remain");
+        return Ok(());
+    }
+    anyhow::ensure!(!objects.is_empty(), "Migration receipt has no owned schema objects");
+    anyhow::ensure!(
+        objects.iter().all(|(_, sql)| {
+            sql.starts_with("CREATE TABLE ")
+                || sql.starts_with("CREATE INDEX ")
+                || sql.starts_with("CREATE UNIQUE INDEX ")
+                || sql.starts_with("CREATE TRIGGER ")
+        }),
+        "Migration contains an unsupported owned schema object"
+    );
+    let projection: i64 = connection.query_row(
+        "SELECT projection_schema_version FROM rovai_data_contract WHERE singleton=1",
+        [],
+        |row| row.get(0),
+    )?;
+    anyhow::ensure!(
+        projection == source_projection,
+        "Migration fixture reset requires its exact source projection"
+    );
+    for allowed in allowed_nonempty_tables {
+        anyhow::ensure!(
+            objects
+                .iter()
+                .any(|(name, sql)| name.as_str() == *allowed && sql.starts_with("CREATE TABLE ")),
+            "Allowed fixture data is not owned by this migration"
+        );
+    }
+    for (name, sql) in objects {
+        if sql.starts_with("CREATE TABLE ") && !allowed_nonempty_tables.contains(&name.as_str()) {
+            let quoted = format!("\"{}\"", name.replace('"', "\"\""));
+            let count: i64 = connection.query_row(
+                &format!("SELECT COUNT(*) FROM {quoted}"),
+                [],
+                |row| row.get(0),
+            )?;
+            anyhow::ensure!(count == 0, "Cannot erase migration fixture data: {name}");
+        }
+    }
+    let foreign_keys_enabled: bool =
+        connection.query_row("PRAGMA foreign_keys", [], |row| row.get(0))?;
+    connection.execute_batch("PRAGMA foreign_keys=OFF;")?;
+    let result = (|| -> Result<()> {
+        let tx = Transaction::new_unchecked(connection, TransactionBehavior::Immediate)?;
+        prepare_downgrade(&tx)?;
+        for (object_type, prefix) in [
+            ("trigger", "CREATE TRIGGER "),
+            ("index", "CREATE INDEX "),
+            ("index", "CREATE UNIQUE INDEX "),
+            ("table", "CREATE TABLE "),
+        ] {
+            for (name, sql) in objects {
+                if sql.starts_with(prefix) {
+                    let quoted = format!("\"{}\"", name.replace('"', "\"\""));
+                    tx.execute_batch(&format!("DROP {object_type} {quoted};"))?;
+                }
+            }
+        }
+        anyhow::ensure!(
+            tx.execute("DELETE FROM schema_migration WHERE version=?1", [version])? == 1,
+            "Migration receipt changed during fixture reset"
+        );
+        anyhow::ensure!(
+            tx.execute(
+                "UPDATE rovai_data_contract SET projection_schema_version=?1,updated_at=datetime('now') WHERE singleton=1 AND projection_schema_version=?2",
+                params![target_projection, source_projection],
+            )? == 1,
+            "Migration projection changed during fixture reset"
+        );
+        tx.commit()?;
+        Ok(())
+    })();
+    let restore_foreign_keys = connection
+        .execute_batch(if foreign_keys_enabled {
+            "PRAGMA foreign_keys=ON;"
+        } else {
+            "PRAGMA foreign_keys=OFF;"
+        })
+        .map_err(anyhow::Error::from);
+    result.and(restore_foreign_keys)
+}
+
+#[cfg(test)]
+pub(crate) fn restore_custom_runtime_kind_for_test(tx: &Transaction<'_>) -> Result<()> {
+    for table in DSH_RUNTIME_TABLES {
+        let sql: String = tx.query_row(
+            "SELECT sql FROM sqlite_schema WHERE type='table' AND name=?1",
+            [table],
+            |row| row.get(0),
+        )?;
+        anyhow::ensure!(
+            sql.contains("'command-code-cli', 'custom-acp'"),
+            "Custom Runtime fixture reset requires the exact expanded {table} schema"
+        );
+    }
+    let triggers = {
+        let mut statement = tx.prepare(
+            "SELECT name,sql FROM sqlite_schema WHERE type='trigger' AND sql IS NOT NULL ORDER BY name",
+        )?;
+        statement
+            .query_map([], |row| {
+                Ok((row.get::<_, String>(0)?, row.get::<_, String>(1)?))
+            })?
+            .collect::<rusqlite::Result<Vec<_>>>()?
+    };
+    for (name, _) in &triggers {
+        tx.execute_batch(&format!("DROP TRIGGER \"{}\"", name.replace('"', "\"\"")))?;
+    }
+    for table in DSH_RUNTIME_TABLES {
+        expand_closed_set(
+            tx,
+            table,
+            "'command-code-cli', 'custom-acp'",
+            "'command-code-cli'",
+        )?;
+    }
+    for (_, sql) in triggers {
+        tx.execute_batch(&sql)?;
+    }
+    validate_migration_foreign_keys(tx, &DSH_RUNTIME_TABLES)?;
+    Ok(())
+}
+
+#[cfg(test)]
 pub(crate) fn downgrade_private_composer_scope_fixture(connection: &Connection) {
     private_composer_scope::downgrade_for_test(connection);
 }
