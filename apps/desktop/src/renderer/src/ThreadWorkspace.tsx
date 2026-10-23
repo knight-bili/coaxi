@@ -2010,6 +2010,7 @@ function ThreadWorkspaceContent({
   const earlierMessageLoadInFlightRef = useRef(false)
   const conversationFindSurfaceRef = useRef<HTMLDivElement>(null)
   const conversationFindInputRef = useRef<HTMLInputElement>(null)
+  const conversationFindHighlightOwnerId = useId()
   const conversationFindRequestGeneration = useRef(0)
   const conversationFindDebounceTimer = useRef<number | null>(null)
   const conversationFindRestorePoint = useRef<ConversationFindRestorePoint | null>(null)
@@ -3230,13 +3231,15 @@ function ThreadWorkspaceContent({
       timeline,
       conversationFind.query,
       conversationFind.snapshot?.match?.messageId ?? null,
-      conversationFind.snapshot?.match?.occurrenceIndex ?? null
+      conversationFind.snapshot?.match?.occurrenceIndex ?? null,
+      conversationFindHighlightOwnerId
     )
   }, [
     conversationFind.open,
     conversationFind.query,
     conversationFind.snapshot?.match?.messageId,
     conversationFind.snapshot?.match?.occurrenceIndex,
+    conversationFindHighlightOwnerId,
     conversationView,
     visibleThreadMessages
   ])

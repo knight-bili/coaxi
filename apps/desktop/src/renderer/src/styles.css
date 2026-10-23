@@ -2930,8 +2930,6 @@ button.camp-world-map-live-caption { cursor: pointer; font: inherit; }
   align-items: flex-end;
 }
 .conversation-bubble.conversation-find-current-message::after { position: absolute; top: -4px; bottom: -4px; left: -12px; width: 1px; border-radius: 1px; background: var(--conversation-find-line); content: ""; pointer-events: none; }
-::highlight(conversation-find-match) { color: var(--ink); background-color: var(--conversation-find-match); }
-::highlight(conversation-find-current) { color: var(--ink); background-color: var(--conversation-find-current); text-decoration: underline var(--conversation-find-line); text-decoration-thickness: 1px; text-underline-offset: 2px; }
 .conversation-bubble.user,
 .conversation-bubble.external_principal,
 .conversation-bubble.user .message-surface,
