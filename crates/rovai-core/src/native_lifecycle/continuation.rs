@@ -103,11 +103,11 @@ pub(crate) fn runtime_for_conversation(connection:&Connection,conversation:&str,
     let stored:Option<(String,String,String,String)>=connection.query_row("SELECT n.base_runtime_digest,n.runtime_json,i.state,c.agent_id FROM native_lifecycle_continuation n JOIN native_lifecycle_intent i ON i.command_id=n.command_id JOIN conversation c ON c.id=n.conversation_id WHERE n.conversation_id=?1",[conversation],|row|Ok((row.get(0)?,row.get(1)?,row.get(2)?,row.get(3)?))).optional()?;
     let Some((expected,raw,state,owner))=stored else{return Ok(None)};
     ensure!(state=="binding_recorded","native_lifecycle.preparation_not_confirmed");
-    ensure!(owner==agent&&base.config_digest==expected,"native_lifecycle.prepared_runtime_changed");
+    ensure!(owner==agent,"native_lifecycle.prepared_runtime_changed");
     let frozen:FrozenAgentRuntimeConfig=serde_json::from_str(&raw)?;
     let origin=frozen.native_origin.as_ref().context("native_lifecycle.origin_missing")?;origin.validate()?;
     let started:bool=connection.query_row("SELECT last_input_sequence>0 FROM conversation WHERE id=?1",[conversation],|row|row.get(0))?;
-    if !started{return Ok(Some(frozen))}
+    if !started{ensure!(base.config_digest==expected,"native_lifecycle.prepared_runtime_changed");return Ok(Some(frozen))}
     // 创建时准备的首次输入沿用原冻结；以后的新消息按当前开关冻结，旧 Run 不回写。
     let mut next=base.clone();
     super::freeze_intent(&mut next,Some(origin.clone()),storage::freeze_policy(connection,agent)?)?;

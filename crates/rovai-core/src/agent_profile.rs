@@ -4460,8 +4460,14 @@ fn resolve_rebound_runtime_with_native_intent(
     rebound.camp_fast = frozen.camp_fast.clone();
     // 恢复只保留原 Run 的精确连接，不读取队员今天选择的服务商或密钥。
     crate::portable_configuration::freeze(&mut rebound,frozen.portable_connection.clone())?;
-    crate::native_lifecycle::freeze_intent(&mut rebound,frozen.native_origin.clone(),native_steer)?;
-    crate::conversation_tools::runtime::attach(&mut rebound,frozen.conversation_tools.clone())?;
+    if frozen.native_origin.is_some(){
+        // 工作副本先冻结自己的工具策略，再登记原生来源；恢复保留这个摘要顺序。
+        crate::conversation_tools::runtime::attach(&mut rebound,frozen.conversation_tools.clone())?;
+        crate::native_lifecycle::freeze_intent(&mut rebound,frozen.native_origin.clone(),native_steer)?;
+    }else{
+        crate::native_lifecycle::freeze_intent(&mut rebound,None,native_steer)?;
+        crate::conversation_tools::runtime::attach(&mut rebound,frozen.conversation_tools.clone())?;
+    }
     if frozen.adapter_kind == AdapterKind::CodexCli
         && frozen.camp_fast.is_some()
         && let Some(tier) = frozen.model.options.get("serviceTier")
