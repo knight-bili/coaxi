@@ -12,7 +12,7 @@ impl Core{
             "history.execution.confirm"=>self.native_continuation_confirm(value,&client).await,
             "history.execution.receipt"=>{
                 let command=value["commandId"].as_str().context("native_lifecycle.command_id_required")?;
-                let database=self.database.lock().await;native::continuation::receipt(database.connection(),command,client.id(),self.interaction_tools.core_instance())
+                let database=self.database.lock().await;native::continuation::receipt(database.connection(),&self.data_dir,command,client.id(),self.interaction_tools.core_instance())
             },
             "runtime.steer.policy.get"=>{let database=self.database.lock().await;storage::policy(database.connection())},
             "runtime.steer.policy.set"=>{
@@ -64,8 +64,8 @@ impl Core{
             let more=rows.len()>input.limit as usize;rows.truncate(input.limit as usize);let next=more.then(||rows.last().map(|row|row.0.clone())).flatten();
             let items=rows.into_iter().map(|(_,raw,command,proof)|->Result<Value>{
                 let preview:Value=serde_json::from_str(&raw)?;native::validate_shape("NativeContinuationPreviewV1",&preview)?;
-                let receipt=command.map(|command|native::continuation::receipt(connection,&command,client.id(),self.interaction_tools.core_instance())).transpose()?;
-                let preparation=proof.map(|raw|serde_json::from_str::<acp::NativePreparationProof>(&raw)).transpose()?;
+                let receipt=command.as_ref().map(|command|native::continuation::receipt(connection,&self.data_dir,&command,client.id(),self.interaction_tools.core_instance())).transpose()?;
+                let preparation=proof.map(|raw|serde_json::from_str::<acp::NativePreparationProof>(&raw)).transpose()?.or(command.as_deref().map(|command|native::preparation_facts::read(connection,&self.data_dir,command)).transpose()?.flatten());
                 Ok(json!({"preview":preview,"receipt":receipt,"preparation":preparation}))
             }).collect::<Result<Vec<_>>>()?;
             return Ok(json!({"schemaVersion":1,"items":items,"next":next}))

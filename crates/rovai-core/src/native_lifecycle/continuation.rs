@@ -82,12 +82,18 @@ pub(crate) fn create_working_copy(tx:&Transaction<'_>,preview:&Value,client:&cra
     Ok((thread,conversation))
 }
 
-pub(crate) fn receipt(connection:&Connection,command:&str,client:&str,core_instance:&str)->Result<Value>{
+pub(crate) fn receipt(connection:&Connection,root:&Path,command:&str,client:&str,core_instance:&str)->Result<Value>{
     let(kind,stored_client,instance,state,raw):(String,String,String,String,String)=connection.query_row("SELECT kind,client_id,core_instance_id,state,value_json FROM native_lifecycle_intent WHERE command_id=?1",[command],|row|Ok((row.get(0)?,row.get(1)?,row.get(2)?,row.get(3)?,row.get(4)?))).context("native_lifecycle.command_missing")?;
     ensure!(kind=="continuation"&&stored_client==client,"native_lifecycle.command_scope_mismatch");
     let mut value:Value=serde_json::from_str(&raw)?;
     if matches!(state.as_str(),"prepared"|"starting")&&(instance!=core_instance||!super::steer_delivery::active(command)){
         value["state"]=json!("unknown");value["error"]=json!("原生创建结果待核对，禁止自动重复创建");
+    }
+    if value["reportedSessionId"].is_null(){
+        if let Some(proof)=super::preparation_facts::read(connection,root,command)?{
+            value["reportedSessionId"]=json!(proof.reported_session_id);
+            if value["state"]=="unknown"{value["error"]=json!("原程序已返回会话编号，Core绑定仍待核对。保留此编号，不重复创建或自动发送首次消息");}
+        }
     }
     validate_shape("NativeContinuationReceiptV1",&value)?;Ok(value)
 }

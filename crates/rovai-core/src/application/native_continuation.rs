@@ -59,7 +59,7 @@ impl Core{
         let input_digest=native::digest(&value)?;let instance=self.interaction_tools.core_instance().to_owned();
         let (preview,snapshot,initialize)={
             let database=self.database.lock().await;let connection=database.connection();
-            if let Some(prior)=continuation_prior(connection,&command,client.id(),&input_digest,&instance)?{return Ok(prior)}
+            if let Some(prior)=continuation_prior(connection,&self.data_dir,&command,client.id(),&input_digest,&instance)?{return Ok(prior)}
             let owner:String=connection.query_row("SELECT owner_thread_id FROM native_lifecycle_preview WHERE id=?1 AND client_id=?2 AND kind='continuation'",params![value["previewId"].as_str(),client.id()],|row|row.get(0))?;
             let preview=storage::preview(connection,&owner,value["previewId"].as_str().context("native_lifecycle.preview_required")?,value["previewDigest"].as_str().context("native_lifecycle.preview_digest_required")?,"continuation")?;
             anyhow::ensure!(preview["capabilityStatus"]=="available","native_lifecycle.program_not_available");
@@ -77,7 +77,7 @@ impl Core{
         }).await??;
         let origin=native::NativeSessionOriginV1{schema_version:1,origin_id:uuid::Uuid::new_v4().to_string(),command_id:command.clone(),source:reference,mode:serde_json::from_value(preview["mode"].clone())?,point:serde_json::from_value(preview["point"].clone())?,workspace_digest:preview["workspaceDigest"].as_str().context("native_lifecycle.workspace_missing")?.into()};origin.validate()?;
         let mut database=self.database.lock().await;let tx=database.connection_mut().transaction()?;
-        if let Some(prior)=continuation_prior(&tx,&command,client.id(),&input_digest,&instance)?{return Ok(prior)}
+        if let Some(prior)=continuation_prior(&tx,&self.data_dir,&command,client.id(),&input_digest,&instance)?{return Ok(prior)}
         storage::preview(&tx,&owner,preview["previewId"].as_str().context("native_lifecycle.preview_required")?,preview["previewDigest"].as_str().context("native_lifecycle.preview_digest_required")?,"continuation")?;
         let current=continuation::member(&tx,&member,expected)?;anyhow::ensure!(preview["runtimeConfigDigest"]==current.config_digest,"native_lifecycle.member_runtime_changed");
         anyhow::ensure!(!crate::conversation_tools::policy::get(&tx)?.member_flags(&member).any(),"native_lifecycle.optional_tools_require_new_session");
@@ -119,9 +119,9 @@ impl Core{
     }
 }
 
-fn continuation_prior(connection:&rusqlite::Connection,command:&str,client:&str,input:&str,instance:&str)->Result<Option<Value>>{
+fn continuation_prior(connection:&rusqlite::Connection,root:&Path,command:&str,client:&str,input:&str,instance:&str)->Result<Option<Value>>{
     let row:Option<(String,String,String)>=connection.query_row("SELECT kind,client_id,input_digest FROM native_lifecycle_intent WHERE command_id=?1",[command],|row|Ok((row.get(0)?,row.get(1)?,row.get(2)?))).optional()?;
-    row.map(|(kind,owner,digest)|{anyhow::ensure!(kind=="continuation"&&owner==client&&digest==input,"native_lifecycle.command_payload_changed");continuation::receipt(connection,command,client,instance)}).transpose()
+    row.map(|(kind,owner,digest)|{anyhow::ensure!(kind=="continuation"&&owner==client&&digest==input,"native_lifecycle.command_payload_changed");continuation::receipt(connection,root,command,client,instance)}).transpose()
 }
 fn settle_continuation(connection:&mut rusqlite::Connection,command:&str,instance:&str,record:&Value,runtime:&crate::agent_profile::FrozenAgentRuntimeConfig,observed:std::result::Result<acp::NativePreparationProof,acp::NativePreparationFailure>)->Result<()>{
     let tx=connection.transaction()?;let mut next=record.clone();
