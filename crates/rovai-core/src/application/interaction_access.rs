@@ -144,7 +144,7 @@ impl Core {
                 let mut rows=query.query_map(rusqlite::params![input.thread_id,input.after],|row|Ok((row.get::<_,String>(0)?,row.get::<_,String>(1)?,row.get::<_,String>(2)?,row.get::<_,String>(3)?,row.get::<_,String>(4)?)))?.collect::<rusqlite::Result<Vec<_>>>()?;
                 let more=rows.len()>200;rows.truncate(200);
                 let after=if more{rows.last().map(|row|row.0.clone())}else{None};
-                let targets=rows.into_iter().map(|(conversation,kind,agent,name,created)|{let public=kind=="camp_member";json!({"id":conversation,"agentId":agent,"displayName":name,"createdAt":created,"scope":{"threadId":input.thread_id,"conversationId":if public{None}else{Some(conversation.as_str())},"scopeKind":if public{"public"}else{kind.as_str()}})}).collect::<Vec<_>>();
+                let targets=rows.into_iter().map(|(conversation,kind,agent,name,created)|{let public=kind=="camp_member";json!({"id":conversation,"agentId":agent,"displayName":name,"createdAt":created,"scope":{"threadId":input.thread_id,"conversationId":if public{None}else{Some(conversation.as_str())},"scopeKind":if public{"public"}else{kind.as_str()}}})}).collect::<Vec<_>>();
                 Ok(json!({"targets":targets,"next":after}))
             }
             "support.get"=>Ok(tools::runtime_support::snapshot()),
