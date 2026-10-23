@@ -49,7 +49,7 @@ struct RovaiNativeContinuation: View {
                     Text("不会重置 Git 或改写工程文件。原程序可能继续写它自己的日志；导入快照保持只读。").font(.caption).foregroundStyle(Theme.textSecondary)
                 }
                 if let receipt {Section("原创建结果") {
-                    Text(nativeCreationState(receipt));Text(receipt.text("commandId")).font(.caption2).textSelection(.enabled)
+                    Text(LocalizedStringKey(nativeCreationState(receipt)));Text(receipt.text("commandId")).font(.caption2).textSelection(.enabled)
                     if let session = receipt["reportedSessionId"]?.stringValue {LabeledContent("原程序会话编号", value: session).font(.caption).textSelection(.enabled)}
                     if let error = receipt["error"]?.stringValue {Text(error).font(.caption).foregroundStyle(Theme.warning)}
                     if receipt.text("state") == "binding_recorded" {Button("打开新工作私聊") {working = true}.disabled(disabled)}

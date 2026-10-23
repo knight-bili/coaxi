@@ -33,7 +33,7 @@ struct RovaiNativeCreationRecords: View {
                 Section {
                     Text(preview.text("title")).font(.headline)
                     Text(preview.text("mode") == "continue" ? "继续原生会话" : preview.text("mode") == "fork_point" ? "从指定回答分叉" : "从会话末尾分叉").font(.caption).foregroundStyle(Theme.textSecondary)
-                    Text(receipt == .null ? "只有预览，尚未确认创建" : nativeCreationState(receipt))
+                    Text(LocalizedStringKey(receipt == .null ? "只有预览，尚未确认创建" : nativeCreationState(receipt)))
                     if let reason = preview["reason"]?.stringValue {Text(reason).font(.caption).foregroundStyle(Theme.textSecondary)}
                     if receipt != .null {
                         Text(receipt.text("commandId")).font(.caption2).textSelection(.enabled)

@@ -10640,7 +10640,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mission"
+            "value" : "Missions"
           }
         },
         "zh-Hans" : {
@@ -14856,7 +14856,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Chat"
+            "value" : "Conversations"
           }
         },
         "zh-Hans" : {
@@ -18749,7 +18749,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Server"
+            "value" : "Servers"
           }
         },
         "zh-Hans" : {
@@ -24393,7 +24393,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Teammates"
+            "value" : "Members"
           }
         },
         "zh-Hans" : {
@@ -24927,6 +24927,261 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "默认级别"
+          }
+        }
+      }
+    },
+    "已登记，正在准备原生会话" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recorded; preparing native session"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已登记，正在准备原生会话"
+          }
+        }
+      }
+    },
+    "原程序正在恢复或分叉" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The original program is resuming or forking"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "原程序正在恢复或分叉"
+          }
+        }
+      }
+    },
+    "原生会话已记录，新会话尚未发送消息" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Native session recorded; the new conversation has not sent a message"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "原生会话已记录，新会话尚未发送消息"
+          }
+        }
+      }
+    },
+    "原生会话已记录，可在新会话发送第一条消息" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Native session recorded; send the first message in the new conversation"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "原生会话已记录，可在新会话发送第一条消息"
+          }
+        }
+      }
+    },
+    "未完成创建，原导入快照保留" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Creation unfinished; the original imported snapshot is preserved"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未完成创建，原导入快照保留"
+          }
+        }
+      }
+    },
+    "创建结果待核对，不重复创建" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Creation result needs reconciliation; do not create again"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "创建结果待核对，不重复创建"
+          }
+        }
+      }
+    },
+    "创建结果待核对，不会重复创建" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Creation result needs reconciliation; creation will not be repeated"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "创建结果待核对，不会重复创建"
+          }
+        }
+      }
+    },
+    "继续原生会话" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continue native conversation"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "继续原生会话"
+          }
+        }
+      }
+    },
+    "从指定回答分叉" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fork from selected response"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "从指定回答分叉"
+          }
+        }
+      }
+    },
+    "从会话末尾分叉" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fork from conversation tail"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "从会话末尾分叉"
+          }
+        }
+      }
+    },
+    "从原生会话继续工作" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continue working from native conversation"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "从原生会话继续工作"
+          }
+        }
+      }
+    },
+    "核对这份模板" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Check this template"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "核对这份模板"
+          }
+        }
+      }
+    },
+    "新建队员" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create member"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新建队员"
+          }
+        }
+      }
+    },
+    "新对话" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New conversation"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新对话"
+          }
+        }
+      }
+    },
+    "只有预览，尚未确认创建" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preview only; creation not confirmed"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "只有预览，尚未确认创建"
           }
         }
       }
