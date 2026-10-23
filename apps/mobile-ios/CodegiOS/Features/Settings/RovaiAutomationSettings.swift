@@ -35,7 +35,7 @@ struct RovaiAutomationSettings: View {
         }.scrollContentBackground(.hidden).navigationTitle("定时任务")
         .toolbar { Button { editor = Editor(value: nil) } label: { Image(systemName: "plus") }.disabled(model.pending != nil) }
         .task(id: "\(filter):\(model.resourceVersion)") { try? await Task.sleep(for: .milliseconds(250)); if !Task.isCancelled { await load(); if let history { await readRuns(history) } } }.onChange(of: model.lastResult) { _, _ in Task { await load(); if let history { await readRuns(history) } } }
-        .sheet(item: $editor) { item in RovaiAutomationEditor(model: model, original: item.value) { editor = nil; Task { await load() } } }
+        .sheet(item: $editor) { item in RovaiAutomationEditor(model: model, original: item.value, onOpenThread: onOpenThread) { editor = nil; Task { await load() } } }
         .confirmationDialog(action?.title ?? "确认操作", isPresented: Binding(get: { action != nil }, set: { if !$0 { action = nil } }), titleVisibility: .visible) { if let action { Button("确认", role: action.operation == .automationsDelete ? .destructive : nil) { Task { await model.command(action.operation, value: action.command); self.action = nil } }.disabled(model.pending != nil || model.busy) }; Button("取消", role: .cancel) { action = nil } } message: { Text("按所选任务执行。立即运行会在宿主创建实际执行；已有结果仍保留在原对话中。") }
     }
     private func load(cursor: String? = nil) async { guard !busy else { return }; busy = true; defer { busy = false }; do { var fields: [String: JSONValue] = ["status": .string(filter), "query": .string(search), "limit": .number(30)]; if let cursor { fields["cursor"] = .string(cursor) }; let value = try await model.query(.automationsList, params: .object(fields)); items = cursor == nil ? value["automations"]?.rvArray ?? [] : items + (value["automations"]?.rvArray ?? []); self.cursor = value["nextCursor"]?.stringValue; issue = nil } catch is CancellationError {} catch { issue = error.localizedDescription } }
@@ -44,6 +44,7 @@ struct RovaiAutomationSettings: View {
 private struct RovaiAutomationEditor: View {
     let model: RovaiWorkspaceModel
     let original: JSONValue?
+    let onOpenThread: (String) -> Void
     let onSaved: () -> Void
     @Environment(\.dismiss) private var dismiss
     @State private var name = ""
@@ -58,6 +59,7 @@ private struct RovaiAutomationEditor: View {
     @State private var channels: Set<String> = []
     @State private var ready = false
     @State private var issue: String?
+    @State private var definitionVersion: Int?
     @State private var sent: String?
     private var owner: String { "automation-draft:" + (original?.text("automationId") ?? "new") }
     private var blocked: Bool { !ready || model.pending != nil || model.busy }
@@ -68,6 +70,7 @@ private struct RovaiAutomationEditor: View {
             Section("内容") { TextField("名称", text: $name); TextField("任务内容", text: $prompt, axis: .vertical).lineLimit(4...12) }
             Section("执行队员和工作目录") { Picker("队员", selection: $member) { Text("选择队员").tag(""); ForEach(model.members.filter { $0.text("presence") == "present" }, id: \.self) { agent in Text(agent.text("displayName")).tag(agent.text("agentId")) } }; Picker("工程", selection: $path) { Text("快速对话").tag(""); ForEach(model.navigation["projects"]?.rvArray ?? [], id: \.self) { project in Text(project.text("name")).tag(project.text("projectPath")) } } }
             Section("计划（宿主时区）") { Picker("重复", selection: $kind) { ForEach(rovaiSchedules, id: \.0) { value in Text(value.1).tag(value.0) } }; if !["manual", "cron"].contains(kind) { TextField("时间 HH:mm", text: $at).keyboardType(.numbersAndPunctuation) }; if kind == "weekly" { Picker("星期", selection: $weekday) { ForEach(rovaiWeekdays, id: \.0) { value in Text(value.1).tag(value.0) } } }; if kind == "once" { TextField("日期 yyyy-MM-dd", text: $date).keyboardType(.numbersAndPunctuation) }; if kind == "cron" { TextField("分钟 小时 日期 月份 星期", text: $cron).autocorrectionDisabled().textInputAutocapitalization(.never) } }
+            if let original {RovaiAutomationConversationDetails(model: model, automationId: original.text("automationId"), enabled: !blocked, onVersionChange: {definitionVersion = $0}, onOpenThread: onOpenThread).id("automation-owner:\(original.text("automationId")):\(model.connectionGeneration)")}
             Section("结果通知") { ForEach([("feishu", "飞书"), ("lark", "Lark"), ("dingtalk", "钉钉")], id: \.0) { value in Toggle(value.1, isOn: Binding(get: { channels.contains(value.0) }, set: { if $0 { channels.insert(value.0) } else { channels.remove(value.0) } })) } }
         }.disabled(blocked).navigationTitle(original == nil ? "新建定时任务" : "编辑定时任务").toolbar { ToolbarItem(placement: .cancellationAction) { Button("返回，保留草稿") { dismiss() } }; ToolbarItem(placement: .confirmationAction) { Button("保存") { Task { await save() } }.disabled(blocked || prompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || member.isEmpty) } } }
         .task { do { let raw = try model.readBody(owner); if !raw.isEmpty { guard let value = JSONValue.parse(raw) else { throw RovaiHostFailure(code: "任务草稿无法读取") }; restore(value) } else if let original { name = original.text("name"); prompt = original.text("prompt"); member = original.text("memberId"); path = original["projectRef"]?.text("path") ?? ""; kind = original["schedule"]?.text("kind") ?? "daily"; at = original["schedule"]?.text("at") ?? "09:00"; date = original["schedule"]?.text("date") ?? ""; weekday = original["schedule"]?.text("weekday") ?? "monday"; cron = original["schedule"]?.text("expression") ?? ""; channels = Set((original["notifyChannels"]?.rvArray ?? []).compactMap(\.stringValue)) }; ready = true } catch { issue = error.localizedDescription } }
@@ -81,6 +84,6 @@ private struct RovaiAutomationEditor: View {
         if kind == "cron", cron.split(whereSeparator: \.isWhitespace).count != 5 { throw RovaiHostFailure(code: "Cron需要5个字段") }
         try model.saveBody(owner, body: draft.prettyString); var schedule: [String: JSONValue] = ["kind": .string(kind)]; if !["manual", "cron"].contains(kind) { schedule["at"] = .string(at) }; if kind == "once" { schedule["date"] = .string(date) }; if kind == "weekly" { schedule["weekday"] = .string(weekday) }; if kind == "cron" { schedule["expression"] = .string(cron) }
         var value: [String: JSONValue] = ["name": .string(name), "prompt": .string(prompt), "memberId": .string(member), "projectRef": path.isEmpty ? .object(["kind": .string("quick_chat")]) : .object(["kind": .string("directory"), "path": .string(path)]), "schedule": .object(schedule), "notifyChannels": .array(channels.sorted().map { .string($0) })]
-        if let original { value["automationId"] = original["automationId"]; value["expectedVersion"] = original["version"] }; let id = UUID().uuidString.lowercased(); sent = id; await model.execute(original == nil ? .automationsCreate : .automationsUpdate, params: .object(["commandId": .string(id), "command": .object(value)]))
+        if let original { value["automationId"] = original["automationId"]; value["expectedVersion"] = definitionVersion.map { .number(Double($0)) } ?? original["version"] }; let id = UUID().uuidString.lowercased(); sent = id; await model.execute(original == nil ? .automationsCreate : .automationsUpdate, params: .object(["commandId": .string(id), "command": .object(value)]))
     } catch { issue = error.localizedDescription } }
 }
