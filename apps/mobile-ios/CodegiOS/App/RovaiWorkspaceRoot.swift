@@ -63,7 +63,7 @@ struct RovaiWorkspaceRoot: View {
     // Same balanced three-column shell and widths as Codeg's original iPad root.
     private var splitShell: some View {
         NavigationSplitView(columnVisibility: $columns) {
-            List(selection: $tab) { Label("对话", systemImage: "message").tag(0); Label("使命", systemImage: "flag").tag(1); Label("队员", systemImage: "person.2").tag(2); Label("画布", systemImage: "map").tag(3); Label("设置", systemImage: "gearshape").tag(4) }
+            List(selection: Binding<Int?>(get: {tab}, set: {value in if let value {tab = value}})) { Label("对话", systemImage: "message").tag(0); Label("使命", systemImage: "flag").tag(1); Label("队员", systemImage: "person.2").tag(2); Label("画布", systemImage: "map").tag(3); Label("设置", systemImage: "gearshape").tag(4) }
                 .navigationTitle(profile?.name ?? "Rovai Workbench")
                 .navigationSplitViewColumnWidth(min: 220, ideal: 260, max: 320)
                 .toolbarTitleMenu { Picker("服务器", selection: $selectedServerID) { ForEach(store.servers) { server in Text(server.name).tag(Optional(server.id)) } }; Divider(); Button("管理服务器", action: onManageServers) }
