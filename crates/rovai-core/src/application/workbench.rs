@@ -241,9 +241,7 @@ fn git_nul_fields(bytes: &[u8]) -> Result<Vec<&[u8]>> {
         bytes.last() == Some(&0),
         "workbench.git_files_metadata_invalid"
     );
-    Ok(bytes[..bytes.len() - 1]
-        .split(|byte| *byte == 0)
-        .collect())
+    Ok(bytes[..bytes.len() - 1].split(|byte| *byte == 0).collect())
 }
 
 fn git_metadata_path(bytes: &[u8]) -> Result<String> {
@@ -313,9 +311,7 @@ fn parse_git_numstat(bytes: &[u8]) -> Result<HashMap<String, bool>> {
             value == b"-" || (!value.is_empty() && value.iter().all(|byte| byte.is_ascii_digit()))
         };
         ensure!(
-            valid_count(added)
-                && valid_count(deleted)
-                && (added == b"-") == (deleted == b"-"),
+            valid_count(added) && valid_count(deleted) && (added == b"-") == (deleted == b"-"),
             "workbench.git_files_metadata_invalid"
         );
         let path = if path.is_empty() {
@@ -353,15 +349,16 @@ fn parse_git_file_metadata(
             .remove(&file.path)
             .context("workbench.git_files_metadata_mismatch")?;
     }
-    ensure!(
-        binaries.is_empty(),
-        "workbench.git_files_metadata_mismatch"
-    );
+    ensure!(binaries.is_empty(), "workbench.git_files_metadata_mismatch");
     Ok(files)
 }
 
 fn git_file_metadata_arguments(request: &GitRequest, numstat: bool) -> Result<Vec<String>> {
-    let format = if numstat { "--numstat" } else { "--name-status" };
+    let format = if numstat {
+        "--numstat"
+    } else {
+        "--name-status"
+    };
     let target = git_target(request.target.as_deref())?;
     let arguments = match request.action.as_str() {
         "show" => vec![
@@ -1390,8 +1387,8 @@ impl Core {
             let output = git.workbench_output(&root, &arguments).await?;
             let success = output.status.success();
             let exit_code = output.status.code();
-            let stdout = String::from_utf8(output.stdout.bytes)
-                .context("workbench.git_non_utf8")?;
+            let stdout =
+                String::from_utf8(output.stdout.bytes).context("workbench.git_non_utf8")?;
             let error = output.stderr.lossy_text();
             let mut result = json!({
                 "success": success,
@@ -1737,7 +1734,7 @@ impl Core {
 
 #[cfg(test)]
 mod git_file_metadata_tests {
-    use super::{parse_git_file_metadata, GitFileMetadata};
+    use super::{GitFileMetadata, parse_git_file_metadata};
     use crate::runtime_probe_process::BoundedCapture;
 
     fn capture(bytes: &[u8], truncated: bool) -> BoundedCapture {
@@ -1760,11 +1757,9 @@ mod git_file_metadata_tests {
         ]
         .concat();
 
-        let files = parse_git_file_metadata(
-            &capture(&name_status, false),
-            &capture(&numstat, false),
-        )
-        .unwrap();
+        let files =
+            parse_git_file_metadata(&capture(&name_status, false), &capture(&numstat, false))
+                .unwrap();
 
         assert_eq!(
             files,
@@ -1798,11 +1793,9 @@ mod git_file_metadata_tests {
         ]
         .concat();
 
-        let files = parse_git_file_metadata(
-            &capture(&name_status, false),
-            &capture(&numstat, false),
-        )
-        .unwrap();
+        let files =
+            parse_git_file_metadata(&capture(&name_status, false), &capture(&numstat, false))
+                .unwrap();
 
         assert_eq!(
             files,
@@ -1836,31 +1829,39 @@ mod git_file_metadata_tests {
 
     #[test]
     fn empty_metadata_returns_no_files() {
-        assert!(parse_git_file_metadata(&capture(b"", false), &capture(b"", false))
-            .unwrap()
-            .is_empty());
+        assert!(
+            parse_git_file_metadata(&capture(b"", false), &capture(b"", false))
+                .unwrap()
+                .is_empty()
+        );
     }
 
     #[test]
     fn truncated_metadata_is_rejected() {
-        assert!(parse_git_file_metadata(
-            &capture(b"M\0partial.txt\0", true),
-            &capture(b"1\t0\tpartial.txt\0", false),
-        )
-        .is_err());
-        assert!(parse_git_file_metadata(
-            &capture(b"M\0partial.txt\0", false),
-            &capture(b"1\t0\tpartial.txt\0", true),
-        )
-        .is_err());
+        assert!(
+            parse_git_file_metadata(
+                &capture(b"M\0partial.txt\0", true),
+                &capture(b"1\t0\tpartial.txt\0", false),
+            )
+            .is_err()
+        );
+        assert!(
+            parse_git_file_metadata(
+                &capture(b"M\0partial.txt\0", false),
+                &capture(b"1\t0\tpartial.txt\0", true),
+            )
+            .is_err()
+        );
     }
 
     #[test]
     fn non_utf8_paths_are_rejected() {
-        assert!(parse_git_file_metadata(
-            &capture(b"M\0\xff\0", false),
-            &capture(b"1\t0\t\xff\0", false),
-        )
-        .is_err());
+        assert!(
+            parse_git_file_metadata(
+                &capture(b"M\0\xff\0", false),
+                &capture(b"1\t0\t\xff\0", false),
+            )
+            .is_err()
+        );
     }
 }
