@@ -828,4 +828,23 @@
     <string name="rovai_fusion_d338da8688d32ec5" formatted="false">"默认关闭；仅之后的新任务生效，仍需实际连接支持。"</string>
     <string name="rovai_fusion_e64072d892a6508d" formatted="false">"默认关闭；开启后从新任务生效，队员主动检查时才会收到。"</string>
     <string name="rovai_fusion_4356a2dd08a4fd69" formatted="false">"默认级别"</string>
+    <string name="rovai_fusion_5d63cd482db507a1" formatted="false">"已登记，正在准备原生会话"</string>
+    <string name="rovai_fusion_ea7f8efe2aeee874" formatted="false">"原程序正在恢复或分叉"</string>
+    <string name="rovai_fusion_f169cdd4ef735014" formatted="false">"原生会话已记录，新会话尚未发送消息"</string>
+    <string name="rovai_fusion_4cd731f644b61c7f" formatted="false">"原生会话已记录，可在新会话发送第一条消息"</string>
+    <string name="rovai_fusion_f5a2613cba11dad9" formatted="false">"未完成创建，原导入快照保留"</string>
+    <string name="rovai_fusion_f0e774677f8fe66c" formatted="false">"创建结果待核对，不重复创建"</string>
+    <string name="rovai_fusion_9dc68f930a6fdc3b" formatted="false">"创建结果待核对，不会重复创建"</string>
+    <string name="rovai_fusion_bd40b8c3902012e9" formatted="false">"继续原生会话"</string>
+    <string name="rovai_fusion_642c8fa5c6d600cb" formatted="false">"从指定回答分叉"</string>
+    <string name="rovai_fusion_aa3f5792ac0342fd" formatted="false">"从会话末尾分叉"</string>
+    <string name="rovai_fusion_a823a9c8657095b2" formatted="false">"从原生会话继续工作"</string>
+    <string name="rovai_fusion_024a9e083013b8fd" formatted="false">"核对这份模板"</string>
+    <string name="rovai_fusion_6bf6d3f3d6261b75" formatted="false">"对话"</string>
+    <string name="rovai_fusion_6f3a9f7421bc2fe6" formatted="false">"队员"</string>
+    <string name="rovai_fusion_df3d58c7d84b85f2" formatted="false">"设置"</string>
+    <string name="rovai_fusion_2940344fab55863b" formatted="false">"新建队员"</string>
+    <string name="rovai_fusion_85d56bf4d4229ac8" formatted="false">"工程"</string>
+    <string name="rovai_fusion_ea4b29f58f879802" formatted="false">"新对话"</string>
+    <string name="rovai_fusion_6154742a3bf6d139" formatted="false">"只有预览，尚未确认创建"</string>
 </resources>

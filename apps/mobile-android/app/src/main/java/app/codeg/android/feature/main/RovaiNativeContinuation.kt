@@ -29,7 +29,7 @@ private fun nativeForkPoint(provider:String,transcript:JsonObject,selected:Strin
     val id=(if(provider=="codex")selected else native?:selected).replace(Regex(":segment:\\d+$"),"")
     return buildJsonObject{put("selectedTurnId",selected);put("messageId",id);put("messageFingerprint",digest?.let(::JsonPrimitive)?:JsonNull);put("messageOccurrence",if(digest==null)JsonNull else JsonPrimitive(turns.take(index).count{it.coreText("role")=="assistant"&&fingerprint(text(it))==digest}+1))}
 }
-internal fun nativeCreationState(receipt:JsonObject)=when(receipt.coreText("state")){"prepared"->"已登记，正在准备原生会话";"starting"->"原程序正在恢复或分叉";"binding_recorded"->"原生会话已记录，新会话尚未发送消息";"failed"->"未完成创建，原导入快照保留";"unknown"->"创建结果待核对，不重复创建";else->receipt.coreText("state")}
+@Composable internal fun nativeCreationState(receipt:JsonObject)=when(receipt.coreText("state")){"prepared"->stringResource(R.string.rovai_fusion_5d63cd482db507a1);"starting"->stringResource(R.string.rovai_fusion_ea7f8efe2aeee874);"binding_recorded"->stringResource(R.string.rovai_fusion_f169cdd4ef735014);"failed"->stringResource(R.string.rovai_fusion_f5a2613cba11dad9);"unknown"->stringResource(R.string.rovai_fusion_f0e774677f8fe66c);else->receipt.coreText("state")}
 
 @Composable fun RovaiNativeContinuation(model:RovaiWorkspaceViewModel,entry:JsonObject,transcript:JsonObject,mode:String,selectedTurnId:String?=null,onClose:()->Unit){
     val coroutine=rememberCoroutineScope();val generation=remember(entry){model.connectionGeneration};val owner="native-continuation:${entry.coreText("linkedThreadId")}:${entry.coreText("id")}"

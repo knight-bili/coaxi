@@ -6045,5 +6045,17 @@
   "默认仅上传界面偏好。完整配置和密钥分别选择；另一台主机下载后仍须逐项选择，不自动工作。": "Only interface preferences upload by default. Select complete configuration and secrets separately. Each item must still be selected on another host after download; nothing starts automatically.",
   "默认关闭；仅之后的新任务生效，仍需实际连接支持。": "Off by default. Applies to future tasks only and requires actual connection support.",
   "默认关闭；开启后从新任务生效，队员主动检查时才会收到。": "Off by default. Once enabled, applies to new tasks and is received only when the member actively checks.",
-  "默认模型（可选）": "Default model (optional)"
+  "默认模型（可选）": "Default model (optional)",
+  "已登记，正在准备原生会话": "Recorded; preparing native session",
+  "原程序正在恢复或分叉": "The original program is resuming or forking",
+  "原生会话已记录，新会话尚未发送消息": "Native session recorded; the new conversation has not sent a message",
+  "原生会话已记录，可在新会话发送第一条消息": "Native session recorded; send the first message in the new conversation",
+  "未完成创建，原导入快照保留": "Creation unfinished; the original imported snapshot is preserved",
+  "创建结果待核对，不重复创建": "Creation result needs reconciliation; do not create again",
+  "创建结果待核对，不会重复创建": "Creation result needs reconciliation; creation will not be repeated",
+  "继续原生会话": "Continue native conversation",
+  "从指定回答分叉": "Fork from selected response",
+  "从会话末尾分叉": "Fork from conversation tail",
+  "从原生会话继续工作": "Continue working from native conversation",
+  "核对这份模板": "Check this template"
 }

@@ -828,4 +828,23 @@
     <string name="rovai_fusion_d338da8688d32ec5" formatted="false">"Off by default. Applies to future tasks only and requires actual connection support."</string>
     <string name="rovai_fusion_e64072d892a6508d" formatted="false">"Off by default. Once enabled, applies to new tasks and is received only when the member actively checks."</string>
     <string name="rovai_fusion_4356a2dd08a4fd69" formatted="false">"Default level"</string>
+    <string name="rovai_fusion_5d63cd482db507a1" formatted="false">"Recorded; preparing native session"</string>
+    <string name="rovai_fusion_ea7f8efe2aeee874" formatted="false">"The original program is resuming or forking"</string>
+    <string name="rovai_fusion_f169cdd4ef735014" formatted="false">"Native session recorded; the new conversation has not sent a message"</string>
+    <string name="rovai_fusion_4cd731f644b61c7f" formatted="false">"Native session recorded; send the first message in the new conversation"</string>
+    <string name="rovai_fusion_f5a2613cba11dad9" formatted="false">"Creation unfinished; the original imported snapshot is preserved"</string>
+    <string name="rovai_fusion_f0e774677f8fe66c" formatted="false">"Creation result needs reconciliation; do not create again"</string>
+    <string name="rovai_fusion_9dc68f930a6fdc3b" formatted="false">"Creation result needs reconciliation; creation will not be repeated"</string>
+    <string name="rovai_fusion_bd40b8c3902012e9" formatted="false">"Continue native conversation"</string>
+    <string name="rovai_fusion_642c8fa5c6d600cb" formatted="false">"Fork from selected response"</string>
+    <string name="rovai_fusion_aa3f5792ac0342fd" formatted="false">"Fork from conversation tail"</string>
+    <string name="rovai_fusion_a823a9c8657095b2" formatted="false">"Continue working from native conversation"</string>
+    <string name="rovai_fusion_024a9e083013b8fd" formatted="false">"Check this template"</string>
+    <string name="rovai_fusion_6bf6d3f3d6261b75" formatted="false">"Chat"</string>
+    <string name="rovai_fusion_6f3a9f7421bc2fe6" formatted="false">"Teammates"</string>
+    <string name="rovai_fusion_df3d58c7d84b85f2" formatted="false">"Settings"</string>
+    <string name="rovai_fusion_2940344fab55863b" formatted="false">"New teammate"</string>
+    <string name="rovai_fusion_85d56bf4d4229ac8" formatted="false">"Project"</string>
+    <string name="rovai_fusion_ea4b29f58f879802" formatted="false">"New chat"</string>
+    <string name="rovai_fusion_6154742a3bf6d139" formatted="false">"Preview only; creation not confirmed"</string>
 </resources>
