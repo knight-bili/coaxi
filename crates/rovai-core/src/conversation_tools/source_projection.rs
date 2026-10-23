@@ -9,6 +9,26 @@ pub(crate) struct Snapshot{
 }
 fn limited(text:&str,maximum:usize)->String{text.chars().filter(|character|*character!='\0').take(maximum).collect()}
 fn stats_unavailable()->Value{json!({"total_usage":null,"coverage":"unavailable"})}
+fn imported_stats(transcript:&Value,complete_boundary:bool)->Value{
+    if !complete_boundary{return stats_unavailable()}
+    let source=&transcript["session_stats"];let Some(fields)=source.as_object()else{return stats_unavailable()};
+    let safe=|value:&Value|value.as_u64().filter(|value|*value<=9_007_199_254_740_991);
+    let mut output=stats_unavailable();let mut known=false;
+    if let Some(usage)=fields.get("total_usage").and_then(Value::as_object){
+        let mut mapped=serde_json::Map::new();
+        for(key,original)in[("input_tokens","input_tokens"),("output_tokens","output_tokens"),("cache_read_tokens","cache_read_input_tokens"),("cache_write_tokens","cache_creation_input_tokens")]{
+            if let Some(value)=usage.get(original).and_then(safe){mapped.insert(key.into(),json!(value));}
+        }
+        if !mapped.is_empty(){output["total_usage"]=Value::Object(mapped);known=true;}
+    }
+    for key in ["total_tokens","context_window_used_tokens","context_window_max_tokens"]{
+        if let Some(value)=fields.get(key).and_then(safe){output[key]=json!(value);known=true;}
+    }
+    let duration_observed=transcript["turns"].as_array().is_some_and(|turns|turns.iter().any(|turn|turn.get("duration_ms").is_some_and(|value|value.is_u64())));
+    if duration_observed&&let Some(duration)=fields.get("total_duration_ms").and_then(safe){output["total_duration_ms"]=json!(duration);known=true;}
+    if let Some(percent)=fields.get("context_window_usage_percent").and_then(Value::as_f64).filter(|value|value.is_finite()&&(0.0..=100.0).contains(value)){output["context_window_usage_percent"]=json!(percent);known=true;}
+    if known{output["coverage"]=json!("partial");}output
+}
 fn finish(source:&Source,through:i64,total:i64,items:Vec<Value>,metadata:Value,truncated:bool)->Result<Snapshot>{
     let source_digest=digest(&json!({"sourceSessionId":source.id,"sourceKind":source.source_kind,"throughSequence":through,"total":total,"items":items,"metadata":metadata}))?;
     Ok(Snapshot{source_digest,through_sequence:through,total,items,metadata,text_truncated:truncated})
@@ -19,7 +39,7 @@ pub(crate) fn live(connection:&Connection,source:&Source,through:Option<i64>)->R
     let public=source.source_kind=="public";ensure!(public==(kind=="camp_member"),"conversation_tools.source_changed");
     let prefix=if public{format!("WITH {} ",crate::camp_message_publication::public_camp_message_publication_cte())}else{String::new()};
     let from=if public{"camp_message m JOIN public_camp_message_publication p ON p.message_id=m.id"}else{"conversation_message m"};
-    let scope=if public{"m.camp_id=?1 AND m.tombstoned_at IS NULL AND m.recall_state<>'withdrawn'"}else{"m.conversation_id=?1"};
+    let scope=if public{"m.camp_id=?1 AND m.tombstoned_at IS NULL AND m.recall_state<>'withdrawn'"}else{"m.conversation_id=?1 AND m.author_type IN ('user','agent')"};
     let owner=if public{&source.owner_thread_id}else{conversation_id};
     let maximum:i64=connection.query_row(&format!("{prefix}SELECT COALESCE(MAX(m.sequence),0) FROM {from} WHERE {scope}"),[owner],|row|row.get(0))?;
     let through=through.unwrap_or(maximum);ensure!(through>=0&&through<=maximum,"conversation_tools.source_boundary_changed");
@@ -54,7 +74,7 @@ pub(crate) fn imported(root:&Path,source:&Source,through:Option<i64>)->Result<Sn
         items.push(json!({"role":turn["role"],"text":limited(&text,4096),"tools":tools}));
     }
     let summary=&transcript["summary"];
-    let mut metadata=json!({"stats":stats_unavailable(),"note":"仅返回原导入中可见的文字与工具名称；图片、思考、工具参数和原生日志定位不随本次查询返回。"});
+    let mut metadata=json!({"stats":imported_stats(&transcript,through==maximum),"note":"仅返回原导入中可见的文字与工具名称；图片、思考、工具参数和原生日志定位不随本次查询返回。原日志统计只按可核对字段列示。"});
     for(key,source_key,max)in[("title","title",4096),("model","model",512),("git_branch","git_branch",1024),("workspace_name","folder_name",1024)]{
         if let Some(text)=summary[source_key].as_str(){metadata[key]=json!(limited(text,max));}
     }
@@ -72,7 +92,7 @@ pub(crate) fn info(source:&Source,snapshot:&Snapshot,session_id:&Value,maximum:u
             let mut candidate=items.clone();candidate.push(item.clone());candidate.reverse();let mut next=result.clone();next["messages"]=json!({"total":snapshot.total,"included":candidate.len(),"truncated":true,"items":candidate});
             if serde_json::to_vec(&next)?.len()>65536{break}items.push(item.clone());
         }
-        items.reverse();result["messages"]=json!({"total":snapshot.total,"included":items.len(),"truncated":snapshot.text_truncated||items.len()as i64<snapshot.total,"items":items});
+        items.reverse();result["messages"]=json!({"total":snapshot.total,"included":items.len(),"truncated":snapshot.text_truncated||(items.len()as i64)<snapshot.total,"items":items});
     }
     validate("SessionInfoV1",&result)?;ensure!(serde_json::to_vec(&result)?.len()<=65536,"conversation_tools.session_info_budget");Ok(result)
 }
