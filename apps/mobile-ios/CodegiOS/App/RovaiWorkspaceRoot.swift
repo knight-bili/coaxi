@@ -106,7 +106,7 @@ struct RovaiWorkspaceRoot: View {
         RovaiProjectNavigation(model: model,threadLink: threadLink,onSelect: horizontalSizeClass == .regular ? {detailRoute = .thread($0)} : nil).id(model.connectionGeneration)
     }
     private func threadLink(_ value: JSONValue) -> some View { routeLink(.thread(value.text("id"))) { VStack(alignment: .leading, spacing: 6) { Text(value.text("title")).font(.headline); if let lead = value["defaultLead"] { Text(lead.text("displayName")).font(.caption).foregroundStyle(Theme.textSecondary) } } }.listRowBackground(Color.clear) }
-    private var missionList: some View {RovaiMissionBoard(model: model) {id in if horizontalSizeClass == .regular {detailRoute = .thread(id)} else {compactPaths.append(.thread(id))}}}
+    private var missionList: some View {RovaiMissionBoard(model: model) {id in if horizontalSizeClass == .regular {detailRoute = .thread(id)} else {compactPaths[1, default: []].append(.thread(id))}}}
     private var memberList: some View {
         List { ForEach(model.members.filter { $0.text("presence") != "removed" }.map { RovaiRow(value: $0) }) { row in
             GlassRow { VStack(alignment: .leading, spacing: 12) { Button { memberEditor = MemberEditorSelection(value: row.value) } label: { VStack(alignment: .leading, spacing: 6) { Text(row.value.text("displayName")).font(.headline); Text(row.value.text("teamRole")).font(.subheadline).foregroundStyle(Theme.textSecondary); Text(row.value.text("professionalResponsibilities")); Text(row.value["runtimeReadiness"]?.text("status") ?? "").font(.caption).foregroundStyle(Theme.accent) } }.buttonStyle(.plain); RovaiMemberLifecycle(model: model, member: row.value) } }.listRowBackground(Color.clear).listRowSeparator(.hidden)
