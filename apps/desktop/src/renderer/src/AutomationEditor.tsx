@@ -12,6 +12,7 @@ import { AutomationDatePicker, AutomationTimePicker } from './AutomationSchedule
 import { runtimeAdapterDisplayLabel } from '../../shared/execution-presentation'
 import { UiText, uiAttribute } from './interface-language'
 import { CHANNEL_KINDS, CHANNEL_PROVIDER_BRANDS } from './channel-provider-brand'
+import { ConversationAutomationDetails } from './ConversationAutomationDetails'
 
 function Picker({ label, value, options, onChange, children, disabled = false }: {
   label: string
@@ -224,6 +225,7 @@ export function AutomationEditor({ draft, onChange, agents, projects, automation
     </details>
     {!automation && <div className="automation-create-actions"><button className="primary-button" type="submit" disabled={busy || Boolean(scheduleError) || !draft.prompt.trim() || member?.presence !== 'present'}>{busy ? uiAttribute("正在保存…") : uiAttribute("保存")}</button></div>}
   </form>
+    {automation && <ConversationAutomationDetails automationId={automation.automationId} version={automation.version} disabled={busy} onOpenThread={onOpenThread} />}
     {automation && <RunHistory automation={automation} onOpenThread={onOpenThread} />}
   </div>
 }
