@@ -31,7 +31,7 @@ struct RovaiExecutionMetrics: View {
                         let member = (projection["members"]?.rvArray ?? []).first {$0.text("agentId") == session.text("agentId")}
                         Text((member?.text("displayName") ?? "队员") + " · 当前原生会话上下文").font(.headline)
                         let fraction = ratio(session)
-                        Text(display(session["usedTokens"]) + " / " + display(session["windowTokens"]) + " · " + (fraction.map {percent($0)} ?? "比例未知"))
+                        Text(sessionUsageSummary(session, fraction: fraction))
                         if let fraction {ProgressView(value: fraction, total: 1).tint(Theme.accent)}
                         Text([session.text("runtimeKind"), session.text("modelKey"), session.text("source"), session.text("observedAt")].filter {!$0.isEmpty}.joined(separator: " · ")).font(.caption).foregroundStyle(Theme.textSecondary)
                     }
@@ -63,6 +63,14 @@ struct RovaiExecutionMetrics: View {
     private func number(_ value: JSONValue?) -> Double? {if case .number(let number) = value {return number};return nil}
     private func display(_ value: JSONValue?) -> String {guard let number = number(value) else {return "—"};let formatter = NumberFormatter();formatter.numberStyle = .decimal;formatter.maximumFractionDigits = 0;return formatter.string(from: NSNumber(value: number)) ?? "—"}
     private func percent(_ value: Double) -> String {let formatter = NumberFormatter();formatter.numberStyle = .percent;formatter.maximumFractionDigits = 1;return formatter.string(from: NSNumber(value: value)) ?? "—"}
+    private func sessionUsageSummary(_ session: JSONValue, fraction: Double?) -> String {
+        let usedTokens: String = display(session["usedTokens"])
+        let windowTokens: String = display(session["windowTokens"])
+        let fractionText: String
+        if let fraction {fractionText = percent(fraction)} else {fractionText = "比例未知"}
+        let tokenText: String = [usedTokens, windowTokens].joined(separator: " / ")
+        return [tokenText, fractionText].joined(separator: " · ")
+    }
     private func ratio(_ session: JSONValue) -> Double? {
         if let used = number(session["usedTokens"]), used >= 0, let window = number(session["windowTokens"]), window > 0, used <= window {return used / window}
         if let native = number(session["nativeRatio"]), native.isFinite, (0...1).contains(native) {return native}
