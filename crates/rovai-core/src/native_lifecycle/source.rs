@@ -46,9 +46,9 @@ pub(crate) fn revision(location:&Location)->Result<String>{
     }entries.sort_by(|left,right|left.0.cmp(&right.0));digest(&json!(entries))
 }
 pub(crate) fn native_id(provider:&str,bytes:&[u8])->Result<String>{
-    let text=std::str::from_utf8(bytes)?;let mut ids=std::collections::BTreeSet::new();
+    let text=std::str::from_utf8(bytes)?;let mut ids=std::collections::BTreeSet::<String>::new();
     for line in text.lines(){let Ok(row)=serde_json::from_str::<Value>(line)else{continue};
-        let value=match provider{"codex"if row["type"]=="session_meta"=>row.pointer("/payload/id").and_then(Value::as_str),"claude"|"qoder"|"grok"=>row["sessionId"].as_str().or_else(||row["session_id"].as_str()),_=>None};
+        let value:Option<&str>=match provider{"codex" if row["type"]=="session_meta"=>row.pointer("/payload/id").and_then(Value::as_str),"claude"|"qoder"|"grok"=>row["sessionId"].as_str().or_else(||row["session_id"].as_str()),_=>None};
         if let Some(id)=value{ensure!(!id.is_empty()&&id.len()<=4096&&!id.contains('\0'),"native_lifecycle.native_id_invalid");ids.insert(id.to_owned());ensure!(ids.len()<=1,"native_lifecycle.ambiguous_native_id");}
     }ids.into_iter().next().context("native_lifecycle.native_id_unavailable")
 }
