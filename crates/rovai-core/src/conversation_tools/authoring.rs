@@ -56,3 +56,27 @@ pub(crate) fn scheduled_authority(connection:&Connection,automation:&str,request
     ensure!(exists,"conversation_tools.automation_owner_changed");
     Ok(CreationAuthority{actor:ActorRef::System{component_id:"conversation_tool_automation".into()},epoch:None,request:request.into(),automation:Some(automation.into())})
 }
+#[derive(Clone,Serialize)]
+pub(crate) struct ApplyAutomation{request_id:String}
+impl sealed::Sealed for ApplyAutomation{}
+impl DomainCommand for ApplyAutomation{const TYPE:&'static str="conversationTool.create_automation";const EXACT_REPLAY:bool=true;}
+pub(crate) fn create_automation(database:&mut crate::db::Database,lease:&RunLease,id:&str)->Result<CommandExecution>{
+    let envelope=CommandEnvelope{command_id:id.into(),actor:ActorRef::Agent{agent_id:lease.frozen.agent_id.clone(),source_agent_run_id:lease.run_id.clone()},camp_id:Some(lease.frozen.scope.thread_id.clone()),expected_versions:vec![],execution_epoch:Some(lease.epoch),payload:ApplyAutomation{request_id:id.into()}};
+    DomainCommandGateway.execute(database,&envelope,|tx|{
+        let input=requests::prepared(tx,lease,id,"create_automation")?;
+        let target=match target(tx,lease,&input){Ok(target)=>target,Err(error) if error.to_string().starts_with("conversation_tools.")=>{
+            let value=json!({"created":false,"kind":"automation","note":"未创建：原工程授权或唯一队员程序不可用，请由用户修复已有工程和队员设置。"});requests::finish(tx,id,"automation",&value)?;return Ok(CommandHandlerResult::applied("conversation_tools.not_created",value,None))
+        },Err(error)=>return Err(error)};
+        let authority=CreationAuthority{actor:envelope.actor.clone(),epoch:Some(lease.epoch),request:id.into(),automation:None};
+        let title=input["name"].as_str().context("conversation_tools.title_required")?;let prompt=input["prompt"].as_str().context("conversation_tools.prompt_required")?;
+        let(timezone,note)=calendar::resolve(input["timezone"].as_str())?;
+        let schedule=match input["cron"].as_str(){Some(expression)=>crate::automation::AutomationSchedule::Cron{expression:expression.into()},None=>crate::automation::AutomationSchedule::Manual};
+        let enabled=input["enabled"].as_bool().unwrap_or(true);let action=input["action"].as_str().unwrap_or("launch_session");
+        let(automation,next)=crate::automation::create_conversation_tool_definition_in_tx(tx,&authority,title,prompt,&target,&schedule,enabled,&timezone,action)?;
+        let mut value=json!({"created":true,"kind":"automation","id":automation,"title":title,"folder_name":Path::new(&target.path).file_name().and_then(|name|name.to_str()).unwrap_or(""),"folder_path":target.path,"agent_type":target.adapter,"timezone":timezone,"target_kind":"automation"});
+        if let Some(cron)=input["cron"].as_str(){value["cron"]=json!(cron)}
+        if let Some(next)=next{value["next_run_at"]=json!(next)}
+        if let Some(note)=note{value["note"]=json!(note)}
+        requests::finish(tx,id,"automation",&value)?;Ok(CommandHandlerResult::applied("conversation_tools.automation_created",value,None))
+    })
+}
