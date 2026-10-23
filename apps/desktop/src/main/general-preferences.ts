@@ -109,6 +109,7 @@ export class GeneralPreferencesStore {
     return this.#enqueue(async () => {
       if (plan.targetId !== 'general') throw new Error('configuration.owner_target_invalid')
       const next = plan.after === null ? { ...DEFAULT_GENERAL_PREFERENCES } : parseGeneralPreferences(plan.after)
+      if (next === null) throw new Error('configuration.general_preferences_invalid')
       if (plan.after !== null && !samePreferenceValue(next, plan.after)) throw new Error('configuration.general_preferences_invalid')
       const state = await applyOwnedPreferenceFile(this.#filePath, plan, value => writePrivateJson(this.#filePath, value))
       if (state === 'applied') this.#snapshot = next
