@@ -1,5 +1,15 @@
 import SwiftUI
 
+private func customRuntimeEnvironmentText(_ value: JSONValue) -> String {
+    switch value["installation"]?["environment"]?.text("status") {
+    case "needs_environment": return "本机程序或关联文件需要修复。保留旧任务，在本机重新安装此版本，再为之后的任务选择本机安装。"
+    case "unreadable": return "暂时无法核对恢复记录，请先检查主机数据目录，原任务和安装记录已保留。"
+    case "artifacts_current": return "本机程序文件与安装记录一致，运行资格仍待实际验证。"
+    case "not_installed": return "当前主机尚未安装此版本，可选择安装此版本。"
+    default: return "当前主机没有提供恢复环境检查结果。"
+    }
+}
+
 private func customObject(_ value: JSONValue?) throws -> [String: JSONValue] {
     guard case .object(let object) = value else {throw RovaiHostFailure(code: "配置必须是 JSON 对象")};return object
 }
@@ -96,7 +106,7 @@ private func customMasked(_ value: JSONValue) throws -> JSONValue {
             }
             if !busy && rows.isEmpty {Section {Text("还没有自定义智能体。添加已有 ACP 程序后，可在队员设置中选择。")}}
             if next != nil {Button("更多程序") {work {try await load(more: true)}}.disabled(disabled)}
-            if let inspection {Section("安装与启动来源") {Text(inspection.prettyString).font(.caption.monospaced()).textSelection(.enabled);Button("收起") {self.inspection = nil}}}
+            if let inspection {Section("安装与启动来源") {Text(customRuntimeEnvironmentText(inspection));DisclosureGroup("安装与启动来源") {Text(inspection.prettyString).font(.caption.monospaced()).textSelection(.enabled)};Button("关闭状态") {self.inspection = nil}}}
             if let receipt {Section {DisclosureGroup("最近原请求回执") {Text(receipt.prettyString).font(.caption.monospaced()).textSelection(.enabled)}}}
         }
         .scrollContentBackground(.hidden).navigationTitle("自定义智能体")

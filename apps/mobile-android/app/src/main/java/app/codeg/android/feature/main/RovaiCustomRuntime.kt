@@ -18,6 +18,16 @@ import kotlinx.serialization.json.*
 import java.util.UUID
 
 internal fun customRuntimeRef(value:JsonObject)=buildJsonObject{put("id",value.coreText("id"));put("definitionRevision",value.coreLong("revision"));put("definitionDigest",value.coreText("definitionDigest"))}
+private fun customRuntimeEnvironmentText(value:JsonObject):String{
+    val environment=(value["installation"] as? JsonObject)?.get("environment") as? JsonObject
+    return when(environment?.coreText("status")){
+        "needs_environment"->"本机程序或关联文件需要修复。保留旧任务，在本机重新安装此版本，再为之后的任务选择本机安装。"
+        "unreadable"->"暂时无法核对恢复记录，请先检查主机数据目录，原任务和安装记录已保留。"
+        "artifacts_current"->"本机程序文件与安装记录一致，运行资格仍待实际验证。"
+        "not_installed"->"当前主机尚未安装此版本，可选择安装此版本。"
+        else->"当前主机没有提供恢复环境检查结果。"
+    }
+}
 private fun customObject(value:JsonElement?):JsonObject=value as? JsonObject?:error("配置必须是 JSON 对象")
 private fun customKeys(value:JsonObject,names:Set<String>){require(value.keys.all{it in names}){"配置含有未知字段，请核对原版格式"}}
 private fun customPackage(raw:JsonObject,kind:String):JsonObject{
@@ -85,7 +95,7 @@ private fun customRuntimeMasked(value:JsonObject):JsonObject=buildJsonObject{val
         }}
         if(!busy&&rows.isEmpty())item{Text("还没有自定义智能体。添加已有 ACP 程序后，可在队员设置中选择。")}
         if(next!=null)item{TextButton(enabled=!disabled,onClick={work{load(true)}}){Text("更多程序")}}
-        inspection?.let{item{Text("安装与启动来源");Text(it.toString(),style=MaterialTheme.typography.bodySmall);TextButton(onClick={inspection=null}){Text("收起")}}}
+        inspection?.let{value->item{GlassRow(Modifier.fillMaxWidth()){Text(customRuntimeEnvironmentText(value));var expanded by remember(value){mutableStateOf(false)};TextButton(onClick={expanded=!expanded}){Text(if(expanded)"收起安装与启动来源" else "安装与启动来源")};if(expanded)Text(value.toString(),style=MaterialTheme.typography.bodySmall);TextButton(onClick={inspection=null}){Text("关闭状态")}}}}
         receipt?.let{item{Text("最近原请求回执");Text(it.toString(),style=MaterialTheme.typography.bodySmall)}}
     }}}
     removing?.let{value->AlertDialog(onDismissRequest={if(!busy)removing=null},title={Text("移除 ${value.coreText("name")}")},text={Text("之后的任务不能再选择此定义，原任务仍保留原安装、记录和秘密引用。")},confirmButton={TextButton(enabled=!disabled&&original==null,onClick={work{write(RovaiOperation.RUNTIME_CUSTOM_REMOVE,value.coreText("id"),buildJsonObject{put("id",value.coreText("id"));put("expectedRevision",value.coreLong("revision"))})}}){Text("移除")}},dismissButton={TextButton(enabled=!busy,onClick={removing=null}){Text("取消")}})}
