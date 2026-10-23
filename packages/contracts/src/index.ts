@@ -5090,6 +5090,7 @@ export type CoreMethod =
   | 'backup.storage.desktop.register'
   | 'history.local'
   | 'history.library'
+  | 'feedback.operation'
   | 'history.usage'
   | 'history.usage.local'
   | 'office.watch'
