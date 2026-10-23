@@ -83,7 +83,7 @@ export function NativeSessionViewer({ target, open, visible, onOpenChange, retur
           <Drawer.Title className="sr-only">{t('原生帮手会话')}</Drawer.Title>
           <Drawer.Description className="sr-only">{t('只读查看帮手已经保存的消息和工具记录。')}</Drawer.Description>
           <header className="native-session-header" tabIndex={-1} ref={heading}>
-            <CodegRuntimeMark target={target.runtime} size={16} />
+            <CodegRuntimeMark target={target.runtime === 'claude' ? 'claude_code' : target.runtime} size={16} />
             <div><strong>{t('原生帮手会话')}</strong>{target.subtitle && <small>{target.subtitle}</small>}</div>
             {state.loading && <Loader2 size={14} className="native-session-spinner" aria-label={t('正在读取会话')} />}
             <button type="button" className="delegation-icon-button" aria-label={t('刷新原生帮手会话')} onClick={() => void reader.refresh()}><RefreshCw size={15} /></button>
