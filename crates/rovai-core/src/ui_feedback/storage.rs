@@ -57,7 +57,7 @@ pub fn preview(connection:&mut Connection,input:PreviewRequest)->Result<PreviewR
     let tx=connection.transaction_with_behavior(TransactionBehavior::Immediate)?;
     let guard=receiving_guard(&tx,&input.scope,&input.agent_id,&input.agent_run_id,input.execution_epoch)?;
     if let Source::GeneratedCard{origin}=&input.source{super::cards::require_card_fields(&tx,&input,origin)?}
-    let id=uuid::Uuid::new_v4().to_string(),now=Utc::now(),expires=(now+chrono::Duration::minutes(10)).to_rfc3339();
+    let id=uuid::Uuid::new_v4().to_string();let now=Utc::now();let expires=(now+chrono::Duration::minutes(10)).to_rfc3339();
     let request_json=serde_json::to_string(&input)?;
     let preview_digest=digest(&json!({"previewId":id,"input":input,"guard":guard,"text":text,"expiresAt":expires}))?;
     let result=PreviewResult{schema_version:1,preview_id:id.clone(),preview_digest,scope:input.scope.clone(),agent_id:input.agent_id.clone(),agent_run_id:input.agent_run_id.clone(),execution_epoch:input.execution_epoch,text,expires_at:expires.clone()};
