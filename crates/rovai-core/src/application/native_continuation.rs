@@ -109,6 +109,7 @@ impl Core{
                 let private=root.join("native-lifecycle").join("preparation").join(&origin.origin_id);
                 if kind==AdapterKind::CodexCli{codex::prepare_native_session(&workspace,&runtime,&origin,&source.location,&initialize).await}else{acp::prepare_native_session(&workspace,&runtime,&origin,&source.location,&initialize,&private).await}
             })).await;
+            if let Ok(proof)=&observed{if native::preparation_facts::record(&root,&command,&instance,&origin.origin_id,proof).is_err(){eprintln!("Native creation receipt file could not be saved; retaining the original database binding attempt");}}
             let mut database=database.lock().await;
             if let Err(error)=settle_continuation(database.connection_mut(),&command,&instance,&record,&runtime,observed){eprintln!("Native creation receipt retained unknown: {error:#}");}
             emit(&output,"nativeLifecycle.changed",json!({"commandId":command,"reason":"continuation_settled"}));
