@@ -37,9 +37,14 @@ export function NativeContinuationDialog({threadId,entry,data,mode,selectedTurnI
     if(!client.editingRecovery)throw new Error(t('原请求恢复存储尚不可用，本次未发送。'))
     client.editingRecovery.set(key,saved)
   }
-  const settle=(value:NativeContinuationReceipt,observed:number):void=>{
+  const settle=async(value:NativeContinuationReceipt,observed:number):Promise<void>=>{
     if(value.commandId!==original.current?.commandId)throw new Error(t('原回执的操作归属不同，请保留编号并核对。'))
     if(observed!==generation.current)return
+    if(value.state==='binding_recorded'||value.state==='failed'){
+      await persist(null)
+      if(observed!==generation.current)return
+      original.current=null
+    }
     setReceipt(value);if(value.state==='binding_recorded')onCreated?.(value)
   }
   useEffect(()=>{
@@ -54,7 +59,7 @@ export function NativeContinuationDialog({threadId,entry,data,mode,selectedTurnI
         const saved=raw as Partial<Saved>
         if(saved.schemaVersion!==1||!saved.request||saved.request.schemaVersion!==1||typeof saved.request.commandId!=='string'||typeof saved.request.previewId!=='string'||typeof saved.request.previewDigest!=='string'||saved.preview?.source.importId!==entry.id||saved.preview.sourceThreadId!==threadId)throw new Error(t('原请求记录损坏，保留原记录。'))
         original.current=saved.request;setPreview(saved.preview)
-        const value=await client.request<NativeContinuationReceipt>('history.execution.receipt',{schemaVersion:1,commandId:saved.request.commandId});settle(value,observed)
+        const value=await client.request<NativeContinuationReceipt>('history.execution.receipt',{schemaVersion:1,commandId:saved.request.commandId});await settle(value,observed)
       }else{
         const list=await client.request<AgentProfile[]>('members.list',{})
         if(observed!==generation.current)return
@@ -79,12 +84,14 @@ export function NativeContinuationDialog({threadId,entry,data,mode,selectedTurnI
     if(!ready||!preview||preview.capabilityStatus!=='available'||original.current)return
     const request:Original={schemaVersion:1,commandId:newCommandId(),previewId:preview.previewId,previewDigest:preview.previewDigest}
     await persist({schemaVersion:1,request,preview});if(observed!==generation.current)return;original.current=request
-    const value=await client.request<NativeContinuationReceipt>('history.execution.confirm',request);settle(value,observed)
+    const value=await client.request<NativeContinuationReceipt>('history.execution.confirm',request);await settle(value,observed)
   })
-  const reconcile=():Promise<void>=>run(async observed=>{if(!original.current)return;const value=await client.request<NativeContinuationReceipt>('history.execution.receipt',{schemaVersion:1,commandId:original.current.commandId});settle(value,observed)})
+  const reconcile=():Promise<void>=>run(async observed=>{if(!original.current)return;const value=await client.request<NativeContinuationReceipt>('history.execution.receipt',{schemaVersion:1,commandId:original.current.commandId});await settle(value,observed)})
+  const beginNewCreation=():void=>{original.current=null;setPreview(null);setReceipt(null);setError('')}
+  const terminal=receipt?.state==='binding_recorded'||receipt?.state==='failed'
   return <Dialog.Root open onOpenChange={open=>{if(!open)onClose()}}><Dialog.Portal><Dialog.Overlay className="app-dialog-overlay"/><Dialog.Content className="app-dialog-content feedback-dialog" aria-describedby={undefined}><header><Dialog.Title>{t(mode==='continue'?'从原生会话继续工作':mode==='fork_point'?'从这条回答分叉':'从会话末尾分叉')}</Dialog.Title><Dialog.Close className="quiet-button" aria-label={t('关闭')}>×</Dialog.Close></header><div className="feedback-dialog-body">
     {!preview&&!original.current&&<><label className="feedback-target-label">{t('使用哪位队员')}<select value={memberId} disabled={busy} onChange={event=>setMemberId(event.target.value)}><option value="">{t('选择队员')}</option>{members.map(member=><option key={member.agentId} value={member.agentId}>{member.displayName}</option>)}</select></label><label className="feedback-target-label">{t('新会话名称')}<input value={title} disabled={busy} onChange={event=>setTitle(event.target.value)}/></label><p>{entry.summary?.title||entry.sourceName} · {entry.provider}</p><p>{t('会在原工程创建只包含所选队员的新会话。原记录保留，不会隐式发送第一条消息。')}</p></>}
     {preview&&<><dl className="feedback-preview-target"><div><dt>{t('新会话')}</dt><dd>{preview.title}</dd></div><div><dt>{t('来源程序')}</dt><dd>{preview.source.provider}</dd></div><div><dt>{t('历史消息')}</dt><dd>{preview.historyMessageCount.toLocaleString()}</dd></div><div><dt>{t('队员')}</dt><dd>{members.find(member=>member.agentId===preview.agentId)?.displayName??preview.agentId}</dd></div></dl>{preview.point&&<p>{t('从原助手回答 {0} 分叉；不能准确定位时不会改为末尾分叉。',preview.point.selectedTurnId)}</p>}{preview.reason&&<p role="status">{preview.reason}</p>}<p>{t('不改变 Git 分支和工程文件。原程序可能继续写它自己的日志，已导入的快照保持只读。')}</p><p className="feedback-help">{t('预览有效至 {0}。',new Date(preview.expiresAt).toLocaleString())}</p></>}
     {receipt&&<p role="status">{t(nativeContinuationStatus[receipt.state])} · {t('编号：{0}',receipt.commandId)}</p>}{receipt?.reportedSessionId&&<p>{t('原程序会话编号：{0}',receipt.reportedSessionId)}</p>}{receipt?.state==='binding_recorded'&&<p>{t('新会话已创建，可从会话列表打开。发送第一条消息前仍使用当前工程的权限和审批。')}</p>}{(receipt?.state==='unknown'||original.current&&!receipt)&&<p role="status">{t('原结果尚未确定。只核对同一编号，不重复创建，也不把只读记录当作普通消息发送。')}</p>}{receipt?.error&&<p role="alert" className="feedback-error">{receipt.error}</p>}{error&&<p role="alert" className="feedback-error">{error}</p>}
-  </div><footer><Dialog.Close className="quiet-button">{t('关闭并保留记录')}</Dialog.Close>{receipt?.state==='binding_recorded'&&onOpen&&<button type="button" className="primary-button" disabled={busy} onClick={()=>void run(async()=>{if(await onOpen(receipt))onClose()})}>{t('打开新工作私聊')}</button>}{original.current?<button type="button" className="quiet-button" disabled={busy} onClick={()=>void reconcile()}>{t(busy?'正在核对…':'核对原创建结果')}</button>:!preview?<button type="button" className="primary-button" disabled={busy||!ready||!memberId||Array.from(title).length>80} onClick={()=>void prepare()}>{t('预览新会话')}</button>:<button type="button" className="primary-button" disabled={busy||!ready||preview.capabilityStatus!=='available'} onClick={()=>void confirm()}>{t('确认创建，不发送消息')}</button>}</footer></Dialog.Content></Dialog.Portal></Dialog.Root>
+  </div><footer><Dialog.Close className="quiet-button">{t('关闭并保留记录')}</Dialog.Close>{receipt?.state==='binding_recorded'&&onOpen&&<button type="button" className="primary-button" disabled={busy} onClick={()=>void run(async()=>{if(await onOpen(receipt))onClose()})}>{t('打开新工作私聊')}</button>}{original.current?<button type="button" className="quiet-button" disabled={busy} onClick={()=>void reconcile()}>{t(busy?'正在核对…':'核对原创建结果')}</button>:terminal?<button type="button" className="primary-button" disabled={busy} onClick={beginNewCreation}>{t('开始新的创建')}</button>:!preview?<button type="button" className="primary-button" disabled={busy||!ready||!memberId||Array.from(title).length>80} onClick={()=>void prepare()}>{t('预览新会话')}</button>:<button type="button" className="primary-button" disabled={busy||!ready||preview.capabilityStatus!=='available'} onClick={()=>void confirm()}>{t('确认创建，不发送消息')}</button>}</footer></Dialog.Content></Dialog.Portal></Dialog.Root>
 }
