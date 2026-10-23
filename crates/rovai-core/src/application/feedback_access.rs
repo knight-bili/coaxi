@@ -16,6 +16,7 @@ use tokio::io::{AsyncBufReadExt,AsyncReadExt,AsyncWriteExt,BufReader};
 }
 impl Core{
     pub(super) async fn feedback_policy_for_run(&self,execution:&AgentRunExecution)->Result<Option<feedback::Policy>>{
+        if !crate::conversation_tools::runtime::feedback_allowed(&execution.runtime){return Ok(None)}
         let database=self.database.lock().await;let policy=feedback::storage::policy(database.connection())?;if !policy.enabled(&execution.agent_id){return Ok(None)}
         let capability=AgentRuntimeAdapterRegistry::default().mcp_projection_for_runtime(&execution.runtime);
         if capability.external_mcp_projection==crate::agent_runtime_adapter::ExternalMcpProjection::Unsupported||!capability.supports_stdio{return Ok(None)}
