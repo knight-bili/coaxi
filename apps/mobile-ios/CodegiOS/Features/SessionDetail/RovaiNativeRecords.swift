@@ -37,6 +37,8 @@ struct RovaiNativeCreationRecords: View {
                     if let reason = preview["reason"]?.stringValue {Text(reason).font(.caption).foregroundStyle(Theme.textSecondary)}
                     if receipt != .null {
                         Text(receipt.text("commandId")).font(.caption2).textSelection(.enabled)
+                        if let session = receipt["reportedSessionId"]?.stringValue {LabeledContent("原程序会话编号", value: session).font(.caption).textSelection(.enabled)}
+                        if let error = receipt["error"]?.stringValue {Text(error).font(.caption).foregroundStyle(Theme.warning)}
                         Button("核对原创建结果") {Task {await reconcile(receipt, id)}}.disabled(busy || generation != model.connectionGeneration)
                         if receipt.text("state") == "binding_recorded" {Button("打开新工作私聊") {working = receipt}.disabled(busy || model.busy || model.pending != nil || generation != model.connectionGeneration)}
                     }
