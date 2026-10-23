@@ -7653,6 +7653,12 @@ impl Core {
                 Ok(json!({ "released": true }))
             }
             "commands.reconcile" => {
+                if request.params["operation"].as_str().is_some_and(|operation|matches!(operation,"conversationTools.policy.set"|"conversationTools.questions.answer"|"conversationTools.questions.decline"|"conversationTools.grants.confirm"|"conversationTools.grants.revoke"|"conversationTools.requests.resolve"|"conversationTools.automationOwner.set")){
+                    #[derive(Deserialize)]#[serde(deny_unknown_fields)]struct Query{operation:String,params:Identity}
+                    #[derive(Deserialize)]#[serde(rename_all="camelCase",deny_unknown_fields)]struct Identity{command_id:String}
+                    let input:Query=serde_json::from_value(request.params.clone())?;let database=self.database.lock().await;
+                    return crate::command::conversation_user_receipt(database.connection(),&input.operation,&input.params.command_id,&request.client)
+                }
                 if let Some(result)=self.reconcile_workspace_operation(&request.params).await?{return Ok(result)}
                 let database = self.database.lock().await;
                 web_commands::reconcile(

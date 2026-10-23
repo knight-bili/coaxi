@@ -73,9 +73,10 @@ async fn serve(config:ProcessConfig)->Result<()>{
     let calls:Arc<Mutex<HashMap<String,CancellationToken>>>=Default::default();let mut tasks=tokio::task::JoinSet::<Result<()>>::new();
     let result:Result<()>=async{
         loop{
+            let mut bounded=(&mut input).take(MAX_FRAME as u64+1);
             let count=tokio::select!{
                 done=tasks.join_next(),if !tasks.is_empty()=>{if let Some(done)=done{done??;}continue},
-                count=(&mut input).take(MAX_FRAME as u64+1).read_until(b'\n',&mut frame)=>count?,
+                count=bounded.read_until(b'\n',&mut frame)=>count?,
             };
             if count==0{break}ensure!(frame.len()<=MAX_FRAME&&frame.last()==Some(&b'\n'),"conversation_tools.invalid_input");
             let parsed=serde_json::from_slice::<Value>(&frame);frame.clear();let request=match parsed{Ok(value)=>value,Err(_)=>{write(&output,&json!({"jsonrpc":"2.0","id":null,"error":{"code":-32700,"message":"Parse error"}})).await?;continue}};
