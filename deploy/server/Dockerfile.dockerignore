@@ -1,0 +1,9 @@
+**
+!out/
+!out/server/
+!out/server/linux-x64/
+!out/server/linux-x64/**
+!deploy/
+!deploy/server/
+!deploy/server/verify-inputs.mjs
+!deploy/server/Dockerfile

@@ -1,0 +1,27 @@
+services:
+  workbench:
+    image: codeg-rovai-workbench:V1.0.0
+    platform: linux/amd64
+    build:
+      context: ../..
+      dockerfile: deploy/server/Dockerfile
+    ports:
+      - "127.0.0.1:${WORKBENCH_PORT:-8767}:8767"
+    volumes:
+      - workbench-data:/data
+      - workbench-projects:/workspace
+      - workbench-home:/home/node
+    read_only: true
+    tmpfs:
+      - /tmp:rw,mode=1777
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    stop_grace_period: 60s
+    restart: unless-stopped
+
+volumes:
+  workbench-data:
+  workbench-projects:
+  workbench-home:
