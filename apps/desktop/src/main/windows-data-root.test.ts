@@ -7,11 +7,13 @@ import {
   prepareWindowsDataRoot,
   resolveWindowsDataRoot
 } from './windows-data-root'
+import { PRODUCT_DATA_DIRECTORY } from '../shared/product-identity'
 
 describe('Windows data-root startup', () => {
   it('uses LOCALAPPDATA for daily state and the exact explicit acceptance root', () => {
+    expect(PRODUCT_DATA_DIRECTORY).toBe('Codeg Rovai Workbench')
     expect(resolveWindowsDataRoot(null, 'C:\\Users\\慕雪\\AppData\\Local')).toBe(
-      'C:\\Users\\慕雪\\AppData\\Local\\Rovai AI'
+      'C:\\Users\\慕雪\\AppData\\Local\\Codeg Rovai Workbench'
     )
     expect(resolveWindowsDataRoot('D:/Rovai fixtures/case 01', undefined)).toBe(
       'D:\\Rovai fixtures\\case 01'
@@ -34,7 +36,7 @@ describe('Windows data-root startup', () => {
   })
 
   it('accepts only the exact closed layout returned by the native preparer', () => {
-    const root = 'C:\\Users\\test-user\\AppData\\Local\\Rovai AI'
+    const root = 'C:\\Users\\test-user\\AppData\\Local\\Codeg Rovai Workbench'
     const layout = expectedWindowsDataRootLayout(root)
     expect(parseWindowsDataRootLayout(root, `${JSON.stringify(layout)}\r\n`)).toEqual(layout)
 
@@ -49,7 +51,7 @@ describe('Windows data-root startup', () => {
   })
 
   it('invokes the native sidecar once before returning paths', () => {
-    const root = 'C:\\Users\\test-user\\AppData\\Local\\Rovai AI'
+    const root = 'C:\\Users\\test-user\\AppData\\Local\\Codeg Rovai Workbench'
     const layout = expectedWindowsDataRootLayout(root)
     const prepare = vi.fn(() => ({
       status: 0,
@@ -58,17 +60,17 @@ describe('Windows data-root startup', () => {
       stderr: ''
     }))
 
-    expect(prepareWindowsDataRoot('C:\\Program Files\\Rovai AI\\rovai-core.exe', root, prepare))
+    expect(prepareWindowsDataRoot('C:\\Program Files\\Codeg Rovai Workbench\\rovai-core.exe', root, prepare))
       .toEqual(layout)
     expect(prepare).toHaveBeenCalledOnce()
     expect(prepare).toHaveBeenCalledWith(
-      'C:\\Program Files\\Rovai AI\\rovai-core.exe',
+      'C:\\Program Files\\Codeg Rovai Workbench\\rovai-core.exe',
       ['--prepare-windows-data-root', root]
     )
   })
 
   it('binds every Electron-owned path without reusing Core storage', () => {
-    const layout = expectedWindowsDataRootLayout('C:\\Rovai AI')
+    const layout = expectedWindowsDataRootLayout('C:\\Codeg Rovai Workbench')
     const electronApp = {
       setPath: vi.fn(),
       setAppLogsPath: vi.fn()
