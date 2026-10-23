@@ -18,6 +18,7 @@ import { creationPreferences, withHostConversationPreferences } from '../shared/
 import { createHostChannelHandler } from './host-channels'
 import { FilePreviewFrameNavigation } from './file-preview/file-preview-navigation'
 import { installWindowNavigation } from './window-navigation'
+import {createDeepLinkInbox} from './deep-links'
 import { chmod, lstat, mkdir, readFile, readdir, rename, unlink, writeFile } from 'node:fs/promises'
 import { openHostWebLink } from './host-web-link'
 import { randomUUID } from 'node:crypto'
@@ -513,6 +514,15 @@ if (windowsBootstrap?.kind === 'blocked') {
 }
 let appUpdates: AppUpdatesService | null = null
 let mainWindow: BrowserWindow | null = null
+const deepLinks=createDeepLinkInbox(()=>{if(mainWindow&&!mainWindow.isDestroyed())mainWindow.webContents.send('rovai:deep-link-available')})
+for(const argument of process.argv)deepLinks.offer(argument)
+app.on('open-url',(event,url)=>{event.preventDefault();if(primaryInstance&&deepLinks.offer(url)&&mainWindow&&!mainWindow.isDestroyed()){if(mainWindow.isMinimized())mainWindow.restore();mainWindow.show();mainWindow.focus()}})
+ipcMain.handle('rovai:deep-links',(event,action:unknown,requestId:unknown)=>{
+  if(!mainWindow||mainWindow.isDestroyed()||event.sender!==mainWindow.webContents||event.senderFrame!==mainWindow.webContents.mainFrame)throw new Error('deep_link.local_owner_required')
+  if(action==='peek')return deepLinks.peek()
+  if(action==='acknowledge'&&typeof requestId==='string'){deepLinks.acknowledge(requestId);return}
+  throw new Error('deep_link.operation_not_admitted')
+})
 const closedFilePreviewSenders = new WeakSet<Electron.WebContents>()
 let appearanceStore: AppearancePreferencesStore | null = null
 let localLoggingPreferences: LocalLoggingPreferences | null = null
@@ -1079,6 +1089,7 @@ async function openThreadFromAutomation(threadId: string): Promise<{ threadId: s
 }
 
 if (primaryInstance) void app.whenReady().then(async () => {
+  if(app.isPackaged&&!isolatedAcceptanceInstance)app.setAsDefaultProtocolClient('rovai')
   console.info(
     `[startup] stage=electron_ready elapsed_ms=${(performance.now() - mainStartupStartedAt).toFixed(1)}`
   )
@@ -1274,7 +1285,8 @@ async function removeRetiredChannelCredentialFiles(userDataPath: string): Promis
     .map((entry) => unlink(join(root, entry.name)).catch(() => undefined)))
 }
 
-app.on('second-instance', () => {
+app.on('second-instance', (_event,arguments_) => {
+  for(const argument of arguments_)deepLinks.offer(argument)
   if (process.platform === 'win32') {
     restoreMainWindow(mainWindow)
     return

@@ -17,6 +17,7 @@ import { ProjectGroupsDialog } from './ProjectGroupsDialog'
 import { runCanvasLeaveTransition, type CanvasLeavePreparation } from './canvas-leave'
 
 export type CanvasWorkspaceProps = Omit<CanvasSurfaceProps, 'boardId' | 'scope' | 'catalog' | 'onRefreshReferences' | 'groups'> & {
+  openBoardRequest?:{requestId:string;boardId:string}|null
   navigationPreferences?: NavigationPreferencesSnapshot | null
   onProjectLayout?(revision: number, mutation: NavigationProjectLayoutMutation): Promise<void>
   onRefreshProjectGroups?(): Promise<void>
@@ -91,7 +92,7 @@ export function CanvasWorkspace(props: CanvasWorkspaceProps): React.JSX.Element 
     onRetryIdentity={() => { setIdentity(null); setIdentityAttempt(current => current + 1) }} />
 }
 
-function CanvasWorkspaceContent({ scope, identityIssue, onRetryIdentity, onLeaveGuardChange, navigationPreferences, onProjectLayout, onRefreshProjectGroups, ...props }: CanvasWorkspaceProps & {
+function CanvasWorkspaceContent({ scope, identityIssue, onRetryIdentity, onLeaveGuardChange, navigationPreferences, onProjectLayout, onRefreshProjectGroups, openBoardRequest, ...props }: CanvasWorkspaceProps & {
   scope: CanvasViewScope | null; identityIssue: string | null; onRetryIdentity(): void
 }): React.JSX.Element {
   const [showBoards, setShowBoards] = useState(false), [query, setQuery] = useState('')
@@ -99,6 +100,7 @@ function CanvasWorkspaceContent({ scope, identityIssue, onRetryIdentity, onLeave
   const catalog = useCanvasReferences()
   const [selectedId, setSelectedId] = useState(() => loadCanvasBoardSelection(storage, scope))
   const [restoreRevision, setRestoreRevision] = useState(0)
+  const handledOpenRequest=useRef<string|null>(null)
   const [dialog, setDialog] = useState<{ board: CanvasBoard | null; remove: boolean } | null>(null)
   const [groupManager, setGroupManager] = useState(false)
   const [issue, setIssue] = useState<string | null>(null), panel = useRef(false), graphGuard = useRef<CanvasLeaveGuard | null>(null)
@@ -131,6 +133,12 @@ function CanvasWorkspaceContent({ scope, identityIssue, onRetryIdentity, onLeave
     try { return await runCanvasLeaveTransition('canvas', { canLeave, isBlocked, prepareLeave }, action, () => leaves) }
     catch (error) { setIssue(readErrorMessage(error)); return false }
   }, [canLeave, isBlocked, prepareLeave])
+  useEffect(()=>{
+    if(!openBoardRequest||handledOpenRequest.current===openBoardRequest.requestId||state.loading||state.readError||!state.snapshot)return
+    handledOpenRequest.current=openBoardRequest.requestId
+    if(!boards.some(board=>board.id===openBoardRequest.boardId)){setIssue(uiAttribute('链接中的画布在当前工作区不可用。'));return}
+    void transition(()=>{setSelectedId(openBoardRequest.boardId);setShowBoards(false);setIssue(null)})
+  },[openBoardRequest,state.loading,state.readError,state.snapshot,boards,transition])
   useEffect(() => {
     const guard = { canLeave, isBlocked, prepareLeave, resume: () => setRestoreRevision(value => value + 1) }
     onLeaveGuardChange?.(guard)

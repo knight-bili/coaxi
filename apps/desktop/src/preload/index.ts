@@ -63,6 +63,11 @@ async function invokeHostWeb<T>(operation: string, input?: unknown): Promise<T> 
 }
 
 const api: RovaiApi = {
+  deepLinks:{
+    peek:()=>ipcRenderer.invoke('rovai:deep-links','peek'),
+    acknowledge:requestId=>ipcRenderer.invoke('rovai:deep-links','acknowledge',requestId),
+    onAvailable(listener){const handler=():void=>listener();ipcRenderer.on('rovai:deep-link-available',handler);return()=>ipcRenderer.removeListener('rovai:deep-link-available',handler)}
+  },
   portableConfiguration:{finishMigrationFiles:commandId=>ipcRenderer.invoke('rovai:portable-configuration-private','filesFinish',{commandId}),templates:input=>ipcRenderer.invoke('rovai:portable-configuration-private','templates',input),logging:input=>ipcRenderer.invoke('rovai:portable-configuration-private','logging',input),sync:input=>ipcRenderer.invoke('rovai:portable-configuration-private','sync',input),prepareExport:input=>ipcRenderer.invoke('rovai:portable-configuration-private','exportPrepare',input),exportReceipt:operationId=>ipcRenderer.invoke('rovai:portable-configuration-private','exportReceipt',{operationId}),saveExport:operationId=>ipcRenderer.invoke('rovai:portable-configuration-private','exportSave',{operationId}),providerForEdit:reference=>ipcRenderer.invoke('rovai:portable-configuration-private','edit',reference),prepareSecret:input=>ipcRenderer.invoke('rovai:portable-configuration-private','secret',input),archiveReceipt:operationId=>ipcRenderer.invoke('rovai:portable-configuration-private','receipt',{operationId}),selectArchive:()=>ipcRenderer.invoke('rovai:portable-configuration-private','select',{}),importSelected:input=>ipcRenderer.invoke('rovai:portable-configuration-private','import',input)},
   nativePets:{importDirectory:()=>ipcRenderer.invoke('rovai:pets-import'),synchronize:()=>ipcRenderer.invoke('rovai:pets-synchronize'),onChanged:listener=>{const receive=():void=>listener();ipcRenderer.on('rovai:pets-changed',receive);return()=>ipcRenderer.removeListener('rovai:pets-changed',receive)}},
   webdavWorkspace:{request:input=>ipcRenderer.invoke('rovai:webdav-workspace',input)},

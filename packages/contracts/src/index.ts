@@ -5239,7 +5239,15 @@ export interface WorkbenchEditorState {documents:WorkbenchEditorDocument[];selec
 export interface WorkbenchEditorSnapshot {revision:string|null;value:WorkbenchEditorState|null;updatedAt:string|null;workspaceRoot:string}
 export interface NativeShortcutInput {key:string;code?:string;metaKey:boolean;ctrlKey:boolean;altKey:boolean;shiftKey:boolean;isComposing?:boolean}
 export interface KeyboardShortcutsApi {get():Promise<KeyboardShortcutsSnapshot>;save(input:KeyboardShortcutsSnapshot):Promise<KeyboardShortcutsSnapshot>;recording?(value:boolean):Promise<void>;onNativeInput?(listener:(input:NativeShortcutInput)=>void):()=>void}
+export interface DesktopDeepLink {requestId:string;kind:'thread'|'mission'|'canvas'|'tab'|'settings';value:string}
+export interface DesktopDeepLinksApi {
+  peek():Promise<DesktopDeepLink|null>
+  acknowledge(requestId:string):Promise<void>
+  onAvailable(listener:()=>void):()=>void
+}
+
 export interface RovaiApi {
+  deepLinks?:DesktopDeepLinksApi
   workbenchEditorRecovery?:{get(key:string):Promise<unknown|null>;put(value:unknown):Promise<void>;copies(key:string,after:string|null):Promise<{items:Array<{key:string;documentCount:number;paths:string[]}>;next:string|null}>}
   keyboardShortcuts?:KeyboardShortcutsApi
   interactionWorkspace?:InteractionWorkspaceApi
