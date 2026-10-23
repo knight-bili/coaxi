@@ -40,6 +40,7 @@ private struct NativeRuntimeEditor: View {
         Form {
             Section("模型服务商") {RovaiPortableMemberConnection(model: model, agentId: member.text("agentId"), disabled: disabled || dirty || changed)}
             Section("工作中补充") {RovaiMemberFeedbackSwitch(model: model, agentId: member.text("agentId"))}
+            Section("提问与后续工作") {RovaiConversationToolSettings(model: model, agentId: member.text("agentId"))}
             Section("原生插话") {RovaiMemberNativeSteerSwitch(model: model, agentId: member.text("agentId"))}
             Section("自定义智能体程序") {RovaiMemberCustomRuntime(model: model, member: member)}
             if let issue { Section { Text(issue).font(.caption).foregroundStyle(Theme.warning) } }
