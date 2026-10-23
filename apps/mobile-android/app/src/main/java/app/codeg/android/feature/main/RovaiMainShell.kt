@@ -113,4 +113,81 @@ private fun RovaiWorkspaceScreen(profile:ServerProfile?,onServers:()->Unit,model
         Row(Modifier.fillMaxWidth().imePadding().padding(12.dp),horizontalArrangement=Arrangement.spacedBy(8.dp)){OutlinedTextField(value=text,onValueChange={if(model.state.value.pending==null&&!model.state.value.busy&&text!=it){text=it;inputRevision++;model.rememberBody(owner,model.publicBody(text,recipients,inputRevision,reply,quotes))}},modifier=Modifier.weight(1f),maxLines=6,placeholder={Text(stringResource(R.string.rovai_fusion_ae2f86f0c4099981))},enabled=bodyReady&&state.pending==null&&!state.busy);FilledIconButton(onClick={val frozenText=text;val frozenRecipients=recipients;val frozenThread=state.selectedThread!!;val document=model.publicBody(text,recipients,inputRevision,reply,quotes);coroutine.launch{try{model.saveBody(owner,document);model.send(frozenText,frozenRecipients,document,frozenThread)}catch(error:Exception){inputIssue=error.message}}},enabled=text.isNotBlank()&&state.pending==null&&!state.busy&&state.publicSourcesReady&&bodyReady&&inputIssue==null){Icon(Icons.Outlined.Send,"发送")}}
     }
 }
-@Composable private fun RovaiNewThreadDialog(state:RovaiWorkspaceState,onDismiss:()->Unit,onCreate:(String,String?,Set<String>,String,String)->Unit){var name by remember{mutableStateOf("")};var path by remember{mutableStateOf<String?>(null)};var ids by remember{mutableStateOf<Set<String>>(emptySet())};var lead by remember{mutableStateOf("")};var coordinated by remember{mutableStateOf(false)};AlertDialog(onDismissRequest=onDismiss,title={Text(stringResource(R.string.rovai_fusion_6897a8ef070bd2c3))},text={LazyColumn{item{OutlinedTextField(value=name,onValueChange={name=it},label={Text(stringResource(R.string.rovai_fusion_d44e9b3d3b31d37b))})};item{TextButton(onClick={path=null}){Text(if(path==null)"✓ 快速对话" else "快速对话")}};items(state.navigation["projects"].coreArray()){project->TextButton(onClick={path=project.coreText("projectPath")}){Text((if(path==project.coreText("projectPath"))"✓ " else "")+project.coreText("name"))}};items(state.members.filter{it.coreText("presence")=="present"}){member->val id=member.coreText("agentId");Row{Checkbox(checked=id in ids,onCheckedChange={checked->ids=if(checked)ids+id else ids-id;if(lead !in ids)lead=ids.firstOrNull()?:""});TextButton(onClick={if(id in ids)lead=id}){Text(member.coreText("displayName")+(if(lead==id)" · 负责人" else ""))}}};item{Row{Switch(checked=coordinated,onCheckedChange={coordinated=it});Text(stringResource(R.string.rovai_fusion_cafbd22ba74866fd))}}}},confirmButton={TextButton(enabled=ids.isNotEmpty()&&lead in ids,onClick={onCreate(name,path,ids,lead,if(coordinated)"lead_coordinated" else "peer")}){Text(stringResource(R.string.rovai_fusion_cde2cd071d25bbab))}},dismissButton={TextButton(onClick=onDismiss){Text(stringResource(R.string.rovai_fusion_2cd0f3be8738a86c))}})}
+@Composable
+private fun RovaiNewThreadDialog(
+    state: RovaiWorkspaceState,
+    onDismiss: () -> Unit,
+    onCreate: (String, String?, Set<String>, String, String) -> Unit
+) {
+    var name by remember { mutableStateOf("") }
+    var path by remember { mutableStateOf<String?>(null) }
+    var ids by remember { mutableStateOf<Set<String>>(emptySet()) }
+    var lead by remember { mutableStateOf("") }
+    var coordinated by remember { mutableStateOf(false) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.rovai_fusion_6897a8ef070bd2c3)) },
+        text = {
+            LazyColumn {
+                item {
+                    OutlinedTextField(
+                        value = name,
+                        onValueChange = { name = it },
+                        label = { Text(stringResource(R.string.rovai_fusion_d44e9b3d3b31d37b)) }
+                    )
+                }
+                item {
+                    TextButton(onClick = { path = null }) {
+                        Text(if (path == null) "✓ 快速对话" else "快速对话")
+                    }
+                }
+                items(state.navigation["projects"].coreArray()) { project ->
+                    TextButton(onClick = { path = project.coreText("projectPath") }) {
+                        val selected = path == project.coreText("projectPath")
+                        Text((if (selected) "✓ " else "") + project.coreText("name"))
+                    }
+                }
+                items(state.members.filter { it.coreText("presence") == "present" }) { member ->
+                    val id = member.coreText("agentId")
+                    Row {
+                        Checkbox(
+                            checked = id in ids,
+                            onCheckedChange = { checked ->
+                                ids = if (checked) ids + id else ids - id
+                                if (lead !in ids) lead = ids.firstOrNull() ?: ""
+                            }
+                        )
+                        TextButton(onClick = { if (id in ids) lead = id }) {
+                            Text(member.coreText("displayName") + (if (lead == id) " · 负责人" else ""))
+                        }
+                    }
+                }
+                item {
+                    Row {
+                        Switch(
+                            checked = coordinated,
+                            onCheckedChange = { coordinated = it }
+                        )
+                        Text(stringResource(R.string.rovai_fusion_cafbd22ba74866fd))
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(
+                enabled = ids.isNotEmpty() && lead in ids,
+                onClick = {
+                    onCreate(name, path, ids, lead, if (coordinated) "lead_coordinated" else "peer")
+                }
+            ) {
+                Text(stringResource(R.string.rovai_fusion_cde2cd071d25bbab))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.rovai_fusion_2cd0f3be8738a86c))
+            }
+        }
+    )
+}
