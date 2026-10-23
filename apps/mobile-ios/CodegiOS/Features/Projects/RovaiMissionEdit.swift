@@ -48,10 +48,10 @@ struct RovaiMissionEdit: View {
                 RovaiMissionDescriptionInput(content: content, members: model.members, disabled: locked) {content = $0;persist()}
                 TextField("标签，用逗号分开", text: changedBinding($tags))
             }.disabled(locked)
-            Section("工作目录与队伍") {
+            Section {
                 Text(baseline.text("projectPath").isEmpty ? "快速对话" : baseline.text("projectPath"))
                 Text(memberNames)
-            } footer: {Text("队伍与队长由原管理入口调整。保存描述中的新提及会邀请对应队员；移除提及保留原成员。")}
+            } header: {Text("工作目录与队伍")} footer: {Text("队伍与队长由原管理入口调整。保存描述中的新提及会邀请对应队员；移除提及保留原成员。")}
             Section("附件 · \(kept.count + sources.count)/10") {
                 ForEach(baseline["attachments"]?.rvArray ?? [], id: \.self) {attachment in
                     HStack {

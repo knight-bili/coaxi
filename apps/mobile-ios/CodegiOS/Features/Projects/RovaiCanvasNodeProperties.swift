@@ -45,10 +45,10 @@ struct RovaiCanvasNodeProperties: View {
                 Stepper("列数 · \(columns == 0 ? "自动" : String(columns))", value: changed($columns), in: 0...12)
                 Stepper("行数 · \(rows == 0 ? "自动" : String(rows))", value: changed($rows), in: 0...12)
             }.disabled(blocked)}
-            Section("原绑定") {
+            Section {
                 ForEach(["folderPath", "folderGroupId", "agentId", "runtimeKind", "path"], id: \.self) {key in if !data.text(key).isEmpty {Text(data.text(key)).font(.caption).foregroundStyle(Theme.textSecondary)}}
                 if data["conversation"] != nil, data["conversation"] != .null {Text("会话引用保留").font(.caption).foregroundStyle(Theme.textSecondary)}
-            } footer: {Text("属性保存不改绑会话或文件，不重写其他端移动后的位置。")}
+            } header: {Text("原绑定")} footer: {Text("属性保存不改绑会话或文件，不重写其他端移动后的位置。")}
             Section {
                 Button("读取最新属性") {Task {await loadLatest()}}.disabled(blocked)
                 Button("保存属性") {Task {await submit(remove: false)}}.disabled(blocked || stale)
