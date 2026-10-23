@@ -317,11 +317,11 @@ describe('User Automation transport', () => {
   it(
     'binds each local IPC request to the published App instance and removes discovery on stop',
     async () => {
-      const root = await mkdtemp(join(tmpdir(), 'rovai-automation-'))
+      const fixtureRoot = await mkdtemp(join(tmpdir(), 'rovai-automation-'))
       const previousQualification = process.env[WINDOWS_USER_AUTOMATION_QUALIFICATION_ENV]
       const binaryEnvironment = ['ROVAI_HOST_BIN', 'ROVAI_CORE_BIN', 'HORIZONWARD_CORE_BIN', 'LUMEN_CORE_BIN']
         .map(name => [name, process.env[name]] as const)
-      let automationRoot = root
+      let automationRoot = fixtureRoot
       let server: UserAutomationServer | null = null
       const core = {
         async request<T>(method: CoreMethod): Promise<T> {
@@ -337,7 +337,7 @@ describe('User Automation transport', () => {
           delete process.env.ROVAI_HOST_BIN
           delete process.env.HORIZONWARD_CORE_BIN
           delete process.env.LUMEN_CORE_BIN
-          const layout = prepareWindowsDataRoot(resolveCoreBinary(), root)
+          const layout = prepareWindowsDataRoot(resolveCoreBinary(), join(fixtureRoot, 'formal'))
           automationRoot = join(layout.electronUserData, 'automation-v1')
           process.env[WINDOWS_USER_AUTOMATION_QUALIFICATION_ENV] = '1'
         }
@@ -390,7 +390,7 @@ describe('User Automation transport', () => {
           }
         } finally {
           try {
-            await rm(root, { recursive: true, force: true })
+            await rm(fixtureRoot, { recursive: true, force: true })
           } finally {
             if (previousQualification === undefined) {
               delete process.env[WINDOWS_USER_AUTOMATION_QUALIFICATION_ENV]
