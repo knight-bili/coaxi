@@ -274,24 +274,27 @@ mod tests {
 
     #[test]
     fn backup_rescan_detects_added_removed_and_retargeted_runtime_links() {
-        let directory = tempfile::tempdir().unwrap();
-        let payload = payload(directory.path());
+        let directory =
+            std::env::temp_dir().join(format!("rovai-backup-links-test-{}", uuid::Uuid::new_v4()));
+        std::fs::create_dir(&directory).unwrap();
+        let payload = payload(&directory);
         let binaries = payload.join("bin");
         std::fs::create_dir_all(&binaries).unwrap();
         let original = binaries.join("runner");
         symlink("../first.js", &original).unwrap();
-        let before = signature(directory.path());
+        let before = signature(&directory);
 
         let added = binaries.join("extra");
         symlink("../first.js", &added).unwrap();
-        let with_added_link = signature(directory.path());
+        let with_added_link = signature(&directory);
         assert_ne!(before, with_added_link);
 
         std::fs::remove_file(&added).unwrap();
-        assert_eq!(before, signature(directory.path()));
+        assert_eq!(before, signature(&directory));
 
         std::fs::remove_file(&original).unwrap();
         symlink("../second.js", &original).unwrap();
-        assert_ne!(before, signature(directory.path()));
+        assert_ne!(before, signature(&directory));
+        std::fs::remove_dir_all(&directory).unwrap();
     }
 }
