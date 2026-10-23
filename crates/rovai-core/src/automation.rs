@@ -683,6 +683,9 @@ impl AutomationService {
                     "Automation management requires the local user or an attested AgentRun",
                 ));
             }
+            if matches!(&envelope.actor,ActorRef::Agent{..})&&crate::conversation_tools::calendar::requires_aware_edit(transaction,&command.automation_id)?{
+                return Ok(rejected("timezone_aware_edit_required","请在自动化设置中保留并核对时区和执行动作。"));
+            }
             let Some(current) = load_automation_record(transaction, &command.automation_id)? else {
                 return Ok(rejected(
                     "automation.not_found",
@@ -726,7 +729,7 @@ impl AutomationService {
             let next_run_at = if !enabled {
                 None
             } else if schedule_changed || reopened {
-                next_occurrence_after(&schedule, now)?
+                crate::conversation_tools::calendar::next_for(transaction,&command.automation_id,&schedule,now)?
             } else {
                 current
                     .next_run_at
@@ -1147,12 +1150,12 @@ impl AutomationService {
             }
             let missed = stored_due < recovery_boundary;
             let consumed_at = if missed {
-                latest_occurrence_at_or_before(&record.schedule, now)?.unwrap_or(stored_due)
+                crate::conversation_tools::calendar::latest_for(&transaction,&record.id,&record.schedule,now)?.unwrap_or(stored_due)
             } else {
                 stored_due
             };
             let next =
-                next_occurrence_after(&record.schedule, if missed { now } else { consumed_at })?;
+                crate::conversation_tools::calendar::next_for(&transaction,&record.id,&record.schedule,if missed { now } else { consumed_at })?;
             advance_definition_in_tx(&transaction, &record, next, &timestamp(now))?;
             if missed {
                 insert_skipped_occurrence_in_tx(
@@ -2599,7 +2602,7 @@ pub fn next_occurrence_after(
     }
 }
 
-fn latest_occurrence_at_or_before(
+pub(crate) fn latest_occurrence_at_or_before(
     schedule: &AutomationSchedule,
     at: DateTime<Utc>,
 ) -> Result<Option<DateTime<Utc>>> {
@@ -2666,7 +2669,7 @@ fn local_datetime(date: NaiveDate, time: NaiveTime) -> Result<Option<DateTime<Ut
     Ok(None)
 }
 
-fn parse_cron_expression(expression: &str) -> Result<Cron> {
+pub(crate) fn parse_cron_expression(expression: &str) -> Result<Cron> {
     let fields = expression.split_whitespace().collect::<Vec<_>>();
     if fields.len() != 5 {
         anyhow::bail!("Cron expression must contain exactly five fields");

@@ -25,6 +25,8 @@ anyhow = "1"
 thiserror = "2"
 base64 = "0.22"
 chrono = { version = "0.4", features = ["serde"] }
+chrono-tz = "=0.10.4"
+iana-time-zone = "=0.1.65"
 croner = "4.0.0"
 comrak = { version = "=0.48.0", default-features = false }
 dirs = "6"
