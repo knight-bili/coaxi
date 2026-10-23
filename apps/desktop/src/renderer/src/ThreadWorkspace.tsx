@@ -11164,6 +11164,8 @@ export function TaskPanel({
 }): JSX.Element {
   const client = useThreadClient()
   const taskCreateRecoveryGeneration = useRef(0)
+  const taskCreateOwner = useRef({ client, threadId: snapshot.thread.id })
+  taskCreateOwner.current = { client, threadId: snapshot.thread.id }
   const pendingTaskCreateRef = useRef<PendingTaskCreate | null>(null)
   const [detailTaskId, setDetailTaskId] = useState<string | null>(null)
   const [statusFilter, setStatusFilter] = useState<'all' | TaskStatus>('all')
@@ -11266,7 +11268,18 @@ export function TaskPanel({
     setCancelReason('')
     editBase.current = null
     setFormError(null)
+    setSubmitting(false)
   }
+
+  useEffect(() => {
+    resetForm()
+    setDetailTaskId(null)
+    drafts.current.clear()
+    pendingTaskCreateRef.current = null
+    setPendingTaskCreate(null)
+    setTaskCreateRecoveryKey(null)
+    setTaskCreateRecoveryReadyFor(null)
+  }, [client, snapshot.thread.id])
 
   const applyDraft = (draft: TaskEditorDraft): void => {
     setTitle(draft.title)
@@ -11342,6 +11355,10 @@ export function TaskPanel({
       setFormError(uiAttribute('请选择负责人。'))
       return
     }
+    const ownerGeneration = taskCreateRecoveryGeneration.current
+    const ownsCurrentEditor = (): boolean => ownerGeneration === taskCreateRecoveryGeneration.current
+      && taskCreateOwner.current.client === client
+      && taskCreateOwner.current.threadId === snapshot.thread.id
     setSubmitting(true)
     setFormError(null)
     try {
@@ -11366,6 +11383,7 @@ export function TaskPanel({
         } else {
           throw new Error('原请求恢复存储尚不可用，本次未发送。')
         }
+        if (!ownsCurrentEditor()) return
         updatePendingTaskCreate(pending)
       }
       const result = await client.request<StoredCommandResult>('tasks.create', structuredClone(pending.request))
@@ -11376,6 +11394,7 @@ export function TaskPanel({
       } else {
         throw new Error('原请求恢复存储尚不可用，保留原请求供核对。')
       }
+      if (!ownsCurrentEditor()) return
       if (pendingTaskCreateRef.current?.request.commandId === pending.request.commandId) updatePendingTaskCreate(null)
       if (result.status === 'rejected') {
         setFormError(taskCommandMessage(result))
@@ -11385,9 +11404,9 @@ export function TaskPanel({
       resetForm()
       await onTasksChanged()
     } catch (error) {
-      setFormError(localizeExecutionEngineTerms(readErrorMessage(error)))
+      if (ownsCurrentEditor()) setFormError(localizeExecutionEngineTerms(readErrorMessage(error)))
     } finally {
-      setSubmitting(false)
+      if (ownsCurrentEditor()) setSubmitting(false)
     }
   }
 
