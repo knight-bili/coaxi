@@ -6058,5 +6058,7 @@
   "从会话末尾分叉": "Fork from conversation tail",
   "从原生会话继续工作": "Continue working from native conversation",
   "核对这份模板": "Check this template",
-  "服务器": "Servers"
+  "服务器": "Servers",
+  "链接中的画布在当前工作区不可用。": "The linked canvas is unavailable in the current workspace.",
+  "链接中的对象在当前工作区不可用，或尚有未完成的编辑。": "The linked object is unavailable in the current workspace, or edits are still unfinished."
 }

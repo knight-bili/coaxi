@@ -1,4 +1,5 @@
 import { PetExtensionHost } from './PetExtensionHost'
+import {useDesktopDeepLinks} from './useDesktopDeepLinks'
 import { useShortcutActions } from './useShortcutActions'
 import { AppearanceExtensionHost } from './AppearanceExtensionHost'
 import { CanvasThreadWorkspace } from './CanvasThreadWorkspace'
@@ -827,6 +828,7 @@ function BusinessAppContent({
   const mobile = useMobileViewport(!desktop)
   const [mobileSettingsList, setMobileSettingsList] = useState(false)
   const [mobileConversationDrawerOpen, setMobileConversationDrawerOpen] = useState(false)
+  const [linkedCanvasRequest,setLinkedCanvasRequest]=useState<{requestId:string;boardId:string}|null>(null)
   const mobileConversationListButtonRef = useRef<HTMLButtonElement>(null)
   const mobileMenuScroll = useRef(0)
   const openMobileMenu = (trigger: HTMLButtonElement): void => {
@@ -3612,6 +3614,31 @@ function BusinessAppContent({
       setMissionPresentation('drawer'); setMissionOpenRequest(value => value + 1)
     }
   }
+  useDesktopDeepLinks(desktop?.deepLinks,startupStatus==='resolved'&&!shuttingDown&&!busy&&onboardingSnapshot?.status==='completed',async link=>{
+    const unavailable=():never=>{throw new Error(uiAttribute('链接中的对象在当前工作区不可用，或尚有未完成的编辑。'))}
+    if(link.kind==='thread'){if(!await activateThread(link.value,{reconcileDefaultLead:false}))unavailable();return}
+    if(link.kind==='mission'){
+      const mission=await client.request<MissionRecord>('missions.get',{missionId:link.value})
+      if(mission.id!==link.value)unavailable()
+      await openMission(mission);return
+    }
+    if(link.kind==='canvas'){
+      await client.request('canvas.boards.get',{boardId:link.value})
+      if(!await desktopNavigation.push({kind:'canvas'})&&viewRef.current!=='canvas')unavailable()
+      setLinkedCanvasRequest({requestId:link.requestId,boardId:link.value});return
+    }
+    if(link.kind==='settings'){
+      if(!await desktopNavigation.push({kind:'settings',section:link.value as SettingsSection}))unavailable();return
+    }
+    const target:NavigationTarget=link.value==='threads'?{kind:'quick_chat'}
+      :link.value==='members'?{kind:'members',agentId:selectedMemberId,tab:memberTab}
+      :link.value==='memory'?{kind:'memory',memoryId:null}
+      :link.value==='settings'?{kind:'settings',section:'general'}
+      :link.value==='missions'?{kind:'missions'}
+      :link.value==='automations'?{kind:'automations'}:{kind:'canvas'}
+    const current=desktopNavigation.getSnapshot(),previous=current.entries[current.index]
+    if(!await desktopNavigation.push(target)&&(!previous||previous.kind!==target.kind))unavailable()
+  },notifyError)
   const refreshMission = async (threadId: string): Promise<void> => {
     await missionList.refresh()
     if (activeThreadIdRef.current === threadId) await refreshActiveThreadSnapshot(threadId)
@@ -4061,7 +4088,7 @@ function BusinessAppContent({
         {!startupGateVisible && view === 'canvas' && <>
           {mobile && <MobilePageHeader title={uiAttribute('无限画布')} onOpenMenu={openMobileMenu} menuOpen={mobileConversationDrawerOpen} triggerRef={mobileConversationListButtonRef} />}
           {[...new Set(canvasConversations.state.instances.map(instance => instance.target.reference.threadId))].map(threadId => <CanvasThreadReader key={threadId} threadId={threadId} reads={threadProjections} />)}
-          <CanvasWorkspace agents={agents} theme={appearance.resolvedTheme} fileApi={environment.files}
+          <CanvasWorkspace agents={agents} theme={appearance.resolvedTheme} fileApi={environment.files} openBoardRequest={linkedCanvasRequest}
             onFileWorkspace={async (threadId, tabId) => {
               if (!await openCanvasReference({ threadId, conversationId: null })) throw new Error(uiAttribute('暂时无法打开原文件工作区。'))
               const session = windowFilePreviewResources(environment.files).session(threadId)

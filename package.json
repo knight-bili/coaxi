@@ -553,6 +553,14 @@
         }
       ],
       "artifactName": "Codeg-Rovai-Workbench-${version}-linux-${arch}.${ext}"
-    }
+    },
+    "protocols": [
+      {
+        "name": "Codeg Rovai Workbench",
+        "schemes": [
+          "rovai"
+        ]
+      }
+    ]
   }
 }
