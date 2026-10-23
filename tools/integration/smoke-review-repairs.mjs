@@ -265,6 +265,60 @@ try {
     readyWorktreePositivePath: 'not_covered_without_starting_a_real_Mission_Runtime'
   })
 
+  stage = 'issue_71_organizer_tags_navigation_projection'
+  const organizerScope = { threadId }
+  const organizerBefore = await call('workbench.organizer.get', {
+    scope: organizerScope, level: 'thread'
+  })
+  const expectedTags = ['review-tag-alpha', 'review-tag-bravo']
+  const organizerSaved = await call('workbench.organizer.set', {
+    scope: organizerScope,
+    level: 'thread',
+    expectedDigest: organizerBefore.digest,
+    value: { ...organizerBefore.value, tags: expectedTags }
+  })
+  assert.deepEqual(organizerSaved.value.tags, expectedTags)
+  assert.deepEqual((await call('workbench.organizer.get', {
+    scope: organizerScope, level: 'thread'
+  })).value.tags, expectedTags, 'Core organizer 应持久保存标签')
+  const message = await call('thread.messages.send', {
+    commandId: randomUUID(),
+    threadId,
+    content: { version: 2, segments: [{ kind: 'text', text: '为会话已读回执建立隔离序号。' }] },
+    sourceAttachments: [],
+    quotes: [],
+    replyToThreadMessageId: null,
+    execution: null
+  })
+  assert.equal(message.commandResult.status, 'applied')
+  const navigationSnapshot = await call('navigation.snapshot')
+  const snapshotThread = navigationSnapshot.projects
+    .flatMap(group => group.recentThreads).find(item => item.id === threadId)
+  assert(snapshotThread, 'navigation.snapshot 应包含测试会话')
+  assert.deepEqual(snapshotThread.tags, expectedTags)
+  const foundThread = await call('navigation.findThread', { threadId })
+  assert.deepEqual(foundThread.tags, expectedTags)
+  const listedThreads = await call('navigation.threads', { threadIds: [threadId] })
+  const listedThread = listedThreads.threads.find(item => item.id === threadId)
+  assert.deepEqual(listedThread?.tags, expectedTags)
+  const throughGlobalSequence = navigationSnapshot.throughGlobalSequence
+  assert(throughGlobalSequence > 0, '隔离消息应产生可确认的全局序号')
+  const viewed = await call('navigation.campViewed', { threadId, throughGlobalSequence })
+  assert.equal(viewed.threadId, threadId)
+  assert.equal(viewed.changed, true)
+  assert.deepEqual(viewed.navigation.threads.find(item => item.id === threadId)?.tags, expectedTags)
+  const viewedReplay = await call('navigation.campViewed', { threadId, throughGlobalSequence })
+  assert.equal(viewedReplay.changed, false)
+  assert.equal(viewedReplay.lastSeenGlobalSequence, viewed.lastSeenGlobalSequence)
+  assert.deepEqual(viewedReplay.navigation.threads.find(item => item.id === threadId)?.tags, expectedTags)
+  record('issue_71_saved_thread_tags_survive_navigation_reads_and_view_receipt', {
+    threadId,
+    tags: expectedTags,
+    projections: ['organizer.get', 'navigation.snapshot', 'navigation.findThread', 'navigation.threads', 'navigation.campViewed'],
+    viewedSequence: throughGlobalSequence,
+    replayChanged: viewedReplay.changed
+  })
+
   finalResult = {
     status: 'passed',
     scope: 'real_host_core_isolated_git_fixture_no_model_execution',
