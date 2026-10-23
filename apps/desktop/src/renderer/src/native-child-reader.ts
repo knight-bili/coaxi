@@ -122,7 +122,7 @@ export class NativeChildReader {
   constructor(private client: Client, target: NativeReaderTarget) {
     this.target = { reference: Object.freeze({ ...target.reference }), kind: target.kind, ...(target.descendant ? { descendant: { ...target.descendant } } : {}) }
   }
-  private method(action: 'start' | 'poll' | 'page' | 'close'): string { return `runtime.${this.target.kind === 'agent' ? 'agentReads' : 'childReads'}.${action}` }
+  private method(action: 'start' | 'poll' | 'page' | 'close'): `runtime.${'agentReads' | 'childReads'}.${'start' | 'poll' | 'page' | 'close'}` { return `runtime.${this.target.kind === 'agent' ? 'agentReads' : 'childReads'}.${action}` }
   getSnapshot = (): NativeReaderState => this.state
   fileSource(): { threadId: string; readId: string } | null {
     return this.current && !this.current.retired && !this.current.closed && this.state.data
