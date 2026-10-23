@@ -62,11 +62,138 @@ fun missionStatusName(value:String)=rovaiMissionStatuses.firstOrNull{it.first==v
         Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState())){listOf("详情","交付","活动","累计Diff").forEachIndexed{index,title->FilterChip(selected=tab==index,onClick={tab=index;if(index==3)work{changes=model.query(RovaiOperation.MISSIONS_CHANGES,buildJsonObject{put("missionId",id)}).coreObject();patches=emptyMap()}},label={Text(title)})}}
         issue?.let{Text(it,color=CodegTheme.colors.danger)}
         LazyColumn(Modifier.weight(1f),verticalArrangement=Arrangement.spacedBy(10.dp)){
-            when(tab){
-                0->{item{RovaiMissionActions(model,mission,onClose)};item{RovaiAttachmentPicker(model,mission.coreText("threadId"),buildJsonObject{put("kind","mission");put("missionId",id)},mission.coreLong("detailsVersion"),state.pending!=null||state.busy)};item{MarkdownContent(mission.coreText("description"));Text(stringResource(R.string.rovai_fusion_316eb58edffd8bdf)+missionStatusName(mission.coreText("status")));Text(mission.coreText("projectPath").ifEmpty{"快速对话"},style=MaterialTheme.typography.bodySmall,color=CodegTheme.colors.textSecondary)};items(mission["attachments"].coreArray(),key={it.coreText("id")}){attachment->RovaiMissionAttachmentRow(model,mission,attachment,onOpen={source=buildJsonObject{put("kind","attachment");put("threadId",mission.coreText("threadId"));putJsonObject("locator"){put("owner","mission");put("threadId",mission.coreText("threadId"));put("missionId",id);put("attachmentRefId",attachment.coreText("id"))}}})}}}
-                1->{delivery?.let{value->item{val workspace=value["workspace"].coreObject();Text(stringResource(R.string.rovai_fusion_3db7b06b5f6de0e0),style=MaterialTheme.typography.titleSmall);Text(value.coreText("workingDirectory"),style=MaterialTheme.typography.bodySmall);if(workspace.isNotEmpty()){Text(workspace.coreText("managedBranch"));Text(workspace.coreText("state"),color=CodegTheme.colors.textSecondary);if(workspace.coreText("diagnostic").isNotEmpty())Text(workspace.coreText("diagnostic"),color=CodegTheme.colors.danger)}};items(value["pullRequests"].coreArray()){pr->GlassRow{Text(pr.coreText("title"));Text(pr.coreText("url"),style=MaterialTheme.typography.bodySmall)}};items(value["files"].coreArray()){file->TextButton(onClick={source=buildJsonObject{put("kind","attachment");put("threadId",mission.coreText("threadId"));putJsonObject("locator"){put("owner","message");put("threadId",mission.coreText("threadId"));put("messageId",file.coreText("messageId"));put("attachmentRefId",file.coreText("attachmentId"))}}}){Text(file.coreText("displayName"))}}}}
-                2->{items(history,key={it.coreLong("id")}){activity->GlassRow{Text(missionActivityName(activity));Text(activity.coreText("createdAt"),style=MaterialTheme.typography.bodySmall,color=CodegTheme.colors.textSecondary)}};if(more)item{TextButton(enabled=!busy,onClick={work{val next=model.query(RovaiOperation.MISSIONS_ACTIVITY,buildJsonObject{put("missionId",id);history.lastOrNull()?.let{put("before",it.coreLong("id"))}}).coreArray();history=(history+next).distinctBy{it.coreLong("id")};more=next.size==100}}){Text(stringResource(R.string.rovai_fusion_3fe6c8a5fdfb7ba7))}}}
-                3->{changes?.let{view->item{val checkout=view["checkoutState"].coreObject();Text(checkout.coreText("kind")+" · "+checkout.coreText("branch"),style=MaterialTheme.typography.bodySmall);if(view.coreText("diffError").isNotEmpty())Text(view.coreText("diffError"),color=CodegTheme.colors.danger)};items(view["files"].coreArray(),key={it.coreText("id")}){file->GlassRow{TextButton(enabled=!busy,onClick={work{val diff=model.query(RovaiOperation.MISSIONS_FILEDIFF,buildJsonObject{put("missionId",id);put("fileId",file.coreText("id"));put("viewId",view["viewId"]?:JsonNull)}).coreObject();patches=patches+(file.coreText("id") to diff.coreText("patch"))}}){Text(file.coreText("path"))};if(file["binary"]==JsonPrimitive(true))Text(stringResource(R.string.rovai_fusion_4e8c1baac23df745));patches[file.coreText("id")]?.let{patch->if(patch.isEmpty())Text(stringResource(R.string.rovai_fusion_467b109e0d14f60c))else DiffView(UnifiedDiff.parse(patch)?:emptyList())}}}}}
+            when (tab) {
+                0 -> {
+                    item { RovaiMissionActions(model, mission, onClose) }
+                    item {
+                        RovaiAttachmentPicker(
+                            model,
+                            mission.coreText("threadId"),
+                            buildJsonObject {
+                                put("kind", "mission")
+                                put("missionId", id)
+                            },
+                            mission.coreLong("detailsVersion"),
+                            state.pending != null || state.busy
+                        )
+                    }
+                    item {
+                        MarkdownContent(mission.coreText("description"))
+                        Text(stringResource(R.string.rovai_fusion_316eb58edffd8bdf) + missionStatusName(mission.coreText("status")))
+                        Text(
+                            mission.coreText("projectPath").ifEmpty { "快速对话" },
+                            style = MaterialTheme.typography.bodySmall,
+                            color = CodegTheme.colors.textSecondary
+                        )
+                    }
+                    items(mission["attachments"].coreArray(), key = { it.coreText("id") }) { attachment ->
+                        RovaiMissionAttachmentRow(model, mission, attachment, onOpen = {
+                            source = buildJsonObject {
+                                put("kind", "attachment")
+                                put("threadId", mission.coreText("threadId"))
+                                putJsonObject("locator") {
+                                    put("owner", "mission")
+                                    put("threadId", mission.coreText("threadId"))
+                                    put("missionId", id)
+                                    put("attachmentRefId", attachment.coreText("id"))
+                                }
+                            }
+                        })
+                    }
+                }
+                1 -> {
+                    delivery?.let { value ->
+                        item {
+                            val workspace = value["workspace"].coreObject()
+                            Text(stringResource(R.string.rovai_fusion_3db7b06b5f6de0e0), style = MaterialTheme.typography.titleSmall)
+                            Text(value.coreText("workingDirectory"), style = MaterialTheme.typography.bodySmall)
+                            if (workspace.isNotEmpty()) {
+                                Text(workspace.coreText("managedBranch"))
+                                Text(workspace.coreText("state"), color = CodegTheme.colors.textSecondary)
+                                if (workspace.coreText("diagnostic").isNotEmpty()) {
+                                    Text(workspace.coreText("diagnostic"), color = CodegTheme.colors.danger)
+                                }
+                            }
+                        }
+                        items(value["pullRequests"].coreArray()) { pr ->
+                            GlassRow {
+                                Text(pr.coreText("title"))
+                                Text(pr.coreText("url"), style = MaterialTheme.typography.bodySmall)
+                            }
+                        }
+                        items(value["files"].coreArray()) { file ->
+                            TextButton(onClick = {
+                                source = buildJsonObject {
+                                    put("kind", "attachment")
+                                    put("threadId", mission.coreText("threadId"))
+                                    putJsonObject("locator") {
+                                        put("owner", "message")
+                                        put("threadId", mission.coreText("threadId"))
+                                        put("messageId", file.coreText("messageId"))
+                                        put("attachmentRefId", file.coreText("attachmentId"))
+                                    }
+                                }
+                            }) { Text(file.coreText("displayName")) }
+                        }
+                    }
+                }
+                2 -> {
+                    items(history, key = { it.coreLong("id") }) { activity ->
+                        GlassRow {
+                            Text(missionActivityName(activity))
+                            Text(activity.coreText("createdAt"), style = MaterialTheme.typography.bodySmall, color = CodegTheme.colors.textSecondary)
+                        }
+                    }
+                    if (more) {
+                        item {
+                            TextButton(enabled = !busy, onClick = {
+                                work {
+                                    val next = model.query(RovaiOperation.MISSIONS_ACTIVITY, buildJsonObject {
+                                        put("missionId", id)
+                                        history.lastOrNull()?.let { put("before", it.coreLong("id")) }
+                                    }).coreArray()
+                                    history = (history + next).distinctBy { it.coreLong("id") }
+                                    more = next.size == 100
+                                }
+                            }) { Text(stringResource(R.string.rovai_fusion_3fe6c8a5fdfb7ba7)) }
+                        }
+                    }
+                }
+                3 -> {
+                    changes?.let { view ->
+                        item {
+                            val checkout = view["checkoutState"].coreObject()
+                            Text(checkout.coreText("kind") + " · " + checkout.coreText("branch"), style = MaterialTheme.typography.bodySmall)
+                            if (view.coreText("diffError").isNotEmpty()) {
+                                Text(view.coreText("diffError"), color = CodegTheme.colors.danger)
+                            }
+                        }
+                        items(view["files"].coreArray(), key = { it.coreText("id") }) { file ->
+                            GlassRow {
+                                TextButton(enabled = !busy, onClick = {
+                                    work {
+                                        val diff = model.query(RovaiOperation.MISSIONS_FILEDIFF, buildJsonObject {
+                                            put("missionId", id)
+                                            put("fileId", file.coreText("id"))
+                                            put("viewId", view["viewId"] ?: JsonNull)
+                                        }).coreObject()
+                                        patches = patches + (file.coreText("id") to diff.coreText("patch"))
+                                    }
+                                }) { Text(file.coreText("path")) }
+                                if (file["binary"] == JsonPrimitive(true)) {
+                                    Text(stringResource(R.string.rovai_fusion_4e8c1baac23df745))
+                                }
+                                patches[file.coreText("id")]?.let { patch ->
+                                    if (patch.isEmpty()) {
+                                        Text(stringResource(R.string.rovai_fusion_467b109e0d14f60c))
+                                    } else {
+                                        DiffView(UnifiedDiff.parse(patch) ?: emptyList())
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }}}
