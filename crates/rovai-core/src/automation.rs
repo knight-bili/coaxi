@@ -1402,7 +1402,6 @@ impl AutomationService {
     }
 }
 
-#[derive(Debug)]
 pub(crate) fn create_conversation_tool_definition_in_tx(
     transaction:&Transaction<'_>,authority:&crate::conversation_tools::authoring::CreationAuthority,
     name:&str,prompt:&str,target:&crate::conversation_tools::authoring::Target,
