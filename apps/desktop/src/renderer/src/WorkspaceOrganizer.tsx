@@ -9,7 +9,7 @@ const empty = ():Organizer=>({tags:[],directoryAliases:[],quickMessages:[]})
 
 // Codeg conversation-tag-list-editor / folder aliases and quick-message rows;
 // shared Rovai settings controls, with Core digest-CAS persistence.
-export function WorkspaceOrganizer({threadId,onDirtyChange,onUseMessage}:{threadId:string;onDirtyChange(dirty:boolean):void;onUseMessage?(text:string):boolean}):React.JSX.Element{
+export function WorkspaceOrganizer({threadId,onDirtyChange,onUseMessage,onDirectoryAliasesApplied}:{threadId:string;onDirtyChange(dirty:boolean):void;onUseMessage?(text:string):boolean;onDirectoryAliasesApplied?():void}):React.JSX.Element{
   const client=useThreadClient(),t=useUiText(),scope=useMemo(()=>({threadId}),[threadId])
   const [value,setValue]=useState<Organizer>(empty),[saved,setSaved]=useState<Organizer>(empty),[digest,setDigest]=useState<string|null>(null)
   const [level,setLevel]=useState<'global'|'project'|'thread'>('thread')
@@ -24,7 +24,12 @@ export function WorkspaceOrganizer({threadId,onDirtyChange,onUseMessage}:{thread
   const save=async():Promise<void>=>{
     if(busy||!digest)return
     const sent=value;setBusy(true);setError(null)
-    try{const result=await client.request<{value:Organizer;digest:string}>('workbench.organizer.set',{scope,level,expectedDigest:digest,value:sent});setSaved(result.value);setDigest(result.digest);setValue(current=>JSON.stringify(current)===JSON.stringify(sent)?result.value:current)}catch(failure){setError(String(failure))}finally{setBusy(false)}
+    try{const result=await client.request<{value:Organizer;digest:string}>('workbench.organizer.set',{scope,level,expectedDigest:digest,value:sent});setSaved(result.value);setDigest(result.digest);setValue(current=>JSON.stringify(current)===JSON.stringify(sent)?result.value:current);onDirectoryAliasesApplied?.()}catch(failure){setError(String(failure))}finally{setBusy(false)}
+  }
+  const applyDirectoryAliases=async():Promise<void>=>{
+    if(busy||dirty||!digest)return
+    const sent=saved;setBusy(true);setError(null)
+    try{const result=await client.request<{value:Organizer;digest:string}>('workbench.organizer.set',{scope,level,expectedDigest:digest,value:sent});setSaved(result.value);setDigest(result.digest);setValue(current=>JSON.stringify(current)===JSON.stringify(sent)?result.value:current);onDirectoryAliasesApplied?.()}catch(failure){setError(String(failure))}finally{setBusy(false)}
   }
   return <section className="workbench-organizer">
     <div className="workbench-toolbar"><strong>{t('会话整理')}</strong><label>{t('适用范围')}<select aria-label={t('适用范围')} disabled={busy||dirty} value={level} onChange={event=>setLevel(event.target.value as typeof level)}><option value="global">{t('全局')}</option><option value="project">{t('当前工程')}</option><option value="thread">{t('当前对话与原有内容')}</option></select></label><button type="button" disabled={busy||!dirty||!digest} onClick={()=>void save()}><Save size={14}/>{t('保存')}</button><button type="button" disabled={busy||!dirty} onClick={()=>{setValue(saved);setError(null)}}>{t('放弃更改')}</button></div>
@@ -33,6 +38,8 @@ export function WorkspaceOrganizer({threadId,onDirtyChange,onUseMessage}:{thread
       <form className="workbench-toolbar" onSubmit={event=>{event.preventDefault();const next=tag.trim();if(next&&!value.tags.includes(next))setValue(current=>({...current,tags:[...current.tags,next]}));setTag('')}}><input aria-label={t('标签名称')} value={tag} onChange={event=>setTag(event.target.value)}/><button type="submit" disabled={!tag.trim()}><Plus size={14}/>{t('添加')}</button></form>
     </fieldset>
     <fieldset disabled={busy}><legend>{t('关联目录、别名与分组')}</legend>
+      <p>{t('保存后，关联目录会应用到当前工程；全局列表不会自动修改其他工程。')}</p>
+      <button type="button" disabled={busy||dirty||!digest} onClick={()=>void applyDirectoryAliases()}>{t('应用关联目录到当前工程')}</button>
       {value.directoryAliases.map((alias,index)=><div className="workbench-organizer-row" key={index}><input aria-label={t('目录')} value={alias.path} onChange={event=>setValue(current=>({...current,directoryAliases:current.directoryAliases.map((row,i)=>i===index?{...row,path:event.target.value}:row)}))}/><input aria-label={t('别名')} value={alias.name} onChange={event=>setValue(current=>({...current,directoryAliases:current.directoryAliases.map((row,i)=>i===index?{...row,name:event.target.value}:row)}))}/><input aria-label={t('分组')} value={alias.group} onChange={event=>setValue(current=>({...current,directoryAliases:current.directoryAliases.map((row,i)=>i===index?{...row,group:event.target.value}:row)}))}/><button type="button" aria-label={t('移除目录')} onClick={()=>setValue(current=>({...current,directoryAliases:current.directoryAliases.filter((_,i)=>i!==index)}))}><Trash2 size={14}/></button></div>)}
       <button type="button" onClick={()=>setValue(current=>({...current,directoryAliases:[...current.directoryAliases,{path:'',name:'',group:''}]}))}><Plus size={14}/>{t('添加目录')}</button>
     </fieldset>

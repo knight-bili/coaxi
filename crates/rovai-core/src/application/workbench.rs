@@ -85,7 +85,7 @@ fn write_text(path: &Path, text: &str, expected: Option<&str>) -> Result<Value> 
 
 fn digest(bytes: &[u8]) -> String { format!("{:x}", Sha256::digest(bytes)) }
 
-fn is_link(metadata: &fs::Metadata) -> bool {
+pub(super) fn is_link(metadata: &fs::Metadata) -> bool {
     let mut linked = metadata.file_type().is_symlink();
     #[cfg(windows)]
     {
@@ -131,6 +131,19 @@ struct OrganizerRequest {
     #[serde(default="organizer_thread_level")] level:String,
     #[serde(default)] expected_digest: Option<String>,
     #[serde(default)] value: Option<Organizer>,
+}
+
+fn organizer_metadata_path(directory: &Path, level: &str, scope: &Scope, root: &Path) -> Result<PathBuf> {
+    if level == "global" { return Ok(directory.join("global-v1.json")); }
+    ensure!(level == "project" || level == "thread", "workbench.invalid_organizer_level");
+    let identity = crate::command::canonical_json_digest(&if level == "project" {
+        json!({"root":root,"level":"project","version":1})
+    } else { json!({"scope":scope,"root":root}) })?;
+    Ok(directory.join(format!("{identity}.json")))
+}
+
+fn read_organizer(path: &Path) -> Result<Organizer> {
+    if path.exists() { Ok(serde_json::from_slice(&fs::read(path)?)?) } else { Ok(Organizer::default()) }
 }
 
 fn git_target(value: Option<&str>) -> Result<String> {
@@ -252,30 +265,290 @@ pub(super) fn relative(root: &Path, value: &str, allow_missing: bool) -> Result<
     Ok(current)
 }
 
+#[derive(Clone, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+struct ManagedDirectoryLink { name: String, target: String }
+#[derive(Clone, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+struct DirectoryLinkManifest { root: String, links: Vec<ManagedDirectoryLink> }
+
+pub(super) struct WorkspaceLinks { manifest: DirectoryLinkManifest }
+pub(super) struct ResolvedWorkspacePath { pub(super) path: PathBuf, pub(super) boundary: PathBuf, pub(super) alias_root: bool }
+
+fn valid_link_name(name: &str) -> Result<()> {
+    ensure!(!name.trim().is_empty() && name.len() <= 255 && !name.contains(['/', '\\', ':', '\0', '\r', '\n']), "workbench.invalid_alias");
+    let mut components = Path::new(name).components();
+    ensure!(matches!(components.next(), Some(Component::Normal(_))) && components.next().is_none(), "workbench.invalid_alias");
+    ensure!(!name.eq_ignore_ascii_case(".git"), "workbench.invalid_alias");
+    Ok(())
+}
+
+fn alias_name_matches(managed: &str, requested: &str) -> bool {
+    #[cfg(windows)]
+    { managed.eq_ignore_ascii_case(requested) }
+    #[cfg(not(windows))]
+    { managed == requested }
+}
+
+fn link_manifest_path(data_dir: &Path, root: &Path) -> Result<PathBuf> {
+    let identity = crate::command::canonical_json_digest(&json!({"root":root.to_string_lossy(),"version":1}))?;
+    Ok(data_dir.join("workspace-directory-links").join(format!("{identity}.json")))
+}
+
+fn directory_link_target(value: &str) -> Result<(PathBuf, bool)> {
+    let target = PathBuf::from(value);
+    ensure!(target.is_absolute(), "workbench.directory_link_manifest_invalid");
+    for component in target.components() {
+        ensure!(!matches!(component, Component::CurDir | Component::ParentDir), "workbench.directory_link_manifest_invalid");
+    }
+    let mut current = target.as_path();
+    let mut missing = Vec::new();
+    loop {
+        match fs::canonicalize(current) {
+            Ok(base) => {
+                let existed = missing.is_empty();
+                let mut reconstructed = base;
+                for component in missing.iter().rev() { reconstructed.push(component); }
+                ensure!(reconstructed.to_string_lossy().as_ref() == value, "workbench.directory_link_manifest_invalid");
+                if existed { ensure!(reconstructed.is_dir(), "workbench.directory_link_manifest_invalid"); }
+                return Ok((reconstructed, existed));
+            }
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
+                let name = current.file_name().context("workbench.directory_link_manifest_invalid")?;
+                missing.push(name.to_os_string());
+                current = current.parent().context("workbench.directory_link_manifest_invalid")?;
+            }
+            Err(error) => return Err(error.into()),
+        }
+    }
+}
+
+fn load_workspace_links(root: &Path, data_dir: &Path) -> Result<WorkspaceLinks> {
+    let root = fs::canonicalize(root)?;
+    let path = link_manifest_path(data_dir, &root)?;
+    let manifest_directory = path.parent().context("workbench.directory_link_manifest_invalid")?;
+    match fs::symlink_metadata(manifest_directory) {
+        Ok(metadata) => ensure!(!is_link(&metadata) && metadata.is_dir(), "workbench.directory_link_manifest_invalid"),
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => {},
+        Err(error) => return Err(error.into()),
+    }
+    let manifest = match fs::symlink_metadata(&path) {
+        Ok(metadata) => {
+            ensure!(!is_link(&metadata) && metadata.is_file(), "workbench.directory_link_manifest_invalid");
+            serde_json::from_slice::<DirectoryLinkManifest>(&fs::read(path)?)?
+        },
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => DirectoryLinkManifest { root: root.to_string_lossy().into_owned(), links: Vec::new() },
+        Err(error) => return Err(error.into()),
+    };
+    ensure!(manifest.root.as_str() == root.to_string_lossy().as_ref(), "workbench.directory_link_manifest_invalid");
+    let mut names = std::collections::HashSet::new();
+    for link in &manifest.links {
+        valid_link_name(&link.name)?;
+        ensure!(names.insert(link.name.to_lowercase()), "workbench.directory_link_manifest_invalid");
+        let (target, _) = directory_link_target(&link.target)?;
+        let private_root = fs::canonicalize(data_dir).unwrap_or_else(|_| data_dir.to_path_buf());
+        ensure!(!target.starts_with(private_root) && !target.starts_with(&root) && !root.starts_with(&target), "workbench.directory_link_manifest_invalid");
+    }
+    Ok(WorkspaceLinks { manifest })
+}
+
+fn verify_directory_link(root: &Path, link: &ManagedDirectoryLink) -> Result<bool> {
+    let path = root.join(&link.name);
+    let metadata = match fs::symlink_metadata(&path) {
+        Ok(metadata) => metadata,
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => return Ok(false),
+        Err(error) => return Err(error.into()),
+    };
+    ensure!(is_link(&metadata), "workbench.directory_link_changed");
+    let actual = fs::read_link(&path)?;
+    ensure!(actual.is_absolute() && actual == Path::new(&link.target), "workbench.directory_link_changed");
+    match fs::canonicalize(&path) {
+        Ok(target) => {
+            ensure!(target.to_string_lossy().as_ref() == link.target.as_str() && fs::metadata(&path)?.is_dir(), "workbench.directory_link_changed");
+        }
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => {},
+        Err(error) => return Err(error.into()),
+    }
+    Ok(true)
+}
+
+fn create_directory_link(target: &Path, path: &Path) -> Result<()> {
+    #[cfg(windows)]
+    std::os::windows::fs::symlink_dir(target, path).context("workbench.directory_link_create_failed")?;
+    #[cfg(not(windows))]
+    std::os::unix::fs::symlink(target, path).context("workbench.directory_link_create_failed")?;
+    Ok(())
+}
+
+fn remove_directory_link(path: &Path) -> Result<()> {
+    #[cfg(windows)]
+    fs::remove_dir(path)?;
+    #[cfg(not(windows))]
+    fs::remove_file(path)?;
+    Ok(())
+}
+
+fn rollback_directory_links(root: &Path, created: &[ManagedDirectoryLink], removed: &[ManagedDirectoryLink]) -> Result<()> {
+    for link in created.iter().rev() {
+        if verify_directory_link(root, link)? { remove_directory_link(&root.join(&link.name))?; }
+    }
+    for link in removed.iter().rev() { create_directory_link(Path::new(&link.target), &root.join(&link.name))?; }
+    Ok(())
+}
+
+fn sync_directory_links(root: &Path, data_dir: &Path, desired: Vec<ManagedDirectoryLink>) -> Result<(PathBuf, Option<Vec<u8>>, Vec<ManagedDirectoryLink>, Vec<ManagedDirectoryLink>)> {
+    let root = fs::canonicalize(root)?;
+    let directory = data_dir.join("workspace-directory-links");
+    let manifest_path = link_manifest_path(data_dir, &root)?;
+    let current = load_workspace_links(&root, data_dir)?.manifest;
+    let previous_bytes = match fs::symlink_metadata(&manifest_path) {
+        Ok(metadata) => { ensure!(!is_link(&metadata) && metadata.is_file(), "workbench.directory_link_manifest_invalid"); Some(fs::read(&manifest_path)?) },
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => None,
+        Err(error) => return Err(error.into()),
+    };
+    let mut desired_by_name = std::collections::HashMap::new();
+    for link in desired {
+        valid_link_name(&link.name)?;
+        ensure!(desired_by_name.insert(link.name.to_lowercase(), link).is_none(), "workbench.directory_alias_conflict");
+    }
+    let current_by_name = current.links.iter().map(|link| (link.name.to_lowercase(), link)).collect::<std::collections::HashMap<_, _>>();
+    for (key, next) in &desired_by_name {
+        if let Some(previous) = current_by_name.get(key) {
+            let _ = verify_directory_link(&root, previous)?;
+        } else {
+            let candidate = root.join(&next.name);
+            match fs::symlink_metadata(candidate) {
+                Ok(_) => anyhow::bail!("workbench.directory_alias_name_taken"),
+                Err(error) if error.kind() == std::io::ErrorKind::NotFound => {},
+                Err(error) => return Err(error.into()),
+            }
+        }
+        let target = fs::canonicalize(&next.target).context("workbench.directory_link_target_missing")?;
+        let private_root = fs::canonicalize(data_dir).unwrap_or_else(|_| data_dir.to_path_buf());
+        ensure!(target.is_dir() && target.to_string_lossy().as_ref() == next.target && !target.starts_with(private_root) && !target.starts_with(&root) && !root.starts_with(&target), "workbench.directory_link_manifest_invalid");
+    }
+    for link in &current.links {
+        if !desired_by_name.contains_key(&link.name.to_lowercase()) {
+            let _ = verify_directory_link(&root, link)?;
+        }
+    }
+    crate::platform::private_storage::prepare_private_directory(&directory)?;
+
+    let mut created = Vec::new();
+    let mut removed = Vec::new();
+    let apply = (|| -> Result<()> {
+        for link in &current.links {
+            let unchanged = desired_by_name.get(&link.name.to_lowercase()).is_some_and(|next| next.name == link.name && next.target == link.target);
+            if !unchanged && verify_directory_link(&root, link)? {
+                remove_directory_link(&root.join(&link.name))?;
+                removed.push(link.clone());
+            }
+        }
+        for link in desired_by_name.values() {
+            let previous = current_by_name.get(&link.name.to_lowercase());
+            if previous.is_some_and(|previous| previous.name == link.name && previous.target == link.target) && verify_directory_link(&root, previous.unwrap())? { continue; }
+            create_directory_link(Path::new(&link.target), &root.join(&link.name))?;
+            created.push(link.clone());
+        }
+        let mut links = desired_by_name.into_values().collect::<Vec<_>>();
+        links.sort_by(|a,b|a.name.to_lowercase().cmp(&b.name.to_lowercase()));
+        let manifest = DirectoryLinkManifest { root: root.to_string_lossy().into_owned(), links };
+        crate::platform::private_storage::atomic_write_private_json(&manifest_path, &json!(manifest))?;
+        Ok(())
+    })();
+    if let Err(error) = apply {
+        let rollback = rollback_directory_links(&root, &created, &removed);
+        if let Some(bytes) = &previous_bytes {
+            let restore = crate::platform::private_storage::atomic_write_private_json(&manifest_path, &serde_json::from_slice::<Value>(bytes)?);
+            restore.context("workbench.directory_link_rollback_failed")?;
+        } else if manifest_path.exists() { fs::remove_file(&manifest_path).context("workbench.directory_link_rollback_failed")?; }
+        rollback.context("workbench.directory_link_rollback_failed")?;
+        return Err(error);
+    }
+    Ok((manifest_path, previous_bytes, created, removed))
+}
+
+fn rollback_directory_link_sync(root: &Path, undo: (PathBuf, Option<Vec<u8>>, Vec<ManagedDirectoryLink>, Vec<ManagedDirectoryLink>)) -> Result<()> {
+    let (manifest_path, previous_bytes, created, removed) = undo;
+    rollback_directory_links(root, &created, &removed)?;
+    if let Some(bytes) = previous_bytes {
+        let value: Value = serde_json::from_slice(&bytes)?;
+        crate::platform::private_storage::atomic_write_private_json(&manifest_path, &value)?;
+    } else if manifest_path.exists() { fs::remove_file(&manifest_path)?; }
+    Ok(())
+}
+
+pub(super) fn workspace_links(root: &Path, data_dir: &Path) -> Result<WorkspaceLinks> { load_workspace_links(root, data_dir) }
+
+pub(super) fn is_directory_alias(root: &Path, links: &WorkspaceLinks, name: &str) -> Result<bool> {
+    if let Some(link) = links.manifest.links.iter().find(|link| alias_name_matches(&link.name, name)) {
+        if !verify_directory_link(root, link)? { return Ok(false); }
+        Ok(fs::metadata(root.join(&link.name)).is_ok_and(|metadata| metadata.is_dir()))
+    } else { Ok(false) }
+}
+
+pub(super) fn normalized_workspace_path(value: &str) -> Result<String> {
+    ensure!(!value.contains(['\0', '\r', '\n', ':', '\\']), "workbench.invalid_path");
+    let path = Path::new(value);
+    ensure!(!path.is_absolute(), "workbench.invalid_path");
+    let mut names = Vec::new();
+    for component in path.components() {
+        match component {
+            Component::Normal(name) => names.push(name.to_str().context("workbench.invalid_path")?),
+            Component::CurDir => {},
+            _ => anyhow::bail!("workbench.invalid_path"),
+        }
+    }
+    Ok(names.join("/"))
+}
+
+pub(super) fn resolve_workspace_path(root: &Path, links: &WorkspaceLinks, value: &str, allow_missing: bool) -> Result<ResolvedWorkspacePath> {
+    ensure!(!value.contains(['\0', '\r', '\n', ':', '\\']), "workbench.invalid_path");
+    let path = Path::new(value);
+    ensure!(!path.is_absolute(), "workbench.invalid_path");
+    let components = path.components().collect::<Vec<_>>();
+    if let Some(Component::Normal(first)) = components.first() {
+        if let Some(link) = links.manifest.links.iter().find(|link| alias_name_matches(&link.name, &first.to_string_lossy())) {
+            ensure!(verify_directory_link(root, link)?, "workbench.directory_link_missing");
+            ensure!(fs::metadata(root.join(&link.name)).is_ok_and(|metadata| metadata.is_dir()), "workbench.directory_link_target_missing");
+            let rest = components.iter().skip(1).map(|part| match part { Component::Normal(name) => name.to_str().context("workbench.invalid_path"), Component::CurDir => Ok("."), _ => anyhow::bail!("workbench.invalid_path") }).collect::<Result<Vec<_>>>()?.join("/");
+            let target = PathBuf::from(&link.target);
+            let resolved = relative(&target, &rest, allow_missing)?;
+            return Ok(ResolvedWorkspacePath { path: resolved, boundary: target, alias_root: components.len() == 1 });
+        }
+    }
+    Ok(ResolvedWorkspacePath { path: relative(root, value, allow_missing)?, boundary: root.to_path_buf(), alias_root: false })
+}
+
 impl Core {
     pub(super) async fn workbench_organizer(&self, method: &str, value: Value) -> Result<Value> {
         let request: OrganizerRequest = serde_json::from_value(value)?;
         let _write = MUTATIONS.lock().await;
         ensure!(["global","project","thread"].contains(&request.level.as_str()),"workbench.invalid_organizer_level");
         let directory = self.data_dir.join("workspace-metadata");
-        let path=if request.level=="global"{directory.join("global-v1.json")}else{
-            let scope=request.scope.as_ref().context("workbench.scope_required")?;let root=self.workbench_root(scope).await?;
-            let identity=crate::command::canonical_json_digest(&if request.level=="project"{json!({"root":root,"level":"project","version":1})}else{json!({"scope":scope,"root":root})})?;directory.join(format!("{identity}.json"))
-        };
-        let current: Organizer = if path.exists() { serde_json::from_slice(&fs::read(&path)?)? } else { Organizer::default() };
+        let scope_root = if request.level == "global" && method == "workbench.organizer.get" { None }
+            else { match request.scope.as_ref() { Some(scope) => Some(self.workbench_root(scope).await?), None => None } };
+        let path = if request.level == "global" { directory.join("global-v1.json") }
+            else { organizer_metadata_path(&directory, &request.level, request.scope.as_ref().context("workbench.scope_required")?, scope_root.as_deref().context("workbench.scope_required")?)? };
+        let current = read_organizer(&path)?;
         let current_value = serde_json::to_value(&current)?;
         let current_digest = crate::command::canonical_json_digest(&current_value)?;
         if method == "workbench.organizer.get" { return Ok(json!({"value":current_value,"digest":current_digest})); }
         ensure!(method == "workbench.organizer.set", "workbench.operation_not_admitted");
+        let scope = request.scope.as_ref().context("workbench.scope_required")?;
+        let root = scope_root.as_deref().context("workbench.scope_required")?;
         let mut next = request.value.context("workbench.metadata_required")?;
         ensure!(next.tags.len() <= 512 && next.directory_aliases.len() <= 512 && next.quick_messages.len() <= 512, "workbench.metadata_limit");
         let mut seen = std::collections::HashSet::new();
         for tag in &next.tags { ensure!(!tag.trim().is_empty() && tag.len() <= 256 && seen.insert(tag), "workbench.invalid_tag"); }
-        let mut seen = std::collections::HashSet::new();
+        let mut seen_paths = std::collections::HashSet::new();
+        let mut seen_names = std::collections::HashSet::new();
         for alias in &mut next.directory_aliases {
             let canonical = git::validate_workspace_directory(Path::new(&alias.path), &self.data_dir, false)?;
             alias.path = canonical.to_string_lossy().into_owned();
-            ensure!(!alias.name.trim().is_empty() && alias.name.len() <= 256 && alias.group.len() <= 256 && seen.insert(alias.path.clone()), "workbench.invalid_alias");
+            valid_link_name(&alias.name)?;
+            ensure!(!canonical.starts_with(root) && !root.starts_with(&canonical), "workbench.invalid_alias");
+            ensure!(alias.group.len() <= 256 && seen_paths.insert(alias.path.clone()) && seen_names.insert(alias.name.to_lowercase()), "workbench.invalid_alias");
         }
         let mut seen = std::collections::HashSet::new();
         for message in &next.quick_messages {
@@ -284,10 +557,33 @@ impl Core {
         }
         let value = serde_json::to_value(next)?;
         let next_digest = crate::command::canonical_json_digest(&value)?;
+        ensure!(request.expected_digest.as_deref() == Some(current_digest.as_str()), "workbench.metadata_changed");
+
+        let mut catalogs = std::collections::HashMap::new();
+        for level in ["global", "project", "thread"] {
+            let catalog_path = organizer_metadata_path(&directory, level, scope, root)?;
+            let catalog = if level == request.level { serde_json::from_value(value.clone())? } else { read_organizer(&catalog_path)? };
+            catalogs.insert(level, catalog);
+        }
+        let mut desired = std::collections::HashMap::<String, ManagedDirectoryLink>::new();
+        for level in ["global", "project", "thread"] {
+            for alias in &catalogs[ level ].directory_aliases {
+                let canonical = git::validate_workspace_directory(Path::new(&alias.path), &self.data_dir, false)?;
+                ensure!(!canonical.starts_with(root) && !root.starts_with(&canonical), "workbench.invalid_alias");
+                let key = alias.name.to_lowercase();
+                let link = ManagedDirectoryLink { name:alias.name.clone(), target:canonical.to_string_lossy().into_owned() };
+                if let Some(previous) = desired.get(&key) {
+                    ensure!(previous.target == link.target, "workbench.directory_alias_conflict");
+                } else { desired.insert(key, link); }
+            }
+        }
+        let undo = sync_directory_links(root, &self.data_dir, desired.into_values().collect())?;
         if next_digest != current_digest {
-            ensure!(request.expected_digest.as_deref() == Some(current_digest.as_str()), "workbench.metadata_changed");
             crate::platform::private_storage::prepare_private_directory(&directory)?;
-            crate::platform::private_storage::atomic_write_private_json(&path, &value)?;
+            if let Err(error) = crate::platform::private_storage::atomic_write_private_json(&path, &value) {
+                rollback_directory_link_sync(root, undo).context("workbench.directory_link_rollback_failed")?;
+                return Err(error);
+            }
         }
         Ok(json!({"value":value,"digest":next_digest}))
     }
@@ -452,7 +748,9 @@ impl Core {
     pub(super) async fn workbench_files(&self, method: &str, value: Value) -> Result<Value> {
         let request: FileRequest = serde_json::from_value(value)?;
         let root = self.workbench_root(&request.scope).await?;
-        let path = relative(&root, &request.path, false)?;
+        let links = workspace_links(&root, &self.data_dir)?;
+        let resolved = resolve_workspace_path(&root, &links, &request.path, false)?;
+        let path = resolved.path;
         match method {
             "workbench.files.list" => {
                 ensure!(path.is_dir(), "workbench.directory_required");
@@ -462,16 +760,14 @@ impl Core {
                     let name = entry.file_name().into_string().map_err(|_| anyhow::anyhow!("workbench.non_utf8_name"))?;
                     if name.eq_ignore_ascii_case(".git") { continue; }
                     let metadata = fs::symlink_metadata(entry.path())?;
-                    let mut link = metadata.file_type().is_symlink();
-                    #[cfg(windows)]
-                    {
-                        use std::os::windows::fs::MetadataExt;
-                        link |= metadata.file_attributes() & 0x400 != 0;
-                    }
-                    let key = format!("{}:{}", if metadata.is_dir() { "0" } else { "1" }, name);
+                    let alias = is_directory_alias(&root, &links, &name)?;
+                    let link = is_link(&metadata);
+                    let prefix = normalized_workspace_path(&request.path)?;
+                    let child_path = if prefix.is_empty() { name.clone() } else { format!("{prefix}/{name}") };
+                    let key = format!("{}:{}", if metadata.is_dir() || alias { "0" } else { "1" }, name);
                     if request.after.as_ref().is_some_and(|after| key.as_str() <= after.as_str()) { continue; }
-                    entries.push((key, json!({"name":name, "path":entry.path().strip_prefix(&root)?.to_string_lossy().replace('\\', "/"),
-                        "directory":metadata.is_dir(), "link":link, "bytes":metadata.len()})));
+                    entries.push((key, json!({"name":name, "path":child_path,
+                        "directory":metadata.is_dir() || alias, "link":link, "managedAlias":alias, "bytes":metadata.len()})));
                 }
                 entries.sort_by(|a,b| a.0.cmp(&b.0));
                 let next = (entries.len() > 500).then(|| entries[499].0.clone());
@@ -496,9 +792,11 @@ impl Core {
         uuid::Uuid::parse_str(&request.command_id).context("workbench.invalid_command_id")?;
         let _write = MUTATIONS.lock().await;
         let root = self.workbench_root(&request.scope).await?;
+        let links = workspace_links(&root, &self.data_dir)?;
         ensure!(!request.path.is_empty(), "workbench.root_immutable");
-        let path = relative(&root, &request.path, true)?;
-        ensure!(path != root, "workbench.root_immutable");
+        let resolved = resolve_workspace_path(&root, &links, &request.path, true)?;
+        let path = resolved.path;
+        ensure!(path != root && !resolved.alias_root, "workbench.root_immutable");
         let identity = crate::command::canonical_json_digest(&json!({"root":root,"request":value}))?;
         let receipts = self.data_dir.join("workspace-operations");
         crate::platform::private_storage::prepare_private_directory(&receipts)?;
@@ -518,11 +816,12 @@ impl Core {
                 "save" => write_text(&path, request.text.as_deref().context("workbench.text_required")?, request.expected_digest.as_deref()),
                 "create_directory" => { fs::create_dir(&path)?; Ok(json!({"applied":true})) }
                 "rename" => {
-                    let destination = relative(&root, request.destination.as_deref().context("workbench.destination_required")?, true)?;
-                    ensure!(destination != root && !destination.exists(), "workbench.destination_exists");
-                    ensure!(!destination.starts_with(&path), "workbench.invalid_destination");
+                    let destination = resolve_workspace_path(&root, &links, request.destination.as_deref().context("workbench.destination_required")?, true)?;
+                    ensure!(destination.path != root && !destination.alias_root && destination.boundary == resolved.boundary, "workbench.invalid_destination");
+                    ensure!(!destination.path.exists(), "workbench.destination_exists");
+                    ensure!(!destination.path.starts_with(&path), "workbench.invalid_destination");
                     if path.is_file() { ensure!(request.expected_digest.as_deref() == Some(digest(&fs::read(&path)?).as_str()), "workbench.file_changed"); }
-                    fs::rename(&path, destination)?;
+                    fs::rename(&path, destination.path)?;
                     Ok(json!({"applied":true}))
                 }
                 _ => anyhow::bail!("workbench.operation_not_admitted"),

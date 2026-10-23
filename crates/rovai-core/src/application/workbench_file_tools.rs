@@ -1,6 +1,6 @@
 //! File-tree actions retain recoverable originals and require captured content.
 use super::*;
-use super::workbench::{Scope,relative,MUTATIONS};
+use super::workbench::{Scope,workspace_links,resolve_workspace_path,normalized_workspace_path,WorkspaceLinks,MUTATIONS,is_link};
 use anyhow::ensure;
 use serde::{Deserialize,Serialize};
 use std::{fs,io::{Read,Write}};
@@ -12,8 +12,7 @@ struct Entry{path:String,directory:bool,bytes:u64,digest:String,#[serde(default)
 fn snapshot(root:&Path)->Result<(String,Vec<Entry>)>{
     let mut pending=vec![(root.to_path_buf(),String::new())];let mut entries=Vec::new();let mut total=0u64;
     while let Some((path,name))=pending.pop(){
-        let metadata=fs::symlink_metadata(&path)?;ensure!(!metadata.file_type().is_symlink(),"workbench.link_not_allowed");
-        #[cfg(windows)]{use std::os::windows::fs::MetadataExt;ensure!(metadata.file_attributes()&0x400==0,"workbench.link_not_allowed");}
+        let metadata=fs::symlink_metadata(&path)?;ensure!(!is_link(&metadata),"workbench.link_not_allowed");
         ensure!(entries.len()<10000&&name.matches('/').count()<32,"workbench.tree_limit");
         if metadata.is_dir(){
             entries.push(Entry{path:name.clone(),directory:true,bytes:0,digest:String::new(),executable:false});
@@ -39,22 +38,26 @@ fn copy_tree(source:&Path,destination:&Path,expected:&str)->Result<()> {
         ensure!(snapshot(source)?.0==before&&snapshot(&temporary)?.0==before,"workbench.file_changed");ensure!(!destination.exists(),"workbench.destination_exists");fs::rename(&temporary,destination)?;Ok(())
     })();if result.is_err(){if temporary.is_dir(){let _=fs::remove_dir_all(&temporary);}else{let _=fs::remove_file(&temporary);}}result
 }
-fn search(root:&Path,request:&Request)->Result<Value>{
+fn search(root:&Path,links:&WorkspaceLinks,request:&Request)->Result<Value>{
     let query=request.query.as_deref().context("workbench.query_required")?;ensure!(!query.is_empty()&&query.len()<=1024,"workbench.query_limit");
     let regex=regex::RegexBuilder::new(&if request.regex{query.to_owned()}else{regex::escape(query)}).case_insensitive(!request.case_sensitive).size_limit(1024*1024).build()?;
-    let start=relative(root,&request.path,false)?;ensure!(start.is_dir(),"workbench.directory_required");
-    let mut pending=vec![start];let mut results=Vec::new();let mut scanned=0usize;let mut bytes=0u64;let mut limited=false;
-    while let Some(directory)=pending.pop(){
+    let start=resolve_workspace_path(root,links,&request.path,false)?;ensure!(start.path.is_dir(),"workbench.directory_required");
+    let mut pending=vec![(start.path,normalized_workspace_path(&request.path)?)];let mut results=Vec::new();let mut scanned=0usize;let mut bytes=0u64;let mut limited=false;
+    while let Some((directory,prefix))=pending.pop(){
         let mut entries=fs::read_dir(directory)?.collect::<std::io::Result<Vec<_>>>()?;entries.sort_by_key(|entry|entry.file_name());
         for entry in entries{
             scanned+=1;if scanned>50000||bytes>64*1024*1024{limited=true;break}
             let name=entry.file_name().to_string_lossy().into_owned();if name.eq_ignore_ascii_case(".git"){continue}
-            let path=entry.path().strip_prefix(root)?.to_string_lossy().replace('\\',"/");let metadata=fs::symlink_metadata(entry.path())?;
-            if relative(root,&path,false).is_err(){continue}
-            if metadata.is_dir(){if path.matches('/').count()<32&&(request.include_ignored||!matches!(name.as_str(),"node_modules"|"target"|"dist"|".next"|".venv"|"vendor")){pending.push(entry.path())}continue}
+            let path=if prefix.is_empty(){name.clone()}else{format!("{prefix}/{name}")};
+            let Ok(resolved)=resolve_workspace_path(root,links,&path,false)else{continue};
+            if resolved.alias_root {
+                if !is_link(&fs::symlink_metadata(entry.path())?) { continue }
+            } else if resolved.path != entry.path(){continue}
+            let metadata=fs::symlink_metadata(&resolved.path)?;
+            if metadata.is_dir(){if path.matches('/').count()<32&&(request.include_ignored||!matches!(name.as_str(),"node_modules"|"target"|"dist"|".next"|".venv"|"vendor")){pending.push((resolved.path,path.clone()))}continue}
             if !metadata.is_file(){continue}
             if !request.content{if regex.is_match(&path){results.push(json!({"path":path,"line":null,"column":null,"text":name}))}continue}
-            if metadata.len()>2*1024*1024{continue}bytes+=metadata.len();let data=fs::read(entry.path())?;let Ok(text)=std::str::from_utf8(&data)else{continue};if text.contains('\0'){continue}
+            if metadata.len()>2*1024*1024{continue}bytes+=metadata.len();let data=fs::read(&resolved.path)?;let Ok(text)=std::str::from_utf8(&data)else{continue};if text.contains('\0'){continue}
             for (line_no,line) in text.lines().enumerate(){for found in regex.find_iter(line).take(20){let column=line[..found.start()].chars().count()+1;results.push(json!({"path":path,"line":line_no+1,"column":column,"text":line.chars().take(400).collect::<String>()}));if results.len()>=2000{limited=true;break}}if limited{break}}
             if results.len()>=2000{limited=true;break}
         }
@@ -68,11 +71,12 @@ fn search(root:&Path,request:&Request)->Result<Value>{
 impl Core{
     pub(super) async fn workbench_file_tools(&self,value:Value)->Result<Value>{
         let request:Request=serde_json::from_value(value.clone())?;let root=self.workbench_root(&request.scope).await?;let data_dir=self.data_dir.clone();
-        if request.operation=="search"{return tokio::task::spawn_blocking(move||search(&root,&request)).await?}
+        if request.operation=="search"{let links=workspace_links(&root,&data_dir)?;return tokio::task::spawn_blocking(move||search(&root,&links,&request)).await?}
         let _guard=MUTATIONS.lock().await;
         tokio::task::spawn_blocking(move||{
-            if request.operation=="versions"{let paths=request.paths.as_ref().context("workbench.paths_required")?;ensure!(paths.len()<=64,"workbench.path_limit");let mut versions=Vec::new();for path in paths{let target=relative(&root,path,true)?;let value=if target.is_file(){let metadata=fs::metadata(&target)?;if metadata.len()>16*1024*1024{json!({"path":path,"state":"too_large"})}else{json!({"path":path,"state":"present","digest":crate::backup::file_digest(&target)?.1})}}else{json!({"path":path,"state":"missing"})};versions.push(value)}return Ok(json!({"versions":versions}))}
-            if request.operation=="inspect"{let path=relative(&root,&request.path,false)?;let (digest,entries)=snapshot(&path)?;return Ok(json!({"path":request.path,"digest":digest,"directory":path.is_dir(),"files":entries.len(),"bytes":entries.iter().map(|entry|entry.bytes).sum::<u64>()}))}
+            let links=workspace_links(&root,&data_dir)?;
+            if request.operation=="versions"{let paths=request.paths.as_ref().context("workbench.paths_required")?;ensure!(paths.len()<=64,"workbench.path_limit");let mut versions=Vec::new();for path in paths{let target=resolve_workspace_path(&root,&links,path,true)?.path;let value=if target.is_file(){let metadata=fs::metadata(&target)?;if metadata.len()>16*1024*1024{json!({"path":path,"state":"too_large"})}else{json!({"path":path,"state":"present","digest":crate::backup::file_digest(&target)?.1})}}else{json!({"path":path,"state":"missing"})};versions.push(value)}return Ok(json!({"versions":versions}))}
+            if request.operation=="inspect"{let path=resolve_workspace_path(&root,&links,&request.path,false)?.path;let (digest,entries)=snapshot(&path)?;return Ok(json!({"path":request.path,"digest":digest,"directory":path.is_dir(),"files":entries.len(),"bytes":entries.iter().map(|entry|entry.bytes).sum::<u64>()}))}
             let trash=trash_root(&root)?;
             if request.operation=="trash_list"{let mut entries=Vec::new();if trash.exists(){crate::platform::private_storage::prepare_private_directory(&trash)?;for entry in fs::read_dir(&trash)?.take(10001){let entry=entry?;if !entry.file_type()?.is_dir(){continue}let metadata=entry.path().join("entry.json");if metadata.is_file(){let value:Value=serde_json::from_slice(&fs::read(metadata)?)?;if value["root"]==json!(root)&&entry.path().join("content").exists(){entries.push(value)}}}}return Ok(json!({"entries":entries}))}
             ensure!(matches!(request.operation.as_str(),"copy"|"trash"|"restore"|"move"),"workbench.operation_not_admitted");
@@ -80,13 +84,13 @@ impl Core{
             let receipts=data_dir.join("workspace-operations");crate::platform::private_storage::prepare_private_directory(&receipts)?;let receipt=receipts.join(format!("{id}.json"));let identity=crate::command::canonical_json_digest(&json!({"root":root,"request":value}))?;
             if receipt.exists(){let previous:Value=serde_json::from_slice(&fs::read(&receipt)?)?;ensure!(previous["identity"]==identity,"workbench.command_conflict");ensure!(previous["state"]=="applied","workbench.operation_unknown_check_state");return Ok(previous["result"].clone())}
             ensure!(!request.path.is_empty(),"workbench.root_immutable");
-            let path=relative(&root,&request.path,request.operation=="restore")?;ensure!(path!=root,"workbench.root_immutable");
+            let resolved=resolve_workspace_path(&root,&links,&request.path,request.operation=="restore")?;let path=resolved.path;ensure!(path!=root&&!resolved.alias_root,"workbench.root_immutable");
             crate::platform::private_storage::atomic_write_private_json(&receipt,&json!({"identity":identity,"state":"started"}))?;
             let result=(||->Result<Value>{
-                if request.operation=="restore"{let trash_id=request.trash_id.as_deref().context("workbench.trash_id_required")?;uuid::Uuid::parse_str(trash_id)?;let source=trash.join(trash_id);let metadata:Value=serde_json::from_slice(&fs::read(source.join("entry.json"))?)?;ensure!(metadata["root"]==json!(root)&&metadata["path"]==request.path,"workbench.trash_identity_changed");ensure!(!path.exists(),"workbench.destination_exists");let (digest,_)=snapshot(&source.join("content"))?;ensure!(metadata["digest"]==digest,"workbench.trash_changed");fs::rename(source.join("content"),&path)?;return Ok(json!({"applied":true,"path":request.path}))}
+                if request.operation=="restore"{ensure!(resolved.boundary==root,"workbench.invalid_destination");let trash_id=request.trash_id.as_deref().context("workbench.trash_id_required")?;uuid::Uuid::parse_str(trash_id)?;let source=trash.join(trash_id);let metadata:Value=serde_json::from_slice(&fs::read(source.join("entry.json"))?)?;ensure!(metadata["root"]==json!(root)&&metadata["path"]==request.path,"workbench.trash_identity_changed");ensure!(!path.exists(),"workbench.destination_exists");let (digest,_)=snapshot(&source.join("content"))?;ensure!(metadata["digest"]==digest,"workbench.trash_changed");fs::rename(source.join("content"),&path)?;return Ok(json!({"applied":true,"path":request.path}))}
                 let (digest,_)=snapshot(&path)?;ensure!(request.expected_digest.as_deref()==Some(digest.as_str()),"workbench.file_changed");
-                if request.operation=="trash"{crate::platform::private_storage::prepare_private_directory(&trash)?;let directory=trash.join(id);crate::platform::private_storage::prepare_private_directory(&directory)?;crate::platform::private_storage::atomic_write_private_json(&directory.join("entry.json"),&json!({"root":root,"path":request.path,"digest":digest,"trashId":id,"deletedAt":Utc::now().to_rfc3339()}))?;fs::rename(&path,directory.join("content"))?;Ok(json!({"applied":true,"trashId":id}))}
-                else{let destination=relative(&root,request.destination.as_deref().context("workbench.destination_required")?,true)?;ensure!(destination!=root&&!destination.exists()&&!destination.starts_with(&path),"workbench.invalid_destination");if request.operation=="copy"{copy_tree(&path,&destination,&digest)?}else{ensure!(snapshot(&path)?.0==digest,"workbench.file_changed");fs::rename(&path,&destination)?;}Ok(json!({"applied":true}))}
+                if request.operation=="trash"{ensure!(resolved.boundary==root,"workbench.invalid_destination");crate::platform::private_storage::prepare_private_directory(&trash)?;let directory=trash.join(id);crate::platform::private_storage::prepare_private_directory(&directory)?;crate::platform::private_storage::atomic_write_private_json(&directory.join("entry.json"),&json!({"root":root,"path":request.path,"digest":digest,"trashId":id,"deletedAt":Utc::now().to_rfc3339()}))?;fs::rename(&path,directory.join("content"))?;Ok(json!({"applied":true,"trashId":id}))}
+                else{let destination=resolve_workspace_path(&root,&links,request.destination.as_deref().context("workbench.destination_required")?,true)?;ensure!(destination.path!=root&&!destination.alias_root&&destination.boundary==resolved.boundary&&!destination.path.exists()&&!destination.path.starts_with(&path),"workbench.invalid_destination");if request.operation=="copy"{copy_tree(&path,&destination.path,&digest)?}else{ensure!(snapshot(&path)?.0==digest,"workbench.file_changed");fs::rename(&path,&destination.path)?;}Ok(json!({"applied":true}))}
             })();
             match result{Ok(result)=>{crate::platform::private_storage::atomic_write_private_json(&receipt,&json!({"identity":identity,"state":"applied","result":result}))?;Ok(result)},Err(error)=>{crate::platform::private_storage::atomic_write_private_json(&receipt,&json!({"identity":identity,"state":"failed","error":error.to_string()}))?;Err(error)}}
         }).await?

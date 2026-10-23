@@ -5277,6 +5277,8 @@
   "移除标签": "Remove tag",
   "标签名称": "Tag name",
   "关联目录、别名与分组": "Linked directories, aliases and groups",
+  "保存后，关联目录会应用到当前工程；全局列表不会自动修改其他工程。": "Saving applies linked directories to the current project; the global list does not automatically change other projects.",
+  "应用关联目录到当前工程": "Apply linked directories to current project",
   "别名": "Alias",
   "分组": "Group",
   "移除目录": "Remove directory",
