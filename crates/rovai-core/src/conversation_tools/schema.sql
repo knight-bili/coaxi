@@ -49,6 +49,10 @@ CREATE UNIQUE INDEX conversation_tool_pending_question ON conversation_tool_requ
  WHERE tool_name='ask_user_question' AND state IN ('prepared','awaiting_answer','answered','outcome_unknown');
 CREATE UNIQUE INDEX conversation_tool_unresolved_create ON conversation_tool_request(agent_run_id,execution_epoch,tool_name)
  WHERE tool_name IN ('create_automation','create_work_task') AND state IN ('prepared','outcome_unknown');
+CREATE TABLE conversation_tool_question (
+ request_id TEXT PRIMARY KEY NOT NULL REFERENCES conversation_tool_request(id),questions_cipher BLOB NOT NULL,
+ target_cipher BLOB NOT NULL,target_digest TEXT NOT NULL,created_at TEXT NOT NULL
+);
 CREATE TABLE conversation_tool_answer (
  request_id TEXT PRIMARY KEY NOT NULL REFERENCES conversation_tool_request(id),command_id TEXT NOT NULL UNIQUE,
  client_id TEXT NOT NULL,input_digest TEXT NOT NULL,value_cipher BLOB NOT NULL,created_at TEXT NOT NULL
