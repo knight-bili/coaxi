@@ -76,6 +76,7 @@ impl Core{
             anyhow::ensure!(native::source::revision(&source.location)?==selected.source_revision,"native_lifecycle.source_changed");Ok(source)
         }).await??;
         let origin=native::NativeSessionOriginV1{schema_version:1,origin_id:uuid::Uuid::new_v4().to_string(),command_id:command.clone(),source:reference,mode:serde_json::from_value(preview["mode"].clone())?,point:serde_json::from_value(preview["point"].clone())?,workspace_digest:preview["workspaceDigest"].as_str().context("native_lifecycle.workspace_missing")?.into()};origin.validate()?;
+        let search=self.runtime_search_environment.read().await.clone();
         let mut database=self.database.lock().await;let tx=database.connection_mut().transaction()?;
         if let Some(prior)=continuation_prior(&tx,&self.data_dir,&command,client.id(),&input_digest,&instance)?{return Ok(prior)}
         storage::preview(&tx,&owner,preview["previewId"].as_str().context("native_lifecycle.preview_required")?,preview["previewDigest"].as_str().context("native_lifecycle.preview_digest_required")?,"continuation")?;
@@ -93,7 +94,7 @@ impl Core{
         tx.execute("INSERT INTO native_lifecycle_continuation(origin_id,command_id,source_thread_id,thread_id,conversation_id,source_snapshot_digest,workspace_path,workspace_digest,base_runtime_digest,runtime_json,created_at,updated_at) VALUES(?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,?11,?11)",params![origin.origin_id,command,owner,thread,conversation,snapshot,workspace.to_string_lossy(),origin.workspace_digest,base_digest,serde_json::to_string(&runtime)?,now])?;
         let activity=native::steer_delivery::Activity::register(&command)?;tx.commit()?;drop(database);
         let prepared_record=record.clone();
-        let database=self.database.clone();let root=self.data_dir.clone();let output=self.output.clone();let search=self.runtime_search_environment.read().await.clone();
+        let database=self.database.clone();let root=self.data_dir.clone();let output=self.output.clone();
         tokio::spawn(async move{
             let _activity=activity;
             let starting=async{
