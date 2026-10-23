@@ -85,6 +85,7 @@ interface MemoryOwnerToken {
   client: ReturnType<typeof useThreadClient>
   generation: number
   identityKey: string | null
+  lifecycle: object | null
 }
 
 type ReviewScheduleAction = 'save' | 'clear'
@@ -185,9 +186,10 @@ export function MemoryLibrary({
   startupFeedbackVisible?: boolean
 }): React.JSX.Element {
   const client = useThreadClient()
-  const ownerRef = useRef<MemoryOwnerToken>({ client, generation: 0, identityKey: null })
+  const lifetimeRef = useRef<object | null>(null)
+  const ownerRef = useRef<MemoryOwnerToken>({ client, generation: 0, identityKey: null, lifecycle: null })
   if (ownerRef.current.client !== client) {
-    ownerRef.current = { client, generation: ownerRef.current.generation + 1, identityKey: null }
+    ownerRef.current = { client, generation: ownerRef.current.generation + 1, identityKey: null, lifecycle: lifetimeRef.current }
   }
   const libraryGeneration = useRef(0)
   const reviewGeneration = useRef(0)
@@ -231,11 +233,37 @@ export function MemoryLibrary({
   const [busy, setBusy] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [feedback, setFeedback] = useState<string | null>(null)
+  const navigationRef = useRef({ target: navigationTarget, onNavigate })
+  navigationRef.current = { target: navigationTarget, onNavigate }
   const startupContentVisible = startupFeedbackVisible || Boolean(error)
   const createRecoveryReady = createRecoveryKey !== null && createRecoveryReadyFor === createRecoveryKey
   const updatePendingCreate = useCallback((value: PendingMemoryCreate | null): void => {
     pendingCreateRef.current = value
     setPendingCreate(value)
+  }, [])
+
+  const clearOwnerTargets = useCallback((): void => {
+    setEditor(null)
+    setDraft(initialDraft)
+    setReviewDrawerOpen(false)
+    setLocalMemoryId(null)
+    setForgetTarget(null)
+    setReviewScheduleEditor(null)
+    setReviewScheduleBusyAction(null)
+    const { target, onNavigate: navigate } = navigationRef.current
+    if (target?.memoryId && navigate) navigate({ ...target, memoryId: null }, 'replace')
+  }, [])
+
+  useEffect(() => {
+    const lifecycle = {}
+    lifetimeRef.current = lifecycle
+    ownerRef.current = { ...ownerRef.current, generation: ownerRef.current.generation + 1, lifecycle }
+    return () => {
+      if (lifetimeRef.current === lifecycle) lifetimeRef.current = null
+      if (ownerRef.current.lifecycle === lifecycle) {
+        ownerRef.current = { ...ownerRef.current, generation: ownerRef.current.generation + 1, lifecycle: null }
+      }
+    }
   }, [])
 
   useEffect(() => {
@@ -255,17 +283,33 @@ export function MemoryLibrary({
     return () => { libraryGeneration.current++; reviewGeneration.current++; createRecoveryGeneration.current++ }
   }, [client, onPendingCountChange, updatePendingCreate])
 
-  const isCurrentOwner = useCallback((owner: MemoryOwnerToken): boolean => ownerRef.current === owner, [])
+  const previousClientRef = useRef(client)
+  useEffect(() => {
+    if (previousClientRef.current === client) return
+    previousClientRef.current = client
+    clearOwnerTargets()
+  }, [client, clearOwnerTargets])
+
+  const isCurrentOwner = useCallback((owner: MemoryOwnerToken): boolean => {
+    const lifecycle = lifetimeRef.current
+    return lifecycle !== null && owner.lifecycle === lifecycle && ownerRef.current === owner
+  }, [])
   const resolveOwner = useCallback(async (expectedClient: ReturnType<typeof useThreadClient>): Promise<MemoryOwnerToken | null> => {
     const observed = ownerRef.current
-    if (observed.client !== expectedClient) return null
+    if (observed.client !== expectedClient || !isCurrentOwner(observed)) return null
     const identity = await readCanvasViewScope(expectedClient)
-    if (ownerRef.current !== observed || !identity) return null
+    if (!isCurrentOwner(observed) || !identity) return null
     const identityKey = JSON.stringify([identity.host, identity.core])
     if (observed.identityKey === identityKey) return observed
-    const next = { client: expectedClient, generation: observed.generation + 1, identityKey }
+    const next: MemoryOwnerToken = {
+      client: expectedClient,
+      generation: observed.generation + 1,
+      identityKey,
+      lifecycle: observed.lifecycle
+    }
     ownerRef.current = next
     setOwnerRevision((revision) => revision + 1)
+    if (observed.identityKey !== null) clearOwnerTargets()
     setLibrary(null)
     setReviewItems([])
     onPendingCountChange?.(0)
@@ -277,7 +321,7 @@ export function MemoryLibrary({
     setError(null)
     setFeedback(null)
     return next
-  }, [onPendingCountChange, updatePendingCreate])
+  }, [clearOwnerTargets, isCurrentOwner, onPendingCountChange, updatePendingCreate])
 
   const verifyOwner = useCallback(async (owner: MemoryOwnerToken): Promise<boolean> => {
     if (!isCurrentOwner(owner)) return false
