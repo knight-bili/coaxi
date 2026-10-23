@@ -324,6 +324,9 @@ try {
   const externalDirectory = path.join(fixture, 'external specs')
   await mkdir(externalDirectory)
   await writeFile(path.join(externalDirectory, 'guide.txt'), 'SAFE_EXTERNAL_ALIAS_MARKER\n')
+  await writeFile(path.join(externalDirectory, 'external-specs'), 'SAFE_ALIAS_CHILD_FILE_MARKER\n')
+  await mkdir(path.join(repository, 'src'), { recursive: true })
+  await writeFile(path.join(repository, 'src', 'external-specs'), 'SAFE_NESTED_FILE_MARKER\n')
   assert(!path.resolve(externalDirectory).startsWith(path.resolve(repository)))
   const symlinkProbe = path.join(fixture, 'directory-link-capability-probe')
   let directoryLinksAvailable = true
@@ -361,10 +364,28 @@ try {
     const linkedDirectory = linkedEntries.entries.find(entry => entry.name === 'external-specs')
     assert.equal(linkedDirectory?.managedAlias, true)
     assert.equal(linkedDirectory?.directory, true)
+    const nestedEntries = await call('workbench.files.list', { scope: organizerScope, path: 'src' })
+    const nestedFile = nestedEntries.entries.find(entry => entry.name === 'external-specs')
+    assert.equal(nestedFile?.managedAlias, false)
+    assert.equal(nestedFile?.directory, false)
+    const nestedRead = await call('workbench.files.read', {
+      scope: organizerScope, path: 'src/external-specs'
+    })
+    assert.equal(nestedRead.text, 'SAFE_NESTED_FILE_MARKER\n')
     const aliasedFile = await call('workbench.files.read', {
       scope: organizerScope, path: 'external-specs/guide.txt'
     })
     assert.equal(aliasedFile.text, 'SAFE_EXTERNAL_ALIAS_MARKER\n')
+    const aliasedEntries = await call('workbench.files.list', {
+      scope: organizerScope, path: 'external-specs'
+    })
+    const aliasChildFile = aliasedEntries.entries.find(entry => entry.name === 'external-specs')
+    assert.equal(aliasChildFile?.managedAlias, false)
+    assert.equal(aliasChildFile?.directory, false)
+    const aliasChildRead = await call('workbench.files.read', {
+      scope: organizerScope, path: 'external-specs/external-specs'
+    })
+    assert.equal(aliasChildRead.text, 'SAFE_ALIAS_CHILD_FILE_MARKER\n')
     const search = await call('workbench.files.tools', {
       scope: organizerScope,
       operation: 'search',
@@ -377,6 +398,8 @@ try {
     record('issue_77_external_alias_is_scoped_and_searchable_from_isolated_fixture', {
       aliasPath: externalDirectory,
       aliasReadMatched: true,
+      rootAliasMarkedManaged: linkedDirectory.managedAlias,
+      nestedFilesStayedFiles: true,
       searchMatched: true,
       externalFixtureOnly: true
     })

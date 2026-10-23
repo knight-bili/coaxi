@@ -1367,6 +1367,7 @@ impl Core {
         match method {
             "workbench.files.list" => {
                 ensure!(path.is_dir(), "workbench.directory_required");
+                let prefix = normalized_workspace_path(&request.path)?;
                 let mut entries = Vec::new();
                 for entry in fs::read_dir(path)? {
                     let entry = entry?;
@@ -1378,9 +1379,8 @@ impl Core {
                         continue;
                     }
                     let metadata = fs::symlink_metadata(entry.path())?;
-                    let alias = is_directory_alias(&root, &links, &name)?;
+                    let alias = prefix.is_empty() && is_directory_alias(&root, &links, &name)?;
                     let link = is_link(&metadata);
-                    let prefix = normalized_workspace_path(&request.path)?;
                     let child_path = if prefix.is_empty() {
                         name.clone()
                     } else {
