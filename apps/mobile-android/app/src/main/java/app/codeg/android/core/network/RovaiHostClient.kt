@@ -3,6 +3,7 @@ package app.codeg.android.core.network
 import io.ktor.client.engine.okhttp.OkHttp
 import android.os.SystemClock
 import io.ktor.utils.io.readUTF8Line
+import io.ktor.utils.io.readAvailable
 import io.ktor.client.HttpClient
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
