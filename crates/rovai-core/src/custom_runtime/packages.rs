@@ -68,6 +68,19 @@ mod tests {
         assert!(resolve_npx_bin(&bins,"@scope/another",None).is_err());
         assert!(resolve_npx_bin(&json!({"widget":"bin/widget.js"}),"@scope/widget",Some("missing")).is_err());
     }
+
+    #[test]
+    fn version_probe_argv_preserves_windows_paths_and_empty_arguments() {
+        assert_eq!(words(r#""C:\new folder\tool.exe" --version """#).unwrap(),
+            vec![r"C:\new folder\tool.exe", "--version", ""]);
+        assert_eq!(words(r#"'C:\new folder\tool.exe' 'literal\path'"#).unwrap(),
+            vec![r"C:\new folder\tool.exe", r"literal\path"]);
+        assert_eq!(words(r#"tool "quote\"inside" "tail\\""#).unwrap(),
+            vec!["tool", "quote\"inside", "tail\\"]);
+        assert!(words(r#"tool "unclosed"#).is_err());
+        assert!(words(" ").is_err());
+        assert!(words(&vec!["arg"; 129].join(" ")).is_err());
+    }
 }
 fn python_distribution_version(root:&Path,package:&str)->Result<String>{
     let normalize=|text:&str|text.to_ascii_lowercase().replace(['_','.'],"-");let target=normalize(package);let mut directories=vec![(root.to_path_buf(),0usize)];let mut visited=0;
