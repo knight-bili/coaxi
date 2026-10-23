@@ -1,4 +1,5 @@
 import { canvasComposerContextKey, canvasComposerDraftStorage, canvasComposerDraftCopies, type CanvasComposerContext } from './canvas-composer-drafts'
+import { readCanvasViewScope } from './canvas-view-state'
 import { groupExecutionEventsByRunId } from './execution-events'
 export { groupExecutionEventsByRunId } from './execution-events'
 import { MemberSessionReset } from './MemberSessionReset'
@@ -11110,6 +11111,35 @@ interface TaskEditorDraft extends TaskEditorValues {
   base?: TaskEditorValues
 }
 
+interface TaskCreateRequest {
+  commandId: string
+  threadId: string
+  title: string
+  description: string
+  assigneeAgentId: string
+}
+
+interface PendingTaskCreate {
+  schemaVersion: 1
+  key: string
+  editorId: 'task-create'
+  request: TaskCreateRequest
+}
+
+function restorePendingTaskCreate(value: unknown, key: string, threadId: string): PendingTaskCreate {
+  if (!value || typeof value !== 'object') throw new Error('任务原请求记录损坏，已保留记录。')
+  const saved = value as Partial<PendingTaskCreate>
+  const request = saved.request as Partial<TaskCreateRequest> | undefined
+  if (saved.schemaVersion !== 1 || saved.key !== key || saved.editorId !== 'task-create'
+    || !request || typeof request.commandId !== 'string' || !request.commandId
+    || request.threadId !== threadId || typeof request.title !== 'string' || !request.title.trim()
+    || typeof request.description !== 'string'
+    || typeof request.assigneeAgentId !== 'string' || !request.assigneeAgentId) {
+    throw new Error('任务原请求归属或参数损坏，已保留原记录。')
+  }
+  return structuredClone(saved as PendingTaskCreate)
+}
+
 export function TaskPanel({
   snapshot,
   coverage = null,
@@ -11130,6 +11160,8 @@ export function TaskPanel({
   onCreateModeChange?(active: boolean): void
 }): JSX.Element {
   const client = useThreadClient()
+  const taskCreateRecoveryGeneration = useRef(0)
+  const pendingTaskCreateRef = useRef<PendingTaskCreate | null>(null)
   const [detailTaskId, setDetailTaskId] = useState<string | null>(null)
   const [statusFilter, setStatusFilter] = useState<'all' | TaskStatus>('all')
   const [editorOpen, setEditorOpen] = useState(false)
@@ -11148,6 +11180,15 @@ export function TaskPanel({
   const [cancelReason, setCancelReason] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
+  const [pendingTaskCreate, setPendingTaskCreate] = useState<PendingTaskCreate | null>(null)
+  const [taskCreateRecoveryKey, setTaskCreateRecoveryKey] = useState<string | null>(null)
+  const [taskCreateRecoveryReadyFor, setTaskCreateRecoveryReadyFor] = useState<string | null>(null)
+  const taskCreateRecoveryReady = taskCreateRecoveryKey !== null && taskCreateRecoveryReadyFor === taskCreateRecoveryKey
+  const hasPendingTaskCreate = pendingTaskCreate?.key === taskCreateRecoveryKey
+  const updatePendingTaskCreate = (value: PendingTaskCreate | null): void => {
+    pendingTaskCreateRef.current = value
+    setPendingTaskCreate(value)
+  }
   const selectedTask = selectedTaskId
     ? snapshot.tasks.find((task) => task.taskId === selectedTaskId) ?? null
     : null
@@ -11163,6 +11204,50 @@ export function TaskPanel({
     onCreateModeChange?.(editorOpen && mode === 'create')
     return () => onCreateModeChange?.(false)
   }, [editorOpen, mode, onCreateModeChange])
+
+  useEffect(() => {
+    if (!editorOpen || mode !== 'create') return
+    const observed = ++taskCreateRecoveryGeneration.current
+    setTaskCreateRecoveryReadyFor(null)
+    void (async () => {
+      const identity = await readCanvasViewScope(client)
+      if (!identity) throw new Error('客户端、Core 实例或 Thread 身份尚未确定，无法安全恢复任务原请求。')
+      const recoveryKey = 'task-create:' + JSON.stringify([identity.host, identity.core, snapshot.thread.id])
+      if (observed !== taskCreateRecoveryGeneration.current) return
+      setTaskCreateRecoveryKey(recoveryKey)
+      let raw: unknown
+      if (client.workbenchEditorRecovery) {
+        const value = await client.workbenchEditorRecovery.get(recoveryKey)
+        if (value !== null) {
+          const record = value as { schemaVersion?: number; key?: string; editorId?: string; pending?: unknown }
+          if (record.schemaVersion !== 1 || record.key !== recoveryKey
+            || record.editorId !== 'task-create' || !('pending' in record)) {
+            throw new Error('任务原请求记录归属不同，已保留原记录。')
+          }
+          raw = record.pending
+        }
+      } else if (client.editingRecovery) {
+        raw = client.editingRecovery.get(recoveryKey)
+      } else {
+        throw new Error('原请求恢复存储尚不可用，本次未发送。')
+      }
+      if (observed !== taskCreateRecoveryGeneration.current) return
+      const pending = raw == null
+        ? pendingTaskCreateRef.current?.key === recoveryKey ? pendingTaskCreateRef.current : null
+        : restorePendingTaskCreate(raw, recoveryKey, snapshot.thread.id)
+      pendingTaskCreateRef.current = pending
+      setPendingTaskCreate(pending)
+      if (pending) {
+        setTitle(pending.request.title)
+        setDescription(pending.request.description)
+        setAssigneeAgentId(pending.request.assigneeAgentId)
+      }
+      setTaskCreateRecoveryReadyFor(recoveryKey)
+    })().catch((error) => {
+      if (observed === taskCreateRecoveryGeneration.current) setFormError(localizeExecutionEngineTerms(readErrorMessage(error)))
+    })
+    return () => { taskCreateRecoveryGeneration.current++ }
+  }, [client, editorOpen, mode, snapshot.thread.id])
 
   const resetForm = (): void => {
     setEditorOpen(false)
@@ -11203,6 +11288,7 @@ export function TaskPanel({
 
   const beginCreate = (): void => {
     resetForm()
+    setTaskCreateRecoveryReadyFor(null)
     const draft = drafts.current.get('new')
     if (draft) applyDraft(draft)
     setMode('create')
@@ -11245,6 +11331,10 @@ export function TaskPanel({
   const submitCreate = async (event: FormEvent): Promise<void> => {
     event.preventDefault()
     if (!title.trim() || submitting || busy) return
+    if (!taskCreateRecoveryReady || !taskCreateRecoveryKey) {
+      setFormError('原请求恢复存储尚未就绪，本次未发送。')
+      return
+    }
     if (!assigneeAgentId) {
       setFormError(uiAttribute('请选择负责人。'))
       return
@@ -11252,13 +11342,38 @@ export function TaskPanel({
     setSubmitting(true)
     setFormError(null)
     try {
-      const result = await client.request<StoredCommandResult>('tasks.create', {
-        commandId: newCommandId(),
-        threadId: snapshot.thread.id,
-        title: title.trim(),
-        description: description.trim(),
-        assigneeAgentId
-      })
+      let pending = pendingTaskCreateRef.current?.key === taskCreateRecoveryKey ? pendingTaskCreateRef.current : null
+      if (!pending) {
+        pending = {
+          schemaVersion: 1,
+          key: taskCreateRecoveryKey,
+          editorId: 'task-create',
+          request: {
+            commandId: newCommandId(),
+            threadId: snapshot.thread.id,
+            title: title.trim(),
+            description: description.trim(),
+            assigneeAgentId
+          }
+        }
+        if (client.workbenchEditorRecovery) {
+          await client.workbenchEditorRecovery.put({ schemaVersion: 1, key: taskCreateRecoveryKey, editorId: 'task-create', pending })
+        } else if (client.editingRecovery) {
+          client.editingRecovery.set(taskCreateRecoveryKey, pending)
+        } else {
+          throw new Error('原请求恢复存储尚不可用，本次未发送。')
+        }
+        updatePendingTaskCreate(pending)
+      }
+      const result = await client.request<StoredCommandResult>('tasks.create', structuredClone(pending.request))
+      if (client.workbenchEditorRecovery) {
+        await client.workbenchEditorRecovery.put({ schemaVersion: 1, key: taskCreateRecoveryKey, editorId: 'task-create', pending: null })
+      } else if (client.editingRecovery) {
+        client.editingRecovery.set(taskCreateRecoveryKey, null)
+      } else {
+        throw new Error('原请求恢复存储尚不可用，保留原请求供核对。')
+      }
+      if (pendingTaskCreateRef.current?.request.commandId === pending.request.commandId) updatePendingTaskCreate(null)
       if (result.status === 'rejected') {
         setFormError(taskCommandMessage(result))
         return
@@ -11446,6 +11561,8 @@ export function TaskPanel({
             <form className="task-editor" onSubmit={(event) => void (mode === 'create' ? submitCreate(event) : submitUpdate(event))}>
               <AppDialogBody>
                 {formError && <p className="task-form-error" role="alert">{formError}</p>}
+                {mode === 'create' && !taskCreateRecoveryReady && <p role="status"><UiText zh={"正在读取任务原请求状态…"} /></p>}
+                {mode === 'create' && hasPendingTaskCreate && <p role="status"><UiText zh={"上次创建结果待核对。重试会使用同一编号和完整请求，不会重复创建。"} /></p>}
                 {mode === 'edit' && terminal && <p className="task-terminal-note" role="status"><UiText zh={"这项任务已结束，不能再修改。你的草稿仍保留。"} /></p>}
                 <TaskFields
                   title={title}
@@ -11455,7 +11572,7 @@ export function TaskPanel({
                   blockedReason={blockedReason}
                   completionSummary={completionSummary}
                   members={activeMembers}
-                  disabled={submitting || busy || (mode === 'edit' && terminal)}
+                  disabled={submitting || busy || mode === 'create' && (!taskCreateRecoveryReady || hasPendingTaskCreate) || (mode === 'edit' && terminal)}
                   showStatus={mode === 'edit'}
                   requireAssignee={mode === 'create'}
                   autoFocusTitle
@@ -11470,8 +11587,8 @@ export function TaskPanel({
               <AppDialogFooter>
                 <small className="task-draft-note"><UiText zh={"关闭后保留本次草稿"} /></small>
                 <button className="quiet-button" type="button" disabled={submitting} onClick={closeEditor}><UiText zh={"收起"} /></button>
-                <button className="primary-button conversation-primary-button task-submit" type="submit" disabled={!title.trim() || submitting || busy || (mode === 'edit' && (terminal || !selectedTask))}>
-                  {submitting ? uiAttribute("正在保存…") : mode === 'create' ? uiAttribute("新建") : uiAttribute("保存")}
+                <button className="primary-button conversation-primary-button task-submit" type="submit" disabled={!title.trim() || submitting || busy || mode === 'create' && !taskCreateRecoveryReady || (mode === 'edit' && (terminal || !selectedTask))}>
+                  {submitting ? uiAttribute("正在保存…") : mode === 'create' ? hasPendingTaskCreate ? uiAttribute("核对原创建") : uiAttribute("新建") : uiAttribute("保存")}
                 </button>
               </AppDialogFooter>
             </form>
