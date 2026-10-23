@@ -680,64 +680,11 @@ impl Core {
     pub(super) async fn workbench_root(&self, scope: &Scope) -> Result<PathBuf> {
         let persisted = self.workbench_directory(scope).await?;
         let path = Path::new(&persisted);
-        let root = match git::validate_workspace_directory(path, &self.data_dir, true) {
-            Ok(root) => root,
-            Err(error) => match self.managed_workbench_root(path).await {
-                Ok(root) => root,
-                Err(_) => return Err(error),
-            },
-        };
+        let root = git::validate_workspace_directory(path, &self.data_dir, true)?;
         ensure!(git::persisted_workspace_path_matches_canonical(Path::new(&persisted), &root), "workbench.workspace_changed");
         Ok(root)
     }
 
-    async fn managed_workbench_root(&self, persisted: &Path) -> Result<PathBuf> {
-        let data_dir = fs::canonicalize(&self.data_dir)?;
-        let trees_entry = self.data_dir.join("workspace-trees");
-        let trees_metadata = fs::symlink_metadata(&trees_entry)?;
-        ensure!(!is_link(&trees_metadata) && trees_metadata.is_dir(), "workbench.worktree_owner_mismatch");
-        let trees = fs::canonicalize(trees_entry)?;
-        ensure!(trees.parent() == Some(data_dir.as_path()), "workbench.worktree_owner_mismatch");
-
-        let path_metadata = fs::symlink_metadata(persisted)?;
-        ensure!(!is_link(&path_metadata) && path_metadata.is_dir(), "workbench.worktree_owner_mismatch");
-        let tree = fs::canonicalize(persisted)?;
-        ensure!(tree.parent() == Some(trees.as_path()), "workbench.worktree_owner_mismatch");
-        ensure!(git::persisted_workspace_path_matches_canonical(persisted, &tree), "workbench.workspace_changed");
-
-        let key = tree.file_name().and_then(|name| name.to_str()).context("workbench.worktree_owner_mismatch")?;
-        ensure!(key.len() == 64 && key.bytes().all(|byte| byte.is_ascii_hexdigit()), "workbench.worktree_owner_mismatch");
-        let owner_path = trees.join(format!("{key}.json"));
-        let owner_metadata = fs::symlink_metadata(&owner_path)?;
-        ensure!(!is_link(&owner_metadata) && owner_metadata.is_file(), "workbench.worktree_owner_mismatch");
-        let owner: Value = serde_json::from_slice(&fs::read(owner_path)?)?;
-        let owner_root_text = owner["root"].as_str().context("workbench.worktree_owner_mismatch")?;
-        let owner_root = git::validate_workspace_directory(Path::new(owner_root_text), &self.data_dir, false)?;
-        ensure!(git::persisted_workspace_path_matches_canonical(Path::new(owner_root_text), &owner_root), "workbench.worktree_owner_mismatch");
-        let branch = git_target(owner["branch"].as_str())?;
-        let expected_key = crate::command::canonical_json_digest(&json!({"root":owner_root_text,"branch":branch}))?;
-        ensure!(expected_key == key, "workbench.worktree_owner_mismatch");
-        let owner_tree_text = owner["path"].as_str().context("workbench.worktree_owner_mismatch")?;
-        let owner_tree = fs::canonicalize(owner_tree_text)?;
-        ensure!(owner_tree == tree && git::persisted_workspace_path_matches_canonical(Path::new(owner_tree_text), &tree), "workbench.worktree_owner_mismatch");
-
-        let output = self.mission_git().await?.workbench_output(&owner_root, &["worktree".into(), "list".into(), "--porcelain".into(), "-z".into()]).await?;
-        ensure!(output.status.success(), "workbench.worktree_owner_mismatch");
-        let mut listed_path: Option<PathBuf> = None;
-        let mut listed = false;
-        for field in output.stdout.bytes.split(|byte| *byte == 0).filter(|field| !field.is_empty()) {
-            let field = std::str::from_utf8(field)?;
-            if let Some(path) = field.strip_prefix("worktree ") {
-                if listed_path.as_deref().is_some_and(|listed| fs::canonicalize(listed).ok().as_ref() == Some(&tree)) {
-                    listed = true;
-                }
-                listed_path = Some(PathBuf::from(path));
-            }
-        }
-        listed |= listed_path.as_deref().is_some_and(|path| fs::canonicalize(path).ok().as_ref() == Some(&tree));
-        ensure!(listed, "workbench.worktree_owner_mismatch");
-        Ok(tree)
-    }
 
     pub(super) async fn workbench_files(&self, method: &str, value: Value) -> Result<Value> {
         let request: FileRequest = serde_json::from_value(value)?;

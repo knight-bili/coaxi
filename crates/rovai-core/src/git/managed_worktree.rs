@@ -58,11 +58,17 @@ pub(super) fn validate(tree: &Path, data: &Path) -> Result<()> {
     let source_admin = metadata_directory(&source_marker)?;
     let common = if source_admin.join("commondir").exists() {
         referenced(&source_admin, &text(&source_admin.join("commondir"))?)?
-    } else { source_admin };
+    } else { source_admin.clone() };
     let marker = tree.join(".git");
     regular(&marker, false)?;
     let admin = metadata_directory(&marker)?;
-    let registrations = fs::canonicalize(common.join("worktrees"))?;
+    let registrations = common.join("worktrees");
+    regular(&registrations, true)?;
+    let registrations = fs::canonicalize(registrations)?;
+    if fs::symlink_metadata(&source_marker)?.is_file() {
+        ensure!(source_admin.parent() == Some(registrations.as_path())
+            && referenced(&source_admin, &text(&source_admin.join("gitdir"))?)? == fs::canonicalize(source_marker)?, "workbench.worktree_owner_mismatch");
+    }
     ensure!(admin.parent() == Some(registrations.as_path()), "workbench.worktree_owner_mismatch");
     regular(&admin, true)?;
     ensure!(referenced(&admin, &text(&admin.join("commondir"))?)? == common
