@@ -18,6 +18,7 @@ pub mod user_commands;
 pub(crate) mod authoring;
 pub(crate) mod calendar;
 pub mod automation_owner;
+pub mod user_api;
 pub mod storage;
 pub use model::*;
 pub const SERVER_NAME:&str="rovai-conversation-tools";
@@ -34,6 +35,11 @@ pub fn validate_operation(name:&str,value:&Value)->Result<()>{
     ensure!(serde_json::to_vec(value)?.len()<=MAX_REQUEST,"conversation_tools.request_too_large");
     let schema=CONTRACT["userOperations"].get(name).context("conversation_tools.operation_unknown")?;
     schema::validate(&CONTRACT,&schema["input"],value,0)
+}
+pub(crate) fn validate_operation_output(name:&str,value:&Value)->Result<()>{
+    let operation=CONTRACT["userOperations"].get(name).context("conversation_tools.operation_unknown")?;
+    ensure!(serde_json::to_vec(value)?.len()<=MAX_RESULT,"conversation_tools.result_too_large");
+    schema::validate(&CONTRACT,&operation["output"],value,0)
 }
 pub(crate) fn tool_definition(name:&str)->Result<&'static Value>{
     CONTRACT["modelTools"].as_array().context("conversation_tools.catalog_invalid")?.iter().find(|tool|tool["name"]==name).context("conversation_tools.tool_unknown")

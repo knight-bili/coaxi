@@ -8,6 +8,12 @@ pub(crate) fn require_scope(connection:&Connection,scope:&ScopeV1)->Result<()>{
     let allowed:bool=connection.query_row("SELECT EXISTS(SELECT 1 FROM camp WHERE id=?1 AND activation_state='active' AND deletion_operation_id IS NULL AND (?2='public' OR EXISTS(SELECT 1 FROM conversation c WHERE c.camp_id=camp.id AND c.id=?3 AND c.kind=?2 AND c.ended_at IS NULL)))",params![scope.thread_id,kind(&scope.scope_kind),scope.conversation_id],|row|row.get(0))?;
     ensure!(allowed,"conversation_tools.scope_changed");Ok(())
 }
+pub(crate) fn require_retained_scope(connection:&Connection,scope:&ScopeV1)->Result<()>{
+    scope.validate()?;crate::camp_id::ThreadId::parse(&scope.thread_id)?;
+    ensure!(matches!(&scope.scope_kind,ScopeKindV1::Public)==scope.conversation_id.is_none(),"conversation_tools.scope_invalid");
+    let present:bool=connection.query_row("SELECT EXISTS(SELECT 1 FROM camp WHERE id=?1 AND deletion_operation_id IS NULL AND (?2='public' OR EXISTS(SELECT 1 FROM conversation c WHERE c.camp_id=camp.id AND c.id=?3 AND c.kind=?2)))",params![scope.thread_id,kind(&scope.scope_kind),scope.conversation_id],|row|row.get(0))?;
+    ensure!(present,"conversation_tools.scope_changed");Ok(())
+}
 /// 仅由 Core 核对已冻结的真实 Run 后创建，不能由模型 JSON 或客户端反序列化。
 #[derive(Clone)]
 pub(crate) struct RunLease{

@@ -22,6 +22,7 @@ mod feedback_access;
 mod custom_runtime_access;
 mod portable_configuration_access;
 mod portable_configuration_private;
+mod conversation_tools_access;
 mod native_lifecycle_access;
 mod native_continuation;
 mod native_normal;
@@ -870,6 +871,10 @@ fn request_runs_outside_main_queue(method: &str) -> bool {
             | "history.usage"
             | "history.usage.local"
             | "feedback.operation"
+            | "conversationTools.policy.get" | "conversationTools.policy.set"
+            | "conversationTools.questions.list" | "conversationTools.questions.answer" | "conversationTools.questions.decline" | "conversationTools.questions.reconcile"
+            | "conversationTools.grants.preview" | "conversationTools.grants.confirm" | "conversationTools.grants.revoke" | "conversationTools.grants.list"
+            | "conversationTools.requests.get" | "conversationTools.requests.resolve" | "conversationTools.automationOwner.get" | "conversationTools.automationOwner.set"
             | "runtime.custom.list" | "runtime.custom.upsert" | "runtime.custom.remove" | "runtime.custom.install" | "runtime.custom.inspect" | "runtime.custom.registry"
             | "configuration.providers.list" | "configuration.providers.upsert" | "configuration.providers.remove" | "configuration.memberConnection.get" | "configuration.memberConnection.set"
             | "configuration.migration.preview" | "configuration.migration.confirm" | "configuration.migration.receipt" | "configuration.migration.undoPreview" | "configuration.migration.undoConfirm"
@@ -10406,6 +10411,10 @@ impl Core {
             "feedback.operation" => self.feedback_operation(request.params.clone(),request.client.clone()).await,
             "runtime.custom.list" | "runtime.custom.upsert" | "runtime.custom.remove" | "runtime.custom.install" | "runtime.custom.inspect" | "runtime.custom.registry" => self.custom_runtime_access(&request.method,request.params.clone()).await,
             "configuration.providers.list" | "configuration.providers.upsert" | "configuration.providers.remove" | "configuration.memberConnection.get" | "configuration.memberConnection.set" => self.portable_configuration_access(&request.method,request.params.clone(),&request.client).await,
+            "conversationTools.policy.get" | "conversationTools.policy.set"
+            | "conversationTools.questions.list" | "conversationTools.questions.answer" | "conversationTools.questions.decline" | "conversationTools.questions.reconcile"
+            | "conversationTools.grants.preview" | "conversationTools.grants.confirm" | "conversationTools.grants.revoke" | "conversationTools.grants.list"
+            | "conversationTools.requests.get" | "conversationTools.requests.resolve" | "conversationTools.automationOwner.get" | "conversationTools.automationOwner.set"=>self.conversation_tools_access(&request.method,request.params.clone(),&request.client).await,
             "configuration.migration.preview" | "configuration.migration.confirm" | "configuration.migration.receipt" | "configuration.migration.undoPreview" | "configuration.migration.undoConfirm" => self.portable_configuration_access(&request.method,request.params.clone(),&request.client).await,
             "configuration.migration.archives" | "configuration.migration.targets" => self.portable_configuration_access(&request.method,request.params.clone(),&request.client).await,
             "configuration.secrets.prepare" | "configuration.archive.registerLocal" | "configuration.archive.registerSelected" | "configuration.archive.receipt" => self.portable_configuration_private(&request.method,request.params.clone(),&request.client).await,

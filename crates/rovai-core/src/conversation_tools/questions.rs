@@ -97,7 +97,7 @@ pub(crate) fn answer_on(tx:&Transaction<'_>,lease:&RunLease,client:&str,command:
     requests::status(tx,lease,id)
 }
 pub(crate) fn list(connection:&Connection,input:&Value)->Result<Value>{
-    validate_operation("conversationTools.questions.list",input)?;let scope:ScopeV1=serde_json::from_value(input["scope"].clone())?;scope::require_scope(connection,&scope)?;
+    validate_operation("conversationTools.questions.list",input)?;let scope:ScopeV1=serde_json::from_value(input["scope"].clone())?;scope::require_retained_scope(connection,&scope)?;
     let mut query=connection.prepare("SELECT q.request_id FROM conversation_tool_question q JOIN conversation_tool_request r ON r.id=q.request_id JOIN conversation_tool_run owned ON owned.agent_run_id=r.agent_run_id AND owned.execution_epoch=r.execution_epoch WHERE owned.thread_id=?1 AND owned.scope_kind=?2 AND owned.conversation_id IS ?3 AND (?4 IS NULL OR q.request_id>?4) ORDER BY q.request_id LIMIT ?5")?;
     let limit=input["limit"].as_u64().context("conversation_tools.limit_required")?;
     let mut ids=query.query_map(params![scope.thread_id,scope::kind(&scope.scope_kind),scope.conversation_id,input["after"].as_str(),limit+1],|row|row.get::<_,String>(0))?.collect::<rusqlite::Result<Vec<_>>>()?;
