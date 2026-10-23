@@ -1,6 +1,11 @@
 // Apache-2.0; Codeg aff1e6c 原工具参数解析，不重写动作默认或边界。
 use serde_json::Value;
 
+// Fixed donor limits from acp/delegation/companion.rs; preserve the approved tool bounds.
+const MAX_CLIPBOARD_TEXT: usize = 100_000;
+const MAX_LAUNCH_NAME: usize = 512;
+const MAX_MENU_PATH: usize = 16;
+
 fn computer_target_id(arguments: &Value, tool: &str) -> Result<String, String> {
     arguments
         .get("targetId")
