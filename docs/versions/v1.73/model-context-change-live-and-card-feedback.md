@@ -6,7 +6,7 @@ revision: 1
 confirmed_revision: 1
 confirmation_status: confirmed
 confirmed_by: user
-confirmed_at: 2026-10-22T05:03:37.288974+00:00
+confirmed_at: 2026-10-22T05:03:37+00:00
 authority: proposed-model-input-change-statement
 implementation_status: proposal_only
 last_updated: 2026-10-22
@@ -55,13 +55,13 @@ Codeg 与 Rovai 第一期融合 客户确认版 r1 待确认
 <!--PAGE-->
 # 研发附录
 
-## A 精确变更前
+## 变更前
 
 本工程当前没有向模型提供 check_user_feedback，没有本次反馈提交合同。JSON 卡片已移植原呈现和内置状态动作，自定义 actions 为 {}。ui-render 原技能文字保持固定供体原文。这份方案不把只读呈现代码称为模型回传已完成。
 
 固定 Codeg 原仓的反馈工具是独立的中途文字指导通道，并非原 JSON 卡片的外部提交动作。以下分别列出原工具及结果呈现函数，再给出本工程的完整候选改动；来源功能与融合新接线不混写。
 
-## B 精确变更后
+## 变更后
 
 新增独立 stdio MCP 服务 rovai-ui-feedback，仅提供下述一个工具。每位队员有 enabled 布尔开关，默认 false；关闭不投递，不启动本服务。开启只影响新 Run 绑定。工具列表在绑定内固定，tools.listChanged=false。JSON 卡片的 actions 仍为 {}，不增加 submitToAgent、任意脚本、网络请求或 watch 自动发送动作。
 
@@ -382,3 +382,16 @@ confirmation_status 为 pending，revision 为 1。需要用户阅读完整说�
   "donorRevision": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
   "donorUiSkillSha256": "46bc09a16dc1f2d09f21004f0891a630ff5010f642b975d82f82be113330daff"
 }
+
+
+## 明确不变
+
+本次仅整理既有 r1 确认记录与章节索引。正文中既有模型输入、字段、省略规则、权限、冻结、恢复及版本轴约定全部保留；此次不新增模型工具或改变输入语义。完整不变范围仍以本页已确认正文及原冻结附件为准。
+
+## 二次确认
+
+当前会话用户阅读对应客户版后明确回复：“ok”。原确认时间 2026-10-22T05:03:37.288974+00:00，Front Matter 只去除秒后的小数以兼容既有文档校验器，保留同一确认时刻到秒。revision 与 confirmed_revision 继续为 1，不重新代用户确认。投递时的 pending 快照保留，后续用户确认以本节及既有确认记录为准。
+
+## 验证
+
+既有正文的全部验证点继续有效。本轮整包编译、回归与跨平台结果由统一修复 PR 记录；未实际执行或缺少环境的项目继续标为待验证。编译通过、组件测试通过及最终真实用户验收分别记录，不将本节视为通过证明。

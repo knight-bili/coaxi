@@ -218,16 +218,23 @@ async fn proxy_inner(
         return (StatusCode::UNAUTHORIZED, "invalid capability").into_response();
     }
 
-    if !matches!(method,Method::GET|Method::HEAD|Method::OPTIONS) && !rovai_core::office_preview::allows_edit(port,&cap) {
-        return (StatusCode::FORBIDDEN,"office.preview_read_only").into_response();
+    if !matches!(method, Method::GET | Method::HEAD | Method::OPTIONS)
+        && !rovai_core::office_preview::allows_edit(port, &cap)
+    {
+        return (StatusCode::FORBIDDEN, "office.preview_read_only").into_response();
     }
-    if method==Method::OPTIONS {return with_cors(StatusCode::NO_CONTENT.into_response());}
+    if method == Method::OPTIONS {
+        return with_cors(StatusCode::NO_CONTENT.into_response());
+    }
     // Mark this as a web/remote (proxied) watch and bump its activity clock so
     // the pool's sweep treats it under the SSE-lease rule, not the desktop rule.
     note_proxy_request(port);
 
     // 2. Build the upstream URL, stripping `cap` so it never reaches officecli.
-    let upstream = format!("http://127.0.0.1:{port}/{rest}{}", query_without(&raw, "cap"));
+    let upstream = format!(
+        "http://127.0.0.1:{port}/{rest}{}",
+        query_without(&raw, "cap")
+    );
 
     // 3. Forward method + curated request headers + body.
     let mut req = OFFICE_PROXY_CLIENT.request(method, &upstream);
@@ -268,17 +275,21 @@ async fn proxy_inner(
     if is_html {
         let bytes = match upstream_resp.bytes().await {
             Ok(b) => b,
-            Err(_) => return (StatusCode::BAD_GATEWAY, "watch upstream read error").into_response(),
+            Err(_) => {
+                return (StatusCode::BAD_GATEWAY, "watch upstream read error").into_response();
+            }
         };
         let prefix = format!("/api/office-watch-proxy/{port}");
         let shim = SHIM_TEMPLATE
             .replace("__PFX__", &prefix)
             .replace("__CAP__", &cap);
         let html = inject_shim(&String::from_utf8_lossy(&bytes), &shim);
-        return with_cors(builder
-            .header("cache-control", "no-store")
-            .body(Body::from(html))
-            .unwrap_or_else(|_| StatusCode::INTERNAL_SERVER_ERROR.into_response()));
+        return with_cors(
+            builder
+                .header("cache-control", "no-store")
+                .body(Body::from(html))
+                .unwrap_or_else(|_| StatusCode::INTERNAL_SERVER_ERROR.into_response()),
+        );
     }
 
     // 4b. Everything else (SSE `/events`, JSON `/api/*`) → stream transparently.
@@ -295,13 +306,32 @@ async fn proxy_inner(
             let _hold = &guard;
             chunk
         });
-        return with_cors(builder
-            .body(Body::from_stream(stream))
-            .unwrap_or_else(|_| StatusCode::INTERNAL_SERVER_ERROR.into_response()));
+        return with_cors(
+            builder
+                .body(Body::from_stream(stream))
+                .unwrap_or_else(|_| StatusCode::INTERNAL_SERVER_ERROR.into_response()),
+        );
     }
-    with_cors(builder
-        .body(Body::from_stream(upstream_resp.bytes_stream()))
-        .unwrap_or_else(|_| StatusCode::INTERNAL_SERVER_ERROR.into_response()))
+    with_cors(
+        builder
+            .body(Body::from_stream(upstream_resp.bytes_stream()))
+            .unwrap_or_else(|_| StatusCode::INTERNAL_SERVER_ERROR.into_response()),
+    )
 }
 
-fn with_cors(mut response:Response)->Response { response.headers_mut().insert("access-control-allow-origin", "null".parse().unwrap()); response.headers_mut().insert("access-control-allow-methods","GET, HEAD, POST, OPTIONS".parse().unwrap()); response.headers_mut().insert("access-control-allow-headers","content-type,range,if-none-match,if-modified-since".parse().unwrap()); response }
+fn with_cors(mut response: Response) -> Response {
+    response
+        .headers_mut()
+        .insert("access-control-allow-origin", "null".parse().unwrap());
+    response.headers_mut().insert(
+        "access-control-allow-methods",
+        "GET, HEAD, POST, OPTIONS".parse().unwrap(),
+    );
+    response.headers_mut().insert(
+        "access-control-allow-headers",
+        "content-type,range,if-none-match,if-modified-since"
+            .parse()
+            .unwrap(),
+    );
+    response
+}

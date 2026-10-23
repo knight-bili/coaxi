@@ -29,9 +29,15 @@ func nativeCreationState(_ receipt: JSONValue) -> String {
 struct RovaiNativeContinuation: View {
     let model: RovaiWorkspaceModel;let entry: JSONValue;let transcript: JSONValue;let selection: NativeContinuationSelection
     @Environment(\.dismiss) private var dismiss
-    @State private var members: [JSONValue] = [], member = "", title = ""
-    @State private var packet: JSONValue?, receipt: JSONValue?, issue: String?, generation: UInt64?
-    @State private var ready = false, busy = false
+    @State private var members: [JSONValue] = []
+    @State private var member = ""
+    @State private var title = ""
+    @State private var packet: JSONValue?
+    @State private var receipt: JSONValue?
+    @State private var issue: String?
+    @State private var generation: UInt64?
+    @State private var ready = false
+    @State private var busy = false
     @State private var working = false
     private var owner: String {"native-continuation:\(entry.text("linkedThreadId")):\(entry.text("id"))"}
     private var preview: JSONValue? {packet?["preview"]}

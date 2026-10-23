@@ -2,11 +2,11 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use async_trait::async_trait;
-use base64::{engine::general_purpose::STANDARD as B64, Engine};
+use base64::{Engine, engine::general_purpose::STANDARD as B64};
 use rand::Rng;
 use reqwest::header::{HeaderMap, HeaderValue};
 use serde::{Deserialize, Serialize};
-use tokio::sync::{mpsc, Mutex};
+use tokio::sync::{Mutex, mpsc};
 
 use crate::chat_channel::error::ChatChannelError;
 use crate::chat_channel::traits::ChatChannelBackend;
@@ -176,7 +176,7 @@ async fn fetch_image_as_data_uri(
 /// The iLink QR page is a SPA that renders `window.location.href` as a QR code.
 /// We replicate that logic server-side so the frontend can display it directly.
 fn generate_qrcode_data_uri(content: &str) -> Result<String, ChatChannelError> {
-    use image::{codecs::png::PngEncoder, ImageEncoder, Luma};
+    use image::{ImageEncoder, Luma, codecs::png::PngEncoder};
     use qrcode::QrCode;
 
     let code = QrCode::new(content.as_bytes()).map_err(|e| {
@@ -284,7 +284,10 @@ impl WeixinBackend {
         }
     }
 
-    pub fn with_allowed_senders(mut self, values: Vec<String>) -> Self { self.allowed_senders=Arc::new(values.into_iter().collect()); self }
+    pub fn with_allowed_senders(mut self, values: Vec<String>) -> Self {
+        self.allowed_senders = Arc::new(values.into_iter().collect());
+        self
+    }
 
     fn build_headers(bot_token: &str, wechat_uin: &str) -> HeaderMap {
         let mut headers = HeaderMap::new();
@@ -590,7 +593,9 @@ impl ChatChannelBackend for WeixinBackend {
                                 }
                                 // Session expired — pause and wait for re-auth
                                 if r == -14 {
-                                    tracing::info!("[Weixin] session expired (ret=-14), pausing 30s");
+                                    tracing::info!(
+                                        "[Weixin] session expired (ret=-14), pausing 30s"
+                                    );
                                     *status.lock().await = ChannelConnectionStatus::Error;
                                     tokio::time::sleep(Duration::from_secs(30)).await;
                                     continue;
@@ -642,7 +647,9 @@ impl ChatChannelBackend for WeixinBackend {
                                         .get("from_user_id")
                                         .and_then(|v| v.as_str())
                                         .unwrap_or_default();
-                                    if !allowed_senders.contains(from_user_id) { continue; }
+                                    if !allowed_senders.contains(from_user_id) {
+                                        continue;
+                                    }
                                     let context_token = msg
                                         .get("context_token")
                                         .and_then(|v| v.as_str())
@@ -686,7 +693,9 @@ impl ChatChannelBackend for WeixinBackend {
                                                     })
                                                     .await;
                                                     if let Err(e) = ok {
-                                                        tracing::error!("[Weixin] resend error: {e}");
+                                                        tracing::error!(
+                                                            "[Weixin] resend error: {e}"
+                                                        );
                                                         // Re-buffer remaining on hard error
                                                         let mut buf = pending_messages.lock().await;
                                                         if buf.len() < MAX_PENDING_MESSAGES {
@@ -712,7 +721,9 @@ impl ChatChannelBackend for WeixinBackend {
                                             metadata: msg.clone(),
                                         })
                                         .await;
-                                    if send_result.is_ok() && durable_rx.await.is_err() { return; }
+                                    if send_result.is_ok() && durable_rx.await.is_err() {
+                                        return;
+                                    }
                                     if let Err(e) = send_result {
                                         tracing::error!("[Weixin] command_tx.send failed: {e}");
                                     }

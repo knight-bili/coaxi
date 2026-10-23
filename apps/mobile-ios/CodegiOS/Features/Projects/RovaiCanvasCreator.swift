@@ -27,11 +27,23 @@ struct RovaiCanvasCreator: View {
     @Environment(\.dismiss) private var dismiss
     @State private var managingGroups = false
     @State private var form: [String: JSONValue] = ["kind": .string("note"), "title": .string(""), "content": .string(""), "color": .string(""), "columns": .number(0), "rows": .number(0)]
-    @State private var revision = 0, commandId = UUID().uuidString.lowercased()
-    @State private var ready = false, busy = false, reading = false, catalogLoaded = false, objectBusy = false, objectReady = false
-    @State private var generation: UInt64?, issue: String?
-    @State private var references: [JSONValue] = [], groups: [JSONValue] = [], tasks: [JSONValue] = []
-    @State private var cursor: RovaiCanvasReferenceCursor?, taskCursor: String?, mission: JSONValue?, diffFiles: [JSONValue]?
+    @State private var revision = 0
+    @State private var commandId = UUID().uuidString.lowercased()
+    @State private var ready = false
+    @State private var busy = false
+    @State private var reading = false
+    @State private var catalogLoaded = false
+    @State private var objectBusy = false
+    @State private var objectReady = false
+    @State private var generation: UInt64?
+    @State private var issue: String?
+    @State private var references: [JSONValue] = []
+    @State private var groups: [JSONValue] = []
+    @State private var tasks: [JSONValue] = []
+    @State private var cursor: RovaiCanvasReferenceCursor?
+    @State private var taskCursor: String?
+    @State private var mission: JSONValue?
+    @State private var diffFiles: [JSONValue]?
     private var owner: String {if let bindingNode {return "canvas-file-binding:\(boardId):\(bindingNode.text("id"))"};return "canvas-create:\(boardId)"}
     private var kind: String {text("kind")}
     private var objectKind: Bool {["task", "mission", "mission_diff"].contains(kind)}

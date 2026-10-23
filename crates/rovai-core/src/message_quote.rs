@@ -410,28 +410,75 @@ pub struct QuoteSelection {
 
 /// A read-only UI selection surface using the same projection as capture_quote.
 /// Its body is an optimistic fence; callers never manufacture a trusted quote.
-pub fn public_quote_projection(connection:&Connection,camp_id:&str,message_id:&str)->Result<Value> {
-    let sql=format!("WITH {} SELECT m.author_type,m.structured_content_json FROM camp_message m JOIN public_camp_message_publication p ON p.message_id=m.id WHERE m.id=?1 AND m.camp_id=?2 AND m.tombstoned_at IS NULL",public_camp_message_publication_cte());
-    let (author,encoded):(String,String)=connection.query_row(&sql,params![message_id,camp_id],|row|Ok((row.get(0)?,row.get(1)?))).optional()?.context("quote.source_unavailable")?;
-    ensure!(matches!(author.as_str(),"user"|"agent")&&encoded.len()<=2*1024*1024,"quote.source_not_supported");
-    let content:StructuredThreadMessageContent=serde_json::from_str(&encoded)?;
-    let body=render_current_plain_text(connection,&content)?;
-    let text=if author=="user" {body.replace("\r\n","\n")} else {
-        project_structured_quote_text(&content,|id|connection.query_row("SELECT display_name FROM agent_profile WHERE id=?1",[id],|row|row.get(0)).optional().ok().flatten(),"你")?
+pub fn public_quote_projection(
+    connection: &Connection,
+    camp_id: &str,
+    message_id: &str,
+) -> Result<Value> {
+    let sql = format!(
+        "WITH {} SELECT m.author_type,m.structured_content_json FROM camp_message m JOIN public_camp_message_publication p ON p.message_id=m.id WHERE m.id=?1 AND m.camp_id=?2 AND m.tombstoned_at IS NULL",
+        public_camp_message_publication_cte()
+    );
+    let (author, encoded): (String, String) = connection
+        .query_row(&sql, params![message_id, camp_id], |row| {
+            Ok((row.get(0)?, row.get(1)?))
+        })
+        .optional()?
+        .context("quote.source_unavailable")?;
+    ensure!(
+        matches!(author.as_str(), "user" | "agent") && encoded.len() <= 2 * 1024 * 1024,
+        "quote.source_not_supported"
+    );
+    let content: StructuredThreadMessageContent = serde_json::from_str(&encoded)?;
+    let body = render_current_plain_text(connection, &content)?;
+    let text = if author == "user" {
+        body.replace("\r\n", "\n")
+    } else {
+        project_structured_quote_text(
+            &content,
+            |id| {
+                connection
+                    .query_row(
+                        "SELECT display_name FROM agent_profile WHERE id=?1",
+                        [id],
+                        |row| row.get(0),
+                    )
+                    .optional()
+                    .ok()
+                    .flatten()
+            },
+            "你",
+        )?
     };
-    Ok(json!({"messageId":message_id,"bodyAtSelection":body,"text":text,"projectionVersion":QUOTE_PROJECTION_VERSION,"maxScalars":MAX_QUOTE_SCALARS}))
+    Ok(
+        json!({"messageId":message_id,"bodyAtSelection":body,"text":text,"projectionVersion":QUOTE_PROJECTION_VERSION,"maxScalars":MAX_QUOTE_SCALARS}),
+    )
 }
 
 /// Private published messages remain inside the original conversation. The
 /// composer mutation captures the selected range under its own owner/version gate.
-pub fn private_quote_projection(connection:&Connection,camp_id:&str,conversation_id:&str,message_id:&str)->Result<Value> {
+pub fn private_quote_projection(
+    connection: &Connection,
+    camp_id: &str,
+    conversation_id: &str,
+    message_id: &str,
+) -> Result<Value> {
     let (author,body):(String,String)=connection.query_row(
         "SELECT m.author_type,m.body FROM conversation_message m JOIN conversation c ON c.id=m.conversation_id WHERE m.id=?1 AND c.id=?2 AND c.camp_id=?3 AND c.kind IN ('single_chat','delegation_child') AND c.ended_at IS NULL",
         params![message_id,conversation_id,camp_id],|row|Ok((row.get(0)?,row.get(1)?)),
     ).optional()?.context("quote.source_unavailable")?;
-    ensure!(matches!(author.as_str(),"user"|"agent")&&body.len()<=2*1024*1024,"quote.source_not_supported");
-    let text=if author=="user" {body.replace("\r\n","\n")} else {project_quote_text(&body)};
-    Ok(json!({"messageId":message_id,"bodyAtSelection":body,"text":text,"projectionVersion":QUOTE_PROJECTION_VERSION,"maxScalars":MAX_QUOTE_SCALARS}))
+    ensure!(
+        matches!(author.as_str(), "user" | "agent") && body.len() <= 2 * 1024 * 1024,
+        "quote.source_not_supported"
+    );
+    let text = if author == "user" {
+        body.replace("\r\n", "\n")
+    } else {
+        project_quote_text(&body)
+    };
+    Ok(
+        json!({"messageId":message_id,"bodyAtSelection":body,"text":text,"projectionVersion":QUOTE_PROJECTION_VERSION,"maxScalars":MAX_QUOTE_SCALARS}),
+    )
 }
 
 pub fn capture_quote(

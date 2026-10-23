@@ -37,7 +37,7 @@ use rovai_core::{
 use serde_json::{Value, json};
 #[path = "native_lifecycle/codex_preparation.rs"]
 mod native_lifecycle_preparation;
-pub(crate) use native_lifecycle_preparation::{inspect_native_preparation,prepare_native_session};
+pub(crate) use native_lifecycle_preparation::{inspect_native_preparation, prepare_native_session};
 use tokio::{
     io::{AsyncBufReadExt, AsyncWriteExt, BufReader},
     process::Command,
@@ -426,7 +426,9 @@ impl CodexHost {
         let host_instance_id = uuid::Uuid::new_v4().to_string();
         let native_source = rovai_core::runtime_subagent_session::CapturedNativeSource::capture(
             rovai_core::agent_profile::AdapterKind::CodexCli,
-            spec.environment(), spec.working_directory(), &host_instance_id,
+            spec.environment(),
+            spec.working_directory(),
+            &host_instance_id,
         );
         let mut child = ManagedProcess::spawn(spec)
             .with_context(|| format!("failed to start {} app-server", codex_path.display()))?;
@@ -448,7 +450,11 @@ impl CodexHost {
                     .unwrap_or_else(|| {
                         rovai_core::runtime_custom_api::CredentialRedactor::from_values(vec![])
                     })
-                    .extend(crate::portable_configuration::launch::redactor().unwrap_or_else(||rovai_core::runtime_custom_api::CredentialRedactor::from_values(vec![])))
+                    .extend(
+                        crate::portable_configuration::launch::redactor().unwrap_or_else(|| {
+                            rovai_core::runtime_custom_api::CredentialRedactor::from_values(vec![])
+                        }),
+                    )
                     .extend(
                         custom_api
                             .as_ref()
@@ -1246,7 +1252,9 @@ impl CodexRuntime {
         &self.host.host_instance_id
     }
 
-    pub(crate) fn native_source(&self) -> Option<rovai_core::runtime_subagent_session::CapturedNativeSource> {
+    pub(crate) fn native_source(
+        &self,
+    ) -> Option<rovai_core::runtime_subagent_session::CapturedNativeSource> {
         self.host.native_source.clone()
     }
 
@@ -1535,7 +1543,7 @@ impl CodexCliRuntimeAdapter {
         let mut spawn_custom_api = frozen_runtime.custom_api.clone();
         let spawn_environment_source = rovai_core::member_environment::launch_source();
         let spawn_environment = frozen_runtime.environment.clone();
-        let spawn_portable_runtime=frozen_runtime.clone();
+        let spawn_portable_runtime = frozen_runtime.clone();
         let compatibility = RuntimeCompatibilityKey::member_session(
             camp_id,
             agent_id,
@@ -1557,26 +1565,37 @@ impl CodexCliRuntimeAdapter {
                     compatibility,
                 },
                 move || async move {
-                    let portable_plan=crate::portable_configuration::launch::prepare(&spawn_portable_runtime,spawn_environment_source.as_ref()).await?;
-                    let spawn_environment =if let Some(plan)=&portable_plan{Some(plan.environment.clone())}else{rovai_core::member_environment::resolve_for_launch(
-                        spawn_environment_source,
-                        spawn_environment,
+                    let portable_plan = crate::portable_configuration::launch::prepare(
+                        &spawn_portable_runtime,
+                        spawn_environment_source.as_ref(),
                     )
-                    .await?};
+                    .await?;
+                    let spawn_environment = if let Some(plan) = &portable_plan {
+                        Some(plan.environment.clone())
+                    } else {
+                        rovai_core::member_environment::resolve_for_launch(
+                            spawn_environment_source,
+                            spawn_environment,
+                        )
+                        .await?
+                    };
                     if spawn_environment
                         .as_ref()
                         .is_some_and(|env| env.has_overlay())
                     {
                         spawn_custom_api = None;
                     }
-                    let host = crate::portable_configuration::launch::with_plan(portable_plan,CodexHost::spawn_uninitialized(
-                        &spawn_executable,
-                        &spawn_cwd,
-                        spawn_incoming,
-                        Some(spawn_builtin_tools),
-                        spawn_custom_api,
-                        spawn_environment,
-                    ))
+                    let host = crate::portable_configuration::launch::with_plan(
+                        portable_plan,
+                        CodexHost::spawn_uninitialized(
+                            &spawn_executable,
+                            &spawn_cwd,
+                            spawn_incoming,
+                            Some(spawn_builtin_tools),
+                            spawn_custom_api,
+                            spawn_environment,
+                        ),
+                    )
                     .await?;
                     Ok(RuntimeProcessHost::Codex(host))
                 },

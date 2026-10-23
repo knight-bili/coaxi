@@ -35,7 +35,7 @@ fun RovaiEngineeringScreen(model:RovaiWorkspaceViewModel,threadId:String,blocked
     var section by remember{mutableIntStateOf(0)};var busy by remember{mutableStateOf(false)};var issue by remember{mutableStateOf<String?>(null)}
     var gitView by remember{mutableStateOf("status")};var gitOutput by remember{mutableStateOf("")};var action by remember{mutableStateOf("stage")};var paths by remember{mutableStateOf("")};var target by remember{mutableStateOf("")};var message by remember{mutableStateOf("")};var mode by remember{mutableStateOf("mixed")}
     var plan by remember(threadId){mutableStateOf<JsonObject?>(null)};var planArgs by remember{mutableStateOf<JsonObject?>(null)};var discard by remember{mutableStateOf(false)};var exitRequested by remember{mutableStateOf(false)}
-    office?.let{selected->RovaiOfficePreview(model,threadId,selected){office=null}}
+    office?.let{selected->RovaiOfficePreview(model, threadId, selected, onClose = { office = null })}
     val dirty=file!=null&&draft!=baseline
     fun work(block:suspend ()->Unit){if(busy)return;busy=true;issue=null;coroutine.launch{try{block()}catch(error:Exception){issue=error.message}finally{busy=false}}}
     suspend fun readDirectory(after:String?=null){val result=model.query(RovaiOperation.WORKBENCH_FILES_LIST,buildJsonObject{put("scope",scope);put("path",directory);if(after!=null)put("after",after)}).coreObject();entries=if(after==null)result["entries"].coreArray() else entries+result["entries"].coreArray();next=(result["next"] as? JsonPrimitive)?.contentOrNull}

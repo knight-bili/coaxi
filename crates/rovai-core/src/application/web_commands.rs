@@ -5,7 +5,7 @@ use super::*;
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
 struct Reconcile {
-    #[serde(deserialize_with="crate::thread_compat::deserialize_host_method")]
+    #[serde(deserialize_with = "crate::thread_compat::deserialize_host_method")]
     operation: String,
     params: Value,
 }
@@ -50,24 +50,56 @@ pub(super) fn reconcile(
         }};
     }
     match query.operation.as_str() {
-        "configuration.providers.upsert"|"configuration.providers.remove"|"configuration.memberConnection.set"=>{
-            #[derive(Deserialize)]#[serde(rename_all="camelCase",deny_unknown_fields)]struct Original{command_id:String}
-            let input:Original=serde_json::from_value(query.params)?;
-            crate::command::portable_user_receipt(database.connection(),&query.operation,&input.command_id,client)
-        },
-        "runtime.custom.upsert" | "runtime.custom.remove" | "runtime.custom.install" | "runtime.steer.policy.set" => {
-            #[derive(Deserialize)]#[serde(rename_all="camelCase",deny_unknown_fields)]struct Original{command_id:String}
-            let input:Original=serde_json::from_value(query.params)?;uuid::Uuid::parse_str(&input.command_id)?;
-            if query.operation=="runtime.custom.install"{
-                let path=crate::custom_runtime::installer::receipt_path(data_dir,&input.command_id)?;
-                return if path.exists(){Ok(json!({"state":"recorded","result":crate::custom_runtime::installer::receipt(data_dir,&input.command_id)?}))}else{Ok(json!({"state":"unknown"}))}
+        "configuration.providers.upsert"
+        | "configuration.providers.remove"
+        | "configuration.memberConnection.set" => {
+            #[derive(Deserialize)]
+            #[serde(rename_all = "camelCase", deny_unknown_fields)]
+            struct Original {
+                command_id: String,
             }
-            let result=crate::command::load_stored_result(database.connection(),&input.command_id)?;
-            if let Some(result)=result{
-                anyhow::ensure!(result.command_type==query.operation&&result.actor_type=="user"&&result.actor_id=="local_user"&&result.camp_id.is_none()&&result.source_agent_run_id.is_none(),"custom_runtime.receipt_scope_changed");
+            let input: Original = serde_json::from_value(query.params)?;
+            crate::command::portable_user_receipt(
+                database.connection(),
+                &query.operation,
+                &input.command_id,
+                client,
+            )
+        }
+        "runtime.custom.upsert"
+        | "runtime.custom.remove"
+        | "runtime.custom.install"
+        | "runtime.steer.policy.set" => {
+            #[derive(Deserialize)]
+            #[serde(rename_all = "camelCase", deny_unknown_fields)]
+            struct Original {
+                command_id: String,
+            }
+            let input: Original = serde_json::from_value(query.params)?;
+            uuid::Uuid::parse_str(&input.command_id)?;
+            if query.operation == "runtime.custom.install" {
+                let path =
+                    crate::custom_runtime::installer::receipt_path(data_dir, &input.command_id)?;
+                return if path.exists() {
+                    Ok(
+                        json!({"state":"recorded","result":crate::custom_runtime::installer::receipt(data_dir,&input.command_id)?}),
+                    )
+                } else {
+                    Ok(json!({"state":"unknown"}))
+                };
+            }
+            let result =
+                crate::command::load_stored_result(database.connection(), &input.command_id)?;
+            if let Some(result) = result {
+                anyhow::ensure!(
+                    result.command_type == query.operation && result.is_local_user_scoped(),
+                    "custom_runtime.receipt_scope_changed"
+                );
                 Ok(json!({"state":"recorded","result":result}))
-            }else{Ok(json!({"state":"unknown"}))}
-        },
+            } else {
+                Ok(json!({"state":"unknown"}))
+            }
+        }
         "runtime.interactions.resolve" => runtime_interactions::reconcile(database, query.params),
         "delegations.resume" => delegation_queries::reconcile_resume(database, query.params),
         "delegations.settings.update" => delegation_queries::reconcile(database, query.params),
@@ -83,13 +115,24 @@ pub(super) fn reconcile(
         "singleChat.composerDraft.mutate" => {
             private_composer::reconcile(database, client, query.params)
         }
-        "skillPacks.install" | "skillPacks.custom.install" => user!(crate::skill_pack_installation::InstallSkillPackCommand),
+        "skillPacks.install" | "skillPacks.custom.install" => {
+            user!(crate::skill_pack_installation::InstallSkillPackCommand)
+        }
         "skillPacks.uninstall" => user!(crate::skill_pack_installation::UninstallSkillPackCommand),
         "skillPacks.office.install" => {
-            #[derive(Deserialize)] #[serde(rename_all="camelCase",deny_unknown_fields)]
-            struct OfficeInstall{command_id:String,command:crate::skill_pack_installation::InstallSkillPackCommand,plan_id:String}
-            let params:OfficeInstall=serde_json::from_value(query.params)?;uuid::Uuid::parse_str(&params.plan_id)?;
-            receipt(database,user_command_envelope(params.command_id,params.command))
+            #[derive(Deserialize)]
+            #[serde(rename_all = "camelCase", deny_unknown_fields)]
+            struct OfficeInstall {
+                command_id: String,
+                command: crate::skill_pack_installation::InstallSkillPackCommand,
+                plan_id: String,
+            }
+            let params: OfficeInstall = serde_json::from_value(query.params)?;
+            uuid::Uuid::parse_str(&params.plan_id)?;
+            receipt(
+                database,
+                user_command_envelope(params.command_id, params.command),
+            )
         }
         "canvas.boards.create" => user!(rovai_core::canvas_board::CreateCanvasBoardCommand),
         "canvas.boards.update" => user!(rovai_core::canvas_board::UpdateCanvasBoardCommand),

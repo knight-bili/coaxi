@@ -5,8 +5,42 @@ import { RUNTIME_RENDERER_CORE_METHODS } from './runtime-core-methods'
 const mainSource = readFileSync(new URL('./index.ts', import.meta.url), 'utf8')
 
 describe('Runtime Renderer Core method allowlist', () => {
-  it('exposes discovery, recovery wake, background ensure, explicit checking, and cancellation', () => {
+  it('exposes exactly the approved Runtime Renderer Core methods', () => {
     expect(RUNTIME_RENDERER_CORE_METHODS).toEqual([
+      'configuration.migration.archives',
+      'configuration.migration.targets',
+      'configuration.migration.preview',
+      'configuration.migration.confirm',
+      'configuration.migration.receipt',
+      'configuration.migration.undoPreview',
+      'configuration.migration.undoConfirm',
+      'configuration.providers.list',
+      'configuration.providers.upsert',
+      'configuration.providers.remove',
+      'configuration.memberConnection.get',
+      'configuration.memberConnection.set',
+      'history.execution.preview',
+      'history.execution.confirm',
+      'history.execution.receipt',
+      'history.execution.records',
+      'runtime.steer.evidence',
+      'runtime.steer.normal.preview',
+      'runtime.steer.normal.confirm',
+      'runtime.steer.normal.receipt',
+      'runtime.steer.policy.get',
+      'runtime.steer.policy.set',
+      'runtime.steer.targets',
+      'runtime.steer.materials.prepare',
+      'runtime.steer.preview',
+      'runtime.steer.confirm',
+      'runtime.steer.receipt',
+      'runtime.steer.previews',
+      'runtime.custom.registry',
+      'runtime.custom.list',
+      'runtime.custom.upsert',
+      'runtime.custom.remove',
+      'runtime.custom.install',
+      'runtime.custom.inspect',
       'runtime.discovery.rescan',
       'runtime.product.ensure',
       'runtime.product.check',
@@ -23,6 +57,15 @@ describe('Runtime Renderer Core method allowlist', () => {
       'runtime.pendingExecution.cancel'
     ])
     expect(RUNTIME_RENDERER_CORE_METHODS).not.toContain('core.shutdown')
+    expect(RUNTIME_RENDERER_CORE_METHODS).not.toContain('runtime.arbitrary.invoke')
+
+    const allowlistStart = mainSource.indexOf('const allowedMethods = new Set<CoreMethod>([')
+    const allowlistEnd = mainSource.indexOf('\n])', allowlistStart)
+    expect(allowlistStart).toBeGreaterThan(-1)
+    expect(allowlistEnd).toBeGreaterThan(allowlistStart)
+    const allowlist = mainSource.slice(allowlistStart, allowlistEnd)
+    expect(allowlist).not.toContain("'core.shutdown'")
+    expect(allowlist).not.toContain("'runtime.arbitrary.invoke'")
   })
 
   it('wakes the same Core recovery check when the operating system resumes', () => {

@@ -47,7 +47,7 @@ struct RovaiFilePreview: View {
                 if let issue { Text(issue).font(.caption).foregroundStyle(Theme.warning); Button("重试读取") { Task { await read(page?["startOffset"]?.rvInt ?? 0) } }.disabled(busy || file == nil) }
                 if let image { ScrollView([.horizontal, .vertical]) { Image(uiImage: image).resizable().scaledToFit().frame(maxWidth: .infinity).clipShape(RoundedRectangle(cornerRadius: 10)) } }
                 else if rendered, let html { RovaiStaticHtml(html: html).frame(maxWidth: .infinity, maxHeight: .infinity) }
-                else if let page { ScrollView([.vertical, .horizontal]) { if file?.text("kind") == "markdown" { MarkdownContent(raw: page.text("text")) } else { Text(page.text("text")).font(.system(.subheadline, design: .monospaced)).textSelection(.enabled) } }
+                else if let page { ScrollView([.vertical, .horizontal]) { if file?.text("kind") == "markdown" { MarkdownContent(raw: page.text("text")) } else { Text(page.text("text")).font(.system(.subheadline, design: .monospaced)).textSelection(.enabled) } } }
                 if page != nil && !rendered { HStack { Button("上一页") { guard let offset = previous.popLast() else { return }; Task { await read(offset) } }.disabled(busy || previous.isEmpty); Spacer(); Button("下一页") { guard let page else { return }; previous.append(page["startOffset"]?.rvInt ?? 0); Task { await read(page["endOffset"]?.rvInt ?? 0) } }.disabled(busy || page?["hasNext"]?.rvBool != true) } }
                 Spacer(minLength: 0)
             }.padding(16).navigationTitle(file?.text("fileName") ?? "文件预览").navigationBarTitleDisplayMode(.inline)

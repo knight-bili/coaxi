@@ -6,8 +6,11 @@ struct RovaiCanvasObjectNode: View {
     let boardId: String
     let node: JSONValue
     @Environment(\.dismiss) private var dismiss
-    @State private var value: JSONValue?, taskProjection: JSONValue?, issue: String?
-    @State private var busy = false, workspace = false
+    @State private var value: JSONValue?
+    @State private var taskProjection: JSONValue?
+    @State private var issue: String?
+    @State private var busy = false
+    @State private var workspace = false
     @State private var version: UInt64 = 0
     private var data: JSONValue {node["data"] ?? .null}
     private var reference: JSONValue {data["conversation"] ?? .null}
@@ -69,7 +72,8 @@ private struct RovaiCanvasMissionChanges: View {
     let missionId: String
     let path: String?
     let revision: UInt64
-    @State private var changes: JSONValue?, issue: String?
+    @State private var changes: JSONValue?
+    @State private var issue: String?
     @State private var patches: [String: String] = [:]
     @State private var busy = false
     @State private var release: (() -> Void)?

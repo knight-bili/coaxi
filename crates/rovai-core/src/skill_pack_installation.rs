@@ -334,10 +334,19 @@ impl SkillPackStore {
         database: &mut Database,
         envelope: &CommandEnvelope<InstallSkillPackCommand>,
     ) -> Result<InstallBeginning> {
-        self.begin_install_with_source(database,envelope,installation_source(&envelope.payload.skill_id))
+        self.begin_install_with_source(
+            database,
+            envelope,
+            installation_source(&envelope.payload.skill_id),
+        )
     }
 
-    pub(crate) fn begin_install_with_source(&self,database:&mut Database,envelope:&CommandEnvelope<InstallSkillPackCommand>,source:Result<InstallationSource>)->Result<InstallBeginning>{
+    pub(crate) fn begin_install_with_source(
+        &self,
+        database: &mut Database,
+        envelope: &CommandEnvelope<InstallSkillPackCommand>,
+        source: Result<InstallationSource>,
+    ) -> Result<InstallBeginning> {
         if let Some(execution) = DomainCommandGateway.replay_if_recorded(database, envelope)? {
             return Ok(InstallBeginning::Complete(execution));
         }

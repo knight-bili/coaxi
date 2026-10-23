@@ -1,5 +1,7 @@
 fn main() -> anyhow::Result<()> {
-    if rovai_core::conversation_tools::stdio::run_if_requested()? {return Ok(());}
+    if rovai_core::conversation_tools::stdio::run_if_requested()? {
+        return Ok(());
+    }
     if rovai_computer::native_host::run_if_requested()? {
         return Ok(());
     }

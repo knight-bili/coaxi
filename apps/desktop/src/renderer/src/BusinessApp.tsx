@@ -130,7 +130,7 @@ import { MissionHeader } from './MissionHeader'
 import { FilePreviewProvider } from './FilePreviewContext'
 import { NavigationShell } from './NavigationShell'
 import { StartupLoadingCanvas } from './StartupLoadingCanvas'
-import { createDesktopNavigation, type NavigationTarget, type NavigationTransaction, type NavigationIntent, type MemoryNavigationTarget } from './desktop-navigation'
+import { createDesktopNavigation, sameNavigationDestination, type NavigationTarget, type NavigationTransaction, type NavigationIntent, type MemoryNavigationTarget } from './desktop-navigation'
 import { forgetFilePreviewSession } from './file-preview-session'
 import { AppearanceSettings } from './AppearanceSettings'
 import { AboutUpdatesSettings } from './AboutUpdatesSettings'
@@ -3628,7 +3628,12 @@ function BusinessAppContent({
       setLinkedCanvasRequest({requestId:link.requestId,boardId:link.value});return
     }
     if(link.kind==='settings'){
-      if(!await desktopNavigation.push({kind:'settings',section:link.value as SettingsSection}))unavailable();return
+      const target:NavigationTarget={kind:'settings',section:link.value as SettingsSection}
+      if(!await desktopNavigation.push(target)){
+        const current=desktopNavigation.getSnapshot(),displayed=current.entries[current.index]
+        if(!displayed||!sameNavigationDestination(displayed,target))unavailable()
+      }
+      return
     }
     const target:NavigationTarget=link.value==='threads'?{kind:'quick_chat'}
       :link.value==='members'?{kind:'members',agentId:selectedMemberId,tab:memberTab}

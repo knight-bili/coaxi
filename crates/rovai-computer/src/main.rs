@@ -57,8 +57,6 @@ mod macos {
     use std::ffi::c_void;
     use std::time::{Duration, Instant};
 
-    use rovai_computer::computer::protocol::OsPermission;
-    use rovai_computer::computer::tcc;
     use core_foundation::base::TCFType;
     use core_foundation::boolean::CFBoolean;
     use core_foundation::dictionary::CFDictionary;
@@ -68,6 +66,8 @@ mod macos {
     use core_foundation_sys::dictionary::{CFDictionaryGetValueIfPresent, CFDictionaryRef};
     use core_foundation_sys::number::{kCFNumberSInt64Type, CFNumberGetValue, CFNumberRef};
     use core_foundation_sys::string::CFStringRef;
+    use rovai_computer::computer::protocol::OsPermission;
+    use rovai_computer::computer::tcc;
 
     #[link(name = "ApplicationServices", kind = "framework")]
     extern "C" {

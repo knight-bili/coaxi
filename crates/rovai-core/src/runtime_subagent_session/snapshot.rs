@@ -376,7 +376,10 @@ impl NativeSnapshot {
             anyhow::bail!("native_child.scope_changed")
         };
         let directory = std::path::PathBuf::from(
-            target.origin.working_directory.as_deref()
+            target
+                .origin
+                .working_directory
+                .as_deref()
                 .context("native_child.source_unavailable")?,
         );
         ensure!(directory.is_absolute(), "native_child.source_unavailable");

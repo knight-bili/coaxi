@@ -2,21 +2,21 @@ import { translateUi, useInterfaceLanguage } from './interface-language'
 
 // Contextual labels for the current Thread header and detail panels.
 const campDetailCopy = {
-  'zh-CN': {
-    tasks: '任务',
-    members: '队员',
-    singleChat: '单聊',
-    singleChatTitle: '单聊'
-  },
-  en: {
-    tasks: 'Tasks',
-    members: 'Team',
-    singleChat: 'DMs',
-    singleChatTitle: 'Direct messages'
-  }
-}
+  tasks: '任务',
+  members: '队员',
+  singleChat: '单聊',
+  singleChatTitle: '单聊'
+} as const
 
-export function useThreadDetailCopy(): typeof campDetailCopy['zh-CN'] & { execution: string } {
+type ThreadDetailCopy = Record<keyof typeof campDetailCopy, string> & { execution: string }
+
+export function useThreadDetailCopy(): ThreadDetailCopy {
   const language = useInterfaceLanguage()
-  return { ...campDetailCopy[language], execution: translateUi(language, '执行') }
+  return {
+    tasks: translateUi(language, campDetailCopy.tasks),
+    members: translateUi(language, campDetailCopy.members),
+    singleChat: translateUi(language, campDetailCopy.singleChat),
+    singleChatTitle: translateUi(language, campDetailCopy.singleChatTitle),
+    execution: translateUi(language, '执行')
+  }
 }

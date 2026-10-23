@@ -60,6 +60,7 @@ last_updated: 2026-10-12
 | [Windows Desktop Platform](windows-desktop-platform.md) | Windows x64 host envelope、平台 seam、原子 Job 启动、Transport v14、私有 local storage、hidden title strip + top-level menu projection + native controls、NSIS 与真实 Windows 验收组合 |
 | [Runtime File Change Observation](runtime-file-change-observation.md) | Runtime 文件操作、Command Diff、每 AgentRun/epoch 的版本化文件变化归约、exact managed-output exclusion、Managed Blob、迟到事实重算、恢复与授权读取边界；不扫描工作区或依赖 Git |
 | [消息选文引用](message-quotes.md) | 正文选择、owner 隔离与 Context 投影 |
+| [会话模型工具](conversation-model-tools.md) | Core 请求、问题卡、来源授权、Mission 与自动化的统一业务权威 |
 <!-- architecture-index:end -->
 
 

@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
+import { PRODUCT_APPLICATION_ID, PRODUCT_NAME } from '../shared/product-identity'
 
 const packageMetadata = JSON.parse(readFileSync(
   new URL('../../../../package.json', import.meta.url),
@@ -7,24 +8,27 @@ const packageMetadata = JSON.parse(readFileSync(
 ))
 
 describe('desktop package metadata', () => {
-  it('keeps the visible brand separate from Electron helper bundle identity', () => {
-    expect(packageMetadata.productName).toBe('Rovai AI')
+  it('keeps the unified product identity aligned with the Electron bundle metadata', () => {
+    expect(PRODUCT_NAME).toBe('Codeg Rovai Workbench')
+    expect(PRODUCT_APPLICATION_ID).toBe('app.codegrovai.workbench.desktop')
+    expect(packageMetadata.productName).toBe(PRODUCT_NAME)
     expect(packageMetadata.version).toBe('0.4.8')
-    expect(packageMetadata.build.productName).toBe('Rovai AI')
+    expect(packageMetadata.build.appId).toBe(PRODUCT_APPLICATION_ID)
+    expect(packageMetadata.build.productName).toBe(PRODUCT_NAME)
     expect(packageMetadata.build.mac.executableName).toBeUndefined()
-    expect(packageMetadata.build.win.executableName).toBe('Rovai-ai')
-    expect(packageMetadata.build.mac.artifactName).toBe('Rovai-AI-${version}-${arch}.${ext}')
-    expect(packageMetadata.build.win.artifactName).toBe('Rovai-AI-${version}-${arch}.${ext}')
-    expect(packageMetadata.build.mac.extendInfo.CFBundleDisplayName).toBe('Rovai AI')
+    expect(packageMetadata.build.win.executableName).toBe('Codeg Rovai Workbench')
+    expect(packageMetadata.build.mac.artifactName).toBe('Codeg-Rovai-Workbench-${version}-${arch}.${ext}')
+    expect(packageMetadata.build.win.artifactName).toBe('Codeg-Rovai-Workbench-${version}-${arch}.${ext}')
+    expect(packageMetadata.build.mac.extendInfo.CFBundleDisplayName).toBe(PRODUCT_NAME)
     expect(packageMetadata.build.mac.extendInfo.CFBundleName).toBeUndefined()
   })
 
   it('packages GitHub update metadata and a macOS zip beside the install DMG', () => {
     expect(packageMetadata.build.publish).toEqual([{
       provider: 'github',
-      owner: 'murray17',
-      repo: 'rovai-ai',
-      releaseType: 'release'
+      owner: 'knight-bili',
+      repo: 'codeg-rovai-workbench',
+      releaseType: 'draft'
     }])
     expect(packageMetadata.build.mac.target).toEqual(['dir', 'dmg', 'zip'])
     expect(packageMetadata.scripts['dist:mac:release:arm64']).toContain('--mac dmg zip')
@@ -60,16 +64,14 @@ describe('desktop package metadata', () => {
     expect(packageMetadata.scripts).not.toHaveProperty('native:build:macos')
     expect(packageMetadata.scripts.dev).not.toContain('native:build:macos')
     expect(packageMetadata.scripts['build:desktop']).not.toContain('native:build:macos')
-    expect(packageMetadata.build.mac.extraResources.map(({ to }: { to: string }) => to)).toEqual([
-      'bin/rovai-core',
-      'bin/rovai-host',
-      'bin/rovai',
-      'web-ui',
-      'skills'
-    ])
+    const packagedResources = [
+      ...packageMetadata.build.mac.extraResources,
+      ...packageMetadata.build.win.extraResources
+    ]
+    expect(JSON.stringify(packagedResources)).not.toMatch(/open.?panel|prewarm/iu)
   })
 
-  it('packages only Rovai-owned target-specific sidecars', () => {
+  it('packages target-specific sidecars and required release assets', () => {
     expect(packageMetadata.build.mac.extraResources).toEqual([
       {
         from: 'resources/bin/macos-${arch}/rovai-core',
@@ -81,7 +83,18 @@ describe('desktop package metadata', () => {
         to: 'bin/rovai'
       },
       { from: 'out/web', to: 'web-ui' },
-      { from: 'skills', to: 'skills' }
+      { from: 'skills', to: 'skills' },
+      {
+        from: 'resources/bin/macos-${arch}/rovai-native-history',
+        to: 'bin/rovai-native-history'
+      },
+      { from: 'helpers/native-history/LICENSE', to: 'licenses/native-history-LICENSE' },
+      { from: 'LICENSE', to: 'licenses/rovai-LICENSE' },
+      { from: 'THIRD_PARTY_NOTICES.md', to: 'licenses/THIRD_PARTY_NOTICES.md' },
+      { from: 'integration/licenses', to: 'licenses/integration' },
+      { from: 'legal/licenses', to: 'licenses/dependencies' },
+      { from: 'integration/sources.lock.json', to: 'workbench/sources.lock.json' },
+      { from: 'integration/product-release.json', to: 'workbench/product-release.json' }
     ])
     expect(packageMetadata.build.win.extraResources).toEqual([
       {
@@ -94,13 +107,25 @@ describe('desktop package metadata', () => {
         to: 'bin/rovai.exe'
       },
       { from: 'out/web', to: 'web-ui' },
-      { from: 'skills', to: 'skills' }
+      { from: 'skills', to: 'skills' },
+      {
+        from: 'resources/bin/windows-x64/rovai-native-history.exe',
+        to: 'bin/rovai-native-history.exe'
+      },
+      { from: 'helpers/native-history/LICENSE', to: 'licenses/native-history-LICENSE' },
+      { from: 'LICENSE', to: 'licenses/rovai-LICENSE' },
+      { from: 'THIRD_PARTY_NOTICES.md', to: 'licenses/THIRD_PARTY_NOTICES.md' },
+      { from: 'integration/licenses', to: 'licenses/integration' },
+      { from: 'legal/licenses', to: 'licenses/dependencies' },
+      { from: 'integration/sources.lock.json', to: 'workbench/sources.lock.json' },
+      { from: 'integration/product-release.json', to: 'workbench/product-release.json' }
     ])
     expect(packageMetadata.build).not.toHaveProperty('extraResources')
     expect(packageMetadata.build.mac.binaries).toEqual([
       'Contents/Resources/bin/rovai-core',
       'Contents/Resources/bin/rovai-host',
-      'Contents/Resources/bin/rovai'
+      'Contents/Resources/bin/rovai',
+      'Contents/Resources/bin/rovai-native-history'
     ])
     expect(JSON.stringify(packageMetadata.build)).not.toMatch(/dws/iu)
     expect(Object.keys(packageMetadata.scripts).some((name) => name.startsWith('dws:'))).toBe(false)

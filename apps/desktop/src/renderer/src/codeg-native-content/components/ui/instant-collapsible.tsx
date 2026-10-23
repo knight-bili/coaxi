@@ -13,6 +13,7 @@ import {
   type ComponentProps,
 } from "react"
 import { flushSync } from "react-dom"
+import { Slot } from "@radix-ui/react-slot"
 import { useControllableState } from "@radix-ui/react-use-controllable-state"
 
 // Drop-in replacement for ui/collapsible (Radix) used on the message hot
@@ -85,30 +86,46 @@ function Collapsible({
   )
 }
 
+type CollapsibleTriggerProps = ComponentProps<"button"> & { asChild?: boolean }
+
 function CollapsibleTrigger({
+  asChild = false,
+  type = "button",
   disabled,
   onClick,
+  children,
   ...props
-}: ComponentProps<"button">) {
+}: CollapsibleTriggerProps) {
   const context = useInstantCollapsible("CollapsibleTrigger")
   const isDisabled = disabled || context.disabled
+  const handleClick: NonNullable<ComponentProps<"button">["onClick"]> = (event) => {
+    onClick?.(event)
+    if (event.defaultPrevented || isDisabled) return
+    context.onOpenToggle()
+  }
+  const triggerProps = {
+    type,
+    "data-slot": "collapsible-trigger",
+    "data-state": context.open ? "open" : "closed",
+    "data-disabled": isDisabled ? "" : undefined,
+    "aria-controls": context.contentId,
+    "aria-expanded": context.open,
+    "aria-disabled": isDisabled || undefined,
+    ...props,
+    onClick: handleClick,
+  }
 
+  if (asChild) {
+    const slotProps = { ...triggerProps, disabled: isDisabled }
+    return <Slot {...(slotProps as ComponentProps<typeof Slot>)}>{children}</Slot>
+  }
   return (
     <button
-      type="button"
-      data-slot="collapsible-trigger"
-      data-state={context.open ? "open" : "closed"}
-      data-disabled={isDisabled ? "" : undefined}
-      aria-controls={context.contentId}
-      aria-expanded={context.open}
       disabled={isDisabled}
-      {...props}
-      onClick={(event) => {
-        onClick?.(event)
-        if (event.defaultPrevented || isDisabled) return
-        context.onOpenToggle()
-      }}
-    />
+      {...triggerProps}
+    >
+      {children}
+    </button>
   )
 }
 

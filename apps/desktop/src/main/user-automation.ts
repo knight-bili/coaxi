@@ -569,15 +569,18 @@ export class UserAutomationServer {
         'User Automation is unavailable on this platform.'
       )
     }
-    await mkdir(this.rootPath, { recursive: true, mode: 0o700 })
-    const rootMetadata = await lstat(this.rootPath)
-    if (!rootMetadata.isDirectory() || rootMetadata.isSymbolicLink()) {
-      throw new UserAutomationError(
-        'automation_endpoint_unsafe',
-        'The Automation data root is not a private directory.'
-      )
+    // On Windows, the Host automation-storage CLI creates and admits this directory with its native private DACL.
+    if (process.platform !== 'win32') {
+      await mkdir(this.rootPath, { recursive: true, mode: 0o700 })
+      const rootMetadata = await lstat(this.rootPath)
+      if (!rootMetadata.isDirectory() || rootMetadata.isSymbolicLink()) {
+        throw new UserAutomationError(
+          'automation_endpoint_unsafe',
+          'The Automation data root is not a private directory.'
+        )
+      }
+      await chmod(this.rootPath, 0o700)
     }
-    await chmod(this.rootPath, 0o700)
     const endpointPath = process.platform === 'win32'
       ? `\\\\.\\pipe\\rovai-ai-${process.pid}-${randomUUID()}`
       : join(this.rootPath, 'app.sock')

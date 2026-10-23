@@ -1811,7 +1811,7 @@ export function SingleChatPanel({
       {currentSnapshot&&<ConversationSources key={`sources:${currentSnapshot.conversation.id}`} scope={{threadId,conversationId:currentSnapshot.conversation.id,scopeKind:conversationKind}} disabled={!sharedDraftState.ready||sending||returningPending||ending||!!inputState.pending} onInsert={async source=>{
         if(!draftStore.update(current=>{const body=current[bodyDraftKey]??'';return body.includes(`rovai-source:${source.sourceSessionId}`)?current:{...current,[bodyDraftKey]:`${body}${body?'\n':''}${conversationSourceReference(source)}`}}))throw new Error(uiAttribute('当前输入已变化，资料授权记录已保留。'));
         if(input)await input.prepareBody();
-      }/>}
+      }}/>}
       {currentSnapshot&&<UserFeedbackDock key={`feedback:${currentSnapshot.conversation.id}`} scope={{threadId,conversationId:currentSnapshot.conversation.id,scopeKind:conversationKind}} agentId={currentSnapshot.conversation.agentId} members={members}
         materials={currentSnapshot.draft.attachments} composerScope={input?.origin.scope??null}
         getPrivateInput={()=>{

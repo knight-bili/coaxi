@@ -453,7 +453,10 @@ pub enum ComputerActRequest {
     /// Set an element's value outright — a text field's text, a slider's
     /// position, a pop-up menu's choice.
     #[serde(rename_all = "camelCase")]
-    SetValue { target: ElementTarget, value: String },
+    SetValue {
+        target: ElementTarget,
+        value: String,
+    },
     /// Put a window back on the screen — out of the Dock or the taskbar if it
     /// is minimized, its application shown again if it is hidden: typing,
     /// keys, scrolling, a point and a screenshot all need it there.

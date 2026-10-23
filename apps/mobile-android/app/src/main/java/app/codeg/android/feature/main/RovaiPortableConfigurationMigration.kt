@@ -132,7 +132,33 @@ fun RovaiPortableConfigurationMigration(model:RovaiWorkspaceViewModel,onClose:()
             receipt!!["files"].coreArray().forEach{file->Text("${file.coreText("targetId")} · ${file.coreText("state")}")}
             TextButton(enabled=!disabled&&last!=null,onClick={work{readReceipt(last!!)}}){Text(stringResource(R.string.rovai_fusion_66f98bd9b1149ef5))}
             if(last!=null&&receipt!!.coreText("state")=="applied"&&receipt!!["files"].coreArray().any{it.coreText("state")=="pending"})TextButton(enabled=!disabled&&pending==null,onClick={work{model.privateConfiguration("files-finish",buildJsonObject{put("commandId",last!!["commandId"]!!)});current();readReceipt(last!!)}}){Text(stringResource(R.string.rovai_fusion_e26fac1811e18695))}
-            TextButton(enabled=!disabled&&pending==null&&receipt!!.coreText("state")=="applied"&&last?.coreText("operation")=="configuration.migration.confirm"&&receipt!!["files"].coreArray().all{it.coreText("state")=="applied"},onClick={work{val value=model.query(RovaiOperation.CONFIGURATION_MIGRATION_UNDOPREVIEW,buildJsonObject{put("schemaVersion",1);put("originalCommandId",last!!["commandId"]!!)}).coreObject();current();preview=value;rows=value["rows"].coreArray();undo=true;visible=50;if(archive==null)archive=buildJsonObject{put("archiveId",value["archiveId"]?:JsonNull);put("sourceDigest",value["sourceDigest"]?:JsonNull)}}){Text(stringResource(R.string.rovai_fusion_c7258de16fde624e))}
+            TextButton(
+                enabled = !disabled && pending == null && receipt!!.coreText("state") == "applied"
+                    && last?.coreText("operation") == "configuration.migration.confirm"
+                    && receipt!!["files"].coreArray().all { it.coreText("state") == "applied" },
+                onClick = {
+                    work {
+                        val value = model.query(
+                            RovaiOperation.CONFIGURATION_MIGRATION_UNDOPREVIEW,
+                            buildJsonObject {
+                                put("schemaVersion", 1)
+                                put("originalCommandId", last!!["commandId"]!!)
+                            }
+                        ).coreObject()
+                        current()
+                        preview = value
+                        rows = value["rows"].coreArray()
+                        undo = true
+                        visible = 50
+                        if (archive == null) {
+                            archive = buildJsonObject {
+                                put("archiveId", value["archiveId"] ?: JsonNull)
+                                put("sourceDigest", value["sourceDigest"] ?: JsonNull)
+                            }
+                        }
+                    }
+                }
+            ) { Text(stringResource(R.string.rovai_fusion_c7258de16fde624e)) }
         }}
         if(issue!=null)item{Text(issue!!,color=MaterialTheme.colorScheme.error)}
         if(busy)item{LinearProgressIndicator(Modifier.fillMaxWidth())}

@@ -40,12 +40,12 @@ use serde::Deserialize;
 use super::auth::ResolvedAuth;
 use super::deliver::{ForgePr, NewPullRequest};
 use super::{
-    sanitize_web_url, truncate_chars, urlencode_query, validate_state_filter, ForgeChangeDetail,
-    ForgeChangedFile, ForgeChangedFileList, ForgeCheck, ForgeCheckList, ForgeCheckState,
-    ForgeComment, ForgeCommentList, ForgeError, ForgeFileStatus, ForgeIssueList, ForgeIssueRow,
-    ForgeItemKind, ForgeLabel, ForgeLabelList, ForgeMergeMethod, ForgeMergeOptions,
-    ForgeMergeStrategy, ForgeStateAction, ForgeTab, ListIssuesRequest, ResolvedNewIssue, BODY_CAP,
-    LABEL_PAGE_SIZE,
+    BODY_CAP, ForgeChangeDetail, ForgeChangedFile, ForgeChangedFileList, ForgeCheck,
+    ForgeCheckList, ForgeCheckState, ForgeComment, ForgeCommentList, ForgeError, ForgeFileStatus,
+    ForgeIssueList, ForgeIssueRow, ForgeItemKind, ForgeLabel, ForgeLabelList, ForgeMergeMethod,
+    ForgeMergeOptions, ForgeMergeStrategy, ForgeStateAction, ForgeTab, LABEL_PAGE_SIZE,
+    ListIssuesRequest, ResolvedNewIssue, sanitize_web_url, truncate_chars, urlencode_query,
+    validate_state_filter,
 };
 
 // ── reads ───────────────────────────────────────────────────────────────────
@@ -90,7 +90,10 @@ pub async fn list_issues(
         // rather than matching nothing, so a stale chip widens the list instead
         // of emptying it; the chips come from `list_labels` on this same
         // repository, so that is a narrow window.
-        url.push_str(&format!("&labels={}", urlencode_query(&req.labels.join(","))));
+        url.push_str(&format!(
+            "&labels={}",
+            urlencode_query(&req.labels.join(","))
+        ));
     }
     if let Some(text) = req.search.as_deref() {
         // Plain text, not a query language: Gitea hands `q` to its issue
@@ -149,7 +152,10 @@ async fn fetch_labels(
     auth: &ResolvedAuth,
     repo: &str,
 ) -> Result<(Vec<RawLabel>, bool), ForgeError> {
-    let url = format!("{}/repos/{repo}/labels?page=1&limit={LABEL_PAGE_SIZE}", auth.api_base);
+    let url = format!(
+        "{}/repos/{repo}/labels?page=1&limit={LABEL_PAGE_SIZE}",
+        auth.api_base
+    );
     let response = api_get(auth, &url).await?;
     let total = header_i64(response.headers(), "x-total-count");
     let raw: Vec<RawLabel> = response
@@ -194,7 +200,9 @@ pub async fn list_comments(
     // `saturating_mul` rather than a bare product: `page` is clamped to at
     // least 1 but has no ceiling, and a 32-bit overflow would wrap round to the
     // FIRST page of a thread the caller asked to be past the end of.
-    let skip = (page as usize).saturating_sub(1).saturating_mul(per_page as usize);
+    let skip = (page as usize)
+        .saturating_sub(1)
+        .saturating_mul(per_page as usize);
     let total = raw.len();
     Ok(ForgeCommentList {
         comments: raw
@@ -318,7 +326,11 @@ fn resolve_label(known: &[RawLabel], wanted: &str) -> Option<i64> {
     known
         .iter()
         .find(|label| label.name == wanted)
-        .or_else(|| known.iter().find(|label| label.name.eq_ignore_ascii_case(wanted)))
+        .or_else(|| {
+            known
+                .iter()
+                .find(|label| label.name.eq_ignore_ascii_case(wanted))
+        })
         .map(|label| label.id)
         .filter(|id| *id > 0)
 }
@@ -374,8 +386,16 @@ pub async fn change_detail(
 
     Ok(ForgeChangeDetail {
         number: if raw.number > 0 { raw.number } else { number },
-        base_ref: raw.base.as_ref().map(|b| b.ref_name.clone()).unwrap_or_default(),
-        head_ref: raw.head.as_ref().map(|h| h.ref_name.clone()).unwrap_or_default(),
+        base_ref: raw
+            .base
+            .as_ref()
+            .map(|b| b.ref_name.clone())
+            .unwrap_or_default(),
+        head_ref: raw
+            .head
+            .as_ref()
+            .map(|h| h.ref_name.clone())
+            .unwrap_or_default(),
         head_repo,
         head_sha,
         draft: raw.draft,
@@ -556,7 +576,9 @@ async fn change_diff(auth: &ResolvedAuth, repo: &str, number: i64) -> HashMap<St
         Some(String::from_utf8_lossy(&body).into_owned())
     }
     .await;
-    fetched.map(|diff| split_diff_by_path(&diff)).unwrap_or_default()
+    fetched
+        .map(|diff| split_diff_by_path(&diff))
+        .unwrap_or_default()
 }
 
 /// A unified diff cut into `path -> hunks` at each `diff --git` boundary.
@@ -606,7 +628,11 @@ fn absorb(out: &mut HashMap<String, String>, block: &[&str]) {
     let path = header
         .iter()
         .find_map(|line| header_path(line, "+++ ", "b/"))
-        .or_else(|| header.iter().find_map(|line| header_path(line, "--- ", "a/")));
+        .or_else(|| {
+            header
+                .iter()
+                .find_map(|line| header_path(line, "--- ", "a/"))
+        });
     let Some(path) = path else { return };
     // No hunk at all — a pure mode change, or the "Binary files … differ" line
     // git emits instead of content. Nothing to reveal, so nothing is recorded
@@ -692,7 +718,10 @@ pub async fn merge_options(
     let strategy = merge_commit_strategy(&raw);
     let methods: Vec<ForgeMergeMethod> = [
         (ForgeMergeMethod::Merge, strategy.is_some()),
-        (ForgeMergeMethod::Squash, raw.allow_squash_merge.unwrap_or(true)),
+        (
+            ForgeMergeMethod::Squash,
+            raw.allow_squash_merge.unwrap_or(true),
+        ),
         (ForgeMergeMethod::Rebase, raw.allow_rebase.unwrap_or(true)),
     ]
     .into_iter()
@@ -720,10 +749,7 @@ pub async fn merge_options(
 }
 
 /// `GET /repos/{o}/{r}` — the repository's merge settings.
-async fn repo_settings(
-    auth: &ResolvedAuth,
-    repo: &str,
-) -> Result<RawRepoSettings, ForgeError> {
+async fn repo_settings(auth: &ResolvedAuth, repo: &str) -> Result<RawRepoSettings, ForgeError> {
     let url = format!("{}/repos/{repo}", auth.api_base);
     api_get(auth, &url)
         .await?
@@ -791,7 +817,12 @@ async fn merge_do(auth: &ResolvedAuth, repo: &str, method: ForgeMergeMethod) -> 
         ForgeMergeMethod::Squash => "squash",
         ForgeMergeMethod::Rebase => "rebase",
         ForgeMergeMethod::Merge => {
-            match repo_settings(auth, repo).await.as_ref().ok().and_then(merge_commit_strategy) {
+            match repo_settings(auth, repo)
+                .await
+                .as_ref()
+                .ok()
+                .and_then(merge_commit_strategy)
+            {
                 Some(ForgeMergeStrategy::RebaseMerge) => "rebase-merge",
                 Some(ForgeMergeStrategy::FastForward) => "fast-forward-only",
                 // Includes "the settings could not be read": a merge commit is
@@ -890,7 +921,9 @@ pub async fn find_pulls(
         found.extend(
             raw.into_iter()
                 .filter(|pull| {
-                    pull.head.as_ref().is_some_and(|h| h.ref_name == head_branch)
+                    pull.head
+                        .as_ref()
+                        .is_some_and(|h| h.ref_name == head_branch)
                 })
                 .map(RawPull::into_pr),
         );
@@ -958,9 +991,11 @@ pub async fn create_pull(
 /// bytes through the middle of a code point PANICS.
 fn is_wip_title(title: &str) -> bool {
     let trimmed = title.trim_start();
-    ["wip:", "[wip]"]
-        .iter()
-        .any(|prefix| trimmed.get(..prefix.len()).is_some_and(|got| got.eq_ignore_ascii_case(prefix)))
+    ["wip:", "[wip]"].iter().any(|prefix| {
+        trimmed
+            .get(..prefix.len())
+            .is_some_and(|got| got.eq_ignore_ascii_case(prefix))
+    })
 }
 
 // ── plumbing ────────────────────────────────────────────────────────────────
@@ -972,7 +1007,11 @@ static LOGIN_CACHE: LazyLock<RwLock<HashMap<String, String>>> =
 
 async fn current_login(auth: &ResolvedAuth) -> Result<String, ForgeError> {
     let cache_key = format!("{}\n{}", auth.api_base, auth.account_id);
-    if let Some(hit) = LOGIN_CACHE.read().ok().and_then(|c| c.get(&cache_key).cloned()) {
+    if let Some(hit) = LOGIN_CACHE
+        .read()
+        .ok()
+        .and_then(|c| c.get(&cache_key).cloned())
+    {
         return Ok(hit);
     }
     #[derive(Deserialize)]
@@ -1000,7 +1039,9 @@ fn repo_ref(owner_repo: &str) -> Result<String, ForgeError> {
 
 fn require_number(number: i64) -> Result<(), ForgeError> {
     if number <= 0 {
-        return Err(ForgeError::Invalid(format!("bad work item number: {number}")));
+        return Err(ForgeError::Invalid(format!(
+            "bad work item number: {number}"
+        )));
     }
     Ok(())
 }
@@ -1431,4 +1472,3 @@ struct RawRepoSettings {
     #[serde(default)]
     default_merge_style: Option<String>,
 }
-

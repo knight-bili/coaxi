@@ -132,7 +132,13 @@ pub(crate) fn prepare(
             "delegation.platform_unavailable"
         );
         let mut configuration = crate::agent_profile::member_runtime_defaults(kind);
-        if kind==AdapterKind::CustomAcp{configuration.custom_runtime_ref=Some(crate::custom_runtime::storage::installation_reference(db.connection(),&installation)?);}
+        if kind == AdapterKind::CustomAcp {
+            configuration.custom_runtime_ref =
+                Some(crate::custom_runtime::storage::installation_reference(
+                    db.connection(),
+                    &installation,
+                )?);
+        }
         let defaults = admission
             .settings()
             .per_runtime_defaults

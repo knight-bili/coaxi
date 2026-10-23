@@ -50,6 +50,8 @@ pub struct WorkspaceInspection {
     pub git_observation: GitObservation,
 }
 
+mod managed_worktree;
+
 pub fn validate_workspace_directory(
     path: &Path,
     application_data_dir: &Path,
@@ -85,7 +87,8 @@ pub fn validate_workspace_directory(
     if canonical.starts_with(&canonical_data_dir)
         && !(allow_managed_quick_chat && canonical_quick_chat.as_ref() == Some(&canonical))
     {
-        bail!("Rovai-ai managed data cannot be used as a project workspace");
+        managed_worktree::validate(&canonical, &canonical_data_dir)
+            .context("Rovai-ai managed data cannot be used as a project workspace")?;
     }
     if is_git_metadata_path(&canonical) {
         bail!("Git metadata directories cannot be used as a project workspace");

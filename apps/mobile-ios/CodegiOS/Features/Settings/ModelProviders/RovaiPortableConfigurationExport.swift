@@ -12,9 +12,15 @@ private struct EncryptedConfigurationDocument: FileDocument {
 struct RovaiPortableConfigurationExport: View {
     let model: RovaiWorkspaceModel
     var sourceArchive: JSONValue? = nil
-    @State private var identity = "", passphrase = "", message = ""
-    @State private var includeSecrets = false, busy = false, saving = false
-    @State private var pending: JSONValue?, receipt: JSONValue?, issue: String?
+    @State private var identity = ""
+    @State private var passphrase = ""
+    @State private var message = ""
+    @State private var includeSecrets = false
+    @State private var busy = false
+    @State private var saving = false
+    @State private var pending: JSONValue?
+    @State private var receipt: JSONValue?
+    @State private var issue: String?
     @State private var document = EncryptedConfigurationDocument()
     private var owner: String { "portable-export/" + identity + (sourceArchive.map { "/original/" + $0.text("archiveId") } ?? "") }
     var body: some View {

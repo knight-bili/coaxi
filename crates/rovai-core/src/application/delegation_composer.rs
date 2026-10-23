@@ -98,9 +98,15 @@ pub(crate) fn handle(
     )?;
     match method {
         "delegations.conversation.get" => {
-            let key = crate::single_chat_composer_scope::PrivateComposerKey::for_scope(scope.scope())?;
+            let key =
+                crate::single_chat_composer_scope::PrivateComposerKey::for_scope(scope.scope())?;
             let snapshot = SingleChatService::for_client(client.clone())
-                .snapshot_for_owner(database, &conversation, &key, single_chat_composer::ComposerOwner::DelegationChild)?
+                .snapshot_for_owner(
+                    database,
+                    &conversation,
+                    &key,
+                    single_chat_composer::ComposerOwner::DelegationChild,
+                )?
                 .context("delegation.not_found")?;
             let editing_elsewhere: bool = database.connection().query_row(
                 "SELECT EXISTS(SELECT 1 FROM single_chat_pending_input_edit_session WHERE conversation_id=?1 AND (client_id<>?2 OR scope_key<>?3))",

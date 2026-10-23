@@ -17,7 +17,7 @@
 use std::collections::{HashMap, HashSet};
 use std::fs;
 use std::io::{Cursor, Read};
-use std::path::{Path,PathBuf};
+use std::path::{Path, PathBuf};
 use std::sync::{Arc, LazyLock};
 use std::time::Duration;
 
@@ -25,7 +25,7 @@ use serde::{Deserialize, Serialize};
 use tokio::sync::Mutex as AsyncMutex;
 
 use super::MarketError as AppCommandError;
-use crate::pets::model::{PetManifest, PetSummary, PET_MANIFEST_FILENAME, SPRITESHEET_FILENAME};
+use crate::pets::model::{PET_MANIFEST_FILENAME, PetManifest, PetSummary, SPRITESHEET_FILENAME};
 use crate::pets::{
     ensure_pets_root_or_create, list_existing_ids, validate_pet_id, validate_spritesheet,
 };
@@ -649,7 +649,7 @@ fn write_staging(
 ) -> Result<(), AppCommandError> {
     use std::io::Write;
     let json = serde_json::to_string_pretty(manifest)
-        .map_err(|e| AppCommandError::io_error(format!("Failed to serialize manifest: {e}")))?;
+        .map_err(|e| AppCommandError::io(format!("Failed to serialize manifest: {e}")))?;
     {
         let mut f =
             fs::File::create(dir.join(PET_MANIFEST_FILENAME)).map_err(AppCommandError::io)?;

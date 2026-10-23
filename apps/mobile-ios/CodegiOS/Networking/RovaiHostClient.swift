@@ -188,7 +188,10 @@ actor RovaiHostClient {
             let reader = Task {
                 do {
                     let (bytes, response) = try await streamSession.bytes(for: request)
-                    guard (response as? HTTPURLResponse)?.statusCode == 200 else { throw RovaiHostFailure(code: "host.events_denied") }
+                    guard let response = response as? HTTPURLResponse else { throw RovaiHostFailure(code: "host.invalid_response") }
+                    if response.statusCode == 401 || response.statusCode == 403 { throw RovaiHostFailure(code: "host.unauthorized") }
+                    guard response.statusCode == 200 else { throw RovaiHostFailure(code: "host.http_" + String(response.statusCode)) }
+                    continuation.yield(.object(["event": .string("resync"), "data": .null]))
                     var event = "", data = ""
                     for try await line in bytes.lines {
                         try Task.checkCancellation()

@@ -4,12 +4,19 @@ import UniformTypeIdentifiers
 struct RovaiMissionCreator: View {
     let model: RovaiWorkspaceModel
     let onClose: () -> Void
-    @State private var name = "", detail = "", path = "", tags = "", lead = ""
-    @State private var ids = Set<String>(), mentions = Set<String>()
+    @State private var name = ""
+    @State private var detail = ""
+    @State private var path = ""
+    @State private var tags = ""
+    @State private var lead = ""
+    @State private var ids = Set<String>()
+    @State private var mentions = Set<String>()
     @State private var sources: [JSONValue] = []
     @State private var descriptionContent: [JSONValue] = [.object(["kind": .string("text"), "text": .string("")])]
     @State private var commandId: String?
-    @State private var ready = false, preparing = false, picking = false
+    @State private var ready = false
+    @State private var preparing = false
+    @State private var picking = false
     @State private var pickerGeneration: UInt64?
     @State private var issue: String?
     private let owner = "mission-create-draft"

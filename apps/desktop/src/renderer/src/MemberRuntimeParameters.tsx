@@ -247,6 +247,8 @@ function runtimeParametersFor(
       return <div className="runtime-parameter-form">{modelFieldsFor('zcode-app', props)}<PermissionSelect {...props} fieldKey="permission_mode" label={uiAttribute("权限模式")} /></div>
     case 'antigravity-app':
       return <AntigravityRuntimeParameters {...props} />
+    case 'custom-acp':
+      return <div className="runtime-parameter-form">{modelFieldsFor('custom-acp', props)}</div>
   }
 }
 
@@ -439,6 +441,8 @@ function modelFieldsFor(
     case 'zcode-app':
     case 'cline-cli':
     case 'antigravity-app':
+      return <ModelFields {...props} />
+    case 'custom-acp':
       return <ModelFields {...props} />
   }
 }

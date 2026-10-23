@@ -30,12 +30,12 @@ use std::collections::HashSet;
 use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value};
 
-
 /// Official codex catalog snapshot compiled into the binary. Generated from the
 /// `codex debug models --bundled` of the codex that `codex-acp` drives (shape
 /// `{"models":[ ModelInfo, ... ]}`). This is only the **offline fallback**; the
 /// live catalog is fetched at runtime by 实际启动程序提供的目录读取入口.
-const BUNDLED_SNAPSHOT: &str = include_str!("../../resources/portable-config/codex-bundled-catalog.json");
+const BUNDLED_SNAPSHOT: &str =
+    include_str!("../../resources/portable-config/codex-bundled-catalog.json");
 
 /// File name (relative to `CODEX_HOME`) of the generated catalog codex reads.
 pub const CATALOG_REL: &str = "codeg-model-catalog.json";
@@ -76,7 +76,13 @@ fn enum_spec_for(key: &str) -> Option<EnumSpec> {
         "default_reasoning_summary" => spec(&["auto", "concise", "detailed", "none"], false),
         "default_verbosity" => spec(&["low", "medium", "high"], true),
         "shell_type" => spec(
-            &["default", "local", "unified_exec", "disabled", "shell_command"],
+            &[
+                "default",
+                "local",
+                "unified_exec",
+                "disabled",
+                "shell_command",
+            ],
             false,
         ),
         // Only `freeform` is a variant; `function` would reject the whole catalog.
@@ -673,4 +679,3 @@ pub fn import_catalog(
         default,
     }
 }
-

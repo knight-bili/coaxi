@@ -68,11 +68,15 @@ struct RovaiCanvasBoardEditor: View {
     let board: JSONValue?
     let remove: Bool
     @Environment(\.dismiss) private var dismiss
-    @State private var name = "", detail = "", color = ""
+    @State private var name = ""
+    @State private var detail = ""
+    @State private var color = ""
     @State private var revision = 0
     @State private var commandId = UUID().uuidString.lowercased()
-    @State private var ready = false, busy = false
-    @State private var generation: UInt64?, issue: String?
+    @State private var ready = false
+    @State private var busy = false
+    @State private var generation: UInt64?
+    @State private var issue: String?
     private var owner: String {"canvas-board:\(board?.text("id") ?? "new"):\(remove ? "remove" : "edit")"}
     private var latest: JSONValue? {model.boards.first {$0.text("id") == board?.text("id")}}
     private var stale: Bool {board != nil && (latest == nil || latest?["revision"]?.rvInt != revision)}

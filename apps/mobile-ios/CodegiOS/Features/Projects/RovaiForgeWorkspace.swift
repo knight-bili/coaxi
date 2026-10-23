@@ -9,11 +9,29 @@ extension JSONValue {
 struct RovaiForgeWorkspace: View {
     let model: RovaiWorkspaceModel
     let threadId: String
-    @State private var accounts: [JSONValue] = [], rows: [JSONValue] = [], comments: [JSONValue] = [], files: [JSONValue] = []
-    @State private var account = "", kind = "issues", status = "open", search = "", sort = "newest", labels = ""
-    @State private var assigned = false, busy = false, incomplete = false
-    @State private var repository: JSONValue?, selected: JSONValue?, detail: JSONValue?, filters: JSONValue?
-    @State private var page = 1, next: Int?, commentNext: Int?, fileNext: Int? = 1, total: Int?, reachable: Int?
+    @State private var accounts: [JSONValue] = []
+    @State private var rows: [JSONValue] = []
+    @State private var comments: [JSONValue] = []
+    @State private var files: [JSONValue] = []
+    @State private var account = ""
+    @State private var kind = "issues"
+    @State private var status = "open"
+    @State private var search = ""
+    @State private var sort = "newest"
+    @State private var labels = ""
+    @State private var assigned = false
+    @State private var busy = false
+    @State private var incomplete = false
+    @State private var repository: JSONValue?
+    @State private var selected: JSONValue?
+    @State private var detail: JSONValue?
+    @State private var filters: JSONValue?
+    @State private var page = 1
+    @State private var next: Int?
+    @State private var commentNext: Int?
+    @State private var fileNext: Int? = 1
+    @State private var total: Int?
+    @State private var reachable: Int?
     @State private var refreshRevision = 0
     @State private var issue: String?
     private var identity: String {"\(threadId):\(model.connectionGeneration):\(account):\(kind):\(refreshRevision)"}

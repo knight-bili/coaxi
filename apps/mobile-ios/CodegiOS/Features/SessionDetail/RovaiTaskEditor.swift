@@ -11,10 +11,19 @@ struct RovaiTaskEditor: View {
     var projection: JSONValue? = nil
     @Environment(\.dismiss) private var dismiss
     @State private var baseline: JSONValue?
-    @State private var title = "", detail = "", assignee = "", status = "pending", blockedReason = "", completion = "", cancelReason = ""
+    @State private var title = ""
+    @State private var detail = ""
+    @State private var assignee = ""
+    @State private var status = "pending"
+    @State private var blockedReason = ""
+    @State private var completion = ""
+    @State private var cancelReason = ""
     @State private var commandId = UUID().uuidString.lowercased()
-    @State private var generation: UInt64?, issue: String?
-    @State private var ready = false, busy = false, cancelling = false
+    @State private var generation: UInt64?
+    @State private var issue: String?
+    @State private var ready = false
+    @State private var busy = false
+    @State private var cancelling = false
     private var key: String {task?.text("taskId") ?? "new"}
     private var owner: String {"task-edit:\(threadId):\(key)"}
     private var source: JSONValue? {projection ?? (model.thread?["thread"]?.text("id") == threadId ? model.thread : nil)}

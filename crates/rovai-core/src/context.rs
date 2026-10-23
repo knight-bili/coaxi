@@ -169,7 +169,8 @@ pub const fn charter_delivery_mode_for_adapter(adapter_kind: AdapterKind) -> Cha
         | AdapterKind::OpenClawCli
         | AdapterKind::TraeCnCli
         | AdapterKind::CursorAgent
-        | AdapterKind::KimiCodeCli => CharterDeliveryMode::FirstPayload,
+        | AdapterKind::KimiCodeCli
+        | AdapterKind::CustomAcp => CharterDeliveryMode::FirstPayload,
     }
 }
 
@@ -2900,7 +2901,17 @@ fn prepare_run_skill_packs(
     )
     .parent()
     .context("Core data directory is unavailable")?;
-    let runtime=if run_snapshot_adapter_kind(snapshot)?==AdapterKind::CustomAcp{Some(serde_json::from_value::<FrozenAgentRuntimeConfig>(snapshot.effective_config.get("runtime").context("Custom Runtime configuration is missing")?.clone())?)}else{None};
+    let runtime = if run_snapshot_adapter_kind(snapshot)? == AdapterKind::CustomAcp {
+        Some(serde_json::from_value::<FrozenAgentRuntimeConfig>(
+            snapshot
+                .effective_config
+                .get("runtime")
+                .context("Custom Runtime configuration is missing")?
+                .clone(),
+        )?)
+    } else {
+        None
+    };
     PreparedMemberSkillPacks::prepare_with_runtime(
         connection,
         data_dir,

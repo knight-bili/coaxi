@@ -111,6 +111,7 @@ beforeEach(() => {
     reload: vi.fn(),
     toggleHtmlSource: vi.fn(),
     reopen: vi.fn(),
+    reopenLastClosedFile: vi.fn(),
     retry: vi.fn(),
     saveReading: vi.fn(), loadChanges: vi.fn(), loadHtmlSource: vi.fn(), saveHtmlSource: vi.fn(), completeHtmlRefresh: vi.fn(), displayed: vi.fn(),
     changePage: vi.fn()

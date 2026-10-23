@@ -9,12 +9,28 @@ private func migrationField(_ value: JSONValue, _ key: String, _ next: JSONValue
 @MainActor @Observable
 private final class PortableMigrationController {
     let model: RovaiWorkspaceModel
-    var identity = "", busy = false, issue: String?, active = true
-    var source: Data?, sourceName = "", sourceDigest = "", passphrase = ""
-    var archives: [JSONValue] = [], archiveNext: JSONValue = .null, archive: JSONValue?
-    var rows: [JSONValue] = [], visible = 50, choices: [String: JSONValue] = [:]
-    var targets: [String: [JSONValue]] = [:], targetNext: [String: JSONValue] = [:], mappings: [String: JSONValue] = [:]
-    var preview: JSONValue?, undo = false, pending: JSONValue?, last: JSONValue?, receipt: JSONValue?
+    var identity = ""
+    var busy = false
+    var issue: String?
+    var active = true
+    var source: Data?
+    var sourceName = ""
+    var sourceDigest = ""
+    var passphrase = ""
+    var archives: [JSONValue] = []
+    var archiveNext: JSONValue = .null
+    var archive: JSONValue?
+    var rows: [JSONValue] = []
+    var visible = 50
+    var choices: [String: JSONValue] = [:]
+    var targets: [String: [JSONValue]] = [:]
+    var targetNext: [String: JSONValue] = [:]
+    var mappings: [String: JSONValue] = [:]
+    var preview: JSONValue?
+    var undo = false
+    var pending: JSONValue?
+    var last: JSONValue?
+    var receipt: JSONValue?
     init(_ model: RovaiWorkspaceModel) { self.model = model }
     private var owner: String { "portable-migration/" + identity }
     var selected: [JSONValue] { choices.keys.sorted().compactMap { choices[$0] }.filter { $0["decision"]?.text("action") != "skip" } }
@@ -126,7 +142,8 @@ private final class PortableMigrationController {
 struct RovaiPortableConfigurationMigration: View {
     let model: RovaiWorkspaceModel
     @State private var controller: PortableMigrationController
-    @State private var picker = false, confirming = false
+    @State private var picker = false
+    @State private var confirming = false
     @State private var details = Set<String>()
     init(model: RovaiWorkspaceModel) { self.model = model; _controller = State(initialValue: PortableMigrationController(model)) }
     var body: some View {

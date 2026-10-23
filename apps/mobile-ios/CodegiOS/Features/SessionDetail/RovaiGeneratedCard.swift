@@ -10,7 +10,9 @@ struct RovaiGeneratedCard: View {
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.locale) private var locale
     @State private var index = 0
-    @State private var card: JSONValue?, issue: String?, generation: UInt64?
+    @State private var card: JSONValue?
+    @State private var issue: String?
+    @State private var generation: UInt64?
     private var scope: JSONValue {.object(["threadId": .string(threadId), "conversationId": conversationId.map(JSONValue.string) ?? .null, "scopeKind": .string(conversationId == nil ? "public" : child ? "delegation_child" : "single_chat")])}
     var body: some View {
         NavigationStack {VStack(spacing: 8) {

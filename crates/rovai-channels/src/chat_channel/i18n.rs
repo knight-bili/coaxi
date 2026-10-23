@@ -1066,16 +1066,36 @@ pub fn task_usage(lang: Lang, prefix: &str) -> String {
 
 pub fn no_agent_selected(lang: Lang, prefix: &str) -> String {
     match lang {
-        Lang::ZhCn => format!("未选择 Agent，请先使用 {prefix}agent 选择，或在工作目录上设置默认 Agent。"),
-        Lang::ZhTw => format!("未選擇 Agent，請先使用 {prefix}agent 選擇，或在工作目錄上設定預設 Agent。"),
-        Lang::Ja => format!("エージェントが選択されていません。{prefix}agent で選択するか、フォルダにデフォルトエージェントを設定してください。"),
-        Lang::Ko => format!("에이전트가 선택되지 않았습니다. {prefix}agent로 선택하거나 폴더에 기본 에이전트를 설정하세요."),
-        Lang::Es => format!("Ningún agente seleccionado. Usa {prefix}agent para elegir uno o define uno por defecto en la carpeta."),
-        Lang::De => format!("Kein Agent ausgewählt. {prefix}agent verwenden oder Standard im Ordner festlegen."),
-        Lang::Fr => format!("Aucun agent sélectionné. Utilisez {prefix}agent ou définissez un agent par défaut sur le dossier."),
-        Lang::Pt => format!("Nenhum agente selecionado. Use {prefix}agent para escolher ou defina um padrão na pasta."),
-        Lang::Ar => format!("لم يتم اختيار وكيل. استخدم {prefix}agent لاختيار واحد أو حدد وكيلًا افتراضيًا للمجلد."),
-        Lang::En => format!("No agent selected. Use {prefix}agent to pick one or set a default on the folder."),
+        Lang::ZhCn => {
+            format!("未选择 Agent，请先使用 {prefix}agent 选择，或在工作目录上设置默认 Agent。")
+        }
+        Lang::ZhTw => {
+            format!("未選擇 Agent，請先使用 {prefix}agent 選擇，或在工作目錄上設定預設 Agent。")
+        }
+        Lang::Ja => format!(
+            "エージェントが選択されていません。{prefix}agent で選択するか、フォルダにデフォルトエージェントを設定してください。"
+        ),
+        Lang::Ko => format!(
+            "에이전트가 선택되지 않았습니다. {prefix}agent로 선택하거나 폴더에 기본 에이전트를 설정하세요."
+        ),
+        Lang::Es => format!(
+            "Ningún agente seleccionado. Usa {prefix}agent para elegir uno o define uno por defecto en la carpeta."
+        ),
+        Lang::De => format!(
+            "Kein Agent ausgewählt. {prefix}agent verwenden oder Standard im Ordner festlegen."
+        ),
+        Lang::Fr => format!(
+            "Aucun agent sélectionné. Utilisez {prefix}agent ou définissez un agent par défaut sur le dossier."
+        ),
+        Lang::Pt => format!(
+            "Nenhum agente selecionado. Use {prefix}agent para escolher ou defina um padrão na pasta."
+        ),
+        Lang::Ar => format!(
+            "لم يتم اختيار وكيل. استخدم {prefix}agent لاختيار واحد أو حدد وكيلًا افتراضيًا للمجلد."
+        ),
+        Lang::En => format!(
+            "No agent selected. Use {prefix}agent to pick one or set a default on the folder."
+        ),
     }
 }
 
@@ -1515,12 +1535,22 @@ pub fn task_deferred_busy(lang: Lang) -> &'static str {
     match lang {
         Lang::ZhCn => "智能体正忙，任务将在当前回合结束后自动开始。",
         Lang::ZhTw => "智慧代理忙碌中，任務將在目前回合結束後自動開始。",
-        Lang::Ja => "エージェントがビジー状態です。現在のターンが終了すると、タスクが自動的に開始されます。",
+        Lang::Ja => {
+            "エージェントがビジー状態です。現在のターンが終了すると、タスクが自動的に開始されます。"
+        }
         Lang::Ko => "에이전트가 사용 중입니다. 현재 턴이 끝나면 작업이 자동으로 시작됩니다.",
-        Lang::Es => "El agente está ocupado; la tarea comenzará automáticamente cuando finalice el turno actual.",
-        Lang::De => "Der Agent ist beschäftigt; die Aufgabe startet automatisch, sobald der aktuelle Zug endet.",
-        Lang::Fr => "L'agent est occupé ; la tâche démarrera automatiquement à la fin du tour en cours.",
-        Lang::Pt => "O agente está ocupado; a tarefa começará automaticamente quando o turno atual terminar.",
+        Lang::Es => {
+            "El agente está ocupado; la tarea comenzará automáticamente cuando finalice el turno actual."
+        }
+        Lang::De => {
+            "Der Agent ist beschäftigt; die Aufgabe startet automatisch, sobald der aktuelle Zug endet."
+        }
+        Lang::Fr => {
+            "L'agent est occupé ; la tâche démarrera automatiquement à la fin du tour en cours."
+        }
+        Lang::Pt => {
+            "O agente está ocupado; a tarefa começará automaticamente quando o turno atual terminar."
+        }
         Lang::Ar => "الوكيل مشغول؛ ستبدأ المهمة تلقائيًا عند انتهاء الجولة الحالية.",
         Lang::En => {
             "The agent is busy — your task will start automatically once the current turn finishes."

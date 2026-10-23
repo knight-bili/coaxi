@@ -15,9 +15,15 @@ struct RovaiTaskTemplateSettings: View {
     @State private var identity = ""
     @State private var rows: [JSONValue] = []
     @State private var next: JSONValue = .null
-    @State private var draft: NativeTaskTemplateDraft?, baseline: NativeTaskTemplateDraft?
-    @State private var pending: JSONValue?, receipt: JSONValue?, issue: String?
-    @State private var busy = false, ready = false, leaving = false, removing = false
+    @State private var draft: NativeTaskTemplateDraft?
+    @State private var baseline: NativeTaskTemplateDraft?
+    @State private var pending: JSONValue?
+    @State private var receipt: JSONValue?
+    @State private var issue: String?
+    @State private var busy = false
+    @State private var ready = false
+    @State private var leaving = false
+    @State private var removing = false
     private var owner: String { "portable-task-templates/" + identity }
     private var dirty: Bool { draft != nil && draft != baseline }
     var body: some View {

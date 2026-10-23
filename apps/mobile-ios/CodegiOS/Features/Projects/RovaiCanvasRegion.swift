@@ -7,11 +7,18 @@ struct RovaiCanvasRegion: View {
     let node: JSONValue
     let onOpenThread: (String) -> Void
     @Environment(\.dismiss) private var dismiss
-    @State private var graph: JSONValue?, current: JSONValue?, issue: String?, generation: UInt64?
-    @State private var rows: [JSONValue] = [], groups: [JSONValue] = []
+    @State private var graph: JSONValue?
+    @State private var current: JSONValue?
+    @State private var issue: String?
+    @State private var generation: UInt64?
+    @State private var rows: [JSONValue] = []
+    @State private var groups: [JSONValue] = []
     @State private var folders: [String:RovaiCanvasFolderRelation] = [:]
     @State private var cursor: RovaiCanvasReferenceCursor?
-    @State private var loaded = false, busy = false, search = "", target = ""
+    @State private var loaded = false
+    @State private var busy = false
+    @State private var search = ""
+    @State private var target = ""
     @State private var selected = Set<String>()
     @State private var opening: RovaiCanvasRegionMember?
     private var id: String {node.text("id")}

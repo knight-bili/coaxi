@@ -2,8 +2,10 @@ import SwiftUI
 
 struct RovaiNativeEvidence: View {
     let model: RovaiWorkspaceModel;let commandId: String
-    @State private var value: JSONValue?, issue: String?
-    @State private var open = false, busy = false
+    @State private var value: JSONValue?
+    @State private var issue: String?
+    @State private var open = false
+    @State private var busy = false
     var body: some View {
         DisclosureGroup("原投递与普通续办记录", isExpanded: $open) {
             Text("这里只读取原记录，不会重发。送到连接或取得原程序回执，不代表模型已经阅读。").font(.caption).foregroundStyle(Theme.textSecondary)
@@ -21,8 +23,12 @@ struct RovaiNativeEvidence: View {
 struct RovaiNativeCreationRecords: View {
     let model: RovaiWorkspaceModel;let entry: JSONValue
     @Environment(\.dismiss) private var dismiss
-    @State private var rows: [JSONValue] = [], overrides: [String: JSONValue] = [:]
-    @State private var after: String?, issue: String?, working: JSONValue?, generation: UInt64?
+    @State private var rows: [JSONValue] = []
+    @State private var overrides: [String: JSONValue] = [:]
+    @State private var after: String?
+    @State private var issue: String?
+    @State private var working: JSONValue?
+    @State private var generation: UInt64?
     @State private var busy = false
     var body: some View {
         NavigationStack {List {

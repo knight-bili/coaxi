@@ -2,12 +2,14 @@ import { useThreadClient } from './camp-client'
 import { MobileBack, useMobileLayout } from './MobileLayout'
 import { newCommandId } from '../../shared/command-id'
 import { readErrorMessage } from './error-message'
+import { readCanvasViewScope } from './canvas-view-state'
 import type { MemoryNavigationTarget } from './desktop-navigation'
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
 import type {
   AcceptHearthReviewItemCommand,
   AgentProfile,
+  CoreMethod,
   CreateMemoryCommand,
   HearthReviewItem,
   MemoryCapacity,
@@ -67,6 +69,25 @@ interface MemorySnapshot {
   reviewItems: HearthReviewItem[]
 }
 
+interface MemoryCreateRequest {
+  commandId: string
+  command: CreateMemoryCommand
+}
+
+interface PendingMemoryCreate {
+  schemaVersion: 1
+  key: string
+  editorId: 'memory-create'
+  request: MemoryCreateRequest
+}
+
+interface MemoryOwnerToken {
+  client: ReturnType<typeof useThreadClient>
+  generation: number
+  identityKey: string | null
+  lifecycle: object | null
+}
+
 type ReviewScheduleAction = 'save' | 'clear'
 type ReviewScheduleBusyAction = ReviewScheduleAction | 'refresh'
 
@@ -89,6 +110,41 @@ const initialDraft: Draft = {
   secondAgentId: '',
   direction: 'mutual',
   directedActorAgentId: ''
+}
+
+function restorePendingMemoryCreate(value: unknown, key: string): PendingMemoryCreate {
+  if (!value || typeof value !== 'object') throw new Error('记忆原请求记录损坏，已保留记录。')
+  const saved = value as Partial<PendingMemoryCreate>
+  const request = saved.request as Partial<MemoryCreateRequest> | undefined
+  const command = request?.command as Partial<CreateMemoryCommand> | undefined
+  if (saved.schemaVersion !== 1 || saved.key !== key || saved.editorId !== 'memory-create'
+    || !request || typeof request.commandId !== 'string' || !request.commandId
+    || !command || !['hearth', 'companion', 'relationship'].includes(command.scope ?? '')
+    || !['agreement', 'preference', 'lesson'].includes(command.kind ?? '')
+    || typeof command.body !== 'string' || !Array.isArray(command.retrievalKeys)
+    || !command.retrievalKeys.every((item) => typeof item === 'string')
+    || command.companionAgentId !== null && typeof command.companionAgentId !== 'string'
+    || !Array.isArray(command.relationshipAgentIds)
+    || !command.relationshipAgentIds.every((item) => typeof item === 'string')
+    || command.direction !== null && !['mutual', 'directed'].includes(command.direction ?? '')
+    || command.directedActorAgentId !== null && typeof command.directedActorAgentId !== 'string'
+    || !('reviewAfter' in command)) {
+    throw new Error('记忆原请求归属或正文损坏，已保留原记录。')
+  }
+  return structuredClone(saved as PendingMemoryCreate)
+}
+
+function memoryDraftFromCreate(command: CreateMemoryCommand): Draft {
+  return {
+    scope: command.scope,
+    kind: command.kind,
+    body: command.body,
+    retrievalKeys: command.retrievalKeys.join(', '),
+    firstAgentId: command.scope === 'companion' ? command.companionAgentId ?? '' : command.relationshipAgentIds[0] ?? '',
+    secondAgentId: command.relationshipAgentIds[1] ?? '',
+    direction: command.direction ?? 'mutual',
+    directedActorAgentId: command.directedActorAgentId ?? ''
+  }
 }
 
 const scopeTabs: Array<[MemoryScopeKind, string]> = [
@@ -130,9 +186,16 @@ export function MemoryLibrary({
   startupFeedbackVisible?: boolean
 }): React.JSX.Element {
   const client = useThreadClient()
+  const lifetimeRef = useRef<object | null>(null)
+  const ownerRef = useRef<MemoryOwnerToken>({ client, generation: 0, identityKey: null, lifecycle: null })
+  if (ownerRef.current.client !== client) {
+    ownerRef.current = { client, generation: ownerRef.current.generation + 1, identityKey: null, lifecycle: lifetimeRef.current }
+  }
   const libraryGeneration = useRef(0)
   const reviewGeneration = useRef(0)
-  useEffect(() => () => { libraryGeneration.current++; reviewGeneration.current++ }, [client])
+  const createRecoveryGeneration = useRef(0)
+  const pendingCreateRef = useRef<PendingMemoryCreate | null>(null)
+  const [ownerRevision, setOwnerRevision] = useState(0)
   const [library, setLibrary] = useState<MemoryLibraryView | null>(null)
   const mobile = useMobileLayout()
   const [mobileOverviewOpen, setMobileOverviewOpen] = useState(false)
@@ -161,59 +224,198 @@ export function MemoryLibrary({
   const [reviewDrawerOpen, setReviewDrawerOpen] = useState(false)
   const [editor, setEditor] = useState<Editor>(null)
   const [draft, setDraft] = useState<Draft>(initialDraft)
+  const [pendingCreate, setPendingCreate] = useState<PendingMemoryCreate | null>(null)
+  const [createRecoveryKey, setCreateRecoveryKey] = useState<string | null>(null)
+  const [createRecoveryReadyFor, setCreateRecoveryReadyFor] = useState<string | null>(null)
   const [forgetTarget, setForgetTarget] = useState<MemoryRecord | null>(null)
   const [reviewScheduleEditor, setReviewScheduleEditor] = useState<ReviewScheduleEditor | null>(null)
   const [reviewScheduleBusyAction, setReviewScheduleBusyAction] = useState<ReviewScheduleBusyAction | null>(null)
   const [busy, setBusy] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [feedback, setFeedback] = useState<string | null>(null)
+  const navigationRef = useRef({ target: navigationTarget, onNavigate })
+  navigationRef.current = { target: navigationTarget, onNavigate }
   const startupContentVisible = startupFeedbackVisible || Boolean(error)
+  const createRecoveryReady = createRecoveryKey !== null && createRecoveryReadyFor === createRecoveryKey
+  const updatePendingCreate = useCallback((value: PendingMemoryCreate | null): void => {
+    pendingCreateRef.current = value
+    setPendingCreate(value)
+  }, [])
 
-  const loadMemoryLibrary = useCallback(async (): Promise<MemoryLibraryView> => {
+  const clearOwnerTargets = useCallback((): void => {
+    setEditor(null)
+    setDraft(initialDraft)
+    setReviewDrawerOpen(false)
+    setLocalMemoryId(null)
+    setForgetTarget(null)
+    setReviewScheduleEditor(null)
+    setReviewScheduleBusyAction(null)
+    const { target, onNavigate: navigate } = navigationRef.current
+    if (target?.memoryId && navigate) navigate({ ...target, memoryId: null }, 'replace')
+  }, [])
+
+  useEffect(() => {
+    const lifecycle = {}
+    lifetimeRef.current = lifecycle
+    ownerRef.current = { ...ownerRef.current, generation: ownerRef.current.generation + 1, lifecycle }
+    return () => {
+      if (lifetimeRef.current === lifecycle) lifetimeRef.current = null
+      if (ownerRef.current.lifecycle === lifecycle) {
+        ownerRef.current = { ...ownerRef.current, generation: ownerRef.current.generation + 1, lifecycle: null }
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    libraryGeneration.current++
+    reviewGeneration.current++
+    createRecoveryGeneration.current++
+    setLibrary(null)
+    setReviewItems([])
+    onPendingCountChange?.(0)
+    updatePendingCreate(null)
+    setCreateRecoveryKey(null)
+    setCreateRecoveryReadyFor(null)
+    setBusy(null)
+    setReviewScheduleBusyAction(null)
+    setError(null)
+    setFeedback(null)
+    return () => { libraryGeneration.current++; reviewGeneration.current++; createRecoveryGeneration.current++ }
+  }, [client, onPendingCountChange, updatePendingCreate])
+
+  const previousClientRef = useRef(client)
+  useEffect(() => {
+    if (previousClientRef.current === client) return
+    previousClientRef.current = client
+    clearOwnerTargets()
+  }, [client, clearOwnerTargets])
+
+  const isCurrentOwner = useCallback((owner: MemoryOwnerToken): boolean => {
+    const lifecycle = lifetimeRef.current
+    return lifecycle !== null && owner.lifecycle === lifecycle && ownerRef.current === owner
+  }, [])
+  const resolveOwner = useCallback(async (expectedClient: ReturnType<typeof useThreadClient>): Promise<MemoryOwnerToken | null> => {
+    const observed = ownerRef.current
+    if (observed.client !== expectedClient || !isCurrentOwner(observed)) return null
+    const identity = await readCanvasViewScope(expectedClient)
+    if (!isCurrentOwner(observed) || !identity) return null
+    const identityKey = JSON.stringify([identity.host, identity.core])
+    if (observed.identityKey === identityKey) return observed
+    const next: MemoryOwnerToken = {
+      client: expectedClient,
+      generation: observed.generation + 1,
+      identityKey,
+      lifecycle: observed.lifecycle
+    }
+    ownerRef.current = next
+    setOwnerRevision((revision) => revision + 1)
+    if (observed.identityKey !== null) clearOwnerTargets()
+    setLibrary(null)
+    setReviewItems([])
+    onPendingCountChange?.(0)
+    updatePendingCreate(null)
+    setCreateRecoveryKey(null)
+    setCreateRecoveryReadyFor(null)
+    setBusy(null)
+    setReviewScheduleBusyAction(null)
+    setError(null)
+    setFeedback(null)
+    return next
+  }, [clearOwnerTargets, isCurrentOwner, onPendingCountChange, updatePendingCreate])
+
+  const verifyOwner = useCallback(async (owner: MemoryOwnerToken): Promise<boolean> => {
+    if (!isCurrentOwner(owner)) return false
+    return await resolveOwner(owner.client) === owner
+  }, [isCurrentOwner, resolveOwner])
+
+  const reportOwnerError = useCallback(async (owner: MemoryOwnerToken, reason: unknown, stillRelevant: () => boolean = () => true): Promise<void> => {
+    try {
+      const resolved = await resolveOwner(owner.client)
+      if (!stillRelevant()) return
+      if (resolved === owner) {
+        setError(errorMessage(reason))
+      } else if (ownerRef.current === owner) {
+        setError(uiAttribute("操作失败：{0}。当前工作区身份无法确认。", String(errorMessage(reason))))
+      }
+    } catch (identityError) {
+      if (stillRelevant() && isCurrentOwner(owner)) {
+        setError(uiAttribute("操作失败：{0}；工作区身份核对失败：{1}", String(errorMessage(reason)), String(errorMessage(identityError))))
+      }
+    }
+  }, [isCurrentOwner, resolveOwner])
+
+  const requestForOwner = async <T,>(owner: MemoryOwnerToken, method: CoreMethod, params?: unknown): Promise<T> => {
+    if (!isCurrentOwner(owner)) throw new Error('工作区已切换，本次操作结果已忽略。')
+    const value = await owner.client.request<T>(method, params)
+    if (!await verifyOwner(owner)) throw new Error('工作区已切换，本次操作结果已忽略。')
+    return value
+  }
+
+  const loadMemoryLibrary = useCallback(async (expectedOwner?: MemoryOwnerToken): Promise<MemoryLibraryView | null> => {
+    const owner = expectedOwner ?? await resolveOwner(client)
+    if (!owner || owner.client !== client || !isCurrentOwner(owner)) return null
     const request = ++libraryGeneration.current
-    const nextLibrary = await client.request<MemoryLibraryView>('memory.list')
+    const nextLibrary = await owner.client.request<MemoryLibraryView>('memory.list')
+    if (!await verifyOwner(owner)) {
+      if (isCurrentOwner(owner)) throw new Error('客户端或 Core 实例身份尚未确定，列表未刷新。')
+      return null
+    }
     if (request === libraryGeneration.current) setLibrary(nextLibrary)
     return nextLibrary
-  }, [client])
+  }, [client, isCurrentOwner, resolveOwner, verifyOwner])
 
-  const load = useCallback(async (): Promise<MemorySnapshot> => {
+  const load = useCallback(async (expectedOwner?: MemoryOwnerToken): Promise<MemorySnapshot | null> => {
+    const owner = expectedOwner ?? await resolveOwner(client)
+    if (!owner || owner.client !== client || !isCurrentOwner(owner)) return null
     const libraryRequest = ++libraryGeneration.current
     const reviewRequest = ++reviewGeneration.current
     const [nextLibrary, nextReviewItems] = await Promise.all([
-      client.request<MemoryLibraryView>('memory.list'),
-      client.request<HearthReviewItem[]>('memory.hearthReviewItems.list')
+      owner.client.request<MemoryLibraryView>('memory.list'),
+      owner.client.request<HearthReviewItem[]>('memory.hearthReviewItems.list')
     ])
+    if (!await verifyOwner(owner)) {
+      if (isCurrentOwner(owner)) throw new Error('客户端或 Core 实例身份尚未确定，列表未刷新。')
+      return null
+    }
     if (libraryRequest === libraryGeneration.current) setLibrary(nextLibrary)
     if (reviewRequest === reviewGeneration.current) {
       setReviewItems(nextReviewItems)
       onPendingCountChange?.(nextReviewItems.filter((reviewItem) => reviewItem.status === 'pending').length)
     }
     return { library: nextLibrary, reviewItems: nextReviewItems }
-  }, [client, onPendingCountChange])
+  }, [client, isCurrentOwner, onPendingCountChange, resolveOwner, verifyOwner])
 
   useEffect(() => {
     if (library) onReady?.()
   }, [library, onReady])
 
   useEffect(() => {
-    void load().catch((nextError) => setError(errorMessage(nextError)))
-  }, [load])
+    const observed = ownerRef.current
+    void load(observed).catch((nextError) => { void reportOwnerError(observed, nextError) })
+  }, [load, ownerRevision, reportOwnerError])
 
   useEffect(() => client.onEvent?.((event) => {
     if (event.method !== 'runtime.state') return
     const params = typeof event.params === 'object' && event.params !== null
       ? event.params as Record<string, unknown>
       : {}
-    if (params.status === 'ready') void load().catch((nextError) => setError(errorMessage(nextError)))
-  }), [client, load])
+    if (params.status === 'ready') {
+      const observed = ownerRef.current
+      void load(observed).catch((nextError) => { void reportOwnerError(observed, nextError) })
+    }
+  }), [client, load, reportOwnerError])
 
   useEffect(() => client.onInvalidated?.(() => {
-    void load().catch((nextError) => setError(errorMessage(nextError)))
-  }), [client, load])
+    const observed = ownerRef.current
+    void load(observed).catch((nextError) => { void reportOwnerError(observed, nextError) })
+  }), [client, load, reportOwnerError])
 
   useEffect(() => {
-    if (refreshSignal > 0) void load().catch((nextError) => setError(errorMessage(nextError)))
-  }, [load, refreshSignal])
+    if (refreshSignal > 0) {
+      const observed = ownerRef.current
+      void load(observed).catch((nextError) => { void reportOwnerError(observed, nextError) })
+    }
+  }, [load, ownerRevision, refreshSignal, reportOwnerError])
 
   useEffect(() => {
     if (reviewDrawerSignal <= 0) return
@@ -288,26 +490,52 @@ export function MemoryLibrary({
   ).length ?? 0
   const loading = library === null && error === null
 
-  const run = async (key: string, operation: () => Promise<void>): Promise<void> => {
+  const run = async (key: string, operation: (owner: MemoryOwnerToken) => Promise<void>): Promise<void> => {
+    const observed = ownerRef.current
+    let owner: MemoryOwnerToken | null
+    try {
+      owner = await resolveOwner(client)
+    } catch (nextError) {
+      if (isCurrentOwner(observed)) setError(errorMessage(nextError))
+      return
+    }
+    if (!owner || owner.client !== client || owner !== observed) return
     setBusy(key)
     setError(null)
     try {
-      await operation()
-      await load()
+      await operation(owner)
+      if (!isCurrentOwner(owner)) return
+      const snapshot = await load(owner)
+      if (!snapshot && isCurrentOwner(owner)) throw new Error('客户端或 Core 实例身份尚未确定，列表未刷新。')
     } catch (nextError) {
+      if (!isCurrentOwner(owner)) return
+      let ownerConfirmed = false
+      try {
+        ownerConfirmed = await verifyOwner(owner)
+      } catch (identityError) {
+        if (isCurrentOwner(owner)) {
+          setError(uiAttribute("操作失败：{0}；工作区身份核对失败：{1}", String(errorMessage(nextError)), String(errorMessage(identityError))))
+        }
+        return
+      }
+      if (!ownerConfirmed) {
+        if (isCurrentOwner(owner)) setError(uiAttribute("操作失败：{0}。当前工作区身份无法确认。", String(errorMessage(nextError))))
+        return
+      }
       if (nextError instanceof CommandRejectedError && isMemoryConflict(nextError.code)) {
         try {
-          const snapshot = await load()
+          const snapshot = await load(owner)
+          if (!snapshot || !isCurrentOwner(owner)) return
           setEditor((current) => refreshEditorAuthority(current, snapshot))
           setError(uiAttribute('审核状态或记忆版本已经变化。已刷新权威状态并保留当前草稿，请核对后明确重试。'))
         } catch (refreshError) {
-          setError(uiAttribute("状态冲突，且刷新失败：{0}", String(errorMessage(refreshError))))
+          if (isCurrentOwner(owner)) setError(uiAttribute("状态冲突，且刷新失败：{0}", String(errorMessage(refreshError))))
         }
       } else {
         setError(errorMessage(nextError))
       }
     } finally {
-      setBusy(null)
+      if (isCurrentOwner(owner)) setBusy(null)
     }
   }
 
@@ -321,6 +549,8 @@ export function MemoryLibrary({
       secondAgentId: agents.find((agent) => agent.agentId !== firstAgentId)?.agentId ?? '',
       directedActorAgentId: firstAgentId
     })
+    setCreateRecoveryReadyFor(null)
+    setError(null)
     setEditor({ kind: 'create' })
   }
 
@@ -350,6 +580,51 @@ export function MemoryLibrary({
     setEditor({ kind: 'reviewItem', reviewItem })
   }
 
+  useEffect(() => {
+    if (editor?.kind !== 'create') return
+    const observed = ++createRecoveryGeneration.current
+    const observedOwner = ownerRef.current
+    let recoveryOwner: MemoryOwnerToken | null = null
+    setCreateRecoveryReadyFor(null)
+    void (async () => {
+      const owner = await resolveOwner(client)
+      if (!owner) {
+        if (isCurrentOwner(observedOwner)) throw new Error('客户端或 Core 实例身份尚未确定，无法安全恢复记忆原请求。')
+        return
+      }
+      if (observed !== createRecoveryGeneration.current || !isCurrentOwner(owner)) return
+      recoveryOwner = owner
+      const recoveryKey = 'memory-create:' + owner.identityKey
+      setCreateRecoveryKey(recoveryKey)
+      let raw: unknown
+      if (owner.client.workbenchEditorRecovery) {
+        const value = await owner.client.workbenchEditorRecovery.get(recoveryKey)
+        if (value !== null) {
+          const record = value as { schemaVersion?: number; key?: string; editorId?: string; pending?: unknown }
+          if (record.schemaVersion !== 1 || record.key !== recoveryKey || record.editorId !== 'memory-create' || !('pending' in record)) {
+            throw new Error('记忆原请求记录归属不同，已保留原记录。')
+          }
+          raw = record.pending
+        }
+      } else if (owner.client.editingRecovery) {
+        raw = owner.client.editingRecovery.get(recoveryKey)
+      } else {
+        throw new Error('原请求恢复存储尚不可用，暂不能安全保存记忆。')
+      }
+      if (observed !== createRecoveryGeneration.current || !isCurrentOwner(owner)) return
+      const pending = raw == null
+        ? pendingCreateRef.current?.key === recoveryKey ? pendingCreateRef.current : null
+        : restorePendingMemoryCreate(raw, recoveryKey)
+      updatePendingCreate(pending)
+      if (pending) setDraft(memoryDraftFromCreate(pending.request.command))
+      setCreateRecoveryReadyFor(recoveryKey)
+    })().catch((nextError) => {
+      if (observed !== createRecoveryGeneration.current) return
+      void reportOwnerError(recoveryOwner ?? observedOwner, nextError, () => observed === createRecoveryGeneration.current)
+    })
+    return () => { createRecoveryGeneration.current++ }
+  }, [client, editor?.kind, ownerRevision, reportOwnerError, resolveOwner])
+
   const retrievalKeys = (): string[] => draft.retrievalKeys
     .split(',')
     .map((value) => value.trim())
@@ -371,19 +646,51 @@ export function MemoryLibrary({
     reviewAfter: null
   })
 
+  const persistPendingCreate = async (value: PendingMemoryCreate | null, owner: MemoryOwnerToken): Promise<void> => {
+    const recoveryKey = owner.identityKey ? 'memory-create:' + owner.identityKey : null
+    if (!recoveryKey || !isCurrentOwner(owner) || createRecoveryKey !== recoveryKey || value && value.key !== recoveryKey) {
+      throw new Error('工作区身份尚未确定，原请求未发送。')
+    }
+    if (owner.client.workbenchEditorRecovery) {
+      await owner.client.workbenchEditorRecovery.put({ schemaVersion: 1, key: recoveryKey, editorId: 'memory-create', pending: value })
+      return
+    }
+    if (!owner.client.editingRecovery) throw new Error('原请求恢复存储尚不可用，原请求未发送。')
+    owner.client.editingRecovery.set(recoveryKey, value)
+  }
+
   const submitEditor = async (event: React.FormEvent): Promise<void> => {
     event.preventDefault()
     if (!editor) return
-    await run(`editor-${editor.kind}`, async () => {
+    await run(`editor-${editor.kind}`, async (owner) => {
       let result: StoredCommandResult
       if (editor.kind === 'create') {
-        result = await client.request('memory.create', {
-          commandId: newCommandId(),
-          command: createCommand()
-        })
+        if (!createRecoveryReady || !createRecoveryKey) throw new Error('原请求恢复存储尚未就绪，本次未发送。')
+        let pending = pendingCreateRef.current?.key === createRecoveryKey ? pendingCreateRef.current : null
+        if (!pending) {
+          pending = {
+            schemaVersion: 1,
+            key: createRecoveryKey,
+            editorId: 'memory-create',
+            request: { commandId: newCommandId(), command: structuredClone(createCommand()) }
+          }
+          await persistPendingCreate(pending, owner)
+          if (!await verifyOwner(owner)) {
+            if (isCurrentOwner(owner)) throw new Error('原请求已保存，但当前工作区身份无法确认，未发送。')
+            return
+          }
+          updatePendingCreate(pending)
+        }
+        result = await requestForOwner<StoredCommandResult>(owner, 'memory.create', structuredClone(pending.request))
+        await persistPendingCreate(null, owner)
+        if (!await verifyOwner(owner)) {
+          if (isCurrentOwner(owner)) throw new Error('创建结果已收到，但当前工作区身份无法确认，原请求记录保留。')
+          return
+        }
+        if (pendingCreateRef.current?.request.commandId === pending.request.commandId) updatePendingCreate(null)
       } else if (editor.kind === 'revise') {
         if (!editor.memory.currentRevisionId) throw new Error(uiAttribute('当前记忆没有可修订的版本。'))
-        result = await client.request('memory.revise', {
+        result = await requestForOwner(owner, 'memory.revise', {
           commandId: newCommandId(),
           command: {
             memoryId: editor.memory.id,
@@ -401,11 +708,12 @@ export function MemoryLibrary({
           finalBody: draft.body.trim(),
           finalRetrievalKeys: retrievalKeys()
         }
-        result = await client.request('memory.hearthReviewItems.accept', {
+        result = await requestForOwner(owner, 'memory.hearthReviewItems.accept', {
           commandId: newCommandId(),
           command
         })
       }
+      if (!isCurrentOwner(owner)) return
       assertApplied(result)
       setEditor(null)
       setFeedback(editor.kind === 'reviewItem'
@@ -415,8 +723,8 @@ export function MemoryLibrary({
   }
 
   const acceptReview = (reviewItem: HearthReviewItem): Promise<void> =>
-    run(`accept-${reviewItem.reviewItemId}`, async () => {
-      const result = await client.request<StoredCommandResult>('memory.hearthReviewItems.accept', {
+    run(`accept-${reviewItem.reviewItemId}`, async (owner) => {
+      const result = await requestForOwner<StoredCommandResult>(owner, 'memory.hearthReviewItems.accept', {
         commandId: newCommandId(),
         command: {
           reviewItemId: reviewItem.reviewItemId,
@@ -428,8 +736,8 @@ export function MemoryLibrary({
     })
 
   const rejectReview = (reviewItem: HearthReviewItem): Promise<void> =>
-    run(`reject-${reviewItem.reviewItemId}`, async () => {
-      const result = await client.request<StoredCommandResult>('memory.hearthReviewItems.reject', {
+    run(`reject-${reviewItem.reviewItemId}`, async (owner) => {
+      const result = await requestForOwner<StoredCommandResult>(owner, 'memory.hearthReviewItems.reject', {
         commandId: newCommandId(),
         command: {
           reviewItemId: reviewItem.reviewItemId,
@@ -443,16 +751,16 @@ export function MemoryLibrary({
   const lifecycle = (
     method: 'memory.retire' | 'memory.reactivate',
     memory: MemoryRecord
-  ): Promise<void> => run(`${method}-${memory.id}`, async () => {
-    const result = await client.request<StoredCommandResult>(method, {
+  ): Promise<void> => run(`${method}-${memory.id}`, async (owner) => {
+    const result = await requestForOwner<StoredCommandResult>(owner, method, {
       commandId: newCommandId(),
       command: { memoryId: memory.id, expectedVersion: memory.version }
     })
     assertApplied(result)
   })
 
-  const forget = (memory: MemoryRecord): Promise<void> => run(`forget-${memory.id}`, async () => {
-    const result = await client.request<StoredCommandResult>('memory.forget', {
+  const forget = (memory: MemoryRecord): Promise<void> => run(`forget-${memory.id}`, async (owner) => {
+    const result = await requestForOwner<StoredCommandResult>(owner, 'memory.forget', {
       commandId: newCommandId(),
       command: { memoryId: memory.id, expectedVersion: memory.version }
     })
@@ -489,6 +797,21 @@ export function MemoryLibrary({
       desiredReviewAfter = validation.selectedDate.toISOString()
     }
 
+    const observedOwner = ownerRef.current
+    let owner: MemoryOwnerToken | null
+    try {
+      owner = await resolveOwner(client)
+    } catch (ownerError) {
+      if (isCurrentOwner(observedOwner)) {
+        setReviewScheduleEditor((editorState) => editorState && {
+          ...editorState,
+          notice: { tone: 'error', message: uiAttribute("无法确认当前工作区身份：{0}", String(errorMessage(ownerError))) }
+        })
+      }
+      return
+    }
+    if (!owner || owner !== observedOwner) return
+
     setReviewScheduleBusyAction(action)
     setBusy(`review-${current.memory.id}`)
     setReviewScheduleEditor((editorState) => editorState && {
@@ -498,7 +821,7 @@ export function MemoryLibrary({
     })
 
     try {
-      const result = await client.request<StoredCommandResult>('memory.review.schedule', {
+      const result = await requestForOwner<StoredCommandResult>(owner, 'memory.review.schedule', {
         commandId: newCommandId(),
         command: {
           memoryId: current.memory.id,
@@ -509,8 +832,11 @@ export function MemoryLibrary({
       assertApplied(result)
 
       try {
-        await loadMemoryLibrary()
+        const refreshed = await loadMemoryLibrary(owner)
+        if (!isCurrentOwner(owner)) return
+        if (!refreshed) throw new Error(uiAttribute('当前工作区身份已变化，尚未刷新列表。'))
       } catch (refreshError) {
+        if (!isCurrentOwner(owner)) return
         const completion = action === 'clear' ? uiAttribute('复核提醒已清除') : uiAttribute('下次复核已设置')
         setReviewScheduleEditor((editorState) => editorState && {
           ...editorState,
@@ -528,9 +854,39 @@ export function MemoryLibrary({
       setReviewScheduleEditor(null)
       setFeedback(action === 'clear' ? uiAttribute('复核提醒已清除') : uiAttribute('下次复核已设置'))
     } catch (nextError) {
+      if (!isCurrentOwner(owner)) return
+      let ownerConfirmed = false
+      try {
+        ownerConfirmed = await verifyOwner(owner)
+      } catch (identityError) {
+        if (isCurrentOwner(owner)) {
+          setReviewScheduleEditor((editorState) => editorState && {
+            ...editorState,
+            phase: 'authority-unknown',
+            appliedAction: null,
+            attemptedAction: action,
+            notice: { tone: 'error', message: uiAttribute("操作失败：{0}；工作区身份核对失败：{1}", String(errorMessage(nextError)), String(errorMessage(identityError))) }
+          })
+        }
+        return
+      }
+      if (!ownerConfirmed) {
+        if (isCurrentOwner(owner)) {
+          setReviewScheduleEditor((editorState) => editorState && {
+            ...editorState,
+            phase: 'authority-unknown',
+            appliedAction: null,
+            attemptedAction: action,
+            notice: { tone: 'error', message: uiAttribute("操作失败：{0}。当前工作区身份无法确认。", String(errorMessage(nextError))) }
+          })
+        }
+        return
+      }
       if (nextError instanceof CommandRejectedError && isMemoryConflict(nextError.code)) {
         try {
-          const nextLibrary = await loadMemoryLibrary()
+          const nextLibrary = await loadMemoryLibrary(owner)
+          if (!isCurrentOwner(owner)) return
+          if (!nextLibrary) throw new Error(uiAttribute('当前工作区身份已变化，无法刷新记忆列表。'))
           const latest = nextLibrary.memories.find((memory) => memory.id === current.memory.id)
           if (!latest) {
             setReviewScheduleEditor((editorState) => editorState && {
@@ -557,6 +913,25 @@ export function MemoryLibrary({
             notice: reviewScheduleConflictNotice(latest, desiredAlreadyApplied, action)
           })
         } catch (refreshError) {
+          if (!isCurrentOwner(owner)) return
+          let stillCurrent = false
+          let identityError: unknown = null
+          try { stillCurrent = await verifyOwner(owner) } catch (reason) { identityError = reason }
+          if (!stillCurrent) {
+            if (isCurrentOwner(owner)) {
+              setReviewScheduleEditor((editorState) => editorState && {
+                ...editorState,
+                phase: 'authority-unknown',
+                appliedAction: null,
+                attemptedAction: action,
+                notice: {
+                  tone: 'error',
+                  message: uiAttribute("刷新失败：{0}；当前工作区身份{1}。", String(errorMessage(refreshError)), identityError ? uiAttribute("核对失败：{0}", String(errorMessage(identityError))) : uiAttribute("无法确认"))
+                }
+              })
+            }
+            return
+          }
           setReviewScheduleEditor((editorState) => editorState && {
             ...editorState,
             phase: 'authority-unknown',
@@ -581,18 +956,36 @@ export function MemoryLibrary({
         })
       }
     } finally {
-      setReviewScheduleBusyAction(null)
-      setBusy(null)
+      if (isCurrentOwner(owner)) {
+        setReviewScheduleBusyAction(null)
+        setBusy(null)
+      }
     }
   }
 
   const retryReviewScheduleRefresh = async (): Promise<void> => {
     const current = reviewScheduleEditor
     if (!current || reviewScheduleBusyAction !== null || current.phase === 'ready') return
+    const observedOwner = ownerRef.current
+    let owner: MemoryOwnerToken | null
+    try {
+      owner = await resolveOwner(client)
+    } catch (ownerError) {
+      if (isCurrentOwner(observedOwner)) {
+        setReviewScheduleEditor((editorState) => editorState && {
+          ...editorState,
+          notice: { tone: 'error', message: uiAttribute("无法确认当前工作区身份：{0}", String(errorMessage(ownerError))) }
+        })
+      }
+      return
+    }
+    if (!owner || owner !== observedOwner) return
     setReviewScheduleBusyAction('refresh')
     setBusy(`review-refresh-${current.memory.id}`)
     try {
-      const nextLibrary = await loadMemoryLibrary()
+      const nextLibrary = await loadMemoryLibrary(owner)
+      if (!isCurrentOwner(owner)) return
+      if (!nextLibrary) throw new Error(uiAttribute('当前工作区身份已变化，无法刷新记忆列表。'))
       if (current.phase === 'applied-refresh-failed') {
         setReviewScheduleEditor(null)
         setFeedback(current.appliedAction === 'clear' ? uiAttribute('复核提醒已清除') : uiAttribute('下次复核已设置'))
@@ -613,6 +1006,22 @@ export function MemoryLibrary({
         notice: reviewScheduleConflictNotice(latest, desiredAlreadyApplied, attemptedAction)
       })
     } catch (refreshError) {
+      if (!isCurrentOwner(owner)) return
+      let ownerConfirmed = false
+      let identityError: unknown = null
+      try { ownerConfirmed = await verifyOwner(owner) } catch (reason) { identityError = reason }
+      if (!ownerConfirmed) {
+        if (isCurrentOwner(owner)) {
+          setReviewScheduleEditor((editorState) => editorState && {
+            ...editorState,
+            notice: {
+              tone: 'error',
+              message: uiAttribute("刷新失败：{0}；当前工作区身份{1}。", String(errorMessage(refreshError)), identityError ? uiAttribute("核对失败：{0}", String(errorMessage(identityError))) : uiAttribute("无法确认"))
+            }
+          })
+        }
+        return
+      }
       setReviewScheduleEditor((editorState) => editorState && {
         ...editorState,
         notice: {
@@ -621,8 +1030,10 @@ export function MemoryLibrary({
         }
       })
     } finally {
-      setReviewScheduleBusyAction(null)
-      setBusy(null)
+      if (isCurrentOwner(owner)) {
+        setReviewScheduleBusyAction(null)
+        setBusy(null)
+      }
     }
   }
 
@@ -652,7 +1063,7 @@ export function MemoryLibrary({
 
       {topNotices && <div className="memory-page-notices">{topNotices}</div>}
 
-      {error && <div className="memory-error" role="alert"><strong><UiText zh={"操作未完成"} /></strong><span>{error}</span>{!library && <button className="quiet-button compact" type="button" onClick={() => { setError(null); void load().catch((nextError) => setError(errorMessage(nextError))) }}><UiText zh={"重试"} /></button>}</div>}
+      {error && !editor && <div className="memory-error" role="alert"><strong><UiText zh={"操作未完成"} /></strong><span>{error}</span>{!library && <button className="quiet-button compact" type="button" onClick={() => { const observed = ownerRef.current; setError(null); void load(observed).catch((nextError) => { void reportOwnerError(observed, nextError) }) }}><UiText zh={"重试"} /></button>}</div>}
       {feedback && <div className="memory-feedback" role="status">{feedback}</div>}
 
       <div className="memory-summary-strip" aria-label={uiAttribute("记忆概览")}>
@@ -767,7 +1178,7 @@ export function MemoryLibrary({
         onRetryRefresh={retryReviewScheduleRefresh}
       />
 
-      <MemoryEditorDialog editor={editor} draft={draft} agents={agents} busy={busy !== null} onDraft={setDraft} onClose={() => setEditor(null)} onSubmit={submitEditor} />
+      <MemoryEditorDialog editor={editor} draft={draft} agents={agents} busy={busy !== null} recoveryReady={editor?.kind !== 'create' || createRecoveryReady} pendingCreate={pendingCreate?.key === createRecoveryKey} error={error} onDraft={setDraft} onClose={() => setEditor(null)} onSubmit={submitEditor} />
 
       <Dialog.Root open={forgetTarget !== null} onOpenChange={(open) => { if (!open) setForgetTarget(null) }}>
         <Dialog.Portal>
@@ -1287,6 +1698,9 @@ function MemoryEditorDialog({
   draft,
   agents,
   busy,
+  recoveryReady,
+  pendingCreate,
+  error,
   onDraft,
   onClose,
   onSubmit
@@ -1295,11 +1709,16 @@ function MemoryEditorDialog({
   draft: Draft
   agents: AgentProfile[]
   busy: boolean
+  recoveryReady: boolean
+  pendingCreate: boolean
+  error: string | null
   onDraft(value: Draft): void
   onClose(): void
   onSubmit(event: React.FormEvent): void
 }): React.JSX.Element {
   const identityLocked = editor?.kind === 'revise' || editor?.kind === 'reviewItem'
+  const createLocked = editor?.kind === 'create' && (!recoveryReady || pendingCreate)
+  const frozenCreate = editor?.kind === 'create' && pendingCreate
   const keys = draft.retrievalKeys.split(',').map((key) => key.trim()).filter(Boolean)
   const keyBytes = keys.reduce((total, key) => total + new TextEncoder().encode(key).length, 0)
   const identityValid = draft.scope === 'hearth'
@@ -1309,6 +1728,8 @@ function MemoryEditorDialog({
   const bodyBytes = new TextEncoder().encode(draft.body).length
   const reviewItemEditable = editor?.kind !== 'reviewItem'
     || (editor.reviewItem.status === 'pending' && !editor.reviewItem.stale)
+  const submitDisabled = busy || editor?.kind === 'create' && !recoveryReady
+    || !frozenCreate && (!draft.body.trim() || bodyBytes > 2048 || !identityValid || !keysValid || !reviewItemEditable)
   return (
     <Dialog.Root open={editor !== null} onOpenChange={(open) => { if (!open) onClose() }}>
       <Dialog.Portal>
@@ -1323,24 +1744,27 @@ function MemoryEditorDialog({
           />
           <form className="app-dialog-form" onSubmit={onSubmit}>
             <AppDialogBody>
+              {error && <p role="alert" className="memory-error">{error}</p>}
+              {editor?.kind === 'create' && !recoveryReady && <p role="status"><UiText zh={"正在读取原保存状态…"} /></p>}
+              {frozenCreate && <p role="status"><UiText zh={"上次保存结果待核对。重试会使用同一编号和完整请求，不会重复创建。"} /></p>}
               <div className="memory-editor-grid">
-                <label className="field-label"><UiText zh={"范围"} /><select value={draft.scope} disabled={identityLocked || busy} onChange={(event) => onDraft({ ...draft, scope: event.target.value as MemoryScopeKind })}><option value="hearth"><UiText zh={"共同记忆"} /></option><option value="companion"><UiText zh={"队员记忆"} /></option><option value="relationship"><UiText zh={"队员间记忆"} /></option></select></label>
-                <label className="field-label"><UiText zh={"类型"} /><select value={draft.kind} disabled={identityLocked || busy} onChange={(event) => onDraft({ ...draft, kind: event.target.value as MemoryKind })}><option value="preference" disabled={draft.scope === 'relationship'}><UiText zh={"偏好"} /></option><option value="agreement"><UiText zh={"约定"} /></option><option value="lesson"><UiText zh={"经验"} /></option></select></label>
-                {draft.scope === 'companion' && <AgentSelect label={uiAttribute("队员")} value={draft.firstAgentId} agents={agents} disabled={identityLocked || busy} onChange={(firstAgentId) => onDraft({ ...draft, firstAgentId })} />}
+                <label className="field-label"><UiText zh={"范围"} /><select value={draft.scope} disabled={identityLocked || busy || createLocked} onChange={(event) => onDraft({ ...draft, scope: event.target.value as MemoryScopeKind })}><option value="hearth"><UiText zh={"共同记忆"} /></option><option value="companion"><UiText zh={"队员记忆"} /></option><option value="relationship"><UiText zh={"队员间记忆"} /></option></select></label>
+                <label className="field-label"><UiText zh={"类型"} /><select value={draft.kind} disabled={identityLocked || busy || createLocked} onChange={(event) => onDraft({ ...draft, kind: event.target.value as MemoryKind })}><option value="preference" disabled={draft.scope === 'relationship'}><UiText zh={"偏好"} /></option><option value="agreement"><UiText zh={"约定"} /></option><option value="lesson"><UiText zh={"经验"} /></option></select></label>
+                {draft.scope === 'companion' && <AgentSelect label={uiAttribute("队员")} value={draft.firstAgentId} agents={agents} disabled={identityLocked || busy || createLocked} onChange={(firstAgentId) => onDraft({ ...draft, firstAgentId })} />}
                 {draft.scope === 'relationship' && <>
-                  <AgentSelect label={uiAttribute("队员 A")} value={draft.firstAgentId} agents={agents} disabled={identityLocked || busy} onChange={(firstAgentId) => onDraft({ ...draft, firstAgentId })} />
-                  <AgentSelect label={uiAttribute("队员 B")} value={draft.secondAgentId} agents={agents.filter((agent) => agent.agentId !== draft.firstAgentId)} disabled={identityLocked || busy} onChange={(secondAgentId) => onDraft({ ...draft, secondAgentId })} />
-                  <label className="field-label"><UiText zh={"方向"} /><select value={draft.direction} disabled={identityLocked || busy} onChange={(event) => onDraft({ ...draft, direction: event.target.value as MemoryDirection })}><option value="mutual"><UiText zh={"双方共同"} /></option><option value="directed"><UiText zh={"单向"} /></option></select></label>
-                  {draft.direction === 'directed' && <AgentSelect label={uiAttribute("责任方")} value={draft.directedActorAgentId} agents={agents.filter((agent) => [draft.firstAgentId, draft.secondAgentId].includes(agent.agentId))} disabled={identityLocked || busy} onChange={(directedActorAgentId) => onDraft({ ...draft, directedActorAgentId })} />}
+                  <AgentSelect label={uiAttribute("队员 A")} value={draft.firstAgentId} agents={agents} disabled={identityLocked || busy || createLocked} onChange={(firstAgentId) => onDraft({ ...draft, firstAgentId })} />
+                  <AgentSelect label={uiAttribute("队员 B")} value={draft.secondAgentId} agents={agents.filter((agent) => agent.agentId !== draft.firstAgentId)} disabled={identityLocked || busy || createLocked} onChange={(secondAgentId) => onDraft({ ...draft, secondAgentId })} />
+                  <label className="field-label"><UiText zh={"方向"} /><select value={draft.direction} disabled={identityLocked || busy || createLocked} onChange={(event) => onDraft({ ...draft, direction: event.target.value as MemoryDirection })}><option value="mutual"><UiText zh={"双方共同"} /></option><option value="directed"><UiText zh={"单向"} /></option></select></label>
+                  {draft.direction === 'directed' && <AgentSelect label={uiAttribute("责任方")} value={draft.directedActorAgentId} agents={agents.filter((agent) => [draft.firstAgentId, draft.secondAgentId].includes(agent.agentId))} disabled={identityLocked || busy || createLocked} onChange={(directedActorAgentId) => onDraft({ ...draft, directedActorAgentId })} />}
                 </>}
               </div>
-              <label className="field-label memory-body-field"><UiText zh={"正文"} /><textarea autoFocus data-dialog-autofocus value={draft.body} rows={7} disabled={busy} onChange={(event) => onDraft({ ...draft, body: event.target.value })} /><small>{bodyBytes}/2048 bytes</small></label>
-              <label className="field-label memory-body-field">Retrieval Keys<input value={draft.retrievalKeys} disabled={busy} placeholder={uiAttribute("1–3 个关键词，使用逗号分隔")} onChange={(event) => onDraft({ ...draft, retrievalKeys: event.target.value })} /><small>{keys.length}<UiText zh={"/3 项 · "} />{keyBytes}/48 bytes</small></label>
+              <label className="field-label memory-body-field"><UiText zh={"正文"} /><textarea autoFocus data-dialog-autofocus value={draft.body} rows={7} disabled={busy || createLocked} onChange={(event) => onDraft({ ...draft, body: event.target.value })} /><small>{bodyBytes}/2048 bytes</small></label>
+              <label className="field-label memory-body-field">Retrieval Keys<input value={draft.retrievalKeys} disabled={busy || createLocked} placeholder={uiAttribute("1–3 个关键词，使用逗号分隔")} onChange={(event) => onDraft({ ...draft, retrievalKeys: event.target.value })} /><small>{keys.length}<UiText zh={"/3 项 · "} />{keyBytes}/48 bytes</small></label>
               {!reviewItemEditable && <div className="memory-review-warning" role="status"><UiText zh={"权威审核状态已变化。草稿仍保留，但这条审核不能再接受；请关闭后查看最新记录。"} /></div>}
             </AppDialogBody>
             <AppDialogFooter>
               <Dialog.Close asChild><button className="quiet-button" type="button" disabled={busy}><UiText zh={"取消"} /></button></Dialog.Close>
-              <button className="primary-button" type="submit" disabled={!draft.body.trim() || bodyBytes > 2048 || !identityValid || !keysValid || !reviewItemEditable || busy}>{busy ? uiAttribute("正在保存…") : editor?.kind === 'reviewItem' ? uiAttribute("接受最终内容") : editor?.kind === 'revise' ? uiAttribute("保存修订") : uiAttribute("保存记忆")}</button>
+              <button className="primary-button" type="submit" disabled={submitDisabled}>{busy ? uiAttribute("正在保存…") : frozenCreate ? uiAttribute("核对原保存") : editor?.kind === 'reviewItem' ? uiAttribute("接受最终内容") : editor?.kind === 'revise' ? uiAttribute("保存修订") : uiAttribute("保存记忆")}</button>
             </AppDialogFooter>
           </form>
         </AppDialogContent>

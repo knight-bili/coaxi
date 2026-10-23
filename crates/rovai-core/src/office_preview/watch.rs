@@ -36,10 +36,9 @@ use serde::Serialize;
 use tokio::net::TcpStream;
 use tokio::process::Child;
 
-
 use super::resolve_tree_path;
-use super::{is_office_path, resolve_officecli};
 use super::tokio_command;
+use super::{is_office_path, resolve_officecli};
 
 // ─── Tunables ───────────────────────────────────────────────────────────
 
@@ -202,11 +201,7 @@ fn spawn_lock_for(key: &str) -> Arc<tokio::sync::Mutex<()>> {
 /// referenced with different casing collapses to one watch.
 fn watch_key(canonical: &Path) -> String {
     let s = canonical.to_string_lossy().replace('\\', "/");
-    if cfg!(windows) {
-        s.to_lowercase()
-    } else {
-        s
-    }
+    if cfg!(windows) { s.to_lowercase() } else { s }
 }
 
 /// Resolve `rel_path` against `root_path`, canonicalize, confine to the root,
@@ -251,7 +246,10 @@ fn loose_key(root_path: &str, rel_path: &str) -> Option<String> {
 /// the readiness probe catches the rare loss as `PortTimeout`/`StartFailed`.
 fn allocate_free_port() -> Result<u16, WatchError> {
     let listener = std::net::TcpListener::bind(("127.0.0.1", 0)).map_err(|_| WatchError::NoPort)?;
-    let port = listener.local_addr().map_err(|_| WatchError::NoPort)?.port();
+    let port = listener
+        .local_addr()
+        .map_err(|_| WatchError::NoPort)?
+        .port();
     drop(listener);
     Ok(port)
 }
@@ -429,7 +427,14 @@ pub async fn start_office_watch_core(
             } else {
                 // A dead entry squats the key — replace it below.
                 watches.remove(&key);
-                register_new(watches, key.clone(), child, port, cap.clone(), canonical_target)
+                register_new(
+                    watches,
+                    key.clone(),
+                    child,
+                    port,
+                    cap.clone(),
+                    canonical_target,
+                )
             }
         } else if watches.len() >= MAX_CONCURRENT_WATCHES {
             // Enforce the cap atomically under the pool lock — per-file spawn
@@ -439,7 +444,14 @@ pub async fn start_office_watch_core(
             reap(child);
             Err(WatchError::TooMany)
         } else {
-            register_new(watches, key.clone(), child, port, cap.clone(), canonical_target)
+            register_new(
+                watches,
+                key.clone(),
+                child,
+                port,
+                cap.clone(),
+                canonical_target,
+            )
         }
     };
     result

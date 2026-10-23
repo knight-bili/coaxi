@@ -2,14 +2,14 @@ mod auth;
 mod channels;
 pub use channels::{ChannelFuture, ChannelHost, ChannelReply, ChannelRequest};
 mod avatars;
+mod mission_uploads;
 mod network;
+mod office_proxy;
 mod operations;
 mod portable_configuration;
 mod resources;
-mod office_proxy;
 mod updates;
 mod uploads;
-mod mission_uploads;
 mod workspaces;
 pub use updates::{UpdateFuture, UpdateHost, UpdateRequest};
 
@@ -215,17 +215,52 @@ fn routes(state: WebState) -> Router {
         .route("/channels", post(channels::request))
         .route("/updates", post(updates::request))
         .route("/request", post(request))
-        .route("/configuration/secrets",post(portable_configuration::secret).layer(DefaultBodyLimit::max(2*1024*1024)))
-        .route("/configuration/receipt",post(portable_configuration::receipt))
-        .route("/configuration/provider",post(portable_configuration::provider))
-        .route("/configuration/export",post(portable_configuration::export).layer(DefaultBodyLimit::max(128*1024)))
-        .route("/configuration/sync",post(portable_configuration::sync).layer(DefaultBodyLimit::max(128*1024)))
-        .route("/configuration/logging",post(portable_configuration::logging).layer(DefaultBodyLimit::max(128*1024)))
-        .route("/configuration/templates",post(portable_configuration::templates).layer(DefaultBodyLimit::max(2*1024*1024)))
-        .route("/configuration/files-finish",post(portable_configuration::files_finish).layer(DefaultBodyLimit::max(4096)))
-        .route("/configuration/export-receipt",post(portable_configuration::export_receipt))
-        .route("/configuration/export-download",post(portable_configuration::export_download))
-        .route("/configuration/archive",post(portable_configuration::archive).layer(DefaultBodyLimit::max(portable_configuration::MAX_ARCHIVE+256*1024)))
+        .route(
+            "/configuration/secrets",
+            post(portable_configuration::secret).layer(DefaultBodyLimit::max(2 * 1024 * 1024)),
+        )
+        .route(
+            "/configuration/receipt",
+            post(portable_configuration::receipt),
+        )
+        .route(
+            "/configuration/provider",
+            post(portable_configuration::provider),
+        )
+        .route(
+            "/configuration/export",
+            post(portable_configuration::export).layer(DefaultBodyLimit::max(128 * 1024)),
+        )
+        .route(
+            "/configuration/sync",
+            post(portable_configuration::sync).layer(DefaultBodyLimit::max(128 * 1024)),
+        )
+        .route(
+            "/configuration/logging",
+            post(portable_configuration::logging).layer(DefaultBodyLimit::max(128 * 1024)),
+        )
+        .route(
+            "/configuration/templates",
+            post(portable_configuration::templates).layer(DefaultBodyLimit::max(2 * 1024 * 1024)),
+        )
+        .route(
+            "/configuration/files-finish",
+            post(portable_configuration::files_finish).layer(DefaultBodyLimit::max(4096)),
+        )
+        .route(
+            "/configuration/export-receipt",
+            post(portable_configuration::export_receipt),
+        )
+        .route(
+            "/configuration/export-download",
+            post(portable_configuration::export_download),
+        )
+        .route(
+            "/configuration/archive",
+            post(portable_configuration::archive).layer(DefaultBodyLimit::max(
+                portable_configuration::MAX_ARCHIVE + 256 * 1024,
+            )),
+        )
         .route("/events", get(events))
         .route("/logout", post(logout))
         .route("/session", post(resume_session))
@@ -235,7 +270,11 @@ fn routes(state: WebState) -> Router {
             "/uploads",
             post(uploads::upload).layer(DefaultBodyLimit::max(uploads::MAX_BYTES + 16384)),
         )
-        .route("/mission-files", post(mission_uploads::submit).layer(DefaultBodyLimit::max(10 * uploads::MAX_BYTES + 65536)))
+        .route(
+            "/mission-files",
+            post(mission_uploads::submit)
+                .layer(DefaultBodyLimit::max(10 * uploads::MAX_BYTES + 65536)),
+        )
         .route("/uploads/reconcile", post(uploads::reconcile))
         .route("/uploads/receipt", post(uploads::receipt))
         .route("/uploads/retry", post(uploads::retry))
@@ -249,8 +288,14 @@ fn routes(state: WebState) -> Router {
         .route("/attachments", post(resources::attachment))
         .route_layer(middleware::from_fn_with_state(state.clone(), authenticate));
     Router::new()
-        .route("/api/office-watch-proxy/{port}/",axum::routing::any(office_proxy::proxy_root))
-        .route("/api/office-watch-proxy/{port}/{*rest}",axum::routing::any(office_proxy::proxy))
+        .route(
+            "/api/office-watch-proxy/{port}/",
+            axum::routing::any(office_proxy::proxy_root),
+        )
+        .route(
+            "/api/office-watch-proxy/{port}/{*rest}",
+            axum::routing::any(office_proxy::proxy),
+        )
         .nest("/api/v1", api)
         .route("/api/v1/login", post(login))
         .route("/api/v1/probe", post(native_probe))
@@ -284,7 +329,8 @@ async fn boundary(State(state): State<WebState>, req: Request, next: Next) -> Re
             *req.method(),
             axum::http::Method::GET | axum::http::Method::HEAD
         );
-    let checked_origin = if (preview_asset || office_preview) && origin.is_some_and(|v| v == "null") {
+    let checked_origin = if (preview_asset || office_preview) && origin.is_some_and(|v| v == "null")
+    {
         None
     } else {
         origin.and_then(|v| v.to_str().ok())
@@ -312,7 +358,10 @@ async fn boundary(State(state): State<WebState>, req: Request, next: Next) -> Re
     headers.insert(header::CONTENT_SECURITY_POLICY, HeaderValue::from_static("default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; font-src 'self'; connect-src 'self'; frame-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"));
     if office_preview && response.status().is_success() {
         response.headers_mut().insert(header::CONTENT_SECURITY_POLICY,HeaderValue::from_static("sandbox allow-scripts; default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data: blob:; connect-src 'self'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'"));
-        response.headers_mut().insert(header::REFERRER_POLICY,HeaderValue::from_static("no-referrer"));
+        response.headers_mut().insert(
+            header::REFERRER_POLICY,
+            HeaderValue::from_static("no-referrer"),
+        );
     }
     if preview_asset && response.status().is_success() {
         // Preserve the existing resource response policy, including direct navigation.
@@ -371,10 +420,19 @@ struct Login {
 }
 
 // Native connection checks authenticate without creating an editing identity.
-async fn native_probe(State(state): State<WebState>, body: std::result::Result<Json<Login>, axum::extract::rejection::JsonRejection>) -> Response {
-    let Ok(Json(body)) = body else { return error(StatusCode::BAD_REQUEST,"invalid_login") };
-    if body.protocol_version != HOST_WEB_PROTOCOL_VERSION { return error(StatusCode::CONFLICT,"protocol_incompatible") }
-    if let Err(failure) = state.sessions.authorize_login(&body.administrator_token) { return login_failure(failure) }
+async fn native_probe(
+    State(state): State<WebState>,
+    body: std::result::Result<Json<Login>, axum::extract::rejection::JsonRejection>,
+) -> Response {
+    let Ok(Json(body)) = body else {
+        return error(StatusCode::BAD_REQUEST, "invalid_login");
+    };
+    if body.protocol_version != HOST_WEB_PROTOCOL_VERSION {
+        return error(StatusCode::CONFLICT, "protocol_incompatible");
+    }
+    if let Err(failure) = state.sessions.authorize_login(&body.administrator_token) {
+        return login_failure(failure);
+    }
     match state.core.request("app.info",json!({})).await {
         Ok(reply) if reply.error.is_none() => Json(json!({"status":"ok","version":reply.result.as_ref().and_then(|value|value.get("version")).cloned().unwrap_or(Value::Null),"protocolVersion":HOST_WEB_PROTOCOL_VERSION})).into_response(),
         _=>error(StatusCode::SERVICE_UNAVAILABLE,"core_unavailable")

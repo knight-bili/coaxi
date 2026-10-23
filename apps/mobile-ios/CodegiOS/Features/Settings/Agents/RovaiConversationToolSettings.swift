@@ -6,7 +6,10 @@ private var emptyConversationFlags: JSONValue { .object(Dictionary(uniqueKeysWit
 /// 沿原移动队员设置表单；本地只保存原编号，不复制第二套权限。
 struct RovaiConversationToolSettings: View {
     let model: RovaiWorkspaceModel; let agentId: String
-    @State private var policy: JSONValue?, pending: JSONValue?, issue: String?, generation: UInt64?
+    @State private var policy: JSONValue?
+    @State private var pending: JSONValue?
+    @State private var issue: String?
+    @State private var generation: UInt64?
     @State private var busy = false
     private var owner: String {"conversation-tools-policy:" + agentId}
     private var global: JSONValue {policy?["globalFlags"] ?? emptyConversationFlags}

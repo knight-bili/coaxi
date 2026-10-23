@@ -9,11 +9,20 @@ struct RovaiCanvasNodeProperties: View {
     let node: JSONValue
     let graph: JSONValue
     @Environment(\.dismiss) private var dismiss
-    @State private var title = "", content = "", color = ""
-    @State private var columns = 0, rows = 0, revision = 0
-    @State private var collapsed = false, ready = false, busy = false, removal = false
+    @State private var title = ""
+    @State private var content = ""
+    @State private var color = ""
+    @State private var columns = 0
+    @State private var rows = 0
+    @State private var revision = 0
+    @State private var collapsed = false
+    @State private var ready = false
+    @State private var busy = false
+    @State private var removal = false
     @State private var commandId = UUID().uuidString.lowercased()
-    @State private var generation: UInt64?, issue: String?, latest: JSONValue?
+    @State private var generation: UInt64?
+    @State private var issue: String?
+    @State private var latest: JSONValue?
     private var data: JSONValue {node["data"] ?? .null}
     private var kind: String {data.text("kind")}
     private var owner: String {"canvas-node:\(boardId):\(node.text("id"))"}
@@ -29,17 +38,17 @@ struct RovaiCanvasNodeProperties: View {
             Section("属性") {
                 TextField("名称", text: changed($title))
                 if kind == "note" {TextField("便签内容（支持Markdown）", text: changed($content), axis: .vertical).lineLimit(8...24)}
-                Picker("颜色", selection: changed($color)) {ForEach(rovaiCanvasColors, id: \.0) {value, label in HStack {Circle().fill(rovaiCanvasTint(value) ?? Theme.textSecondary).frame(width: 12, height: 12).accessibilityHidden(true);Text(label)}.tag(value)}}
+                Picker("颜色", selection: changed($color)) {ForEach(rovaiCanvasColors, id: \.0) {option in colorOption(option)}}
                 Toggle("折叠卡片", isOn: changed($collapsed))
             }.disabled(blocked)
             if region {Section("区域网格") {
                 Stepper("列数 · \(columns == 0 ? "自动" : String(columns))", value: changed($columns), in: 0...12)
                 Stepper("行数 · \(rows == 0 ? "自动" : String(rows))", value: changed($rows), in: 0...12)
             }.disabled(blocked)}
-            Section("原绑定") {
+            Section {
                 ForEach(["folderPath", "folderGroupId", "agentId", "runtimeKind", "path"], id: \.self) {key in if !data.text(key).isEmpty {Text(data.text(key)).font(.caption).foregroundStyle(Theme.textSecondary)}}
                 if data["conversation"] != nil, data["conversation"] != .null {Text("会话引用保留").font(.caption).foregroundStyle(Theme.textSecondary)}
-            } footer: {Text("属性保存不改绑会话或文件，不重写其他端移动后的位置。")}
+            } header: {Text("原绑定")} footer: {Text("属性保存不改绑会话或文件，不重写其他端移动后的位置。")}
             Section {
                 Button("读取最新属性") {Task {await loadLatest()}}.disabled(blocked)
                 Button("保存属性") {Task {await submit(remove: false)}}.disabled(blocked || stale)
@@ -65,6 +74,12 @@ struct RovaiCanvasNodeProperties: View {
         }
     }
     private func changed<T>(_ binding: Binding<T>) -> Binding<T> {Binding(get: {binding.wrappedValue}, set: {binding.wrappedValue = $0;persist()})}
+    private func colorOption(_ option: (String, String)) -> some View {
+        let value: String = option.0
+        let label: String = option.1
+        let tint: Color = rovaiCanvasTint(value) ?? Theme.textSecondary
+        return HStack {Circle().fill(tint).frame(width: 12, height: 12).accessibilityHidden(true);Text(label)}.tag(value)
+    }
     private func document() throws -> String {let value = JSONValue.object(["version": .number(1), "boardId": .string(boardId), "nodeId": node["id"] ?? .null, "title": .string(title), "content": .string(content), "color": .string(color), "gridColumns": .number(Double(columns)), "gridRows": .number(Double(rows)), "collapsed": .bool(collapsed), "revision": .number(Double(revision)), "commandId": .string(commandId)]);let encoder = JSONEncoder();encoder.outputFormatting = [.sortedKeys];return String(decoding: try encoder.encode(value), as: UTF8.self)}
     private func persist() {guard ready, generation == model.connectionGeneration else {return};do {try model.saveBody(owner, body: document())} catch {issue = error.localizedDescription}}
     private func restore() {

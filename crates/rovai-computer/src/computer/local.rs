@@ -456,10 +456,7 @@ impl LocalBackend {
     /// may be a change behind: one still acting on an earlier "on" must not
     /// start a helper — and fetch a driver just removed — after the switch
     /// has gone off.
-    pub fn with_switch(
-        mut self,
-        config: crate::ComputerSwitch,
-    ) -> Self {
+    pub fn with_switch(mut self, config: crate::ComputerSwitch) -> Self {
         self.switch = Some(config);
         self
     }

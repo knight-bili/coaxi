@@ -7,8 +7,12 @@ struct RovaiCanvasSelectionActions: View {
     let graph: JSONValue
     let nodeIds: Set<String>
     @Environment(\.dismiss) private var dismiss
-    @State private var target = "", busy = false
-    @State private var generation: UInt64?, issue: String?, sentId: String?, confirmation: JSONValue?
+    @State private var target = ""
+    @State private var busy = false
+    @State private var generation: UInt64?
+    @State private var issue: String?
+    @State private var sentId: String?
+    @State private var confirmation: JSONValue?
     private var owner: String {"canvas-bulk:\(boardId)"}
     private var nodes: [JSONValue] {(graph["nodes"]?.rvArray ?? []).filter {nodeIds.contains($0.text("id"))}}
     private var stale: Bool {model.boards.first {$0.text("id") == boardId}?["revision"] != graph["board"]?["revision"]}

@@ -5,7 +5,10 @@ struct RovaiThreadMembers: View {
     let model: RovaiWorkspaceModel
     let threadId: String
     @Environment(\.dismiss) private var dismiss
-    @State private var snapshot: JSONValue?, confirmation: JSONValue?, issue: String?, submitted: String?
+    @State private var snapshot: JSONValue?
+    @State private var confirmation: JSONValue?
+    @State private var issue: String?
+    @State private var submitted: String?
     @State private var busy = false
     @State private var generation: UInt64?
     @State private var search = ""
@@ -40,14 +43,14 @@ struct RovaiThreadMembers: View {
                     }
                 }.padding(.vertical, 4)
             }}
-            Section("邀请队员") {
+            Section {
                 TextField("搜索姓名或职责", text: $search)
                 ForEach(candidates, id: \.self) {candidate in HStack {
                     VStack(alignment: .leading, spacing: 4) {Text(candidate.text("displayName"));Text(candidate.text("teamRole")).font(.caption).foregroundStyle(Theme.textSecondary)};Spacer()
                     Button("邀请") {confirmation = prepared("add", command: .object(["threadId": .string(threadId), "agentId": candidate["agentId"] ?? .null, "expectedMembershipGeneration": snapshot?["thread"]?["membershipGeneration"] ?? .null]), preview: candidate)}.disabled(blocked || snapshot == nil)
                 }}
                 if candidates.isEmpty {Text("没有符合条件的可邀请队员").foregroundStyle(Theme.textSecondary)}
-            } footer: {Text("加入只在后续新执行中生效；不会启动队员或恢复旧执行。")}
+            } header: {Text("邀请队员")} footer: {Text("加入只在后续新执行中生效；不会启动队员或恢复旧执行。")}
         }.navigationTitle("会话队员").navigationBarTitleDisplayMode(.inline).toolbar {Button("关闭") {dismiss()}.disabled(busy)}}
         .task {generation = model.connectionGeneration;await load()}
         .task(id: model.resourceVersion) {if generation != nil {await load()}}
@@ -61,14 +64,14 @@ struct RovaiThreadMembers: View {
             if let confirmation {let kind = confirmation.text("kind"), preview = confirmation["preview"] ?? .null
                 NavigationStack {Form {
                     if kind == "remove" {
-                        Section("移出影响") {
+                        Section {
                             Text("\(preview.text("displayName"))将离开此会话。历史记录保留，旧参与期的执行停止，开放任务回到待分配。")
                             LabeledContent("相关执行", value: "\(preview["nonTerminalAgentRunCount"]?.rvInt ?? 0)")
                             LabeledContent("开放任务", value: "\(preview["openAssignedTaskCount"]?.rvInt ?? 0)")
                             LabeledContent("相关投递", value: "\((preview["pendingDeliveryCount"]?.rvInt ?? 0) + (preview["runningDeliveryCount"]?.rvInt ?? 0))")
                             if preview["isDefaultLead"]?.rvBool == true {let id = preview.text("nextDefaultLeadAgentId");LabeledContent("接任队长", value: members.first {$0.text("agentId") == id}?.text("displayName") ?? "暂缺，等现有成员归队后恢复")}
                             if preview["removable"]?.rvBool != true {Text(preview.text("blockerCode")).foregroundStyle(Theme.warning)}
-                        } footer: {Text("名册变更会拒绝本次操作。重新邀请不会恢复旧执行。")}
+                        } header: {Text("移出影响")} footer: {Text("名册变更会拒绝本次操作。重新邀请不会恢复旧执行。")}
                     } else {Section {Text(kind == "lead" ? "将\(preview.text("displayName"))设为此会话队长。" : "邀请\(preview.text("displayName"))加入当前会话，不自动发消息或启动运行。")}}
                     if model.pending != nil {Section {Text("原请求结果待核对，可关闭本页后从工作区核对。").font(.caption)}}
                     Section {Button(self.submitted == nil ? "确认" : "原请求待核对", role: kind == "remove" ? .destructive : nil) {Task {await send(confirmation)}}.disabled(blocked || self.submitted != nil || kind == "remove" && preview["removable"]?.rvBool != true)}

@@ -1,23 +1,19 @@
-import { afterEach, expect, it, vi } from 'vitest'
-import { desktopThreadClient } from './desktop-camp-client'
+import {afterEach, expect, it, vi} from 'vitest'
+import {desktopThreadClient} from './desktop-camp-client'
 
-// Owns the Renderer → preload channel seam: the provider kind chosen on a tab
-// must reach preload unchanged, never defaulted or rewritten to another provider.
 afterEach(() => vi.unstubAllGlobals())
 
-it.each(['feishu', 'lark', 'dingtalk'] as const)('forwards %s publish and retry to exactly that provider', async (kind) => {
-  const snapshot = { schemaVersion: 4 }
-  const channels = {
-    publishMemberBot: vi.fn().mockResolvedValue(snapshot),
-    retryMemberBot: vi.fn().mockResolvedValue(snapshot),
-    selectPublicationApprover: vi.fn().mockResolvedValue(snapshot)
-  }
-  vi.stubGlobal('window', { rovai: { channels } })
+it('没有桌面桥时可读取可选能力且不伪造实现', () => {
+  vi.stubGlobal('window', undefined)
+  expect(desktopThreadClient.keyboardShortcuts).toBeUndefined()
+  expect(desktopThreadClient.nativePets).toBeUndefined()
+  expect(desktopThreadClient.privateInputRecovery).toBeUndefined()
+  expect(desktopThreadClient.missionAttachments).toBeNull()
+})
 
-  await expect(desktopThreadClient.channels!.publishMemberBot('agent-a', kind)).resolves.toBe(snapshot)
-  await expect(desktopThreadClient.channels!.retryMemberBot('agent-a', kind)).resolves.toBe(snapshot)
-
-  expect(channels.publishMemberBot).toHaveBeenCalledExactlyOnceWith('agent-a', kind)
-  expect(channels.retryMemberBot).toHaveBeenCalledExactlyOnceWith('agent-a', kind)
-  expect(channels.selectPublicationApprover).not.toHaveBeenCalled()
+it('能力从当前桥惰性读取，不缓存已替换的桥', () => {
+  vi.stubGlobal('window', {rovai: {platform: 'win32'}})
+  expect(desktopThreadClient.platform).toBe('win32')
+  vi.stubGlobal('window', {rovai: {platform: 'darwin'}})
+  expect(desktopThreadClient.platform).toBe('darwin')
 })

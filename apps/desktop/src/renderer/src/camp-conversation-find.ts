@@ -16,8 +16,8 @@ export interface ConversationFindScrollMetrics {
 
 export type PendingConversationFindStatus = 'idle' | 'searching'
 
-const MATCH_HIGHLIGHT_NAME = 'conversation-find-match'
-const CURRENT_HIGHLIGHT_NAME = 'conversation-find-current'
+const MATCH_HIGHLIGHT_PREFIX = 'conversation-find-match'
+const CURRENT_HIGHLIGHT_PREFIX = 'conversation-find-current'
 
 export function pendingConversationFindStatus(query: string): PendingConversationFindStatus {
   return query.trim() ? 'searching' : 'idle'
@@ -161,7 +161,8 @@ export function applyConversationFindHighlights(
   timeline: HTMLElement,
   query: string,
   currentMessageId: string | null,
-  currentOccurrenceIndex: number | null
+  currentOccurrenceIndex: number | null,
+  ownerId: string
 ): () => void {
   const cssWithHighlights = globalThis.CSS as typeof CSS & {
     highlights?: HighlightRegistryLike
@@ -170,12 +171,25 @@ export function applyConversationFindHighlights(
     Highlight?: HighlightConstructorLike
   }).Highlight
   const registry = cssWithHighlights.highlights
+  const ownerSuffix = ownerId.replace(/[^a-zA-Z0-9_-]/g, '') || 'instance'
+  const matchName = MATCH_HIGHLIGHT_PREFIX + '-' + ownerSuffix
+  const currentName = CURRENT_HIGHLIGHT_PREFIX + '-' + ownerSuffix
+  let styleElement: HTMLStyleElement | null = null
   const clear = (): void => {
-    registry?.delete(MATCH_HIGHLIGHT_NAME)
-    registry?.delete(CURRENT_HIGHLIGHT_NAME)
+    registry?.delete(matchName)
+    registry?.delete(currentName)
+    styleElement?.remove()
+    styleElement = null
   }
   clear()
   if (!registry || !HighlightConstructor || !query) return clear
+  styleElement = document.createElement('style')
+  styleElement.dataset.conversationFindOwner = ownerSuffix
+  styleElement.textContent = [
+    '::highlight(' + matchName + ') { color: var(--ink); background-color: var(--conversation-find-match); }',
+    '::highlight(' + currentName + ') { color: var(--ink); background-color: var(--conversation-find-current); text-decoration: underline var(--conversation-find-line); text-decoration-thickness: 1px; text-underline-offset: 2px; }'
+  ].join('\n')
+  document.head.append(styleElement)
 
   const passiveRanges: Range[] = []
   const currentRanges: Range[] = []
@@ -201,10 +215,10 @@ export function applyConversationFindHighlights(
   }
 
   if (passiveRanges.length > 0) {
-    registry.set(MATCH_HIGHLIGHT_NAME, new HighlightConstructor(...passiveRanges))
+    registry.set(matchName, new HighlightConstructor(...passiveRanges))
   }
   if (currentRanges.length > 0) {
-    registry.set(CURRENT_HIGHLIGHT_NAME, new HighlightConstructor(...currentRanges))
+    registry.set(currentName, new HighlightConstructor(...currentRanges))
   }
   return clear
 }

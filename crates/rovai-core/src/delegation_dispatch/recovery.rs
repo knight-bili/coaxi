@@ -77,7 +77,9 @@ pub(crate) fn source_receipt(
     )?.query_map(params![evidence_id,payload["toolCallId"].as_str()], |row|
         Ok(model::ReceiptObservation { command_id: row.get(0)?, request_digest: row.get(1)? }))?
         .collect::<rusqlite::Result<Vec<_>>>()?;
-    let [claim] = claims.as_slice() else { return Ok(None) };
+    let [claim] = claims.as_slice() else {
+        return Ok(None);
+    };
     let mut observed = payload.clone();
     observed["coreCommandReceipt"] = serde_json::to_value(claim)?;
     confirmed(db, evidence_id, &observed)

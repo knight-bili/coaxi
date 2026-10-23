@@ -70,6 +70,6 @@ export function NativeHistoryWorkbench({threadId,onOpenConversation}:{threadId:s
         <div className="native-session-body">{data?<NativeTranscriptBody data={data} reader={null} target={null} live={false} visible onForkFromTurn={selected&&!selected.archived&&['codex','claude','deepseek'].includes(selected.provider)?selectedTurnId=>setExecution({entry:selected,data,mode:'fork_point',selectedTurnId}):undefined}/>:<div className="workbench-empty">{t(entries.length?'选择会话查看原始消息和工具记录。':'还没有导入的原生会话。')}</div>}</div>
       </div>
     </div>
-    {execution&&<NativeContinuationDialog key={`${execution.entry.id}:${execution.mode}:${execution.selectedTurnId??''}`} threadId={execution.entry.linkedThreadId} entry={execution.entry} data={execution.data} mode={execution.mode} selectedTurnId={execution.selectedTurnId} onClose={()=>setExecution(null)} onOpen={onOpenConversation?receipt=>onOpenConversation({threadId:receipt.threadId,conversationId:receipt.conversationId}):undefined}/>}
+    {execution&&<NativeContinuationDialog key={`${execution.entry.id}:${execution.mode}:${execution.selectedTurnId??''}`} threadId={execution.entry.linkedThreadId} entry={execution.entry} data={execution.data} mode={execution.mode} selectedTurnId={execution.selectedTurnId} onClose={()=>setExecution(current=>current===execution?null:current)} onOpen={onOpenConversation?receipt=>onOpenConversation({threadId:receipt.threadId,conversationId:receipt.conversationId}):undefined}/>}
   </div>
 }

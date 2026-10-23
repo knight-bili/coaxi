@@ -7,10 +7,15 @@ struct RovaiMissionTemplatePicker: View {
     let materials: [(String, String)]
     let onChooseMaterials: () -> Void
     let onApply: (String, String) -> Void
-    @State private var identity = "", open = false, busy = false, confirmed = false
+    @State private var identity = ""
+    @State private var open = false
+    @State private var busy = false
+    @State private var confirmed = false
     @State private var rows: [JSONValue] = []
     @State private var next: JSONValue = .null
-    @State private var selected: JSONValue?, configuration: JSONValue?, issue: String?
+    @State private var selected: JSONValue?
+    @State private var configuration: JSONValue?
+    @State private var issue: String?
     @State private var mappings: [Int: String] = [:]
     private var blocks: [JSONValue] { configuration?["prompt_blocks"]?.rvArray ?? [] }
     private var required: [Int] { blocks.indices.filter { blocks[$0].text("type") != "text" } }

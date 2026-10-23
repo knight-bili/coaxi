@@ -9,10 +9,13 @@ struct RovaiAutomationConversationDetails: View {
     let enabled: Bool
     let onVersionChange: (Int) -> Void
     let onOpenThread: (String) -> Void
-    @State private var owner: JSONValue?, pending: JSONValue?
-    @State private var action = "launch_session", timezone = ""
+    @State private var owner: JSONValue?
+    @State private var pending: JSONValue?
+    @State private var action = "launch_session"
+    @State private var timezone = ""
     @State private var rows: [JSONValue] = []
-    @State private var next: String?, issue: String?
+    @State private var next: String?
+    @State private var issue: String?
     @State private var busy = false
     @State private var generation: UInt64 = 0
     private var storage: String {"conversation-automation:\(automationId)"}

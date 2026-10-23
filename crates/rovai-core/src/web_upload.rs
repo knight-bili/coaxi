@@ -183,9 +183,11 @@ pub fn snapshot(
     intent: &UploadIntent,
 ) -> Result<serde_json::Value> {
     match &intent.target {
-        UploadTarget::Mission {mission_id} => {
-            let mission=crate::mission::MissionService::default().get(database,mission_id)?.ok_or_else(||anyhow::anyhow!("mission.not_found"))?;
-            ensure!(mission.camp_id==intent.camp_id,"mission.thread_mismatch");
+        UploadTarget::Mission { mission_id } => {
+            let mission = crate::mission::MissionService::default()
+                .get(database, mission_id)?
+                .ok_or_else(|| anyhow::anyhow!("mission.not_found"))?;
+            ensure!(mission.camp_id == intent.camp_id, "mission.thread_mismatch");
             Ok(serde_json::to_value(mission)?)
         }
         UploadTarget::DelegationChildPending {
@@ -275,10 +277,25 @@ impl DomainCommand for BindUpload {
     }
 }
 /// 原生移动端的公聊草稿由客户端保管；只读核对它明确选中的既有上传回执。
-pub(crate) fn owned_public_source(connection:&rusqlite::Connection,client:&DraftClient,thread:&str,id:&str)->Result<Option<LocalAttachmentSourceRef>>{
-    crate::camp_id::ThreadId::parse(thread)?;uuid::Uuid::parse_str(id)?;
+pub(crate) fn owned_public_source(
+    connection: &rusqlite::Connection,
+    client: &DraftClient,
+    thread: &str,
+    id: &str,
+) -> Result<Option<LocalAttachmentSourceRef>> {
+    crate::camp_id::ThreadId::parse(thread)?;
+    uuid::Uuid::parse_str(id)?;
     let raw:Option<String>=connection.query_row("SELECT result_payload_json FROM event_log WHERE event_type='command.result' AND command_type='camp.source_attachment.upload.bind' AND actor_type='user' AND actor_id=?1 AND command_client_id=?2 AND camp_id=?3 AND result_status IN ('applied','accepted') AND json_extract(result_payload_json,'$.source.id')=?4 ORDER BY created_at DESC LIMIT 1",rusqlite::params![crate::current_user::CURRENT_USER_ID,client.id(),thread,id],|row|row.get(0)).optional()?;
-    raw.map(|raw|{let value:serde_json::Value=serde_json::from_str(&raw)?;let source:LocalAttachmentSourceRef=serde_json::from_value(value["source"].clone())?;ensure!(source.id==id&&source.kind==LocalAttachmentKind::File,"native_lifecycle.upload_source_changed");Ok(source)}).transpose()
+    raw.map(|raw| {
+        let value: serde_json::Value = serde_json::from_str(&raw)?;
+        let source: LocalAttachmentSourceRef = serde_json::from_value(value["source"].clone())?;
+        ensure!(
+            source.id == id && source.kind == LocalAttachmentKind::File,
+            "native_lifecycle.upload_source_changed"
+        );
+        Ok(source)
+    })
+    .transpose()
 }
 
 pub(crate) fn envelope(

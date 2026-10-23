@@ -1,9 +1,11 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { mkdtemp, readFile, rm } from 'node:fs/promises'
 import { connect } from 'node:net'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import type { CoreMethod } from '@contracts'
+import { resolveCoreBinary } from './core-client'
+import { prepareWindowsDataRoot } from './windows-data-root'
 import {
   dispatchUserAutomation,
   startUserAutomationOptional,
@@ -12,6 +14,10 @@ import {
   userAutomationAvailableOnPlatform,
   WINDOWS_USER_AUTOMATION_QUALIFICATION_ENV
 } from './user-automation'
+
+vi.mock('electron', () => ({
+  app: { isPackaged: false, getAppPath: () => process.cwd() }
+}))
 
 it('routes only closed evaluation operations to Host without granting generic Core execution', async () => {
   const calls: unknown[] = []
@@ -311,23 +317,35 @@ describe('User Automation transport', () => {
   it(
     'binds each local IPC request to the published App instance and removes discovery on stop',
     async () => {
-      const root = await mkdtemp(join(tmpdir(), 'rovai-automation-'))
+      const fixtureRoot = await mkdtemp(join(tmpdir(), 'rovai-automation-'))
       const previousQualification = process.env[WINDOWS_USER_AUTOMATION_QUALIFICATION_ENV]
-      if (process.platform === 'win32') {
-        process.env[WINDOWS_USER_AUTOMATION_QUALIFICATION_ENV] = '1'
-      }
+      const binaryEnvironment = ['ROVAI_HOST_BIN', 'ROVAI_CORE_BIN', 'HORIZONWARD_CORE_BIN', 'LUMEN_CORE_BIN']
+        .map(name => [name, process.env[name]] as const)
+      let automationRoot = fixtureRoot
+      let server: UserAutomationServer | null = null
       const core = {
         async request<T>(method: CoreMethod): Promise<T> {
           if (method === 'app.info') return { version: 'core-test' } as T
           throw new Error(`unexpected ${method}`)
         }
       }
-      const server = new UserAutomationServer(root, {
-        core,
-        openThread: async (threadId) => ({ threadId, opened: true }),
-        appVersion: 'app-test'
-      })
       try {
+        if (process.platform === 'win32') {
+          if (!process.env.ROVAI_CORE_BIN?.trim()) {
+            throw new Error('Windows User Automation integration requires ROVAI_CORE_BIN to point to the real rovai-host.exe.')
+          }
+          delete process.env.ROVAI_HOST_BIN
+          delete process.env.HORIZONWARD_CORE_BIN
+          delete process.env.LUMEN_CORE_BIN
+          const layout = prepareWindowsDataRoot(resolveCoreBinary(), join(fixtureRoot, 'formal'))
+          automationRoot = join(layout.electronUserData, 'automation-v1')
+          process.env[WINDOWS_USER_AUTOMATION_QUALIFICATION_ENV] = '1'
+        }
+        server = new UserAutomationServer(automationRoot, {
+          core,
+          openThread: async (threadId) => ({ threadId, opened: true }),
+          appVersion: 'app-test'
+        })
         await server.start()
         const context = JSON.parse(await readFile(server.contextPath, 'utf8')) as {
           contractVersion: number
@@ -365,22 +383,35 @@ describe('User Automation transport', () => {
           error: { code: 'automation_unauthorized' }
         })
       } finally {
-        await server.stop()
-        await expect(readFile(server.contextPath, 'utf8')).rejects.toMatchObject({ code: 'ENOENT' })
-        await rm(root, { recursive: true, force: true })
-        if (previousQualification === undefined) {
-          delete process.env[WINDOWS_USER_AUTOMATION_QUALIFICATION_ENV]
-        } else {
-          process.env[WINDOWS_USER_AUTOMATION_QUALIFICATION_ENV] = previousQualification
+        try {
+          if (server) {
+            await server.stop()
+            await expect(readFile(server.contextPath, 'utf8')).rejects.toMatchObject({ code: 'ENOENT' })
+          }
+        } finally {
+          try {
+            await rm(fixtureRoot, { recursive: true, force: true })
+          } finally {
+            if (previousQualification === undefined) {
+              delete process.env[WINDOWS_USER_AUTOMATION_QUALIFICATION_ENV]
+            } else {
+              process.env[WINDOWS_USER_AUTOMATION_QUALIFICATION_ENV] = previousQualification
+            }
+            for (const [name, value] of binaryEnvironment) {
+              if (value === undefined) delete process.env[name]
+              else process.env[name] = value
+            }
+          }
         }
       }
     }
   )
 
-  it('keeps Windows Automation behind the explicit local qualification gate', () => {
-    expect(userAutomationAvailableOnPlatform('win32', undefined)).toBe(false)
-    expect(userAutomationAvailableOnPlatform('win32', '0')).toBe(false)
-    expect(userAutomationAvailableOnPlatform('win32', '1')).toBe(true)
+  it('reports the supported desktop platforms and rejects unsupported platforms', () => {
+    expect(userAutomationAvailableOnPlatform('win32', undefined)).toBe(true)
+    expect(userAutomationAvailableOnPlatform('win32', '0')).toBe(true)
     expect(userAutomationAvailableOnPlatform('darwin', undefined)).toBe(true)
+    expect(userAutomationAvailableOnPlatform('linux', undefined)).toBe(true)
+    expect(userAutomationAvailableOnPlatform('freebsd', undefined)).toBe(false)
   })
 })

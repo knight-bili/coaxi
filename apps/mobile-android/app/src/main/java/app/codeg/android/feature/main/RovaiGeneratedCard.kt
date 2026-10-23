@@ -47,7 +47,7 @@ import java.util.UUID
                 if(value.coreLong("cardCount")>1)Row(Modifier.padding(horizontal=12.dp)){TextButton(enabled=index>0,onClick={index--}){Text(stringResource(R.string.rovai_fusion_bcf200709dbc7ff4))};Text("${index+1}/${value.coreLong("cardCount")}");TextButton(enabled=index+1<value.coreLong("cardCount"),onClick={index++}){Text(stringResource(R.string.rovai_fusion_dcd4eb0273699416))}}
                 key(value){
                     val channel=remember{UUID.randomUUID().toString()};val previews=remember{mutableSetOf<String>()};val requests=remember{mutableSetOf<String>()};val retired=remember{mutableStateOf(false)}
-                    AndroidView(Modifier.fillMaxWidth().weight(1f),factory={nativeContext->WebView(nativeContext).apply{
+                    AndroidView(modifier = Modifier.fillMaxWidth().weight(1f), factory = { nativeContext -> WebView(nativeContext).apply {
                         val web=this;val origin="https://rovai-card.local/";val page=origin+"index.html"
                         settings.javaScriptEnabled=true;settings.allowFileAccess=false;settings.allowContentAccess=false;settings.domStorageEnabled=false;settings.mixedContentMode=WebSettings.MIXED_CONTENT_NEVER_ALLOW;settings.setSupportMultipleWindows(false);CookieManager.getInstance().setAcceptThirdPartyCookies(this,false)
                         fun live()=!retired.value&&foreground.value&&generation==model.connectionGeneration&&web.url==page

@@ -29,10 +29,11 @@ import { NativeHistoryWorkbench } from './NativeHistoryWorkbench'
 import { UnifiedDiffPreview } from './codeg-native-content/components/diff/unified-diff-preview'
 import './workspace-workbench.css'
 
-type Entry = { name: string; path: string; directory: boolean; link: boolean; bytes: number }
+type Entry = { name: string; path: string; directory: boolean; link: boolean; managedAlias?:boolean; bytes: number }
 type Directory = { entries: Entry[]; next: string | null }
 type Document = { path: string; text: string; saved: string; digest: string | null; conflict?: boolean }
 type GitResult = { success: boolean; exitCode: number | null; output: string; error: string }
+type WorkbenchTab = 'files' | 'git' | 'organizer' | 'forge' | 'browser' | 'computer' | 'office' | 'history' | 'trash' | 'launcher' | 'terminals'
 const gitActions = {
   stage: '暂存文件', unstage: '取消暂存', commit: '提交暂存内容', stash_save: '保存到 Stash', stash_apply: '应用 Stash', stash_pop: '取出 Stash', stash_drop: '删除 Stash',
   clone:'克隆到子目录',worktree_add:'创建独立工作目录',worktree_remove:'移除托管工作目录',branch_delete:'删除已合并分支',branch_rename:'重命名分支',tag_create:'创建标签',tag_delete:'删除标签',discard:'放弃指定工作区改动',branch_create: '新建分支', checkout: '切换分支', reset: '重置历史', merge: '合并分支', rebase: '变基', merge_continue: '继续合并', merge_abort: '中止合并',
@@ -41,11 +42,11 @@ const gitActions = {
 } as const
 
 /** Codeg file-tree and Git auxiliary-panel structure, hosted in Rovai's dialog. */
-export function WorkspaceWorkbench({ threadId, projectPath, members, bindLeaveGuard, onQuickMessage, onOpenNativeConversation }: {
-  threadId: string; projectPath:string; members:Array<{id:string;name:string}>; bindLeaveGuard(guard: (() => void) | null): void; onQuickMessage?(text:string):boolean;onOpenNativeConversation?(reference:import('@contracts').CanvasConversationRef):Promise<boolean>
+export function WorkspaceWorkbench({ threadId, projectPath, members, bindLeaveGuard, onQuickMessage, onOpenNativeConversation, initiallyOpen=false, initialTab='files', onClosed }: {
+  threadId: string; projectPath:string; members:Array<{id:string;name:string}>; bindLeaveGuard(guard: (() => void) | null): void; onQuickMessage?(text:string):boolean;onOpenNativeConversation?(reference:import('@contracts').CanvasConversationRef):Promise<boolean>;initiallyOpen?:boolean;initialTab?:'files'|'terminals';onClosed?():void
 }): React.JSX.Element {
   const client = useThreadClient(), t = useUiText(), scope = useMemo(() => ({ threadId }), [threadId])
-  const [open, setOpen] = useState(false), [tab, setTab] = useState<'files' | 'git' | 'organizer' | 'forge' | 'browser' | 'computer' | 'office' | 'history' | 'trash' | 'launcher' | 'terminals'>('files')
+  const [open, setOpen] = useState(initiallyOpen), [tab, setTab] = useState<WorkbenchTab>(initialTab)
   const [fileAction,setFileAction]=useState<FileAction|null>(null),[searchVisible,setSearchVisible]=useState(false),[cursorLine,setCursorLine]=useState<number|undefined>(undefined)
   const [organizerDirty,setOrganizerDirty]=useState(false)
   const [forgeDirty,setForgeDirty]=useState(false)
@@ -130,7 +131,7 @@ export function WorkspaceWorkbench({ threadId, projectPath, members, bindLeaveGu
     if (selected === path) setSelected(documents.find(item => item.path !== path)?.path ?? null)
   }
   const renderTree = (path: string, depth = 0): React.ReactNode => <>
-    {(directories.get(path)?.entries ?? []).map(entry => entry.directory && !entry.link
+    {(directories.get(path)?.entries ?? []).map(entry => entry.directory && (!entry.link || entry.managedAlias)
       ? <FileTreeFolder key={entry.path} path={entry.path} name={entry.name} depth={depth} actions={<WorkspaceFileMenu path={entry.path} disabled={busy||dirty||entry.link} onAction={setFileAction}/>}>{renderTree(entry.path, depth + 1)}</FileTreeFolder>
       : <FileTreeFile key={entry.path} path={entry.path} name={entry.name} depth={depth} actions={<WorkspaceFileMenu path={entry.path} disabled={busy||dirty||entry.link} onAction={setFileAction}/>} aria-disabled={entry.link} onDoubleClick={() => { if (!entry.link) void openFile(entry.path) }} />)}
     {directories.get(path)?.next && <button type="button" className="quiet-button" disabled={busy} onClick={() => void operation(() => loadDirectory(path, directories.get(path)!.next!))}>{t('加载更多')}</button>}
@@ -179,7 +180,7 @@ export function WorkspaceWorkbench({ threadId, projectPath, members, bindLeaveGu
   }
   return <>
     <button type="button" className="quiet-button conversation-tool-button" title={t('文件与 Git 工程工作区')} onClick={() => setOpen(true)}><Files size={15} /><span>{t('工程')}</span></button>
-    <Dialog.Root open={open} onOpenChange={next => { if (!next) { try { guard() } catch (failure) { setError(String(failure)); return } }; setOpen(next) }}>
+    <Dialog.Root open={open} onOpenChange={next => { if (!next) { try { guard() } catch (failure) { setError(String(failure)); return } }; setOpen(next);if(!next)onClosed?.() }}>
       <Dialog.Portal><Dialog.Overlay className="dialog-overlay" /><AppDialogContent className="workspace-workbench" width="large">
         <AppDialogHeader title={t('工程工作区')} description={t('文件与 Git')} hideDescription closeDisabled={busy || dirty} />
         <nav className="workbench-toolbar" aria-label={t('工程视图')}>
@@ -208,7 +209,7 @@ export function WorkspaceWorkbench({ threadId, projectPath, members, bindLeaveGu
           }}>{renderTree('')}</FileTree>}</div></Panel>
           <PanelResizeHandle className="workbench-resize" />
           <Panel minSize={25}>
-            {merge ? <WorkspaceMergeEditor {...merge} onClose={()=>setMerge(null)} onApply={text=>{setDocuments(previous=>previous.map(document=>document.path===merge.path?{...document,text}:document));setMerge(null)}} /> : tab==='terminals'?<WorkspaceTerminals projectPath={projectPath} onUnsettledChange={setTerminalUnsettled}/> : tab==='launcher'?<ProjectLauncher threadId={threadId} onCreated={async()=>{await loadDirectory('')}}/> : tab==='trash'?<WorkspaceTrash threadId={threadId} onRestored={async()=>{for(const path of ['',...expanded])await loadDirectory(path).catch(()=>{})}}/> : tab==='history'?<NativeHistoryWorkbench threadId={threadId} onOpenConversation={onOpenNativeConversation?async reference=>{guard();const opened=await onOpenNativeConversation(reference);if(opened)setOpen(false);return opened}:undefined}/> : tab==='office'&&officePath?<OfficePreviewWorkbench key={officePath} threadId={threadId} path={officePath}/> : tab==='computer'?<ComputerWorkbench threadId={threadId}/> : tab==='browser'?<BrowserWorkbench threadId={threadId}/> : tab==='forge'?<ForgeWorkbench threadId={threadId} projectPath={projectPath} members={members} onDirtyChange={setForgeDirty}/> : tab==='organizer'?<WorkspaceOrganizer threadId={threadId} onDirtyChange={setOrganizerDirty} onUseMessage={onQuickMessage?text=>{if(dirty||!onQuickMessage(text))return false;setOpen(false);return true}:undefined}/> : tab === 'files' ? <div className="workbench-editor">
+            {merge ? <WorkspaceMergeEditor {...merge} onClose={()=>setMerge(null)} onApply={text=>{setDocuments(previous=>previous.map(document=>document.path===merge.path?{...document,text}:document));setMerge(null)}} /> : tab==='terminals'?<WorkspaceTerminals projectPath={projectPath} onUnsettledChange={setTerminalUnsettled}/> : tab==='launcher'?<ProjectLauncher threadId={threadId} onCreated={async()=>{await loadDirectory('')}}/> : tab==='trash'?<WorkspaceTrash threadId={threadId} onRestored={async()=>{for(const path of ['',...expanded])await loadDirectory(path).catch(()=>{})}}/> : tab==='history'?<NativeHistoryWorkbench threadId={threadId} onOpenConversation={onOpenNativeConversation?async reference=>{guard();const opened=await onOpenNativeConversation(reference);if(opened)setOpen(false);return opened}:undefined}/> : tab==='office'&&officePath?<OfficePreviewWorkbench key={officePath} threadId={threadId} path={officePath}/> : tab==='computer'?<ComputerWorkbench threadId={threadId}/> : tab==='browser'?<BrowserWorkbench threadId={threadId}/> : tab==='forge'?<ForgeWorkbench threadId={threadId} projectPath={projectPath} members={members} onDirtyChange={setForgeDirty}/> : tab==='organizer'?<WorkspaceOrganizer threadId={threadId} onDirtyChange={setOrganizerDirty} onDirectoryAliasesApplied={()=>{setDirectories(new Map());setExpanded(new Set());void loadDirectory('')}} onUseMessage={onQuickMessage?text=>{if(dirty||!onQuickMessage(text))return false;setOpen(false);return true}:undefined}/> : tab === 'files' ? <div className="workbench-editor">
               {current ? <><div className="workbench-toolbar"><span title={current.path}>{current.path}</span><button type="button" className="quiet-button" disabled={busy || current.text === current.saved} onClick={() => void save()}><Save size={14} />{t('保存')}</button><button type="button" className="quiet-button" disabled={busy || dirty} onClick={() => {setCreation('rename');setName(current.path)}}>{t('重命名')}</button><button type="button" className="quiet-button" disabled={busy} onClick={()=>void openMerge()}>{t('解决冲突')}</button></div>
                 {current.conflict && <div className="workbench-error" role="alert">{t('文件在外部发生变化，本地修改已保留。')}<button disabled={busy} onClick={()=>void mergeExternal()}>{t('比较并合并外部版本')}</button></div>}
                 <SplitTabDeck key={`${threadId}:${projectPath}`} scopeKey={`${threadId}:${projectPath}`} items={documents.map(item=>({id:item.path,label:item.path,dirty:item.text!==item.saved}))} selected={selected} disabled={busy||!draftStatus.ready} restoredLayout={restoredSplitLayout.current} restoreToken={restoreToken} onLayoutChange={setSplitLayout} onSelect={setSelected} onClose={closeDocument} renderBody={(item,visible)=>{const document=documents.find(row=>row.path===item.id)!;return <WorkspaceCodeEditor path={document.path} text={document.text} visible={visible} line={document.path===selected?cursorLine:undefined} onSave={()=>void save(document.path)} onChange={text=>setDocuments(previous=>previous.map(row=>row.path===document.path?{...row,text}:row))}/>}}/>

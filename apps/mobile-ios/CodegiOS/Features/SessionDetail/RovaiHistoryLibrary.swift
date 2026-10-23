@@ -43,8 +43,13 @@ struct RovaiHistoryLibrary: View {
     let threadId: String
     @State private var entries: [JSONValue] = []
     @State private var selected: JSONValue?
-    @State private var archived = false, busy = false, confirming = false, exporting = false
-    @State private var search = "", tags = "", progress = ""
+    @State private var archived = false
+    @State private var busy = false
+    @State private var confirming = false
+    @State private var exporting = false
+    @State private var search = ""
+    @State private var tags = ""
+    @State private var progress = ""
     @State private var issue: String?
     @State private var document: ImportedHistoryDocument?
     @State private var readTask: Task<Void, Never>?

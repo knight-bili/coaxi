@@ -120,7 +120,9 @@ export function translateUi(language: InterfaceLanguage, chinese: string, ...val
   const prefix = chinese.slice(0, chinese.indexOf(key))
   const suffix = chinese.slice(chinese.indexOf(key) + key.length)
   const source: Readonly<Record<string, string>> = codegCommon[language]
-  const template = language === 'zh-CN' ? key : source[key] ?? english[key] ?? key
+  const template = language === 'zh-CN' ? key : language === 'en'
+    ? english[key] ?? source[key] ?? key
+    : source[key] ?? english[key] ?? key
   const formatted = template.replace(/\{(\d+)\}/g, (match, index: string) => {
     const value = values[Number(index)]
     return value === undefined ? match : String(value)

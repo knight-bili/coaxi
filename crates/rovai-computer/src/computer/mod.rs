@@ -1,23 +1,23 @@
 pub mod agent;
 pub mod appident;
 pub mod backend;
+#[cfg(target_os = "macos")]
+pub mod codesign;
 pub mod driver;
 pub mod helper;
+#[cfg(target_os = "macos")]
+pub mod helper_app;
 pub mod keys;
+#[cfg(target_os = "macos")]
+pub mod launch_req;
 pub mod local;
 pub mod procinfo;
 pub mod protocol;
-pub mod targets;
-pub mod types;
-#[cfg(target_os="macos")]
-pub mod codesign;
-#[cfg(target_os="macos")]
-pub mod helper_app;
-#[cfg(target_os="macos")]
-pub mod launch_req;
-#[cfg(target_os="macos")]
+#[cfg(target_os = "macos")]
 pub mod spawn;
-#[cfg(target_os="macos")]
+pub mod targets;
+#[cfg(target_os = "macos")]
 pub mod tcc;
+pub mod types;
 
 pub mod stop_shortcut;

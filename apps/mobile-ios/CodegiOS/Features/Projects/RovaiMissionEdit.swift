@@ -7,18 +7,34 @@ struct RovaiMissionEdit: View {
     let mission: JSONValue
     @Environment(\.dismiss) private var dismiss
     @State private var baseline: JSONValue = .null
-    @State private var title = "", tags = ""
+    @State private var title = ""
+    @State private var tags = ""
     @State private var content: [JSONValue] = []
     @State private var kept: [String] = []
     @State private var sources: [JSONValue] = []
     @State private var commandId = UUID().uuidString.lowercased()
-    @State private var legacySent: JSONValue?, latest: JSONValue?, preview: JSONValue?, issue: String?
-    @State private var ready = false, busy = false, picking = false
-    @State private var generation: UInt64?, pickerGeneration: UInt64?
+    @State private var legacySent: JSONValue?
+    @State private var latest: JSONValue?
+    @State private var preview: JSONValue?
+    @State private var issue: String?
+    @State private var ready = false
+    @State private var busy = false
+    @State private var picking = false
+    @State private var generation: UInt64?
+    @State private var pickerGeneration: UInt64?
     private var owner: String {"mission-edit:\(mission.text("missionId"))"}
     private var blocked: Bool {!ready || busy || model.busy || model.pending != nil || generation != model.connectionGeneration}
     private var locked: Bool {blocked || legacySent != nil}
     private var rendered: String {missionDescriptionDisplay(content, members: model.members)}
+    private var memberNames: String {
+        let ids: [String] = (baseline["memberAgentIds"]?.rvArray ?? []).compactMap(\.stringValue)
+        let members: [JSONValue] = model.members
+        let names: [String] = ids.map { id -> String in
+            guard let member = members.first(where: { (candidate: JSONValue) -> Bool in candidate.text("agentId") == id }) else {return "已不可用队员"}
+            return member.text("displayName")
+        }
+        return names.joined(separator: "、")
+    }
     private var parsedTags: [String] {var seen = Set<String>();return tags.components(separatedBy: CharacterSet(charactersIn: ",，\n")).map {$0.trimmingCharacters(in: .whitespacesAndNewlines)}.filter {!$0.isEmpty && seen.insert($0).inserted}}
     private var changed: Bool {title.trimmingCharacters(in: .whitespacesAndNewlines) != baseline.text("title") || content != contentOf(baseline) || parsedTags != (baseline["tags"]?.rvArray ?? []).compactMap(\.stringValue) || kept != (baseline["attachments"]?.rvArray ?? []).map {$0.text("id")} || !sources.isEmpty}
     private var valid: Bool {!title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && title.trimmingCharacters(in: .whitespacesAndNewlines).unicodeScalars.count <= 200 && rendered.unicodeScalars.count <= (baseline["descriptionLimit"]?.rvInt == 20000 ? 20000 : 12000) && parsedTags.count <= 30 && parsedTags.allSatisfy {$0.unicodeScalars.count <= 24} && kept.count + sources.count <= 10}
@@ -32,11 +48,10 @@ struct RovaiMissionEdit: View {
                 RovaiMissionDescriptionInput(content: content, members: model.members, disabled: locked) {content = $0;persist()}
                 TextField("标签，用逗号分开", text: changedBinding($tags))
             }.disabled(locked)
-            Section("工作目录与队伍") {
+            Section {
                 Text(baseline.text("projectPath").isEmpty ? "快速对话" : baseline.text("projectPath"))
-                let ids = (baseline["memberAgentIds"]?.rvArray ?? []).compactMap(\.stringValue)
-                Text(ids.map {id in model.members.first {$0.text("agentId") == id}?.text("displayName") ?? "已不可用队员"}.joined(separator: "、"))
-            } footer: {Text("队伍与队长由原管理入口调整。保存描述中的新提及会邀请对应队员；移除提及保留原成员。")}
+                Text(memberNames)
+            } header: {Text("工作目录与队伍")} footer: {Text("队伍与队长由原管理入口调整。保存描述中的新提及会邀请对应队员；移除提及保留原成员。")}
             Section("附件 · \(kept.count + sources.count)/10") {
                 ForEach(baseline["attachments"]?.rvArray ?? [], id: \.self) {attachment in
                     HStack {

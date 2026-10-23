@@ -5,6 +5,7 @@ import app.codeg.android.R
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -48,6 +49,7 @@ fun canvasRegionHeight(data:JsonObject,resolution:RovaiCanvasRegionResolution,ex
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable fun RovaiCanvasCard(node:JsonObject,zoom:Float,offset:Offset,boardRevision:Long,disabled:Boolean,isSelected:Boolean,catalog:RovaiCanvasCatalogSnapshot,profiles:List<JsonObject>,expanded:Boolean,onExpand:()->Unit,onOpen:()->Unit,onEdit:()->Unit,onMember:(JsonObject)->Unit,onDetach:(JsonObject)->Unit,onMutation:(JsonObject,Long)->Unit,onMemberMove:(JsonObject,Float,Float,Long)->Unit){
     val data=node["data"].coreObject();val id=node.coreText("id");val kind=data.coreText("kind");val density=LocalDensity.current.density;val colors=CodegTheme.colors;val region=kind in listOf("folder","group","agent","custom");val resolution=resolveCanvasRegion(node,catalog.rows,catalog.complete,catalog.groups,catalog.folders)
     val x=data.canvasFloat("x");val y=data.canvasFloat("y");val width=data.canvasFloat("width",320f);val height=if(region)canvasRegionHeight(data,resolution,expanded)else data.canvasFloat("height",220f);val collapsed=data["collapsed"]==JsonPrimitive(true)

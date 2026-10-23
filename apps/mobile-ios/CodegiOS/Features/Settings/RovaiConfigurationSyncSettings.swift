@@ -4,10 +4,18 @@ import SwiftUI
 struct RovaiConfigurationSyncSettings: View {
     let model: RovaiWorkspaceModel
     @Environment(\.dismiss) private var dismiss
-    @State private var saved: JSONValue = .object([:]), draft: JSONValue = .object([:])
-    @State private var identity = "", passphrase = "", message = ""
-    @State private var pending: JSONValue?, issue: String?
-    @State private var clear = false, dirty = false, busy = false, leaving = false, archiving = false
+    @State private var saved: JSONValue = .object([:])
+    @State private var draft: JSONValue = .object([:])
+    @State private var identity = ""
+    @State private var passphrase = ""
+    @State private var message = ""
+    @State private var pending: JSONValue?
+    @State private var issue: String?
+    @State private var clear = false
+    @State private var dirty = false
+    @State private var busy = false
+    @State private var leaving = false
+    @State private var archiving = false
     private var owner: String { "portable-sync/" + identity }
     private var active: String { saved["state"]?.text("activeCommandId") ?? "" }
     private var phase: String { saved["state"]?.text("phase") ?? "" }

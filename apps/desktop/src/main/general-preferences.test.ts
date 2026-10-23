@@ -33,7 +33,7 @@ describe('general preferences', () => {
     const malformed = '{broken'
     await writeFile(filePath, malformed)
     expect(await readGeneralPreferences(filePath)).toEqual(DEFAULT_GENERAL_PREFERENCES)
-    const store = await GeneralPreferencesStore.load(filePath)
+    const store = await GeneralPreferencesStore.load(filePath, () => 'zh-CN')
     expect(store.get()).toEqual(DEFAULT_GENERAL_PREFERENCES)
     expect(store.loadDegradation?.code).toBe('general_preferences_unreadable')
     expect(await readFile(filePath, 'utf8')).toBe(malformed)
@@ -47,6 +47,10 @@ describe('general preferences', () => {
     expect(parseGeneralPreferences({
       ...DEFAULT_GENERAL_PREFERENCES,
       interfaceLanguage: 'fr'
+    })?.interfaceLanguage).toBe('fr')
+    expect(parseGeneralPreferences({
+      ...DEFAULT_GENERAL_PREFERENCES,
+      interfaceLanguage: 'xx'
     })).toBeNull()
     expect(parseGeneralPreferences({
       schemaVersion: 4,
@@ -59,6 +63,7 @@ describe('general preferences', () => {
       worldMapEnabled: false
     })).toEqual({
       ...DEFAULT_GENERAL_PREFERENCES,
+      interfaceLanguageMode: 'manual',
       lastSettingsSection: 'about',
       executionConsolePlacement: 'bottom',
       worldMapEnabled: false
@@ -74,6 +79,7 @@ describe('general preferences', () => {
       worldMapEnabled: true
     })).toEqual({
       ...DEFAULT_GENERAL_PREFERENCES,
+      interfaceLanguageMode: 'manual',
       executionConsolePlacement: 'right',
       worldMapEnabled: true
     })
@@ -82,8 +88,9 @@ describe('general preferences', () => {
       startupLocationMode: 'quick_chat',
       lastSettingsSection: 'diagnostics'
     })).toEqual({
-      schemaVersion: 5,
+      schemaVersion: 6,
       interfaceLanguage: 'zh-CN',
+      interfaceLanguageMode: 'manual',
       startupLocationMode: 'quick_chat',
       lastSettingsSection: 'diagnostics',
       executionConsolePlacement: 'inspector',
@@ -102,6 +109,7 @@ describe('general preferences', () => {
       oneClickNewConversationEnabled: false
     })).toEqual({
       ...DEFAULT_GENERAL_PREFERENCES,
+      interfaceLanguageMode: 'manual',
       lastSettingsSection: 'channels',
       executionConsolePlacement: 'bottom',
       worldMapEnabled: true
@@ -117,8 +125,9 @@ describe('general preferences', () => {
       newConversationDefaultsRequireConfirmation: true,
       oneClickNewConversationEnabled: true
     })).toEqual({
-      schemaVersion: 5,
+      schemaVersion: 6,
       interfaceLanguage: 'zh-CN',
+      interfaceLanguageMode: 'manual',
       startupLocationMode: 'quick_chat',
       lastSettingsSection: 'diagnostics',
       executionConsolePlacement: 'inspector',
@@ -140,6 +149,7 @@ describe('general preferences', () => {
       oneClickNewConversationEnabled: false
     })).toEqual({
       ...DEFAULT_GENERAL_PREFERENCES,
+      interfaceLanguageMode: 'manual',
       executionConsolePlacement: 'inspector',
       worldMapEnabled: true
     })
@@ -158,6 +168,7 @@ describe('general preferences', () => {
       oneClickNewConversationEnabled: false
     })).toEqual({
       ...DEFAULT_GENERAL_PREFERENCES,
+      interfaceLanguageMode: 'manual',
       worldMapEnabled: true
     })
     expect(parseGeneralPreferences({
@@ -169,6 +180,7 @@ describe('general preferences', () => {
       oneClickNewConversationEnabled: false
     })).toEqual({
       ...DEFAULT_GENERAL_PREFERENCES,
+      interfaceLanguageMode: 'manual',
       worldMapEnabled: true
     })
     expect(parseGeneralPreferences({
@@ -193,6 +205,27 @@ describe('general preferences', () => {
     })).toBeNull()
   })
 
+  it('resolves system language without persisting it and preserves an explicit manual choice', async () => {
+    const directory = await temporaryDirectory()
+    const filePath = join(directory, 'general-preferences.json')
+    let systemLanguage: 'fr' | 'ja' = 'fr'
+    const store = GeneralPreferencesStore.defaults(filePath, () => systemLanguage)
+
+    expect(store.get()).toMatchObject({
+      schemaVersion: 6,
+      interfaceLanguage: 'fr',
+      interfaceLanguageMode: 'system'
+    })
+    systemLanguage = 'ja'
+    expect(store.get().interfaceLanguage).toBe('ja')
+
+    await store.setInterfaceLanguage('en')
+    expect(store.get()).toMatchObject({ interfaceLanguage: 'en', interfaceLanguageMode: 'manual' })
+    expect(JSON.parse(await readFile(filePath, 'utf8'))).toEqual(store.get())
+    systemLanguage = 'fr'
+    expect(store.get().interfaceLanguage).toBe('en')
+  })
+
   it('serializes concurrent mutations in call order and writes a private exact snapshot', async () => {
     const directory = await temporaryDirectory()
     const filePath = join(directory, 'general-preferences.json')
@@ -208,8 +241,9 @@ describe('general preferences', () => {
     ])
 
     expect(store.get()).toEqual({
-      schemaVersion: 5,
+      schemaVersion: 6,
       interfaceLanguage: 'en',
+      interfaceLanguageMode: 'manual',
       startupLocationMode: 'last_location',
       lastSettingsSection: 'toolbox',
       executionConsolePlacement: 'bottom',
@@ -264,7 +298,7 @@ describe('general preferences', () => {
   it('saves the selected team and enables one-click together, preserving other preferences', async () => {
     const directory = await temporaryDirectory()
     const filePath = join(directory, 'general-preferences.json')
-    const store = await GeneralPreferencesStore.load(filePath)
+    const store = await GeneralPreferencesStore.load(filePath, () => 'zh-CN')
     const defaults = { memberAgentIds: ['agent-a', 'agent-b'], defaultLeadAgentId: 'agent-b' }
     const saving = store.setNewConversationDefaults(defaults, true)
     defaults.memberAgentIds.push('agent-c')
@@ -276,14 +310,14 @@ describe('general preferences', () => {
       newConversationDefaults: { memberAgentIds: ['agent-a', 'agent-b'], defaultLeadAgentId: 'agent-b' },
       oneClickNewConversationEnabled: true
     })
-    expect((await GeneralPreferencesStore.load(filePath)).get()).toEqual(store.get())
+    expect((await GeneralPreferencesStore.load(filePath, () => 'zh-CN')).get()).toEqual(store.get())
     await store.setNewConversationDefaults({ memberAgentIds: ['agent-a'], defaultLeadAgentId: 'agent-a' }, false)
     expect(store.get().oneClickNewConversationEnabled).toBe(true)
   })
 
   it('rejects invalid atomic updates without enabling one-click or changing the team', async () => {
     const directory = await temporaryDirectory()
-    const store = await GeneralPreferencesStore.load(join(directory, 'general-preferences.json'))
+    const store = await GeneralPreferencesStore.load(join(directory, 'general-preferences.json'), () => 'zh-CN')
     await expect(store.setNewConversationDefaults({ memberAgentIds: ['agent-a'], defaultLeadAgentId: 'agent-b' }, true)).rejects.toThrow()
     await expect(store.setNewConversationDefaults(
       { memberAgentIds: ['agent-a'], defaultLeadAgentId: 'agent-a' },
@@ -317,7 +351,7 @@ describe('general preferences', () => {
     const directory = await temporaryDirectory()
     const filePath = join(directory, 'general-preferences.json')
     await mkdir(filePath)
-    const store = await GeneralPreferencesStore.load(filePath)
+    const store = await GeneralPreferencesStore.load(filePath, () => 'zh-CN')
 
     await expect(store.setExecutionConsolePlacement('bottom')).rejects.toBeInstanceOf(Error)
     expect(store.get()).toEqual(DEFAULT_GENERAL_PREFERENCES)

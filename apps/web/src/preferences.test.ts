@@ -11,6 +11,49 @@ import { browserPreferences } from './preferences'
 import { ConsoleClient } from './client'
 import type { NavigationPreferencesSnapshot } from '@contracts'
 
+interface HostProjectGroupsFixture {
+  schemaVersion: 1
+  initialized: boolean
+  projectGroupsRevision: number
+  projectGroups: NavigationPreferencesSnapshot['projectGroups']
+  projectOrder: NavigationPreferencesSnapshot['projectOrder']
+}
+
+function scopedProjectGroupsTransports() {
+  const values = new Map<string, HostProjectGroupsFixture>()
+  const empty: HostProjectGroupsFixture = {
+    schemaVersion: 1,
+    initialized: false,
+    projectGroupsRevision: 0,
+    projectGroups: [],
+    projectOrder: null
+  }
+  return (scope: string) => ({
+    request: vi.fn(async (operation: string, params: unknown): Promise<HostProjectGroupsFixture> => {
+      if (operation !== 'navigation.projectGroups' || !params || typeof params !== 'object') {
+        throw new Error('Unexpected Host request')
+      }
+      const input = params as { action?: unknown; expectedRevision?: unknown; value?: unknown }
+      const current = values.get(scope) ?? empty
+      if (input.action === 'get') return structuredClone(current)
+      if (input.action !== 'replace' || input.expectedRevision !== current.projectGroupsRevision
+        || !input.value || typeof input.value !== 'object') {
+        throw new Error('navigation.project_groups_changed')
+      }
+      const layout = input.value as Pick<HostProjectGroupsFixture, 'projectGroups' | 'projectOrder'>
+      const next: HostProjectGroupsFixture = {
+        schemaVersion: 1,
+        initialized: true,
+        projectGroupsRevision: current.projectGroupsRevision + 1,
+        projectGroups: structuredClone(layout.projectGroups),
+        projectOrder: structuredClone(layout.projectOrder)
+      }
+      values.set(scope, next)
+      return structuredClone(next)
+    })
+  })
+}
+
 // The actual Web preference adapter must read the Host's saved team instead
 // of letting an empty or stale browser-local copy shadow the Desktop choice.
 afterEach(() => vi.unstubAllGlobals())
@@ -59,23 +102,27 @@ it('persists local unread intent, preserves it across other tab writes, and publ
   vi.stubGlobal('localStorage', storage)
   vi.stubGlobal('window', events)
   vi.stubGlobal('matchMedia', () => ({ matches: false, addEventListener() {}, removeEventListener() {} }))
-  const transport = { request: vi.fn() } as unknown as ConsoleClient
-  const first = browserPreferences('host-a', transport).preferences.navigationPreferences
-  const other = browserPreferences('host-a', transport).preferences.navigationPreferences
+  const hostTransport = scopedProjectGroupsTransports()
+  const firstTransport = hostTransport('host-a')
+  const otherTransport = hostTransport('host-a')
+  const first = browserPreferences('host-a', firstTransport as unknown as ConsoleClient).preferences.navigationPreferences
+  const other = browserPreferences('host-a', otherTransport as unknown as ConsoleClient).preferences.navigationPreferences
   const id = 'rvcamp_01h47kvsy5fk1shh6w1g60eec0'
   const seen: NavigationPreferencesSnapshot[] = []
   const unsubscribe = first.onChanged(snapshot => seen.push(snapshot))
   await first.setThreadReadState(id, { manualUnread: true, readThroughGlobalSequence: 12 })
   await other.replacePins([])
   expect((await first.get()).threadReadStates[id]).toEqual({ manualUnread: true, readThroughGlobalSequence: 12 })
-  expect((await browserPreferences('host-a', transport).preferences.navigationPreferences.get()).threadReadStates[id].manualUnread).toBe(true)
-  expect((await browserPreferences('host-b', transport).preferences.navigationPreferences.get()).threadReadStates).toEqual({})
+  expect((await browserPreferences('host-a', otherTransport as unknown as ConsoleClient).preferences.navigationPreferences.get()).threadReadStates[id].manualUnread).toBe(true)
+  const otherHostTransport = hostTransport('host-b')
+  const otherHost = browserPreferences('host-b', otherHostTransport as unknown as ConsoleClient).preferences.navigationPreferences
+  expect((await otherHost.get()).threadReadStates).toEqual({})
   const groupId = '11111111-1111-4111-8111-111111111111'
   await first.registerProjects(['/work/a'])
   await first.applyProjectLayout(0, { type: 'create', group: { id: groupId, name: '工作', color: null, projectPaths: ['/work/a'] } })
   await other.replacePins([])
   expect((await first.get()).projectGroups[0].id).toBe(groupId)
-  expect((await browserPreferences('host-b', transport).preferences.navigationPreferences.get()).projectGroups).toEqual([])
+  expect((await otherHost.get()).projectGroups).toEqual([])
   await expect(other.applyProjectLayout(0, { type: 'delete', groupId })).rejects.toThrow('已有新修改')
   await other.removeProject('directory:/work/a', [])
   await first.restoreProject('directory:/work/a')
@@ -84,14 +131,29 @@ it('persists local unread intent, preserves it across other tab writes, and publ
   await other.setThreadReadState(id, { manualUnread: false, readThroughGlobalSequence: 8 })
   const event = new Event('storage')
   Object.assign(event, { storageArea: storage, key: 'rovai.presentation:host-a:navigation' })
+  const changed = new Promise<NavigationPreferencesSnapshot>((resolve) => {
+    let unsubscribeChanged: () => void = () => {}
+    unsubscribeChanged = first.onChanged(snapshot => {
+      if (snapshot.threadReadStates[id]?.manualUnread !== false) return
+      unsubscribeChanged()
+      resolve(snapshot)
+    })
+  })
   events.dispatchEvent(event)
+  const delivered = await changed
+  expect(delivered.threadReadStates[id]).toEqual({ manualUnread: false, readThroughGlobalSequence: 12 })
   expect(seen.at(-1)?.threadReadStates[id]).toEqual({ manualUnread: false, readThroughGlobalSequence: 12 })
+  await first.get()
   const count = seen.length
+  const requestCount = firstTransport.request.mock.calls.length
+  const storedNavigation = entries.get('rovai.presentation:host-a:navigation')
   failWrite = true
   await expect(first.setThreadReadState(id, { manualUnread: true, readThroughGlobalSequence: 12 })).rejects.toThrow('Storage unavailable')
   expect(seen).toHaveLength(count)
-  expect((await first.get()).threadReadStates[id].manualUnread).toBe(false)
-  expect(transport.request).not.toHaveBeenCalled()
+  expect(entries.get('rovai.presentation:host-a:navigation')).toBe(storedNavigation)
+  expect(JSON.parse(storedNavigation!).threadReadStates[id].manualUnread).toBe(false)
+  expect(firstTransport.request).toHaveBeenCalledTimes(requestCount)
+  expect(firstTransport.request.mock.calls.every(([operation]) => operation === 'navigation.projectGroups')).toBe(true)
   unsubscribe()
 })
 
@@ -99,9 +161,9 @@ it('merges concurrent directory writes and protects removal, completed migration
   const entries = new Map<string, string>()
   vi.stubGlobal('localStorage', { getItem: (key: string) => entries.get(key) ?? null, setItem: (key: string, value: string) => entries.set(key, value) })
   vi.stubGlobal('matchMedia', () => ({ matches: false, addEventListener() {}, removeEventListener() {} }))
-  const transport = { request: vi.fn() } as unknown as ConsoleClient
-  const a = browserPreferences('projects', transport).preferences.navigationPreferences
-  const b = browserPreferences('projects', transport).preferences.navigationPreferences
+  const transport = scopedProjectGroupsTransports()('projects')
+  const a = browserPreferences('projects', transport as unknown as ConsoleClient).preferences.navigationPreferences
+  const b = browserPreferences('projects', transport as unknown as ConsoleClient).preferences.navigationPreferences
   await Promise.all([a.registerProjects(['/a']), b.setProjectName('directory:/a', '名字'), b.registerProjects(['/b']), a.removeProject('directory:/gone', []), b.registerProjects(['/gone', '/legacy'], true)])
   expect(await a.get()).toMatchObject({ registeredProjects: ['/a', '/b', '/legacy'], legacyProjectsSynced: true, projectNames: { 'directory:/a': '名字' } })
   await a.registerProjects(['/late'], true)

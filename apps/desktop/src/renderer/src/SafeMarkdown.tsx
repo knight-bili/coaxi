@@ -104,7 +104,7 @@ function markdownCodeBlock(children: ReactNode): { code: string; languageName?: 
 
 function remarkCardOrdinals(): (tree:MarkdownTreeNode)=>void {
   return tree=>{let ordinal=0;const visit=(node:MarkdownTreeNode):void=>{
-    if(node.type==='code'&&(node as MarkdownTreeNode&{lang?:string}).lang==='spec')node.data={...node.data,hProperties:{...node.data?.hProperties,'data-rovai-card-ordinal':ordinal++}}
+    if(node.type==='code'&&(node as MarkdownTreeNode&{lang?:string}).lang==='spec')node.data={...node.data,hProperties:{...node.data?.hProperties,'data-rovai-card-ordinal':String(ordinal++)}}
     for(const child of node.children??[])visit(child)
   };visit(tree)}
 }

@@ -235,7 +235,7 @@ impl Dialect {
                 (rest.starts_with("AX")
                     && end > 2
                     && follows(&rest[end..], &[" \"", " = \"", " (", " ["]))
-                    .then(|| &rest[..end])
+                .then(|| &rest[..end])
             }
             Dialect::Windows => {
                 let end = rest
@@ -244,7 +244,7 @@ impl Dialect {
                     .unwrap_or(rest.len());
                 (UIA_CONTROL_TYPES.contains(&&rest[..end])
                     && follows(&rest[end..], &[" \"", " = \"", " ["]))
-                    .then(|| &rest[..end])
+                .then(|| &rest[..end])
             }
             Dialect::Linux => {
                 // `- [3] push button "name" …` and `- label = "name"`: an
@@ -267,12 +267,48 @@ impl Dialect {
 /// UI Automation's control types, as cua-driver names them in its Windows
 /// tree.
 const UIA_CONTROL_TYPES: &[&str] = &[
-    "AppBar", "Button", "Calendar", "CheckBox", "ComboBox", "Custom", "DataGrid", "DataItem",
-    "Document", "Edit", "Group", "Header", "HeaderItem", "Hyperlink", "Image", "List",
-    "ListItem", "Menu", "MenuBar", "MenuItem", "Pane", "ProgressBar", "RadioButton",
-    "ScrollBar", "SemanticZoom", "Separator", "Slider", "Spinner", "SplitButton", "StatusBar",
-    "Tab", "TabItem", "Table", "Text", "Thumb", "TitleBar", "ToolBar", "ToolTip", "Tree",
-    "TreeItem", "Unknown", "Window",
+    "AppBar",
+    "Button",
+    "Calendar",
+    "CheckBox",
+    "ComboBox",
+    "Custom",
+    "DataGrid",
+    "DataItem",
+    "Document",
+    "Edit",
+    "Group",
+    "Header",
+    "HeaderItem",
+    "Hyperlink",
+    "Image",
+    "List",
+    "ListItem",
+    "Menu",
+    "MenuBar",
+    "MenuItem",
+    "Pane",
+    "ProgressBar",
+    "RadioButton",
+    "ScrollBar",
+    "SemanticZoom",
+    "Separator",
+    "Slider",
+    "Spinner",
+    "SplitButton",
+    "StatusBar",
+    "Tab",
+    "TabItem",
+    "Table",
+    "Text",
+    "Thumb",
+    "TitleBar",
+    "ToolBar",
+    "ToolTip",
+    "Tree",
+    "TreeItem",
+    "Unknown",
+    "Window",
 ];
 
 pub fn redact_tree(tree: &str, dialect: Dialect) -> Redacted {

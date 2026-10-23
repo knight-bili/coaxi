@@ -2,6 +2,12 @@
 use super::*;
 
 pub(super) fn downgrade(connection: &Connection) -> Result<()> {
+    crate::conversation_tools::storage::downgrade_for_test(connection)?;
+    crate::portable_configuration::storage::downgrade_for_test(connection)?;
+    crate::native_lifecycle::storage::downgrade_for_test(connection)?;
+    crate::custom_runtime::storage::downgrade_for_test(connection)?;
+    crate::db::ui_feedback::downgrade_for_test(connection)?;
+    crate::db::usage_activity::downgrade_for_test(connection)?;
     crate::db::runtime_interactions::downgrade_for_test(connection)?;
     if !connection.table_exists(None, "schema_migration")? {
         return Ok(());

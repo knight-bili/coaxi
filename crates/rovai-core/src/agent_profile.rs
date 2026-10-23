@@ -1,4 +1,4 @@
-use crate::custom_runtime::{CustomRuntimeRefV1,FrozenCustomRuntimeV1};
+use crate::custom_runtime::{CustomRuntimeRefV1, FrozenCustomRuntimeV1};
 use std::{
     collections::{BTreeMap, BTreeSet},
     path::Path,
@@ -321,7 +321,8 @@ impl AdapterKind {
             | Self::GrokBuild
             | Self::DeepseekHarness
             | Self::ZcodeApp
-            | Self::AntigravityApp | Self::CustomAcp => PublicOutputMode::ExplicitSendOnly,
+            | Self::AntigravityApp
+            | Self::CustomAcp => PublicOutputMode::ExplicitSendOnly,
         }
     }
 
@@ -976,7 +977,9 @@ pub struct SetMemberRuntimeConfigurationCommand {
 impl sealed::Sealed for SetMemberRuntimeConfigurationCommand {}
 impl DomainCommand for SetMemberRuntimeConfigurationCommand {
     const TYPE: &'static str = "agent_profile.runtime.set";
-    fn exact_replay(&self)->bool {self.adapter_kind==AdapterKind::CustomAcp||self.custom_runtime_ref.is_some()}
+    fn exact_replay(&self) -> bool {
+        self.adapter_kind == AdapterKind::CustomAcp || self.custom_runtime_ref.is_some()
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -2940,7 +2943,10 @@ impl AgentProfileService {
                     envelope.payload.expected_version,
                 ],
             )?;
-            transaction.execute("DELETE FROM custom_runtime_member WHERE member_id=?1",[&envelope.payload.agent_id])?;
+            transaction.execute(
+                "DELETE FROM custom_runtime_member WHERE member_id=?1",
+                [&envelope.payload.agent_id],
+            )?;
             Ok(profile_updated_result(
                 &envelope.payload.agent_id,
                 version + 1,
@@ -3699,7 +3705,14 @@ impl AgentProfileService {
             (None, None, None, None) => None,
             (Some(adapter_kind), Some(installation_id), Some(model), Some(permissions)) => {
                 Some(ResolvedRuntimeBinding {
-                    custom_runtime_ref: if adapter_kind=="custom-acp"{crate::custom_runtime::storage::member_reference(database.connection(),&raw.id)?}else{None},
+                    custom_runtime_ref: if adapter_kind == "custom-acp" {
+                        crate::custom_runtime::storage::member_reference(
+                            database.connection(),
+                            &raw.id,
+                        )?
+                    } else {
+                        None
+                    },
                     adapter_kind: AdapterKind::from_str(&adapter_kind)?,
                     installation_id,
                     model: serde_json::from_str(&model)
@@ -4443,7 +4456,10 @@ fn resolve_rebound_runtime_with_native_intent(
     let mut rebound = match resolve_frozen_runtime_binding_with_snapshot(
         connection,
         &ResolvedRuntimeBinding {
-            custom_runtime_ref: frozen.custom_runtime.as_ref().map(|custom|custom.reference.clone()),
+            custom_runtime_ref: frozen
+                .custom_runtime
+                .as_ref()
+                .map(|custom| custom.reference.clone()),
             adapter_kind: frozen.adapter_kind,
             installation_id: frozen.installation_id.clone(),
             model,
@@ -4459,14 +4475,24 @@ fn resolve_rebound_runtime_with_native_intent(
     rebound.environment = frozen.environment.clone();
     rebound.camp_fast = frozen.camp_fast.clone();
     // 恢复只保留原 Run 的精确连接，不读取队员今天选择的服务商或密钥。
-    crate::portable_configuration::freeze(&mut rebound,frozen.portable_connection.clone())?;
-    if frozen.native_origin.is_some(){
+    crate::portable_configuration::freeze(&mut rebound, frozen.portable_connection.clone())?;
+    if frozen.native_origin.is_some() {
         // 工作副本先冻结自己的工具策略，再登记原生来源；恢复保留这个摘要顺序。
-        crate::conversation_tools::runtime::attach(&mut rebound,frozen.conversation_tools.clone())?;
-        crate::native_lifecycle::freeze_intent(&mut rebound,frozen.native_origin.clone(),native_steer)?;
-    }else{
-        crate::native_lifecycle::freeze_intent(&mut rebound,None,native_steer)?;
-        crate::conversation_tools::runtime::attach(&mut rebound,frozen.conversation_tools.clone())?;
+        crate::conversation_tools::runtime::attach(
+            &mut rebound,
+            frozen.conversation_tools.clone(),
+        )?;
+        crate::native_lifecycle::freeze_intent(
+            &mut rebound,
+            frozen.native_origin.clone(),
+            native_steer,
+        )?;
+    } else {
+        crate::native_lifecycle::freeze_intent(&mut rebound, None, native_steer)?;
+        crate::conversation_tools::runtime::attach(
+            &mut rebound,
+            frozen.conversation_tools.clone(),
+        )?;
     }
     if frozen.adapter_kind == AdapterKind::CodexCli
         && frozen.camp_fast.is_some()
@@ -4577,7 +4603,11 @@ pub fn resolve_frozen_runtime(
     // remain outer errors so a database outage cannot be mistaken for bad input.
     let binding = (|| -> Result<ResolvedRuntimeBinding> {
         Ok(ResolvedRuntimeBinding {
-            custom_runtime_ref: if selected_runtime_adapter_kind=="custom-acp"{crate::custom_runtime::storage::member_reference(transaction,agent_id)?}else{None},
+            custom_runtime_ref: if selected_runtime_adapter_kind == "custom-acp" {
+                crate::custom_runtime::storage::member_reference(transaction, agent_id)?
+            } else {
+                None
+            },
             adapter_kind: AdapterKind::from_str(&selected_runtime_adapter_kind)?,
             installation_id: installation_id.clone(),
             model: serde_json::from_str(&model_json)?,
@@ -4593,9 +4623,17 @@ pub fn resolve_frozen_runtime(
             )));
         }
     };
-    if let Some(reference)=binding.custom_runtime_ref.as_ref(){
-        let current=crate::custom_runtime::storage::latest(transaction,&reference.id)?;
-        if !current.as_ref().is_some_and(|value|value["enabled"]==true&&value["definitionDigest"].as_str()==Some(reference.definition_digest.as_str())){return Ok(Err(runtime_blocker("custom_runtime.definition_changed",json!({"agentId":agent_id,"reference":reference}))))}
+    if let Some(reference) = binding.custom_runtime_ref.as_ref() {
+        let current = crate::custom_runtime::storage::latest(transaction, &reference.id)?;
+        if !current.as_ref().is_some_and(|value| {
+            value["enabled"] == true
+                && value["definitionDigest"].as_str() == Some(reference.definition_digest.as_str())
+        }) {
+            return Ok(Err(runtime_blocker(
+                "custom_runtime.definition_changed",
+                json!({"agentId":agent_id,"reference":reference}),
+            )));
+        }
     }
     if binding.permissions.adapter_kind != binding.adapter_kind {
         return Ok(Err(runtime_blocker(
@@ -4606,20 +4644,35 @@ pub fn resolve_frozen_runtime(
             }),
         )));
     }
-    let portable_selected=crate::portable_configuration::members::selected(transaction,agent_id)?;
+    let portable_selected =
+        crate::portable_configuration::members::selected(transaction, agent_id)?;
     let mut result = resolve_frozen_runtime_binding_with_snapshot(
         transaction,
         &binding,
-        if portable_selected{Some(None)}else{None},
+        if portable_selected { Some(None) } else { None },
         native_binding_compatibility_digest.as_deref(),
     )?;
     if let Ok(runtime) = &mut result {
-        let connection=crate::portable_configuration::members::freeze_for_member(transaction,agent_id,runtime)?;
-        crate::portable_configuration::freeze(runtime,connection)?;
+        let connection = crate::portable_configuration::members::freeze_for_member(
+            transaction,
+            agent_id,
+            runtime,
+        )?;
+        crate::portable_configuration::freeze(runtime, connection)?;
         crate::camp_fast::freeze(transaction, conversation_id, agent_id, runtime)?;
-        crate::conversation_tools::runtime::freeze_for_conversation(transaction,conversation_id,agent_id,runtime)?;
-        if let Some(prepared)=crate::native_lifecycle::continuation::runtime_for_conversation(transaction,conversation_id,agent_id,runtime)?{
-            *runtime=prepared;
+        crate::conversation_tools::runtime::freeze_for_conversation(
+            transaction,
+            conversation_id,
+            agent_id,
+            runtime,
+        )?;
+        if let Some(prepared) = crate::native_lifecycle::continuation::runtime_for_conversation(
+            transaction,
+            conversation_id,
+            agent_id,
+            runtime,
+        )? {
+            *runtime = prepared;
         }
     }
     Ok(result)
@@ -4634,17 +4687,22 @@ pub(crate) fn resolve_frozen_runtime_binding(
 
 /// 新帮手只在目标程序与队员明确选定的程序相同时使用该队员的独立连接。
 pub(crate) fn resolve_frozen_runtime_for_member_binding(
-    connection:&Connection,
-    member:&str,
-    binding:&ResolvedRuntimeBinding,
-)->Result<std::result::Result<FrozenAgentRuntimeConfig,RuntimeConfigurationBlocker>>{
+    connection: &Connection,
+    member: &str,
+    binding: &ResolvedRuntimeBinding,
+) -> Result<std::result::Result<FrozenAgentRuntimeConfig, RuntimeConfigurationBlocker>> {
     let selected:bool=connection.query_row("SELECT EXISTS(SELECT 1 FROM agent_profile WHERE id=?1 AND selected_runtime_adapter_kind=?2 AND default_runtime_installation_id=?3 AND profile_status='present')",params![member,binding.adapter_kind.as_str(),binding.installation_id],|row|row.get(0))?;
-    let portable=selected&&crate::portable_configuration::members::selected(connection,member)?;
-    if !portable{return resolve_frozen_runtime_binding(connection,binding)}
-    let mut result=resolve_frozen_runtime_binding_with_snapshot(connection,binding,Some(None),None)?;
-    if let Ok(runtime)=&mut result{
-        let portable=crate::portable_configuration::members::freeze_for_member(connection,member,runtime)?;
-        crate::portable_configuration::freeze(runtime,portable)?;
+    let portable =
+        selected && crate::portable_configuration::members::selected(connection, member)?;
+    if !portable {
+        return resolve_frozen_runtime_binding(connection, binding);
+    }
+    let mut result =
+        resolve_frozen_runtime_binding_with_snapshot(connection, binding, Some(None), None)?;
+    if let Ok(runtime) = &mut result {
+        let portable =
+            crate::portable_configuration::members::freeze_for_member(connection, member, runtime)?;
+        crate::portable_configuration::freeze(runtime, portable)?;
     }
     Ok(result)
 }
@@ -4831,13 +4889,24 @@ fn resolve_frozen_runtime_binding_with_snapshot(
             "native": frozen.binding_compatibility_digest, "customApi": identity
         }))?;
     }
-    if adapter_kind==AdapterKind::CustomAcp{
-        let reference=binding.custom_runtime_ref.as_ref().context("custom_runtime.reference_missing")?;
-        let custom=crate::custom_runtime::storage::frozen(transaction,reference,&frozen.installation_id)?;
-        let identity=crate::custom_runtime::digest(&serde_json::to_value(&custom)?)?;
-        frozen.host_config_digest=canonical_json_digest(&json!({"native":frozen.host_config_digest,"customRuntime":identity}))?;
-        frozen.binding_compatibility_digest=canonical_json_digest(&json!({"native":frozen.binding_compatibility_digest,"customRuntime":identity}))?;
-        frozen.custom_runtime=Some(custom);
+    if adapter_kind == AdapterKind::CustomAcp {
+        let reference = binding
+            .custom_runtime_ref
+            .as_ref()
+            .context("custom_runtime.reference_missing")?;
+        let custom = crate::custom_runtime::storage::frozen(
+            transaction,
+            reference,
+            &frozen.installation_id,
+        )?;
+        let identity = crate::custom_runtime::digest(&serde_json::to_value(&custom)?)?;
+        frozen.host_config_digest = canonical_json_digest(
+            &json!({"native":frozen.host_config_digest,"customRuntime":identity}),
+        )?;
+        frozen.binding_compatibility_digest = canonical_json_digest(
+            &json!({"native":frozen.binding_compatibility_digest,"customRuntime":identity}),
+        )?;
+        frozen.custom_runtime = Some(custom);
     }
     frozen.refresh_config_digest()?;
     Ok(Ok(frozen))
@@ -5108,10 +5177,17 @@ fn runtime_readiness(
     if binding.permissions.adapter_kind != binding.adapter_kind {
         return Ok(needs_attention("runtime_permission_adapter_mismatch", None));
     }
-    if binding.adapter_kind==AdapterKind::CustomAcp{
-        let Some(reference)=binding.custom_runtime_ref.as_ref() else{return Ok(needs_attention("custom_runtime.reference_missing",None))};
-        let current=crate::custom_runtime::storage::latest(database.connection(),&reference.id)?;
-        if !current.as_ref().is_some_and(|value|value["enabled"]==true&&value["definitionDigest"].as_str()==Some(reference.definition_digest.as_str())){return Ok(needs_attention("custom_runtime.definition_changed",None))}
+    if binding.adapter_kind == AdapterKind::CustomAcp {
+        let Some(reference) = binding.custom_runtime_ref.as_ref() else {
+            return Ok(needs_attention("custom_runtime.reference_missing", None));
+        };
+        let current = crate::custom_runtime::storage::latest(database.connection(), &reference.id)?;
+        if !current.as_ref().is_some_and(|value| {
+            value["enabled"] == true
+                && value["definitionDigest"].as_str() == Some(reference.definition_digest.as_str())
+        }) {
+            return Ok(needs_attention("custom_runtime.definition_changed", None));
+        }
     }
     let mut validation = binding.clone();
     validation.model = ModelSelection::RuntimeDefault;
@@ -5149,11 +5225,21 @@ struct ConfigurableManagedRuntime {
     permissions_json: String,
 }
 
-fn configurable_custom_runtime(transaction:&Transaction<'_>,reference:&CustomRuntimeRefV1)->Result<ConfigurableManagedRuntime>{
-    crate::custom_runtime::storage::resolve(transaction,reference,true)?;
-    let(installation_id,_)=crate::custom_runtime::storage::installed_lock(transaction,reference)?;
+fn configurable_custom_runtime(
+    transaction: &Transaction<'_>,
+    reference: &CustomRuntimeRefV1,
+) -> Result<ConfigurableManagedRuntime> {
+    crate::custom_runtime::storage::resolve(transaction, reference, true)?;
+    let (installation_id, _) =
+        crate::custom_runtime::storage::installed_lock(transaction, reference)?;
     let generation:i64=transaction.query_row("SELECT generation FROM adapter_installation WHERE id=?1 AND adapter_kind='custom-acp' AND enabled=1",[&installation_id],|r|r.get(0))?;
-    Ok(ConfigurableManagedRuntime{installation_id,installation_generation:generation,permission_schema_version:1,models_json:"[]".into(),permissions_json:"[]".into()})
+    Ok(ConfigurableManagedRuntime {
+        installation_id,
+        installation_generation: generation,
+        permission_schema_version: 1,
+        models_json: "[]".into(),
+        permissions_json: "[]".into(),
+    })
 }
 
 fn configurable_managed_runtime(

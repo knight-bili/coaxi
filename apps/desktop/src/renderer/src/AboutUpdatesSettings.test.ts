@@ -68,19 +68,29 @@ const languageApi = {
 afterEach(async () => { await changeInterfaceLanguage(languageApi, 'zh-CN') })
 
 describe('AboutUpdatesSettingsView', () => {
-  it('links Server update fallback to the exact bridge or unified release tag', () => {
+  it('links update fallback to the unified Releases page without inventing a release tag', () => {
     const markup = render(snapshot({
       status: 'download_failed',
       availableRelease: release,
       failureReason: 'network'
     }), { product: 'server' })
-    expect(markup).toContain('https://github.com/murray17/rovai-ai/releases/tag/v0.0.3')
+    expect(markup).toContain('href="https://github.com/knight-bili/codeg-rovai-workbench/releases"')
+    expect(markup).not.toContain('https://github.com/murray17/rovai-ai')
+    expect(markup).not.toContain('/releases/tag/')
     const bridge = render(snapshot({
       status: 'download_failed',
       availableRelease: { ...release, version: '0.4.1' },
       failureReason: 'network'
     }), { product: 'server' })
-    expect(bridge).toContain('https://github.com/murray17/rovai-ai/releases/tag/server-v0.4.1')
+    expect(bridge).toContain('href="https://github.com/knight-bili/codeg-rovai-workbench/releases"')
+    expect(bridge).not.toContain('/releases/tag/server-v0.4.1')
+
+    const withoutReleaseTag = render(snapshot({
+      status: 'check_failed',
+      failureReason: 'updater_unavailable'
+    }), { product: 'server' })
+    expect(withoutReleaseTag).toContain('href="https://github.com/knight-bili/codeg-rovai-workbench/releases"')
+    expect(withoutReleaseTag).not.toContain('/releases/tag/')
   })
   it('always shows the installed version and keeps all update mutations user initiated', () => {
     const markup = render(snapshot())

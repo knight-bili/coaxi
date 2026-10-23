@@ -389,7 +389,7 @@ export function normalizeShortcut(rawShortcut: string): string | null {
  * 键盘事件里我们真正读的那几个字段。`code` 是可选的，因为部分调用点（含测试）
  * 构造的是精简对象。
  */
-type ShortcutEventLike = Pick<
+export type ShortcutEventLike = Pick<
   KeyboardEvent,
   "key" | "metaKey" | "ctrlKey" | "altKey" | "shiftKey"
 > & { code?: string }

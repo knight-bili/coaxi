@@ -31,12 +31,12 @@ use serde::Deserialize;
 
 use super::auth::ResolvedAuth;
 use super::{
-    sanitize_web_url, truncate_chars, urlencode_query, validate_state_filter, ForgeChangeDetail,
-    ForgeChangedFile, ForgeChangedFileList, ForgeCheck, ForgeCheckList, ForgeCheckState,
-    ForgeComment, ForgeCommentList, ForgeError, ForgeFileStatus, ForgeIssueList, ForgeIssueRow,
-    ForgeItemKind, ForgeLabel, ForgeLabelList, ForgeMergeMethod, ForgeMergeOptions,
-    ForgeMergeStrategy, ForgeProvider, ForgeStateAction, ForgeTab, ListIssuesRequest,
-    ResolvedNewIssue, BODY_CAP, LABEL_PAGE_SIZE,
+    BODY_CAP, ForgeChangeDetail, ForgeChangedFile, ForgeChangedFileList, ForgeCheck,
+    ForgeCheckList, ForgeCheckState, ForgeComment, ForgeCommentList, ForgeError, ForgeFileStatus,
+    ForgeIssueList, ForgeIssueRow, ForgeItemKind, ForgeLabel, ForgeLabelList, ForgeMergeMethod,
+    ForgeMergeOptions, ForgeMergeStrategy, ForgeProvider, ForgeStateAction, ForgeTab,
+    LABEL_PAGE_SIZE, ListIssuesRequest, ResolvedNewIssue, sanitize_web_url, truncate_chars,
+    urlencode_query, validate_state_filter,
 };
 
 /// How deep search pagination goes, per GitHub's documented limit. Beyond this
@@ -179,10 +179,7 @@ fn label_qualifier(name: &str) -> String {
 /// what a filter box is expected to do).
 fn search_terms(raw: &str) -> String {
     raw.split_whitespace()
-        .map(|word| {
-            word.trim_start_matches(['-', '+'])
-                .replace([':', '"'], "")
-        })
+        .map(|word| word.trim_start_matches(['-', '+']).replace([':', '"'], ""))
         .filter(|word| !word.is_empty())
         .collect::<Vec<_>>()
         .join(" ")
@@ -306,7 +303,10 @@ pub async fn list_labels(
 ) -> Result<ForgeLabelList, ForgeError> {
     let repo = super::normalize_repo(owner_repo)
         .ok_or_else(|| ForgeError::Invalid(format!("bad repository path: {owner_repo}")))?;
-    let url = format!("{}/repos/{repo}/labels?per_page={LABEL_PAGE_SIZE}", auth.api_base);
+    let url = format!(
+        "{}/repos/{repo}/labels?per_page={LABEL_PAGE_SIZE}",
+        auth.api_base
+    );
     let raw: Vec<RawLabel> = api_get(auth, &url)
         .await?
         .json()
@@ -347,7 +347,9 @@ pub async fn list_comments(
     let repo = super::normalize_repo(owner_repo)
         .ok_or_else(|| ForgeError::Invalid(format!("bad repository path: {owner_repo}")))?;
     if number <= 0 {
-        return Err(ForgeError::Invalid(format!("bad work item number: {number}")));
+        return Err(ForgeError::Invalid(format!(
+            "bad work item number: {number}"
+        )));
     }
     // Oldest first, which is this endpoint's own default and the only order a
     // conversation reads in. It takes no `sort` parameter, so there is nothing
@@ -436,7 +438,9 @@ pub async fn create_comment(
     let repo = super::normalize_repo(owner_repo)
         .ok_or_else(|| ForgeError::Invalid(format!("bad repository path: {owner_repo}")))?;
     if number <= 0 {
-        return Err(ForgeError::Invalid(format!("bad work item number: {number}")));
+        return Err(ForgeError::Invalid(format!(
+            "bad work item number: {number}"
+        )));
     }
     let url = format!("{}/repos/{repo}/issues/{number}/comments", auth.api_base);
     let raw: RawComment = api_post(auth, &url, &serde_json::json!({ "body": body }))
@@ -469,7 +473,9 @@ pub async fn set_item_state(
     let repo = super::normalize_repo(owner_repo)
         .ok_or_else(|| ForgeError::Invalid(format!("bad repository path: {owner_repo}")))?;
     if number <= 0 {
-        return Err(ForgeError::Invalid(format!("bad work item number: {number}")));
+        return Err(ForgeError::Invalid(format!(
+            "bad work item number: {number}"
+        )));
     }
     let collection = match kind {
         ForgeItemKind::Issue => "issues",
@@ -582,7 +588,9 @@ pub async fn change_detail(
     let repo = super::normalize_repo(owner_repo)
         .ok_or_else(|| ForgeError::Invalid(format!("bad repository path: {owner_repo}")))?;
     if number <= 0 {
-        return Err(ForgeError::Invalid(format!("bad work item number: {number}")));
+        return Err(ForgeError::Invalid(format!(
+            "bad work item number: {number}"
+        )));
     }
     let url = format!("{}/repos/{repo}/pulls/{number}", auth.api_base);
     let raw: RawPull = api_get(auth, &url)
@@ -611,8 +619,16 @@ pub async fn change_detail(
 
     Ok(ForgeChangeDetail {
         number: if raw.number > 0 { raw.number } else { number },
-        base_ref: raw.base.as_ref().map(|b| b.ref_name.clone()).unwrap_or_default(),
-        head_ref: raw.head.as_ref().map(|h| h.ref_name.clone()).unwrap_or_default(),
+        base_ref: raw
+            .base
+            .as_ref()
+            .map(|b| b.ref_name.clone())
+            .unwrap_or_default(),
+        head_ref: raw
+            .head
+            .as_ref()
+            .map(|h| h.ref_name.clone())
+            .unwrap_or_default(),
         head_repo,
         head_sha,
         draft: raw.draft,
@@ -846,7 +862,9 @@ pub async fn list_change_files(
     let repo = super::normalize_repo(owner_repo)
         .ok_or_else(|| ForgeError::Invalid(format!("bad repository path: {owner_repo}")))?;
     if number <= 0 {
-        return Err(ForgeError::Invalid(format!("bad work item number: {number}")));
+        return Err(ForgeError::Invalid(format!(
+            "bad work item number: {number}"
+        )));
     }
     let url = format!(
         "{}/repos/{repo}/pulls/{number}/files?page={page}&per_page={per_page}",
@@ -998,7 +1016,9 @@ pub async fn merge_change(
     let repo = super::normalize_repo(owner_repo)
         .ok_or_else(|| ForgeError::Invalid(format!("bad repository path: {owner_repo}")))?;
     if number <= 0 {
-        return Err(ForgeError::Invalid(format!("bad work item number: {number}")));
+        return Err(ForgeError::Invalid(format!(
+            "bad work item number: {number}"
+        )));
     }
     let url = format!("{}/repos/{repo}/pulls/{number}/merge", auth.api_base);
     let mut payload = serde_json::json!({ "merge_method": method.github_method() });
@@ -1046,7 +1066,11 @@ static LOGIN_CACHE: LazyLock<RwLock<HashMap<String, String>>> =
 
 async fn current_login(auth: &ResolvedAuth) -> Result<String, ForgeError> {
     let cache_key = format!("{}\n{}", auth.api_base, auth.account_id);
-    if let Some(hit) = LOGIN_CACHE.read().ok().and_then(|c| c.get(&cache_key).cloned()) {
+    if let Some(hit) = LOGIN_CACHE
+        .read()
+        .ok()
+        .and_then(|c| c.get(&cache_key).cloned())
+    {
         return Ok(hit);
     }
     #[derive(Deserialize)]
@@ -1188,4 +1212,3 @@ async fn classify_failure(status: u16, response: reqwest::Response) -> ForgeErro
         }
     }
 }
-

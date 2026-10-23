@@ -4,9 +4,14 @@ import UniformTypeIdentifiers
 /// Presents the source DiagnosticsCenter report and exports only Core's centrally redacted v5 bundle.
 struct RovaiDiagnostics: View {
     let model: RovaiWorkspaceModel
-    @State private var report: JSONValue?, issue: String?
-    @State private var filter = "", destination = ""
-    @State private var busy = false, repair = false, settings = false, exporting = false
+    @State private var report: JSONValue?
+    @State private var issue: String?
+    @State private var filter = ""
+    @State private var destination = ""
+    @State private var busy = false
+    @State private var repair = false
+    @State private var settings = false
+    @State private var exporting = false
     @State private var generation: UInt64?
     @State private var exportDocument: RovaiDiagnosticDocument?
     private var blocked: Bool {busy || model.busy || model.pending != nil || generation != model.connectionGeneration}

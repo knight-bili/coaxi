@@ -83,7 +83,7 @@ export function NativeSessionViewer({ target, open, visible, onOpenChange, retur
           <Drawer.Title className="sr-only">{t('原生帮手会话')}</Drawer.Title>
           <Drawer.Description className="sr-only">{t('只读查看帮手已经保存的消息和工具记录。')}</Drawer.Description>
           <header className="native-session-header" tabIndex={-1} ref={heading}>
-            <CodegRuntimeMark target={target.runtime} size={16} />
+            <CodegRuntimeMark target={target.runtime === 'claude' ? 'claude_code' : target.runtime} size={16} />
             <div><strong>{t('原生帮手会话')}</strong>{target.subtitle && <small>{target.subtitle}</small>}</div>
             {state.loading && <Loader2 size={14} className="native-session-spinner" aria-label={t('正在读取会话')} />}
             <button type="button" className="delegation-icon-button" aria-label={t('刷新原生帮手会话')} onClick={() => void reader.refresh()}><RefreshCw size={15} /></button>
@@ -128,7 +128,7 @@ export function NativeTranscriptBody({ data, reader, target, live, visible, onFo
       undefined, { commitOnSuccess: true, revalidateSource: true })
     if (outcome.kind === 'error') throw new Error('native_child.file_unavailable')
   }, [reader, previewOpen])
-  const source = reader?.fileSource()
+  const source = reader?.fileSource() ?? null
   const client = useThreadClient(), local = client.attachments?.kind !== 'download'
   const scope = useMemo(() => ({ source, api: fileApi, theme: filePreview?.resolvedTheme ?? 'day' as const, visible, local, open: filePreview && source ? openFile : null }),
     [source?.threadId, source?.readId, fileApi, filePreview?.resolvedTheme, visible, local, Boolean(previewOpen), openFile])
@@ -237,7 +237,7 @@ function NativeReasoning({ text }: { text: string }): React.JSX.Element {
   const t = useUiText()
   return <details className="native-session-reasoning"><summary><Brain size={14} /><span>{t('思考')}</span><ChevronDown size={14} /></summary><NativeMarkdown>{text}</NativeMarkdown></details>
 }
-function NativeTool({ use, result, reader, target, live }: { use?: ToolUse; result?: ToolResult; reader: NativeChildReader; target: NativeSessionTarget; live: boolean }): React.JSX.Element {
+function NativeTool({ use, result, reader, target, live }: { use?: ToolUse; result?: ToolResult; reader: NativeChildReader | null; target: NativeSessionTarget | null; live: boolean }): React.JSX.Element {
   const t = useUiText(), host = useContext(NativeSessionViewerContext)
   const [expanded, setExpanded] = useState(false)
   const pending = live && !result && (use?.status === 'pending' || use?.status === 'in_progress')
@@ -245,9 +245,11 @@ function NativeTool({ use, result, reader, target, live }: { use?: ToolUse; resu
   const command = use ? ['bash', 'exec_command'].includes(normalizeToolName(use.tool_name).toLowerCase()) || isShellSessionToolName(normalizeToolName(use.tool_name)) : false
   const output = result?.output_preview
   const commandOutput = command && output != null ? parseCodexCommandEnvelope(output)?.output ?? output : ''
-  const children = nativeToolChildren(use, result).flatMap(id => { const source = reader.child(id); return source ? [{ id, source }] : [] })
-  const openChild = (child: typeof children[number], trigger: HTMLElement): void => host?.open({ ...target,
-    identity: `${target.identity}:${child.id}`, parentConversationId: `native-view:${target.identity}`, source: child.source, subtitle: `#${child.id.slice(-8)}` }, trigger)
+  const children = reader && target ? nativeToolChildren(use, result).flatMap(id => { const source = reader.child(id); return source ? [{ id, source }] : [] }) : []
+  const openChild = (child: typeof children[number], trigger: HTMLElement): void => {
+    if (!target) return
+    host?.open({ ...target, identity: `${target.identity}:${child.id}`, parentConversationId: `native-view:${target.identity}`, source: child.source, subtitle: `#${child.id.slice(-8)}` }, trigger)
+  }
   return <Tool className="native-session-source-tool" open={expanded || pending && command} onOpenChange={setExpanded}>
     <ToolHeader type="dynamic-tool" toolName={use?.tool_name ?? t('工具结果')} state={failed ? 'output-error' : pending ? 'input-available' : result || use?.status === 'completed' ? 'output-available' : 'input-streaming'} />
     {children.length === 1 && host && <button className="native-session-open-child" type="button" aria-label={t('查看下级帮手会话')} onClick={event => openChild(children[0]!, event.currentTarget)}><Eye size={14} /><span>{t('查看会话')}</span></button>}

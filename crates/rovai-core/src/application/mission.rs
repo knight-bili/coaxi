@@ -1263,10 +1263,16 @@ impl Core {
                     Ok(value)
                 }
             }
-            "missions.create" | "missions.createWithAttachments" | "host.missions.createWithAttachments" => {
+            "missions.create"
+            | "missions.createWithAttachments"
+            | "host.missions.createWithAttachments" => {
                 let mut params: UserCommandParams<CreateMissionCommand> =
                     if request.method.ends_with("createWithAttachments") {
-                        anyhow::ensure!(request.client.is_desktop() || request.method == "host.missions.createWithAttachments", "mission.desktop_required");
+                        anyhow::ensure!(
+                            request.client.is_desktop()
+                                || request.method == "host.missions.createWithAttachments",
+                            "mission.desktop_required"
+                        );
                         let private: CreateMissionWithAttachmentsParams =
                             serde_json::from_value(request.params.clone())?;
                         let mut command = private.command;
@@ -1326,7 +1332,11 @@ impl Core {
             | "missions.start"
             | "missions.linkPr" => {
                 let private_update = if request.method.ends_with("updateWithAttachments") {
-                    anyhow::ensure!(request.client.is_desktop() || request.method == "host.missions.updateWithAttachments", "mission.desktop_required");
+                    anyhow::ensure!(
+                        request.client.is_desktop()
+                            || request.method == "host.missions.updateWithAttachments",
+                        "mission.desktop_required"
+                    );
                     let private: UpdateMissionWithAttachmentsParams =
                         serde_json::from_value(request.params.clone())?;
                     let mut command = private.command;
@@ -1346,7 +1356,9 @@ impl Core {
                 };
                 let mut database = self.database.lock().await;
                 let execution = match request.method.as_str() {
-                    "missions.update" | "missions.updateWithAttachments" | "host.missions.updateWithAttachments" => {
+                    "missions.update"
+                    | "missions.updateWithAttachments"
+                    | "host.missions.updateWithAttachments" => {
                         let params: UserCommandParams<UpdateMissionCommand> = match private_update {
                             Some(params) => params,
                             None => serde_json::from_value(request.params.clone())?,
@@ -1357,8 +1369,9 @@ impl Core {
                         )?
                     }
                     "missions.attachments.remove" => {
-                        let params: UserCommandParams<crate::mission::RemoveMissionAttachmentCommand> =
-                            serde_json::from_value(request.params.clone())?;
+                        let params: UserCommandParams<
+                            crate::mission::RemoveMissionAttachmentCommand,
+                        > = serde_json::from_value(request.params.clone())?;
                         MissionService::default().remove_attachment(
                             &mut database,
                             &user_command_envelope(params.command_id, params.command),

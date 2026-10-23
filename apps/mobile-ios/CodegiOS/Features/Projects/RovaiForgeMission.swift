@@ -14,11 +14,20 @@ private struct RovaiForgeMissionEditor: View {
     let number: Int, repository: JSONValue
     let onSaved: () -> Void
     @Environment(\.dismiss) private var dismiss
-    @State private var title = "", description = "", sourceURL = "", project = "", lead = "", created = "", commandId = UUID().uuidString.lowercased()
+    @State private var title = ""
+    @State private var description = ""
+    @State private var sourceURL = ""
+    @State private var project = ""
+    @State private var lead = ""
+    @State private var created = ""
+    @State private var commandId = UUID().uuidString.lowercased()
     @State private var members: [JSONValue] = []
     @State private var selected = Set<String>()
-    @State private var sent: JSONValue?, link: JSONValue?, issue: String?
-    @State private var ready = false, busy = false
+    @State private var sent: JSONValue?
+    @State private var link: JSONValue?
+    @State private var issue: String?
+    @State private var ready = false
+    @State private var busy = false
     private var owner: String {"forge-mission:\(threadId):\(accountId):\(sourceKind):\(number)"}
     private var record: JSONValue {.object(["repositoryKey": repository["repositoryKey"] ?? .null, "title": .string(title), "description": .string(description), "sourceUrl": .string(sourceURL), "project": .string(project), "members": .array(members), "selected": .array(selected.sorted().map(JSONValue.string)), "lead": .string(lead), "commandId": .string(commandId), "sent": sent ?? .null, "link": link ?? .null, "createdId": .string(created)])}
     var body: some View {

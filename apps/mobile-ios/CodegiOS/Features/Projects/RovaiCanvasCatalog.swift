@@ -10,7 +10,9 @@ struct RovaiCanvasCatalogSnapshot {
 /// One mounted canvas reads shared metadata; all cards derive from the same bounded pages and folder facts.
 @MainActor @Observable final class RovaiCanvasCatalog {
     private(set) var snapshot = RovaiCanvasCatalogSnapshot()
-    @ObservationIgnored private var scope = "", epoch: UInt64 = 0, loading = false
+    @ObservationIgnored private var scope = ""
+    @ObservationIgnored private var epoch: UInt64 = 0
+    @ObservationIgnored private var loading = false
     func configure(_ next: String) {guard next != scope else {return};scope = next;epoch &+= 1;snapshot = .init()}
     func load(_ model: RovaiWorkspaceModel,nodes: [JSONValue]) async {
         guard !loading else {return};loading = true;defer {loading = false}

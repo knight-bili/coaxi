@@ -4,9 +4,15 @@ struct RovaiForgeLinks: View {
     let model: RovaiWorkspaceModel
     let threadId: String, accountId: String, sourceKind: String
     let number: Int, repositoryKey: String
-    @State private var page: JSONValue?, pending: JSONValue?, unlinking: JSONValue?, issue: String?
-    @State private var missions: [JSONValue] = [], tasks: [JSONValue] = []
-    @State private var kind = "thread", target = "", busy = false
+    @State private var page: JSONValue?
+    @State private var pending: JSONValue?
+    @State private var unlinking: JSONValue?
+    @State private var issue: String?
+    @State private var missions: [JSONValue] = []
+    @State private var tasks: [JSONValue] = []
+    @State private var kind = "thread"
+    @State private var target = ""
+    @State private var busy = false
     private var owner: String {"forge-link:\(threadId):\(accountId):\(sourceKind):\(number)"}
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {

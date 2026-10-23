@@ -30,7 +30,7 @@ struct PackObservation {
 pub(crate) struct PreparedMemberSkillPacks {
     agent_id: String,
     observations: BTreeMap<String, PackObservation>,
-    custom_native: Option<BTreeMap<String,String>>,
+    custom_native: Option<BTreeMap<String, String>>,
 }
 
 impl PreparedMemberSkillPacks {
@@ -40,16 +40,46 @@ impl PreparedMemberSkillPacks {
         agent_id: &str,
         requested_ids: impl IntoIterator<Item = &'a str>,
     ) -> Result<Self> {
-        Self::prepare_with_runtime(connection,data_dir,agent_id,requested_ids,None)
+        Self::prepare_with_runtime(connection, data_dir, agent_id, requested_ids, None)
     }
-    pub(crate) fn prepare_with_runtime<'a>(connection:&Connection,data_dir:&Path,agent_id:&str,requested_ids:impl IntoIterator<Item=&'a str>,runtime:Option<&crate::agent_profile::FrozenAgentRuntimeConfig>)->Result<Self>{
-        let custom_native=if let Some(runtime)=runtime.filter(|runtime|runtime.adapter_kind==crate::agent_profile::AdapterKind::CustomAcp){
-            let custom=runtime.custom_runtime.as_ref().ok_or_else(||anyhow::anyhow!("custom_runtime.reference_required"))?;
-            anyhow::ensure!(crate::custom_runtime::storage::frozen(connection,&custom.reference,&runtime.installation_id)?==*custom,"custom_runtime.frozen_definition_changed");
-            let roots=custom.declared_skill_roots.iter().map(std::path::PathBuf::from).collect::<Vec<_>>();
-            let scan=crate::native_skills::NativeSkillDiscovery::default().discover_custom(&roots,false)?;
-            Some(scan.skills.into_iter().map(|skill|(skill.id,skill.name)).collect())
-        }else{None};
+    pub(crate) fn prepare_with_runtime<'a>(
+        connection: &Connection,
+        data_dir: &Path,
+        agent_id: &str,
+        requested_ids: impl IntoIterator<Item = &'a str>,
+        runtime: Option<&crate::agent_profile::FrozenAgentRuntimeConfig>,
+    ) -> Result<Self> {
+        let custom_native = if let Some(runtime) = runtime
+            .filter(|runtime| runtime.adapter_kind == crate::agent_profile::AdapterKind::CustomAcp)
+        {
+            let custom = runtime
+                .custom_runtime
+                .as_ref()
+                .ok_or_else(|| anyhow::anyhow!("custom_runtime.reference_required"))?;
+            anyhow::ensure!(
+                crate::custom_runtime::storage::frozen(
+                    connection,
+                    &custom.reference,
+                    &runtime.installation_id
+                )? == *custom,
+                "custom_runtime.frozen_definition_changed"
+            );
+            let roots = custom
+                .declared_skill_roots
+                .iter()
+                .map(std::path::PathBuf::from)
+                .collect::<Vec<_>>();
+            let scan = crate::native_skills::NativeSkillDiscovery::default()
+                .discover_custom(&roots, false)?;
+            Some(
+                scan.skills
+                    .into_iter()
+                    .map(|skill| (skill.id, skill.name))
+                    .collect(),
+            )
+        } else {
+            None
+        };
         let selected = connection.prepare(
             "SELECT choice.skill_id FROM member_skill_pack AS choice \
              JOIN agent_profile AS member ON member.id=choice.agent_id \
@@ -116,7 +146,11 @@ impl PreparedMemberSkillPacks {
         );
         Ok(())
     }
-    pub(crate) fn permits_native(&self,id:&str,name:&str)->bool{self.custom_native.as_ref().is_none_or(|sources|sources.get(id).is_some_and(|found|found==name))}
+    pub(crate) fn permits_native(&self, id: &str, name: &str) -> bool {
+        self.custom_native
+            .as_ref()
+            .is_none_or(|sources| sources.get(id).is_some_and(|found| found == name))
+    }
 
     pub(crate) fn source(&self, id: &str) -> Result<&SkillPackModelSource, PackUnavailable> {
         self.observations

@@ -21,7 +21,8 @@ struct RovaiCanvasFileNode: View {
     let model: RovaiWorkspaceModel
     let node: JSONValue
     @Environment(\.dismiss) private var dismiss
-    @State private var source: JSONValue?, issue: String?
+    @State private var source: JSONValue?
+    @State private var issue: String?
     var body: some View {
         Group {
             if let source {if rovaiOfficeFile(node["data"]?.text("path") ?? "") {RovaiOfficePreview(model: model, threadId: source.text("threadId"), path: node["data"]?.text("path") ?? "")} else {RovaiFilePreview(model: model, source: source)}}

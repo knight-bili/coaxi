@@ -31,7 +31,41 @@ import java.util.UUID
             item{issue?.let{Text(it,color=CodegTheme.colors.danger)};if(stale)Text(stringResource(R.string.rovai_fusion_7ee7ed047066bed9),color=CodegTheme.colors.danger);if(state.pending!=null)Text(stringResource(R.string.rovai_fusion_bf9578664719ce2f),color=CodegTheme.colors.textSecondary)}
             nodes.forEach{node->item(key=node.coreText("id")){val data=node["data"].coreObject();Text(data.coreText("title").ifEmpty{rovaiCanvasKindNames[data.coreText("kind")]?:"卡片"})}}
             item{RovaiCanvasChoice("目标分组",target,listOf("" to "新建自定义分组")+graph["nodes"].coreArray().filter{it["data"].coreObject().coreText("kind")=="custom"}.map{it.coreText("id") to it["data"].coreObject().coreText("title").ifEmpty{"自定义分组"}},!blocked){target=it}
-                Button(enabled=!blocked&&!stale&&groupable,onClick={val references=nodes.map{it["data"].coreObject()["conversation"].coreObject()}.distinctBy{RovaiCanvasReferenceChoice(it,"").key};fun n(node:JsonObject,key:String)=(node["data"].coreObject()[key]as?JsonPrimitive)?.doubleOrNull?:0.0;val count=(references.size+1)/2;submit(buildJsonObject{put("type","group");put("targetNodeId",if(target.isEmpty())JsonNull else JsonPrimitive(target));put("newRegion",if(target.isNotEmpty())JsonNull else buildJsonObject{put("kind","custom");put("x",nodes.minOf{n(it,"x")}-12);put("y",nodes.minOf{n(it,"y")}-52);put("width",484);put("height",64+count*132+(count-1).coerceAtLeast(0)*12)});put("conversations",JsonArray(references));put("consumeNodeIds",JsonArray(nodes.map{JsonPrimitive(it.coreText("id"))}))})}){Text(if(target.isEmpty())"归为新分组"else"归入已有分组")}
+                Button(
+                    enabled = !blocked && !stale && groupable,
+                    onClick = {
+                        val references = nodes
+                            .map { it["data"].coreObject()["conversation"].coreObject() }
+                            .distinctBy { RovaiCanvasReferenceChoice(it, "").key }
+                        val count = (references.size + 1) / 2
+                        val newRegion = if (target.isNotEmpty()) {
+                            JsonNull
+                        } else {
+                            val coordinate: (JsonObject, String) -> Double = { node, key ->
+                                (node["data"].coreObject()[key] as? JsonPrimitive)?.doubleOrNull ?: 0.0
+                            }
+
+                            buildJsonObject {
+                                put("kind", "custom")
+                                put("x", nodes.minOf { coordinate(it, "x") } - 12)
+                                put("y", nodes.minOf { coordinate(it, "y") } - 52)
+                                put("width", 484)
+                                put("height", 64 + count * 132 + (count - 1).coerceAtLeast(0) * 12)
+                            }
+                        }
+                        submit(
+                            buildJsonObject {
+                                put("type", "group")
+                                put("targetNodeId", if (target.isEmpty()) JsonNull else JsonPrimitive(target))
+                                put("newRegion", newRegion)
+                                put("conversations", JsonArray(references))
+                                put("consumeNodeIds", JsonArray(nodes.map { JsonPrimitive(it.coreText("id")) }))
+                            }
+                        )
+                    }
+                ) {
+                    Text(if (target.isEmpty()) "归为新分组" else "归入已有分组")
+                }
                 if(!groupable)Text(stringResource(R.string.rovai_fusion_bdb39e069e23d7b3),color=CodegTheme.colors.textSecondary)
             }
             item{TextButton(enabled=!blocked&&!stale&&nodes.isNotEmpty(),onClick={confirm=buildJsonObject{put("type","move");put("moves",canvasPackedMoves(nodes))}}){Text(stringResource(R.string.rovai_fusion_c8b6fc5c52191014))};TextButton(enabled=!blocked&&!stale&&nodes.isNotEmpty(),onClick={confirm=buildJsonObject{put("type","delete");put("nodeIds",JsonArray(nodes.map{JsonPrimitive(it.coreText("id"))}))}}){Text(stringResource(R.string.rovai_fusion_e6d7c2665e984459),color=CodegTheme.colors.danger)}}

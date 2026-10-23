@@ -14,8 +14,7 @@ use std::{
 };
 use tokio::{io::AsyncWriteExt, sync::Notify};
 
-const CHANNEL: &str =
-    "https://raw.githubusercontent.com/knight-bili/codeg-rovai-workbench/main/scripts/server-release-tag.txt";
+const CHANNEL: &str = "https://raw.githubusercontent.com/knight-bili/codeg-rovai-workbench/main/scripts/server-release-tag.txt";
 const RELEASES: &str = "https://github.com/knight-bili/codeg-rovai-workbench/releases/download";
 const API: &str = "https://api.github.com/repos/knight-bili/codeg-rovai-workbench/releases/tags";
 const MAX_ARCHIVE: u64 = 1024 * 1024 * 1024;
@@ -290,8 +289,11 @@ impl UpdateHost for ServerUpdates {
             if matches!(request, UpdateRequest::Get {}) {
                 return Ok(self.snapshot());
             }
-            if matches!(request, UpdateRequest::Download { .. } | UpdateRequest::Install { .. })
-                && std::env::var("ROVAI_SERVER_UPDATE_MODE").ok().as_deref() == Some("container-image")
+            if matches!(
+                request,
+                UpdateRequest::Download { .. } | UpdateRequest::Install { .. }
+            ) && std::env::var("ROVAI_SERVER_UPDATE_MODE").ok().as_deref()
+                == Some("container-image")
             {
                 return Err("updates_unsupported");
             }

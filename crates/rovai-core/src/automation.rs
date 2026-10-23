@@ -683,11 +683,24 @@ impl AutomationService {
                     "Automation management requires the local user or an attested AgentRun",
                 ));
             }
-            if matches!(&envelope.actor,ActorRef::Agent{..})&&crate::conversation_tools::calendar::requires_aware_edit(transaction,&command.automation_id)?{
-                return Ok(rejected("timezone_aware_edit_required","请在自动化设置中保留并核对时区和执行动作。"));
+            if matches!(&envelope.actor, ActorRef::Agent { .. })
+                && crate::conversation_tools::calendar::requires_aware_edit(
+                    transaction,
+                    &command.automation_id,
+                )?
+            {
+                return Ok(rejected(
+                    "timezone_aware_edit_required",
+                    "请在自动化设置中保留并核对时区和执行动作。",
+                ));
             }
-            if matches!(&envelope.actor,ActorRef::Agent{..})&&legacy_name_requires_user(transaction,&command.automation_id)?{
-                return Ok(rejected("automation.user_editor_required","此计划需要在用户自动化设置中保留完整名称。"));
+            if matches!(&envelope.actor, ActorRef::Agent { .. })
+                && legacy_name_requires_user(transaction, &command.automation_id)?
+            {
+                return Ok(rejected(
+                    "automation.user_editor_required",
+                    "此计划需要在用户自动化设置中保留完整名称。",
+                ));
             }
             let Some(current) = load_automation_record(transaction, &command.automation_id)? else {
                 return Ok(rejected(
@@ -706,9 +719,19 @@ impl AutomationService {
                 None => current.prompt.clone(),
             };
             let name = match command.name.as_deref() {
-                Some(value) if crate::conversation_tools::calendar::owner_zone(transaction,&command.automation_id)?.is_some()=>{
-                    anyhow::ensure!(!value.trim().is_empty()&&value.chars().count()<=120,"conversation_tools.title_invalid");value.into()
-                },
+                Some(value)
+                    if crate::conversation_tools::calendar::owner_zone(
+                        transaction,
+                        &command.automation_id,
+                    )?
+                    .is_some() =>
+                {
+                    anyhow::ensure!(
+                        !value.trim().is_empty() && value.chars().count() <= 120,
+                        "conversation_tools.title_invalid"
+                    );
+                    value.into()
+                }
                 Some(value) => normalized_or_derived_name(Some(value), &prompt)?,
                 None => current.name.clone(),
             };
@@ -735,7 +758,12 @@ impl AutomationService {
             let next_run_at = if !enabled {
                 None
             } else if schedule_changed || reopened {
-                crate::conversation_tools::calendar::next_for(transaction,&command.automation_id,&schedule,now)?
+                crate::conversation_tools::calendar::next_for(
+                    transaction,
+                    &command.automation_id,
+                    &schedule,
+                    now,
+                )?
             } else {
                 current
                     .next_run_at
@@ -873,8 +901,16 @@ impl AutomationService {
     ) -> Result<CommandExecution> {
         let command = envelope.payload.clone();
         self.gateway.execute(database, envelope, |transaction| {
-            if matches!(&envelope.actor,ActorRef::Agent{..})&&crate::conversation_tools::calendar::requires_enqueue_user(transaction,&command.automation_id)?{
-                return Ok(rejected("timezone_aware_edit_required","此计划生成未启动使命，请在用户自动化设置中明确执行。"));
+            if matches!(&envelope.actor, ActorRef::Agent { .. })
+                && crate::conversation_tools::calendar::requires_enqueue_user(
+                    transaction,
+                    &command.automation_id,
+                )?
+            {
+                return Ok(rejected(
+                    "timezone_aware_edit_required",
+                    "此计划生成未启动使命，请在用户自动化设置中明确执行。",
+                ));
             }
             if !management_actor(&envelope.actor) {
                 return Ok(rejected(
@@ -901,7 +937,11 @@ impl AutomationService {
             Ok(CommandHandlerResult::accepted(
                 "automation.run_requested",
                 occurrence.payload(),
-                Some(if let Some(mission)=&occurrence.mission_id{entity("mission",mission)}else{entity("automation_run", &occurrence.run_id)}),
+                Some(if let Some(mission) = &occurrence.mission_id {
+                    entity("mission", mission)
+                } else {
+                    entity("automation_run", &occurrence.run_id)
+                }),
             ))
         })
     }
@@ -1162,12 +1202,22 @@ impl AutomationService {
             }
             let missed = stored_due < recovery_boundary;
             let consumed_at = if missed {
-                crate::conversation_tools::calendar::latest_for(&transaction,&record.id,&record.schedule,now)?.unwrap_or(stored_due)
+                crate::conversation_tools::calendar::latest_for(
+                    &transaction,
+                    &record.id,
+                    &record.schedule,
+                    now,
+                )?
+                .unwrap_or(stored_due)
             } else {
                 stored_due
             };
-            let next =
-                crate::conversation_tools::calendar::next_for(&transaction,&record.id,&record.schedule,if missed { now } else { consumed_at })?;
+            let next = crate::conversation_tools::calendar::next_for(
+                &transaction,
+                &record.id,
+                &record.schedule,
+                if missed { now } else { consumed_at },
+            )?;
             advance_definition_in_tx(&transaction, &record, next, &timestamp(now))?;
             if missed {
                 insert_skipped_occurrence_in_tx(
@@ -1402,52 +1452,165 @@ impl AutomationService {
     }
 }
 
-#[derive(Debug)]
 pub(crate) fn create_conversation_tool_definition_in_tx(
-    transaction:&Transaction<'_>,authority:&crate::conversation_tools::authoring::CreationAuthority,
-    name:&str,prompt:&str,target:&crate::conversation_tools::authoring::Target,
-    schedule:&AutomationSchedule,enabled:bool,timezone:&str,action:&str,
-)->Result<(String,Option<String>)>{
-    anyhow::ensure!(!name.trim().is_empty()&&name.chars().count()<=120&&!prompt.trim().is_empty()&&prompt.chars().count()<=20_000,"conversation_tools.automation_content_invalid");
-    anyhow::ensure!(matches!(action,"launch_session"|"enqueue_task")&&matches!(schedule,AutomationSchedule::Cron{..}|AutomationSchedule::Manual),"conversation_tools.automation_action_invalid");
-    validate_member(transaction,&target.member)?;validate_schedule(schedule)?;
-    let project=normalize_project_ref(&if target.binding==ProjectBindingKind::QuickChat{AutomationProjectRef::QuickChat}else{AutomationProjectRef::Directory{path:target.path.clone()}})?;
-    let next=if enabled{crate::conversation_tools::calendar::next(schedule,timezone,Utc::now())?.map(timestamp)}else{None};
-    let id=Uuid::new_v4().to_string();let now=timestamp(Utc::now());
+    transaction: &Transaction<'_>,
+    authority: &crate::conversation_tools::authoring::CreationAuthority,
+    name: &str,
+    prompt: &str,
+    target: &crate::conversation_tools::authoring::Target,
+    schedule: &AutomationSchedule,
+    enabled: bool,
+    timezone: &str,
+    action: &str,
+) -> Result<(String, Option<String>)> {
+    anyhow::ensure!(
+        !name.trim().is_empty()
+            && name.chars().count() <= 120
+            && !prompt.trim().is_empty()
+            && prompt.chars().count() <= 20_000,
+        "conversation_tools.automation_content_invalid"
+    );
+    anyhow::ensure!(
+        matches!(action, "launch_session" | "enqueue_task")
+            && matches!(
+                schedule,
+                AutomationSchedule::Cron { .. } | AutomationSchedule::Manual
+            ),
+        "conversation_tools.automation_action_invalid"
+    );
+    validate_member(transaction, &target.member)?;
+    validate_schedule(schedule)?;
+    let project = normalize_project_ref(&if target.binding == ProjectBindingKind::QuickChat {
+        AutomationProjectRef::QuickChat
+    } else {
+        AutomationProjectRef::Directory {
+            path: target.path.clone(),
+        }
+    })?;
+    let next = if enabled {
+        crate::conversation_tools::calendar::next(schedule, timezone, Utc::now())?.map(timestamp)
+    } else {
+        None
+    };
+    let id = Uuid::new_v4().to_string();
+    let now = timestamp(Utc::now());
     transaction.execute("INSERT INTO automation(id,version,name,prompt,enabled,member_id,project_ref_json,schedule_json,notify_channels_json,next_run_at,created_at,updated_at) VALUES(?1,1,?2,?3,?4,?5,?6,?7,'[]',?8,?9,?9)",params![id,name,prompt,enabled,target.member,serde_json::to_string(&project)?,serde_json::to_string(schedule)?,next,now])?;
     transaction.execute("INSERT INTO conversation_tool_automation_owner(automation_id,revision,action,timezone,source_request_id,created_at,updated_at) VALUES(?1,1,?2,?3,?4,?5,?5)",params![id,action,timezone,authority.source_request(),now])?;
-    crate::collaboration::append_domain_event(transaction,"conversationTools.automationCreated",None,Some(("automation",&id)),authority.actor(),authority.epoch(),&json!({"automationId":id,"sourceRequestId":authority.source_request(),"enabled":enabled,"action":action}))?;
-    Ok((id,next))
+    crate::collaboration::append_domain_event(
+        transaction,
+        "conversationTools.automationCreated",
+        None,
+        Some(("automation", &id)),
+        authority.actor(),
+        authority.epoch(),
+        &json!({"automationId":id,"sourceRequestId":authority.source_request(),"enabled":enabled,"action":action}),
+    )?;
+    Ok((id, next))
 }
-fn enqueue_mission_occurrence_in_tx(transaction:&Transaction<'_>,record:&AutomationRecord,scheduled_for:DateTime<Utc>,trigger_kind:&str,quick_chat_path:&Path)->Result<Option<ClaimedOccurrence>>{
-    if crate::conversation_tools::storage::absent(transaction)?{return Ok(None)}
+fn enqueue_mission_occurrence_in_tx(
+    transaction: &Transaction<'_>,
+    record: &AutomationRecord,
+    scheduled_for: DateTime<Utc>,
+    trigger_kind: &str,
+    quick_chat_path: &Path,
+) -> Result<Option<ClaimedOccurrence>> {
+    if crate::conversation_tools::storage::absent(transaction)? {
+        return Ok(None);
+    }
     let request:Option<String>=transaction.query_row("SELECT source_request_id FROM conversation_tool_automation_owner WHERE automation_id=?1 AND action='enqueue_task'",[&record.id],|row|row.get(0)).optional()?;
-    let Some(request)=request else{return Ok(None)};
-    let scheduled=occurrence_timestamp(scheduled_for,trigger_kind);
+    let Some(request) = request else {
+        return Ok(None);
+    };
+    let scheduled = occurrence_timestamp(scheduled_for, trigger_kind);
     let prior:Option<(String,String,Option<String>)>=transaction.query_row("SELECT command_id,state,target_id FROM conversation_tool_automation_fire WHERE automation_id=?1 AND scheduled_at_utc=?2",params![record.id,scheduled],|row|Ok((row.get(0)?,row.get(1)?,row.get(2)?))).optional()?;
-    if let Some((id,state,mission))=prior{return Ok(Some(ClaimedOccurrence{run_id:id,status:if state=="applied"{"enqueued"}else{"skipped"},reason:None,camp_id:None,mission_id:mission}))}
-    let command=Uuid::new_v4().to_string();let now=timestamp(Utc::now());
+    if let Some((id, state, mission)) = prior {
+        return Ok(Some(ClaimedOccurrence {
+            run_id: id,
+            status: if state == "applied" {
+                "enqueued"
+            } else {
+                "skipped"
+            },
+            reason: None,
+            camp_id: None,
+            mission_id: mission,
+        }));
+    }
+    let command = Uuid::new_v4().to_string();
+    let now = timestamp(Utc::now());
     transaction.execute("INSERT INTO conversation_tool_automation_fire(automation_id,scheduled_at_utc,command_id,state,created_at) VALUES(?1,?2,?3,'prepared',?4)",params![record.id,scheduled,command,now])?;
     let member_ready:bool=transaction.query_row("SELECT EXISTS(SELECT 1 FROM agent_profile WHERE id=?1 AND profile_status='present' AND default_runtime_installation_id IS NOT NULL AND default_model_selection_json IS NOT NULL)",[&record.member_id],|row|row.get(0))?;
-    let path=record.project_ref.execution_path(quick_chat_path);
-    if !member_ready||!Path::new(&path).is_dir(){
+    let path = record.project_ref.execution_path(quick_chat_path);
+    if !member_ready || !Path::new(&path).is_dir() {
         transaction.execute("UPDATE conversation_tool_automation_fire SET state='cancelled' WHERE automation_id=?1 AND scheduled_at_utc=?2",params![record.id,scheduled])?;
-        let run=insert_skipped_occurrence_in_tx(transaction,record,scheduled_for,"dispatch_rejected",trigger_kind)?;
-        return Ok(Some(ClaimedOccurrence{run_id:run,status:"skipped",reason:Some("dispatch_rejected".into()),camp_id:None,mission_id:None}))
+        let run = insert_skipped_occurrence_in_tx(
+            transaction,
+            record,
+            scheduled_for,
+            "dispatch_rejected",
+            trigger_kind,
+        )?;
+        return Ok(Some(ClaimedOccurrence {
+            run_id: run,
+            status: "skipped",
+            reason: Some("dispatch_rejected".into()),
+            camp_id: None,
+            mission_id: None,
+        }));
     }
-    let authority=crate::conversation_tools::authoring::scheduled_authority(transaction,&record.id,&request)?;
-    let mission=crate::mission::create_conversation_tool_mission_in_tx(transaction,&authority,&record.name,&record.prompt,&path,record.project_ref.binding_kind(),&record.member_id)?;
+    let authority = crate::conversation_tools::authoring::scheduled_authority(
+        transaction,
+        &record.id,
+        &request,
+    )?;
+    let mission = crate::mission::create_conversation_tool_mission_in_tx(
+        transaction,
+        &authority,
+        &record.name,
+        &record.prompt,
+        &path,
+        record.project_ref.binding_kind(),
+        &record.member_id,
+    )?;
     transaction.execute("UPDATE conversation_tool_automation_fire SET state='applied',target_id=?3 WHERE automation_id=?1 AND scheduled_at_utc=?2 AND state='prepared'",params![record.id,scheduled,mission])?;
-    crate::collaboration::append_domain_event(transaction,"conversationTools.automationEnqueued",None,Some(("automation",&record.id)),authority.actor(),None,&json!({"automationId":record.id,"missionId":mission,"scheduledAtUtc":scheduled,"occurrenceId":command}))?;
-    Ok(Some(ClaimedOccurrence{run_id:command,status:"enqueued",reason:None,camp_id:None,mission_id:Some(mission)}))
+    crate::collaboration::append_domain_event(
+        transaction,
+        "conversationTools.automationEnqueued",
+        None,
+        Some(("automation", &record.id)),
+        authority.actor(),
+        None,
+        &json!({"automationId":record.id,"missionId":mission,"scheduledAtUtc":scheduled,"occurrenceId":command}),
+    )?;
+    Ok(Some(ClaimedOccurrence {
+        run_id: command,
+        status: "enqueued",
+        reason: None,
+        camp_id: None,
+        mission_id: Some(mission),
+    }))
 }
 /// 供User自动化工作区补充展示；不拼入旧Agent工具结果。
-pub(crate) fn queued_missions(connection:&rusqlite::Connection,id:&str,after:Option<&str>)->Result<Value>{
-    if crate::conversation_tools::storage::absent(connection)?{return Ok(json!({"items":[],"next":null}))}
+pub(crate) fn queued_missions(
+    connection: &rusqlite::Connection,
+    id: &str,
+    after: Option<&str>,
+) -> Result<Value> {
+    if crate::conversation_tools::storage::absent(connection)? {
+        return Ok(json!({"items":[],"next":null}));
+    }
     let boundary=after.map(|cursor|->Result<String>{Uuid::parse_str(cursor)?;connection.query_row("SELECT scheduled_at_utc FROM conversation_tool_automation_fire WHERE automation_id=?1 AND command_id=?2",params![id,cursor],|row|row.get(0)).map_err(Into::into)}).transpose()?;
     let mut statement=connection.prepare("SELECT f.command_id,f.scheduled_at_utc,f.target_id,m.title,f.created_at,m.camp_id FROM conversation_tool_automation_fire f JOIN mission m ON m.id=f.target_id JOIN camp ON camp.id=m.camp_id WHERE f.automation_id=?1 AND f.state='applied' AND camp.deletion_operation_id IS NULL AND (?2 IS NULL OR f.scheduled_at_utc<?2 OR(f.scheduled_at_utc=?2 AND f.command_id<?3)) ORDER BY f.scheduled_at_utc DESC,f.command_id DESC LIMIT 51")?;
     let mut rows=statement.query_map(params![id,boundary,after],|row|Ok(json!({"occurrenceId":row.get::<_,String>(0)?,"scheduledAtUtc":row.get::<_,String>(1)?,"missionId":row.get::<_,String>(2)?,"title":row.get::<_,String>(3)?,"createdAt":row.get::<_,String>(4)?,"threadId":row.get::<_,String>(5)?})))?.collect::<rusqlite::Result<Vec<_>>>()?;
-    let more=rows.len()>50;rows.truncate(50);let next=if more{rows.last().map(|row|row["occurrenceId"].clone()).unwrap_or(Value::Null)}else{Value::Null};
+    let more = rows.len() > 50;
+    rows.truncate(50);
+    let next = if more {
+        rows.last()
+            .map(|row| row["occurrenceId"].clone())
+            .unwrap_or(Value::Null)
+    } else {
+        Value::Null
+    };
     Ok(json!({"items":rows,"next":next}))
 }
 struct ClaimedOccurrence {
@@ -1460,13 +1623,16 @@ struct ClaimedOccurrence {
 
 impl ClaimedOccurrence {
     fn payload(&self) -> Value {
-        let mut value=json!({
+        let mut value = json!({
             "status": self.status,
             "runId": self.run_id,
             "threadId": self.camp_id,
             "reason": self.reason,
         });
-        if let Some(mission)=&self.mission_id{value["missionId"]=json!(mission);value["targetKind"]=json!("mission");}
+        if let Some(mission) = &self.mission_id {
+            value["missionId"] = json!(mission);
+            value["targetKind"] = json!("mission");
+        }
         value
     }
 }
@@ -1480,7 +1646,15 @@ fn claim_occurrence_in_tx(
     _user_id: &str,
     quick_chat_path: &Path,
 ) -> Result<ClaimedOccurrence> {
-    if let Some(occurrence)=enqueue_mission_occurrence_in_tx(transaction,record,scheduled_for,trigger_kind,quick_chat_path)?{return Ok(occurrence)}
+    if let Some(occurrence) = enqueue_mission_occurrence_in_tx(
+        transaction,
+        record,
+        scheduled_for,
+        trigger_kind,
+        quick_chat_path,
+    )? {
+        return Ok(occurrence);
+    }
     if automation_has_active_run(transaction, &record.id)? {
         let run_id = insert_skipped_occurrence_in_tx(
             transaction,
@@ -2426,11 +2600,17 @@ fn notification_target(
         .map_err(Into::into)
 }
 
-fn legacy_name_requires_user(connection:&rusqlite::Connection,id:&str)->Result<bool>{
-    let name:Option<String>=connection.query_row("SELECT name FROM automation WHERE id=?1",[id],|row|row.get(0)).optional()?;
-    Ok(name.is_some_and(|name|name.chars().count()>MAX_NAME_SCALARS))
+fn legacy_name_requires_user(connection: &rusqlite::Connection, id: &str) -> Result<bool> {
+    let name: Option<String> = connection
+        .query_row("SELECT name FROM automation WHERE id=?1", [id], |row| {
+            row.get(0)
+        })
+        .optional()?;
+    Ok(name.is_some_and(|name| name.chars().count() > MAX_NAME_SCALARS))
 }
-pub(crate) fn legacy_view_compatible(view:&AutomationView)->bool{view.name.chars().count()<=MAX_NAME_SCALARS}
+pub(crate) fn legacy_view_compatible(view: &AutomationView) -> bool {
+    view.name.chars().count() <= MAX_NAME_SCALARS
+}
 
 fn load_automation_record(
     connection: &rusqlite::Connection,

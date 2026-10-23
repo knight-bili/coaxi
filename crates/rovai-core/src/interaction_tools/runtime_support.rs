@@ -1,10 +1,14 @@
 //! 工具接线源码能力和实测准入分开；候选不改变 Runtime 原有启动资格。
-use anyhow::{Result,ensure};
-use serde_json::{Value,json};
-use crate::{agent_profile::AdapterKind,agent_runtime_adapter::{AgentRuntimeAdapterRegistry,ExternalMcpProjection},mcp::McpServerDefinition};
+use crate::{
+    agent_profile::AdapterKind,
+    agent_runtime_adapter::{AgentRuntimeAdapterRegistry, ExternalMcpProjection},
+    mcp::McpServerDefinition,
+};
+use anyhow::{Result, ensure};
+use serde_json::{Value, json};
 
-pub fn snapshot()->Value {
-    let registry=AgentRuntimeAdapterRegistry::default();
+pub fn snapshot() -> Value {
+    let registry = AgentRuntimeAdapterRegistry::default();
     let runtimes=AdapterKind::ALL.into_iter().map(|kind|{
         let capability=registry.mcp_projection(kind);
         let (state,message)=match kind {
@@ -19,13 +23,48 @@ pub fn snapshot()->Value {
 }
 
 /// 供隔离准入任务准备候选报文；不启动 Cursor、不写项目或用户的 .cursor 配置。
-pub fn cursor_session_candidate(cwd:&str,definition:&McpServerDefinition,native_session_id:Option<&str>)->Result<Value>{
-    ensure!(std::path::Path::new(cwd).is_absolute(),"interaction.absolute_workspace_required");
-    let McpServerDefinition::Stdio{command,args,cwd:server_cwd,env}=definition else{anyhow::bail!("runtime_unavailable")};
-    ensure!(std::path::Path::new(command).is_absolute()&&args.first().map(String::as_str)==Some("--interaction-mcp")&&args.get(1).map(String::as_str)==Some("--config")&&args.len()==3&&std::path::Path::new(&args[2]).is_absolute()&&env.is_empty(),"interaction.invalid_candidate_definition");
-    if let Some(server_cwd)=server_cwd{ensure!(server_cwd==cwd,"scope_changed")}
-    let server=json!({"name":super::SERVER_NAME,"command":command,"args":args,"env":[]});
-    let new_params=json!({"cwd":cwd,"mcpServers":[server.clone()]});
-    let load_params=if let Some(id)=native_session_id{ensure!(!id.is_empty()&&id.len()<=4096&&!id.contains('\0'),"interaction.invalid_native_session");json!({"sessionId":id,"cwd":cwd,"mcpServers":[server]})}else{Value::Null};
-    Ok(json!({"schemaVersion":1,"adapterKind":AdapterKind::CursorAgent.as_str(),"state":"candidate","activated":false,"sessionNew":new_params,"sessionLoad":load_params,"sharedConfigurationWritten":false,"automaticApproval":false}))
+pub fn cursor_session_candidate(
+    cwd: &str,
+    definition: &McpServerDefinition,
+    native_session_id: Option<&str>,
+) -> Result<Value> {
+    ensure!(
+        std::path::Path::new(cwd).is_absolute(),
+        "interaction.absolute_workspace_required"
+    );
+    let McpServerDefinition::Stdio {
+        command,
+        args,
+        cwd: server_cwd,
+        env,
+    } = definition
+    else {
+        anyhow::bail!("runtime_unavailable")
+    };
+    ensure!(
+        std::path::Path::new(command).is_absolute()
+            && args.first().map(String::as_str) == Some("--interaction-mcp")
+            && args.get(1).map(String::as_str) == Some("--config")
+            && args.len() == 3
+            && std::path::Path::new(&args[2]).is_absolute()
+            && env.is_empty(),
+        "interaction.invalid_candidate_definition"
+    );
+    if let Some(server_cwd) = server_cwd {
+        ensure!(server_cwd == cwd, "scope_changed")
+    }
+    let server = json!({"name":super::SERVER_NAME,"command":command,"args":args,"env":[]});
+    let new_params = json!({"cwd":cwd,"mcpServers":[server.clone()]});
+    let load_params = if let Some(id) = native_session_id {
+        ensure!(
+            !id.is_empty() && id.len() <= 4096 && !id.contains('\0'),
+            "interaction.invalid_native_session"
+        );
+        json!({"sessionId":id,"cwd":cwd,"mcpServers":[server]})
+    } else {
+        Value::Null
+    };
+    Ok(
+        json!({"schemaVersion":1,"adapterKind":AdapterKind::CursorAgent.as_str(),"state":"candidate","activated":false,"sessionNew":new_params,"sessionLoad":load_params,"sharedConfigurationWritten":false,"automaticApproval":false}),
+    )
 }

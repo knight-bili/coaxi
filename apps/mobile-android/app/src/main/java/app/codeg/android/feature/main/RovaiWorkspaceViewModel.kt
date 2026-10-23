@@ -26,18 +26,86 @@ data class RovaiWorkspaceState(val resourceVersion:Long=0,val connected:Boolean=
 @HiltViewModel
 class RovaiWorkspaceViewModel @Inject constructor(private val servers:ServerRepository,@ApplicationContext private val appContext:Context):ViewModel(){
     private val mutable=MutableStateFlow(RovaiWorkspaceState());val state=mutable.asStateFlow()
-    private var profile:ServerProfile?=null;private var client:RovaiHostClient?=null;private var lifetime=0L;private var events:Job?=null;private var active=true
-    private val refreshGate=Mutex();private val writeGate=Mutex();private val bodyGate=Mutex();private val bodyCache=mutableMapOf<String,String>()
-    fun bind(next:ServerProfile?){if(profile==next)return;events?.cancel();lifetime++;bodyCache.clear();profile=next;client=null;mutable.value=RovaiWorkspaceState();if(next!=null)viewModelScope.launch{try{val generation=lifetime;val current=servers.rovaiClient(next)?:throw RovaiHostFailure("缺少服务器凭据");if(generation!=lifetime)return@launch;client=current;val pending=servers.loadRovaiPending(next);mutable.update{it.copy(pending=pending)};current.connect();if(generation==lifetime){mutable.update{it.copy(connected=true)};refresh();listen()}}catch(cancelled:CancellationException){throw cancelled}catch(error:Exception){mutable.update{it.copy(error=error.message)}}}}
+    private var profile:ServerProfile?=null;private var client:RovaiHostClient?=null;private var lifetime=0L;private var eventGeneration=0L;private var events:Job?=null;private var active=true
+    private data class RefreshRun(val epoch:Long,val id:Long)
+    private val refreshStateLock=Any();private var refreshRun:RefreshRun?=null;private var refreshAgainEpoch:Long?=null;private var refreshRunSequence=0L;@Volatile private var refreshEpoch=0L
+    private val writeGate=Mutex();private val bodyGate=Mutex();private val bodyCache=mutableMapOf<String,String>()
+    fun bind(next:ServerProfile?){if(profile==next)return;eventGeneration++;events?.cancel();lifetime++;synchronized(refreshStateLock){refreshEpoch++;refreshAgainEpoch=null};bodyCache.clear();profile=next;client=null;mutable.value=RovaiWorkspaceState();if(next!=null)viewModelScope.launch{try{val generation=lifetime;val current=servers.rovaiClient(next)?:throw RovaiHostFailure("缺少服务器凭据");if(generation!=lifetime)return@launch;client=current;val pending=servers.loadRovaiPending(next);mutable.update{it.copy(pending=pending)};current.connect();if(generation==lifetime){mutable.update{it.copy(connected=true)};refresh();listen()}}catch(cancelled:CancellationException){throw cancelled}catch(error:Exception){mutable.update{it.copy(error=error.message)}}}}
     fun authenticate(){viewModelScope.launch{try{val generation=lifetime;val current=client?:profile?.let{servers.rovaiClient(it)}?:return@launch;mutable.update{it.copy(busy=true,error=null)};current.connect(authenticate=true);if(generation!=lifetime)return@launch;client=current;mutable.update{it.copy(connected=true)};refresh();listen()}catch(cancelled:CancellationException){throw cancelled}catch(error:Exception){mutable.update{it.copy(error=error.message,connected=false)}}finally{mutable.update{it.copy(busy=false)}}}}
-    fun foreground(value:Boolean){active=value;if(!value){events?.cancel();return};if(state.value.connected){viewModelScope.launch{refresh();listen()}}}
-    private fun listen(){events?.cancel();if(!active)return;val current=client?:return;val generation=lifetime;events=viewModelScope.launch{try{current.invalidations().conflate().collect{if(generation!=lifetime)return@collect;mutable.update{it.copy(resourceVersion=it.resourceVersion+1)};delay(250);refresh()}}catch(cancelled:CancellationException){throw cancelled}catch(error:Exception){if(generation==lifetime)mutable.update{it.copy(error=error.message)}}}}
-    suspend fun refresh(){val current=client?:return;if(!refreshGate.tryLock())return;val generation=lifetime;try{
-        coroutineScope{
-            val navigation=async{current.request(RovaiOperation.NAVIGATION_SNAPSHOT).coreObject()};val members=async{current.request(RovaiOperation.MEMBERS_LIST).coreArray()};val missions=async{current.request(RovaiOperation.MISSIONS_LIST).coreArray()};val boards=async{current.request(RovaiOperation.CANVAS_BOARDS_LIST).coreObject()};val selected=state.value.selectedThread;val thread=async{selected?.let{current.request(RovaiOperation.THREADS_OPEN,buildJsonObject{put("threadId",it);put("traceId",UUID.randomUUID().toString())}).coreObject()}}
-            val navValue=navigation.await();val memberValue=members.await();val missionValue=missions.await();val boardValue=boards.await();val threadValue=thread.await();if(generation==lifetime)mutable.update{it.copy(navigation=navValue,members=memberValue,missions=missionValue,boards=boardValue["boards"].coreArray(),boardSummaries=boardValue["summaries"].coreArray(),thread=if(it.selectedThread==selected)threadValue else it.thread,error=null)}
+    fun foreground(value:Boolean){if(active!=value)synchronized(refreshStateLock){refreshEpoch++;refreshAgainEpoch=null};active=value;if(!value){eventGeneration++;events?.cancel();return};if(state.value.connected){viewModelScope.launch{refresh();listen()}}}
+    private fun listen(){
+        val previous=events
+        previous?.cancel()
+        if(!active)return
+        val current=client?:return
+        val generation=lifetime
+        val listener=++eventGeneration
+        events=viewModelScope.launch {
+            previous?.join()
+            if(listener!=eventGeneration||generation!=lifetime||!active||client!==current||!state.value.connected)return@launch
+            var retryDelayMillis=500L
+            while(isActive&&listener==eventGeneration&&generation==lifetime&&active&&client===current&&state.value.connected){
+                var openedAt:Long?=null
+                try{
+                    current.invalidations().conflate().collect{
+                        if(listener!=eventGeneration||generation!=lifetime||!active||client!==current||!state.value.connected)return@collect
+                        if(openedAt==null)openedAt=System.nanoTime()
+                        mutable.update{it.copy(resourceVersion=it.resourceVersion+1)}
+                        delay(250)
+                        if(listener==eventGeneration&&generation==lifetime&&active&&client===current&&state.value.connected)refresh()
+                    }
+                }catch(cancelled:CancellationException){throw cancelled}
+                catch(error:Exception){
+                    if(!isActive||listener!=eventGeneration||generation!=lifetime||!active||client!==current)return@launch
+                    if(error is RovaiHostFailure&&error.code in setOf("host.unauthorized","host.login_required")){
+                        mutable.update{it.copy(error=error.message,connected=false)}
+                        return@launch
+                    }
+                    mutable.update{it.copy(error=error.message)}
+                }
+                if(!isActive||listener!=eventGeneration||generation!=lifetime||!active||client!==current||!state.value.connected)return@launch
+                openedAt?.let{if(System.nanoTime()-it>=30_000_000_000L)retryDelayMillis=500L}
+                delay(retryDelayMillis)
+                retryDelayMillis=(retryDelayMillis*2).coerceAtMost(30_000L)
+            }
         }
-    }catch(cancelled:CancellationException){throw cancelled}catch(error:Exception){if(generation==lifetime)mutable.update{it.copy(error=error.message)}}finally{refreshGate.unlock()}}
+    }
+    suspend fun refresh(){
+        val current=client?:return
+        val generation=lifetime
+        val refreshLifetime=refreshEpoch
+        if(!active)return
+        val runId=synchronized(refreshStateLock){
+            if(generation!=lifetime||refreshLifetime!=refreshEpoch||!active||current!==client)return
+            if(refreshRun?.epoch==refreshLifetime){refreshAgainEpoch=refreshLifetime;return}
+            (++refreshRunSequence).also{refreshRun=RefreshRun(refreshLifetime,it)}
+        }
+        val owner=RefreshRun(refreshLifetime,runId)
+        val coroutineContext=currentCoroutineContext()
+        try{
+            while(generation==lifetime&&refreshLifetime==refreshEpoch&&active&&coroutineContext.isActive&&current===client){
+                synchronized(refreshStateLock){if(refreshRun==owner&&refreshAgainEpoch==refreshLifetime)refreshAgainEpoch=null}
+                val selected=state.value.selectedThread
+                try{
+                    coroutineScope{
+                        val navigation=async{current.request(RovaiOperation.NAVIGATION_SNAPSHOT).coreObject()};val members=async{current.request(RovaiOperation.MEMBERS_LIST).coreArray()};val missions=async{current.request(RovaiOperation.MISSIONS_LIST).coreArray()};val boards=async{current.request(RovaiOperation.CANVAS_BOARDS_LIST).coreObject()};val thread=async{selected?.let{current.request(RovaiOperation.THREADS_OPEN,buildJsonObject{put("threadId",it);put("traceId",UUID.randomUUID().toString())}).coreObject()}}
+                        val navValue=navigation.await();val memberValue=members.await();val missionValue=missions.await();val boardValue=boards.await();val threadValue=thread.await()
+                        coroutineContext.ensureActive()
+                        if(generation==lifetime&&refreshLifetime==refreshEpoch&&active&&current===client)mutable.update{it.copy(navigation=navValue,members=memberValue,missions=missionValue,boards=boardValue["boards"].coreArray(),boardSummaries=boardValue["summaries"].coreArray(),thread=if(it.selectedThread==selected)threadValue else it.thread,error=null)}
+                    }
+                }catch(cancelled:CancellationException){throw cancelled}catch(error:Exception){if(generation==lifetime&&refreshLifetime==refreshEpoch&&active&&current===client)mutable.update{it.copy(error=error.message)}}
+                coroutineContext.ensureActive()
+                val repeat=synchronized(refreshStateLock){
+                    if(refreshRun!=owner)false
+                    else if(refreshAgainEpoch==refreshLifetime&&generation==lifetime&&refreshLifetime==refreshEpoch&&active&&coroutineContext.isActive&&current===client){refreshAgainEpoch=null;true}
+                    else{refreshRun=null;if(refreshAgainEpoch==refreshLifetime)refreshAgainEpoch=null;false}
+                }
+                if(!repeat)return
+            }
+        }finally{
+            synchronized(refreshStateLock){if(refreshRun==owner){refreshRun=null;if(refreshAgainEpoch==refreshLifetime)refreshAgainEpoch=null}}
+        }
+    }
     private val missionReaders=mutableMapOf<String,Int>()
     fun retainMissionDiff(id:String):()->Unit{val generation=lifetime;val key="$generation:$id";missionReaders[key]=(missionReaders[key]?:0)+1;var released=false;return release@{if(released)return@release;released=true;missionReaders[key]=((missionReaders[key]?:1)-1).coerceAtLeast(0);viewModelScope.launch{yield();if(missionReaders[key]==0){missionReaders.remove(key);if(generation==lifetime)runCatching{query(RovaiOperation.MISSIONS_DIFFSESSION_RELEASE,buildJsonObject{put("missionId",id)})}}}}}
     fun refreshNow(){viewModelScope.launch{refresh()}}

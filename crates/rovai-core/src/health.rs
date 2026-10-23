@@ -3770,6 +3770,7 @@ pub fn find_adapter(kind: AdapterKind) -> Option<PathBuf> {
             ][..],
             "agy",
         ),
+        AdapterKind::CustomAcp => return None,
         AdapterKind::CodexCli => unreachable!(),
     };
     for environment_key in environment_keys {

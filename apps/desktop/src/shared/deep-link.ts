@@ -1,4 +1,5 @@
 import type {DesktopDeepLink,SettingsSection} from '@contracts'
+import {isThreadId} from '@contracts'
 
 const settings:readonly SettingsSection[]=['remote','general','skills','toolbox','mcp','runtime','channels','appearance','notifications','monitoring','diagnostics','about']
 const tabs=['threads','missions','members','canvas','automations','memory','settings']
@@ -14,7 +15,10 @@ export function parseDesktopDeepLink(raw:string):Omit<DesktopDeepLink,'requestId
     if(value.length>128||/[\u0000-\u001f\u007f/\\]/.test(value))return null
     if(kind==='settings'&&settings.includes(value as SettingsSection))return {kind,value}
     if(kind==='tab'&&tabs.includes(value))return {kind,value}
-    if((kind==='thread'||kind==='mission'||kind==='canvas')&&/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/.test(value))return {kind,value}
+    const uuid=/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/.test(value)
+    if(kind==='mission'&&(uuid||/^rvm_[a-f0-9]{32}$/.test(value)))return {kind,value}
+    if(kind==='thread'&&isThreadId(value))return {kind,value}
+    if(kind==='canvas'&&uuid)return {kind,value}
     return null
   }catch{return null}
 }

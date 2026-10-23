@@ -10,6 +10,14 @@ function deferred<T>(): { promise: Promise<T>; resolve(value: T): void; reject(e
 }
 
 describe('interface language', () => {
+  it('保留应用术语，通用供体目录只补缺少的英文', async () => {
+    vi.resetModules()
+    const {translateUi} = await import('./interface-language')
+    expect(translateUi('en', '飞书')).toBe('Feishu')
+    expect(translateUi('en', '思考强度')).toBe('Thinking intensity')
+    expect(translateUi('en', '执行')).toBe('Run')
+    expect(translateUi('zh-CN', '飞书')).toBe('飞书')
+  })
   it('uses a complete translated sentence while preserving interpolated member names', async () => {
     vi.resetModules()
     const { translateUi } = await import('./interface-language')

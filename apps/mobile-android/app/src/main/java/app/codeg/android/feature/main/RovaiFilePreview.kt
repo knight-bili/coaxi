@@ -34,7 +34,37 @@ fun RovaiMessageArtifacts(model:RovaiWorkspaceViewModel,threadId:String,message:
     var source by remember(threadId,message.coreText("id")){mutableStateOf<JsonObject?>(null)}
     message["quotes"].coreArray().forEach{quote->GlassRow{Text(stringResource(R.string.rovai_fusion_3bcf3c1e64b2165d)+quote["authorAtCapture"].coreObject().coreText("displayName"),style=MaterialTheme.typography.labelSmall);MarkdownContent(quote.coreText("text"));val origin=quote["source"].coreObject();if(origin.coreText("scope")=="camp"&&origin.coreText("threadId")==threadId&&origin.coreText("messageId").isNotEmpty())RovaiPublicMessageOrigin(model,threadId,origin.coreText("messageId"),"查看引用原消息")}}
     if(conversationId==null&&message.coreText("replyToThreadMessageId").isNotEmpty())RovaiPublicMessageOrigin(model,threadId,message.coreText("replyToThreadMessageId"),"查看回复原消息")
-    message["attachments"].coreArray().filter{it.coreText("previewKind")!="image"}.forEach{attachment->TextButton(onClick={source=buildJsonObject{put("kind","attachment");put("threadId",threadId);putJsonObject("locator"){put("threadId",threadId);put("attachmentRefId",attachment.coreText("id"));if(conversationId==null){put("owner","message");put("messageId",message.coreText("id"))}else{put("owner",if(child)"delegation_child_message" else "single_chat_message");put("conversationId",conversationId);put("conversationMessageId",message.coreText("id"))}}},enabled=attachment.coreText("availability") !in listOf("missing","unreadable","kind_changed")){Text((if(attachment.coreText("previewKind")=="image")"图片 · " else "文件 · ")+attachment.coreText("displayName"))}}
+    message["attachments"]
+        .coreArray()
+        .filter { it.coreText("previewKind") != "image" }
+        .forEach { attachment ->
+            TextButton(
+                onClick = {
+                    source = buildJsonObject {
+                        put("kind", "attachment")
+                        put("threadId", threadId)
+                        putJsonObject("locator") {
+                            put("threadId", threadId)
+                            put("attachmentRefId", attachment.coreText("id"))
+                            if (conversationId == null) {
+                                put("owner", "message")
+                                put("messageId", message.coreText("id"))
+                            } else {
+                                put("owner", if (child) "delegation_child_message" else "single_chat_message")
+                                put("conversationId", conversationId)
+                                put("conversationMessageId", message.coreText("id"))
+                            }
+                        }
+                    }
+                },
+                enabled = attachment.coreText("availability") !in listOf("missing", "unreadable", "kind_changed")
+            ) {
+                Text(
+                    (if (attachment.coreText("previewKind") == "image") "图片 · " else "文件 · ") +
+                        attachment.coreText("displayName")
+                )
+            }
+        }
     source?.let{request->RovaiFilePreview(model,request){source=null}}
 }
 @Composable

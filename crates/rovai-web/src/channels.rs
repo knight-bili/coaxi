@@ -22,12 +22,20 @@ pub enum ChannelKind {
 #[serde(tag = "operation", rename_all = "camelCase", deny_unknown_fields)]
 pub enum ChannelRequest {
     Get {},
-    Connect { kind: ChannelKind },
-    Disconnect { kind: ChannelKind },
+    Connect {
+        kind: ChannelKind,
+    },
+    Disconnect {
+        kind: ChannelKind,
+    },
     #[serde(rename_all = "camelCase")]
-    CancelLogin { attempt_id: String },
+    CancelLogin {
+        attempt_id: String,
+    },
     #[serde(rename_all = "camelCase")]
-    RefreshLogin { attempt_id: String },
+    RefreshLogin {
+        attempt_id: String,
+    },
     #[serde(rename_all = "camelCase")]
     Publish {
         kind: ChannelKind,
@@ -67,7 +75,9 @@ impl ChannelRequest {
 pub type ChannelReply = Result<Value, &'static str>;
 pub type ChannelFuture<'a> = Pin<Box<dyn Future<Output = ChannelReply> + Send + 'a>>;
 pub trait ChannelHost: Send + Sync {
-    fn deployment(&self) -> &'static str { "desktop" }
+    fn deployment(&self) -> &'static str {
+        "desktop"
+    }
     fn call(&self, request: ChannelRequest) -> ChannelFuture<'_>;
 }
 

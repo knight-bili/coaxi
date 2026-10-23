@@ -777,13 +777,12 @@ impl ClaudeCodeCliRuntimeAdapter {
                 ManagedWindowsArgvDialect::MicrosoftCrt,
                 format!("agent-run:{}:claude-code-cli", request.agent_run_id),
             )?;
-            let native_source =
-                rovai_core::runtime_subagent_session::CapturedNativeSource::capture(
-                    rovai_core::agent_profile::AdapterKind::ClaudeCodeCli,
-                    spec.environment(),
-                    spec.working_directory(),
-                    &uuid::Uuid::new_v4().to_string(),
-                );
+            let native_source = rovai_core::runtime_subagent_session::CapturedNativeSource::capture(
+                rovai_core::agent_profile::AdapterKind::ClaudeCodeCli,
+                spec.environment(),
+                spec.working_directory(),
+                &uuid::Uuid::new_v4().to_string(),
+            );
             ManagedProcess::spawn(spec).map(|child| (child, native_source))
         })();
         let (child, native_source) = launch_result.map_err(|error| {
@@ -1003,7 +1002,10 @@ impl ClaudeCodeCliRuntimeAdapter {
         let prompt = if let Some(ready) = &request.input_ready {
             let (release, released) = oneshot::channel();
             ready
-                .send(ClaudeCodeInputReady { release, native_source })
+                .send(ClaudeCodeInputReady {
+                    release,
+                    native_source,
+                })
                 .map_err(|_| anyhow::anyhow!("Claude Code dispatch owner is unavailable"))?;
             tokio::select! {
                 biased;
@@ -2163,9 +2165,9 @@ fn normalize_claude_runtime_events(
                     .tool_names
                     .insert(tool_use_id.clone(), tool_name.clone());
                 if let Some(input) = block.get("input") {
-                    state.tool_input_digests.insert(
-                        tool_use_id.clone(), canonical_json_digest(input)?,
-                    );
+                    state
+                        .tool_input_digests
+                        .insert(tool_use_id.clone(), canonical_json_digest(input)?);
                 }
                 if let Some(input) = public_claude_tool_input(&tool_name, block.get("input")) {
                     state.tool_inputs.insert(tool_use_id.clone(), input);

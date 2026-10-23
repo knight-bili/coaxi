@@ -1,15 +1,15 @@
-mod desktop_channels;
-mod server_channels;
-mod transport_channels;
 mod backup;
 mod config_snapshot;
-mod program_recovery;
-mod lifecycle;
-mod server;
-mod server_logs;
+mod desktop_channels;
 mod diagnostic_preferences;
+mod lifecycle;
+mod program_recovery;
+mod server;
+mod server_channels;
+mod server_logs;
 mod server_updates;
 mod signals;
+mod transport_channels;
 mod web_control;
 
 pub use server::run as run_server;
@@ -39,19 +39,33 @@ struct Cli {
 #[derive(Subcommand)]
 enum Command {
     /// Publish the local owner CLI discovery record using native private storage.
-    AutomationStorage { #[arg(long)] directory:PathBuf },
+    AutomationStorage {
+        #[arg(long)]
+        directory: PathBuf,
+    },
     /// Inspect or explicitly switch an installer-owned program revision; never rewrite business data.
     ProgramRecovery(program_recovery::Arguments),
     /// Register only Desktop-owned state units for the current local data root.
-    BackupPreferences { #[arg(long)] data_dir:PathBuf, #[arg(long)] preferences_root:PathBuf },
+    BackupPreferences {
+        #[arg(long)]
+        data_dir: PathBuf,
+        #[arg(long)]
+        preferences_root: PathBuf,
+    },
     /// Offline encrypted backup/restore; passphrase is read from stdin only.
     Backup(backup::Arguments),
     /// Portable encrypted preference export and explicit offline import.
     ConfigSnapshot(config_snapshot::Arguments),
     /// Roll back an interrupted portable configuration import before UI stores load.
-    ConfigRecover { #[arg(long)] data_dir:PathBuf },
+    ConfigRecover {
+        #[arg(long)]
+        data_dir: PathBuf,
+    },
     /// Finish or roll back local recovery before Desktop caches are opened.
-    RecoverLocalData { #[arg(long)] data_dir:PathBuf },
+    RecoverLocalData {
+        #[arg(long)]
+        data_dir: PathBuf,
+    },
     /// Start one Core owner, optionally with the shared Web module.
     Run(RunArgs),
     /// Generate a management token for an operator. Treat stdout as a secret.
@@ -116,15 +130,52 @@ pub fn run_host() -> Result<()> {
         CoreConfig::from_legacy_args(arguments)?
     } else {
         match Cli::parse().command {
-            Command::AutomationStorage{directory}=>{
-                anyhow::ensure!(directory.is_absolute()&&!directory.components().any(|part|matches!(part,std::path::Component::CurDir|std::path::Component::ParentDir)),"automation_context_absolute_directory_required");let mut bytes=Vec::new();std::io::stdin().take(1024*1024+1).read_to_end(&mut bytes)?;rovai_core::platform::write_user_automation_context(&directory,&bytes)?;println!("{}",serde_json::json!({"saved":true}));return Ok(())
+            Command::AutomationStorage { directory } => {
+                anyhow::ensure!(
+                    directory.is_absolute()
+                        && !directory.components().any(|part| matches!(
+                            part,
+                            std::path::Component::CurDir | std::path::Component::ParentDir
+                        )),
+                    "automation_context_absolute_directory_required"
+                );
+                let mut bytes = Vec::new();
+                std::io::stdin()
+                    .take(1024 * 1024 + 1)
+                    .read_to_end(&mut bytes)?;
+                rovai_core::platform::write_user_automation_context(&directory, &bytes)?;
+                println!("{}", serde_json::json!({"saved":true}));
+                return Ok(());
             }
-            Command::BackupPreferences{data_dir,preferences_root}=>{anyhow::ensure!(data_dir.is_absolute()&&preferences_root.is_absolute(),"backup.absolute_paths_required");rovai_core::backup::owned_roots::register_desktop(&data_dir,&preferences_root)?;println!("{}",serde_json::json!({"registered":true}));return Ok(())}
-            Command::RecoverLocalData{data_dir}=>{anyhow::ensure!(data_dir.is_absolute(),"backup.absolute_paths_required");println!("{}",rovai_core::backup::recover_before_desktop(&data_dir)?);return Ok(())}
-            Command::ConfigRecover{data_dir}=>{anyhow::ensure!(data_dir.is_absolute(),"config_sync.absolute_paths_required");let recovered=rovai_core::backup::light_config::recover(&data_dir)?;println!("{}",serde_json::json!({"recovered":recovered}));return Ok(())}
-            Command::ProgramRecovery(args)=>{return program_recovery::run(args)},
-            Command::ConfigSnapshot(args)=>{return config_snapshot::run(args)},
-            Command::Backup(args)=>{return backup::run(args)},
+            Command::BackupPreferences {
+                data_dir,
+                preferences_root,
+            } => {
+                anyhow::ensure!(
+                    data_dir.is_absolute() && preferences_root.is_absolute(),
+                    "backup.absolute_paths_required"
+                );
+                rovai_core::backup::owned_roots::register_desktop(&data_dir, &preferences_root)?;
+                println!("{}", serde_json::json!({"registered":true}));
+                return Ok(());
+            }
+            Command::RecoverLocalData { data_dir } => {
+                anyhow::ensure!(data_dir.is_absolute(), "backup.absolute_paths_required");
+                println!("{}", rovai_core::backup::recover_before_desktop(&data_dir)?);
+                return Ok(());
+            }
+            Command::ConfigRecover { data_dir } => {
+                anyhow::ensure!(
+                    data_dir.is_absolute(),
+                    "config_sync.absolute_paths_required"
+                );
+                let recovered = rovai_core::backup::light_config::recover(&data_dir)?;
+                println!("{}", serde_json::json!({"recovered":recovered}));
+                return Ok(());
+            }
+            Command::ProgramRecovery(args) => return program_recovery::run(args),
+            Command::ConfigSnapshot(args) => return config_snapshot::run(args),
+            Command::Backup(args) => return backup::run(args),
             Command::Token => {
                 println!("{}", rovai_web::new_token()?);
                 return Ok(());
@@ -218,12 +269,23 @@ fn run(
     console: Option<&server::Console>,
     updates: Option<server_updates::ServerUpdates>,
 ) -> Result<()> {
-    use tracing_subscriber::{Layer,prelude::*};
-    let preferences=diagnostic_preferences::Filter::new(config.data_dir.clone());
-    tracing_subscriber::registry().with(
-        tracing_subscriber::fmt::layer().with_ansi(false).with_target(true).with_writer(std::io::stderr)
-            .with_filter(tracing_subscriber::filter::filter_fn(move|metadata|if desktop{*metadata.level()<=tracing::Level::INFO}else{preferences.enabled(metadata)}))
-    ).init();
+    use tracing_subscriber::{Layer, prelude::*};
+    let preferences = diagnostic_preferences::Filter::new(config.data_dir.clone());
+    tracing_subscriber::registry()
+        .with(
+            tracing_subscriber::fmt::layer()
+                .with_ansi(false)
+                .with_target(true)
+                .with_writer(std::io::stderr)
+                .with_filter(tracing_subscriber::filter::filter_fn(move |metadata| {
+                    if desktop {
+                        *metadata.level() <= tracing::Level::INFO
+                    } else {
+                        preferences.enabled(metadata)
+                    }
+                })),
+        )
+        .init();
 
     // Preserve the Desktop adapter's ordering: discovery captures its search
     // environment before Tokio starts and passes it to child launches explicitly.

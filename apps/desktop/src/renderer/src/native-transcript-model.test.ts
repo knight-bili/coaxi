@@ -36,6 +36,20 @@ describe('native source metadata stays separate from native read authority', () 
     expect(pairs.paired.has(orphan)).toBe(false); expect(pairs.paired.has(extra)).toBe(false)
     expect(pairs.paired.size).toBe(2)
   })
+  it('retains an orphan result and its stats when there is no tool use or child target', () => {
+    const fullOutput = 'first line\n' + '完整输出'.repeat(1200)
+    const stats = { child_session_id: 'saved-child', duration_ms: 1200, usage: { input_tokens: 15, output_tokens: 8 } }
+    const orphan: Extract<NativeTranscriptBlock, { type: 'tool_result' }> = {
+      type: 'tool_result', tool_use_id: 'missing-use', output_preview: fullOutput, is_error: false, agent_stats: stats
+    }
+    const pairs = nativeToolPairs([{ id: 'orphan-turn', role: 'assistant', timestamp: '2026-10-18T00:00:00Z', blocks: [orphan] }])
+
+    expect(pairs.paired.has(orphan)).toBe(false)
+    expect(orphan.output_preview).toBe(fullOutput)
+    expect(orphan.agent_stats).toEqual(stats)
+    expect(nativeToolChildren(undefined, orphan)).toEqual(['saved-child'])
+    expect(nativeToolChildren(undefined, undefined)).toEqual([])
+  })
   it('uses Codeg live metadata, saved stats and UUID collab rules as candidates without reading arbitrary input strings', () => {
     const uuid = '00000000-0000-4000-8000-000000000001'
     const use: Extract<NativeTranscriptBlock, { type: 'tool_use' }> = { type: 'tool_use', tool_use_id: 'call', tool_name: 'collab_agent',

@@ -6,9 +6,12 @@ struct RovaiThreadHistory: View {
     var anchor: String? = nil
     @Environment(\.dismiss) private var dismiss
     @State private var rows: [JSONValue] = []
-    @State private var before: Int?, watermark = 0
-    @State private var query = "", frozenQuery = ""
-    @State private var matchIndex = 0, total = 0
+    @State private var before: Int?
+    @State private var watermark = 0
+    @State private var query = ""
+    @State private var frozenQuery = ""
+    @State private var matchIndex = 0
+    @State private var total = 0
     @State private var focused: String?
     @State private var busy = false
     @State private var issue: String?

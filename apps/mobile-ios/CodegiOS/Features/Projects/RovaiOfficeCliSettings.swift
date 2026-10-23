@@ -2,8 +2,11 @@ import SwiftUI
 
 struct RovaiOfficeCliSettings: View {
     let model: RovaiWorkspaceModel
-    @State private var info: JSONValue?, task: JSONValue?, issue: String?
-    @State private var busy = false, expanded = false
+    @State private var info: JSONValue?
+    @State private var task: JSONValue?
+    @State private var issue: String?
+    @State private var busy = false
+    @State private var expanded = false
     @State private var confirm: String?
     private let owner = "office-cli-operation"
     var body: some View {

@@ -137,12 +137,12 @@ fn source_url(path: &str) -> String {
 
 pub(crate) struct InstallationFile {
     pub path: String,
-    pub bytes: std::borrow::Cow<'static,[u8]>,
+    pub bytes: std::borrow::Cow<'static, [u8]>,
     pub executable: bool,
 }
 
 pub(crate) struct InstallationSource {
-    pub revision: std::borrow::Cow<'static,str>,
+    pub revision: std::borrow::Cow<'static, str>,
     pub files: Vec<InstallationFile>,
 }
 

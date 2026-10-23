@@ -3,6 +3,7 @@ package app.codeg.android.core.network
 import io.ktor.client.engine.okhttp.OkHttp
 import android.os.SystemClock
 import io.ktor.utils.io.readUTF8Line
+import io.ktor.utils.io.readAvailable
 import io.ktor.client.HttpClient
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
@@ -200,7 +201,9 @@ class RovaiHostClient(rawBaseUrl:String,private val administratorToken:String,
     fun invalidations():Flow<JsonObject> = flow {
         val current=connect()
         http.prepareGet("$baseUrl/api/v1/events"){header(HttpHeaders.Authorization,"Bearer ${current.token}")}.execute {response->
-            if(response.status.value!=200)throw RovaiHostFailure("host.events_denied")
+            if(response.status.value==401||response.status.value==403)throw RovaiHostFailure("host.unauthorized")
+            if(response.status.value!=200)throw RovaiHostFailure("host.http_"+response.status.value)
+            emit(buildJsonObject{put("event","resync");put("data",JsonNull)})
             val channel=response.bodyAsChannel();var event="";val data=StringBuilder()
             while(!channel.isClosedForRead){val line=channel.readUTF8Line(1024*1024)?:break
                 if(line.isEmpty()){if(event in listOf("resync","invalidate")&&data.isNotEmpty()){emit(buildJsonObject{put("event",event);put("data",json.parseToJsonElement(data.toString()))})};event="";data.clear()}

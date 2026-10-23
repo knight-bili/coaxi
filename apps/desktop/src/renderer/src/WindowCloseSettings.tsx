@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
 import type { WindowCloseApi, WindowCloseBehavior, WindowCloseResponse, WindowCloseSnapshot } from '@contracts'
 import { AppDialogBody, AppDialogContent, AppDialogFooter, AppDialogHeader } from './AppDialog'
-import { useInterfaceLanguage } from './interface-language'
+import { translateUi, useInterfaceLanguage } from './interface-language'
 import './window-close.css'
 
 function useCloseState(api: WindowCloseApi) {
@@ -31,8 +31,11 @@ function useCloseState(api: WindowCloseApi) {
 }
 
 function useCloseCopy() {
-  const english = useInterfaceLanguage() === 'en'
-  return (zh: string, en: string): string => english ? en : zh
+  const language = useInterfaceLanguage()
+  return (zh: string, en: string): string => {
+    const translated = translateUi(language, zh)
+    return language === 'zh-CN' || translated !== zh ? translated : en
+  }
 }
 
 function CloseError({ error, transport, prompt = false }: { error: WindowCloseSnapshot['error']; transport: boolean; prompt?: boolean }): React.JSX.Element | null {

@@ -48,7 +48,7 @@ export class PortablePreferenceOwner {
     let after: Cursor | null = null
     do {
       if (this.stopped || this.core.getSnapshot().fullCoreState !== 'ready' || this.core.getSnapshot().generation !== generation) return
-      const page = await this.core.request<Page>('configuration.desktopOwner.pending', { after, limit: 4 })
+      const page: Page = await this.core.request<Page>('configuration.desktopOwner.pending', { after, limit: 4 })
       for (const plan of page.items) {
         if (this.stopped || this.core.getSnapshot().generation !== generation) return
         let state: PreferenceApplyState | 'pending' | 'failed'

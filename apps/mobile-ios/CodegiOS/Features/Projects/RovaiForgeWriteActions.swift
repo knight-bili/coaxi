@@ -19,9 +19,18 @@ private struct RovaiForgeWriteEditor: View {
     let repository: JSONValue, selected: JSONValue?
     let onSaved: () -> Void
     @Environment(\.dismiss) private var dismiss
-    @State private var title = "", bodyText = "", head = "", base = "", status = "open", commandId = UUID().uuidString.lowercased()
-    @State private var draft = false, ready = false, busy = false, confirming = false
-    @State private var sent: JSONValue?, issue: String?
+    @State private var title = ""
+    @State private var bodyText = ""
+    @State private var head = ""
+    @State private var base = ""
+    @State private var status = "open"
+    @State private var commandId = UUID().uuidString.lowercased()
+    @State private var draft = false
+    @State private var ready = false
+    @State private var busy = false
+    @State private var confirming = false
+    @State private var sent: JSONValue?
+    @State private var issue: String?
     private var owner: String {"forge-write:\(threadId):\(accountId):\(action):\(selected?.forgeNumber ?? 0)"}
     private var record: JSONValue {.object(["title": .string(title), "body": .string(bodyText), "head": .string(head), "base": .string(base), "draft": .bool(draft), "state": .string(status), "commandId": .string(commandId), "sent": sent ?? .null, "repositoryKey": repository["repositoryKey"] ?? .null])}
     private var enabled: Bool {ready && !busy && (sent != nil || (action.hasPrefix("comment_") ? !bodyText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty : !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && (action != "create_pr" || !head.isEmpty && !base.isEmpty)))}

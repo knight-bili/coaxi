@@ -1,21 +1,41 @@
 use super::*;
-use crate::{command::{sealed,ActorRef,CommandEnvelope,CommandExecution,CommandHandlerResult,DomainCommand,DomainCommandGateway},draft_client::DraftClient};
-use rusqlite::{Connection,OptionalExtension,params};
+use crate::{
+    command::{
+        ActorRef, CommandEnvelope, CommandExecution, CommandHandlerResult, DomainCommand,
+        DomainCommandGateway, sealed,
+    },
+    draft_client::DraftClient,
+};
+use rusqlite::{Connection, OptionalExtension, params};
 
-pub fn get(connection:&Connection,id:&str)->Result<Option<Value>>{
+pub fn get(connection: &Connection, id: &str) -> Result<Option<Value>> {
     uuid::Uuid::parse_str(id)?;
     let row:Option<(i64,i64,String,String,String)>=connection.query_row("SELECT o.revision,a.version,o.action,o.timezone,o.source_request_id FROM conversation_tool_automation_owner o JOIN automation a ON a.id=o.automation_id WHERE o.automation_id=?1",[id],|row|Ok((row.get(0)?,row.get(1)?,row.get(2)?,row.get(3)?,row.get(4)?))).optional()?;
     row.map(|(revision,version,action,timezone,request)|{let value=json!({"automationId":id,"revision":revision,"automationVersion":version,"action":action,"timezone":timezone,"sourceRequestId":request});validate("AutomationOwnerV1",&value)?;Ok(value)}).transpose()
 }
-#[derive(Clone,Serialize,Deserialize)]
-#[serde(rename_all="camelCase",deny_unknown_fields)]
-pub struct SetOwner{
-    #[serde(default,skip_deserializing)]pub client:DraftClient,
-    pub automation_id:String,pub expected_automation_version:i64,pub expected_owner_revision:i64,pub action:String,pub timezone:String,
+#[derive(Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct SetOwner {
+    #[serde(default, skip_deserializing)]
+    pub client: DraftClient,
+    pub automation_id: String,
+    pub expected_automation_version: i64,
+    pub expected_owner_revision: i64,
+    pub action: String,
+    pub timezone: String,
 }
-impl sealed::Sealed for SetOwner{}
-impl DomainCommand for SetOwner{const TYPE:&'static str="conversationTools.automationOwner.set";const EXACT_REPLAY:bool=true;fn draft_client(&self)->Option<&DraftClient>{Some(&self.client)}}
-pub fn set(database:&mut crate::db::Database,envelope:&CommandEnvelope<SetOwner>)->Result<CommandExecution>{
+impl sealed::Sealed for SetOwner {}
+impl DomainCommand for SetOwner {
+    const TYPE: &'static str = "conversationTools.automationOwner.set";
+    const EXACT_REPLAY: bool = true;
+    fn draft_client(&self) -> Option<&DraftClient> {
+        Some(&self.client)
+    }
+}
+pub fn set(
+    database: &mut crate::db::Database,
+    envelope: &CommandEnvelope<SetOwner>,
+) -> Result<CommandExecution> {
     DomainCommandGateway.execute(database,envelope,|tx|{
         ensure!(matches!(&envelope.actor,ActorRef::User{..})&&envelope.camp_id.is_none(),"conversation_tools.user_required");let p=&envelope.payload;
         let mut value=serde_json::to_value(p)?;value.as_object_mut().context("conversation_tools.command_invalid")?.remove("client");value["commandId"]=json!(envelope.command_id);validate_operation(SetOwner::TYPE,&value)?;

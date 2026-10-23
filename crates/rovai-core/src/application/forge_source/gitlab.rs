@@ -32,12 +32,12 @@ use serde::Deserialize;
 use super::auth::ResolvedAuth;
 use super::deliver::{ForgePr, NewPullRequest};
 use super::{
-    count_diff_lines, sanitize_web_url, truncate_chars, urlencode_path, urlencode_query,
-    validate_state_filter, web_origin, ForgeChangeDetail, ForgeChangedFile, ForgeChangedFileList,
-    ForgeCheck, ForgeCheckList, ForgeCheckState, ForgeComment, ForgeCommentList, ForgeError,
-    ForgeFileStatus, ForgeIssueList, ForgeIssueRow, ForgeItemKind, ForgeLabel, ForgeLabelList,
-    ForgeMergeMethod, ForgeMergeOptions, ForgeMergeStrategy, ForgeSort, ForgeStateAction,
-    ListIssuesRequest, ResolvedNewIssue, BODY_CAP, LABEL_PAGE_SIZE,
+    BODY_CAP, ForgeChangeDetail, ForgeChangedFile, ForgeChangedFileList, ForgeCheck,
+    ForgeCheckList, ForgeCheckState, ForgeComment, ForgeCommentList, ForgeError, ForgeFileStatus,
+    ForgeIssueList, ForgeIssueRow, ForgeItemKind, ForgeLabel, ForgeLabelList, ForgeMergeMethod,
+    ForgeMergeOptions, ForgeMergeStrategy, ForgeSort, ForgeStateAction, LABEL_PAGE_SIZE,
+    ListIssuesRequest, ResolvedNewIssue, count_diff_lines, sanitize_web_url, truncate_chars,
+    urlencode_path, urlencode_query, validate_state_filter, web_origin,
 };
 
 // ── reads ───────────────────────────────────────────────────────────────────
@@ -77,7 +77,10 @@ pub async fn list_issues(
     if !req.labels.is_empty() {
         // Comma-joined, which is lossless here: GitLab forbids commas in label
         // titles, so no name can be split by this.
-        url.push_str(&format!("&labels={}", urlencode_query(&req.labels.join(","))));
+        url.push_str(&format!(
+            "&labels={}",
+            urlencode_query(&req.labels.join(","))
+        ));
     }
     if let Some(text) = req.search.as_deref() {
         // `search` is plain text on both collections, so unlike GitHub's `q`
@@ -85,15 +88,18 @@ pub async fn list_issues(
         // default and is stated anyway: the box promises that scope, and a
         // promise resting on somebody else's default is one release away from
         // being wrong.
-        url.push_str(&format!("&search={}&in=title,description", urlencode_query(text)));
+        url.push_str(&format!(
+            "&search={}&in=title,description",
+            urlencode_query(text)
+        ));
     }
 
     let response = api_get(auth, &url).await?;
     let total_count = header_i64(response.headers(), "x-total");
     // Empty means "no page after this one" — the one pagination signal GitLab
     // always sends, even where it declines to count.
-    let has_next = header_str(response.headers(), "x-next-page")
-        .is_some_and(|v| !v.trim().is_empty());
+    let has_next =
+        header_str(response.headers(), "x-next-page").is_some_and(|v| !v.trim().is_empty());
     let raw: Vec<RawItem> = response
         .json()
         .await
@@ -223,8 +229,8 @@ pub async fn list_notes(
         auth.api_base
     );
     let response = api_get(auth, &url).await?;
-    let has_next = header_str(response.headers(), "x-next-page")
-        .is_some_and(|v| !v.trim().is_empty());
+    let has_next =
+        header_str(response.headers(), "x-next-page").is_some_and(|v| !v.trim().is_empty());
     let raw: Vec<RawNote> = response
         .json()
         .await
@@ -271,7 +277,9 @@ pub async fn get_merge_request(
         .json()
         .await
         .map_err(|e| ForgeError::Network(format!("bad merge request payload: {e}")))?;
-    let foreign_project = raw.source_project_id.filter(|src| Some(*src) != raw.target_project_id);
+    let foreign_project = raw
+        .source_project_id
+        .filter(|src| Some(*src) != raw.target_project_id);
     let mut pr = map_merge_request(raw, owner_repo);
     if let Some(id) = foreign_project {
         if let Some(path) = project_path(auth, id).await {
@@ -363,7 +371,10 @@ pub async fn create_note(
         return Err(ForgeError::Invalid(format!("bad work item number: {iid}")));
     }
     let collection = collection_of(kind);
-    let url = format!("{}/projects/{project}/{collection}/{iid}/notes", auth.api_base);
+    let url = format!(
+        "{}/projects/{project}/{collection}/{iid}/notes",
+        auth.api_base
+    );
     let created: RawNote = api_post(auth, &url, &serde_json::json!({ "body": body }))
         .await?
         .json()
@@ -549,7 +560,8 @@ async fn pipeline_jobs(auth: &ResolvedAuth, project: &str, pipeline: i64) -> For
         "{}/projects/{project}/pipelines/{pipeline}/jobs?per_page={LABEL_PAGE_SIZE}",
         auth.api_base
     );
-    let raw: Option<Vec<RawJob>> = async { api_get(auth, &url).await.ok()?.json().await.ok() }.await;
+    let raw: Option<Vec<RawJob>> =
+        async { api_get(auth, &url).await.ok()?.json().await.ok() }.await;
     match raw {
         Some(jobs) => ForgeCheckList::available(
             jobs.into_iter()
@@ -606,8 +618,8 @@ pub async fn list_change_files(
     );
     match api_get(auth, &url).await {
         Ok(response) => {
-            let has_next = header_str(response.headers(), "x-next-page")
-                .is_some_and(|v| !v.trim().is_empty());
+            let has_next =
+                header_str(response.headers(), "x-next-page").is_some_and(|v| !v.trim().is_empty());
             let raw: Vec<RawDiff> = response
                 .json()
                 .await
@@ -619,9 +631,7 @@ pub async fn list_change_files(
                 has_next,
             })
         }
-        Err(ForgeError::NotFound) => {
-            legacy_change_files(auth, &project, iid, page, per_page).await
-        }
+        Err(ForgeError::NotFound) => legacy_change_files(auth, &project, iid, page, per_page).await,
         Err(other) => Err(other),
     }
 }
@@ -652,7 +662,9 @@ async fn legacy_change_files(
     // `saturating_mul` rather than a bare product: `page` is clamped to at
     // least 1 but has no ceiling, and a 32-bit overflow here would wrap round
     // to the FIRST page of a list the caller asked to be past the end of.
-    let skip = (page as usize).saturating_sub(1).saturating_mul(per_page as usize);
+    let skip = (page as usize)
+        .saturating_sub(1)
+        .saturating_mul(per_page as usize);
     Ok(ForgeChangedFileList {
         files: raw
             .changes
@@ -819,7 +831,11 @@ static LOGIN_CACHE: LazyLock<RwLock<HashMap<String, String>>> =
 
 async fn current_login(auth: &ResolvedAuth) -> Result<String, ForgeError> {
     let cache_key = format!("{}\n{}", auth.api_base, auth.account_id);
-    if let Some(hit) = LOGIN_CACHE.read().ok().and_then(|c| c.get(&cache_key).cloned()) {
+    if let Some(hit) = LOGIN_CACHE
+        .read()
+        .ok()
+        .and_then(|c| c.get(&cache_key).cloned())
+    {
         return Ok(hit);
     }
     #[derive(Deserialize)]
@@ -1334,4 +1350,3 @@ struct RawDiffRefs {
     #[serde(default)]
     head_sha: Option<String>,
 }
-

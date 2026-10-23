@@ -12,7 +12,10 @@ private func feedbackStatus(_ value: JSONValue) -> String {
 /// 使用原模型设置的原生表单，保存原请求后才交给 Host。
 struct RovaiMemberFeedbackSwitch: View {
     let model: RovaiWorkspaceModel;let agentId: String
-    @State private var policy: JSONValue?, original: JSONValue?, issue: String?, generation: UInt64?
+    @State private var policy: JSONValue?
+    @State private var original: JSONValue?
+    @State private var issue: String?
+    @State private var generation: UInt64?
     @State private var busy = false
     private var owner: String {"feedback-policy:" + agentId}
     private var enabled: Bool {(policy?["members"]?.rvArray ?? []).first {$0.text("agentId") == agentId}?["enabled"]?.rvBool == true}
@@ -43,10 +46,21 @@ struct RovaiUserFeedback: View {
     var normalInput: (() async throws -> JSONValue)? = nil
     var nativeMaterials: [JSONValue]? = nil
     @Environment(\.dismiss) private var dismiss
-    @State private var text = "", selected = "", run = ""
-    @State private var targets: [JSONValue] = [], records: [JSONValue] = [], previews: [JSONValue] = []
-    @State private var next: String?, previewNext: String?, packet: JSONValue?, receipt: JSONValue?, issue: String?, generation: UInt64?
-    @State private var busy = false, ready = false, uncertain = false
+    @State private var text = ""
+    @State private var selected = ""
+    @State private var run = ""
+    @State private var targets: [JSONValue] = []
+    @State private var records: [JSONValue] = []
+    @State private var previews: [JSONValue] = []
+    @State private var next: String?
+    @State private var previewNext: String?
+    @State private var packet: JSONValue?
+    @State private var receipt: JSONValue?
+    @State private var issue: String?
+    @State private var generation: UInt64?
+    @State private var busy = false
+    @State private var ready = false
+    @State private var uncertain = false
     @State private var nativeOpen = false
     private var scope: JSONValue {.object(["threadId": .string(threadId), "conversationId": conversationId.map(JSONValue.string) ?? .null, "scopeKind": .string(conversationId == nil ? "public" : child ? "delegation_child" : "single_chat")])}
     private var owner: String {"feedback:\(threadId):\(conversationId ?? "public"):\(child ? "child" : "member")"}
@@ -56,7 +70,7 @@ struct RovaiUserFeedback: View {
         NavigationStack {List {
             if let issue {Section {Text(issue).font(.caption).foregroundStyle(Theme.warning)}}
             if let packet {previewSection(packet)} else {
-                Section("补充说明") {
+                Section {
                     if agentId == nil {Picker("查看哪位队员的反馈", selection: $selected) {Text("选择队员").tag("");ForEach((model.thread?["members"]?.rvArray ?? []).map {RovaiRow(value: $0)}) {row in Text(row.value.text("displayName")).tag(row.value.text("agentId"))}}}
                     TextField("例如：按钮用蓝色，先不要加动画。", text: $text, axis: .vertical).lineLimit(3...8).disabled(disabled)
                     Text("\(text.unicodeScalars.count)/4096").font(.caption).foregroundStyle(Theme.textSecondary)
@@ -65,7 +79,7 @@ struct RovaiUserFeedback: View {
                     Button("核对记录") {Task {await refresh()}}.disabled(disabled)
                     Button("预览原生插话及当前材料") {nativeOpen = true}.disabled(disabled)
                     if targets.isEmpty {Text("当前没有可接收反馈的运行任务。").font(.caption).foregroundStyle(Theme.textSecondary)}
-                } footer: {Text("先预览全文，再交给队员。送到连接不代表模型已阅读。")}
+                } header: {Text("补充说明")} footer: {Text("先预览全文，再交给队员。送到连接不代表模型已阅读。")}
                 Section("原预览") {ForEach(previews.filter {$0["receipt"] == nil || $0["receipt"] == .null}, id: \.self) {row in
                     VStack(alignment: .leading, spacing: 8) {Text(row["preview"]?.text("text") ?? "").textSelection(.enabled);Button("继续核对原预览") {do {try keep(.object(["kind": .string("feedback"), "preview": row["preview"] ?? .null]));receipt = nil;uncertain = false} catch {issue = error.localizedDescription}}.disabled(disabled)}
                 }}

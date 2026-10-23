@@ -35,7 +35,7 @@ struct RovaiProjectNavigation<ThreadLink: View>: View {
             }
         }.scrollContentBackground(.hidden)
         .refreshable {await model.refresh();refresh += 1}
-        .sheet(isPresented: $managing) {RovaiProjectGroups(model: model) {managing = false;refresh += 1}}
+        .sheet(isPresented: $managing, onDismiss: { refresh += 1 }) { RovaiProjectGroups(model: model) }
         .task {restore()}
         .task(id: "\(model.connectionGeneration):\(model.connected):\(scenePhase):\(refresh)") {
             guard model.connected,scenePhase == .active else {return};let generation = model.connectionGeneration

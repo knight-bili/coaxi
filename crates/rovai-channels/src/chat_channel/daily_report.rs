@@ -1,5 +1,5 @@
 //! Codeg原版日报格式，统计数据由Core提供。
-use super::i18n::{self,Lang};
+use super::i18n::{self, Lang};
 use super::types::RichMessage;
 pub struct DailyReportData {
     pub date: String,
@@ -43,4 +43,3 @@ pub fn format_daily_report(report: &DailyReportData, lang: Lang) -> RichMessage 
 
     RichMessage::info(body).with_title(i18n::daily_report_title(lang))
 }
-
