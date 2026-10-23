@@ -5586,6 +5586,11 @@ describe('task event projections', () => {
         }),
         copies: vi.fn(async (_key: string, _after: string | null) => ({ items: [], next: null }))
       }
+      const installRecovery = (client: ThreadClient): void => {
+        Object.defineProperty(client, 'workbenchEditorRecovery', {
+          configurable: true, enumerable: true, value: recovery
+        })
+      }
       const { client: clientA, request: requestA, rejectFirst, resolveRetry } = (() => {
         let rejectFirst!: (error: Error) => void
         let resolveRetry!: (result: StoredCommandResult) => void
@@ -5602,9 +5607,9 @@ describe('task event projections', () => {
         Object.assign(client, {
           request: request as unknown as ThreadClient['request'],
           presentationScope: 'host-old',
-          canvasCoreIdentity: async () => 'core-old',
-          workbenchEditorRecovery: recovery
+          canvasCoreIdentity: async () => 'core-old'
         })
+        installRecovery(client)
         return { client, request, rejectFirst, resolveRetry }
       })()
       const requestB = vi.fn(async (method: CoreMethod) => {
@@ -5614,9 +5619,9 @@ describe('task event projections', () => {
       Object.assign(clientB, {
         request: requestB as unknown as ThreadClient['request'],
         presentationScope: 'host-new',
-        canvasCoreIdentity: async () => 'core-new',
-        workbenchEditorRecovery: recovery
+        canvasCoreIdentity: async () => 'core-new'
       })
+      installRecovery(clientB)
       const resultFor = (commandId: string): StoredCommandResult => ({
         commandId, commandType: 'tasks.create', status: 'accepted', code: 'task.created', payload: {},
         resultEntity: { entityType: 'task', entityId: 'task-created' }, recordedAt: '2026-10-23T00:00:00Z'
