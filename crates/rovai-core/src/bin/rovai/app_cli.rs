@@ -457,7 +457,7 @@ async fn evaluation_actions_reach_their_public_help_without_owner_ipc() {
 
 fn print_help() {
     println!(
-        "Rovai User Automation CLI\n\nOperations:\n  rovai app status\n  rovai app runtime list|check|models\n  rovai app member list|show|create\n  rovai app member runtime set|clear\n  rovai app thread create|send|open\n  rovai app agent-run show|watch|export|cancel\n  rovai app trial run\n  rovai app trace export|schedule|schedules\n  rovai app eval configure|gate|weekly|schedule|status|cancel\n\nThe Desktop App must already be running. V1 never launches it automatically."
+        "Rovai User Automation CLI\n\nOperations:\n  rovai app status\n  rovai app runtime list|check|models\n  rovai app member list|show|create\n  rovai app member runtime set|clear\n  rovai app thread create|send|open\n  rovai app agent-run show|watch|export|cancel\n  rovai app trial run\n  rovai app trace export|schedule|schedules\n  rovai app eval configure|gate|weekly|schedule|status|cancel\n  rovai app conversation-tools <action> --input <private-json-file>\n\nThe Desktop App must already be running. V1 never launches it automatically."
     );
 }
 

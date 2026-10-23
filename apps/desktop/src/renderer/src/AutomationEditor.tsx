@@ -171,7 +171,7 @@ export function AutomationEditor({ draft, onChange, agents, projects, automation
   const cronId = useId()
 
   return <div className="automation-editor-scroll"><form className="automation-form" onSubmit={(event) => { event.preventDefault(); if (!automation && !busy && !scheduleError && draft.prompt.trim() && member?.presence === 'present') onCreate() }}>
-    <input className="automation-name-input" aria-label={uiAttribute("定时任务名称")} value={draft.name} maxLength={80} placeholder={uiAttribute("定时任务名称")} disabled={busy} onChange={(event) => onChange((current) => ({ ...current, name: event.target.value }))} />
+    <input className="automation-name-input" aria-label={uiAttribute("定时任务名称")} value={draft.name} maxLength={automation && /^[0-9a-f-]{36}$/i.test(automation.automationId) ? 120 : 80} placeholder={uiAttribute("定时任务名称")} disabled={busy} onChange={(event) => onChange((current) => ({ ...current, name: event.target.value }))} />
     <textarea className="automation-prompt-input" aria-label={uiAttribute("执行内容")} rows={3} value={draft.prompt} placeholder={uiAttribute("告诉队员需要按时完成什么…")} disabled={busy} onChange={(event) => onChange((current) => ({ ...current, prompt: event.target.value }))} />
     <div className="automation-context" aria-label={uiAttribute("执行上下文")}>
       <div className="automation-context-field"><span><UiText zh={"队员"} /></span>

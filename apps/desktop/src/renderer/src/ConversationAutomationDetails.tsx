@@ -31,7 +31,7 @@ export function ConversationAutomationDetails({ automationId, version, disabled,
     if (!owner || pending) return
     const original: ConversationOriginal = {operation: 'conversationTools.automationOwner.set', commandId: newCommandId()}
     await conversationOriginal(client, key, original); if (observed !== generation.current) return; setPending(original)
-    const value = await conversationToolRequest(client, original.operation, {commandId: original.commandId, automationId, expectedAutomationVersion: owner.automationVersion, expectedOwnerRevision: owner.revision, action, timezone})
+    const value = await conversationToolRequest(client, 'conversationTools.automationOwner.set', {commandId: original.commandId, automationId, expectedAutomationVersion: owner.automationVersion, expectedOwnerRevision: owner.revision, action, timezone})
     if (observed !== generation.current) return
     await conversationOriginal(client, key, null); if (observed !== generation.current) return; setPending(null); setOwner(value); setAction(value.action); setTimezone(value.timezone); edited.current = false; await load()
   })}
