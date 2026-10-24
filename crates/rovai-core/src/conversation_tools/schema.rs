@@ -117,6 +117,16 @@ pub(super) fn validate(root: &Value, shape: &Value, value: &Value, depth: usize)
             )
         }
         match shape["format"].as_str() {
+            Some("rovai-camp-id") => {
+                crate::camp_id::ThreadId::parse(text)
+                    .context("conversation_tools.camp_id_invalid")?;
+            }
+            Some("rovai-agent-id") => {
+                ensure!(
+                    crate::agent_identity::parse_agent_id(text).is_some(),
+                    "conversation_tools.agent_id_invalid"
+                );
+            }
             Some("uuid") => {
                 uuid::Uuid::parse_str(text).context("conversation_tools.uuid_invalid")?;
             }
@@ -139,4 +149,56 @@ pub(super) fn validate(root: &Value, shape: &Value, value: &Value, depth: usize)
         )
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::super::{FlagsV1, MemberPolicyV1, PolicyV1, validate_operation};
+    use serde_json::json;
+
+    #[test]
+    fn public_operations_preserve_canonical_camp_and_member_ids() {
+        let camp = crate::camp_id::ThreadId::new().to_string();
+        let scope = json!({"threadId":camp,"conversationId":null,"scopeKind":"public"});
+        let request = json!({"scope":scope,"after":null,"limit":50});
+        assert!(validate_operation("conversationTools.questions.list", &request).is_ok());
+        for invalid in [
+            uuid::Uuid::new_v4().to_string(),
+            "rvcamp_00000000000000000000000000".into(),
+            camp.to_uppercase(),
+            "rvcamp_bad".into(),
+        ] {
+            let mut changed = request.clone();
+            changed["scope"]["threadId"] = json!(invalid);
+            assert!(validate_operation("conversationTools.questions.list", &changed).is_err());
+        }
+        let mut unknown = request.clone();
+        unknown["scope"]["untrustedField"] = json!(true);
+        assert!(validate_operation("conversationTools.questions.list", &unknown).is_err());
+        let mut private = request.clone();
+        private["scope"]["scopeKind"] = json!("single_chat");
+        private["scope"]["conversationId"] = json!(uuid::Uuid::new_v4().to_string());
+        assert!(validate_operation("conversationTools.questions.list", &private).is_ok());
+        private["scope"]["conversationId"] = json!("not-a-conversation");
+        assert!(validate_operation("conversationTools.questions.list", &private).is_err());
+        for (agent, valid) in [
+            ("agent_1", true),
+            ("agent_4", true),
+            ("agent_25", true),
+            ("agent_0", false),
+            ("agent_01", false),
+            ("agent_-1", false),
+            ("", false),
+            ("agent_9223372036854775808", false),
+        ] {
+            let policy = PolicyV1 {
+                members: vec![MemberPolicyV1 {
+                    agent_id: agent.into(),
+                    flags: FlagsV1::default(),
+                }],
+                ..PolicyV1::default()
+            };
+            assert_eq!(policy.validate().is_ok(), valid, "{agent}");
+        }
+    }
 }

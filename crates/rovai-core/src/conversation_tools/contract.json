@@ -10,7 +10,8 @@
       "properties": {
         "agentId": {
           "type": "string",
-          "format": "uuid"
+          "format": "rovai-agent-id",
+          "pattern": "^agent_[1-9][0-9]*$"
         },
         "flags": {
           "type": "object",
@@ -110,7 +111,8 @@
       "properties": {
         "threadId": {
           "type": "string",
-          "format": "uuid"
+          "format": "rovai-camp-id",
+          "pattern": "^rvcamp_[0-7][0123456789abcdefghjkmnpqrstvwxyz]{25}$"
         },
         "conversationId": {
           "anyOf": [
@@ -226,7 +228,8 @@
           "type": "array",
           "items": {
             "type": "string",
-            "format": "uuid"
+            "format": "rovai-agent-id",
+            "pattern": "^agent_[1-9][0-9]*$"
           },
           "maxItems": 128
         }
@@ -259,7 +262,8 @@
         },
         "agentId": {
           "type": "string",
-          "format": "uuid"
+          "format": "rovai-agent-id",
+          "pattern": "^agent_[1-9][0-9]*$"
         },
         "flags": {
           "type": "object",
@@ -445,7 +449,8 @@
         },
         "agentId": {
           "type": "string",
-          "format": "uuid"
+          "format": "rovai-agent-id",
+          "pattern": "^agent_[1-9][0-9]*$"
         },
         "agentRunId": {
           "type": "string",
