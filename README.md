@@ -1,146 +1,72 @@
-> 本仓库为Codeg与Rovai完整融合研发工程。范围、当前进度和工程资格统一见[融合项目入口](integration/README.md)，以下保留上游文档。
-
 <div align="center">
+<img src="build/icon.png" width="88" alt="Coaxi 图标" />
 
 # Coaxi
 
-Coaxi integrates Codeg and Rovai into one workspace. Upstream copyrights and licenses are retained.
+**把 AI 队员、无限画布和真实工程放在同一个工作台。**
 
-
-### Assemble a team of agents that grows together.
-
-A workspace for long-lived coding-agent teams.<br>
-Bring your installed Agents into shared conversations, divide the work,<br>
-inspect execution and file changes, and keep useful knowledge for the next task.
-
-<p>
-  <a href="https://github.com/knight-bili/coaxi/releases"><img src="https://img.shields.io/badge/macOS-arm64%20%2B%20x64-111111?logo=apple&logoColor=white" alt="macOS arm64 + x64"></a>
-  <a href="https://github.com/knight-bili/coaxi/releases"><img src="https://img.shields.io/badge/Windows-x64-0078D4?logo=windows11&logoColor=white" alt="Windows x64"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-4b8f77" alt="MIT License"></a>
-  <a href="https://www.rust-lang.org/"><img src="https://img.shields.io/badge/Rust-1.85%2B-000000?logo=rust&logoColor=white" alt="Rust 1.85+"></a>
-  <a href="https://nodejs.org/"><img src="https://img.shields.io/badge/Node.js-24%2B-339933?logo=node.js&logoColor=white" alt="Node.js 24+"></a>
-  <a href="https://linux.do/"><img src="https://img.shields.io/badge/LINUX%20DO-Community-1f6feb" alt="LINUX DO Community"></a>
-</p>
-
-<p>
-  <a href="https://rovai.dev/"><strong>Website</strong></a>
-  · <a href="https://rovai.dev/download/"><strong>Download</strong></a>
-  · <a href="https://rovai.dev/docs/"><strong>Docs</strong></a>
-  · <a href="https://github.com/knight-bili/coaxi/releases"><strong>Releases</strong></a>
-</p>
-
-<p><strong>English</strong> | <a href="README.zh-CN.md">简体中文</a></p>
-
+[使用说明](docs/guides/coaxi-workbench.md) · [开发指南](docs/development/README.md) · [文档导航](docs/README.md) · [一期融合范围](integration/README.md)
 </div>
 
-https://github.com/user-attachments/assets/5922b023-a956-416e-b9c5-4df7e209ec1b
+Coaxi 是基于 Rovai Core、融合 Codeg 工程与画布能力的本地 AI 工作台。你可以选择电脑上已安装的智能体，为队员分配职责，在会话和无限画布中组织工作，并直接查看文件、执行过程和 Git 变更。
 
-<p align="center"><sub>Watch a real team workflow · 64s · No audio</sub></p>
+## 开发与安装
 
-<details>
-<summary>Workspace screenshot</summary>
+版本、安装包和各平台验证情况见[项目范围与状态](integration/README.md)。正式下载以维护者为Coaxi发布的安装包为准，上游安装包不代表本产品。下表说明一期融合范围，不代表所有功能已在每个环境完成验证。
 
-<p align="center"><a href="docs/assets/readme/workspace-team-ready.png"><img src="docs/assets/readme/workspace-team-ready.png" alt="Four teammates are mentioned; Gugu and Cheese have replied with their execution cards expanded in the right-hand Overview, while Dingding and Bunny are still running" width="100%"></a></p>
+## 一期融合范围
 
-</details>
+| 工作场景 | 范围 |
+|---|---|
+| 在一张画布上组织工作 | 独立画板、区域、公开/私聊卡片、便笺、文件、终端、分组与布局恢复 |
+| 和 AI 队员持续协作 | 队员身份与工具箱、Thread、私聊材料隔离、独立帮手、审批、停止与恢复 |
+| 推进较长任务 | Mission、任务与责任、定时工作、文字补充、交互卡片与协作记忆 |
+| 操作真实工程 | 项目与 Git 工作区、文件树、编辑与预览、Diff、提交、历史、分支与冲突处理 |
+| 连接仓库平台 | 仓库面板、Issue/PR 关联与操作；实际权限和远程动作由用户控制 |
+| 选择智能体和模型 | 原生 CLI/ACP 接入、自定义程序、模型与推理参数、配置迁移、原生继续与分叉 |
+| 使用工具与资料 | Skills、MCP、浏览器与电脑操作、Office/HTML 预览、科研与生成式卡片 |
+| 在其他入口继续 | Desktop/Web、独立 Server、用户 CLI、渠道、移动客户端；各平台资格单独验证 |
+| 管理自己的环境 | 加密备份、恢复、WebDAV、主题、快捷键、日志、诊断与桌面宠物 |
 
-## Work together, from the first request to the next task
+## 第一次使用
 
-Start with one teammate, then bring in another when the work needs a second perspective. Keep their roles, conversations, unfinished tasks, and useful agreements available when you return.
+1. 安装并登录你准备使用的智能体程序，例如 Codex CLI 或 Claude Code。
+2. 打开 Coaxi，选择队员和本机智能体。模型目录来自所选程序，同一电脑上不同安装版本可能返回不同模型。
+3. 打开一个工程，先让队员解释项目，再查看执行记录、文件和 Diff。
+4. 完成变更后自行决定是否提交、推送或创建 PR。
 
-| Capability | What you can do |
-| --- | --- |
-| **[Lasting teammates](https://rovai.dev/docs/members.html)** | Give each teammate a name, role, responsibilities, and working principles. Choose their Agent, model, and permissions separately. |
-| **[Shared conversations](https://rovai.dev/docs/collaboration.html)** | Address the right teammates, exchange findings, and hand off work. Open a separate one-on-one conversation when you need a focused discussion. |
-| **[Visible execution](https://rovai.dev/docs/execution.html)** | Follow tool activity, respond to approvals, preview files, and inspect changes alongside the conversation. |
-| **[Ongoing work](https://rovai.dev/docs/missions.html)** | Track larger goals on the Mission board, schedule recurring work, and save agreements as collaborative memory. |
-| **[Skills and tools](https://rovai.dev/docs/skills.html)** | Use native Skills, configure Rovai collaboration tools, and connect MCP services supported by your Agent. |
-| **[Remote access](https://rovai.dev/docs/remote.html)** | Return to your workspace through a browser. Connect Desktop teammates to external messaging channels. |
+更多安装、模型列表和旧数据说明见[Coaxi 使用说明](docs/guides/coaxi-workbench.md)。
 
-## Keep your teammates. Choose how they work.
+## 本地开发
 
-A teammate's identity stays with the team across projects. An implementer and a reviewer can have different responsibilities, use different Agents, and keep their own ways of working.
-
-Connect installed coding Agents such as **Codex CLI, Claude Code, Pi Coding Agent, DeepSeek Harness, and OpenCode**. Model choices, permissions, Skills, and MCP capabilities depend on the Agent and host platform.
-
-<p align="center"><a href="docs/assets/readme/teammates-agents.png"><img src="docs/assets/readme/teammates-agents.png" alt="Four English demo teammates configured with Codex CLI, Claude Code, Pi Coding Agent, and DeepSeek Harness; Dingding’s profile and permissions are open" width="100%"></a></p>
-
-[Teammates and configuration](https://rovai.dev/docs/members.html) · [Agents and models](https://rovai.dev/docs/agents.html) · [Platform compatibility](https://rovai.dev/docs/compatibility.html)
-
-## Keep longer work in view
-
-Use the Mission board for a goal you will return to: improving a download flow, preparing a release, or working through a project review. Choose a project and team, continue in its conversation, and inspect the accumulated file changes and delivery.
-
-Tasks record responsibility; execution records show what ran. Finishing a run, completing a mission, and merging code are separate actions.
-
-<p align="center"><a href="docs/assets/readme/missions.png"><img src="docs/assets/readme/missions.png" alt="An Orbit mission with its goal, project, and team filled in" width="100%"></a></p>
-
-[Mission board](https://rovai.dev/docs/missions.html) · [Tasks and ownership](https://rovai.dev/docs/tasks.html) · [Scheduled work](https://rovai.dev/docs/automations.html) · [Collaborative memory](https://rovai.dev/docs/memory.html)
-
-## Continue from another device
-
-Enable Web access in Rovai Desktop, or run an independent Rovai Server on your own host. Open the workspace in a browser to continue the conversation and follow the work. Agents and project files stay on the host you connect to; separate instances keep separate data.
-
-Rovai Desktop also connects to **Feishu and DingTalk**, so you can send requests and receive results in those channels. See the channel guide for setup and availability.
-
-<p align="center"><a href="docs/assets/readme/remote-access.png"><img src="docs/assets/readme/remote-access.png" alt="Reference layout of Rovai's mobile conversation and Desktop Channels settings" width="100%"></a></p>
-
-[Deployment and remote access](https://rovai.dev/docs/remote.html) · [Channels](https://rovai.dev/docs/channels.html)
-
-## Get started
-
-| Where you want to work | Start here |
-| --- | --- |
-| **On your desktop** | [Download Rovai Desktop](https://rovai.dev/download/) for macOS Apple Silicon, macOS Intel, or Windows x64. Follow the installation and upgrade notes for your release. |
-| **On your own server** | [Install Rovai Server](https://rovai.dev/docs/server-install.html). Server packages, host requirements, release limitations, and setup are documented separately. |
-
-1. **Prepare one Agent.** Install and sign in to a supported coding Agent on the host, then check it in **Settings → Agents**.
-2. **Choose a teammate.** Set their Agent, model, and permissions. One teammate is enough to get started.
-3. **Give it a small task.** Open a project conversation, ask the teammate to explain the project, and inspect the execution before assigning a change.
-
-[Complete quick start](https://rovai.dev/docs/quickstart.html) · [Try a two-teammate workflow](https://rovai.dev/docs/collaboration.html)
-
-## How it fits together
-
-Rovai keeps the team's collaboration state and coordinates execution. The coding Agents perform the work using their own tools, authentication, and configured model services.
-
-<p align="center"><a href="docs/assets/readme/architecture-overview.svg"><img src="docs/assets/readme/architecture-overview.svg" alt="Desktop and browser clients connect to one Rovai Host and Core instance, which stores team state and coordinates installed Agents working with host files and configured model services" width="100%"></a></p>
-
-Desktop and standalone Server share the Host implementation. Each instance has its own data and environment; connecting through a browser does not migrate or synchronize them. Channel integration is provided by Desktop.
-
-[How work moves through Rovai](https://rovai.dev/docs/mechanism.html) · [Engineering architecture](https://github.com/knight-bili/coaxi/blob/main/docs/architecture/README.md)
-
-## Documentation and development
-
-| You want to… | Read |
-| --- | --- |
-| Learn to use Rovai | [English documentation](https://rovai.dev/docs/) · [中文文档](https://rovai.dev/zh/docs/) |
-| Configure your tools | [Agents](https://rovai.dev/docs/agents.html) · [Skills](https://rovai.dev/docs/skills.html) · [MCP](https://rovai.dev/docs/mcp.html) |
-| Connect another device | [Desktop Web](https://rovai.dev/docs/desktop-web.html) · [Server installation](https://rovai.dev/docs/server-install.html) · [Connection options](https://rovai.dev/docs/remote.html) |
-| Build from source or contribute | [Developer guide](https://github.com/knight-bili/coaxi/blob/main/docs/development/README.md) · [Architecture](https://github.com/knight-bili/coaxi/blob/main/docs/architecture/README.md) · [Compatibility evidence](https://github.com/knight-bili/coaxi/blob/main/docs/runtime-compatibility.md) |
-
-The engineering guides are primarily in Chinese. Start with the developer guide for environment setup and isolated development data, then:
+需要 Node.js 24、pnpm、仓库锁定的 Rust 工具链，以及对应平台的原生编译环境。
 
 ```sh
-git clone https://github.com/knight-bili/coaxi.git
-cd coaxi
+git switch develop/V1.0.0
 pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-## Contributing
+开发实例必须使用独立数据目录、Skill Library 和 MCP 配置，不能占用日常安装版的数据。执行前阅读[本地隔离流程](docs/development/local-workflow.md)。类型检查、测试和打包的实际入口由 [package.json](package.json) 维护。
 
-[Issues](https://github.com/knight-bili/coaxi/issues) and [pull requests](https://github.com/knight-bili/coaxi/pulls) are welcome. Include the Coaxi version, host platform, and steps to reproduce when reporting a problem.
+## 源码入口
 
-Rovai connects coding agents through native protocols and ACP. See [Agent integration](contributing/agent-integrations.md) for existing adapters, implementation notes, and current gaps.
+| 目录 | 内容 |
+|---|---|
+| `apps/desktop` | Electron 主进程、界面与本机桥接 |
+| `apps/web`、`crates/rovai-web` | Web 客户端与受控服务入口 |
+| `crates/rovai-core`、`crates/rovai-host` | 数据、模型输入、任务执行与 Host |
+| `apps/mobile-android`、`apps/mobile-ios` | 移动客户端 |
+| `packages` | 类型合同、共享界面和主题 |
+| `docs` | 用户说明、架构、合同与开发文档 |
+| `integration` | 融合范围、来源锁定、移植规则与必要历史证据 |
 
-## License
+## 名称与旧数据兼容
 
-[MIT](https://github.com/knight-bili/coaxi/blob/main/LICENSE) — free to use, modify, distribute, and use commercially.
+界面、菜单、通知和当前产品介绍统一使用 **Coaxi**。已有安装身份、数据库文件、数据目录、IPC 和受控资源引用继续兼容，避免旧数据失联。源码里的供体来源、第三方商标、许可证和历史记录按事实保留；它们不代表当前产品仍使用旧名称。详见[品牌与兼容边界](docs/development/coaxi-branding.md)。
 
-## Community
+## 来源与许可
 
-<p align="center">
-  <a href="docs/assets/readme/wechat-group.png"><img src="docs/assets/readme/wechat-group.png" alt="QR code for the Rovai WeChat group" width="320"></a><br>
-  <sub>Scan with WeChat · Click the image to view full size</sub>
-</p>
+Coaxi 融合 [Rovai AI](https://github.com/murray17/rovai-ai) 与 [Codeg](https://github.com/spacering-net/codeg) 的代码和交互设计。具体供体地址、冻结提交与许可证以 [sources.lock.json](integration/sources.lock.json) 和 [来源许可证](integration/licenses) 为准。
+
+上游版权、MIT 与适用的 Apache-2.0 条款保持有效；移植文件保留其原始通知。完整说明见 [LICENSE](LICENSE) 与 [第三方通知](THIRD_PARTY_NOTICES.md)。Coaxi 不代表上游官方发行。

@@ -1,119 +1,26 @@
-# Codeg 与 Rovai 一期完整融合
+# Coaxi 融合项目
 
-- [I04 执行读取认证恢复记录](execution/i04-execution-read-auth-result.json)：同client重新认证回收旧窗口/完整体与展开状态，拦截迟到回复；普通断线和续期保留。182项定向、13组实际窗口及日夜两图通过；真实Host/两端与完整富内容继续，完整I04未收口。
+Coaxi一期目标是完整融合两份固定供体的现有能力，包括原I00–I12计划内的整改、兼容与修复。第二期才规划自研新方向；不能因排期方便把一期能力删掉。
 
-- [I04 委派分页客户端记录](execution/i04-delegation-block-client-result.json)：实际执行窗口接新分页、组内移除/恢复与原卡片；来源/输出分别取证，跨epoch编号与缓存按主块隔离。130项定向和18组实际窗口、8图对照通过，真实Core/两端/授权恢复与完整富内容继续。
+## 当前开发方式
 
-- [I04 委派独立分页后端记录](execution/i04-delegation-blocks-result.json)：旧3兼容、跨块唯一来源、主线/组成对位置与精确移除已定向验证；10k检查约束局部更新范围。客户端协商和真实界面链路继续，I04未收口。
+唯一开发分支为`develop/V1.0.0`。小功能或单个问题独立中文commit，阶段集中验证后push。main冻结，必须在工程验证、客户实际使用验收后由客户明确指示合入。具体见[分支约定](branch-policy.md)和[当前执行路径](execution/phase-one-execution.md)。
 
-- [I04 父工具原卡片接线记录](execution/i04-tool-source-ui-result.json)：生产工具行使用核实来源显示原委派/恢复卡片，完整任务、恢复原因与原记录可达，元数据共享刷新和授权失效清空已接；分页Core工具块分类及真实两端整链继续。
+## 状态边界
 
-- [I04 父工具来源读取工程记录](execution/i04-tool-source-result.json)：Core 按真实观察、回执与 attempt 核对完整任务和恢复原因，拒绝不关联子正文；Native/Web 方法已接。原 Context 与 Web 投影 owner、90 项 TS 检查通过，父工具生产卡片接线和真实两端联调继续，I04 未收口。
+I04–I12源码已集中归并；一次全范围静态审查确认的25个Issue已通过PR #141归并开发分支。当前Windows本机试用包为0.4.8，目标版本为V1.0.0；正式Coaxi稳定安装包尚未发布。当前进入Windows本机使用反馈与整改，不能把源码齐备或该轮局部检查等同全部324场景、全部平台和客户验收通过。
 
-- [I04 原委派、恢复主卡与后台任务分组工程记录](execution/i04-native-delegation-background-result.json)：完整原组件接入Core User列表与原后台合并；保留元数据/正文边界，真实链路候选仍待集中验证。
+2026-10-24当前工作：Coaxi品牌遗漏、内置队员名称/形象、仓库入口整理及独立CodexCLI模型目录兼容。用户已明确取消启动最大化改动。
 
-当前唯一开发分支为 **`develop/V1.0.0`**，跟踪同名origin分支；一期全部阶段在此累计，不再建立阶段分支。I12工程与客户软件使用验收全部通过后，仍须客户明确指令才合入main。详见[单分支约定](branch-policy.md)。
+## 范围、来源与规则
 
-- [I04 原版帮手、问答、分组与细滚动](execution/i04-native-agent-question-result.json)：原Agent/collab胶囊、完整只读问答/工具分组与Overlay细滚动已接；87项定向、28组产品窗口通过，原函数体和状态/文案可追溯。打开下级仍走Core签发引用；完整委派/恢复/后台、图片和真实链路继续，I04未收口。
+- [一期执行路径](execution/phase-one-execution.md)
+- [固定源码和UI来源](inventory/canvas-ui-reference.md)
+- [全部页面原应用UI规则](ui-source-policy.md)
+- [单分支与main边界](branch-policy.md)
+- [批量验证与Actions成本](ci-cost-policy.md)
+- [许可证与来源通知](licenses/)
+- [Coaxi用户说明](../docs/guides/coaxi-workbench.md)
+- [完整技术文档导航](../docs/README.md)
 
-- [I04 原版压缩、反馈、MCP 与委派状态卡](execution/i04-native-specialized-status-result.json)：四类只读专用卡及合并查询已接生产页；82项定向、19组实际窗口与15组普通工具回归通过。原函数体/JSX与7组双语文案核对通过，帮手主卡、问答/后台、图片和真实两端候选继续；I04未收口。
-
-- [I04 原版普通工具、搜索与 Diff](execution/i04-native-ordinary-tools-result.json)：完整普通分支、搜索分组、统一/左右 Diff 和 Core 原生文件来源已接；149 项定向通过、1 项原有平台跳过、原文件 owner 及 15 组生产 Renderer 检查通过。专用卡片接续见上条；图片与真实两端候选验证继续，I04 未收口。
-
-- [I04原生计划与目标富内容](execution/i04-native-rich-content-result.json)：固定原纯适配层及计划/目标组件已接只读页，182项定向与17组受控Renderer检查通过；完整工具卡片、图片查看和真实Core/两端仍待，I04范围不减。
-
-- [I04原生后台阅读与User接口分项](execution/i04-native-reader-result.json)：有界后台FS线程、取消/回收/关闭租约、每页Core重授权及Native/Web四方法已编码，原source与Web/客户端owner定向验证；实际Core/Host/网络及原Codeg只读UI继续，完整I04未完成。
-
-- [I04完整签名快照与分页分项](execution/i04-native-snapshot-result.json)：已接私有整份原投影UTF8分页、冻结快照/游标/核实后代引用签名与首次发现/hash/序列化取消。最低编译和精确原文件owner通过；后台任务注册/销毁、每页Core重授权、Native/Web及原只读UI继续，完整I04未收口。
-
-- [I04旧代理文件来源分项](execution/i04-legacy-agent-source-result.json)：Claude旧agent文件已单独建来源校验，不把agentId/消息parentUuid当Session；原文件owner通过，完整parser/生产关联及Qoder来源继续。现有Codex/Grok接口与原查看器可独立推进，完整I04范围不变。
-
-- [I04可信工程补丁读取](execution/i04-native-project-patch-result.json)：原Core用户准入、持久Host目录、核验文件及原Codex补丁行号已接，旧来源兼容和边界分项通过；旧agent文件、完整有界运输/后台取消、原UI及完整运行资格继续。
-
-原生帮手查看器已接完整分页客户端和初始只读界面，与Core独立帮手共用单槽/嵌套窗口；实际Renderer检查和原外壳参考见[本批证据](execution/i04-native-viewer-ui-result.json)。完整原富内容和真实Core/两端候选仍待，I04四包84范围不变。
-
-I00已自审修正并合入，I01基础证据及环境待验项保留；I02继续补齐，I03本机工程验证已有记录，当前推进I04。实际阶段资格以[持续状态](execution/goal-state.json)为准，完整一期终点不变。Rovai Core唯一业务与执行权威，Codeg与双原生移动按模块移植；第二阶段才开发自主新增能力。
-
-- [I04原解析器对照检查点](execution/i04-native-parser-parity-result.json)：Grok统计及原模型窗口目录已接；两固定原parser的31组受控案例中30组完整投影相同、1组仅保留原版截断的工具正文，0项未解释差异。公开查看器运输、原UI、真实Host/Runtime/平台及I04其余工作包继续，不能按组件对照称阶段完成。
-
-- [完整计划](planning/plan-v4.md)、[日历基准](planning/schedule.json)、[源码锁定](sources.lock.json)。
-- [功能账本](planning/features.json)、[研发工作包](planning/work-packages.json)、[验收场景](acceptance/cases.json)。
-- [候选入口库存](inventory/source-entrypoints.json)、[开发规则](development.md)、[I00验收单](acceptance/i00.md)。
-- [资源与风险](resources.md)、[许可证保留](licenses/README.md)。
-- [免费优先 CI 安排](ci-cost-policy.md)：公开前审查、标准运行机、按里程碑启动全平台验证及产物保留边界。
-
-源Rovai当前版本指针只代表源骨架状态，不证明融合完成。根文档和品牌保留，后续设计阶段再处理。
-
-- [I01执行入口](foundation/README.md)。
-- [持续执行状态](execution/goal-state.json)、[需要客户补齐的待办](execution/customer-todos.json)。客户已授权沿I00至I12自动推进，阶段分支持续开发，main仍由客户验收控制。
-- [I03收口排期](execution/i03-closeout-plan-r1.md)、[有限剩余清单](execution/i03-closeout-remaining.md)：由Codex完成研发与工程验证，明确每组完成条件，客户软件使用验收仍在I12之后。
-- [I03实际完整输入页面核定](execution/i03-r01-native-complete-input-verification.json)：保留当批卡片往返、排队、删除后恢复及迟到上传证据。此为历史批次，后续资格与当前剩余项统一以[有限剩余清单](execution/i03-closeout-remaining.md)及[实时账本](execution/i03-closeout-ledger.json)为准，不能把历史待补数量当成当前状态。
-- [I03真实Windows终端输入核定](execution/i03-r07-native-input-verification.json)：系统拼音、剪贴板、原生复制、折叠重开及受控读取错误恢复整批通过；原Core容量/重连按未变源码复用，完整I03与其他平台仍以实时账本为准。
-- [I02技能包配置证据](execution/i02-skill-members-result.json)：目录、安装/更新卸载与队员配置已验；[实际模型投递r1](../docs/versions/v1.72/model-context-change-skill-pack-member-delivery.md)已获客户明确确认，[本地实际输入及恢复](execution/i02-skill-delivery-context-result.json)已接通并验证，逐SP矩阵和真实Gate仍继续。Office及其他一期功能继续实施。
-- [I03画布架构](../docs/architecture/canvas.md)：多画板Core元数据及八类节点图已实现；[固定版本节点源码清单](execution/i03-node-source-audit-result.json)与[节点持久化/真实升级验证](execution/i03-canvas-nodes-result.json)可查。交互UI、实时业务绑定、布局、客户端视口和真实临时PTY继续实施，均保留在一期，不能把Core基础当整个I03完成。
-- [I02恢复兼容矩阵增补](execution/i02-skill-delivery-matrix-result.json)：数据库边界的执行轮次、旧公开29/33与旧A2A冻结输入补测已通过；[数据库修复](execution/i02-db153-regression-repair-result.json)的 Windows109项与Linux110项全部通过，原失败保留。[进程恢复](execution/i02-skill-process-recovery-result.json)已验真实Core重启保留冻结输入并终结未知结果、禁止重发；明确确认分支、其余逐SP与真实模型Gate继续补齐。
-
-- [I03项目分组排列检查点](execution/i03-project-layout-result.json)：侧栏/画布统一入口、组与工程混合拖放、键盘排列及冲突/未知结果保护已编码；37项相关检查与4项静态导航检查通过，实际交互和当前Host资格仍待阶段候选。
-
-- [I03工作树层级与分组菜单检查点](execution/i03-project-tree-result.json)：真实Git父子/分支展示、置顶去重、显式打开登记和统一分组菜单已编码；42项相关测试与5项静态导航检查通过，新Rust及实际Host/UI仍待阶段候选，活动统计继续实施。
-
-- [I03完整导航活动统计检查点](execution/i03-navigation-activity-result.json)：Core按普通导航Thread完整聚合、窗口外组定位及工程/分组三态徽章已编码；78项相关检查、6项静态导航与7项SQL原文夹具通过，新Rust/真实Host/挂载UI继续按阶段候选补验，不据此标I03完成。
-
-- [I03区域成员拖放检查点](execution/i03-canvas-member-drag-result.json)：派生成员节点、跨源原子分组、精确引用和旧服务保护已编码；52项相关检查及定向类型/文档/格式通过，新增Rust与真实Host/UI仍待阶段候选，原地展开和Composer继续实施。
-
-- [I03画布原地与侧边会话检查点](execution/i03-canvas-conversation-result.json)：复用既有会话/输入/执行控制，补精确私有绑定和离开保护；40项组件及4项离开退出检查通过，定向类型/文案/文档通过，真实UI/Runtime及多卡、重开恢复、通知继续，不作为I03完成依据。
-
-- [I03会话读写归属检查点](execution/i03-thread-scope-result.json)：既有页面改用固定Core client/Thread的共享读写层；13声明保持原文、10旧导出兼容，216项定向检查与类型/文案/文档通过。多卡实例、共享草稿和展开恢复仍继续，实际UI/Runtime待阶段候选。
-
-- [I03私有共享草稿检查点](execution/i03-single-chat-shared-result.json)：既有面板接共享正文、发送互斥、保存失败恢复与保留输入切换，原send和pending edit请求表达式保持；41项相关检查及类型/文案/文档通过。公开草稿镜像和多卡挂载仍继续，真实UI/Runtime未验。
-
-- [I03每卡独立草稿与恢复检查点](execution/i03-canvas-composer-context-result.json)：固定Codeg源码确认每卡输入独立，纠正此前共享草稿计划；已接主会话隔离、Pending输入并集、Web公开归档与精确副本、Native私有正文存储。251项相关检查及类型/文案/文档通过；当前仍单聚焦，多卡同时挂载及私有附件/引用隔离继续，真实UI/Runtime未验。
-
-- [I03按Thread读取与刷新检查点](execution/i03-thread-projection-result.json)：现有页面的只读打开、刷新、缓存和历史分页已用client/Thread owner；刷新尾读、过期页、删除/重启代次、挂载租约和旧错误保护已接。215项相关检查及类型/文案/文档通过，enter参数与原发送/编辑器源码保持；实际多卡UI、事件分发和各卡文件预览继续。
-
-- [I03实际多卡会话检查点](execution/i03-canvas-multi-result.json)：多卡及镜像、独立输入、稳定原地/侧边实例、每Thread事件读取与窗口预览并集已接。296项相关检查与类型/文案/文档通过；浏览器实际挂载三张生产卡片、模拟Core/文件，验证独立草稿、撤销、局部查找、关闭重开及预览归属/缩放。通知、持久展开恢复、私有附件隔离和真实Core/Runtime/完整应用验证继续，不作为I03完成依据。
-
-
-- [I03多卡通知可见确认检查点](execution/i03-canvas-notification-result.json)：实际卡片来源并集、裁剪/遮挡观察、每Thread确认/独立重试和client围栏已接；245项检查、类型/文案/文档及浏览器9项检查通过。现有隔离Electron通知检查1通过1失败，设置焦点问题在旧Controller对照同样复现并登记研发整改；真实Core通知、公私来源/Host与规模待验。
-
-- [I03展开保存与只读恢复检查点](execution/i03-canvas-recovery-result.json)：精确Host/Owner/Core/Board记录、切页切板保留、显式收起、恢复/停止/重试与saved-input恢复已接；230相关检查及类型/文案/文档通过。真实CanvasWorkspace/Surface/ReactFlow模拟Core完成12步检查，另发现并修复展开白屏；只读运输没有enter/启动Runtime。原编辑器/undo的原子离开、Native完整/异常进程恢复、私有附件隔离及真实平台仍待补齐。
-
-- [I03原编辑器离开事务检查点](execution/i03-canvas-atomic-leave-result.json)：导航失败/拒绝/失效、等待取消与Renderer后续退出检查失败保留同一编辑器和撤销；画板拒绝/未知结果保留实例、核对成功才交接。247相关检查、类型/文案/文档及生产画布mock浏览器验证通过，并修复删除后自动选板循环；Native退出/异常进程/Host与私有附件隔离继续。
-
-- [I03卡片使命交付与累计Diff检查点](execution/i03-canvas-mission-result.json)：复用原Mission说明/启动/交付/活动/累计Diff，核对Thread/Mission标识、来源回原卡片及镜像控件隔离；修复选中节点遮挡真实会话控件。228相关检查与类型/文案/文档、mock前端交互通过；独立持久对象引用、完整私有导航和真实使命运行/平台验收继续。
-
-- [I03私聊卡片材料隔离r1](proposals/canvas-private-materials-r1.md)：16页客户确认版已逐页自审且获明确确认，[证据](execution/i03-private-materials-proposal-result.json)绑定批准文件摘要。继续Core归属、完整输入保留和未知结果恢复；24项验证要求仍待执行，不计作功能通过。
-
-- [I03私聊草稿归属基础](execution/i03-private-scope-foundation-result.json)：r1已确认；闭合codec、旧省略/显式null区分与精确活跃私聊pin校验已编写，原文SQL25项见证/格式/文档通过；Rust两owner未编译执行，生产新接口及新存储尚未接通，不计作完整隔离功能通过。
-
-- [I03私聊草稿与保留输入存储](execution/i03-private-scope-storage-result.json)：已确认r1追加Schema155/Migration205，保留旧默认原值，补材料/引用/资源及编辑范围限制、orphan保留和删除清理。22项本地Rust定向及相关回归通过，旧回执/准入负例保留；新卡片材料接口/完整恢复和平台Runtime资格继续，不判I03完成。
-
-- [I03私聊材料业务服务与按卡片发送](execution/i03-private-composer-service-result.json)：已确认r1的Core七动作、精确读取、分页恢复及按scope消费接原FIFO，17项本地定向检查通过；整份交换/回执回滚和100001字正文保留已验证。运输/客户端、上传准备、编辑接管/完整移回及最终Blob/真实Runtime继续，不计完整24PC或324产品场景通过。
-
-- [I03私聊材料应用入口与客户端能力核对](execution/i03-private-composer-api-result.json)：统一get/mutate/recovery、可信编辑端注入和原UUID只读回查已接两端准入；快照隔离其他位置的令牌和未保存材料。17项Core、29项模拟客户端及定向类型/文档通过；current准入180，历史161保持。UI未启用，上传/编辑/本机意图及实际Host/Native/模型继续待验。
-
-- [I03私聊排队接管与完整移回](execution/i03-private-pending-edit-result.json)：Core 单租约按 client/scope 接管并拒绝旧令牌；空目标迁入、占用目标完整 retained，与 Pending 取消和回执同事务。17项Core及56项既存/模拟客户端检查通过。该检查点之后继续 Renderer 接线；最新进展见下一条，上传/授权和正式24PC/324继续。
-
-- [I03私聊完整输入界面与原请求恢复](execution/i03-private-input-ui-result.json)：生产面板已接完整移回、整份保留交换、排队保存/放弃/接管和本机原请求恢复。76项定向检查及模拟Core三位置挂载通过，包括原连接永久等待后查回结果解除按钮等待；卡片上传/资源授权、迁入/孤立恢复与真实Host/平台/模型仍待，完整24PC/324未验。
-
-- [I03私有文件资源定位](execution/i03-private-resource-result.json)：卡片、排队工作副本与retained按可信编辑端/原对话/位置/材料定位，旧默认JSON保持；Main双入口与缓存保留位置，接管后旧token拒绝、孤立输入保留可读。17项Core、65项客户端及定向types/文档通过；上传/源摘要、实际Host文件链路与新预览UI、完整PC15/324仍待。
-
-2026-10-16分工澄清：[目标描述](execution/goal-description.txt)与[阶段验证规则](ci-cost-policy.md#工程验证与最终用户验收)规定I00–I12由Codex研发和工程验证，客户只审方案/协助环境，I12工程完成后才进行真实软件使用验收；[I03固定收口清单](execution/i03-closeout.json)不设客户阶段门槛。
-
-- [I03上传准备生命周期与旧租约入口](execution/i03-private-upload-lifecycle-result.json)：原意图重试/明确结束/同卡片旧Pending-token恢复已编码，71项客户端检查、定向类型与2项文案检查通过；新Rust和实际HTTP/Native/挂载待阶段集中验证。用户不承担阶段技术验收。
-
-- [I03默认迁入与原位置恢复界面](execution/i03-private-recovery-ui-result.json)：61项定向检查与类型/文案通过，模拟Core的生产组件完成9步交互，包含孤立原位置编辑与未知提交关闭保护。C01登记阶段工程待验，继续独立Mission/Task/Diff引用；实际Host/资源/24PC尚未通过。
-
-- [I03独立对象引用存储](execution/i03-object-reference-storage-result.json)：源码Schema157/Migration207仅追加引用元数据，原对象归属/身份/失效保留已编码；46项原文SQL与19项客户端检查、types通过，新Rust/实际Host未验。独立卡片选择和工作区定位继续，C02未完成。
-
-- [I03独立对象选择与详情](execution/i03-object-reference-ui-result.json)：Mission/历史Task/Diff原路径选择、按需原对象读取及既有工作区接线已编码；66项定向检查和类型通过，模拟Core界面检查通过。C02代码就绪待阶段工程验证，实际Core/Host/跳转未验；继续C03授权文件节点。
-
-- [I03文件节点原来源基础](execution/i03-file-binding-result.json)：源码158/208追加原Thread身份与旧节点一次显式绑定；42项原文SQL、76项客户端/原Main检查及类型通过，1项Windows条件跳过。具体预览权限保持，选择/预览UI和生命周期继续，新增Rust/真实Host未运行，C03未完成。
-
-- [I03文件节点选择与固定预览](execution/i03-file-preview-ui-result.json)：来源选择、旧节点绑定、原文件读者、变化/失效与收起/删除/重开已编码；108项定向检查及类型通过，1项原Windows条件跳过。隔离界面包含删除目标缺陷修复复测；C03代码就绪待阶段工程验证，继续C04临时PTY，实际Core/Host/完整App仍待。
-
-- [I03临时终端移植基础](execution/i03-terminal-foundation-result.json)：闭合请求、原节点来源查询、进程代次和有界原始字节回放、PTY辅助进程源码已加入。纯状态源单独编译执行2项通过，11项原文SQL只读见证通过；helper/完整Core尚未编译，父端受管进程、API/Native/Web/UI和关闭接线继续，C04开发中。
-
-- [I03终端父端与关闭接线](execution/i03-terminal-parent-result.json)：Core会话registry、受管helper、原输入顺序/回执、删除和计划退出已编码；状态源2项复验通过，Core语法与模块格式通过。新增manager/codec、实际PTY/进程树尚未运行，Native/Web/API与终端读者继续，C04开发中，用户无需阶段技术验收。
-
-- [I04原生工具外壳与内容原语](execution/i04-native-tool-primitives-result.json)：40项定向与24组实际产品窗口检查通过；JSON键身份及代码片段缓存缺陷已修复。完整普通/专用工具卡片、搜索/Diff、真实Core链路和一项上游许可文件缺口继续，I04范围不减。
+此前逐步执行日志保留在[旧版项目入口的固定Git提交](https://github.com/knight-bili/coaxi/blob/1e3b455efa8bce4725112aaf7bf6b8036ef99b0e/integration/README.md)。它是历史记录，不作为当前进度页。

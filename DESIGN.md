@@ -1,5 +1,5 @@
 ---
-name: Rovai AI
+name: Coaxi
 description: A quiet, evidence-first desktop workspace for human and agent collaboration.
 colors:
   steel-day: "#526f88"
@@ -31,7 +31,7 @@ spacing:
   xl: "24px"
 ---
 
-# Design System: Rovai AI
+# Design System: Coaxi
 
 ## Overview
 
@@ -44,7 +44,7 @@ Follow [`integration/ui-source-policy.md`](integration/ui-source-policy.md).
 
 **Creative North Star: “Porcelain Day / Steel Night.”**
 
-Rovai AI is a dense but calm desktop workspace: porcelain and graphite surfaces provide quiet
+Coaxi is a dense but calm desktop workspace: porcelain and graphite surfaces provide quiet
 structure while evidence, responsibility and user decisions remain easy to inspect. Porcelain Day
 and Steel Night are two implementations of the same visual world and the same component tree—not
 separate products.

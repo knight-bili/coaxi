@@ -4,7 +4,7 @@ authority: development-routing
 last_updated: 2026-10-12
 ---
 
-# Rovai-ai 开发者指南
+# Coaxi 开发者指南
 
 本目录是本地开发命令的唯一常青入口。根目录
 [`package.json`](../../package.json)中的 scripts 决定命令实际行为；本文档负责说明

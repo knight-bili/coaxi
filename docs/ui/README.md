@@ -7,14 +7,14 @@ target_version: cross-version
 last_updated: 2026-09-28
 ---
 
-# Rovai AI UI 规范
+# Coaxi UI 规范
 
 本文件是 Renderer UI/UX 的稳定路由，不保存版本流水账。开始 UI 工作时先读根目录
 [`DESIGN.md`](../../DESIGN.md)，再按目标读取主题、复杂组件、surface brief、QA 与相关领域合同。
 
 ## 当前视觉系统
 
-Porcelain Day 与 Steel Night 是同一 Rovai AI 视觉世界的两套生产主题。它们共享组件树、功能和
+Porcelain Day 与 Steel Night 是同一 Coaxi 视觉世界的两套生产主题。它们共享组件树、功能和
 状态矩阵；`system` 跟随当前宿主 OS 的应用主题解析策略。全局排版、空间、形状、深度、色彩职责和基础组件
 规则由 [`DESIGN.md`](../../DESIGN.md) 统一拥有。
 

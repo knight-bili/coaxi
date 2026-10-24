@@ -8,13 +8,13 @@ desktop
 
 ## Users
 
-Rovai AI serves developers who coordinate coding agents on their desktop. They need to assign work,
+Coaxi serves developers who coordinate coding agents on their desktop. They need to assign work,
 inspect what each agent did, intervene when approval or recovery is required, and keep collaboration
 state understandable across long-running projects.
 
 ## Product Purpose
 
-Rovai AI is a desktop workspace for long-lived agent teams. It organizes members, Threads, tasks,
+Coaxi is a desktop workspace for long-lived agent teams. It organizes members, Threads, tasks,
 execution, approvals, evidence, recovery and collaborative memory while driving coding-agent
 Runtimes already installed on the user's machine. Success means the user can understand and control
 collaborative agent work without surrendering ownership of the workspace, Runtime configuration or
@@ -44,13 +44,12 @@ coordinates them while preserving which facts came from Rovai Core and which cam
   retained but are not backfilled or included in current Usage denominators.
 - Runtime-reported cost, public-price estimates and Provider billing buckets remain distinct grains.
 - User workspaces, Runtime-native configuration and credentials remain user-owned and local.
-- Rovai AI publishes versioned public releases; compatibility labels describe Rovai's verified evidence,
+- Coaxi is currently a development preview; compatibility labels describe this repository's verified evidence,
   not upstream support promises.
 
 ## Brand Commitments
 
-The product name, macOS application bundle, macOS executable and Helper names are “Rovai AI”.
-“Rovai-ai” remains only where legacy data, the Windows executable or the repository slug requires it.
+The product name is “Coaxi”. Existing installation identifiers, data directories, CLI names and IPC namespaces remain stable for compatibility. Upstream names remain in provenance and licensing.
 Copy is calm, direct and evidence-first. Uncertainty, partial coverage and the next available action
 are stated plainly rather than hidden behind optimistic status language.
 

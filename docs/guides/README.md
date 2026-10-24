@@ -1,26 +1,17 @@
 ---
 document_type: user-guide
 authority: user-guide-routing
-last_updated: 2026-09-29
+last_updated: 2026-10-24
 ---
 
-# 用户指南
+# Coaxi 用户指南
 
-完整使用教程已发布到官网：[中文文档](https://rovai.dev/zh/docs/) · [English documentation](https://rovai.dev/docs/)。
-从下面选择要完成的事情；下载页分别列出 Desktop 与 Server 的版本、安装包和注意事项。
+从[Coaxi 使用说明](coaxi-workbench.md)开始，了解首次启动、队员、模型目录、工程、关闭窗口和旧数据兼容。
 
-| 你想做什么 | 入口 |
-|---|---|
-| 下载、安装与升级 | [下载页](https://rovai.dev/zh/download/) · [下载与安装](https://rovai.dev/zh/docs/installation.html) |
-| 完成第一次任务 | [快速开始](https://rovai.dev/zh/docs/quickstart.html) |
-| 配置队员、智能体和模型 | [队员管理](https://rovai.dev/zh/docs/members.html) · [智能体与模型配置](https://rovai.dev/zh/docs/agents.html) |
-| 组织协作、查看执行与文件 | [多队员协作与交接](https://rovai.dev/zh/docs/collaboration.html) · [执行台](https://rovai.dev/zh/docs/execution.html) · [文件预览与变更](https://rovai.dev/zh/docs/files.html) |
-| 持续推进和积累工作 | [使命板](https://rovai.dev/zh/docs/missions.html) · [定时任务](https://rovai.dev/zh/docs/automations.html) · [记忆](https://rovai.dev/zh/docs/memory.html) |
-| 扩展工具与连接渠道 | [Skills](https://rovai.dev/zh/docs/skills.html) · [MCP](https://rovai.dev/zh/docs/mcp.html) · [渠道](https://rovai.dev/zh/docs/channels.html) |
-| 用浏览器连接桌面端或部署独立 Server | [部署与远程访问](https://rovai.dev/zh/docs/remote.html) |
+- 产品范围与当前验证边界：[融合项目入口](../../integration/README.md)。
+- 开发与隔离运行：[开发者指南](../development/README.md)。
+- 安装技术参考：[安装参考](installation.md)；现有页面含供体资料，以Coaxi当前打包信息为准。
+- 数据与运行技术参考：[操作参考](operations.md)、[Server技术参考](server-access.md)。
+- 平台/智能体验证按[兼容性清单](../runtime-compatibility.md)分别记录。
 
-已有仓库地址继续保留：[安装参考](installation.md)、[操作参考](operations.md)、
-[Server 技术参考](server-access.md)。对应的分步用户教程以上述官网入口为准。
-
-准备参与开发时，请转到[开发者指南](../development/README.md)；实测智能体与平台边界见
-[兼容性清单](../runtime-compatibility.md)。
+原供体官网教程仍可作为来源参考，但不是Coaxi当前下载、版本或安装包的权威入口。Coaxi正式稳定包尚未发布，不将上游下载页作为本产品下载页。

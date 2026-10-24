@@ -4,7 +4,7 @@ authority: documentation-routing
 last_updated: 2026-10-12
 ---
 
-# Rovai-ai 文档导航
+# Coaxi 文档导航
 
 人类用户统一称 User，旧 Session 与别名规则见 [User Naming v1](contracts/user-naming-v1.md)。
 
@@ -16,7 +16,7 @@ last_updated: 2026-10-12
 
 | 你想做什么 | 入口 |
 |---|---|
-| 安装和使用 Rovai | [用户指南](guides/README.md) |
+| 安装和使用 Coaxi | [Coaxi 使用说明](guides/coaxi-workbench.md) |
 | 查看产品界面与实际协作 | [产品展示](product-showcase.md) |
 | 浏览系统架构图解 | [系统架构图解](architecture/system-views.md) |
 | 参与开发 | [开发者指南](development/README.md) |
