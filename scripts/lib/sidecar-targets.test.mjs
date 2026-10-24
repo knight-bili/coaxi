@@ -43,12 +43,12 @@ test('Windows release verification matches the current Core transport versions',
   )
 })
 
-test('maps only the three shipped sidecar targets', () => {
+test('maps only the four shipped sidecar targets', () => {
   assert.equal(hostSidecarTargetKey('darwin', 'arm64'), 'macos-arm64')
   assert.equal(hostSidecarTargetKey('darwin', 'x64'), 'macos-x64')
   assert.equal(hostSidecarTargetKey('win32', 'x64'), 'windows-x64')
-  assert.throws(() => hostSidecarTargetKey('linux', 'x64'), /Unsupported Rovai sidecar host/)
-  assert.throws(() => sidecarTarget('linux-x64'), /Unsupported Rovai sidecar target/)
+  assert.equal(hostSidecarTargetKey('linux', 'x64'), 'linux-x64')
+  assert.equal(sidecarTarget('linux-x64').rustTarget, 'x86_64-unknown-linux-gnu')
   assert.equal(hostServerTargetKey('linux', 'x64'), 'linux-x64')
   assert.equal(serverTarget('linux-x64').rustTarget, 'x86_64-unknown-linux-gnu')
   assert.equal(serverTarget('macos-arm64'), sidecarTarget('macos-arm64'))

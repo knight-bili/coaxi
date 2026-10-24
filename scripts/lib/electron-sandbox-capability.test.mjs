@@ -33,10 +33,10 @@ test('every real Electron fixture uses the shared sandbox capability admission',
     )
     assert.match(
       source,
-      /if \(!admitElectronIntegrationTest\(t\)\) return/,
+      /if\s*\(!admitElectronIntegrationTest\(t\)\)\s*return/u,
       `${file} must run the shared admission`
     )
-    const admissionOffset = source.indexOf('if (!admitElectronIntegrationTest(t)) return')
+    const admissionOffset = source.search(/if\s*\(!admitElectronIntegrationTest\(t\)\)\s*return/u)
     const fixtureOffset = source.indexOf('mkdtemp(')
     assert.ok(
       fixtureOffset === -1 || admissionOffset < fixtureOffset,
