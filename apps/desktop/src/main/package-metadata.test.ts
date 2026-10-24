@@ -9,16 +9,16 @@ const packageMetadata = JSON.parse(readFileSync(
 
 describe('desktop package metadata', () => {
   it('keeps the unified product identity aligned with the Electron bundle metadata', () => {
-    expect(PRODUCT_NAME).toBe('Codeg Rovai Workbench')
+    expect(PRODUCT_NAME).toBe('Coaxi')
     expect(PRODUCT_APPLICATION_ID).toBe('app.codegrovai.workbench.desktop')
     expect(packageMetadata.productName).toBe(PRODUCT_NAME)
     expect(packageMetadata.version).toBe('0.4.8')
     expect(packageMetadata.build.appId).toBe(PRODUCT_APPLICATION_ID)
     expect(packageMetadata.build.productName).toBe(PRODUCT_NAME)
     expect(packageMetadata.build.mac.executableName).toBeUndefined()
-    expect(packageMetadata.build.win.executableName).toBe('Codeg Rovai Workbench')
-    expect(packageMetadata.build.mac.artifactName).toBe('Codeg-Rovai-Workbench-${version}-${arch}.${ext}')
-    expect(packageMetadata.build.win.artifactName).toBe('Codeg-Rovai-Workbench-${version}-${arch}.${ext}')
+    expect(packageMetadata.build.win.executableName).toBe('Coaxi')
+    expect(packageMetadata.build.mac.artifactName).toBe('Coaxi-${version}-${arch}.${ext}')
+    expect(packageMetadata.build.win.artifactName).toBe('Coaxi-${version}-${arch}.${ext}')
     expect(packageMetadata.build.mac.extendInfo.CFBundleDisplayName).toBe(PRODUCT_NAME)
     expect(packageMetadata.build.mac.extendInfo.CFBundleName).toBeUndefined()
   })
@@ -27,7 +27,7 @@ describe('desktop package metadata', () => {
     expect(packageMetadata.build.publish).toEqual([{
       provider: 'github',
       owner: 'knight-bili',
-      repo: 'codeg-rovai-workbench',
+      repo: 'coaxi',
       releaseType: 'draft'
     }])
     expect(packageMetadata.build.mac.target).toEqual(['dir', 'dmg', 'zip'])
@@ -105,6 +105,10 @@ describe('desktop package metadata', () => {
       {
         from: 'resources/bin/windows-x64/rovai.exe',
         to: 'bin/rovai.exe'
+      },
+      {
+        from: 'resources/bin/windows-x64/rovai-computer-helper.exe',
+        to: 'bin/rovai-computer-helper.exe'
       },
       { from: 'out/web', to: 'web-ui' },
       { from: 'skills', to: 'skills' },

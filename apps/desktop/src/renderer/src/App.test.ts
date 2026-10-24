@@ -3829,7 +3829,7 @@ describe('task event projections', () => {
     expect(markup).toContain('aria-label="发送消息"')
     expect(markup).not.toContain('<span class="composer-hint">Enter</span>')
     expect(markup).not.toContain('agent_run.runtime_not_ready')
-    expect(markup).toContain('<option value="agent_1">洛可</option>')
+    expect(markup).toMatch(/class="[^"]*runtime-model-picker-trigger[^"]*"[^>]*>[\s\S]*?洛可/u)
     expect(markup).not.toMatch(/>[^<]*agent_1[^<]*</u)
     expect(markup).not.toMatch(/(?:aria-label|title)="[^"]*agent_1/u)
     expect(markup).not.toContain('Runtime')

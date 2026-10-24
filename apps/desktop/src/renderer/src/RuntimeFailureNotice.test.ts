@@ -11,7 +11,7 @@ import {
 describe('RuntimeFailureNotice', () => {
   it.each([
     ['runtime', 'Claude Code 返回错误'],
-    ['compatibility', 'Claude Code 与当前 Rovai 版本不兼容'],
+    ['compatibility', 'Claude Code 与当前 Coaxi 版本不兼容'],
     ['environment', 'Claude Code 的本机运行环境不可用'],
     ['unknown', 'Claude Code 未能完成运行']
   ] satisfies Array<[RuntimeFailureOrigin, string]>)(
@@ -20,7 +20,7 @@ describe('RuntimeFailureNotice', () => {
       const failure = runtimeFailure(origin)
       expect(runtimeFailureTitle(failure)).toBe(title)
       expect(renderToStaticMarkup(createElement(RuntimeFailureNotice, { failure })))
-        .not.toContain('Rovai 内部错误')
+        .not.toContain('Coaxi 内部错误')
     }
   )
 
@@ -35,7 +35,7 @@ describe('RuntimeFailureNotice', () => {
 
   it('uses Rovai internal error only when Core explicitly attributes the origin to Rovai', () => {
     const failure = runtimeFailure('rovai')
-    expect(runtimeFailureTitle(failure)).toBe('Rovai 内部错误')
+    expect(runtimeFailureTitle(failure)).toBe('Coaxi 内部错误')
     failure.phase = 'model_catalog'
     failure.code = 'runtime_probe_frame_capacity_exceeded'
     failure.summary = 'Rovai 探测读取容量不足'
@@ -61,7 +61,7 @@ describe('RuntimeFailureNotice', () => {
     expect(markup).toContain('agent-run-runtime-failure')
     expect(markup).toContain(`>${message}</p>`)
     expect(markup).not.toContain('Codex CLI')
-    expect(markup).not.toContain('与当前 Rovai 版本不兼容')
+    expect(markup).not.toContain('与当前 Coaxi 版本不兼容')
     if (detail) {
       expect(markup).not.toContain('模型额度不足')
     }

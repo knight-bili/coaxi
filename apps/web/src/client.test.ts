@@ -87,7 +87,7 @@ describe('console transport', () => {
     pending!(Response.json({ result: { schemaVersion: 4 } }))
     await expect(old).rejects.toMatchObject({ name: 'AbortError' })
     for (const [code, expected] of [
-      ['channel_session_expired', '请在运行此服务的 Rovai Desktop 中重新连接账号'],
+      ['channel_session_expired', '请在运行此服务的 Coaxi 中重新连接账号'],
       ['channel_operation_failed', '请重新读取发布状态']
     ]) {
       const next = client.channel({ operation: 'get' })

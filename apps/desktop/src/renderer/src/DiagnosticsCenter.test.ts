@@ -58,8 +58,8 @@ describe('DiagnosticsCenter projections', () => {
       facts: [{ key: 'entryCount', value: '24' }]
     }))).toEqual({
       title: '旧版 Skill 入口待清理',
-      reason: '项目目录中留有旧版 Rovai 派发的 Skill 入口，可以统一清理。',
-      impact: '仅清理确认由 Rovai 派发的旧入口；运行中或无法确认的入口会自动跳过。'
+      reason: '项目目录中留有旧版应用派发的 Skill 入口，可以统一清理。',
+      impact: '仅清理确认由旧版应用派发的入口；运行中或无法确认的入口会自动跳过。'
     })
 
     expect(diagnosticActionForCheck(check({

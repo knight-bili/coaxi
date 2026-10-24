@@ -735,7 +735,7 @@ describe('channel settings service', () => {
     }
     internals.registerDispatcherHandlers()
     channel.on('cardAction', async () => ({
-      toast: { type: 'warning', content: '仅 Rovai Owner 可以选择项目' }
+      toast: { type: 'warning', content: '仅 Coaxi Owner 可以选择项目' }
     }))
 
     await expect(internals.dispatcher.invoke({
@@ -747,7 +747,7 @@ describe('channel settings service', () => {
         action: { tag: 'button', value: { rovaiAction: 'bind_project' } }
       }
     }, { needCheck: false })).resolves.toEqual({
-      toast: { type: 'warning', content: '仅 Rovai Owner 可以选择项目' }
+      toast: { type: 'warning', content: '仅 Coaxi Owner 可以选择项目' }
     })
   })
 
@@ -2495,7 +2495,7 @@ describe('channel settings service', () => {
     await messageHandler({ ...outsider, messageId: 'om_outsider_again' })
     expect(commands.filter(({ method }) => method === 'channels.inbound.observe')).toHaveLength(0)
     expect(harness.send.mock.calls.filter(([, input]) => (
-      (input as { text?: string }).text === '该 Bot 当前仅供 Rovai Owner 使用。'
+      (input as { text?: string }).text === '该 Bot 当前仅供 Coaxi Owner 使用。'
     ))).toHaveLength(1)
 
     await messageHandler(normalizedMessage({
@@ -2584,7 +2584,7 @@ describe('channel settings service', () => {
       }
     })
     expect(nonOwnerResult).toEqual({
-      toast: { type: 'warning', content: '仅 Rovai Owner 可以选择项目' }
+      toast: { type: 'warning', content: '仅 Coaxi Owner 可以选择项目' }
     })
     expect(commands.filter(({ method }) => (
       method === 'channels.feishu.pendingBinding.resolve'
@@ -2628,7 +2628,7 @@ describe('channel settings service', () => {
       })
       expect(result).toEqual({ toast: owner
         ? { type: 'success', content: '已开始快速对话，正在处理消息' }
-        : { type: 'warning', content: '仅 Rovai Owner 可以选择项目' }
+        : { type: 'warning', content: '仅 Coaxi Owner 可以选择项目' }
       })
     }
     expect(harness.updateCard).not.toHaveBeenCalled()
@@ -2825,7 +2825,7 @@ describe('channel settings service', () => {
         })).then(value => { response = value })
         await vi.advanceTimersByTimeAsync(2500)
         expect(response).toEqual({ toast: { type: 'error', content: failure === 'unavailable'
-          ? 'Rovai 执行服务暂不可用，请检查本机 Rovai 状态后重试'
+          ? 'Coaxi 执行服务暂不可用，请检查本机 Coaxi 状态后重试'
           : failure === 'source_error' ? '执行记录暂时无法翻页，请稍后重试'
             : '翻页响应超时，请稍后重试' } })
         release(failure === 'authorize' ? authorized : source)
@@ -3318,7 +3318,7 @@ describe('channel settings service', () => {
       'oc_group',
       { card: expect.objectContaining({
         header: expect.objectContaining({
-          title: { tag: 'plain_text', content: '选择 Rovai 项目' }
+          title: { tag: 'plain_text', content: '选择 Coaxi 项目' }
         })
       }) },
       undefined
@@ -3366,7 +3366,7 @@ describe('channel settings service', () => {
       expect(picker.card.body.elements[0]?.content).toBe([
         '选择一个项目，或直接开始快速对话。',
         `选择项目后，这个${scope}之后都会使用该项目；快速对话不绑定项目。`,
-        ...(!hasProjects ? ['当前没有可用项目。可以直接开始快速对话，或在 Rovai 创建或打开一个项目后刷新。'] : [])
+        ...(!hasProjects ? ['当前没有可用项目。可以直接开始快速对话，或在 Coaxi 创建或打开一个项目后刷新。'] : [])
       ].join('\n\n'))
       expect(picker.card.body.elements.at(-1)).toEqual({
         tag: 'column_set',
@@ -3473,7 +3473,7 @@ describe('channel settings service', () => {
       })
     expect(commands.filter(({ method }) => method === 'channels.inbound.observe')).toHaveLength(1)
     expect(harness.send).not.toHaveBeenCalledWith(expect.anything(), expect.objectContaining({
-      text: '该 Bot 当前仅供 Rovai Owner 使用。'
+      text: '该 Bot 当前仅供 Coaxi Owner 使用。'
     }))
     await service.stop()
   })
@@ -3539,7 +3539,7 @@ describe('channel settings service', () => {
       text: '飞书连接异常，请稍后重试。'
     })
     expect(harness.send).not.toHaveBeenCalledWith(expect.anything(), expect.objectContaining({
-      text: '该 Bot 当前仅供 Rovai Owner 使用。'
+      text: '该 Bot 当前仅供 Coaxi Owner 使用。'
     }))
     await service.stop()
   })

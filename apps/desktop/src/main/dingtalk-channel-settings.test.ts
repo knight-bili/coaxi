@@ -555,7 +555,7 @@ describe('DingTalk channel account connection', () => {
       expect(fixture.welcomeCard).toHaveBeenCalledWith(expect.objectContaining({
         outTrackId: dingtalkOutTrackId('status', 'failure-attention'),
         cardParamMap: expect.objectContaining({
-          msgTitle: 'Rovai 未能处理',
+          msgTitle: 'Coaxi 未能处理',
           staticMsgContent: '附件下载失败，本条消息未交给队员。',
           flowStatus: '5'
         })

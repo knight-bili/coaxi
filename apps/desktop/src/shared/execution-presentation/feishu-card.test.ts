@@ -249,7 +249,7 @@ describe('Feishu execution console card', () => {
     const cmd = `inspect ${'项目/'.repeat(8_000)}`
     const card = executionConsoleCard(snapshot('running', { evidence: [narration(1, '当前正文仍保留。'), runningCommand(2, cmd)] }))
     expect(bodyText(card)).toContain('当前正文仍保留。')
-    expect(bodyText(card)).toContain('当前指令超出飞书卡片大小限制，请在 Rovai 查看。')
+    expect(bodyText(card)).toContain('当前指令超出飞书卡片大小限制，请在 Coaxi 查看。')
     expect(Buffer.byteLength(JSON.stringify(card))).toBeLessThanOrEqual(16_000)
     expect(JSON.stringify(card)).not.toContain(cmd)
   })

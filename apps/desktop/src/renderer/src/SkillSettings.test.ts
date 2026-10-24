@@ -177,21 +177,21 @@ describe('Skill settings', () => {
 
     expect(skillSourcePresentation(bundled)).toMatchObject({
       kind: 'bundled',
-      badgeLabel: 'Rovai',
-      sourceLabel: '随 Rovai 安装',
+      badgeLabel: 'Coaxi',
+      sourceLabel: '随 Coaxi 安装',
       repositoryUrl: null,
       revisionLabel: 'Revision r1'
     })
     expect(skillSourcePresentation(grillDuo)).toMatchObject({
       kind: 'bundled',
-      badgeLabel: 'Rovai',
+      badgeLabel: 'Coaxi',
       repositoryUrl: 'https://github.com/mattpocock/skills',
       repositoryLabel: 'mattpocock/skills',
       revisionLabel: '84fdeffd'
     })
     expect(skillSourcePresentation(grillDuoWithDocs)).toMatchObject({
       kind: 'bundled',
-      badgeLabel: 'Rovai',
+      badgeLabel: 'Coaxi',
       repositoryUrl: 'https://github.com/mattpocock/skills',
       repositoryLabel: 'mattpocock/skills',
       revisionLabel: '84fdeffd'
