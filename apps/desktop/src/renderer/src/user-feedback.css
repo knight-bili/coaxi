@@ -1,4 +1,4 @@
-.feedback-dialog{display:flex;flex-direction:column;gap:18px;width:min(680px,calc(100vw - 32px));max-height:calc(100dvh - 40px);padding:24px;overflow:hidden;color:var(--ink);background:var(--surface-raised);border:1px solid var(--line);border-radius:12px}
+.dialog-content.app-dialog.feedback-dialog{display:flex;flex-direction:column;gap:18px;width:min(680px,calc(100vw - 32px));max-height:calc(100dvh - 40px);padding:24px;overflow:hidden;color:var(--ink);background:var(--surface-raised);border:1px solid var(--line);border-radius:12px}
 /* Follow Rovai's composer width and Codeg's compact chat actions. Only an
    expanded disclosure or a real question occupies a separate row. */
 .conversation-tools-rail { display:flex;align-items:center;flex-wrap:wrap;flex:0 0 auto;gap:0 12px;width:min(var(--conversation-composer-width),calc(100% - 40px));min-width:0;max-height:36dvh;overflow:auto;margin:0 auto;padding:3px 0;border-top:1px solid var(--line);color:var(--muted);font-size:12px;scrollbar-width:thin }

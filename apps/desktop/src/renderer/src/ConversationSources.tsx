@@ -86,7 +86,7 @@ export function ConversationSources({ scope, disabled = false, onInsert }: { sco
     const preview = await conversationToolRequest(client, 'conversationTools.grants.preview', { scope, sourceSessionId: value.source.sourceSessionId, sourceDigest: value.source.sourceDigest, throughSequence: value.source.throughSequence })
     if (observed === generation.current) { setSelected(value.source); setPreview(preview); setConfirmed(null) }
   }) }
-  return <><button type="button" className="quiet-button" disabled={disabled} onClick={() => setOpen(true)}>{t('参考旧讨论')}</button><Dialog.Root open={open} onOpenChange={setOpen}><Dialog.Portal><Dialog.Overlay className="app-dialog-overlay" /><Dialog.Content className="app-dialog-content feedback-dialog" aria-describedby={undefined}>
+  return <><button type="button" className="quiet-button" disabled={disabled} onClick={() => setOpen(true)}>{t('参考旧讨论')}</button><Dialog.Root open={open} onOpenChange={setOpen}><Dialog.Portal><Dialog.Overlay className="dialog-overlay app-dialog-overlay" /><Dialog.Content className="dialog-content app-dialog feedback-dialog" aria-describedby={undefined}>
     <header><Dialog.Title>{t('选择这次参考的资料')}</Dialog.Title><Dialog.Close className="quiet-button" aria-label={t('关闭')}>×</Dialog.Close></header>
     <div className="feedback-dialog-body"><p>{t('由你选择讨论并确认授权，引用加入当前消息后再按原方式发送。只读取选中时已经保存的可见文字和工具名称；图片、隐藏思考和凭据不会一起交给队员。')}</p>
       <p>{t(scope.scopeKind === 'public' ? '当前是团队公开讨论，只列出可公开参考的来源。私聊和私人导入资料可以在私聊或帮手讨论中选择。' : '资料只授权给当前私聊或帮手讨论，不会因此开放给整个团队。')}</p>
