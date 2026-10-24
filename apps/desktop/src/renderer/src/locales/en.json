@@ -756,7 +756,7 @@
   "正在开启…": "Opening...",
   "通过浏览器连接这台电脑。": "Connect to this computer via browser.",
   "正在更新…": "Updating...",
-  "读取失败": "Read failed",
+  "读取失败": "Could not load",
   "本机地址": "Local address",
   "在这台电脑上访问": "Access on this computer",
   "远程地址": "Remote address",
@@ -5620,7 +5620,7 @@
   "属性保存不改绑会话、文件，不重写其他端移动后的位置。": "Saving properties does not rebind conversations or files, or overwrite positions moved on another client.",
   "属性保存不改绑会话或文件，不重写其他端移动后的位置。": "Saving properties does not rebind conversations or files, or overwrite positions moved on another client.",
   "履行队员": "Executing member",
-  "工作中补充": "Follow-up input during work",
+  "工作中补充": "Add guidance",
   "工作树关系待核对": "Worktree relationship needs reconciliation",
   "工作目录 · ": "Working directory · ",
   "工作目录与队伍": "Working directory and team",
@@ -6178,5 +6178,8 @@
   "兼容配置": "Compatible configuration",
   "上次检测：{0}": "Last detected: {0}",
   "目录来自所选智能体": "Catalog from the selected agent",
-  "暂时无法读取队员提问，请重试。": "Unable to load teammate questions. Please try again."
+  "暂时无法读取队员提问，请重试。": "Unable to load teammate questions. Please try again.",
+  "给正在工作的队员补充说明": "Add guidance for the working teammate",
+  "补充给谁": "Teammate",
+  "补充与插话记录": "Guidance and steering history"
 }

@@ -39,3 +39,9 @@
 .conversation-tools-rail .feedback-error details{margin:8px 0;color:var(--muted)}
 .conversation-tools-rail .feedback-error details p{margin:8px 0;font:11px/1.6 var(--font-mono,monospace);overflow-wrap:anywhere}
 .conversation-tools-rail summary:focus-visible{outline:2px solid var(--conversation-focus);outline-offset:2px;border-radius:6px}
+
+.feedback-error{margin:0;color:var(--danger);font-size:12px;line-height:1.7;overflow-wrap:anywhere}
+.feedback-error>p{margin:0 0 6px}
+.feedback-error details{color:var(--muted)}
+.feedback-error details>p{user-select:text;overflow-wrap:anywhere}
+@media(max-width:640px){.conversation-tools-rail{width:calc(100% - 24px)}}
