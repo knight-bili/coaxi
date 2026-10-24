@@ -41,6 +41,21 @@ function fixture() {
 }
 
 describe('临时终端控制器与字节读者', () => {
+  it('退出时先显示最后输出再切为只读，下一代恢复光标和输入状态', async () => {
+    const events: string[] = [], pending = deferred<void>()
+    const reader = new CanvasTerminalReader({ reset: () => events.push('reset'),
+      write: (_bytes, done) => { events.push('write'); void pending.promise.then(done) },
+      setReadOnly: value => events.push('readonly:' + value) })
+    const last = reader.apply(snapshot({ phase: 'exited', cleanupComplete: true,
+      chunks: [{ seq: 1, bytesBase64: btoa('last output') }], throughSeq: 1 }))
+    await Promise.resolve(); await Promise.resolve()
+    expect(events).toEqual(['reset', 'write'])
+    pending.resolve(); await last
+    expect(events).toEqual(['reset', 'write', 'readonly:true'])
+    await reader.apply(snapshot({ generation: next }))
+    expect(events.slice(-2)).toEqual(['reset', 'readonly:false'])
+    reader.dispose()
+  })
   it('读取不启动；未知启动只在显式重试时用原编号/尺寸，Core重启不会重开', async () => {
     const f = fixture()
     const missing = snapshot({ exists: false, generation: null, launchRequestId: null, phase: 'missing', cols: null, rows: null, cleanupComplete: true })

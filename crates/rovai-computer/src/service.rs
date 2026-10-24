@@ -5,7 +5,7 @@ use crate::computer::{
     backend::{ComputerBackend, SnapshotOptions},
     local::LocalBackend,
     protocol::{ClipboardUse, OsPermission},
-    targets::{ReadMark, TargetTable},
+    targets::{AppTarget, ReadMark, TargetTable},
     types::{ActDelivery, ComputerActRequest},
 };
 use crate::{ComputerSwitch, GrantLevel};
@@ -67,7 +67,10 @@ impl Service {
         let windows = self.backend.list_windows(None).await.map_err(failed)?;
         let (entries, _) = self.targets.observe(&windows, None);
         let now = chrono::Utc::now().timestamp_millis();
-        let rows=entries.into_iter().filter(|entry|entry.worth_listing()).map(|entry|json!({"targetId":entry.target_id,"app":entry.app.name,"title":entry.title,"bounds":entry.bounds,"level":entry.grant.as_ref().map(|grant|grant.level).unwrap_or_default(),"shareable":crate::computer::agent::grantable(&entry.app,&self.me,&self.blocklist).is_ok()})).collect::<Vec<_>>();
+        let rows=entries.into_iter().filter(|entry|entry.worth_listing()).map(|entry|{
+            let app_share = self.targets.app_share_of(&entry.target_id);
+            json!({"targetId":entry.target_id,"app":entry.app.name,"appKey":entry.app.key(),"pid":entry.app.pid,"title":entry.title,"bounds":entry.bounds,"minimized":entry.minimized,"hidden":entry.hidden,"wholeApp":app_share.is_some(),"appId":app_share.map(|share|share.app_id),"level":entry.grant.as_ref().map(|grant|grant.level).unwrap_or_default(),"shareable":crate::computer::agent::grantable(&entry.app,&self.me,&self.blocklist).is_ok()})
+        }).collect::<Vec<_>>();
         self.targets.sweep(
             now,
             Some(std::time::Duration::from_secs(1800)),
@@ -135,7 +138,28 @@ impl Service {
         }
         let id = request.target_id.context("computer.target_required")?;
         let now = chrono::Utc::now().timestamp_millis();
-        if request.operation == "share" {
+        if request.operation == "thumbnail" {
+            // 原版选择器的本机预览，不授予模型窗口读取权限。
+            let Some(entry) = self.targets.get(&id) else { return Ok(json!({"thumbnail":null})) };
+            if entry.gone || entry.minimized == Some(true) || entry.hidden == Some(true)
+                || crate::computer::agent::grantable(&entry.app, &self.me, &self.blocklist).is_err() {
+                return Ok(json!({"thumbnail":null}));
+            }
+            let capture = self.backend.capture(entry.identity.pid, entry.identity.window_id, Some(480)).await;
+            self.refresh().await?;
+            ensure!(self.enabled.load(Ordering::Acquire) && self.stop.load(Ordering::Acquire) == stop, "computer.stopped");
+            if !self.targets.get(&id).is_some_and(|current| !current.gone && current.identity == entry.identity) {
+                return Ok(json!({"thumbnail":null}));
+            }
+            return match capture {
+                Ok(value) => Ok(json!({"thumbnail":format!("data:image/png;base64,{}",value.png_base64)})),
+                Err(crate::computer::backend::BackendError::PermissionMissing(_)
+                    | crate::computer::backend::BackendError::NoSuchWindow
+                    | crate::computer::backend::BackendError::Refused(crate::computer::backend::ActRefusal::Occluded, _)) => Ok(json!({"thumbnail":null})),
+                Err(error) => Err(failed(error)),
+            };
+        }
+        if request.operation == "share" || request.operation == "share_app" {
             let level = request.level.context("computer.level_required")?;
             if level == GrantLevel::None {
                 self.backend
@@ -145,9 +169,11 @@ impl Service {
                     .await
                     .map_err(failed)?;
             }
-            self.targets
-                .share(&id, level, now, &self.me, &self.blocklist)
-                .map_err(failed)?;
+            if request.operation == "share_app" {
+                self.targets.share_app(AppTarget::Window(&id), level, now, &self.me, &self.blocklist).map_err(failed)?;
+            } else {
+                self.targets.share(&id, level, now, &self.me, &self.blocklist).map_err(failed)?;
+            }
             return Ok(json!({"shared":self.targets.shared()}));
         }
         let ttl = Some(std::time::Duration::from_secs(1800));

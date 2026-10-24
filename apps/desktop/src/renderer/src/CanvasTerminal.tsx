@@ -67,7 +67,7 @@ export function CanvasTerminal({ row, scope, terminalVersion, disabled = false }
         term.reset()
         // The accessibility live region also belongs to this generation, not the previous shell.
         term.options.screenReaderMode = false; term.options.screenReaderMode = true
-      }, write: (bytes, done) => term.write(bytes, done) }), detach = controller.attach(reader.apply)
+      }, write: (bytes, done) => term.write(bytes, done), setReadOnly: value => { if (value) term.write('\x1b[?25l') } }), detach = controller.attach(reader.apply)
       const measure = () => {
         const dimensions = sizing.proposeDimensions()
         if (dimensions && box.current && box.current.clientWidth > 0 && box.current.clientHeight > 0) {
@@ -152,7 +152,8 @@ export function CanvasTerminal({ row, scope, terminalVersion, disabled = false }
     {state?.outputTruncated && <p className="canvas-terminal-issue"><UiText zh="仅保留最近的终端输出，更早内容已丢弃。" /></p>}
     {current?.issue && <p className="canvas-terminal-issue" role="status"><UiText zh="终端运行或回收出现问题，请核对后重新读取。" /></p>}
     {current?.exitCode != null && <p className="canvas-terminal-issue">{uiAttribute('退出码：{0}', String(current.exitCode))}</p>}
-    <div ref={box} className="canvas-terminal-emulator" dir="ltr" />
+    {current?.phase === 'exited' && <p className="canvas-terminal-issue" role="status"><UiText zh="终端已退出，以下保留只读输出。可重新启动或关闭终端。" /></p>}
+    <div ref={box} className="canvas-terminal-emulator" data-read-only={!controller?.inputReady()} dir="ltr" />
     {showKeys && <div className="canvas-terminal-keys" role="toolbar" aria-label={uiAttribute('终端快捷键')}>
       {(['ctrl', 'alt'] as const).map(key => <button key={key} type="button" aria-pressed={modifiers[key]} onPointerDown={event => event.preventDefault()} onClick={() => { mods.current = { ...mods.current, [key]: !mods.current[key] }; setModifiers(mods.current); terminal.current?.focus() }}>{key === 'ctrl' ? 'Ctrl' : 'Alt'}</button>)}
       {TERMINAL_KEYS.map(([key, label]) => <button key={key} type="button" disabled={busy || !controller?.inputReady()} onPointerDown={event => event.preventDefault()} onClick={() => {

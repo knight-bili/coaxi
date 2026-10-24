@@ -96,3 +96,62 @@
 [data-theme="night"] .workspace-workbench .codeg-native-rich .dark\:text-green-300 { color:var(--color-green-300); }
 [data-theme="night"] .workspace-workbench .codeg-native-rich .dark\:text-red-300 { color:var(--color-red-300); }
 [data-theme="night"] .workspace-workbench .codeg-native-rich .dark\:text-blue-300 { color:var(--color-blue-300); }
+
+/* Codeg ComputerWindowPicker: fixed header, app groups, thumbnail tiles and independent scrolling. */
+.workbench-computer,.workbench-browser{height:100%}
+.workbench-computer{width:100%;max-width:1080px;margin-inline:auto}
+.workbench-computer-heading{flex:none;padding:12px 16px}
+.workbench-computer-heading h2{font-size:18px;font-weight:600;margin:0 0 8px}
+.workbench-computer-heading>p{font-size:13px;line-height:1.6;color:var(--muted);margin:0 0 14px}
+.workbench-computer-tools{display:flex;align-items:center;flex-wrap:wrap;gap:8px 16px;font-size:12px}
+.workbench-computer-tools>label{display:inline-flex;align-items:center;gap:6px}
+.workbench-computer-system{font-size:12px;margin-top:12px}
+.workbench-computer-system>summary{color:var(--muted);cursor:pointer}
+.workbench-computer-system .workbench-toolbar{padding:8px 0;gap:8px;border:0}
+.workbench-computer-summary{flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line);font-size:12px;color:var(--muted)}
+.workbench-computer-summary>div{display:flex;align-items:center;gap:8px}
+.workbench-computer-summary strong{font-weight:500;color:var(--violet)}
+.workbench-computer-summary .quiet-button{display:inline-flex;align-items:center;gap:6px}
+.workbench-computer-summary .workbench-stop-sharing{color:var(--danger)}
+.workbench-bulk-sharing{position:relative;color:var(--ink)}
+.workbench-bulk-sharing>summary{display:flex;align-items:center;gap:6px;list-style:none;cursor:pointer;padding:7px 12px;border:1px solid var(--line);border-radius:999px;background:var(--surface-subtle)}
+.workbench-bulk-sharing>summary[aria-disabled=true]{opacity:.5;cursor:default}
+.workbench-bulk-sharing>div{position:absolute;right:0;top:calc(100% + 6px);z-index:5;min-width:160px;padding:6px;background:var(--surface-raised);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow-float)}
+.workbench-bulk-sharing button{display:block;border:0;border-radius:6px;padding:8px;width:100%;text-align:left;background:transparent;color:inherit}
+.workbench-bulk-sharing button:hover{background:var(--surface-hover)}
+.workbench-window-groups{min-height:0;padding:16px;overscroll-behavior:contain}
+.workbench-window-groups>section+section{margin-top:24px}
+.workbench-window-group-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:0 0 10px}
+.workbench-window-group-heading h3{margin:0;font-size:13px;color:var(--ink)}
+.workbench-window-group-heading h3 span{font-weight:400;color:var(--muted)}
+.workbench-window-group-heading>div{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px}
+.workbench-window-group-heading .workbench-share-level{width:192px}
+.workbench-window-grid{grid-template-columns:repeat(auto-fill,minmax(208px,1fr))}
+.workbench-window-tile{padding:0;gap:0;overflow:hidden;border-radius:16px}
+.workbench-window-tile[data-level=read]{border-color:var(--violet);box-shadow:0 0 0 2px color-mix(in srgb,var(--violet) 18%,transparent)}
+.workbench-window-tile[data-level=control]{border-color:var(--danger);box-shadow:0 0 0 2px color-mix(in srgb,var(--danger) 18%,transparent)}
+.workbench-window-cover{position:relative;border-bottom:1px solid var(--line)}
+.workbench-window-picture{aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;color:var(--muted);background:var(--surface-sunken)}
+.workbench-window-picture img{max-width:calc(100% - 16px);max-height:calc(100% - 16px);object-fit:contain;border-radius:4px}
+.workbench-window-picture .is-loading{opacity:.35}
+.workbench-window-badge{position:absolute;top:8px;left:8px;padding:5px 8px;font-size:11px;border-radius:999px;background:var(--surface);color:var(--muted)}
+.workbench-window-badge.is-app{left:auto;right:8px}
+.workbench-window-info{padding:10px;min-width:0}
+.workbench-window-info>strong{display:block;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.workbench-window-info>p{font-size:12px;color:var(--muted);margin:4px 0 12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.workbench-window-info>small{display:block;margin-top:8px;color:var(--muted)}
+.workbench-share-level{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:2px;padding:2px;border-radius:999px;background:var(--surface-hover)}
+.workbench-share-level>button{border:0;border-radius:999px;padding:5px 4px;font-size:11px;line-height:1.4;color:var(--muted);background:transparent;white-space:nowrap;cursor:pointer}
+.workbench-share-level>button[aria-pressed=true]{background:var(--surface-raised);color:var(--ink)}
+.workbench-share-level>button[data-level=read][aria-pressed=true]{background:var(--violet);color:var(--primary-foreground)}
+.workbench-share-level>button[data-level=control][aria-pressed=true]{background:var(--danger);color:var(--primary-foreground)}
+.workbench-share-level>button:disabled{cursor:default}
+.workbench-window-actions{display:flex;gap:6px;margin-top:8px}
+.workbench-window-actions .quiet-button{font-size:11px;padding:4px 6px}
+.workbench-browser>.workbench-empty,.workbench-browser-preview>.workbench-empty,.workbench-window-groups>.workbench-empty{display:flex;flex:1;min-height:100%;align-items:center;justify-content:center;flex-direction:column;text-align:center;gap:12px;padding:24px;box-sizing:border-box}
+.workbench-browser>.workbench-empty{min-height:0}
+.workbench-empty>p{margin:0;max-width:42ch;line-height:1.7}
+.workbench-terminal-tab{display:inline-flex;align-items:center;border-radius:8px}
+.workbench-terminal-tab.is-active{background:var(--surface-selected)}
+.workbench-terminal-tab>.quiet-button{display:inline-flex;align-items:center;gap:6px;background:transparent}
+.workbench-terminal-tab>.quiet-button:last-child{padding-inline:5px}

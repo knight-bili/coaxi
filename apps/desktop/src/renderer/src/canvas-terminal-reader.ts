@@ -1,7 +1,7 @@
 import type { CanvasTerminalSnapshot } from '@contracts'
 import { uiAttribute } from './interface-language'
 
-type TerminalWriter = { reset(): void; write(bytes: Uint8Array, callback: () => void): void }
+type TerminalWriter = { reset(): void; write(bytes: Uint8Array, callback: () => void): void; setReadOnly?(value: boolean): void }
 
 /** Raw bytes reach one emulator in sequence; the callback is the redraw backpressure boundary. */
 export class CanvasTerminalReader {
@@ -31,6 +31,7 @@ export class CanvasTerminalReader {
         })
         this.through = chunk.seq
       }
+      if (!this.disposed) this.terminal.setReadOnly?.(['missing', 'exited', 'failed'].includes(snapshot.phase))
     })
     return this.tail
   }

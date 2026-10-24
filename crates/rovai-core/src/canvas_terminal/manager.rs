@@ -668,7 +668,7 @@ pub(crate) fn default_launch(
             "-NoProfile",
             "-NoExit",
             "-Command",
-            "[Console]::OutputEncoding = [System.Text.Encoding]::UTF8",
+            "[Console]::InputEncoding = [Console]::OutputEncoding = $OutputEncoding = [System.Text.UTF8Encoding]::new($false)",
         ],
         "bash" | "zsh" | "sh" | "dash" | "ksh" | "ash" | "mksh" | "busybox" | "fish" => {
             vec!["-l", "-i"]

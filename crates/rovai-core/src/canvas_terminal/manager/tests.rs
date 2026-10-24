@@ -15,6 +15,13 @@ fn default_shell_launch_uses_a_windows_compatible_executable_path() {
     assert!(!launch.shell.to_string_lossy().starts_with(r"\\?\"));
     assert_eq!(launch.cwd.canonicalize().unwrap(), directory);
     assert!(!launch.cwd.to_string_lossy().starts_with(r"\\?\"));
+    if matches!(launch.shell.file_stem().and_then(|name| name.to_str()), Some("powershell" | "pwsh")) {
+        let initialization = launch.args.last().unwrap();
+        assert!(initialization.contains("[Console]::InputEncoding"));
+        assert!(initialization.contains("[Console]::OutputEncoding"));
+        assert!(initialization.contains("$OutputEncoding"));
+        assert!(initialization.contains("UTF8Encoding"));
+    }
 }
 
 fn fixture() -> (Arc<Manager>, Arc<Entry>, mpsc::Receiver<Control>, String) {
