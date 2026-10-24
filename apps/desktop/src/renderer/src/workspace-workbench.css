@@ -20,7 +20,9 @@
  .workspace-workbench .workbench-forge-panes { grid-template-columns:minmax(120px,35%) minmax(0,1fr); }
 }
 .workbench-toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;flex-shrink:0;padding:8px 0;border-bottom:1px solid var(--line)}
-.workbench-toolbar input{flex:1;min-width:160px}.workbench-toolbar span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.workbench-toolbar input:not([type="checkbox"]):not([type="radio"]){flex:1;min-width:160px}.workbench-toolbar span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.workbench-toolbar label:has(>input:is([type="checkbox"],[type="radio"])) { display:inline-flex;align-items:center;gap:6px;font-size:12px;line-height:1.5; }
+.workbench-toolbar input:is([type="checkbox"],[type="radio"]) { min-width:0;width:15px;height:15px;flex:0 0 15px; }
 .workbench-draft-comparison{flex:none;min-width:0;max-height:32vh;overflow:auto;padding:8px 0;border-bottom:1px solid var(--line);font-size:12px;scrollbar-width:thin}
 .workbench-draft-comparison details{padding:6px 0}
 .workbench-draft-comparison pre{white-space:pre-wrap;overflow-wrap:anywhere;color:var(--ink);background:var(--surface-subtle);padding:8px;border-radius:6px}
