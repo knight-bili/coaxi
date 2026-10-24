@@ -681,7 +681,7 @@ pub(crate) fn default_launch(
     Ok(HelperLaunch {
         // Windows PowerShell 的 .NET 初始化不兼容普通磁盘路径的 verbatim 前缀。
         shell: dunce::canonicalize(shell)?,
-        cwd: directory,
+        cwd: dunce::simplified(&directory).to_path_buf(),
         args,
         cols: size.cols(),
         rows: size.rows(),

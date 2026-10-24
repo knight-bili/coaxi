@@ -5,7 +5,7 @@ use super::*;
 fn default_shell_launch_uses_a_windows_compatible_executable_path() {
     let directory = std::env::temp_dir().canonicalize().unwrap();
     let launch = default_launch(
-        directory,
+        directory.clone(),
         Size::new(80, 24).unwrap(),
         &crate::runtime_discovery::RuntimeSearchEnvironment::for_test_paths(1, vec![]),
     )
@@ -13,6 +13,8 @@ fn default_shell_launch_uses_a_windows_compatible_executable_path() {
     assert!(launch.shell.is_file());
     assert_eq!(launch.shell, dunce::canonicalize(&launch.shell).unwrap());
     assert!(!launch.shell.to_string_lossy().starts_with(r"\\?\"));
+    assert_eq!(launch.cwd.canonicalize().unwrap(), directory);
+    assert!(!launch.cwd.to_string_lossy().starts_with(r"\\?\"));
 }
 
 fn fixture() -> (Arc<Manager>, Arc<Entry>, mpsc::Receiver<Control>, String) {
