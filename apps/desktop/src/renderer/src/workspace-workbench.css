@@ -155,3 +155,5 @@
 .workbench-terminal-tab.is-active{background:var(--surface-selected)}
 .workbench-terminal-tab>.quiet-button{display:inline-flex;align-items:center;gap:6px;background:transparent}
 .workbench-terminal-tab>.quiet-button:last-child{padding-inline:5px}
+
+.workbench-empty>p{text-wrap:balance}
