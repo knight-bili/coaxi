@@ -110,7 +110,7 @@ describe('Channel settings', () => {
     expect(markup).not.toContain('aria-disabled="true"')
     expect(markup).not.toContain('channel-provider-tab is-disabled')
     expect(markup).not.toContain('Telegram')
-    expect(markup).toContain('只有 Rovai Owner 可以从外部渠道触发队员')
+    expect(markup).toContain('只有 Coaxi Owner 可以从外部渠道触发队员')
     expect(markup).toContain('飞书中的 Owner 消息不获得本机管理权限')
     expect(markup).toContain('项目绝对路径不会发送到外部渠道')
     expect(markup).not.toContain('已授权用户')
