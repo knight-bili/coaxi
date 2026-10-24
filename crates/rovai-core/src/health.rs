@@ -3104,7 +3104,23 @@ pub async fn codex_model_catalog(path: &Path) -> Result<Value> {
                     bail!("model/list exceeded the pagination safety limit");
                 }
             }
-            Ok::<_, anyhow::Error>(json!({"data": models}))
+            let mut catalog = json!({"data": models});
+            // A native recommendation is not the user's configured default. Read only
+            // the model ID from this same process; never retain config layers or secrets.
+            let config = timeout(Duration::from_secs(2), async {
+                write_json_line(stdin, &json!({
+                    "method": "config/read", "id": request_id + 1,
+                    "params": {"includeLayers": false}
+                })).await?;
+                read_rpc_result(lines, request_id + 1).await
+            }).await;
+            if let Ok(Ok(config)) = config {
+                if let Some(model) = config.pointer("/config/model").and_then(Value::as_str)
+                    .filter(|id| !id.trim().is_empty() && !id.chars().any(char::is_control)) {
+                    catalog["_coaxiConfiguredModel"] = Value::String(model.to_string());
+                }
+            }
+            Ok::<_, anyhow::Error>(catalog)
         };
         timeout(Duration::from_secs(30), query)
             .await

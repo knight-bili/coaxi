@@ -74,7 +74,7 @@ describe('AboutUpdatesSettingsView', () => {
       availableRelease: release,
       failureReason: 'network'
     }), { product: 'server' })
-    expect(markup).toContain('href="https://github.com/knight-bili/codeg-rovai-workbench/releases"')
+    expect(markup).toContain('href="https://github.com/knight-bili/coaxi/releases"')
     expect(markup).not.toContain('https://github.com/murray17/rovai-ai')
     expect(markup).not.toContain('/releases/tag/')
     const bridge = render(snapshot({
@@ -82,14 +82,14 @@ describe('AboutUpdatesSettingsView', () => {
       availableRelease: { ...release, version: '0.4.1' },
       failureReason: 'network'
     }), { product: 'server' })
-    expect(bridge).toContain('href="https://github.com/knight-bili/codeg-rovai-workbench/releases"')
+    expect(bridge).toContain('href="https://github.com/knight-bili/coaxi/releases"')
     expect(bridge).not.toContain('/releases/tag/server-v0.4.1')
 
     const withoutReleaseTag = render(snapshot({
       status: 'check_failed',
       failureReason: 'updater_unavailable'
     }), { product: 'server' })
-    expect(withoutReleaseTag).toContain('href="https://github.com/knight-bili/codeg-rovai-workbench/releases"')
+    expect(withoutReleaseTag).toContain('href="https://github.com/knight-bili/coaxi/releases"')
     expect(withoutReleaseTag).not.toContain('/releases/tag/')
   })
   it('always shows the installed version and keeps all update mutations user initiated', () => {

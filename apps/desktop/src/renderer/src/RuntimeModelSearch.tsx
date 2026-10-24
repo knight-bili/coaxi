@@ -7,7 +7,7 @@ import { UiText, uiAttribute } from './interface-language'
 const DEFAULT_MODEL = 'runtime_default'
 const normalize = (text: string): string => text.normalize('NFKC').trim().toLocaleLowerCase()
 
-export function RuntimeModelSearch({ open, onOpenChange, models, value, label, disabled, loading, failed, notice, onRetry, onSelect }: {
+export function RuntimeModelSearch({ open, onOpenChange, models, value, label, disabled, loading, failed, notice, defaultModelId, source, onRetry, onSelect }: {
   open: boolean
   onOpenChange(open: boolean): void
   models: ModelDescriptor[]
@@ -17,6 +17,8 @@ export function RuntimeModelSearch({ open, onOpenChange, models, value, label, d
   loading: boolean
   failed: boolean
   notice: string | null
+  defaultModelId?: string | null
+  source?: { version: string | null; path: string | null; observedAt: string | null }
   onRetry(): void
   onSelect(value: string): void
 }): React.JSX.Element {
@@ -127,6 +129,10 @@ export function RuntimeModelSearch({ open, onOpenChange, models, value, label, d
           <svg aria-hidden="true" viewBox="0 0 16 16"><path d="m4 4 8 8M4 12l8-8" /></svg>
         </button>}
       </div>
+      {source && <p className="runtime-model-source" title={[source.version, source.path, source.observedAt].filter(Boolean).join('\n')}>
+        <span>{source.version ? uiAttribute('上次检测：{0}', source.version) : uiAttribute('目录来自所选智能体')}</span>
+        {source.observedAt && <time dateTime={source.observedAt}>{new Date(source.observedAt).toLocaleString()}</time>}
+      </p>}
       {notice && <div className="runtime-model-picker-notice" role="status">
         <span>{notice}</span>
         <button type="button" className="runtime-model-picker-retry" disabled={disabled} onClick={onRetry}><UiText zh={"重试"} /></button>
@@ -167,7 +173,9 @@ export function RuntimeModelSearch({ open, onOpenChange, models, value, label, d
             id={`${id}-option-${resultIds.length}`} className="runtime-model-picker-item"
             data-highlighted={active === DEFAULT_MODEL ? '' : undefined} title={uiAttribute("跟随智能体默认")}
             onMouseDown={event => event.preventDefault()} onPointerMove={() => setActiveId(DEFAULT_MODEL)} onClick={() => choose(DEFAULT_MODEL)}>
-            <span className="runtime-model-picker-copy"><strong><UiText zh={"默认"} /></strong></span>
+            <span className="runtime-model-picker-copy"><strong><UiText zh={"默认"} /></strong>
+              {defaultModelId && <small className="is-code" title={uiAttribute('配置快照；项目设置可能覆盖，实际模型以运行回执为准。')}>{defaultModelId}</small>}
+            </span>
             <span className="runtime-model-picker-check">{value === DEFAULT_MODEL && <RuntimePickerCheck />}</span>
           </button>
         </div>

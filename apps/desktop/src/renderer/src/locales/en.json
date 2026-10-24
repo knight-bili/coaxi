@@ -6167,5 +6167,15 @@
   "自定义 CSS": "Custom CSS",
   "阻止": "Block",
   "Telegram / 微信": "Telegram / WeChat",
-  "输出": "Output"
+  "输出": "Output",
+  "Coaxi 默认": "Coaxi default",
+  "仅清理确认由旧版应用派发的入口；运行中或无法确认的入口会自动跳过。": "Only entries confirmed to have been distributed by the earlier app are removed. Active or unverified entries are skipped.",
+  "原生智能体会话请使用“导入本地会话”。本入口迁入兼容 Core 工作区的会话、画布、队员、使命和目录内文件。外部工程、共享技能库与模型原生目录继续保留在原位置。": "Use Import local sessions for native agent conversations. This imports conversations, canvases, teammates, missions and local files from a compatible Core workspace. External projects, shared skill libraries and native model directories remain in their original locations.",
+  "目录来源": "Catalog source",
+  "默认 · {0}": "Default · {0}",
+  "配置快照；项目设置可能覆盖，实际模型以运行回执为准。": "Configuration snapshot; project settings may override it. The runtime response determines the actual model.",
+  "内置参考价": "Built-in reference prices",
+  "兼容配置": "Compatible configuration",
+  "上次检测：{0}": "Last detected: {0}",
+  "目录来自所选智能体": "Catalog from the selected agent"
 }

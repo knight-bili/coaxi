@@ -25,6 +25,21 @@ import {
 const styles = readFileSync(new URL('./styles.css', import.meta.url), 'utf8')
 
 describe('runtime model catalog source', () => {
+  it('shows the configured Codex default without turning it into an explicit model choice', () => {
+    const installation = runtimeInstallation('codex-cli')
+    installation.snapshot!.models.push({
+      id: 'codex://runtime-default', displayName: 'provider-configured-model',
+      hidden: true, deprecated: false, isDefault: true, options: []
+    })
+    expect(displayableInstallationModels(installation).some(model => model.id === 'codex://runtime-default')).toBe(false)
+    const draft = draftFromDefaults(installation.memberRuntimeDefaults!)
+    const markup = renderToStaticMarkup(createElement(MemberRuntimeParameters, {
+      adapterKind: 'codex-cli', installation, draft, disabled: false, onChange: () => undefined
+    }))
+    expect(markup).toContain('provider-configured-model')
+    expect(draft.model).toEqual({ mode: 'runtime_default' })
+  })
+
   it('keeps expired same-environment history displayable without accepting invalidated history', () => {
     const installation = runtimeInstallation('codex-cli')
     installation.modelCatalog.status = 'expired'

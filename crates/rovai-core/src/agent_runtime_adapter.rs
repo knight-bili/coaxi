@@ -1676,7 +1676,8 @@ pub fn codex_models(catalog: &Value) -> Result<Vec<ModelDescriptor>> {
         .get("data")
         .and_then(Value::as_array)
         .context("Codex model/list catalog did not include data")?;
-    values
+    let mut selection_ids = std::collections::BTreeSet::new();
+    let mut models = values
         .iter()
         .map(|value| {
             let id = value
@@ -1685,6 +1686,9 @@ pub fn codex_models(catalog: &Value) -> Result<Vec<ModelDescriptor>> {
                 .and_then(Value::as_str)
                 .filter(|id| !id.trim().is_empty())
                 .context("Codex model is missing a selection value")?;
+            if id == "codex://runtime-default" || !selection_ids.insert(id.to_string()) {
+                anyhow::bail!("Codex model catalog contains a duplicate or reserved selection value");
+            }
             let display_name = value
                 .get("displayName")
                 .and_then(Value::as_str)
@@ -1738,7 +1742,17 @@ pub fn codex_models(catalog: &Value) -> Result<Vec<ModelDescriptor>> {
                 options,
             })
         })
-        .collect()
+        .collect::<Result<Vec<_>>>()?;
+    if let Some(model) = catalog.get("_coaxiConfiguredModel").and_then(Value::as_str)
+        .filter(|id| !id.trim().is_empty() && !id.chars().any(char::is_control)) {
+        // Display-only marker, excluded from explicit choices and native requests.
+        models.push(ModelDescriptor {
+            id: "codex://runtime-default".into(), display_name: model.to_string(),
+            description: None, runtime_metadata: None, is_default: true,
+            hidden: true, deprecated: false, options: Vec::new(),
+        });
+    }
+    Ok(models)
 }
 
 fn humanize_identifier(value: &str) -> String {
@@ -4524,6 +4538,12 @@ mod tests {
         }]})).unwrap();
         assert_eq!(catalog[0].id, "native-selection-id");
         assert!(!catalog[0].deprecated, "an upgrade recommendation does not revoke access");
+        assert!(codex_models(&json!({"data":[{"id":"a","model":"same"},{"id":"b","model":"same"}]})).is_err());
+        let defaults = codex_models(&json!({"data":[],"_coaxiConfiguredModel":"private-model"})).unwrap();
+        assert_eq!(defaults[0].id, "codex://runtime-default");
+        assert_eq!(defaults[0].display_name, "private-model");
+        assert!(defaults[0].hidden && defaults[0].options.is_empty());
+        assert!(codex_models(&json!({"data":[],"_coaxiConfiguredModel":"bad\nvalue"})).unwrap().is_empty());
         assert!(codex_models(&json!({"data":[{"id":"label", "model":""}]})).is_err());
         assert!(codex_models(&json!({"data":[{"id":"label", "model":12}]})).is_err());
         assert_eq!(codex_models(&json!({"data":[{"id":"legacy-id"}]})).unwrap()[0].id, "legacy-id");

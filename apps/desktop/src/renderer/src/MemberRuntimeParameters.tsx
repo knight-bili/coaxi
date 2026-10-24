@@ -668,6 +668,8 @@ function RuntimeModelPicker({
     ? selectableModels(activeLiveCatalog.models)
     : initialModels
   const canFilterOptions = modelCatalogCanValidateOptions(initialCache, liveCatalog)
+  const defaultModelId = (activeLiveCatalog?.models ?? (initialModels.length ? installation.snapshot?.models ?? [] : []))
+    .find(model => model.id === 'codex://runtime-default')?.displayName ?? null
   const explicit = draft.model.mode === 'explicit' ? draft.model : null
   const selectedModel = explicit
     ? models.find((model) => model.id === explicit.modelId) ?? null
@@ -733,7 +735,7 @@ function RuntimeModelPicker({
     refreshStatus: loading ? 'joined' : activeLiveCatalog?.refreshStatus ?? null
   })
   const triggerLabel = draft.model.mode === 'runtime_default'
-    ? uiAttribute('默认')
+    ? defaultModelId ? uiAttribute('默认 · {0}', defaultModelId) : uiAttribute('默认')
     : selectedModel?.displayName ?? draft.model.modelId
 
   return (
@@ -748,6 +750,8 @@ function RuntimeModelPicker({
         models={models}
         value={selectedValue}
         label={triggerLabel}
+        defaultModelId={defaultModelId}
+        source={{ version: installation.snapshot?.reportedVersion ?? null, path: installation.executablePath, observedAt: cache.observedAt }}
         disabled={disabled}
         loading={loading}
         failed={refreshFailed || persistedRefreshFailed}
