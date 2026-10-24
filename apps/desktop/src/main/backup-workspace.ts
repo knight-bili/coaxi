@@ -141,7 +141,7 @@ export class BackupWorkspace{
     try{
       for(const [id,value]of this.legacySelections)if(value.expires<Date.now())this.legacySelections.delete(id)
       if(operation==='legacy_inspect'){
-        const chosen=await dialog.showOpenDialog(owner,{title:'选择已退出的旧 Rovai Core 数据目录',properties:['openDirectory']})
+        const chosen=await dialog.showOpenDialog(owner,{title:'选择已退出的旧 Coaxi Core 数据目录',properties:['openDirectory']})
         if(chosen.canceled||!chosen.filePaths[0])return null
         if(this.legacySelections.size>=16)throw new Error('migration.too_many_selections')
         const value=await this.execute<{preview:Omit<LegacyDataPreview,'selectionId'>}>('legacy-inspect',root,undefined,'',event,'backup',['--source-dir',chosen.filePaths[0]])

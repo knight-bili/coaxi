@@ -28,7 +28,7 @@ export function BrowserSettingsDialog({api, onChanged}: {api: BrowserWorkspaceAp
   }
   return <Dialog.Root open={open} onOpenChange={next => { if (!busy) setOpen(next) }}>
     <Dialog.Trigger asChild><button type="button"><Settings2 size={14}/>{t('浏览设置')}</button></Dialog.Trigger>
-    <Dialog.Portal><Dialog.Overlay className="dialog-overlay"/><AppDialogContent width="wide" tone="neutral"><AppDialogHeader title={t('浏览器设置')} description={t('网站规则、浏览代理和开发工具沿用 Codeg 的设置方式。保存后会收回已共享页面权限。')} closeDisabled={busy}/>
+    <Dialog.Portal><Dialog.Overlay className="dialog-overlay"/><AppDialogContent width="wide" tone="neutral"><AppDialogHeader title={t('浏览器设置')} description={t('设置网站规则、浏览代理与开发工具。保存后会收回已共享页面权限。')} closeDisabled={busy}/>
       {error && <p role="alert" className="workbench-error">{error}</p>}
       {value && <div className="browser-settings-content">
         <section className="section-block"><h3>{t('网站规则')}</h3><p>{t('支持 example.com、*.example.com、localhost:3000 和 [::1]:3000。更具体的规则优先；相同范围优先阻止。')}</p>

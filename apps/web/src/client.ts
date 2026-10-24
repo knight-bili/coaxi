@@ -793,9 +793,9 @@ export class ConsoleClient {
     } catch (error) {
       if (!(error instanceof HttpRequestError)) throw error
       const message = error.code === 'channel_session_expired'
-        ? '请在运行此服务的 Rovai Desktop 中重新连接账号，完成后返回本页重试。'
+        ? '请在运行此服务的 Coaxi 中重新连接账号，完成后返回本页重试。'
         : error.code === 'channel_native_interaction'
-          ? '此步骤需要原生页面，请在运行此服务的 Rovai Desktop 中完成后返回。'
+          ? '此步骤需要原生页面，请在运行此服务的 Coaxi 中完成后返回。'
           : error.code === 'channels_unsupported'
             ? '此宿主未安装匹配的渠道组件，请补齐 Server 安装包后重试。'
             : error.code === 'channel_capacity'

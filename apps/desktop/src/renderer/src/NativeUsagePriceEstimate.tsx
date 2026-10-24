@@ -20,7 +20,7 @@ export function NativeUsagePriceEstimate({report}:{report:TokenUsageReport}):Rea
     if(!catalog||!index||!estimate||busy)return
     const observed=++generation.current;setBusy(true);setError(null)
     // 保存当前画面的价目和匹配结果，避免重新查询后用另一版价格解释同一数字。
-    const snapshot={schemaVersion:1,kind:'native_usage_public_price_estimate',actualBill:false,source:'imported_native_history',generatedAt:new Date().toISOString(),range:{from:report.range_start,to:report.range_end},partial:report.truncated,algorithm:{donor:'Codeg',revision:'aff1e6c278453ed8d0b96a5f664edcdca621aa3f',module:'model-api-rates.ts'},catalog:{source:catalog.source,fetchedAt:catalog.fetchedAt,contentDigest:catalog.contentDigest,originDigest:catalog.originDigest,stale:catalog.stale,ratesArePerMillionUsd:true},estimate,models:report.by_model.map(usage=>{const rate=resolveRate(index,usage.key);return {usage,rate,cost:estimateItemCost(usage,rate)}})}
+    const snapshot={schemaVersion:1,kind:'native_usage_public_price_estimate',actualBill:false,source:'imported_native_history',generatedAt:new Date().toISOString(),range:{from:report.range_start,to:report.range_end},partial:report.truncated,algorithm:{donor:'内置参考价',revision:'aff1e6c278453ed8d0b96a5f664edcdca621aa3f',module:'model-api-rates.ts'},catalog:{source:catalog.source,fetchedAt:catalog.fetchedAt,contentDigest:catalog.contentDigest,originDigest:catalog.originDigest,stale:catalog.stale,ratesArePerMillionUsd:true},estimate,models:report.by_model.map(usage=>{const rate=resolveRate(index,usage.key);return {usage,rate,cost:estimateItemCost(usage,rate)}})}
     try{
       const serialized=JSON.stringify(snapshot,null,2)
       if(client.usageCard?.saveEstimate)await client.usageCard.saveEstimate(serialized)

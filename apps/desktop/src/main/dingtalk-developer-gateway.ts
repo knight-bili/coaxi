@@ -220,7 +220,7 @@ async function executeConsoleOperation(
     case 'app.version.configure': {
       const versionId = requiredString(values, 'versionId')
       const version = await readVersion(web, id, versionId, options)
-      const description = dingTalkApplicationPresentation('Rovai', requiredString(values, 'versionDescription')).description
+      const description = dingTalkApplicationPresentation('Coaxi', requiredString(values, 'versionDescription')).description
       if (version.status !== 'INIT') throw new DingTalkDeveloperApiError('dingtalk_version_draft_conflict')
       if (version.version) {
         requirePreparedVersion(version, request.expectedIdentity.userId, description)
@@ -402,10 +402,10 @@ function mutationSucceeded(value: unknown): void {
   if (value !== undefined && value !== null && value !== true && !record(value)) throw protocolUnverified()
 }
 
-/** The console rejects the middle dot/semicolon in Rovai's normal descriptions. */
+/** The console rejects the middle dot/semicolon in Coaxi's normal descriptions. */
 export function dingTalkApplicationPresentation(name: string, description: string): { name: string; description: string } {
   let safeName = [...name.replace(/[^\u4e00-\u9fa5a-zA-Z0-9_#*+\-]/gu, '')].slice(0, 20).join('')
-  if (!safeName) safeName = 'RovaiBot'
+  if (!safeName) safeName = 'CoaxiBot'
   else if ([...safeName].length < 2) safeName += 'Bot'
   let safeDescription = description.replace(/[^\u4e00-\u9fa5a-zA-Z0-9,.!:\-，。！：、 ]/gu, ' ')
     .replace(/ +/gu, ' ').trim().slice(0, 200)

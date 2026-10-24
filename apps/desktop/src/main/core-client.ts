@@ -534,7 +534,7 @@ export class CoreClient {
       throw new RovaiRequestError(structuredFailure(
         'full_core_unavailable',
         'full_core_unavailable',
-        'The authoritative workspace is unavailable while Rovai is in bootstrap mode.',
+        'The authoritative workspace is unavailable while Coaxi is in bootstrap mode.',
         true,
         this.#snapshot.generation,
         { authorityState: this.#snapshot.authorityState }

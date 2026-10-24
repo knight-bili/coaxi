@@ -733,7 +733,7 @@ function replaceSkillRow(skills: SkillView[], updated: SkillView): SkillView[] {
 
 export type SkillSourcePresentation = {
   kind: 'bundled' | 'imported'
-  badgeLabel?: 'Rovai'
+  badgeLabel?: 'Coaxi'
   sourceLabel: string
   repositoryUrl: string | null
   repositoryLabel: string | null
@@ -752,7 +752,7 @@ export function skillSourcePresentation(skill: SkillView): SkillSourcePresentati
     if (repository && revision) {
       return {
         kind: 'bundled',
-        badgeLabel: 'Rovai',
+        badgeLabel: 'Coaxi',
         sourceLabel:uiAttribute("随 Coaxi 安装"),
         repositoryUrl: repository.url,
         repositoryLabel: repository.label,
@@ -762,7 +762,7 @@ export function skillSourcePresentation(skill: SkillView): SkillSourcePresentati
     }
     return {
       kind: 'bundled',
-      badgeLabel: 'Rovai',
+      badgeLabel: 'Coaxi',
       sourceLabel:uiAttribute("随 Coaxi 安装"),
       repositoryUrl: null,
       repositoryLabel: null,

@@ -463,7 +463,7 @@ export class ChannelSettingsService {
     this.#activeQrAbort = abort
     this.#activeQrAttempt = {
       attemptId, purpose: 'account_login', agentId: null, stage: 'loading_local_session',
-      qrDataUrl: null, expiresAt: null, detail: '正在读取 Rovai 本地渠道数据…'
+      qrDataUrl: null, expiresAt: null, detail: '正在读取 Coaxi 本地渠道数据…'
     }
     void this.#emit()
     try {
@@ -1004,7 +1004,7 @@ export class ChannelSettingsService {
         agentId,
         stage: unknownRemoteState ? 'unknown_remote_state' : 'failed',
         detail: unknownRemoteState
-          ? '无法确认本次创建请求是否已在飞书落地。为避免重复应用，Rovai 不会自动再次创建。'
+          ? '无法确认本次创建请求是否已在飞书落地。为避免重复应用，Coaxi 不会自动再次创建。'
           : recoverableProvisioningDetail(failureCode, remoteAppId !== null),
         remoteAppId,
         failureCode
@@ -1345,7 +1345,7 @@ export class ChannelSettingsService {
     if (this.#activeQrAttempt?.attemptId !== attemptId
       || !canAdvanceFeishuLoginStage(this.#activeQrAttempt.stage as FeishuLoginStage, stage)) return
     const details: Partial<Record<FeishuLoginStage, string>> = {
-      loading_local_session: '正在读取 Rovai 本地渠道数据…',
+      loading_local_session: '正在读取 Coaxi 本地渠道数据…',
       preparing: '正在准备二维码',
       awaiting_scan: '请使用飞书扫码',
       scan_confirmed: '已扫码，请在手机上确认',
@@ -1636,7 +1636,7 @@ export class ChannelSettingsService {
           owner.payload.classification === 'unverified' ? 'connection' : 'non_owner',
           owner.payload.classification === 'unverified'
             ? '飞书连接异常，请稍后重试。'
-            : '该 Bot 当前仅供 Rovai Owner 使用。'
+            : '该 Bot 当前仅供 Coaxi Owner 使用。'
         )
       }
       await this.#emit()
@@ -3107,7 +3107,7 @@ async function externalMessageBody(
     const normalized = await normalize(event, {
       botIdentity: normalization.botIdentity ?? {
         openId: 'external_quote',
-        name: 'Rovai'
+        name: 'Coaxi'
       },
       stripBotMentions: false
     })
@@ -3163,7 +3163,7 @@ type ProjectSelectionOperation = 'send' | 'update' | 'recall'
 
 function projectCardActionResponse(result: StoredCommandResult): FeishuCardActionResponse {
   if (result.code === 'channel.binding.owner_required') {
-    return { toast: { type: 'warning', content: '仅 Rovai Owner 可以选择项目' } }
+    return { toast: { type: 'warning', content: '仅 Coaxi Owner 可以选择项目' } }
   }
   if (result.code === 'channel.project_unavailable') {
     return { toast: { type: 'warning', content: '该项目已不可用，请重新选择' } }
@@ -3327,7 +3327,7 @@ function projectSelectionCard(input: {
     schema: '2.0',
     config: { update_multi: true },
     header: {
-      title: { tag: 'plain_text', content: '选择 Rovai 项目' },
+      title: { tag: 'plain_text', content: '选择 Coaxi 项目' },
       template: input.notice ? 'orange' : 'blue'
     },
     body: {
@@ -3338,7 +3338,7 @@ function projectSelectionCard(input: {
             notice,
             ...scopeCopy,
             input.projectOptions.length === 0
-              ? '当前没有可用项目。可以直接开始快速对话，或在 Rovai 创建或打开一个项目后刷新。'
+              ? '当前没有可用项目。可以直接开始快速对话，或在 Coaxi 创建或打开一个项目后刷新。'
               : null
           ].filter(Boolean).join('\n\n')
         },
@@ -3395,8 +3395,8 @@ function deliveryCard(delivery: ClaimedChannelDelivery): Record<string, unknown>
     throw new Error('channel_delivery_card_kind_invalid')
   }
   const title = delivery.deliveryKind === 'attention'
-    ? 'Rovai 需要你确认'
-    : 'Rovai 已接收'
+    ? 'Coaxi 需要你确认'
+    : 'Coaxi 已接收'
   return {
     schema: '2.0',
     config: { update_multi: true },

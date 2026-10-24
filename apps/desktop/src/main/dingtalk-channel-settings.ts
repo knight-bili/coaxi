@@ -510,7 +510,7 @@ export class DingTalkChannelSettingsService {
       stage: 'loading_local_session',
       qrDataUrl: null,
       expiresAt: null,
-      detail: '正在读取 Rovai 本地渠道数据…'
+      detail: '正在读取 Coaxi 本地渠道数据…'
     }
     this.#notify()
     let loginFinished = false
@@ -530,7 +530,7 @@ export class DingTalkChannelSettingsService {
       if (order !== undefined && order < highestStage) return
       if (order !== undefined) highestStage = order
       const details: Record<DingTalkLoginStage, string> = {
-        loading_local_session: '正在读取 Rovai 本地渠道数据…',
+        loading_local_session: '正在读取 Coaxi 本地渠道数据…',
         preparing: '正在加载钉钉二维码…',
         awaiting_scan: '请使用钉钉扫码登录开放平台。',
         scan_confirmed: '扫码成功，等待钉钉确认…',
@@ -1115,7 +1115,7 @@ export class DingTalkChannelSettingsService {
     const api = this.#api(bot)
     const outTrackId = `rv-verify-${randomUUID()}`
     await api.createCardInstance(outTrackId, dingtalkCardParams({
-      title: 'Rovai 连接验证',
+      title: 'Coaxi 连接验证',
       content: 'Bot 配置已完成。'
     }))
   }
@@ -1276,8 +1276,8 @@ export class DingTalkChannelSettingsService {
     await api.sendPrivateMarkdown({
       robotCode: bot.robotCode,
       userId: message.senderUserId,
-      title: 'Rovai',
-      text: '该 Bot 当前仅供 Rovai Owner 使用。'
+      title: 'Coaxi',
+      text: '该 Bot 当前仅供 Coaxi Owner 使用。'
     })
   }
 
@@ -1357,7 +1357,7 @@ export class DingTalkChannelSettingsService {
       const api = this.#apis.get(callback.appKey)
       if (api && result.status !== 'rejected' && value.action !== 'refresh') {
         await api.updateCard(outTrackId, dingtalkCardParams({
-          title: 'Rovai 项目',
+          title: 'Coaxi 项目',
           content: value.action === 'cancel'
             ? '已取消。'
             : value.action === 'quick_chat'
@@ -1747,11 +1747,11 @@ export class DingTalkChannelSettingsService {
           })
         } else {
           cardFallback = {
-            title: delivery.deliveryKind === 'attention' ? 'Rovai 未能处理' : 'Rovai',
+            title: delivery.deliveryKind === 'attention' ? 'Coaxi 未能处理' : 'Coaxi',
             text: String(delivery.payload.text ?? '状态已更新')
           }
           const params = dingtalkCardParams({
-            title: delivery.deliveryKind === 'attention' ? 'Rovai 未能处理' : 'Rovai 已接收',
+            title: delivery.deliveryKind === 'attention' ? 'Coaxi 未能处理' : 'Coaxi 已接收',
             content: String(delivery.payload.text ?? '状态已更新'),
             flowStatus: delivery.deliveryKind === 'attention' ? '5' : '1'
           })
@@ -1955,7 +1955,7 @@ export function projectCardParams(
   closed: boolean
 ): Record<string, string> {
   if (closed) return dingtalkCardParams({
-    title: '选择 Rovai 项目',
+    title: '选择 Coaxi 项目',
     content: '此项目选择已结束。',
     flowStatus: '3'
   })
@@ -1983,10 +1983,10 @@ export function projectCardParams(
     value: { pendingBindingId, expectedVersion, nonce, action: 'refresh' }
   })
   return dingtalkCardParams({
-    title: '选择 Rovai 项目',
+    title: '选择 Coaxi 项目',
     content: projects.length
       ? projects.length > 6
-        ? '选择最近使用的项目，或直接开始快速对话。更多项目可在 Rovai 打开后刷新。'
+        ? '选择最近使用的项目，或直接开始快速对话。更多项目可在 Coaxi 打开后刷新。'
         : '选择一个项目，或直接开始快速对话。'
       : '当前没有可用项目，可以直接开始快速对话。',
     buttons,

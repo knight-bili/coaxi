@@ -22,9 +22,9 @@ export function LegacyDataSettings():React.JSX.Element|null{
     try{await api.importLegacyData(preview.selectionId)}catch(error){if(epoch===generation.current)setError(String(error))}finally{if(epoch===generation.current)setBusy(false)}
   }
   return <section className="section-block">
-    <div className="section-heading"><div><h3>{t('从旧 Rovai 迁入数据')}</h3><p>{t('旧应用退出后，选择它的 Core 数据目录。当前工作区会先保留安全副本，旧目录仍保留。')}</p></div></div>
+    <div className="section-heading"><div><h3>{t('从旧版应用迁入数据')}</h3><p>{t('旧应用退出后，选择它的 Core 数据目录。当前工作区会先保留安全副本，旧目录仍保留。')}</p></div></div>
     <button type="button" disabled={busy} onClick={()=>void inspect()}><FolderInput size={14}/>{t('选择旧数据目录并预览')}</button>
-    <p className="interaction-help">{t('Codeg 原生会话请使用“导入本地会话”。本入口迁入 Rovai Core 的会话、画布、队员、使命和目录内文件。外部工程、共享技能库与模型原生目录继续保留在原位置。')}</p>
+    <p className="interaction-help">{t('原生智能体会话请使用“导入本地会话”。本入口迁入兼容 Core 工作区的会话、画布、队员、使命和目录内文件。外部工程、共享技能库与模型原生目录继续保留在原位置。')}</p>
     <Dialog.Root open={open} onOpenChange={value=>{if(!busy){setOpen(value);setConfirmation('')}}}>
       <Dialog.Portal><Dialog.Overlay className="dialog-overlay"/><AppDialogContent width="wide" tone="danger"><AppDialogHeader title={t('预览旧数据迁入')} description={t('旧数据内容和已冻结的会话材料保持原样，迁入后由现有升级流程处理兼容。请继续保留旧目录及外部工程。')} closeDisabled={busy}/>
         <AppDialogBody>{preview&&<><dl className="legacy-data-summary"><dt>{t('来源目录')}</dt><dd>{preview.source}</dd><dt>{t('原数据库')}</dt><dd>{preview.authority}</dd><dt>{t('迁入文件')}</dt><dd>{preview.fileCount} · {(preview.totalBytes/1024/1024).toFixed(1)} MB</dd></dl>

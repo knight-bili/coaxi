@@ -42,7 +42,7 @@ const LOGIN_FAILURE_DETAILS: Readonly<Record<string, string>> = {
     feishu_login_protocol_redirect: '飞书登录入口已变化，需要更新登录适配器。',
     feishu_open_platform_bootstrap_unsupported: '飞书账号数据格式已变化，需要更新登录适配器。',
     feishu_open_platform_bootstrap_incomplete: '飞书开放平台未返回完整的会话信息，请关闭后重试。',
-    feishu_local_save_failed: '连接未能保存到 Rovai 本地，原连接已保留，请稍后重试。',
+    feishu_local_save_failed: '连接未能保存到 Coaxi 本地，原连接已保留，请稍后重试。',
     feishu_open_platform_http_error: '飞书开放平台暂时无法访问，请稍后重试。',
     feishu_session_url_rejected: '飞书返回了不受信任的登录地址，已停止连接。',
     feishu_session_redirect_invalid: '飞书返回了无效跳转，已停止连接。',

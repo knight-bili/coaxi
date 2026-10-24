@@ -34,7 +34,7 @@ export function parseMemberEnvironment(text: string, windows: boolean, kind: Ada
   for (const [name, raw] of entries) {
     const value = raw as string
     if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(name) || name.length > 256) throw new Error(uiAttribute('变量名只能包含字母、数字和下划线，且不能以数字开头。'))
-    if (/^ROVAI_/i.test(name) || ['CLAUDE_CODE_PROVIDER_MANAGED_BY_HOST', 'CLAUDE_CODE_DISABLE_AUTO_MEMORY', 'CLAUDE_CODE_EMIT_SESSION_STATE_EVENTS', 'PI_TELEMETRY'].includes(name.toUpperCase())) throw new Error(uiAttribute('此变量由 Rovai 管理：{0}', name))
+    if (/^ROVAI_/i.test(name) || ['CLAUDE_CODE_PROVIDER_MANAGED_BY_HOST', 'CLAUDE_CODE_DISABLE_AUTO_MEMORY', 'CLAUDE_CODE_EMIT_SESSION_STATE_EVENTS', 'PI_TELEMETRY'].includes(name.toUpperCase())) throw new Error(uiAttribute('此变量由 Coaxi 管理：{0}', name))
     if (value.includes('\0') || encoder.encode(value).length > 65536) throw new Error(uiAttribute('变量值不能包含 NUL 字符或超过 64 KiB。'))
     bytes += encoder.encode(name + value).length
   }

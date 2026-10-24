@@ -511,8 +511,8 @@ export function diagnosticChecksForFilter(
 export function diagnosticIssueCopy(check: DiagnosticCheck): { title: string; reason: string; impact: string } {
   if (check.id === 'legacy-skill-entries') return {
     title:uiAttribute("旧版 Skill 入口待清理"),
-    reason:uiAttribute("项目目录中留有旧版 Rovai 派发的 Skill 入口，可以统一清理。"),
-    impact:uiAttribute("仅清理确认由 Rovai 派发的旧入口；运行中或无法确认的入口会自动跳过。")
+    reason:uiAttribute("项目目录中留有旧版应用派发的 Skill 入口，可以统一清理。"),
+    impact:uiAttribute("仅清理确认由旧版应用派发的入口；运行中或无法确认的入口会自动跳过。")
   }
   if (check.id === 'mcp-config' && check.code === 'mcp_config_permissions_too_broad') return {
     title:uiAttribute("MCP 配置权限不安全"),
@@ -552,7 +552,7 @@ export function diagnosticCheckDetail(check: DiagnosticCheck): string {
     const version = factValue(check, 'reportedVersion')
     return `${uiAttribute(STATUS_META[check.status].label)}${version ? ` · ${version}` : ''}${check.stale ?uiAttribute(" · 保留最近成功证据") : ''}`
   }
-  if (check.id === 'legacy-skill-entries') return check.status === 'ok' ?uiAttribute("旧版 Rovai 派发入口已清理") : uiAttribute("发现 {0} 个旧版派发入口或记录", String(factValue(check, 'entryCount') ?? '—'))
+  if (check.id === 'legacy-skill-entries') return check.status === 'ok' ?uiAttribute("旧版应用派发入口已清理") : uiAttribute("发现 {0} 个旧版派发入口或记录", String(factValue(check, 'entryCount') ?? '—'))
   if (check.id === 'mcp-config') return check.code === 'mcp_config_not_initialized' ?uiAttribute("尚未初始化 · 无外部 MCP") : check.status === 'ok' ? uiAttribute("配置有效 · {0} 个 Server", String(factValue(check, 'serverCount') ?? '0')) : uiAttribute(STATUS_META[check.status].label)
   if (check.id === 'database') return check.status === 'ok' ?uiAttribute("WAL · quick_check 通过") : uiAttribute(STATUS_META[check.status].label)
   if (check.id === 'git') return check.status === 'ok' ? factValue(check, 'version') ?? uiAttribute('可用') :uiAttribute("当前 PATH 中不可用")

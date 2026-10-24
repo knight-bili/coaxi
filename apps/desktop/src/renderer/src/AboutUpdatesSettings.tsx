@@ -77,7 +77,7 @@ export function AboutUpdatesSettingsView({
   const showManualCheck = snapshot?.status === 'available' || snapshot?.status === 'download_failed'
   const showFallback = snapshot?.status === 'download_failed'
     || (snapshot?.status === 'check_failed' && snapshot.failureReason === 'updater_unavailable')
-  const officialRepositoryUrl = 'https://github.com/knight-bili/codeg-rovai-workbench'
+  const officialRepositoryUrl = 'https://github.com/knight-bili/coaxi'
   const officialReleasesUrl = `${officialRepositoryUrl}/releases`
 
   useEffect(() => {
