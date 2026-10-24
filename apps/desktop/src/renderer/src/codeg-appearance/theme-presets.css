@@ -793,6 +793,16 @@
 }
 
 :root[data-codeg-preset]:not([data-codeg-preset="rovai"]) {
+ /* Map every host surface, not just the conversation. A partial bridge leaves
+    a Codeg canvas surrounded by the old blue/green rail and settings panels. */
+ --rail:var(--cg-sidebar);--rail-ink:var(--cg-muted-foreground);--rail-line:var(--cg-sidebar-border);--rail-logo:var(--cg-sidebar-foreground);
+ --home-surface:var(--cg-background);--topbar:var(--cg-sidebar);--inspector-surface:var(--cg-card);--execution-running-surface:var(--cg-card);
+ --neutral-selected:var(--cg-sidebar-accent);--neutral-hover:var(--cg-muted);
+ --brand:var(--cg-primary);--brand-hover:var(--cg-primary);--brand-ink:var(--cg-foreground);--brand-contrast:var(--cg-primary-foreground);--brand-soft:var(--cg-accent);
+ --conversation-action-contrast:var(--cg-primary-foreground);--conversation-action-hover:var(--cg-foreground);--conversation-control-line:var(--cg-input);--conversation-inspector-line:var(--cg-border);--conversation-focus:var(--cg-ring);--conversation-focus-soft:color-mix(in srgb,var(--cg-ring) 20%,transparent);
+ --control-line:var(--cg-input);--settings-choice-line:var(--cg-border);--settings-choice-selected-line:var(--cg-ring);--settings-choice-hover:var(--cg-muted);--settings-field-line:var(--cg-input);--settings-switch-off:var(--cg-muted-foreground);
+ --new-camp-picker-surface:var(--cg-card);--new-camp-picker-soft:var(--cg-muted);--new-camp-picker-hover:var(--cg-accent);--new-camp-picker-line-strong:var(--cg-ring);
+ --workspace-steel:var(--cg-primary);--workspace-steel-ink:var(--cg-foreground);--workspace-faint:var(--cg-muted-foreground);
  --canvas:var(--cg-sidebar);--surface:var(--cg-background);--surface-raised:var(--cg-card);--surface-subtle:var(--cg-muted);--surface-muted:var(--cg-muted);--surface-selected:var(--cg-accent);--surface-hover:var(--cg-accent);--surface-sunken:var(--cg-secondary);
  --workspace-surface-subtle:var(--cg-muted);--workspace-surface-raised:var(--cg-card);--workspace-surface-hover:var(--cg-accent);--workspace-surface-selected:var(--cg-accent);--workspace-line:var(--cg-border);--workspace-line-strong:var(--cg-input);
  --ink:var(--cg-foreground);--muted:var(--cg-muted-foreground);--faint:var(--cg-muted-foreground);--line:var(--cg-border);--line-strong:var(--cg-input);--input:var(--cg-card);--steel:var(--cg-primary);--steel-ink:var(--cg-primary);
