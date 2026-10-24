@@ -1,0 +1,103 @@
+/* Shared host presentation for the migrated Codeg controls. Reference:
+   Codeg ui/button.tsx, ui/input.tsx, shortcut-settings.tsx and config-sync-settings.tsx;
+   Rovai GeneralSettings/SettingsPageHeader retain the page and dialog structure. */
+.workspace-field {
+  min-width: 0;
+  max-width: 100%;
+  min-height: 34px;
+  padding: 7px 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  color: var(--ink);
+  background: var(--input);
+  font: inherit;
+  font-size: 12px;
+  line-height: 1.5;
+  transition: border-color 120ms ease, box-shadow 120ms ease;
+}
+.workspace-field::placeholder { color: var(--faint); }
+.workspace-field:focus-visible {
+  border-color: var(--conversation-focus);
+  outline: 2px solid var(--conversation-focus-soft);
+  outline-offset: 1px;
+}
+.workspace-field:disabled { opacity: .5; cursor: not-allowed; }
+textarea.workspace-field { min-height: 84px; resize: vertical; }
+.workspace-check { width: 15px; height: 15px; margin: 0; flex: 0 0 auto; accent-color: var(--conversation-action); }
+.workspace-file { min-width: 0; max-width: 100%; font: inherit; font-size: 12px; color: var(--muted); }
+.workspace-file::file-selector-button {
+  margin-right: 10px; padding: 7px 10px; border: 1px solid var(--line);
+  border-radius: 8px; color: var(--ink); background: var(--surface-raised); font: inherit; cursor: pointer;
+}
+.forge-form { display: grid; min-width: 0; gap: 16px; }
+.forge-form fieldset { display: grid; min-width: 0; margin: 0; padding: 0; gap: 14px; border: 0; }
+.forge-form label { display: grid; min-width: 0; gap: 7px; color: var(--ink); font-size: 12px; line-height: 1.6; }
+.forge-form label:has(>input:is([type="checkbox"],[type="radio"])) { display: flex; align-items: flex-start; gap: 9px; }
+.forge-form label>input:is([type="checkbox"],[type="radio"]) { margin-top: 3px; }
+.forge-form :is(input:not([type="checkbox"],[type="radio"]),select,textarea) { width: 100%; }
+.forge-form small { color: var(--muted); font-size: 11px; line-height: 1.6; }
+.forge-form p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.7; }
+.forge-form .workbench-toolbar { margin: 0; padding: 0; border: 0; }
+.app-dialog .forge-form { min-height: 0; padding: 0 24px 24px; overflow: auto; }
+.app-dialog-body .forge-form, .app-dialog form .forge-form { padding: 0; overflow: visible; }
+.workbench-toolbar .workspace-field { min-width: 0; }
+.dialog-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 8px; padding-top: 12px; }
+.dialog-actions :is(.quiet-button,.primary-button) { display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+.workspace-check:focus-visible, .workspace-file:focus-visible { outline: 2px solid var(--conversation-focus); outline-offset: 3px; }
+
+/* An explicit opt-in prevents the data panels from inheriting the engineering
+   toolbar's full width and the original two-column general-section geometry. */
+:root .settings-panel :is(.settings-data-section,.portable-migration-settings) {
+  display: grid; min-width: 0; gap: 16px; margin: 0; padding: 24px 0;
+  border: 0; border-bottom: 1px solid var(--line); background: transparent;
+}
+:root .settings-panel :is(.settings-data-section,.portable-migration-settings)>.section-heading { margin: 0; align-items: center; }
+:root .settings-panel :is(.settings-data-section,.portable-migration-settings)>.section-heading :is(h2,h3) {
+  display: flex; align-items: center; gap: 8px; margin: 0; font-size: 14px; font-weight: 600; line-height: 1.5;
+}
+:root .settings-panel .settings-data-section>.section-heading p,
+:root .settings-panel .portable-migration-settings>.section-heading p {
+  display: block; max-width: 72ch; margin: 6px 0 0; color: var(--muted); font-size: 12px; line-height: 1.7;
+}
+.settings-data-section>.section-heading svg { color: var(--faint); flex: none; }
+.settings-data-section .workbench-toolbar { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding: 0; border: 0; }
+.settings-data-section .forge-form { max-width: 640px; }
+.settings-data-section .forge-form>fieldset { padding: 14px; border: 1px solid var(--line); border-radius: 10px; }
+.settings-data-section :is(.workbench-toolbar, .dialog-actions) :is(.quiet-button,.primary-button),
+.settings-data-section>.section-heading .quiet-button {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 32px; padding: 6px 11px;
+}
+:root .settings-panel .settings-data-section .quiet-button { border-color: var(--line); background: var(--surface-raised); color: var(--ink); }
+:root .settings-panel .settings-data-section .quiet-button:hover:not(:disabled) { background: var(--surface-hover); border-color: var(--line-strong); }
+.settings-data-section>:is(p,div[role="status"]) { margin: 0; font-size: 12px; color: var(--muted); line-height: 1.7; overflow-wrap: anywhere; }
+.settings-data-section .settings-data-section { padding: 20px 0 0; border-bottom: 0; border-top: 1px solid var(--line); }
+.backup-preview-summary { display: grid; gap: 12px; padding: 16px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-raised); font-size: 12px; }
+.backup-preview-summary :is(p,dl) { margin: 0; overflow-wrap: anywhere; }
+.configuration-compare { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; padding: 12px 0; }
+.configuration-compare>div { min-width: 0; padding: 12px; border: 1px solid var(--line); border-radius: 8px; }
+.configuration-compare dl>div { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; padding: 4px 0; }
+.configuration-compare dd { margin: 0; overflow-wrap: anywhere; }
+.webdav-transfer-list,.webdav-snapshot-list { display: grid; min-width: 0; gap: 10px; }
+.settings-panel .settings-error { margin: 8px 0; color: var(--danger); font-size: 12px; line-height: 1.6; overflow-wrap: anywhere; }
+.settings-panel .empty-note { padding: 16px 0; color: var(--muted); font-size: 12px; }
+.settings-panel .portable-provider-toolbar { justify-content: flex-start; gap: 10px; margin: 0; }
+.portable-migration-settings .portable-provider-toolbar { flex-wrap: wrap; }
+.portable-migration-settings .portable-provider-toolbar>label { display: grid; gap: 6px; font-size: 12px; }
+.portable-migration-settings .portable-provider-toolbar>.workspace-field { flex: 1 1 200px; }
+.portable-migration-settings .portable-migration-file { flex: 1 1 200px; font-size: 12px; color: var(--muted); }
+
+/* Codeg's shortcut list: one compact row per action, keys aligned on the right. */
+.keyboard-shortcut-rows { display: grid; min-width: 0; gap: 6px; }
+.keyboard-shortcut-rows>.setting-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; min-width: 0; min-height: 46px; gap: 8px 16px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 8px; }
+.keyboard-shortcut-rows .setting-copy { min-width: 0; flex: 1 1 180px; font-size: 12px; }
+.keyboard-shortcut-rows .setting-action { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.keyboard-shortcut-rows .setting-action .quiet-button { min-height: 28px; padding: 4px 9px; }
+.keyboard-shortcut-rows kbd { font: 11px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace; }
+.keyboard-shortcut-rows [aria-pressed="true"] { outline: 2px solid var(--conversation-focus); outline-offset: 1px; }
+.keyboard-shortcut-rows .setting-action>button:first-child { min-width: 110px; }
+
+@media(max-width:760px) {
+  .configuration-compare { grid-template-columns: minmax(0,1fr); }
+  .settings-data-section>.section-heading { flex-wrap: wrap; gap: 10px; }
+  .settings-data-section .forge-form { max-width: none; }
+}
