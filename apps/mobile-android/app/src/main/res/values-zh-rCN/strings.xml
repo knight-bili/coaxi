@@ -3,12 +3,12 @@
 
     <!-- Onboarding -->
     <string name="onboarding_title">Coaxi</string>
-    <string name="onboarding_tagline">实时观察你的 codeg 智能体工作，随时随地进行引导。</string>
+    <string name="onboarding_tagline">实时观察你的 Coaxi 智能体工作，随时随地进行引导。</string>
     <string name="onboarding_feature_watch">实时查看任务</string>
     <string name="onboarding_feature_steer">随时随地引导</string>
     <string name="onboarding_feature_start">开启新任务</string>
     <string name="onboarding_add_server">添加你的服务器</string>
-    <string name="onboarding_footnote">Coaxi 连接到你自行运行的 codeg 服务器。</string>
+    <string name="onboarding_footnote">Coaxi 连接到你自行运行的 Coaxi 服务器。</string>
 
     <!-- Servers -->
     <string name="servers_title">服务器</string>
@@ -21,7 +21,7 @@
     <string name="server_test_connection">测试连接</string>
     <string name="server_save">保存</string>
     <string name="server_delete">删除</string>
-    <string name="server_connection_ok">已连接 · codeg %1$s</string>
+    <string name="server_connection_ok">已连接 · Coaxi %1$s</string>
     <string name="server_connection_failed">连接失败：%1$s</string>
     <string name="server_section_connection">连接</string>
     <string name="server_section_auth">身份认证</string>
@@ -30,7 +30,7 @@
     <!-- Home (smoke screen) -->
     <string name="home_title">Coaxi</string>
     <string name="home_status_checking">正在检查连接…</string>
-    <string name="home_status_online">在线 · codeg %1$s</string>
+    <string name="home_status_online">在线 · Coaxi %1$s</string>
     <string name="home_status_offline">离线</string>
     <string name="home_folders_count">%1$d 个文件夹</string>
     <string name="home_conversations_count">%1$d 个会话</string>
@@ -223,8 +223,8 @@
     <string name="settings_accent_button">强调色按钮</string>
     <string name="settings_version">版本 %1$s</string>
     <string name="settings_server">服务器：%1$s</string>
-    <string name="settings_codeg_version">codeg %1$s</string>
-    <string name="settings_about_description">面向 codeg 多智能体编程服务器的原生 Android 客户端。</string>
+    <string name="settings_codeg_version">Coaxi %1$s</string>
+    <string name="settings_about_description">面向 Coaxi 多智能体编程服务器的原生 Android 客户端。</string>
     <string name="settings_coming_soon">将在里程碑 M9 中推出。</string>
     <string name="settings_licenses_unavailable">无法加载开源许可声明。</string>
 
@@ -237,7 +237,7 @@
     <string name="system_proxy_url">代理地址</string>
     <string name="system_server_update">服务器更新</string>
     <string name="system_check_for_updates">检查更新</string>
-    <string name="system_current_version">当前：codeg %1$s</string>
+    <string name="system_current_version">当前：Coaxi %1$s</string>
     <string name="system_update_available">有可用更新：%1$s</string>
     <string name="system_up_to_date">已是最新版本。</string>
 
@@ -397,12 +397,12 @@
     <string name="agents_codebuddy_url_invalid">请输入有效的 http(s) 地址。</string>
     <!-- Detail · Kimi Code（独立面板） -->
     <string name="agents_kimi_section">Kimi Code 配置</string>
-    <string name="agents_kimi_footer">`kimi acp` 只接受已存储的登录令牌进行认证，单独的 API 密钥会被拒绝。为使用 API 密钥，codeg 会写入一份托管的 ~/.kimi-code/config.toml provider，并植入一个本地门禁令牌以便会话打开——推理仍使用你的密钥。</string>
+    <string name="agents_kimi_footer">`kimi acp` 只接受已存储的登录令牌进行认证，单独的 API 密钥会被拒绝。为使用 API 密钥，Coaxi 会写入一份托管的 ~/.kimi-code/config.toml provider，并植入一个本地门禁令牌以便会话打开——推理仍使用你的密钥。</string>
     <string name="agents_kimi_auth_method">认证方式</string>
     <string name="agents_kimi_auth_apikey">API 密钥</string>
     <string name="agents_kimi_auth_login">Kimi 账号登录（订阅）</string>
-    <string name="agents_kimi_auth_caption">“API 密钥”会写入 codeg 托管的 config.toml provider 并植入门禁令牌。“登录”会清除它，改用真正的 `kimi login` 会话（需要 Kimi 订阅）。</string>
-    <string name="agents_kimi_login_caption">在终端运行 `kimi login`，用 Kimi 订阅账号登录（设备码 OAuth）。codeg 不存储任何内容，复用 Kimi 自身的登录。在此保存会移除 codeg 的 API 密钥门禁令牌。</string>
+    <string name="agents_kimi_auth_caption">“API 密钥”会写入 Coaxi 托管的 config.toml provider 并植入门禁令牌。“登录”会清除它，改用真正的 `kimi login` 会话（需要 Kimi 订阅）。</string>
+    <string name="agents_kimi_login_caption">在终端运行 `kimi login`，用 Kimi 订阅账号登录（设备码 OAuth）。Coaxi 不存储任何内容，复用 Kimi 自身的登录。在此保存会移除 Coaxi 的 API 密钥门禁令牌。</string>
     <string name="agents_kimi_provider_type">Provider 类型</string>
     <string name="agents_kimi_provider_caption">Kimi 使用的 provider 协议（config.toml 的 `type`）。Moonshot / platform.kimi.com 密钥请选 Kimi / Moonshot。</string>
     <string name="agents_kimi_endpoint">端点</string>
@@ -428,10 +428,10 @@
     <string name="agents_kimi_max_context_caption">token 数，例如 262144。留空则使用模型默认值。</string>
     <string name="agents_kimi_save">保存 Kimi Code 配置</string>
     <string name="agents_kimi_raw_disclosure">高级：直接编辑 config.toml</string>
-    <string name="agents_kimi_raw_caption">原样写入（保留注释）并作为 TOML 校验。codeg 同时植入门禁令牌以便会话打开。</string>
+    <string name="agents_kimi_raw_caption">原样写入（保留注释）并作为 TOML 校验。Coaxi 同时植入门禁令牌以便会话打开。</string>
     <string name="agents_kimi_save_raw">保存 config.toml</string>
     <string name="agents_kimi_gate_login">已通过 Kimi 账号登录认证。</string>
-    <string name="agents_kimi_gate_apikey">已通过 API 密钥认证（codeg 已植入本地门禁令牌）。</string>
+    <string name="agents_kimi_gate_apikey">已通过 API 密钥认证（Coaxi 已植入本地门禁令牌）。</string>
     <string name="agents_kimi_gate_none">尚未认证——请在下方保存 API 密钥（或登录）以打开 Kimi 会话。</string>
     <string name="agents_kimi_saved">Kimi Code 配置已保存</string>
     <string name="agents_kimi_model_required">请输入模型 id（API 密钥模式下 Kimi 需要指定）。</string>
@@ -493,7 +493,7 @@
     <string name="agents_pi_config_saved">Pi 配置已保存</string>
     <string name="agents_pi_trust_section">自动信任已打开的工作区</string>
     <string name="agents_pi_trust_title">自动信任已打开的工作区</string>
-    <string name="agents_pi_trust_desc">当 codeg 将 pi 连接到某个文件夹时，把该文件夹标记为受信任，这样 pi 会加载项目本地配置和 skills，无需单独提示。</string>
+    <string name="agents_pi_trust_desc">当 Coaxi 将 pi 连接到某个文件夹时，把该文件夹标记为受信任，这样 pi 会加载项目本地配置和 skills，无需单独提示。</string>
     <string name="agents_pi_trust_caption">只有你在这里打开的文件夹会被信任，绝不会信任整台机器——而且这只影响配置加载，不影响 pi 被允许执行什么。</string>
     <string name="agents_pi_trust_failed">保存工作区信任失败</string>
     <!-- Detail · Grok -->
@@ -538,7 +538,7 @@
     <string name="agents_cursor_status_signed_out">未登录</string>
     <string name="agents_cursor_status_signed_in">已登录</string>
     <string name="agents_cursor_refresh">刷新</string>
-    <string name="agents_cursor_login_hint">在运行 codeg 的机器上执行以下命令，完成后点刷新：</string>
+    <string name="agents_cursor_login_hint">在运行 Coaxi 的机器上执行以下命令，完成后点刷新：</string>
     <string name="agents_cursor_api_key">Cursor API 密钥</string>
     <string name="agents_cursor_api_key_hint">在 Cursor Dashboard 的 Integrations 中创建。</string>
     <string name="agents_cursor_model">默认模型</string>

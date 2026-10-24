@@ -69,7 +69,7 @@ struct KimiConfigSection: View {
 
     var body: some View {
         EditorSection(title: "Kimi Code Configuration",
-                      footer: "`kimi acp` only authenticates with a stored login token and rejects API keys on their own. To use an API key, codeg writes a managed ~/.kimi-code/config.toml provider AND seeds a local gate token so the session opens — inference still runs on your key.") {
+                      footer: "`kimi acp` only authenticates with a stored login token and rejects API keys on their own. To use an API key, Coaxi writes a managed ~/.kimi-code/config.toml provider AND seeds a local gate token so the session opens — inference still runs on your key.") {
             gateBanner
             if let banner { resultBanner(banner) }
             divider
@@ -81,7 +81,7 @@ struct KimiConfigSection: View {
             }
             caption("“API key” writes a codeg-managed config.toml provider and seeds a gate token. “Login” clears that and uses a real `kimi login` session (requires a Kimi subscription).")
 
-            if mode == .apikey { apiKeyForm } else { caption("Run `kimi login` in a terminal to sign in with a Kimi subscription account (device-code OAuth). codeg stores nothing and reuses Kimi’s own login. Saving here removes codeg’s API-key gate token.") }
+            if mode == .apikey { apiKeyForm } else { caption("Run `kimi login` in a terminal to sign in with a Kimi subscription account (device-code OAuth). Coaxi stores nothing and reuses Kimi’s own login. Saving here removes Coaxi’s API-key gate token.") }
 
             divider
             saveRow(title: "Save Kimi Code Config", action: handleSave)
@@ -197,7 +197,7 @@ struct KimiConfigSection: View {
                 .overlay(RoundedRectangle(cornerRadius: Theme.Radius.sm).stroke(Theme.hairline))
                 .autocorrectionDisabled(true).textInputAutocapitalization(.never)
                 .padding(.horizontal, 16).padding(.top, 4)
-            caption("Written verbatim (comments preserved) and validated as TOML. codeg also seeds the gate token so the session opens.")
+            caption("Written verbatim (comments preserved) and validated as TOML. Coaxi also seeds the gate token so the session opens.")
             saveRow(title: "Save config.toml", action: handleSaveRaw, prominent: false)
         }
     }
@@ -209,7 +209,7 @@ struct KimiConfigSection: View {
         let text: LocalizedStringKey = present
             ? (mode == .login
                 ? "Authenticated via a Kimi account login."
-                : "Authenticated via API key (codeg seeded the local gate token).")
+                : "Authenticated via API key (Coaxi seeded the local gate token).")
             : "Not authenticated yet — save an API key below (or sign in) to open Kimi sessions."
         return HStack(alignment: .top, spacing: 8) {
             Image(systemName: present ? "checkmark.seal.fill" : "exclamationmark.triangle.fill")

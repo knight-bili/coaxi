@@ -121,12 +121,12 @@
         }
       }
     },
-    "Run this on the machine hosting codeg, then refresh:" : {
+    "Run this on the machine hosting Coaxi, then refresh:" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "在运行 codeg 的机器上执行以下命令，然后点击刷新："
+            "value" : "在运行 Coaxi 的机器上执行以下命令，然后点击刷新："
           }
         }
       }
@@ -739,13 +739,13 @@
         }
       }
     },
-    "`kimi acp` only authenticates with a stored login token and rejects API keys on their own. To use an API key, codeg writes a managed ~/.kimi-code/config.toml provider AND seeds a local gate token so the session opens — inference still runs on your key." : {
+    "`kimi acp` only authenticates with a stored login token and rejects API keys on their own. To use an API key, Coaxi writes a managed ~/.kimi-code/config.toml provider AND seeds a local gate token so the session opens — inference still runs on your key." : {
       "extractionState" : "manual",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "`kimi acp` 只认可已存储的登录令牌，单独的 API 密钥会被拒绝。为支持 API 密钥，codeg 会写入受管的 ~/.kimi-code/config.toml 供应商，并植入一个本地闸门令牌以打开会话——推理仍走你的密钥。"
+            "value" : "`kimi acp` 只认可已存储的登录令牌，单独的 API 密钥会被拒绝。为支持 API 密钥，Coaxi 会写入受管的 ~/.kimi-code/config.toml 供应商，并植入一个本地闸门令牌以打开会话——推理仍走你的密钥。"
           }
         }
       }
@@ -778,18 +778,18 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "“API 密钥”会写入由 codeg 管理的 config.toml 供应商并植入闸门令牌。“登录”会清除它，改用真正的 `kimi login` 会话（需要 Kimi 订阅）。"
+            "value" : "“API 密钥”会写入由 Coaxi 管理的 config.toml 供应商并植入闸门令牌。“登录”会清除它，改用真正的 `kimi login` 会话（需要 Kimi 订阅）。"
           }
         }
       }
     },
-    "Run `kimi login` in a terminal to sign in with a Kimi subscription account (device-code OAuth). codeg stores nothing and reuses Kimi’s own login. Saving here removes codeg’s API-key gate token." : {
+    "Run `kimi login` in a terminal to sign in with a Kimi subscription account (device-code OAuth). Coaxi stores nothing and reuses Kimi’s own login. Saving here removes Coaxi’s API-key gate token." : {
       "extractionState" : "manual",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "在终端运行 `kimi login`，用 Kimi 订阅账号登录（设备码 OAuth）。codeg 不存储任何内容，复用 Kimi 自己的登录。在此保存会移除 codeg 的 API 密钥闸门令牌。"
+            "value" : "在终端运行 `kimi login`，用 Kimi 订阅账号登录（设备码 OAuth）。Coaxi 不存储任何内容，复用 Kimi 自己的登录。在此保存会移除 Coaxi 的 API 密钥闸门令牌。"
           }
         }
       }
@@ -1014,13 +1014,13 @@
         }
       }
     },
-    "Written verbatim (comments preserved) and validated as TOML. codeg also seeds the gate token so the session opens." : {
+    "Written verbatim (comments preserved) and validated as TOML. Coaxi also seeds the gate token so the session opens." : {
       "extractionState" : "manual",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "原样写入（保留注释）并按 TOML 校验。codeg 还会植入闸门令牌以打开会话。"
+            "value" : "原样写入（保留注释）并按 TOML 校验。Coaxi 还会植入闸门令牌以打开会话。"
           }
         }
       }
@@ -1047,13 +1047,13 @@
         }
       }
     },
-    "Authenticated via API key (codeg seeded the local gate token)." : {
+    "Authenticated via API key (Coaxi seeded the local gate token)." : {
       "extractionState" : "manual",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "已通过 API 密钥认证（codeg 已植入本地闸门令牌）。"
+            "value" : "已通过 API 密钥认证（Coaxi 已植入本地闸门令牌）。"
           }
         }
       }
@@ -1498,13 +1498,13 @@
         }
       }
     },
-    "When codeg connects pi to a folder, mark that folder trusted so pi loads the project’s local config and skills without a separate prompt." : {
+    "When Coaxi connects pi to a folder, mark that folder trusted so pi loads the project’s local config and skills without a separate prompt." : {
       "extractionState" : "manual",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "当 codeg 将 pi 连接到某文件夹时，把该文件夹标记为受信任，使 pi 无需额外提示即可加载项目的本地配置和技能。"
+            "value" : "当 Coaxi 将 pi 连接到某文件夹时，把该文件夹标记为受信任，使 pi 无需额外提示即可加载项目的本地配置和技能。"
           }
         }
       }
@@ -1968,13 +1968,13 @@
         }
       }
     },
-    "Add a codeg server to start browsing its sessions." : {
+    "Add a Coaxi server to start browsing its sessions." : {
       "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "添加一个 codeg 服务器以开始浏览其会话。"
+            "value" : "添加一个 Coaxi 服务器以开始浏览其会话。"
           }
         }
       }
@@ -1990,13 +1990,13 @@
         }
       }
     },
-    "Add a folder in the codeg desktop app, then start tasks in it from here." : {
+    "Add a folder in the Coaxi desktop app, then start tasks in it from here." : {
       "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "在 codeg 桌面应用中添加文件夹，然后从这里在其中启动任务。"
+            "value" : "在 Coaxi 桌面应用中添加文件夹，然后从这里在其中启动任务。"
           }
         }
       }
@@ -2272,12 +2272,12 @@
         }
       }
     },
-    "Align your codeg server's QR code within the frame." : {
+    "Align your Coaxi server's QR code within the frame." : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "将你的 codeg 服务器二维码对准框内。"
+            "value" : "将你的 Coaxi 服务器二维码对准框内。"
           }
         }
       }
@@ -2599,12 +2599,12 @@
         }
       }
     },
-    "Browse and drive your codeg servers' agent sessions from iOS — watch tasks live, reply while the agent streams, and start new work in any folder." : {
+    "Browse and drive your Coaxi servers' agent sessions from iOS — watch tasks live, reply while the agent streams, and start new work in any folder." : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "在 iOS 上浏览并驱动你的 codeg 服务器的智能体会话——实时查看任务、在智能体输出时回复，并在任意文件夹中开始新工作。"
+            "value" : "在 iOS 上浏览并驱动你的 Coaxi 服务器的智能体会话——实时查看任务、在智能体输出时回复，并在任意文件夹中开始新工作。"
           }
         }
       }
@@ -2960,22 +2960,22 @@
       }
     },
     "Coaxi" : {},
-    "codeg agent client for iOS" : {
+    "Coaxi agent client for iOS" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "codeg iOS 智能体客户端"
+            "value" : "Coaxi iOS 智能体客户端"
           }
         }
       }
     },
-    "Coaxi connects to a codeg server you run — usually on your dev machine." : {
+    "Coaxi connects to a Coaxi server you run — usually on your dev machine." : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Coaxi 连接到你运行的 codeg 服务器——通常在你的开发机上。"
+            "value" : "Coaxi 连接到你运行的 Coaxi 服务器——通常在你的开发机上。"
           }
         }
       }
@@ -5963,13 +5963,13 @@
         }
       }
     },
-    "No quick messages yet. Create them on the codeg web app." : {
+    "No quick messages yet. Create them on the Coaxi web app." : {
       "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "还没有快捷消息。请在 codeg 网页应用中创建。"
+            "value" : "还没有快捷消息。请在 Coaxi 网页应用中创建。"
           }
         }
       }
@@ -8409,13 +8409,13 @@
         }
       }
     },
-    "That QR code isn’t a codeg server address. Make sure you’re scanning the server URL QR from codeg." : {
+    "That QR code isn’t a Coaxi server address. Make sure you’re scanning the server URL QR from codeg." : {
       "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "该二维码不是 codeg 服务器地址。请确保扫描的是 codeg 的服务器地址二维码。"
+            "value" : "该二维码不是 Coaxi 服务器地址。请确保扫描的是 Coaxi 的服务器地址二维码。"
           }
         }
       }
@@ -8486,13 +8486,13 @@
         }
       }
     },
-    "The bearer token issued by your codeg server." : {
+    "The bearer token issued by your Coaxi server." : {
       "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "由你的 codeg 服务器签发的 bearer 令牌。"
+            "value" : "由你的 Coaxi 服务器签发的 bearer 令牌。"
           }
         }
       }
@@ -16114,7 +16114,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Both the global switch and member assignment must be enabled, and the program must support the tool. Only new tasks are affected; original Rovai tools retain their own permissions."
+            "value" : "Both the global switch and member assignment must be enabled, and the program must support the tool. Only new tasks are affected; original Coaxi tools retain their own permissions."
           }
         },
         "zh-Hans" : {

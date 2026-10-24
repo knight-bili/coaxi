@@ -159,7 +159,7 @@ struct ComposeInsertSheet: View {
 
     private var emptyMessage: LocalizedStringKey {
         switch source {
-        case .quickMessages: return "No quick messages yet. Create them on the codeg web app."
+        case .quickMessages: return "No quick messages yet. Create them on the Coaxi web app."
         case .experts: return "No experts are linked to this agent."
         case .slashCommands: return "No slash commands yet — they appear once the session is active."
         }

@@ -83,7 +83,7 @@ struct AboutView: View {
                     Text("Coaxi")
                         .font(.title2.weight(.bold))
                         .foregroundStyle(Theme.textPrimary)
-                    Text("codeg agent client for iOS")
+                    Text("Coaxi agent client for iOS")
                         .font(.subheadline)
                         .foregroundStyle(Theme.textSecondary)
                 }
@@ -98,7 +98,7 @@ struct AboutView: View {
                 Text("About")
                     .font(.headline)
                     .foregroundStyle(Theme.textPrimary)
-                Text("Browse and drive your codeg servers' agent sessions from iOS — watch tasks live, reply while the agent streams, and start new work in any folder.")
+                Text("Browse and drive your Coaxi servers' agent sessions from iOS — watch tasks live, reply while the agent streams, and start new work in any folder.")
                     .font(.subheadline)
                     .foregroundStyle(Theme.textSecondary)
                     .fixedSize(horizontal: false, vertical: true)

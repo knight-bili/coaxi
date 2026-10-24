@@ -90,7 +90,7 @@ struct QRScannerView: View {
             case .authorized:
                 VStack(spacing: 18) {
                     ScanReticle()
-                    Text("Align your codeg server's QR code within the frame.")
+                    Text("Align your Coaxi server's QR code within the frame.")
                         .font(.subheadline)
                         .foregroundStyle(.white.opacity(0.9))
                         .multilineTextAlignment(.center)

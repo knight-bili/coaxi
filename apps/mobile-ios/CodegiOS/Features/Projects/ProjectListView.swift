@@ -109,7 +109,7 @@ struct ProjectListView: View {
             EmptyStateView(
                 icon: "folder",
                 title: "No Folders",
-                message: "Add a folder in the codeg desktop app, then start tasks in it from here."
+                message: "Add a folder in the Coaxi desktop app, then start tasks in it from here."
             )
         } else {
             projectList

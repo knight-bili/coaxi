@@ -275,7 +275,7 @@ struct PiConfigSection: View {
             Toggle(isOn: Binding(get: { trustWorkspace }, set: { toggleTrust($0) })) {
                 VStack(alignment: .leading, spacing: 3) {
                     Text("Auto-trust opened workspaces").font(.subheadline).foregroundStyle(Theme.textPrimary)
-                    Text("When codeg connects pi to a folder, mark that folder trusted so pi loads the project’s local config and skills without a separate prompt.")
+                    Text("When Coaxi connects pi to a folder, mark that folder trusted so pi loads the project’s local config and skills without a separate prompt.")
                         .font(.caption).foregroundStyle(Theme.textTertiary).fixedSize(horizontal: false, vertical: true)
                 }
             }

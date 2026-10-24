@@ -46,7 +46,7 @@ struct OnboardingView: View {
                 PrimaryGlassButton(title: "Add Your Server", systemImage: "plus") {
                     showEditor = true
                 }
-                Text("Coaxi connects to a codeg server you run — usually on your dev machine.")
+                Text("Coaxi connects to a Coaxi server you run — usually on your dev machine.")
                     .font(.caption)
                     .foregroundStyle(Theme.textTertiary)
                     .multilineTextAlignment(.center)

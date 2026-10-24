@@ -94,7 +94,7 @@ struct ServerEditorSheet: View {
     private var connectionSection: some View {
         EditorSection(title: "Connection") {
             FieldRow(label: "Name") {
-                TextField("My codeg server", text: $model.name)
+                TextField("My Coaxi server", text: $model.name)
                     .textContentType(.name)
                     .submitLabel(.next)
                     .focused($focusedField, equals: .name)
@@ -195,7 +195,7 @@ struct ServerEditorSheet: View {
     /// QR carries only the URL).
     private func handleScanned(_ code: String) {
         if !model.applyScanned(code) {
-            scanError = "That QR code isn’t a codeg server address. Make sure you’re scanning the server URL QR from codeg."
+            scanError = "That QR code isn’t a Coaxi server address. Make sure you’re scanning the server URL QR from codeg."
         }
     }
 

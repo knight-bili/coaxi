@@ -83,7 +83,7 @@ struct ServerListView: View {
             EmptyStateView(
                 icon: "server.rack",
                 title: "No Servers",
-                message: "Add a codeg server to start browsing its sessions.",
+                message: "Add a Coaxi server to start browsing its sessions.",
                 actionTitle: "Add Server",
                 action: { editorRoute = .add }
             )

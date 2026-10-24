@@ -169,7 +169,7 @@ struct CursorConfigSection: View {
     /// hands over the fully-resolved command rather than a bare `cursor-agent`.
     private var loginCommandRow: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Run this on the machine hosting codeg, then refresh:")
+            Text("Run this on the machine hosting Coaxi, then refresh:")
                 .font(.caption).foregroundStyle(Theme.textSecondary)
                 .fixedSize(horizontal: false, vertical: true)
             HStack(spacing: 8) {

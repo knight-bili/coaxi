@@ -98,7 +98,7 @@ final class ServerEditorModel {
         if hasExistingToken {
             return "Leave blank to keep the existing token."
         }
-        return "The bearer token issued by your codeg server."
+        return "The bearer token issued by your Coaxi server."
     }
 
     /// Placeholder for the token field — only promises to keep the existing token

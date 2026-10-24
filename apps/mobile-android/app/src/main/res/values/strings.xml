@@ -3,12 +3,12 @@
 
     <!-- Onboarding -->
     <string name="onboarding_title">Coaxi</string>
-    <string name="onboarding_tagline">Watch your codeg agents work, and steer them from anywhere.</string>
+    <string name="onboarding_tagline">Watch your Coaxi agents work, and steer them from anywhere.</string>
     <string name="onboarding_feature_watch">Watch tasks live</string>
     <string name="onboarding_feature_steer">Steer from anywhere</string>
     <string name="onboarding_feature_start">Start new work</string>
     <string name="onboarding_add_server">Add Your Server</string>
-    <string name="onboarding_footnote">Coaxi connects to a codeg server you run.</string>
+    <string name="onboarding_footnote">Coaxi connects to a Coaxi server you run.</string>
 
     <!-- Servers -->
     <string name="servers_title">Servers</string>
@@ -21,7 +21,7 @@
     <string name="server_test_connection">Test Connection</string>
     <string name="server_save">Save</string>
     <string name="server_delete">Delete</string>
-    <string name="server_connection_ok">Connected · codeg %1$s</string>
+    <string name="server_connection_ok">Connected · Coaxi %1$s</string>
     <string name="server_connection_failed">Connection failed: %1$s</string>
     <string name="server_section_connection">Connection</string>
     <string name="server_section_auth">Authentication</string>
@@ -30,7 +30,7 @@
     <!-- Home (smoke screen) -->
     <string name="home_title">Coaxi</string>
     <string name="home_status_checking">Checking connection…</string>
-    <string name="home_status_online">Online · codeg %1$s</string>
+    <string name="home_status_online">Online · Coaxi %1$s</string>
     <string name="home_status_offline">Offline</string>
     <string name="home_folders_count">%1$d folders</string>
     <string name="home_conversations_count">%1$d conversations</string>
@@ -223,8 +223,8 @@
     <string name="settings_accent_button">Accent button</string>
     <string name="settings_version">Version %1$s</string>
     <string name="settings_server">Server: %1$s</string>
-    <string name="settings_codeg_version">codeg %1$s</string>
-    <string name="settings_about_description">A native Android client for the codeg multi-agent coding server.</string>
+    <string name="settings_codeg_version">Coaxi %1$s</string>
+    <string name="settings_about_description">A native Android client for the Coaxi multi-agent coding server.</string>
     <string name="settings_coming_soon">Coming in milestone M9.</string>
     <string name="settings_licenses_unavailable">Unable to load open-source notices.</string>
 
@@ -237,7 +237,7 @@
     <string name="system_proxy_url">Proxy URL</string>
     <string name="system_server_update">Server Update</string>
     <string name="system_check_for_updates">Check for updates</string>
-    <string name="system_current_version">Current: codeg %1$s</string>
+    <string name="system_current_version">Current: Coaxi %1$s</string>
     <string name="system_update_available">Update available: %1$s</string>
     <string name="system_up_to_date">You\'re up to date.</string>
 
@@ -397,12 +397,12 @@
     <string name="agents_codebuddy_url_invalid">Enter a valid http(s) URL.</string>
     <!-- Detail · Kimi Code (self-contained panel) -->
     <string name="agents_kimi_section">Kimi Code Configuration</string>
-    <string name="agents_kimi_footer">`kimi acp` only authenticates with a stored login token and rejects API keys on their own. To use an API key, codeg writes a managed ~/.kimi-code/config.toml provider AND seeds a local gate token so the session opens — inference still runs on your key.</string>
+    <string name="agents_kimi_footer">`kimi acp` only authenticates with a stored login token and rejects API keys on their own. To use an API key, Coaxi writes a managed ~/.kimi-code/config.toml provider AND seeds a local gate token so the session opens — inference still runs on your key.</string>
     <string name="agents_kimi_auth_method">Authentication method</string>
     <string name="agents_kimi_auth_apikey">API key</string>
     <string name="agents_kimi_auth_login">Kimi account login (subscription)</string>
     <string name="agents_kimi_auth_caption">“API key” writes a codeg-managed config.toml provider and seeds a gate token. “Login” clears that and uses a real `kimi login` session (requires a Kimi subscription).</string>
-    <string name="agents_kimi_login_caption">Run `kimi login` in a terminal to sign in with a Kimi subscription account (device-code OAuth). codeg stores nothing and reuses Kimi’s own login. Saving here removes codeg’s API-key gate token.</string>
+    <string name="agents_kimi_login_caption">Run `kimi login` in a terminal to sign in with a Kimi subscription account (device-code OAuth). Coaxi stores nothing and reuses Kimi’s own login. Saving here removes Coaxi’s API-key gate token.</string>
     <string name="agents_kimi_provider_type">Provider type</string>
     <string name="agents_kimi_provider_caption">The provider protocol Kimi speaks (config.toml `type`). Use Kimi / Moonshot for a Moonshot / platform.kimi.com key.</string>
     <string name="agents_kimi_endpoint">Endpoint</string>
@@ -428,10 +428,10 @@
     <string name="agents_kimi_max_context_caption">Tokens, e.g. 262144. Leave blank to use the model default.</string>
     <string name="agents_kimi_save">Save Kimi Code Config</string>
     <string name="agents_kimi_raw_disclosure">Advanced: edit config.toml directly</string>
-    <string name="agents_kimi_raw_caption">Written verbatim (comments preserved) and validated as TOML. codeg also seeds the gate token so the session opens.</string>
+    <string name="agents_kimi_raw_caption">Written verbatim (comments preserved) and validated as TOML. Coaxi also seeds the gate token so the session opens.</string>
     <string name="agents_kimi_save_raw">Save config.toml</string>
     <string name="agents_kimi_gate_login">Authenticated via a Kimi account login.</string>
-    <string name="agents_kimi_gate_apikey">Authenticated via API key (codeg seeded the local gate token).</string>
+    <string name="agents_kimi_gate_apikey">Authenticated via API key (Coaxi seeded the local gate token).</string>
     <string name="agents_kimi_gate_none">Not authenticated yet — save an API key below (or sign in) to open Kimi sessions.</string>
     <string name="agents_kimi_saved">Kimi Code config saved</string>
     <string name="agents_kimi_model_required">Enter a model id (Kimi requires one for API-key mode).</string>
@@ -493,7 +493,7 @@
     <string name="agents_pi_config_saved">Pi config saved</string>
     <string name="agents_pi_trust_section">Auto-trust opened workspaces</string>
     <string name="agents_pi_trust_title">Auto-trust opened workspaces</string>
-    <string name="agents_pi_trust_desc">When codeg connects pi to a folder, mark that folder trusted so pi loads the project’s local config and skills without a separate prompt.</string>
+    <string name="agents_pi_trust_desc">When Coaxi connects pi to a folder, mark that folder trusted so pi loads the project’s local config and skills without a separate prompt.</string>
     <string name="agents_pi_trust_caption">Only folders you open here are trusted, never your whole machine — and this affects config loading only, not what pi is allowed to run.</string>
     <string name="agents_pi_trust_failed">Failed to save workspace trust</string>
     <!-- Detail · Grok -->
@@ -538,7 +538,7 @@
     <string name="agents_cursor_status_signed_out">Not signed in</string>
     <string name="agents_cursor_status_signed_in">Signed in</string>
     <string name="agents_cursor_refresh">Refresh</string>
-    <string name="agents_cursor_login_hint">Run this on the machine hosting codeg, then refresh:</string>
+    <string name="agents_cursor_login_hint">Run this on the machine hosting Coaxi, then refresh:</string>
     <string name="agents_cursor_api_key">Cursor API Key</string>
     <string name="agents_cursor_api_key_hint">Create one in the Cursor Dashboard under Integrations.</string>
     <string name="agents_cursor_model">Default Model</string>
