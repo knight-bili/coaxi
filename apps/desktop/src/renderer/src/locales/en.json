@@ -6181,5 +6181,7 @@
   "暂时无法读取队员提问，请重试。": "Unable to load teammate questions. Please try again.",
   "给正在工作的队员补充说明": "Add guidance for the working teammate",
   "补充给谁": "Teammate",
-  "补充与插话记录": "Guidance and steering history"
+  "补充与插话记录": "Guidance and steering history",
+  "预览补充": "Preview guidance",
+  "预览即时插话": "Preview immediate steering"
 }
