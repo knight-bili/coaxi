@@ -68,6 +68,20 @@ describe('Runtime Renderer Core method allowlist', () => {
     expect(allowlist).not.toContain("'runtime.arbitrary.invoke'")
   })
 
+  it('admits the existing conversation questions, grants and policy operations without private RPCs', () => {
+    const start = mainSource.indexOf('const allowedMethods = new Set<CoreMethod>([')
+    const end = mainSource.indexOf('\n])', start)
+    const methods = mainSource.slice(start, end)
+    for (const suffix of ['policy.get', 'policy.set', 'questions.list', 'questions.answer',
+      'questions.decline', 'questions.reconcile', 'grants.preview', 'grants.confirm',
+      'grants.revoke', 'grants.list', 'requests.get', 'requests.resolve',
+      'automationOwner.get', 'automationOwner.set']) {
+      expect(methods).toContain(`'conversationTools.${suffix}'`)
+    }
+    expect(methods).not.toContain("'core.shutdown'")
+    expect(methods).not.toContain("'conversationTools.*'")
+  })
+
   it('wakes the same Core recovery check when the operating system resumes', () => {
     expect(mainSource).toContain("powerMonitor.on('resume', wakeNetworkRecoveryAfterSystemResume)")
     expect(mainSource).toContain("core.request('runtime.networkRecovery.wake')")
