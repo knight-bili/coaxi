@@ -46,5 +46,9 @@
 .usage-activity-dashboard .usage-panel ol { list-style:none;margin:0;padding:0; }
 .usage-share-dialog footer { display:flex;justify-content:flex-end;flex-wrap:wrap;gap:8px; }
 .dialog-content.app-dialog.usage-share-dialog { width:min(420px,calc(100vw - 24px));max-height:calc(100dvh - 32px);padding:20px;gap:14px; }
+.usage-share-dialog>header { display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex:none; }
+.usage-share-dialog>header h2 { margin:0;font-size:18px;line-height:1.5; }
+.usage-share-dialog>header>.quiet-button { display:grid;place-items:center;flex:none;width:28px;min-height:28px;padding:0;font-size:20px;line-height:1; }
+.usage-share-dialog>footer { flex:none;padding-top:14px;border-top:1px solid var(--line); }
 @media(max-width:1000px){.usage-dashboard-two-panels{grid-template-columns:minmax(0,1fr)}.usage-connected-stats{grid-template-columns:repeat(3,minmax(0,1fr))}.usage-connected-stats>div{border-bottom:1px solid var(--line)}}
 @media(max-width:650px){.usage-dashboard-heading{padding:16px;flex-wrap:wrap}.usage-dashboard-toolbar{padding:0 16px 12px}.usage-dashboard-content{padding:16px}.usage-dashboard-filters input{max-width:160px}.usage-connected-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}

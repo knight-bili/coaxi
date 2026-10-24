@@ -8872,7 +8872,7 @@ html[lang="en"] .runtime-parameter-picker-menu:has(.permission-menu-guidance) { 
 
 /* Shared shells and surface-specific composition. */
 
-:root .dialog-content.app-dialog { width:min(480px,calc(100vw - 48px)); padding:0; max-height:calc(100vh - 48px); border-radius:12px; border:1px solid var(--line-strong); }
+.dialog-content.app-dialog { width:min(480px,calc(100vw - 48px)); padding:0; max-height:calc(100vh - 48px); border-radius:12px; border:1px solid var(--line-strong); }
 :root .dialog-content.app-dialog::before { content:none; }
 :root .dialog-content.app-dialog.camp-member-dialog { width:min(560px,calc(100vw - 48px)); }
 :root .app-dialog:is(.task-editor-dialog,.memory-editor-dialog,.mcp-editor-dialog,.member-avatar-dialog) { width:min(600px,calc(100vw - 48px)); }
