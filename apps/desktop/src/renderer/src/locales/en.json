@@ -6177,5 +6177,6 @@
   "内置参考价": "Built-in reference prices",
   "兼容配置": "Compatible configuration",
   "上次检测：{0}": "Last detected: {0}",
-  "目录来自所选智能体": "Catalog from the selected agent"
+  "目录来自所选智能体": "Catalog from the selected agent",
+  "暂时无法读取队员提问，请重试。": "Unable to load teammate questions. Please try again."
 }
