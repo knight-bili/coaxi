@@ -88,3 +88,5 @@
 .workbench-launcher-confirm pre,.workbench-project-launcher pre.capability-source-code{overflow-wrap:anywhere;white-space:pre-wrap}
 @container project-launcher (max-width:680px){.workbench-launcher-layout{flex-direction:column}.workbench-launcher-config,.workbench-launcher-config:only-child{flex:none;max-width:640px}.workbench-launcher-preview{flex:none;height:420px}}
 @container project-launcher (max-width:420px){.workbench-launcher-config{grid-template-columns:minmax(0,1fr)}.workbench-launcher-kinds{grid-template-columns:minmax(0,1fr)}}
+.conversation-tool-button { display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap; }
+.conversation-tool-button > svg { display:block;flex-shrink:0; }
