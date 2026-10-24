@@ -1680,9 +1680,11 @@ pub fn codex_models(catalog: &Value) -> Result<Vec<ModelDescriptor>> {
         .iter()
         .map(|value| {
             let id = value
-                .get("id")
+                .get("model")
+                .or_else(|| value.get("id"))
                 .and_then(Value::as_str)
-                .context("Codex model is missing id")?;
+                .filter(|id| !id.trim().is_empty())
+                .context("Codex model is missing a selection value")?;
             let display_name = value
                 .get("displayName")
                 .and_then(Value::as_str)
@@ -1730,8 +1732,9 @@ pub fn codex_models(catalog: &Value) -> Result<Vec<ModelDescriptor>> {
                     .and_then(Value::as_bool)
                     .unwrap_or(false),
                 deprecated: value
-                    .get("upgrade")
-                    .is_some_and(|upgrade| !upgrade.is_null()),
+                    .get("deprecated")
+                    .and_then(Value::as_bool)
+                    .unwrap_or(false),
                 options,
             })
         })
@@ -4515,6 +4518,15 @@ mod tests {
             .expect("Codex catalog should map");
 
         assert_eq!(snapshot.models[0].id, "gpt-current");
+        let catalog = codex_models(&json!({"data": [{
+            "id": "display-entry-id", "model": "native-selection-id",
+            "displayName": "Catalog label", "upgrade": "recommended-new-model"
+        }]})).unwrap();
+        assert_eq!(catalog[0].id, "native-selection-id");
+        assert!(!catalog[0].deprecated, "an upgrade recommendation does not revoke access");
+        assert!(codex_models(&json!({"data":[{"id":"label", "model":""}]})).is_err());
+        assert!(codex_models(&json!({"data":[{"id":"label", "model":12}]})).is_err());
+        assert_eq!(codex_models(&json!({"data":[{"id":"legacy-id"}]})).unwrap()[0].id, "legacy-id");
         assert_eq!(
             snapshot.models[0].options[0].default_value.as_deref(),
             Some("high")

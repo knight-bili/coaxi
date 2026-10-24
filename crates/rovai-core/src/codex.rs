@@ -991,7 +991,7 @@ impl CodexRuntime {
                     })
                 })?;
             if models.iter().any(|model| {
-                model.get("id").and_then(Value::as_str) == Some(model_id)
+                model.get("model").or_else(|| model.get("id")).and_then(Value::as_str) == Some(model_id)
                     && !model
                         .get("hidden")
                         .and_then(Value::as_bool)
