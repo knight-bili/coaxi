@@ -25,5 +25,26 @@
 .usage-native-sync{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}.usage-native-sync strong{font-size:13px}.usage-native-sync p{margin:4px 0 0;font-size:11px;color:var(--muted)}
 .usage-share-dialog{display:flex;flex-direction:column;gap:14px;width:min(420px,calc(100vw - 24px));max-height:calc(100dvh - 32px);padding:20px;overflow:hidden}
 .usage-share-dialog header h2{margin:0;font-size:17px;font-weight:600}.usage-share-preview{display:flex;justify-content:center;min-height:0;overflow:auto;scrollbar-width:thin;border-radius:12px}.usage-share-names{display:flex;align-items:center;gap:8px;font-size:12px}.usage-share-dialog p{font-size:12px;margin:0}.usage-share-dialog footer{flex:none}
+/* The chart primitives keep their source CSS. Host layout uses explicit
+   classes instead of utilities absent from the frozen rich-content stylesheet. */
+.usage-dashboard-content { display:flex;flex-direction:column;gap:16px; }
+.usage-dashboard-content>* { flex-shrink:0; }
+.usage-activity-dashboard .usage-stack { display:grid;gap:16px;min-width:0; }
+.usage-activity-dashboard .usage-panel { display:flex;flex-direction:column;min-width:0;gap:8px;padding:16px;border:1px solid var(--line);border-radius:12px;background:var(--surface-raised);color:var(--ink); }
+.usage-activity-dashboard .usage-panel-heading { display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:8px 16px;margin-bottom:12px; }
+.usage-activity-dashboard .usage-panel :is(h2,.usage-panel-title) { margin:0 0 8px;font-size:13px;font-weight:600;line-height:1.5; }
+.usage-activity-dashboard .usage-panel-heading p { margin:4px 0 0;font-size:12px;line-height:1.7;color:var(--muted); }
+.usage-activity-dashboard .usage-total-panel { gap:0;padding:0;overflow:hidden; }
+.usage-activity-dashboard .usage-total-heading { display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px;padding:20px; }
+.usage-activity-dashboard .usage-total-value { display:block;margin-top:8px;font-size:34px;font-weight:650;line-height:1.2;letter-spacing:-.03em; }
+.usage-activity-dashboard .usage-stat { min-width:0;padding:16px 20px;overflow-wrap:anywhere; }
+.usage-activity-dashboard .usage-stat dd { margin:6px 0 0;font-size:20px;font-weight:600;line-height:1.3; }
+.usage-activity-dashboard .usage-stat dt { font-size:11px;color:var(--muted); }
+.usage-activity-dashboard .usage-connected-stats { border-top:1px solid var(--line); }
+.usage-activity-dashboard .usage-total-panel>p { margin:0;padding:0 20px 20px;font-size:12px;color:var(--muted); }
+.usage-dashboard-heading>div:last-child,.usage-native-sync>div:last-child { display:flex;align-items:center;flex-wrap:wrap;gap:8px; }
+.usage-activity-dashboard .usage-panel ol { list-style:none;margin:0;padding:0; }
+.usage-share-dialog footer { display:flex;justify-content:flex-end;flex-wrap:wrap;gap:8px; }
+.dialog-content.app-dialog.usage-share-dialog { width:min(420px,calc(100vw - 24px));max-height:calc(100dvh - 32px);padding:20px;gap:14px; }
 @media(max-width:1000px){.usage-dashboard-two-panels{grid-template-columns:minmax(0,1fr)}.usage-connected-stats{grid-template-columns:repeat(3,minmax(0,1fr))}.usage-connected-stats>div{border-bottom:1px solid var(--line)}}
 @media(max-width:650px){.usage-dashboard-heading{padding:16px;flex-wrap:wrap}.usage-dashboard-toolbar{padding:0 16px 12px}.usage-dashboard-content{padding:16px}.usage-dashboard-filters input{max-width:160px}.usage-connected-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
