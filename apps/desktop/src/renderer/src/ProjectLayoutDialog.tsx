@@ -134,9 +134,9 @@ export function ProjectLayoutDialog({ snapshot, onSave, onRefresh, onClose }: {
       <AppDialogBody>
         {(error || snapshot.readError) && <p role="alert">{error || uiAttribute('布局暂时无法保存，原有记录已保留。')}</p>}
         {(stale || relationIssue) && <p role="status"><UiText zh="最新清单或工程关系已有变化。本次排列保留，请核对后使用最新布局重新排列。" /></p>}
-        <div className="project-layout-actions"><button type="button" disabled={busy} onClick={() => { void refresh() }}><UiText zh="重新读取布局" /></button>
-          {reread && <button type="button" disabled={busy || Boolean(snapshot.readError) || paths.some(path => !folders.resolutions.get(path)?.complete)} onClick={useLatest}><UiText zh="使用最新布局，放弃本次排列" /></button>}
-          {matched && <button type="button" disabled={busy} onClick={onClose}><UiText zh="使用已保存布局" /></button>}</div>
+        <div className="project-layout-actions"><button className="quiet-button" type="button" disabled={busy} onClick={() => { void refresh() }}><UiText zh="重新读取布局" /></button>
+          {reread && <button className="quiet-button" type="button" disabled={busy || Boolean(snapshot.readError) || paths.some(path => !folders.resolutions.get(path)?.complete)} onClick={useLatest}><UiText zh="使用最新布局，放弃本次排列" /></button>}
+          {matched && <button className="quiet-button" type="button" disabled={busy} onClick={onClose}><UiText zh="使用已保存布局" /></button>}</div>
         <p role="status" aria-live="polite">{moving ? uiAttribute('正在排列“{0}”', label(moving)) : uiAttribute('工作树跟随主工程，不单独排列。置顶工程在此排列其原位置。')}</p>
         <div ref={surface} className="project-layout-surface" tabIndex={moving ? 0 : -1} role={moving ? 'listbox' : 'group'} aria-label={uiAttribute('项目排列位置')}
           aria-activedescendant={moving && target !== null ? `${slotId}-${target}` : undefined}
@@ -162,11 +162,11 @@ export function ProjectLayoutDialog({ snapshot, onSave, onRefresh, onClose }: {
                 ...layout.members[item.groupId].map(projectPath => <div key={projectPath} className="project-layout-row" data-depth="1">{grip({ kind: 'project', projectPath })}<span title={projectPath}>{label({ kind: 'project', projectPath })}</span></div>)])}
         </div>
         {discard && <div className="canvas-notice" role="alert"><p><UiText zh={unknown ? '保存结果仍需核对，请先重新读取布局。' : '排列尚未保存，确认放弃本次排列？'} /></p>
-          {!unknown && <button type="button" onClick={onClose}><UiText zh="确认放弃排列" /></button>}
-          <button type="button" onClick={() => setDiscard(false)}><UiText zh="继续排列" /></button></div>}
+          {!unknown && <button className="quiet-button" type="button" onClick={onClose}><UiText zh="确认放弃排列" /></button>}
+          <button className="quiet-button" type="button" onClick={() => setDiscard(false)}><UiText zh="继续排列" /></button></div>}
       </AppDialogBody>
-      <AppDialogFooter><button type="button" disabled={busy} onClick={close}><UiText zh="返回分组清单" /></button>
-        <button type="button" disabled={blocked || !dirty || Boolean(moving)} onClick={() => { void save() }}><UiText zh="保存排列" /></button></AppDialogFooter>
+      <AppDialogFooter><button className="quiet-button" type="button" disabled={busy} onClick={close}><UiText zh="返回分组清单" /></button>
+        <button className="quiet-button" type="button" disabled={blocked || !dirty || Boolean(moving)} onClick={() => { void save() }}><UiText zh="保存排列" /></button></AppDialogFooter>
     </AppDialogContent>
   </Dialog.Portal></Dialog.Root>
 }

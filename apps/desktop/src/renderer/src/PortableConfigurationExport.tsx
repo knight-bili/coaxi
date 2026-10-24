@@ -64,14 +64,14 @@ export function PortableConfigurationExport({sourceArchive}:{sourceArchive?:Port
   return <section className="portable-configuration-export">
     <div className="section-heading"><h3>{t(sourceArchive?'保留原配置的完整副本':'导出完整配置')}</h3><p>{t(sourceArchive?'保存这份候选的原内容，包括尚不支持的字段。保存副本不会启用其中的配置。':'保存一份加密副本，到另一台主机再选择要搬入的配置和本机队员。')}</p></div>
     {receipt?.state!=='ready'&&<fieldset className="portable-provider-fields" disabled={busy||!ready}>
-      <label><span>{t(sourceArchive?'确认原内容和可能包含的密钥一起加密保存':'同时包含密钥')}</span><input type="checkbox" checked={includeSecrets} disabled={!!pending&&receipt?.state!=='unknown'} onChange={event=>setIncludeSecrets(event.target.checked)}/></label>
-      <label><span>{t('副本加密口令')}</span><input type="password" autoComplete="new-password" value={passphrase} onChange={event=>setPassphrase(event.target.value)} placeholder={t('至少8个字符')}/></label>
+      <label><span>{t(sourceArchive?'确认原内容和可能包含的密钥一起加密保存':'同时包含密钥')}</span><input className="workspace-check" type="checkbox" checked={includeSecrets} disabled={!!pending&&receipt?.state!=='unknown'} onChange={event=>setIncludeSecrets(event.target.checked)}/></label>
+      <label><span>{t('副本加密口令')}</span><input className="workspace-field" type="password" autoComplete="new-password" value={passphrase} onChange={event=>setPassphrase(event.target.value)} placeholder={t('至少8个字符')}/></label>
     </fieldset>}
     <p className="muted">{t(sourceArchive?'原副本可能含原应用保存的敏感设置；需要你明确勾选后才导出，始终使用加密文件。':'默认不含密钥；包含密钥时也只放进加密副本。原生登录、服务令牌和本机安装锁不随配置迁移。')}</p>
     <div className="portable-provider-actions">
-      {receipt?.state!=='ready'&&<button type="button" disabled={busy||!ready||Array.from(passphrase).length<8||Boolean(sourceArchive&&!includeSecrets)} onClick={()=>void prepare()}>{t(pending?'继续准备原副本':'准备加密副本')}</button>}
-      {pending&&<button type="button" disabled={busy} onClick={()=>void reconcile()}>{t('核对原导出')}</button>}
-      {receipt?.state==='ready'&&<><button type="button" disabled={busy} onClick={()=>void save()}>{t('保存加密副本')}</button><button type="button" disabled={busy} onClick={()=>void another()}>{t('另建一份副本')}</button></>}
+      {receipt?.state!=='ready'&&<button className="quiet-button" type="button" disabled={busy||!ready||Array.from(passphrase).length<8||Boolean(sourceArchive&&!includeSecrets)} onClick={()=>void prepare()}>{t(pending?'继续准备原副本':'准备加密副本')}</button>}
+      {pending&&<button className="quiet-button" type="button" disabled={busy} onClick={()=>void reconcile()}>{t('核对原导出')}</button>}
+      {receipt?.state==='ready'&&<><button className="quiet-button" type="button" disabled={busy} onClick={()=>void save()}>{t('保存加密副本')}</button><button className="quiet-button" type="button" disabled={busy} onClick={()=>void another()}>{t('另建一份副本')}</button></>}
     </div>
     {receipt&&<p role="status">{t(receipt.state==='ready'?'副本已准备好。':receipt.state==='prepared'?'原副本仍待完成，请使用原口令继续。':'尚未查到原导出结果，未自动重发。')}</p>}
     {message&&<p role="status">{message}</p>}{error&&<p className="inline-error" role="alert">{error}</p>}

@@ -24,6 +24,7 @@
 .workspace-field:disabled { opacity: .5; cursor: not-allowed; }
 textarea.workspace-field { min-height: 84px; resize: vertical; }
 .workspace-check { width: 15px; height: 15px; margin: 0; flex: 0 0 auto; accent-color: var(--conversation-action); }
+.workspace-check:disabled { opacity: .45; cursor: not-allowed; }
 .workspace-file { min-width: 0; max-width: 100%; font: inherit; font-size: 12px; color: var(--muted); }
 .workspace-file::file-selector-button {
   margin-right: 10px; padding: 7px 10px; border: 1px solid var(--line);
@@ -113,6 +114,13 @@ textarea.workspace-field { min-height: 84px; resize: vertical; }
 .portable-task-templates>.section-heading h3 { margin: 0; font-size: 14px; }
 .portable-task-templates>.section-heading p { margin: 0; max-width: 72ch; color: var(--muted); font-size: 12px; line-height: 1.7; }
 .portable-task-templates .muted { color: var(--muted); font-size: 12px; }
+.portable-configuration-export { display:grid;min-width:0;gap:14px;padding:20px 0;border-top:1px solid var(--line); }
+.portable-configuration-export>.section-heading { display:grid;gap:6px;margin:0; }
+.portable-configuration-export>.section-heading h3 { margin:0;font-size:14px; }
+.portable-configuration-export>.section-heading p,.portable-configuration-export>.muted { margin:0;color:var(--muted);font-size:12px;line-height:1.7; }
+.portable-configuration-export .portable-provider-fields { margin:0; }
+.mission-template-menu .muted { color:var(--muted);font-size:12px;line-height:1.7; }
+.mission-template-menu .workspace-field { width:100%; }
 .interaction-member-settings details { padding: 10px 0; border-block: 1px solid var(--line); font-size: 12px; }
 .interaction-member-settings summary { color: var(--muted); cursor: pointer; line-height: 1.7; }
 .interaction-member-settings .settings-form-field { display: grid; min-width: 0; gap: 6px; padding: 12px 0; font-size: 12px; }
