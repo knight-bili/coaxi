@@ -92,3 +92,7 @@
 @container project-launcher (max-width:420px){.workbench-launcher-config{grid-template-columns:minmax(0,1fr)}.workbench-launcher-kinds{grid-template-columns:minmax(0,1fr)}}
 .conversation-tool-button { display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap; }
 .conversation-tool-button > svg { display:block;flex-shrink:0; }
+/* Keep source diff night colors above the shared Markdown utility vocabulary. */
+[data-theme="night"] .workspace-workbench .codeg-native-rich .dark\:text-green-300 { color:var(--color-green-300); }
+[data-theme="night"] .workspace-workbench .codeg-native-rich .dark\:text-red-300 { color:var(--color-red-300); }
+[data-theme="night"] .workspace-workbench .codeg-native-rich .dark\:text-blue-300 { color:var(--color-blue-300); }
