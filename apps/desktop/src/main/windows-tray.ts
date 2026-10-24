@@ -1,5 +1,6 @@
 import { Menu, nativeImage, Tray } from 'electron'
 import iconPath from '../../../../build/icon.png?asset'
+import { PRODUCT_NAME } from '../shared/product-identity'
 
 /** Called only by the Windows main-window owner, after app.ready. */
 export function createWindowsTray(open: () => void, quit: () => void, english: boolean): Tray {
@@ -7,10 +8,10 @@ export function createWindowsTray(open: () => void, quit: () => void, english: b
   if (icon.isEmpty()) throw new Error('Coaxi tray icon is unavailable')
   const tray = new Tray(icon.resize({ width: 16, height: 16 }))
   try {
-    tray.setToolTip('Coaxi')
+    tray.setToolTip(PRODUCT_NAME)
     tray.setContextMenu(Menu.buildFromTemplate([
-      { label: english ? 'Open Rovai' : '打开 Rovai', click: open },
-      { label: english ? 'Quit Rovai' : '退出 Rovai', click: quit }
+      { label: english ? `Open ${PRODUCT_NAME}` : `打开 ${PRODUCT_NAME}`, click: open },
+      { label: english ? `Quit ${PRODUCT_NAME}` : `退出 ${PRODUCT_NAME}`, click: quit }
     ]))
     tray.on('click', open)
     return tray

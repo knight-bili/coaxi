@@ -72,7 +72,7 @@ export function WindowCloseSettings({ api }: { api: WindowCloseApi }): React.JSX
         disabled={!snapshot || busy || snapshot.promptId !== null} onChange={event => change(event.target.value as WindowCloseBehavior)}>
         <option value="ask">{text('每次询问', 'Ask every time')}</option>
         <option value="tray">{text('最小化到系统托盘', 'Minimize to system tray')}</option>
-        <option value="exit">{text('退出 Rovai', 'Quit Rovai')}</option>
+        <option value="exit">{text('退出 Coaxi', 'Quit Coaxi')}</option>
       </select>
     </label>
     {busy && <p className="general-inline-status" role="status">{text('正在保存…', 'Saving…')}</p>}
@@ -124,7 +124,7 @@ function ClosePrompt({ snapshot, transportError, busy, respond }: {
         </AppDialogBody>
         <AppDialogFooter leading={<button type="button" className="quiet-button" data-dialog-autofocus disabled={busy}
           onClick={() => choose('cancel')}>{text('取消', 'Cancel')}</button>}>
-          <button type="button" className="quiet-button" disabled={busy} onClick={() => choose('exit')}>{text('退出 Rovai', 'Quit Rovai')}</button>
+          <button type="button" className="quiet-button" disabled={busy} onClick={() => choose('exit')}>{text('退出 Coaxi', 'Quit Coaxi')}</button>
           <button type="button" className="primary-button" disabled={busy} onClick={() => choose('tray')}>{busy ? text('正在处理…', 'Working…') : text('最小化到托盘', 'Minimize to tray')}</button>
         </AppDialogFooter>
         {busy && <p className="sr-only" role="status">{text('正在处理…', 'Working…')}</p>}
