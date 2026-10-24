@@ -1,6 +1,10 @@
 import assert from 'node:assert/strict'
-import { readFileSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import test from 'node:test'
+import { recordWorkbenchPackage } from './workbench-package.cjs'
 
 const read = file => readFileSync(new URL(file, import.meta.url), 'utf8')
 
@@ -20,4 +24,24 @@ test('Windows release verification rejects a missing helper and probes the insta
   assert.match(verifier, /verifyBinary\('rovai-computer-helper', computerHelperExecutable\)/u)
   assert.match(verifier, /run\(computerHelperExecutable, \['--request-permission', 'accessibility'\]/u)
   assert.match(verifier, /helperPermission\.prompted !== false/u)
+})
+
+test('package admission fails on a missing helper and records it only after it exists', t => {
+  const directory = mkdtempSync(join(tmpdir(), 'coaxi-helper-package-'))
+  t.after(() => rmSync(directory, { recursive: true, force: true }))
+  const resources = join(directory, 'resources')
+  const put = (relative, content = 'fixture') => {
+    const file = join(resources, relative)
+    mkdirSync(dirname(file), { recursive: true })
+    writeFileSync(file, content)
+  }
+  put('workbench/product-release.json', JSON.stringify({ productId: 'codeg-rovai-workbench', repository: 'https://github.com/knight-bili/coaxi', targetVersion: '1.0.0' }))
+  put('workbench/sources.lock.json', JSON.stringify({ repository: 'knight-bili/coaxi' }))
+  for (const name of ['rovai-core', 'rovai-host', 'rovai', 'rovai-native-history']) put(`bin/${name}.exe`)
+  for (const name of ['web-ui/index.html', 'skills/cli-operations/SKILL.md', 'licenses/rovai-LICENSE', 'licenses/THIRD_PARTY_NOTICES.md', 'licenses/integration/codeg/LICENSE', 'licenses/integration/rovai-ai/LICENSE']) put(name)
+  const context = { electronPlatformName: 'win32', appOutDir: directory, arch: 1, packager: { projectDir: fileURLToPath(new URL('../../', import.meta.url)), appInfo: { version: '0.4.8' } } }
+  assert.throws(() => recordWorkbenchPackage(context), /rovai-computer-helper\.exe/u)
+  put('bin/rovai-computer-helper.exe')
+  recordWorkbenchPackage(context)
+  assert.ok(JSON.parse(readFileSync(join(resources, 'workbench/package.json'), 'utf8')).nativeExecutables.includes('bin/rovai-computer-helper.exe'))
 })

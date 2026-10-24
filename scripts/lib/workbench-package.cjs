@@ -12,6 +12,7 @@ function recordWorkbenchPackage(context){
   if(source.repository!=='knight-bili/coaxi')throw new Error('Fusion source lock mismatch')
   const suffix=platform==='win32'?'.exe':''
   const binaries=['rovai-core','rovai-host','rovai','rovai-native-history'].map(name=>`bin/${name}${suffix}`)
+  if(platform==='win32')binaries.push('bin/rovai-computer-helper.exe')
   const documents=['licenses/rovai-LICENSE','licenses/THIRD_PARTY_NOTICES.md','licenses/integration/codeg/LICENSE','licenses/integration/rovai-ai/LICENSE','workbench/sources.lock.json','workbench/product-release.json']
   const resourcesToHash=['web-ui/index.html','skills/cli-operations/SKILL.md',...documents]
   const files={}
