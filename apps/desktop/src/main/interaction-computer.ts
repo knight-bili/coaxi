@@ -89,10 +89,19 @@ export class InteractionComputer implements DesktopComputerExecutor{
   async monitor():Promise<InteractionComputerMonitor>{
     await this.ready
     const peer=this.peer
-    const all=peer?await this.core.request<{grants:InteractionGrant[]}>('interaction.local',{action:'grant.list',payload:{desktopPeerId:peer.desktopPeerId}}):{grants:[]}
+    const grants=new Map<string,InteractionGrant>()
+    if(peer)for(const [key,target] of this.scopes){
+      try{
+        const result=await this.core.request<{grants:InteractionGrant[]}>('interaction.local',{action:'grant.list',payload:{scope:target.scope,agentId:target.agentId,desktopPeerId:peer.desktopPeerId}})
+        for(const grant of result.grants)grants.set(grant.grantId,grant)
+      }catch(error){
+        if(error instanceof Error&&error.message==='scope_changed'){this.scopes.delete(key);continue}
+        throw error
+      }
+    }
     if(this.peer!==peer)throw new Error('desktop_unavailable')
     return {enabled:this.preferences.enabled,connected:Boolean(this.child),lastError:this.lastError,stopShortcut:this.registeredShortcut?this.preferences.stopShortcut:null,
-      grants:all.grants.filter(grant=>grant.targetKind.startsWith('computer_')&&Date.parse(grant.expiresAt)>Date.now()),
+      grants:[...grants.values()].filter(grant=>grant.targetKind.startsWith('computer_')&&Date.parse(grant.expiresAt)>Date.now()),
       activity:this.activity.map(item=>({...item,...this.scopes.get(item.scopeKey)}))}
   }
   async clearActivity(before:number,threadId:string):Promise<void>{if(!Number.isSafeInteger(before)||typeof threadId!=='string')throw new Error('invalid_arguments');for(let index=this.activity.length-1;index>=0;index--)if(this.activity[index].at<=before&&this.scopes.get(this.activity[index].scopeKey)?.scope.threadId===threadId)this.activity.splice(index,1)}
