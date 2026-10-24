@@ -1,3 +1,4 @@
+import { readErrorMessage } from './error-message'
 import { InteractionActivity } from './InteractionActivity'
 import { InteractionShareControl } from './InteractionShareControl'
 import { useEffect, useState } from 'react'
@@ -19,8 +20,8 @@ export function BrowserWorkbench({threadId}:{threadId:string}):React.JSX.Element
   const [profileId,setProfileId]=useState('temporary'),[devtools,setDevtools]=useState(false)
   useEffect(()=>{let cancelled=false;void api?.preferences().then(value=>{if(!cancelled)setDevtools(value.devtools)}).catch(()=>undefined);return()=>{cancelled=true}},[api])
   const current=tabs.find(tab=>tab.id===selected)
-  useEffect(()=>{let cancelled=false;const refresh=():void=>{void api?.list(threadId).then(value=>{if(!cancelled)setTabs(value)}).catch(failure=>{if(!cancelled)setError(String(failure))})};refresh();const timer=window.setInterval(refresh,2000);return()=>{cancelled=true;window.clearInterval(timer)}},[api,threadId])
-  const run=async(action:()=>Promise<void>):Promise<void>=>{if(busy)return;setBusy(true);setError(null);try{await action()}catch(failure){setError(String(failure))}finally{setBusy(false)}}
+  useEffect(()=>{let cancelled=false;const refresh=():void=>{void api?.list(threadId).then(value=>{if(!cancelled)setTabs(value)}).catch(failure=>{if(!cancelled)setError(readErrorMessage(failure))})};refresh();const timer=window.setInterval(refresh,2000);return()=>{cancelled=true;window.clearInterval(timer)}},[api,threadId])
+  const run=async(action:()=>Promise<void>):Promise<void>=>{if(busy)return;setBusy(true);setError(null);try{await action()}catch(failure){setError(readErrorMessage(failure))}finally{setBusy(false)}}
   const control=async(action:Parameters<NonNullable<typeof api>['control']>[0]['action'],extra:Record<string,unknown>={}):Promise<void>=>{
     if(!api||!current)return
     const result=await api.control({id:current.id,action,...extra});setPreview(null)

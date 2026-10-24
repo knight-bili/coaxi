@@ -1,3 +1,4 @@
+import { readErrorMessage } from './error-message'
 import {useMemo,useRef,useState,type ComponentProps} from 'react'
 import {Files} from 'lucide-react'
 import {useThreadClient} from './camp-client'
@@ -29,7 +30,7 @@ export function WorkspaceWorkbenchEntry(props:Props):React.JSX.Element{
       if(!isCurrent())return
       if(typeof result.workspaceRoot!=='string'||!result.workspaceRoot)throw new Error(t('当前主机尚未提供已核实的工程目录。'))
       setReady({root:result.workspaceRoot,owner:captured,initialTab})
-    }catch(error){if(isCurrent())setIssue({owner:captured,message:String(error)})}
+    }catch(error){if(isCurrent())setIssue({owner:captured,message:readErrorMessage(error)})}
     finally{if(isCurrent()){busyOwnerRef.current=null;setBusyOwner(null)}}
   }
   useShortcutActions({

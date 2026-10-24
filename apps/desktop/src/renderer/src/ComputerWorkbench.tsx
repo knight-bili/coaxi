@@ -1,3 +1,4 @@
+import { readErrorMessage } from './error-message'
 import { InteractionComputerPanel } from './InteractionComputerPanel'
 import { InteractionActivity } from './InteractionActivity'
 import { useCallback, useEffect, useState } from 'react'
@@ -13,8 +14,8 @@ export function ComputerWorkbench({threadId}:{threadId:string}):React.JSX.Elemen
   const [status,setStatus]=useState<Status|null>(null),[windows,setWindows]=useState<Window[]>([]),[busy,setBusy]=useState(false),[error,setError]=useState<string|null>(null)
   const [preview,setPreview]=useState<{targetId:string;image?:string;tree?:string}|null>(null),[permissions,setPermissions]=useState<{required:boolean;accessibility:boolean;screenRecording:boolean}|null>(null)
   const refresh=useCallback(async()=>{if(api)setStatus(await api.request<Status>(threadId,{operation:'status'}))},[api,threadId])
-  useEffect(()=>{let active=true;void refresh().catch(failure=>{if(active)setError(String(failure))});return()=>{active=false}},[refresh])
-  const run=async(action:()=>Promise<void>):Promise<void>=>{if(busy)return;setBusy(true);setError(null);try{await action();await refresh()}catch(failure){setError(String(failure))}finally{setBusy(false)}}
+  useEffect(()=>{let active=true;void refresh().catch(failure=>{if(active)setError(readErrorMessage(failure))});return()=>{active=false}},[refresh])
+  const run=async(action:()=>Promise<void>):Promise<void>=>{if(busy)return;setBusy(true);setError(null);try{await action();await refresh()}catch(failure){setError(readErrorMessage(failure))}finally{setBusy(false)}}
   const load=async():Promise<void>=>{if(api)setWindows((await api.request<{windows:Window[]}>(threadId,{operation:'windows'})).windows)}
   const share=async(window:Window,level:Window['level']):Promise<void>=>{if(!api)return;await api.request(threadId,{operation:'share',targetId:window.targetId,level});setPreview(null);await load()}
   const read=async(window:Window,operation:'capture'|'snapshot'):Promise<void>=>{
@@ -29,7 +30,7 @@ export function ComputerWorkbench({threadId}:{threadId:string}):React.JSX.Elemen
       <label><input className="workspace-check" type="checkbox" checked={status?.enabled??false} disabled={busy||!status} onChange={event=>{const enabled=event.target.checked;void run(async()=>{await api.request(threadId,{operation:'enable',enabled});setWindows([]);setPreview(null);setPermissions(null)})}}/>{t('允许在此会话共享窗口')}</label>
       <button className="quiet-button" disabled={busy||!status?.enabled} onClick={()=>void run(load)}><RefreshCw size={14}/>{t('选择窗口')}</button>
       <button className="quiet-button" disabled={busy||!status?.enabled} onClick={()=>void run(async()=>setPermissions(await api.request(threadId,{operation:'permissions'})))}>{t('系统权限')}</button>
-      <button className="quiet-button" disabled={!status?.enabled} onClick={()=>{setPreview(null);void api.request(threadId,{operation:'stop'}).then(()=>refresh()).catch(failure=>setError(String(failure)))}}><Square size={13}/>{t('立即停止并收回共享')}</button>
+      <button className="quiet-button" disabled={!status?.enabled} onClick={()=>{setPreview(null);void api.request(threadId,{operation:'stop'}).then(()=>refresh()).catch(failure=>setError(readErrorMessage(failure)))}}><Square size={13}/>{t('立即停止并收回共享')}</button>
     </div>
     <div className="workbench-toolbar"><span>{t('驱动')} {status?.driverVersion??''} · {status?.installed?t('已安装'):t('未安装')} · {status?.backend.state??''}</span><button className="quiet-button" disabled={busy} onClick={()=>void run(async()=>{await api.request(threadId,{operation:'install'})})}>{t('安装固定版本')}</button><button className="quiet-button" disabled={busy||status?.enabled||!status?.installed} onClick={()=>void run(async()=>{await api.request(threadId,{operation:'remove'})})}>{t('移除驱动')}</button></div>
     {(error||status?.backend.detail)&&<p role="alert" className="workbench-error">{error??status?.backend.detail}</p>}

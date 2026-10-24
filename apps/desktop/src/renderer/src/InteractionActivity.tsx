@@ -1,3 +1,4 @@
+import { readErrorMessage } from './error-message'
 import { useEffect, useRef, useState } from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
 import { Bot, Square } from 'lucide-react'
@@ -25,14 +26,14 @@ export function InteractionActivity({threadId}:{threadId:string}):React.JSX.Elem
     const result=await api.request<{items:Entry[]}>('pending',{})
     if(epoch===generation.current)setItems(result.items.filter(item=>item.binding.scope.threadId===threadId))
   }
-  useEffect(()=>{const epoch=++generation.current;setItems([]);setError('');let active=true;const refresh=():void=>{void load(epoch).catch(error=>{if(active&&open)setError(String(error))})};refresh();const timer=window.setInterval(refresh,2000);return()=>{active=false;generation.current++;window.clearInterval(timer)}},[api,threadId,open])
-  useEffect(()=>{let active=true;setActivity([]);if(!computer||!open)return()=>{active=false};const refresh=():void=>{void computer.request<{activity:ComputerLine[]}>('monitor',{}).then(value=>{if(active)setActivity(value.activity.filter(item=>item.scope?.threadId===threadId))}).catch(error=>{if(active)setError(String(error))})};refresh();const timer=window.setInterval(refresh,1000);return()=>{active=false;window.clearInterval(timer)}},[computer,open,threadId])
+  useEffect(()=>{const epoch=++generation.current;setItems([]);setError('');let active=true;const refresh=():void=>{void load(epoch).catch(error=>{if(active&&open)setError(readErrorMessage(error))})};refresh();const timer=window.setInterval(refresh,2000);return()=>{active=false;generation.current++;window.clearInterval(timer)}},[api,threadId,open])
+  useEffect(()=>{let active=true;setActivity([]);if(!computer||!open)return()=>{active=false};const refresh=():void=>{void computer.request<{activity:ComputerLine[]}>('monitor',{}).then(value=>{if(active)setActivity(value.activity.filter(item=>item.scope?.threadId===threadId))}).catch(error=>{if(active)setError(readErrorMessage(error))})};refresh();const timer=window.setInterval(refresh,1000);return()=>{active=false;window.clearInterval(timer)}},[computer,open,threadId])
   if(!api)return null
   const waiting=items.filter(item=>localApproval(item.call.toolName)&&item.receipt.state==='prepared'||item.receipt.state==='unknown').length
   const run=async(id:string,action:()=>Promise<unknown>):Promise<void>=>{
     if(busy)return
     const epoch=generation.current;setBusy(id);setError('')
-    try{await action();await load(epoch)}catch(error){if(epoch===generation.current)setError(String(error))}finally{if(epoch===generation.current)setBusy(null)}
+    try{await action();await load(epoch)}catch(error){if(epoch===generation.current)setError(readErrorMessage(error))}finally{if(epoch===generation.current)setBusy(null)}
   }
   return <Dialog.Root open={open} onOpenChange={value=>{if(!busy)setOpen(value)}}>
     <Dialog.Trigger asChild><button className="quiet-button" type="button"><Bot size={14}/>{t('队员操作')}{waiting>0?` · ${waiting}`:''}</button></Dialog.Trigger>
