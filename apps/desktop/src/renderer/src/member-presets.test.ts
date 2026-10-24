@@ -11,10 +11,10 @@ describe('builtin member presets', () => {
       'qilu'
     ])
     expect(BUILTIN_MEMBER_PRESETS.map((preset) => preset.displayName)).toEqual([
-      '叮叮',
-      '芝士',
-      '咕咕',
-      '小兔'
+      '星璃',
+      '月汐',
+      '铃音',
+      '绘羽'
     ])
     expect(BUILTIN_MEMBER_PRESETS[1]).toMatchObject({
       teamRole: '鉴定士',

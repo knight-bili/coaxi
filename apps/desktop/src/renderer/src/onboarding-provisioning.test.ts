@@ -111,7 +111,7 @@ describe('first-run provisioning', () => {
     const create = harness.requests.find(({ method }) => method === 'members.create')
     expect(create?.params).toMatchObject({
       command: {
-        displayName: 'Dingding',
+        displayName: 'Xingli',
         teamRole: 'Traveling Scholar',
         personalityTraits: ['Curious', 'Adaptable', 'Diligent'],
         avatarRef: 'rovai://member-avatar/builtin/luoke/v1'
@@ -236,7 +236,7 @@ describe('first-run provisioning', () => {
     await provisionFirstRun(harness.api, harness.current() as InProgress, [], () => undefined, 'en')
 
     expect(updates).toBe(4)
-    expect(members.map((member) => member.displayName)).toEqual(['Dingding', 'Cheese', 'Gugu', 'Bunny'])
+    expect(members.map((member) => member.displayName)).toEqual(['Xingli', 'Yuexi', 'Lingyin', 'Huiyu'])
     expect(harness.requests.find(({ method }) => method === 'members.runtime.set')?.params).toMatchObject({
       command: { agentId: selectedMember.agentId, expectedVersion: selectedMember.version }
     })

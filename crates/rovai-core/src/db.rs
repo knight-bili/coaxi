@@ -35710,7 +35710,7 @@ impl Database {
             (
                 LUOKE_AGENT_ID,
                 "luoke",
-                "叮叮",
+                "星璃",
                 "游学者",
                 "负责理解需求、调查项目、编写文档，并将明确的方案实现为可运行、可验证的代码变更。",
                 "[\"好奇\",\"灵活\",\"勤勉\"]",
@@ -35721,7 +35721,7 @@ impl Database {
             (
                 MUWA_AGENT_ID,
                 "muwa",
-                "芝士",
+                "月汐",
                 "鉴定士",
                 "负责文档、方案与代码评审，核查事实准确性、结构完整性、边界条件、潜在风险，以及方案与实现是否一致，并给出明确、可执行的评审结论与修改建议。",
                 "[\"严谨\",\"沉稳\",\"公正\"]",
@@ -35732,7 +35732,7 @@ impl Database {
             (
                 MIANZHI_AGENT_ID,
                 "mianzhi",
-                "咕咕",
+                "铃音",
                 "巡夜人",
                 "负责设计和执行测试、复现问题、检查边界与失败路径，并通过可重复的结果确认功能是否真正可靠。",
                 "[\"警觉\",\"耐心\",\"求真\"]",
@@ -35743,7 +35743,7 @@ impl Database {
             (
                 QILU_AGENT_ID,
                 "qilu",
-                "小兔",
+                "绘羽",
                 "绘图师",
                 "负责 UI、UX、视觉设计和前端实现，把复杂功能组织成清晰、顺手、有一致性的界面体验。",
                 "[\"敏锐\",\"细腻\",\"灵动\"]",
@@ -35784,6 +35784,38 @@ impl Database {
                     member_order as i64,
                     Uuid::new_v4().to_string(),
                 ],
+            )?;
+            // Only an untouched, never-configured or used factory identity may be renamed.
+            // Conversation rows own Native Bindings; admission IDs retain Run history.
+            let previous_name = match profile.1 {
+                "luoke" => "叮叮",
+                "muwa" => "芝士",
+                "mianzhi" => "咕咕",
+                "qilu" => "小兔",
+                _ => unreachable!("closed built-in member list"),
+            };
+            transaction.execute(
+                r#"
+                UPDATE agent_profile AS profile
+                SET display_name = ?2, version = version + 1, updated_at = ?10
+                WHERE id = ?1 AND slug = ?8 AND handle = ?8
+                  AND display_name = ?11 AND avatar_ref = ?9
+                  AND team_role = ?3 AND professional_responsibilities = ?4
+                  AND personality_traits_json = ?5
+                  AND working_principles = '' AND growth_topic = ''
+                  AND default_capabilities_json = ?7 AND accent = ?6
+                  AND profile_status = 'present' AND removed_at IS NULL
+                  AND archived_at IS NULL AND version = 1 AND created_at = updated_at
+                  AND selected_runtime_adapter_kind IS NULL
+                  AND default_runtime_installation_id IS NULL
+                  AND default_model_selection_json IS NULL
+                  AND default_permission_config_json IS NULL
+                  AND NOT EXISTS (SELECT 1 FROM conversation WHERE agent_id = profile.id)
+                  AND NOT EXISTS (SELECT 1 FROM agent_run
+                                  WHERE assignee_agent_id_at_admission = profile.id)
+                "#,
+                params![profile.0, profile.2, profile.3, profile.4, profile.5,
+                        profile.6, profile.7, profile.1, profile.8, now, previous_name],
             )?;
         }
         transaction.commit()?;
@@ -53203,6 +53235,69 @@ mod tests {
         std::fs::remove_dir_all(directory).expect("temporary database should be removable");
     }
 
+    #[cfg(feature = "extended-tests")]
+    #[test]
+    fn coaxi_builtin_names_preserve_custom_configured_and_used_members() {
+        let directory = std::env::temp_dir().join(format!("coaxi-member-names-{}", Uuid::new_v4()));
+        let mut database = Database::open(&directory).unwrap();
+        let names = |database: &Database| -> Vec<String> {
+            database.connection().prepare("SELECT display_name FROM agent_profile ORDER BY id")
+                .unwrap().query_map([], |row| row.get(0)).unwrap()
+                .collect::<rusqlite::Result<Vec<_>>>().unwrap()
+        };
+        let old_names = ["叮叮", "芝士", "咕咕", "小兔"];
+        let new_names = ["星璃", "月汐", "铃音", "绘羽"];
+        assert_eq!(names(&database), new_names);
+        let restore_factory_names = |database: &Database| {
+            for (index, name) in old_names.iter().enumerate() {
+                database.connection().execute(
+                    "UPDATE agent_profile SET display_name=?1,version=1,updated_at=created_at WHERE id=?2",
+                    params![name, format!("agent_{}", index + 1)],
+                ).unwrap();
+            }
+        };
+        restore_factory_names(&database);
+        database.connection().execute_batch(
+            "CREATE TEMP TRIGGER reject_coaxi_rename BEFORE UPDATE OF display_name ON agent_profile
+             WHEN OLD.id='agent_2' AND NEW.display_name='月汐'
+             BEGIN SELECT RAISE(ABORT,'rename fixture failure'); END;"
+        ).unwrap();
+        assert!(database.seed_agents().is_err());
+        assert_eq!(names(&database), old_names, "a failed row must roll back the whole batch");
+        database.connection().execute_batch("DROP TRIGGER reject_coaxi_rename").unwrap();
+        database.seed_agents().unwrap();
+        assert_eq!(names(&database), new_names);
+        let changes = database.connection().total_changes();
+        database.seed_agents().unwrap();
+        // Existing startup runtime_enabled reset is independent of name reconciliation.
+        assert_eq!(database.connection().total_changes() - changes, 4);
+        let versions: Vec<i64> = database.connection().prepare("SELECT version FROM agent_profile")
+            .unwrap().query_map([], |row| row.get(0)).unwrap().collect::<rusqlite::Result<_>>().unwrap();
+        assert_eq!(versions, vec![2; 4]);
+        restore_factory_names(&database);
+        database.connection().execute_batch(
+            "UPDATE agent_profile SET team_role='我自定的角色' WHERE id='agent_1';
+             INSERT INTO adapter_installation(id,adapter_kind,executable_path,command_name,
+                 installation_class,source,auth_scope,enabled,generation,path_state,version,created_at,updated_at)
+             VALUES('coaxi-fixture-codex','codex-cli','/fixture/codex','codex','managed_default',
+                 'manual','default',1,1,'valid',1,'2026-01-01','2026-01-01');
+             UPDATE agent_profile SET selected_runtime_adapter_kind='codex-cli',
+                 default_runtime_installation_id='coaxi-fixture-codex',
+                 default_model_selection_json='{\"mode\":\"runtime_default\"}',
+                 default_permission_config_json='{\"adapterKind\":\"codex-cli\",\"schemaVersion\":1,\"values\":{\"sandbox_mode\":\"workspace-write\",\"approval_policy\":\"on-request\"}}',
+                 default_runtime_generation=1 WHERE id='agent_2';
+             UPDATE agent_profile SET avatar_ref='rovai://member-avatar/managed/7b330b78-c4f6-40a5-bcba-6e07462e9748' WHERE id='agent_3';
+             INSERT INTO camp(id,title,project_binding_kind,project_path,created_at,updated_at)
+             VALUES('coaxi-used','Used','quick_chat','','2026-01-01','2026-01-01');
+             INSERT INTO conversation(id,camp_id,agent_id,created_at,updated_at)
+             VALUES('coaxi-used-conversation','coaxi-used','agent_4','2026-01-01','2026-01-01');"
+        ).unwrap();
+        database.seed_agents().unwrap();
+        assert_eq!(names(&database), old_names);
+        drop(database);
+        std::fs::remove_dir_all(directory).unwrap();
+    }
+
     #[cfg(feature = "legacy-migration-tests")]
     fn a_new_database_seeds_durable_companions() {
         let directory = std::env::temp_dir().join(format!("rovai-db-test-{}", Uuid::new_v4()));
@@ -53308,7 +53403,7 @@ mod tests {
                 |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?, row.get(3)?)),
             )
             .expect("built-in identity");
-        assert_eq!(built_in_identity.0, "芝士");
+        assert_eq!(built_in_identity.0, "月汐");
         assert_eq!(built_in_identity.1, "鉴定士");
         assert_eq!(
             built_in_identity.2,

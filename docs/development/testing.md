@@ -2312,3 +2312,13 @@ I04完整Qoder解析继续扩原source filesystem owner和source/qoder_tests.rs�
 I04旧代理Core读取资格继续扩原Context slow owner与native_child_session_tests.rs，同DB/Blob/根目录使用明确SQL适配器/来源/evidence元数据夹具；不声称真实Claude/Qoder Host正向绑定或提供方ID实测。独立三字段User引用禁止路径/agent/Session/Runtime覆盖，Core按原Run/epoch/Context/捕获来源准备，文件层再核原工具编号+canonical输入摘要及原ack/meta。原source owner扩同一Claude/Qoder文件的观察发现/错摘要/错编号，Core owner验角色/错Thread/Run/evidence、独立目标、历史读取、停止实时资格、再授权和total_changes零写。不新增owner/DB/进程，不把短agent当Session；准备与FS拆开，未来后台运输需发布前/每页再授权。本批仅最低slow-tests库组合编译、精确两个原owner列册再运行；未接RPC/签名/原UI或真实Host/CLI资格，仍在阶段清单。
 
 I04旧代理后台读取接续复用原Registry线程/16读者/4 worker/关闭墓碑及idle清理，不建第二套池。原Context owner同DB/Blob/目录调用reader_tests.rs测试缝，真实C/Q核验文件→完整正文/自身统计→签名UTF8分页，核对摘要/字节位置/多页拼接、错令牌/错kind/其他读者令牌拒绝、原ID重放、User-only和未知字段；用新Core计划证明旧epoch只读保留、live关闭和材料摘要变更撤权。原source owner继续拥有Session后代/窗口和共享生命周期回归，不新增owner/数据库或外部进程。Web原operation owner扩四接口闭集和只保留允许字段，Native原名单owner回归；需要Core lib slow-tests精确原两owner、生产bins check及Web lib精确原owner，不能用lib证明Application接线编译。实际Core.handle/IPC/HTTP、原Viewer与文件动作/嵌套源及Host/CLI映射仍归后续实现和阶段候选；SQL producer元数据不升级为真实提供方资格。
+
+
+### Coaxi 默认队员名称兼容
+
+`db::tests::coaxi_builtin_names_preserve_custom_configured_and_used_members` 拥有当前seed协调的事务边界：
+同一独立临时Database覆盖新默认值、旧原厂资料改名、重复不增加profile版本、中途失败整批回滚，
+以及自定义职责、已配置Runtime、自定义头像和已有Conversation拒绝覆盖。旧迁移owner只验证历史版本，
+不能拥有本次启动协调，因此新增一个extended-tests owner；不访问日常数据、账号、原生Session或模型。
+定向命令：`cargo test --locked -p rovai-core --features extended-tests --lib coaxi_builtin_names_preserve_custom_configured_and_used_members -- --exact`，
+执行时使用完整列册名称，先确认非零。真实安装旧数据与UI另行验证，组件通过不代表客户验收通过。
