@@ -530,7 +530,7 @@ html[lang="en"] .settings-app-update-badge svg { display: none; }
   border-radius: 7px;
 }
 .project-heading-row:hover { background: color-mix(in srgb, var(--surface-muted) 70%, transparent); }
-.project-heading-row.current-project { background: var(--surface-selected); }
+.project-heading-row.current-project { background: transparent; }
 .project-select-row {
   z-index: 1;
   display: flex;

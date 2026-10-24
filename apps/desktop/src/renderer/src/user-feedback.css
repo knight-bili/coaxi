@@ -1,4 +1,24 @@
-.feedback-dialog{display:flex;flex-direction:column;gap:18px;width:min(680px,calc(100vw - 32px));max-height:calc(100dvh - 40px);padding:24px;overflow:hidden}
+.feedback-dialog{display:flex;flex-direction:column;gap:18px;width:min(680px,calc(100vw - 32px));max-height:calc(100dvh - 40px);padding:24px;overflow:hidden;color:var(--ink);background:var(--surface-raised);border:1px solid var(--line);border-radius:12px}
+/* Follow Rovai's composer width and Codeg's compact chat actions. Only an
+   expanded disclosure or a real question occupies a separate row. */
+.conversation-tools-rail { display:flex;align-items:center;flex-wrap:wrap;flex:0 0 auto;gap:0 12px;width:min(var(--conversation-composer-width),calc(100% - 40px));min-width:0;max-height:36dvh;overflow:auto;margin:0 auto;padding:3px 0;border-top:1px solid var(--line);color:var(--muted);font-size:12px;scrollbar-width:thin }
+.conversation-tools-rail:empty { display:none }
+.conversation-tools-rail>.feedback-dock { flex:1 1 220px;min-width:0;border:0;padding:6px 0 }
+.conversation-tools-rail>.feedback-dock[open] { flex-basis:100%;order:2 }
+.conversation-tools-rail>.feedback-dock>summary { width:fit-content;max-width:100%;line-height:1.7;cursor:pointer;color:var(--muted) }
+.conversation-tools-rail>.feedback-dock>summary:hover { color:var(--ink) }
+.conversation-tools-rail>.feedback-dock>summary:focus-visible { outline:2px solid var(--conversation-focus);outline-offset:3px;border-radius:4px }
+.conversation-tools-rail>.feedback-dock-body { flex:1 0 100%;order:-1;min-width:0;margin:0;padding:8px 0 }
+.conversation-tools-rail>.quiet-button { flex:none;min-height:28px;padding:4px 8px;font-size:11px }
+.conversation-tools-rail .feedback-dock-body>label { display:flex;align-items:center;flex-wrap:wrap;gap:8px }
+.conversation-tools-rail .feedback-dock-body select { min-width:160px;max-width:100%;padding:6px 9px;border:1px solid var(--line);border-radius:8px;background:var(--input);color:var(--ink);font:inherit }
+.conversation-tools-rail .feedback-dock textarea { min-height:64px;max-height:160px;border-radius:8px }
+.conversation-tools-rail .feedback-history-item { font-size:12px;line-height:1.7 }
+.feedback-error { margin:0;color:var(--danger);font-size:12px;line-height:1.7;overflow-wrap:anywhere }
+.feedback-error>p { margin:0 0 6px }
+.feedback-error details { color:var(--muted) }
+.feedback-error details>p { user-select:text;overflow-wrap:anywhere }
+@media(max-width:640px) { .conversation-tools-rail { width:calc(100% - 24px);max-height:32dvh } }
 .feedback-dialog>header,.feedback-dialog>footer{display:flex;align-items:center;justify-content:space-between;gap:12px;flex:none}.feedback-dialog>header h2{font-size:18px;font-weight:600;margin:0}.feedback-dialog>footer{justify-content:flex-end}
 .feedback-dialog-body{min-height:0;overflow:auto;scrollbar-width:thin;font-size:13px;line-height:1.6}.feedback-dialog-body>p{margin:10px 0;color:var(--muted)}.feedback-dialog-body>.feedback-error{color:var(--danger)}
 .feedback-target-label{display:flex;flex-direction:column;gap:8px}.feedback-target-label select{border:1px solid var(--line);background:var(--input);color:var(--ink);padding:9px 12px;border-radius:12px;font:inherit;min-width:0}

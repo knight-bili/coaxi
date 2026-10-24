@@ -5886,6 +5886,7 @@ function ThreadWorkspaceContent({
             />
           )}
 
+          <div className="conversation-tools-rail">
           <UserFeedbackDock key={`feedback:${snapshot.thread.id}`} scope={{threadId:snapshot.thread.id,conversationId:null,scopeKind:'public'}} members={snapshot.members} materials={composerDraft?.attachments??[]}/>
           <ConversationQuestionsDock key={`questions:${snapshot.thread.id}`} scope={{threadId:snapshot.thread.id,conversationId:null,scopeKind:'public'}} members={snapshot.members}/>
           <ConversationSources key={`sources:${snapshot.thread.id}`} scope={{threadId:snapshot.thread.id,conversationId:null,scopeKind:'public'}} disabled={composerInteractionDisabled} onInsert={async source=>{
@@ -5893,6 +5894,7 @@ function ThreadWorkspaceContent({
             const before=await handle.flush();if(!JSON.stringify(before.document).includes(`rovai-source:${source.sourceSessionId}`)&&!handle.appendText(conversationSourceReference(source)))throw new Error(uiAttribute('当前输入已锁定，资料授权记录已保留。'));
             await handle.flush();handle.focus('end');
           }}/>
+          </div>
           <form
         className={[
           'composer',

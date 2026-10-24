@@ -1807,6 +1807,7 @@ export function SingleChatPanel({
         ownerKey={`${conversationKind}:${currentSnapshot.conversation.id}`} messages={currentSnapshot.messages}
         disabled={!visible || sending || quoteBusy || returningPending || preparingAttachments.some((item) => !item.error)}
         onAdd={(selection) => mutateDraftQuote({ type: 'add', selection })} />}
+      <div className="conversation-tools-rail">
       {currentSnapshot&&<ConversationQuestionsDock key={`questions:${currentSnapshot.conversation.id}`} scope={{threadId,conversationId:currentSnapshot.conversation.id,scopeKind:conversationKind}} members={members}/>}
       {currentSnapshot&&<ConversationSources key={`sources:${currentSnapshot.conversation.id}`} scope={{threadId,conversationId:currentSnapshot.conversation.id,scopeKind:conversationKind}} disabled={!sharedDraftState.ready||sending||returningPending||ending||!!inputState.pending} onInsert={async source=>{
         if(!draftStore.update(current=>{const body=current[bodyDraftKey]??'';return body.includes(`rovai-source:${source.sourceSessionId}`)?current:{...current,[bodyDraftKey]:`${body}${body?'\n':''}${conversationSourceReference(source)}`}}))throw new Error(uiAttribute('当前输入已变化，资料授权记录已保留。'));
@@ -1818,6 +1819,7 @@ export function SingleChatPanel({
           if(!sharedDraftState.ready||sharedDraftState.error||draft.length||sending||returningPending||ending||quoteBusy||inputState.pending||uploadBusy||leaving||preparingAttachments.length||currentSnapshot.draft.attachments.length||(currentSnapshot.draft.quotes?.length??0))throw new Error(uiAttribute('请先处理普通输入中的草稿和材料，再确认反馈续办。'))
           return {draftRevision:currentSnapshot.draft.revision,...(input?.origin.scope?{composerScope:input.origin.scope}:{})}
         }} onContinued={()=>{void refreshCurrent()}}/>}
+      </div>
       <form className="composer single-chat-composer" onSubmit={(event) => void send(event)}>
         <div className={`composer-box single-chat-composer-box${activeRun ? ' is-running' : ''}`}>
           <div className="composer-input">
