@@ -96,6 +96,28 @@ textarea.workspace-field { min-height: 84px; resize: vertical; }
 .keyboard-shortcut-rows [aria-pressed="true"] { outline: 2px solid var(--conversation-focus); outline-offset: 1px; }
 .keyboard-shortcut-rows .setting-action>button:first-child { min-width: 110px; }
 
+.quiet-button:focus-visible,.primary-button:focus-visible { outline: 2px solid var(--conversation-focus); outline-offset: 2px; }
+.settings-panel :is(.appearance-section,.portable-provider-settings,.portable-task-templates) {
+  display: grid; min-width: 0; gap: 16px; padding: 24px 0; margin: 0; border-top: 1px solid var(--line);
+}
+.settings-panel .appearance-section-heading { display: grid; gap: 6px; }
+.settings-panel .appearance-section-heading h2 { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 15px; font-weight: 600; }
+.settings-panel .appearance-section-heading p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.7; }
+.settings-panel .appearance-section .setting-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 0; font-size: 12px; }
+.settings-panel .appearance-section .workbench-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 0; border: 0; }
+.settings-panel .extension-catalog-settings { min-width: 0; padding: 14px 0; border-top: 1px solid var(--line); font-size: 12px; }
+.extension-catalog-settings>summary { display: flex; align-items: center; gap: 8px; color: var(--muted); cursor: pointer; }
+.extension-catalog-settings>p { color: var(--muted); line-height: 1.7; }
+.portable-codex-models { display: grid; min-width: 0; gap: 12px; }
+.portable-task-templates>.section-heading { flex-wrap: wrap; align-items: flex-start; }
+.portable-task-templates>.section-heading h3 { margin: 0; font-size: 14px; }
+.portable-task-templates>.section-heading p { margin: 0; max-width: 72ch; color: var(--muted); font-size: 12px; line-height: 1.7; }
+.portable-task-templates .muted { color: var(--muted); font-size: 12px; }
+.interaction-member-settings details { padding: 10px 0; border-block: 1px solid var(--line); font-size: 12px; }
+.interaction-member-settings summary { color: var(--muted); cursor: pointer; line-height: 1.7; }
+.interaction-member-settings .settings-form-field { display: grid; min-width: 0; gap: 6px; padding: 12px 0; font-size: 12px; }
+.interaction-member-settings .interaction-actions button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+
 @media(max-width:760px) {
   .configuration-compare { grid-template-columns: minmax(0,1fr); }
   .settings-data-section>.section-heading { flex-wrap: wrap; gap: 10px; }
