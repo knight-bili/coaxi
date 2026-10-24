@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import {CircleHelp,ChevronDown} from 'lucide-react'
 import type { ConversationQuestionOutcome, ConversationQuestionSet, ConversationRequestStatus, ConversationToolScope, StoredCommandResult } from '@contracts'
 import { newCommandId } from '../../shared/command-id'
 import { useThreadClient } from './camp-client'
@@ -91,8 +92,12 @@ export function ConversationQuestionsDock({ scope, members }: { scope: Conversat
     window.addEventListener('focus', refresh)
     return () => { off?.(); invalidated?.(); window.removeEventListener('focus', refresh); if (timer) clearTimeout(timer) }
   }, [client, scopeKey])
-  if (!page.items.length && !error) return null
   const active = page.items.filter(value => value.state === 'awaiting_answer' || value.state === 'answered' || value.state === 'outcome_unknown'), history = page.items.filter(value => !active.includes(value))
+  const [open,setOpen] = useState(false)
+  const activeIds = active.map(value=>value.requestId).join(',')
+  useEffect(()=>{setOpen(false)},[scopeKey])
+  useEffect(()=>{if(activeIds)setOpen(true)},[scopeKey,activeIds])
+  if (!page.items.length && !error) return null
   const card = (value: ConversationQuestionSet): React.JSX.Element => <Question key={value.requestId} value={value} name={members.find(member => member.agentId === value.agentId)?.displayName ?? value.agentId} onChanged={() => void read()} />
-  return <aside className="feedback-dock-body" aria-label={t('队员提问')}>{active.map(card)}{!!history.length && <details><summary>{t('已结束的问题记录')}</summary>{history.map(card)}</details>}{error && <div role="alert" className="feedback-error"><p>{t('暂时无法读取队员提问，请重试。')}</p><details><summary>{t('查看原因')}</summary><p>{error}</p></details><button type="button" className="quiet-button" onClick={() => void read()}>{t('重新读取')}</button></div>}{page.next && <button type="button" className="quiet-button" onClick={() => void read(true)}>{t('更多问题记录')}</button>}</aside>
+  return <details className="feedback-dock conversation-questions-dock" open={open} onToggle={event=>setOpen(event.currentTarget.open)}><summary><CircleHelp size={14}/><span>{t('队员提问')}</span>{error?<small className="feedback-tool-issue">{t('读取失败')}</small>:!!active.length&&<small>{active.length}</small>}<ChevronDown size={13} className="feedback-tool-chevron"/></summary><div className="feedback-dock-body" aria-label={t('队员提问')}>{active.map(card)}{!!history.length && <details><summary>{t('已结束的问题记录')}</summary>{history.map(card)}</details>}{error && <div role="alert" className="feedback-error"><p>{t('暂时无法读取队员提问，请重试。')}</p><details><summary>{t('查看原因')}</summary><p>{error}</p></details><button type="button" className="quiet-button" onClick={() => void read()}>{t('重新读取')}</button></div>}{page.next && <button type="button" className="quiet-button" onClick={() => void read(true)}>{t('更多问题记录')}</button>}</div></details>
 }
