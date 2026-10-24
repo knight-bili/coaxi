@@ -51,6 +51,7 @@ const appExecutable = join(appDirectory, `${executableName}.exe`)
 const hostExecutable = join(appDirectory, 'resources', 'bin', 'rovai-host.exe')
 const coreExecutable = join(appDirectory, 'resources', 'bin', 'rovai-core.exe')
 const cliExecutable = join(appDirectory, 'resources', 'bin', 'rovai.exe')
+const computerHelperExecutable = join(appDirectory, 'resources', 'bin', 'rovai-computer-helper.exe')
 const installer = join(
   dist,
   artifactName('exe')
@@ -394,8 +395,13 @@ try {
     app: await verifyBinary('App', appExecutable),
     host: await verifyBinary('rovai-host', hostExecutable),
     core: await verifyBinary('rovai-core', coreExecutable),
-    cli: await verifyBinary('rovai', cliExecutable)
+    cli: await verifyBinary('rovai', cliExecutable),
+    computerHelper: await verifyBinary('rovai-computer-helper', computerHelperExecutable)
   }
+  // Windows answers this metadata-only request without opening a permission prompt.
+  const helperPermission = JSON.parse(run(computerHelperExecutable, ['--request-permission', 'accessibility'], { timeout: 10_000 }))
+  if (helperPermission.prompted !== false) throw new Error('Unexpected Windows computer helper permission response')
+  report.push('Computer helper: packaged executable launched and answered its Windows permission probe')
   const cliVersion = run(cliExecutable, ['--version'])
   if (!cliVersion.includes(
     `rovai ${packageMetadata.version} contract-v${builtinToolContractVersion} ipc-v${builtinToolIpcProtocolVersion}`

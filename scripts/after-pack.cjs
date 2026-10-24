@@ -34,6 +34,12 @@ module.exports = async function afterPack(context) {
       originalFilename: 'rovai.exe',
       iconPath
     })
+    await stampWindowsExecutable(join(bundledBin, 'rovai-computer-helper.exe'), {
+      version,
+      description: 'Coaxi Computer Helper',
+      originalFilename: 'rovai-computer-helper.exe',
+      iconPath
+    })
     recordWorkbenchPackage(context)
     return
   }

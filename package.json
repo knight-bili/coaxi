@@ -418,6 +418,10 @@
           "to": "bin/rovai.exe"
         },
         {
+          "from": "resources/bin/windows-x64/rovai-computer-helper.exe",
+          "to": "bin/rovai-computer-helper.exe"
+        },
+        {
           "from": "out/web",
           "to": "web-ui"
         },
