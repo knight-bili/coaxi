@@ -62,7 +62,7 @@ const picker = `(() => {
   const select = event => {
     event.preventDefault(); event.stopImmediatePropagation();
     const target = event.target;
-    if(target instanceof Element) state.result = {tag:target.tagName.toLowerCase(),text:(target.textContent||'').trim().slice(0,3000),html:target.outerHTML.slice(0,6000)};
+    if(target instanceof Element) { const r=target.getBoundingClientRect();state.result = {tag:target.tagName.toLowerCase(),text:(target.textContent||'').trim().slice(0,3000),html:target.outerHTML.slice(0,6000),rect:{x:Math.max(0,Math.floor(r.x)),y:Math.max(0,Math.floor(r.y)),width:Math.max(0,Math.ceil(Math.min(r.right,innerWidth)-Math.max(0,r.x))),height:Math.max(0,Math.ceil(Math.min(r.bottom,innerHeight)-Math.max(0,r.y)))}}; }
     cleanup();
   };
   const key = event => { if(event.key==='Escape'){event.preventDefault();state.cancelled=true;cleanup();} };
@@ -82,7 +82,11 @@ export async function inspectBrowserPage(contents: Electron.WebContents, action:
   if (action === 'screenshot') value = { mime: 'image/png', data: (await contents.capturePage()).toPNG().toString('base64') }
   else if (action === 'page') value = { text: await read("(document.body?.innerText || '').slice(0,16000)") }
   else if (action === 'pick_start') { await read(picker); value = { started: true } }
-  else if (action === 'pick_read') value = await read("({result:globalThis.__coaxiPicker?.result??null,cancelled:!globalThis.__coaxiPicker||globalThis.__coaxiPicker.cancelled})") as Record<string, unknown>
+  else if (action === 'pick_read') {
+    value = await read("({result:globalThis.__coaxiPicker?.result??null,cancelled:!globalThis.__coaxiPicker||globalThis.__coaxiPicker.cancelled})") as Record<string, unknown>
+    const result = value.result as { rect?: { x: number; y: number; width: number; height: number } } | null
+    if (result?.rect && result.rect.width > 0 && result.rect.height > 0) value.data = (await contents.capturePage(result.rect)).toPNG().toString('base64')
+  }
   else if (action === 'pick_cancel') { await read('globalThis.__coaxiPicker?.cancel?.()'); value = { cancelled: true } }
   else throw new Error('browser.operation_not_admitted')
   if (contents.isDestroyed() || contents.getURL() !== url || String(await identity()) !== documentId) throw new Error('browser.document_changed')

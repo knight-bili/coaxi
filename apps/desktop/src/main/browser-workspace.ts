@@ -34,6 +34,11 @@ export class BrowserWorkspace {
   private readonly preferences=new BrowserPreferenceStore(()=>{for(const surface of this.surfaces.values()){this.revoke(surface);if(!surface.window.isDestroyed()){surface.window.webContents.stop();if(this.preferences.action(surface.view.url)!=='builtin')surface.view.error='此地址的浏览规则已变更，请在允许的地址继续浏览'}}})
   constructor(private readonly request:Request,private readonly owner:()=>BrowserWindow|null){}
   onModelResourceChanged:((id:string,origin:string|null)=>void)|null=null
+  assertShareTarget(grant:InteractionGrant):void{
+    const surface=this.find(grant.targetId)
+    if(surface.view.threadId!==grant.scope.threadId)throw new Error('scope_changed')
+    if(new URL(address(surface.window.webContents.getURL())).origin!==grant.origin)throw new Error('origin_changed')
+  }
   private trusted(event:IpcMainInvokeEvent):void{
     const owner=this.owner()
     if(!owner||owner.isDestroyed()||event.sender!==owner.webContents||event.senderFrame!==owner.webContents.mainFrame)throw new Error('browser.local_owner_required')

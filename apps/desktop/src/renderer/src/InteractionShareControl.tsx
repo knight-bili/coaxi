@@ -5,6 +5,7 @@ import { AppDialogBody,AppDialogContent,AppDialogFooter,AppDialogHeader } from '
 import { useThreadClient } from './camp-client'
 import { useUiText } from './interface-language'
 import { newCommandId } from '../../shared/command-id'
+import { readErrorMessage } from './error-message'
 import './interaction-workspace.css'
 
 type Scope={threadId:string;conversationId:string|null;scopeKind:'public'|'single_chat'|'delegation_child'}
@@ -22,7 +23,7 @@ export function InteractionShareControl({threadId,targetId,targetKind,origin=nul
   const commit=async(request:NonNullable<typeof pending>):Promise<void>=>{
     if(busy)return
     const generation=sequence.current;setBusy(true);setError('');setPending(request)
-    try{await api.request(request.action,request.payload);if(sequence.current===generation){setPending(null);if(target)setGrants((await api.request<{grants:Grant[]}>('grant.list',{scope:target.scope,agentId:target.agentId})).grants)}}catch(error){if(sequence.current===generation)setError(String(error))}finally{setBusy(false)}
+    try{await api.request(request.action,request.payload);if(sequence.current===generation){setPending(null);if(target)setGrants((await api.request<{grants:Grant[]}>('grant.list',{scope:target.scope,agentId:target.agentId})).grants)}}catch(error){if(sequence.current===generation){const message=readErrorMessage(error);const rejected=/interaction_disabled|desktop_unavailable|scope_changed|membership_changed|permission_changed|policy_changed|invalid_arguments/.test(message);if(rejected)setPending(null);setError(message.includes('interaction_disabled')?t('请先在队员设置中启用电脑工具，再共享窗口。'):message.includes('desktop_unavailable')?t('桌面连接正在准备，请稍后重试。'):message)}}finally{setBusy(false)}
   }
   const share=(level:'read'|'control'):void=>{
     if(!target)return

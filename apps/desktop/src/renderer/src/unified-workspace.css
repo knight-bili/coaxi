@@ -117,3 +117,22 @@
 .workspace-terminal-resize:is(:hover,:focus-visible) {background:var(--brand);}
 
 .engineering-entry-error {top:12px;}
+
+/* Codeg handoff feedback floats without resizing the live browser viewport. */
+.unified-browser {position:relative;}
+.browser-handoff-toast {position:absolute;z-index:610;right:16px;bottom:16px;max-width:calc(100% - 32px);padding:10px 16px;border:1px solid var(--line);border-radius:10px;background:var(--surface);box-shadow:var(--shadow-float);font-size:13px;pointer-events:none;}
+
+.browser-share-popover {width:340px;max-width:calc(100vw - 24px);padding:12px;display:flex;flex-direction:column;gap:10px;}
+.browser-share-summary {padding:4px 8px 10px;border-bottom:1px solid var(--line);}
+.browser-share-summary p {margin:6px 0;color:var(--muted);overflow-wrap:anywhere;font-size:12px;}
+.browser-share-summary small,.browser-share-footnote small,.browser-share-setup small {color:var(--muted);font-size:12px;line-height:1.6;}
+.browser-share-scope,.browser-share-commands {display:flex;flex-direction:column;gap:2px;}
+.browser-share-scope button,.browser-share-commands button {display:flex;align-items:center;gap:10px;min-height:36px;padding:8px;border:0;border-radius:6px;background:transparent;text-align:left;color:var(--text);font:inherit;cursor:pointer;}
+.browser-share-scope button svg:last-child {margin-left:auto;}
+.browser-share-scope button:hover,.browser-share-commands button:hover {background:var(--neutral-hover);}
+.browser-share-scope button[aria-pressed=true] {background:var(--neutral-selected);}
+.browser-share-commands {padding-top:8px;border-top:1px solid var(--line);}
+.browser-share-commands button:disabled {opacity:.45;cursor:default;}
+.browser-share-setup {padding:8px;display:flex;flex-direction:column;gap:8px;}
+.browser-share-setup p {margin:0;font-size:12px;}
+.browser-share-footnote {display:flex;align-items:center;justify-content:space-between;padding:0 8px;}

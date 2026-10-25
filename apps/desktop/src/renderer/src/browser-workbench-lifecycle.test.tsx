@@ -19,9 +19,9 @@ function fixture(){
  let finish:(value:unknown)=>void=()=>{}
  const inspect=vi.fn((input:any)=>input.action==='pick_cancel'?Promise.resolve({}):new Promise(resolve=>{finish=resolve}))
  const client={browserWorkspace:{list:async()=>rows,preferences:async()=>({devtools:false}),inspect}} as unknown as ThreadClient
- const append=vi.fn(()=>true)
- const element=(resource:string,threadId='thread')=><ThreadClientProvider client={client}><BrowserWorkbench resource={resource} threadId={threadId} onQuickMessage={append}/></ThreadClientProvider>
- const view=render(element('a'));return {view,inspect,append,finish:(value:unknown)=>finish(value),switch:(resource:string,threadId?:string)=>view.rerender(element(resource,threadId))}
+ const append=vi.fn(()=>true),files=vi.fn(async (_files:File[])=>true)
+ const element=(resource:string,threadId='thread')=><ThreadClientProvider client={client}><BrowserWorkbench resource={resource} threadId={threadId} onQuickMessage={append} onWorkspaceFiles={files}/></ThreadClientProvider>
+ const view=render(element('a'));return {view,inspect,append,files,finish:(value:unknown)=>finish(value),switch:(resource:string,threadId?:string)=>view.rerender(element(resource,threadId))}
 }
 it('replaces an edited address with the real URL when switching page tabs',async()=>{
  const f=fixture();await waitFor(()=>expect((f.view.getByLabelText('网页地址') as HTMLInputElement).value).toBe('http://one.test'))
@@ -40,4 +40,25 @@ it('cancels an element picker whose delayed start finishes after changing tabs',
  f.switch('b');await act(async()=>f.finish({documentId:'old-document',url:'http://one.test',title:'Old'}))
  expect(f.inspect).toHaveBeenCalledWith({id:'a',action:'pick_cancel',documentId:'old-document'})
  expect(f.append).not.toHaveBeenCalled()
+})
+
+it('adds page material as a compact attachment without replacing the user input',async()=>{
+ const f=fixture();await waitFor(()=>expect((f.view.getByLabelText('网页地址') as HTMLInputElement).value).toBe('http://one.test'))
+ fireEvent.click(f.view.getByText('页面文字与链接'));await act(async()=>f.finish({title:'Page One',url:'http://one.test',text:'Visible page content'}))
+ await waitFor(()=>expect(f.files).toHaveBeenCalledTimes(1));expect(f.append).not.toHaveBeenCalled()
+ const file=f.files.mock.calls[0][0][0];expect(file.name).toBe('网页 · Page One.txt');expect(file.type).toBe('text/plain')
+ expect(f.view.queryByText('加入输入')).toBeNull()
+})
+it('selected elements are attached immediately without a second confirmation',async()=>{
+ const f=fixture();await waitFor(()=>expect((f.view.getByLabelText('网页地址') as HTMLInputElement).value).toBe('http://one.test'))
+ fireEvent.click(f.view.getByText('选择一个元素'));await act(async()=>f.finish({documentId:'document-a',url:'http://one.test',title:'One'}))
+ await act(async()=>new Promise(resolve=>setTimeout(resolve,400)))
+ await act(async()=>f.finish({documentId:'document-a',url:'http://one.test',title:'One',result:{tag:'button',text:'Selected',html:'<button>Selected</button>'}}))
+ await waitFor(()=>expect(f.files).toHaveBeenCalledTimes(1));expect(f.files.mock.calls[0][0][0].name).toBe('页面元素 · button.txt')
+ expect(f.append).not.toHaveBeenCalled();expect(f.view.queryByText('加入输入')).toBeNull()
+})
+it('a refused attachment never reports a successful handoff',async()=>{
+ const f=fixture();f.files.mockResolvedValue(false);await waitFor(()=>expect((f.view.getByLabelText('网页地址') as HTMLInputElement).value).toBe('http://one.test'))
+ fireEvent.click(f.view.getByText('页面文字与链接'));await act(async()=>f.finish({title:'Page',url:'http://one.test',text:'contents'}))
+ await waitFor(()=>expect(f.view.getByRole('alert').textContent).toContain('暂不可用'));expect(f.view.queryByText('已加入对话')).toBeNull()
 })

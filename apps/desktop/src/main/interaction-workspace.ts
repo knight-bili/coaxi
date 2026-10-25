@@ -23,6 +23,8 @@ export class InteractionWorkspace {
   private busy=false
   private readonly ownerId=randomUUID()
   private readonly grants=new Map<string,InteractionGrant>()
+  private readonly resourceVersions=new Map<string,number>()
+  private readonly pendingRevocations=new Set<string>()
   private readonly outcomes=new Map<string,Finish>()
   private journalLoaded=false
   private lastError:string|null=null
@@ -30,7 +32,12 @@ export class InteractionWorkspace {
   constructor(private readonly core:CoreClient,private readonly browser:BrowserWorkspace,private readonly owner:()=>BrowserWindow|null,private readonly computer?:DesktopComputerExecutor,private readonly journal?:InteractionResultJournal){
     this.timer=setInterval(()=>{void this.pump().catch(error=>{this.lastError=String(error)})},500)
     this.timer.unref()
-    browser.onModelResourceChanged=(id,origin)=>{for(const [grantId,grant] of this.grants){if(grant.targetKind==='browser_tab'&&grant.targetId===id&&(!origin||grant.origin!==origin)){this.grants.delete(grantId);void this.request('grant.revoke',{grantId}).catch(()=>undefined)}}}
+    browser.onModelResourceChanged=(id,origin)=>{this.resourceVersions.set(id,(this.resourceVersions.get(id)??0)+1);for(const [grantId,grant] of this.grants){if(grant.targetKind==='browser_tab'&&grant.targetId===id&&(!origin||grant.origin!==origin)){void this.revokeGrant(grantId).catch(()=>undefined)}}}
+  }
+  private async revokeGrant(grantId:string):Promise<unknown>{
+    this.pendingRevocations.add(grantId);this.grants.delete(grantId)
+    const result=await this.request('grant.revoke',{grantId})
+    this.pendingRevocations.delete(grantId);return result
   }
   private async request<T>(action:string,payload:unknown):Promise<T>{return this.core.request<T>('interaction.local',{action,payload})}
   private async storeOriginal(result:Finish):Promise<void>{const receipt=await this.request<{state:string;resultDigest:string|null}>('desktop.finish',result);if(result.result!==null&&!receipt.resultDigest)await this.request('desktop.archiveLate',result)}
@@ -52,15 +59,21 @@ export class InteractionWorkspace {
     if(action==='grant.share'){
       if(!this.peer)throw new Error('desktop_unavailable')
       const input=payload as InteractionGrant
-      const result=await this.request<InteractionGrant>('grant.share',{...input,schemaVersion:1,desktopPeerId:this.peer.desktopPeerId})
+      const peer=this.peer,generation=this.generation,version=this.resourceVersions.get(input.targetId)??0
+      const current=():void=>{if(this.disposed||this.peer!==peer||this.generation!==generation)throw new Error('desktop_unavailable');if(input.targetKind==='browser_tab'){this.browser.assertShareTarget(input);if((this.resourceVersions.get(input.targetId)??0)!==version)throw new Error('origin_changed')}}
+      current()
+      let result:InteractionGrant
+      try{result=await this.request<InteractionGrant>('grant.share',{...input,schemaVersion:1,desktopPeerId:peer.desktopPeerId})}catch(error){await this.revokeGrant(input.grantId).catch(()=>undefined);throw error}
+      try{current()}catch(error){await this.revokeGrant(result.grantId).catch(()=>undefined);throw error}
       this.grants.set(result.grantId,result);return result
     }
     if(action==='grant.revoke'){
       const input=payload as {grantId?:unknown};if(typeof input.grantId!=='string')throw new Error('invalid_arguments')
-      const result=await this.request(action,input);this.grants.delete(input.grantId);await this.computer?.stop();return result
+      const result=await this.revokeGrant(input.grantId);await this.computer?.stop();return result
     }
     if(action==='grant.list'){
       const result=await this.request<{grants:InteractionGrant[]}>('grant.list',{...payload,desktopPeerId:this.peer?.desktopPeerId??null})
+      result.grants=result.grants.filter(grant=>!this.pendingRevocations.has(grant.grantId))
       for(const grant of result.grants)this.grants.set(grant.grantId,grant)
       return result
     }
@@ -83,6 +96,7 @@ export class InteractionWorkspace {
       }
       const peer=this.peer,generation=this.generation
       if(!peer)return
+      for(const id of this.pendingRevocations){try{await this.revokeGrant(id)}catch(error){this.lastError=String(error)}}
       for(const [id,result] of this.outcomes){
         try{
           if(result.desktopPeerId===peer.desktopPeerId)await this.storeOriginal(result)
@@ -94,6 +108,7 @@ export class InteractionWorkspace {
       for(const work of page.calls){
         const current=async():Promise<void>=>{
           if(this.disposed||this.generation!==generation||this.peer!==peer||this.core.getSnapshot().generation!==peer.connectionGeneration)throw new Error('desktop_unavailable')
+          if(work.grants.some(grant=>this.pendingRevocations.has(grant.grantId)))throw new Error('grant_required')
           await this.request('desktop.check',{schemaVersion:1,desktopPeerId:peer.desktopPeerId,connectionGeneration:peer.connectionGeneration,bridgeCallId:work.call.bridgeCallId,bindingDigest:work.receipt.bindingDigest,argumentsDigest:work.call.argumentsDigest})
         }
         let result:unknown|null=null,outcome:Finish['outcome']='unknown'
