@@ -103,7 +103,13 @@ export function WorkspaceWorkbench({ threadId, projectPath, members, bindLeaveGu
   const operation = async <T,>(run: () => Promise<T>): Promise<T | undefined> => {
     if (busy) return
     const generation = epoch.current; setBusy(true); setError(null)
-    try { return await run() } catch (failure) { if (generation === epoch.current) setError(readErrorMessage(failure, t('工程操作失败。'))); return undefined }
+    try { return await run() } catch (failure) {
+      if (generation === epoch.current) {
+        const message = readErrorMessage(failure, t('工程操作失败。'))
+        setError(message.includes('workbench.text_required') ? t('这个文件不是可编辑的文本。图片、PDF 和网页请使用预览。') : message)
+      }
+      return undefined
+    }
     finally { if (generation === epoch.current) setBusy(false) }
   }
   const loadDirectory = async (path: string, after?: string): Promise<void> => {
@@ -208,7 +214,7 @@ export function WorkspaceWorkbench({ threadId, projectPath, members, bindLeaveGu
     <button type="button" className="quiet-button conversation-tool-button" title={t('文件与 Git 工程工作区')} onClick={() => setOpen(true)}><Files size={15} /><span>{t('工程')}</span></button>
     <Dialog.Root open={open} onOpenChange={next => { if (!next) void closeWorkspace(); else setOpen(true) }}>
       <Dialog.Portal><Dialog.Overlay className="dialog-overlay" /><AppDialogContent className="workspace-workbench" width="large">
-        <AppDialogHeader title={t('工程工作区')} description={projectPath} closeLabel={t('关闭工程工作区')} closeDisabled={closing} />
+        <AppDialogHeader title={t('工程工作区')} description={<span title={projectPath}>{projectPath.split(/[\\/]/).filter(Boolean).at(-1)}</span>} closeLabel={t('关闭工程工作区')} closeDisabled={closing} />
         <nav className="workbench-toolbar workbench-view-tabs" aria-label={t('工程视图')}>
           <button disabled={organizerDirty||forgeDirty||terminalUnsettled} className={tab==='terminals'?'quiet-button is-active':'quiet-button'} onClick={()=>setTab('terminals')}>{t('终端')}</button>
           <button disabled={organizerDirty||forgeDirty||terminalUnsettled} className={tab==='launcher'?'quiet-button is-active':'quiet-button'} onClick={()=>setTab('launcher')}>{t('项目启动器')}</button>

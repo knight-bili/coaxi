@@ -32,13 +32,13 @@ vi.mock('./codeg-native-content/components/diff/unified-diff-preview', () => ({ 
 vi.mock('./useShortcutActions', () => ({ useShortcutActions: () => undefined }))
 afterEach(cleanup)
 
-function fixture() {
+function fixture(readError = '文件无法读取，请检查访问权限。') {
   const records = new Map<string, unknown>()
   let finishSave: (() => void) | undefined
   const request = vi.fn(async (method: string, input?: unknown) => {
     if (method === 'app.info') return { dataDir: '/fixture-core' }
     if (method === 'workbench.files.list') return { entries: ['image.png', 'broken.txt'].map(path => ({ name: path, path, directory: false, link: false, bytes: 10 })), next: null }
-    if (method === 'workbench.files.read') throw { message: '文件无法读取，请检查访问权限。' }
+    if (method === 'workbench.files.read') throw { message: readError }
     if (method !== 'workbench.editor') throw new Error(method)
     const params = input as { operation: string; value?: unknown }
     if (params.operation === 'save') await new Promise<void>(resolve => { finishSave = resolve })
@@ -76,5 +76,13 @@ describe('工程文件打开与关闭', () => {
     finish()
     await waitFor(() => expect(closed).toHaveBeenCalledOnce())
     expect([...records.values()].some(value => (value as { latest?: { selected: unknown } }).latest?.selected)).toBe(false)
+  })
+
+  it('将 Core 的非文本拒绝转换为可理解的提示', async () => {
+    const { view } = fixture('workbench.text_required: invalid utf-8 sequence')
+    await waitFor(() => expect(view.getByText('编辑草稿需要处理')).toBeTruthy())
+    fireEvent.click(view.getByRole('treeitem', { name: 'broken.txt' }))
+    await waitFor(() => expect(view.getByRole('alert').textContent).toContain('这个文件不是可编辑的文本'))
+    expect(view.getByRole('alert').textContent).not.toContain('workbench.text_required')
   })
 })
