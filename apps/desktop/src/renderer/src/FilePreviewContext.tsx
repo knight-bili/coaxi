@@ -10,6 +10,7 @@ import { FilePreviewPaneContent, FilePreviewSingleContent } from './FilePreviewP
 import type { FilePreviewContextValue, FilePreviewSession, FilePreviewTabModel } from './file-preview-controller'
 import { UiText } from './interface-language'
 import { filePreviewSourceKey } from './file-preview-session'
+import './unified-workspace.css'
 export * from './file-preview-controller'
 
 const FilePreviewApiContext = createContext<FilePreviewApi | null>(null)
@@ -19,16 +20,18 @@ const noSubscription = (): (() => void) => () => undefined
 const emptyRevision = (): number => 0
 const PreviewHostContext = createContext<((element: HTMLDivElement | null) => void) | null>(null)
 const ExecutionPreviewHostContext = createContext<ReadonlyMap<string, HTMLDivElement>>(new Map())
+const WorkbenchPreviewHostContext = createContext<ReadonlyMap<string, HTMLDivElement>>(new Map())
 
 function sessionValue(session: FilePreviewSession, resolvedTheme: ResolvedTheme): FilePreviewContextValue {
   const state = session.getSnapshot()
-  return { ...state, ...session.actions, resolvedTheme, activeTab: state.tabs.find(tab => tab.id === state.activeTabId) ?? null }
+  return { ...state, ...session.actions, threadId: session.threadId, resolvedTheme, activeTab: state.tabs.find(tab => tab.id === state.activeTabId) ?? null }
 }
 
 const RetainedPane = memo(FilePreviewPaneContent)
-function RetainedPreview({ session, resolvedTheme, current, bounds, resizing, missionActivity, registerExecutionHost, domScope, isFocusedSurface }: {
+function RetainedPreview({ session, resolvedTheme, current, bounds, resizing, missionActivity, registerExecutionHost, registerWorkbenchHost, domScope, isFocusedSurface }: {
   session: FilePreviewSession; resolvedTheme: ResolvedTheme; current: boolean; bounds: CSSProperties | null; resizing: boolean; missionActivity?: ReactNode
   registerExecutionHost(threadId: string, element: HTMLDivElement | null): void
+  registerWorkbenchHost(threadId: string, element: HTMLDivElement | null): void
   domScope?: string; isFocusedSurface: boolean
 }): React.JSX.Element {
   const state = session.getSnapshot()
@@ -38,6 +41,7 @@ function RetainedPreview({ session, resolvedTheme, current, bounds, resizing, mi
     (element: HTMLDivElement | null) => registerExecutionHost(session.threadId, element),
     [registerExecutionHost, session.threadId]
   )
+  const workbenchHostRef = useCallback((element: HTMLDivElement | null) => registerWorkbenchHost(session.threadId, element), [registerWorkbenchHost, session.threadId])
   return <FilePreviewContext.Provider value={value}>
     <div className={`file-preview-retained-host${resizing ? ' is-resizing' : ''}`} hidden={!visible} inert={!visible}
       style={bounds ?? undefined} data-preview-camp={session.threadId}>
@@ -45,14 +49,16 @@ function RetainedPreview({ session, resolvedTheme, current, bounds, resizing, mi
         visible={visible}
         missionActivity={missionActivity}
         executionHostRef={executionHostRef}
+        workbenchHostRef={workbenchHostRef}
       />
     </div>
   </FilePreviewContext.Provider>
 }
 
-function PreviewDeck({ resources, anchor, resolvedTheme, missionActivity, registerExecutionHost, contained, host, threadId, domScope, isFocusedSurface }: {
+function PreviewDeck({ resources, anchor, resolvedTheme, missionActivity, registerExecutionHost, registerWorkbenchHost, contained, host, threadId, domScope, isFocusedSurface }: {
   resources: FilePreviewResources; anchor: HTMLDivElement | null; resolvedTheme: ResolvedTheme; missionActivity?: ReactNode
   registerExecutionHost(threadId: string, element: HTMLDivElement | null): void
+  registerWorkbenchHost(threadId: string, element: HTMLDivElement | null): void
   contained?: boolean; host: HTMLElement; threadId: string | null
   domScope?: string; isFocusedSurface: boolean
 }): React.JSX.Element {
@@ -90,7 +96,7 @@ function PreviewDeck({ resources, anchor, resolvedTheme, missionActivity, regist
   return <>{[...resources.sessions.values()].filter(session => !contained || session.threadId === threadId).map(session => <RetainedPreview key={session.id} session={session}
     resolvedTheme={resolvedTheme} current={session.threadId === threadId} bounds={positioned} resizing={!!layout?.resizing}
     missionActivity={session.threadId === threadId ? missionActivity : null}
-    registerExecutionHost={registerExecutionHost} domScope={domScope} isFocusedSurface={isFocusedSurface && session.threadId === threadId} />)}</>
+    registerExecutionHost={registerExecutionHost} registerWorkbenchHost={registerWorkbenchHost} domScope={domScope} isFocusedSurface={isFocusedSurface && session.threadId === threadId} />)}</>
 
 }
 
@@ -107,6 +113,16 @@ export function FilePreviewProvider({ threadId, resolvedTheme, api: providedApi,
   const [anchor, setAnchor] = useState<HTMLDivElement | null>(null)
   const [deckHost, setDeckHost] = useState<HTMLElement>(document.body)
   const [executionHosts, setExecutionHosts] = useState<ReadonlyMap<string, HTMLDivElement>>(new Map())
+  const [workbenchHosts, setWorkbenchHosts] = useState<ReadonlyMap<string, HTMLDivElement>>(new Map())
+  const registerWorkbenchHost = useCallback((id: string, element: HTMLDivElement | null): void => {
+    setWorkbenchHosts(current => {
+      if (current.get(id) === element || !element && !current.has(id)) return current
+      const next = new Map(current)
+      if (element) next.set(id, element)
+      else next.delete(id)
+      return next
+    })
+  }, [])
   const registerAnchor = useCallback((element: HTMLDivElement | null): void => {
     setAnchor(element)
     if (element) setDeckHost(element.closest<HTMLElement>(contained ? '.file-preview-contained' : '.app-shell') ?? document.body)
@@ -131,14 +147,14 @@ export function FilePreviewProvider({ threadId, resolvedTheme, api: providedApi,
     return () => { window.removeEventListener('beforeunload', dispose); release() }
   }, [resources])
   const deck = createPortal(<PreviewDeck resources={resources} anchor={anchor} resolvedTheme={resolvedTheme} missionActivity={missionActivity}
-    registerExecutionHost={registerExecutionHost} contained={contained} host={deckHost} threadId={threadId} domScope={domScope} isFocusedSurface={isFocusedSurface} />, deckHost)
+    registerExecutionHost={registerExecutionHost} registerWorkbenchHost={registerWorkbenchHost} contained={contained} host={deckHost} threadId={threadId} domScope={domScope} isFocusedSurface={isFocusedSurface} />, deckHost)
   return <HtmlPresentationContext.Provider value={resources}><FilePreviewApiContext.Provider value={api}><FilePreviewContext.Provider value={value}>
     <FilePreviewLayoutProvider threadId={threadId} visible={!!threadId && value.paneVisible} activityMode={value.activeTab?.kind === 'mission_activity'}>
       <FileFindProvider activeTabId={value.activeTabId} visible={!!threadId && value.paneVisible && isFocusedSurface}>
-        <ExecutionPreviewHostContext.Provider value={executionHosts}>
+        <ExecutionPreviewHostContext.Provider value={executionHosts}><WorkbenchPreviewHostContext.Provider value={workbenchHosts}>
           <PreviewHostContext.Provider value={registerAnchor}>{contained ? <div className="file-preview-contained"
             onPointerDownCapture={() => resources.focus(threadId, owner)} onFocusCapture={() => resources.focus(threadId, owner)}>{children}{deck}</div> : <>{children}{deck}</>}</PreviewHostContext.Provider>
-        </ExecutionPreviewHostContext.Provider>
+        </WorkbenchPreviewHostContext.Provider></ExecutionPreviewHostContext.Provider>
       </FileFindProvider>
     </FilePreviewLayoutProvider>
   </FilePreviewContext.Provider></FilePreviewApiContext.Provider></HtmlPresentationContext.Provider>
@@ -166,6 +182,7 @@ export function useFilePreview(): FilePreviewContextValue {
   return value
 }
 export function useOptionalFilePreview(): FilePreviewContextValue | null { return useContext(FilePreviewContext) }
+export function useWorkbenchPreviewHost(threadId: string): HTMLDivElement | undefined { return useContext(WorkbenchPreviewHostContext).get(threadId) }
 export function useOptionalFilePreviewApi(): FilePreviewApi | null { return useContext(FilePreviewApiContext) }
 export function useFilePreviewApi(): FilePreviewApi {
   const api = useContext(FilePreviewApiContext)

@@ -6,8 +6,9 @@ import type { ThreadClient } from './camp-client'
 import { ThreadClientProvider } from './camp-client'
 import { WorkspaceWorkbench } from './WorkspaceWorkbench'
 
+const previewActions = vi.hoisted(()=>({open:vi.fn(async()=>({kind:'preview',tabId:'image'})),openWorkspace:vi.fn(),updateWorkspaceTab:vi.fn(),bindWorkspaceClose:vi.fn(()=>()=>{}),close:vi.fn()}))
 vi.mock('./FilePreviewContext', () => ({
-  useOptionalFilePreview: () => ({ resolvedTheme: 'night' }),
+  useOptionalFilePreview: () => ({ resolvedTheme: 'night',...previewActions }),
   useOptionalFilePreviewApi: () => ({}),
   PinnedFilePreview: ({ source }: { source: { rawReference: string } }) => createElement('img', { alt: source.rawReference })
 }))
@@ -48,9 +49,9 @@ function fixture(readError = '文件无法读取，请检查访问权限。') {
     get: async (key: string) => structuredClone(records.get(key) ?? null),
     put: async (value: { key: string }) => { records.set(value.key, structuredClone(value)) }
   } } as unknown as ThreadClient
-  const closed = vi.fn()
-  const view = render(<ThreadClientProvider client={client}><WorkspaceWorkbench threadId="thread" projectPath="/project" members={[]} bindLeaveGuard={()=>undefined} initiallyOpen onClosed={closed}/></ThreadClientProvider>)
-  return { view, request, closed, records, finish: () => finishSave?.() }
+  const closed = vi.fn();let leaveGuard:(()=>void)|null=null
+  const view = render(<ThreadClientProvider client={client}><WorkspaceWorkbench threadId="thread" projectPath="/project" members={[]} bindLeaveGuard={guard=>{leaveGuard=guard}} initiallyOpen onClosed={closed}/></ThreadClientProvider>)
+  return { view, request, closed, records, guard:()=>leaveGuard?.(), finish: () => finishSave?.() }
 }
 
 describe('工程文件打开与关闭', () => {
@@ -58,23 +59,23 @@ describe('工程文件打开与关闭', () => {
     const { view, request, finish } = fixture()
     await waitFor(() => expect(view.getByRole('treeitem', { name: 'image.png' })).toBeTruthy())
     fireEvent.click(view.getByRole('treeitem', { name: 'image.png' }))
-    expect(view.getByRole('img', { name: 'image.png' })).toBeTruthy()
+    expect(previewActions.open).toHaveBeenCalledWith({kind:'camp_workspace',threadId:'thread',rawReference:'image.png'})
     expect(request.mock.calls.some(([method]) => method === 'workbench.files.read')).toBe(false)
     finish()
   })
 
-  it('文本读取失败保留可读错误、有效选择和可用关闭入口；关闭会等待草稿保存', async () => {
-    const { view, request, closed, records, finish } = fixture()
+  it('文本读取失败保留可读错误；未补存的草稿仍阻止离开工程', async () => {
+    const { view, request, records, finish, guard } = fixture()
     await waitFor(() => expect(view.getByText('编辑草稿需要处理')).toBeTruthy())
     fireEvent.click(view.getByRole('treeitem', { name: 'broken.txt' }))
     await waitFor(() => expect(view.getByRole('alert').textContent).toContain('文件无法读取'))
     expect(view.queryByText('[object Object]')).toBeNull()
     expect(view.getByText('选择文件，开始查看')).toBeTruthy()
-    fireEvent.click(view.getByRole('button', { name: '收起工程区' }))
+    expect(guard).toThrow('编辑草稿或布局仍未补存')
     await waitFor(() => expect(request.mock.calls.some(([, input]) => (input as { operation?: string })?.operation === 'save')).toBe(true))
-    expect(closed).toHaveBeenCalledOnce()
+    expect(records.size).toBeGreaterThan(0)
     finish()
-    await waitFor(() => expect(closed).toHaveBeenCalledOnce())
+    await waitFor(() => expect(guard).not.toThrow())
     expect([...records.values()].some(value => (value as { latest?: { selected: unknown } }).latest?.selected)).toBe(false)
   })
 

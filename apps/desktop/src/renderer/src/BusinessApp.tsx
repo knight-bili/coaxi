@@ -2,6 +2,7 @@ import {prepareCreatedProject} from './project-launcher-handoff'
 import {createPortal} from 'react-dom'
 import {ProjectLauncher} from './ProjectLauncher'
 import { BrandMark } from './BrandMark'
+import { CoaxiStatusBar } from './CoaxiStatusBar'
 import { PetExtensionHost } from './PetExtensionHost'
 import {useDesktopDeepLinks} from './useDesktopDeepLinks'
 import { useShortcutActions } from './useShortcutActions'
@@ -3886,6 +3887,7 @@ function BusinessAppContent({
     navigationId={drawer ? 'mobile-conversation-navigation' : 'global-navigation'}
     platform={client.platform}
     footer={sidebarFooter}
+    showSettingsEntry={mobile}
     view={view === 'camp' && missionThread ? 'missions' : view}
     state={startupStatus === 'resolved' ? navigationState : 'loading'}
     navigation={displayNavigation}
@@ -4378,6 +4380,11 @@ function BusinessAppContent({
         onOpenDetails={openUpdateSettings}
         onDownload={appUpdates.download}
       />}
+      {!mobile && <CoaxiStatusBar threadId={view === 'camp' ? activeThreadId : null} sessionCount={(displayNavigation?.quickChat.totalCount ?? 0) + (displayNavigation?.projects.reduce((sum, project) => sum + project.totalCount, 0) ?? 0)}
+        disabled={startupStatus !== 'resolved' || shuttingDown || projectLauncherOpen} updates={appUpdates.snapshot}
+        onSettings={section => section ? void navigateToSettings(section) : openSettings()} onUpdates={() => { void openUpdateSettings() }}
+        onOpenFolder={() => { void openProject().catch(error => notifyError(errorMessage(error))) }} onProjectLauncher={openProjectLauncher}
+        onNotification={navigateFromNotification} />}
     </NavigationShell>
     {startupStatus !== 'waiting' && <StartupLoadingCanvas visible={startupLoadingVisible} route={startupLoadingRoute} />}
     </MissionInteractionProvider>

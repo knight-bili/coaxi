@@ -98,6 +98,8 @@ const api: RovaiApi = {
   interactionWorkspace: {request:(action,payload)=>ipcRenderer.invoke('rovai:interaction-workspace',action,payload)},
   workbenchEditorRecovery:{get:key=>ipcRenderer.invoke('rovai:workbench-editor-recovery','get',{key}),put:value=>ipcRenderer.invoke('rovai:workbench-editor-recovery','put',value),copies:(key,after)=>ipcRenderer.invoke('rovai:workbench-editor-recovery','copies',{key,after})},
   browserWorkspace: {
+    present: input => ipcRenderer.invoke('rovai:browser-workspace','present',input),
+    inspect: input => ipcRenderer.invoke('rovai:browser-workspace','inspect',input),
     preferences: () => ipcRenderer.invoke('rovai:browser-workspace','preferences'),
     updatePreferences: input => ipcRenderer.invoke('rovai:browser-workspace','updatePreferences',input),
     profiles: () => ipcRenderer.invoke('rovai:browser-workspace','profiles'),

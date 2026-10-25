@@ -1,183 +1,46 @@
 // @vitest-environment jsdom
-
-import { createElement } from 'react'
-import { afterEach, describe, expect, it, vi } from 'vitest'
-import { act, cleanup, fireEvent, render, waitFor } from '@testing-library/react'
-import type { CoreMethod } from '@contracts'
-import { ThreadClientProvider, type ThreadClient } from './camp-client'
-import { desktopThreadClient } from './desktop-camp-client'
-import { WorkspaceWorkbenchEntry } from './WorkspaceWorkbenchEntry'
-import { dispatchShortcutAction } from './shortcut-action-driver'
+import {createElement} from 'react'
+import {afterEach,expect,it,vi} from 'vitest'
+import {act,cleanup,fireEvent,render,waitFor} from '@testing-library/react'
+import {ThreadClientProvider,type ThreadClient} from './camp-client'
+import {WorkspaceWorkbenchEntry} from './WorkspaceWorkbenchEntry'
+import {dispatchShortcutAction} from './shortcut-action-driver'
 import type {FilePreviewContextValue} from './FilePreviewContext'
-
-const previewState=vi.hoisted(()=>({value:null as FilePreviewContextValue|null}))
-vi.mock('./FilePreviewContext',()=>({useOptionalFilePreview:()=>previewState.value}))
-
-vi.mock('./WorkspaceWorkbench', async () => {
-  const React = await import('react')
-  return {
-    WorkspaceWorkbench: (props: {
-      threadId: string
-      projectPath: string
-      initiallyOpen?: boolean
-      terminalRequest?: number
-      onClosed?: () => void
-    }) => React.createElement('section', {
-      'data-testid': 'workbench',
-      'data-thread': props.threadId,
-      'data-root': props.projectPath,
-      'data-tab': props.terminalRequest ? 'terminals' : 'files',
-      'data-open': String(props.initiallyOpen),
-    }, React.createElement('button', { type: 'button', onClick: props.onClosed }, '关闭工作区')),
-  }
+const state=vi.hoisted(()=>({preview:null as FilePreviewContextValue|null,host:null as HTMLElement|null}))
+vi.mock('./FilePreviewContext',()=>({useOptionalFilePreview:()=>state.preview,useWorkbenchPreviewHost:()=>state.host}))
+vi.mock('./WorkspaceWorkbench',()=>({WorkspaceWorkbench:(props:any)=>createElement('section',{'data-testid':'workbench','data-thread':props.threadId,'data-root':props.projectPath,'data-visible':String(props.visible),'data-terminal':props.terminalRequest})}))
+afterEach(()=>{cleanup();state.host?.remove();state.host=null;state.preview=null;document.querySelectorAll('[data-engineering-entry]').forEach(el=>el.remove())})
+function fixture(request: ReturnType<typeof vi.fn<() => Promise<unknown>>> =vi.fn(async()=>({workspaceRoot:'/verified/project'}))){
+ state.host=document.createElement('div');document.body.append(state.host)
+ const header=document.createElement('span');header.dataset.engineeringEntry='thread-a';document.body.append(header)
+ const preview={paneVisible:false,tabs:[],activeTab:null,openWorkspace:vi.fn((tool:string)=>{preview.tabs=[{id:'tool',tool}];preview.paneVisible=true}),showPane:vi.fn(()=>{preview.paneVisible=true}),hidePane:vi.fn(()=>{preview.paneVisible=false})} as any;state.preview=preview
+ let client={request,presentationScope:'fixture'} as unknown as ThreadClient,thread='thread-a'
+ const tree=()=> <ThreadClientProvider client={client}><WorkspaceWorkbenchEntry threadId={thread} missionId="mission-current" projectPath="unverified" members={[]} bindLeaveGuard={()=>{}}><div>对话</div></WorkspaceWorkbenchEntry></ThreadClientProvider>
+ const view=render(tree())
+ return {view,request,preview,refresh:()=>view.rerender(tree()),switchOwner:(nextClient:ThreadClient,nextThread=thread)=>{client=nextClient;thread=nextThread;header.dataset.engineeringEntry=thread;view.rerender(tree())}}
+}
+it('只向顶栏提供一个开关，工具使用现有工作区宿主，收起保留实例',async()=>{
+ const f=fixture();fireEvent.click(f.view.getByRole('button',{name:'展开工作区'}));await waitFor(()=>expect(f.preview.openWorkspace).toHaveBeenCalledWith('files',undefined,'工程文件'))
+ f.refresh();const editor=f.view.getByTestId('workbench');expect(editor.parentElement).toBe(state.host);expect(document.querySelectorAll('.engineering-pane')).toHaveLength(0)
+ fireEvent.click(f.view.getByRole('button',{name:'收起工作区'}));f.refresh();expect(f.preview.hidePane).toHaveBeenCalledOnce();expect(f.view.getByTestId('workbench')).toBe(editor)
+ fireEvent.click(f.view.getByRole('button',{name:'展开工作区'}));await waitFor(()=>expect(f.preview.showPane).toHaveBeenCalledOnce());expect(f.request).toHaveBeenCalledTimes(2)
 })
-
-afterEach(()=>{cleanup();previewState.value=null})
-
-function createClient(request: (method: CoreMethod, params?: unknown) => Promise<unknown>): ThreadClient {
-  const client = Object.create(desktopThreadClient) as ThreadClient
-  Object.defineProperty(client, 'request', { configurable: true, value: request as unknown as ThreadClient['request'] })
-  Object.defineProperty(client, 'keyboardShortcuts', { configurable: true, value: undefined })
-  return client
-}
-
-function ownerTree(client: ThreadClient, threadId: string) {
-  return createElement(ThreadClientProvider, {
-    client,
-    children: createElement(WorkspaceWorkbenchEntry, {
-      threadId,
-      missionId: 'mission-current',
-      projectPath: '/caller-path-must-not-be-used',
-      members: [],
-      bindLeaveGuard: () => undefined,
-    }),
-  })
-}
-
-describe('WorkspaceWorkbenchEntry 快捷键', () => {
-  it('预览标签区可以返回工程，不必增加第二个顶栏开关',async()=>{
-    const host=document.createElement('span');host.dataset.engineeringPreviewEntry='global';document.body.append(host)
-    previewState.value={paneVisible:true,activeTab:{kind:'file'}} as unknown as FilePreviewContextValue
-    const request=vi.fn(async()=>({workspaceRoot:'/verified'}))
-    try{
-      const view=render(ownerTree(createClient(request),'thread-a'))
-      fireEvent.click(view.getByRole('button',{name:'打开工程区'}))
-      const editor=await view.findByTestId('workbench')
-      expect(editor.closest('aside')?.hidden).toBe(false)
-      expect(request).toHaveBeenCalledOnce()
-    }finally{host.remove()}
-  })
-  it('统一入口收起文件预览后恢复原预览，不误开工程或重新读取目录',()=>{
-    const hidePane=vi.fn(),showPane=vi.fn(),request=vi.fn(),client=createClient(request)
-    previewState.value={paneVisible:true,activeTab:{kind:'file'},hidePane,showPane} as unknown as FilePreviewContextValue
-    const view=render(ownerTree(client,'thread-a'))
-    fireEvent.click(view.getByRole('button',{name:'收起文件预览'}))
-    expect(hidePane).toHaveBeenCalledOnce()
-    previewState.value={...previewState.value,paneVisible:false}
-    view.rerender(ownerTree(client,'thread-a'))
-    fireEvent.click(view.getByRole('button',{name:'展开文件预览'}))
-    expect(showPane).toHaveBeenCalledOnce()
-    expect(request).not.toHaveBeenCalled()
-  })
-  it('右上固定控制保持可达，放大、恢复与收起不重建编辑器', async () => {
-    const host=document.createElement('span');host.dataset.engineeringEntry='thread-a';document.body.append(host)
-    try{
-      const view=render(ownerTree(createClient(vi.fn(async()=>({workspaceRoot:'/verified'}))),'thread-a'))
-      fireEvent.click(view.getByRole('button',{name:'展开工程区'}))
-      const editor=await view.findByTestId('workbench')
-      const controls=view.getByRole('group',{name:'工程区显示'})
-      expect(controls.parentElement).toBe(host)
-      fireEvent.click(view.getByRole('button',{name:'放大工程区'}))
-      expect(view.container.querySelector('.engineering-layout.is-maximized')).toBeTruthy()
-      expect(host.querySelector('button[aria-label="恢复并排"]')).toBeTruthy()
-      fireEvent.click(view.getByRole('button',{name:'恢复并排'}))
-      fireEvent.click(view.getByRole('button',{name:'收起工程区'}))
-      expect(editor.closest('aside')?.hidden).toBe(true)
-      expect(host.querySelector('button[aria-label="展开工程区"]')).toBeTruthy()
-      expect(view.getByTestId('workbench')).toBe(editor)
-    }finally{host.remove()}
-  })
-  it('收起保留同一编辑器，重新展开核验目录，目录变更拒绝迁移旧草稿', async () => {
-    const roots=['/verified/first','/verified/first','/verified/changed']
-    const request=vi.fn(async(method:CoreMethod,params?:unknown)=>{
-      expect(method).toBe('workbench.files.list')
-      expect(params).toEqual({scope:{threadId:'thread-a',missionId:'mission-current'},path:''})
-      return {workspaceRoot:roots.shift()}
-    })
-    const view=render(ownerTree(createClient(request),'thread-a'))
-    await act(async()=>{expect(dispatchShortcutAction('toggle_terminal')).toBe(true)})
-    const editor=await view.findByTestId('workbench')
-    expect(editor.getAttribute('data-tab')).toBe('terminals')
-    expect(editor.closest('aside')?.hidden).toBe(false)
-    await act(async()=>{expect(dispatchShortcutAction('toggle_aux_panel')).toBe(true)})
-    expect(editor.closest('aside')?.hidden).toBe(true)
-    expect(view.getByTestId('workbench')).toBe(editor)
-    fireEvent.click(view.getByRole('button',{name:'展开工程区'}))
-    await waitFor(()=>expect(editor.closest('aside')?.hidden).toBe(false))
-    expect(view.getByTestId('workbench')).toBe(editor)
-    fireEvent.click(view.getByRole('button',{name:'关闭工作区'}))
-    fireEvent.click(view.getByRole('button',{name:'展开工程区'}))
-    await waitFor(()=>expect(view.getByRole('alert').textContent).toContain('工程目录已变化'))
-    expect(editor.getAttribute('data-root')).toBe('/verified/first')
-    expect(editor.closest('aside')?.hidden).toBe(true)
-    expect(request).toHaveBeenCalledTimes(3)
-  })
-
-  it('模态框或菜单打开时不核验；Core 未返回已核实目录时不挂载工作区', async () => {
-    const request = vi.fn(async () => ({ workspaceRoot: '' }))
-    const view = render(ownerTree(createClient(request), 'thread-a'))
-    const dialog = document.createElement('div')
-    dialog.setAttribute('role', 'dialog')
-    dialog.setAttribute('aria-modal', 'true')
-    const menu = document.createElement('div')
-    menu.setAttribute('role', 'menu')
-    menu.setAttribute('data-state', 'open')
-    const overlays = [dialog, menu]
-
-    for (const overlay of overlays) {
-      document.body.append(overlay)
-      await act(async () => { expect(dispatchShortcutAction('toggle_aux_panel')).toBe(false) })
-      expect(request).not.toHaveBeenCalled()
-      overlay.remove()
-    }
-
-    await act(async () => { expect(dispatchShortcutAction('toggle_aux_panel')).toBe(true) })
-    await waitFor(() => expect(view.getByRole('alert').textContent).toContain('尚未提供已核实的工程目录'))
-    expect(view.queryByTestId('workbench')).toBeNull()
-    expect(request).toHaveBeenCalledTimes(1)
-  })
-
-  it('Host 同 Thread 切换和 Thread 切换后忽略旧目录核验结果，并合并同一 owner 的重复触发', async () => {
-    let resolveOld!: (value: unknown) => void
-    const oldRequest = vi.fn((_method: CoreMethod, _params?: unknown) => new Promise<unknown>(resolve => { resolveOld = resolve }))
-    const newRequest = vi.fn(async (method: CoreMethod, params?: unknown) => {
-      expect(method).toBe('workbench.files.list')
-      const threadId = (params as { scope: { threadId: string } }).scope.threadId
-      return { workspaceRoot: threadId === 'thread-a' ? '/verified/new-host' : '/verified/new-thread' }
-    })
-    const view = render(ownerTree(createClient(oldRequest), 'thread-a'))
-
-    await act(async () => { expect(dispatchShortcutAction('toggle_terminal')).toBe(true) })
-    await waitFor(() => expect(oldRequest).toHaveBeenCalledTimes(1))
-    await act(async () => { expect(dispatchShortcutAction('toggle_terminal')).toBe(true) })
-    expect(oldRequest).toHaveBeenCalledTimes(1)
-
-    const clientB = createClient(newRequest)
-    view.rerender(ownerTree(clientB, 'thread-a'))
-    await act(async () => { expect(dispatchShortcutAction('toggle_terminal')).toBe(true) })
-    await waitFor(() => expect(view.getByTestId('workbench').getAttribute('data-root')).toBe('/verified/new-host'))
-    expect(view.getByTestId('workbench').getAttribute('data-thread')).toBe('thread-a')
-    expect(view.getByTestId('workbench').getAttribute('data-tab')).toBe('terminals')
-
-    view.rerender(ownerTree(clientB, 'thread-b'))
-    await act(async () => { expect(dispatchShortcutAction('toggle_aux_panel')).toBe(true) })
-    await waitFor(() => expect(view.getByTestId('workbench').getAttribute('data-thread')).toBe('thread-b'))
-    expect(view.getByTestId('workbench').getAttribute('data-root')).toBe('/verified/new-thread')
-    expect(view.getByTestId('workbench').getAttribute('data-tab')).toBe('files')
-    expect(newRequest).toHaveBeenCalledTimes(2)
-
-    await act(async () => { resolveOld({ workspaceRoot: '/stale/old-owner' }) })
-    expect(view.getByTestId('workbench').getAttribute('data-thread')).toBe('thread-b')
-    expect(view.getByTestId('workbench').getAttribute('data-root')).toBe('/verified/new-thread')
-  })
+it('终端快捷键不打开第二个右栏，模态框打开时不截获',async()=>{
+ const f=fixture();const overlay=document.createElement('div');overlay.setAttribute('role','dialog');overlay.setAttribute('aria-modal','true');document.body.append(overlay)
+ await act(async()=>{expect(dispatchShortcutAction('toggle_terminal')).toBe(false)});expect(f.request).not.toHaveBeenCalled();overlay.remove()
+ await act(async()=>{expect(dispatchShortcutAction('toggle_terminal')).toBe(true)});await waitFor(()=>expect(f.view.getByTestId('workbench').getAttribute('data-terminal')).toBe('-1'));expect(f.preview.openWorkspace).not.toHaveBeenCalled()
+})
+it('再次展开发现目录变更时保留旧编辑器，不把草稿迁移到新根目录',async()=>{
+ const request=vi.fn().mockResolvedValueOnce({workspaceRoot:'/verified/first'}).mockResolvedValueOnce({workspaceRoot:'/verified/changed'}),f=fixture(request)
+ fireEvent.click(f.view.getByRole('button',{name:'展开工作区'}));await waitFor(()=>expect(f.view.getByTestId('workbench').getAttribute('data-root')).toBe('/verified/first'));f.refresh()
+ fireEvent.click(f.view.getByRole('button',{name:'收起工作区'}));f.refresh();fireEvent.click(f.view.getByRole('button',{name:'展开工作区'}));await waitFor(()=>expect(f.view.getByRole('alert').textContent).toContain('工程目录已变化'));expect(f.preview.showPane).not.toHaveBeenCalled();expect(f.view.getByTestId('workbench').getAttribute('data-root')).toBe('/verified/first')
+})
+it('旧主机的延迟目录结果不能挂到新主机；重复打开合并目录核验',async()=>{
+ let resolveOld!:(value:unknown)=>void;const old=vi.fn(()=>new Promise(resolve=>{resolveOld=resolve})),f=fixture(old),fresh=vi.fn(async()=>({workspaceRoot:'/verified/new-host'}))
+ fireEvent.click(f.view.getByRole('button',{name:'展开工作区'}));await act(async()=>{dispatchShortcutAction('toggle_terminal')});expect(old).toHaveBeenCalledTimes(1)
+ f.switchOwner({request:fresh,presentationScope:'new'} as unknown as ThreadClient)
+ fireEvent.click(f.view.getByRole('button',{name:'展开工作区'}));await waitFor(()=>expect(f.view.getByTestId('workbench').getAttribute('data-root')).toBe('/verified/new-host'));await act(async()=>resolveOld({workspaceRoot:'/stale'}));expect(f.view.getByTestId('workbench').getAttribute('data-root')).toBe('/verified/new-host')
+})
+it('没有经过主机核实的目录时不挂载工作区',async()=>{
+ const f=fixture(vi.fn(async()=>({workspaceRoot:''})));fireEvent.click(f.view.getByRole('button',{name:'展开工作区'}));await waitFor(()=>expect(f.view.getByRole('alert').textContent).toContain('尚未提供已核实的工程目录'));expect(f.view.queryByTestId('workbench')).toBeNull()
 })

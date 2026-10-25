@@ -475,10 +475,11 @@ export function FilePreviewPane({ tabsInPane = false }: { tabsInPane?: boolean }
   return <div ref={host} className="file-preview-pane file-preview-anchor" hidden={!paneVisible} aria-hidden="true" />
 }
 
-export function FilePreviewPaneContent({ visible, missionActivity, executionHostRef }: {
+export function FilePreviewPaneContent({ visible, missionActivity, executionHostRef, workbenchHostRef }: {
   visible: boolean
   missionActivity?: React.ReactNode
   executionHostRef?(element: HTMLDivElement | null): void
+  workbenchHostRef?(element: HTMLDivElement | null): void
 }): React.JSX.Element {
   const language = useInterfaceLanguage()
   const { tabs, activeTabId, paneVisible, domScope } = useFilePreview()
@@ -490,7 +491,9 @@ export function FilePreviewPaneContent({ visible, missionActivity, executionHost
         <h2><UiText zh={"选择一个文件预览"} /></h2>
         <p><UiText zh={"点击会话中的文件链接或 File Change 卡片，在这里查看文件和变更。"} /></p>
       </div>}
-      {tabs.map((tab) => <section
+      <div ref={workbenchHostRef} className="workbench-preview-host" id={activeTabId && tabs.some(tab => tab.id === activeTabId && tab.kind === 'workspace') ? panelDomId(activeTabId, domScope) : undefined}
+        role="tabpanel" aria-labelledby={activeTabId ? tabDomId(activeTabId, domScope) : undefined} hidden={!visible || !tabs.some(tab => tab.id === activeTabId && tab.kind === 'workspace')} />
+      {tabs.filter(tab => tab.kind !== 'workspace').map((tab) => <section
         key={tab.id}
         id={panelDomId(tab.id, domScope)}
         className="file-preview-tab-panel"

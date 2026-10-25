@@ -1,4 +1,5 @@
 import { BrowserWindow, shell, type IpcMainInvokeEvent } from 'electron'
+import { BrowserNativeSurface, inspectBrowserPage } from './browser-native-surface'
 import { createHash, randomUUID } from 'node:crypto'
 import type { BrowserWorkspaceApi, BrowserWorkspaceView, BrowserPreferences, CoreMethod } from '@contracts'
 import agentBundle from './codeg-browser-agent.js?raw'
@@ -10,7 +11,7 @@ import { InteractionLateResult, sameInteractionScope, type InteractionWork, type
 
 type Request = <T>(method: CoreMethod, params?: unknown) => Promise<T>
 type Surface = {
-  view:BrowserWorkspaceView; window:BrowserWindow; grantOrigin:string|null;
+  view:BrowserWorkspaceView; window:BrowserNativeSurface; grantOrigin:string|null;
   console:Array<{level:string;message:string;at:number;seq:number;origin:string|null;top:boolean;url?:string;line?:number}>; consoleSequence:number; tail:Promise<unknown>;
   modelOwner?:{scope:InteractionScope;agentId:string}; modelWorlds:Map<string,number>
 }
@@ -25,6 +26,8 @@ const address=(value:string):string=>{
 /** Codeg's native window surface and isolated snapshot engine, adapted to
  * Electron. Only a trusted local owner can create/share/control a surface. */
 export class BrowserWorkspace {
+  private presentationSequence = 0
+  private presentationOwner:Electron.WebContents|null=null
   private readonly surfaces=new Map<string,Surface>()
   private readonly downloads=new BrowserDownloads()
   private readonly profiles=new BrowserProfiles(value=>this.downloads.hasActive(value))
@@ -34,6 +37,10 @@ export class BrowserWorkspace {
   private trusted(event:IpcMainInvokeEvent):void{
     const owner=this.owner()
     if(!owner||owner.isDestroyed()||event.sender!==owner.webContents||event.senderFrame!==owner.webContents.mainFrame)throw new Error('browser.local_owner_required')
+    if(this.presentationOwner!==owner.webContents){
+      this.presentationOwner=owner.webContents
+      owner.webContents.on('did-start-navigation',(_event,_url,isInPlace,isMainFrame)=>{if(isMainFrame&&!isInPlace){this.presentationSequence=0;for(const surface of this.surfaces.values())surface.window.present(null)}})
+    }
   }
   private find(id:string):Surface{
     const surface=this.surfaces.get(id)
@@ -93,8 +100,8 @@ export class BrowserWorkspace {
       const admission=await this.profiles.admit(profileId,id)
       let policy:Awaited<ReturnType<BrowserPreferenceStore['attach']>>
       try{policy=await this.preferences.attach(admission.session)}catch(error){admission.release();throw error}
-      let window:BrowserWindow
-      try{window=new BrowserWindow({width:1100,height:780,show:false,title:'浏览器',autoHideMenuBar:true,webPreferences:{session:admission.session,nodeIntegration:false,contextIsolation:true,sandbox:true,webSecurity:true,allowRunningInsecureContent:false,devTools:policy.devtools}})}catch(error){policy.release();admission.release();throw error}
+      let window:BrowserNativeSurface
+      try{const parent=this.owner();if(!parent||parent.isDestroyed())throw new Error('browser.local_owner_required');window=new BrowserNativeSurface({webPreferences:{session:admission.session,nodeIntegration:false,contextIsolation:true,sandbox:true,webSecurity:true,allowRunningInsecureContent:false,devTools:policy.devtools}},parent)}catch(error){policy.release();admission.release();throw error}
       const surface:Surface={window,console:[],consoleSequence:0,modelWorlds:new Map(),tail:Promise.resolve(),grantOrigin:null,view:{id,threadId,profileId:admission.profileId,url:initial,title:'浏览器',level:'none',expiresAt:null,loading:true,error:null}}
       this.surfaces.set(id,surface)
       window.webContents.session.setPermissionRequestHandler((_contents,_permission,callback)=>callback(false))
@@ -124,6 +131,22 @@ export class BrowserWorkspace {
     const id=(input as {id?:unknown}).id
     if(typeof id!=='string')throw new Error('browser.invalid_id')
     const surface=this.find(id)
+    if(operation==='control'&&(input as {action?:unknown}).action==='close'){
+      this.revoke(surface);this.surfaces.delete(id);surface.window.destroy();return null
+    }
+    if(operation==='present'){
+      const value=input as {sequence:number;bounds:{x:number;y:number;width:number;height:number}|null}
+      if(!Number.isSafeInteger(value.sequence)||value.sequence<=this.presentationSequence)return null
+      if(value.bounds&&(![value.bounds.x,value.bounds.y,value.bounds.width,value.bounds.height].every(Number.isFinite)||value.bounds.width<0||value.bounds.height<0))throw new Error('browser.invalid_bounds')
+      this.presentationSequence=value.sequence
+      for(const row of this.surfaces.values())row.window.present(row===surface?value.bounds:null)
+      return null
+    }
+    if(operation==='inspect'){
+      const value=input as {action:string;documentId?:string}
+      if(value.action==='console'){const origin=new URL(surface.view.url).origin;return {url:surface.view.url,title:surface.view.title,entries:surface.console.filter(row=>row.top&&row.origin===origin&&row.level==='error').map(({level,message,at})=>({level,message,at}))}}
+      return inspectBrowserPage(surface.window.webContents,value.action,value.documentId)
+    }
     return this.exclusive(surface,async()=>{
       this.find(id)
       if(operation==='control'){

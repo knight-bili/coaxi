@@ -1627,10 +1627,17 @@ function RevealNotificationConversation({ active, onHidePreview }: { active: boo
 
 export function ThreadWorkspace(props: Parameters<typeof ThreadWorkspaceContent>[0]): JSX.Element {
   const client = useThreadClient(), owner = useRef({ client, generation: 0 })
+  const deliveryContext=props.composerContext?canvasComposerContextKey(props.composerContext):null
+  const deliveryOwner=useMemo(()=>({client,threadId:props.snapshot.thread.id,context:deliveryContext}),[client,props.snapshot.thread.id,deliveryContext])
+  const currentDeliveryOwner=useRef<typeof deliveryOwner|null>(deliveryOwner);currentDeliveryOwner.current=deliveryOwner
+  useEffect(()=>()=>{if(currentDeliveryOwner.current===deliveryOwner)currentDeliveryOwner.current=null},[deliveryOwner])
   const workbenchGuard = useRef<(() => void) | null>(null)
   const workbenchQuickMessage = useRef<((text:string)=>boolean)|null>(null)
+  const workbenchFiles = useRef<((files:File[])=>Promise<boolean>)|null>(null)
+  const bindWorkbenchFiles = useCallback((insert:((files:File[])=>Promise<boolean>)|null)=>{workbenchFiles.current=insert},[])
+  const insertWorkbenchFiles = useCallback((files:File[])=>currentDeliveryOwner.current===deliveryOwner?(workbenchFiles.current?.(files)??Promise.resolve(false)):Promise.resolve(false),[deliveryOwner])
   const bindWorkbenchQuickMessage = useCallback((insert:((text:string)=>boolean)|null)=>{workbenchQuickMessage.current=insert},[])
-  const insertWorkbenchQuickMessage = useCallback((text:string)=>workbenchQuickMessage.current?.(text)??false,[])
+  const insertWorkbenchQuickMessage = useCallback((text:string)=>currentDeliveryOwner.current===deliveryOwner?(workbenchQuickMessage.current?.(text)??false):false,[deliveryOwner])
   const bindWorkbenchGuard = useCallback((guard: (() => void) | null) => { workbenchGuard.current = guard }, [])
   const viewerGuard = useRef<(() => ThreadLeavePreparation) | null>(null)
   const bindViewerGuard = useCallback((guard: (() => ThreadLeavePreparation) | null) => { viewerGuard.current = guard }, [])
@@ -1650,8 +1657,8 @@ export function ThreadWorkspace(props: Parameters<typeof ThreadWorkspaceContent>
     busy={props.busy} onResolveApproval={props.onResolveApproval} onNotify={props.onNotify}>
     <WorkspaceWorkbenchEntry headerEntry={!props.composerContext} enabled={props.surfaceVisible!==false} threadId={props.snapshot.thread.id} missionId={props.snapshot.thread.missionId} projectPath={props.snapshot.thread.projectPath??''}
       members={props.snapshot.members.map(member=>({id:member.agentId,name:props.agents.find(agent=>agent.agentId===member.agentId)?.displayName??member.agentId}))}
-      bindLeaveGuard={bindWorkbenchGuard} onQuickMessage={insertWorkbenchQuickMessage} onOpenNativeConversation={props.onOpenNativeConversation}>
-      <ThreadWorkspaceContent {...props} onThreadLeaveGuardChange={bindWorkspaceGuard} onBindWorkbenchQuickMessage={bindWorkbenchQuickMessage}/>
+      bindLeaveGuard={bindWorkbenchGuard} onQuickMessage={insertWorkbenchQuickMessage} onWorkspaceFiles={insertWorkbenchFiles} onOpenNativeConversation={props.onOpenNativeConversation}>
+      <ThreadWorkspaceContent {...props} onThreadLeaveGuardChange={bindWorkspaceGuard} onBindWorkbenchQuickMessage={bindWorkbenchQuickMessage} onBindWorkbenchFiles={bindWorkbenchFiles}/>
     </WorkspaceWorkbenchEntry>
   </DelegationViewerHost>
 }
@@ -1659,6 +1666,7 @@ export function ThreadWorkspace(props: Parameters<typeof ThreadWorkspaceContent>
 function ThreadWorkspaceContent({
   snapshot,
   onBindWorkbenchQuickMessage,
+  onBindWorkbenchFiles,
   composerContext,
   userAnchorNavigation,
   missionBoard = null,
@@ -1723,6 +1731,7 @@ function ThreadWorkspaceContent({
 }: {
   snapshot: ThreadSnapshot
   onBindWorkbenchQuickMessage?(insert:((text:string)=>boolean)|null):void
+  onBindWorkbenchFiles?(insert:((files:File[])=>Promise<boolean>)|null):void
   surfaceVisible?: boolean
   composerContext?: CanvasComposerContext
   userAnchorNavigation?: ThreadUserAnchorNavigation
@@ -2130,11 +2139,10 @@ function ThreadWorkspaceContent({
     setExecutionInspectorActive(false)
     setExecutionDrawerAgentId(null)
     onCloseInspector()
-    filePreview?.hidePane()
   },[engineeringDock.opened])
   useEffect(()=>{
-    if(inspectorVisible || filePreview?.paneVisible || executionDrawerAgentId)engineeringDock.collapse()
-  },[inspectorVisible,filePreview?.paneVisible,executionDrawerAgentId])
+    if(inspectorVisible || executionDrawerAgentId)engineeringDock.collapse()
+  },[inspectorVisible,executionDrawerAgentId])
   const inspectorTab = controlledInspectorTab ?? localInspectorTab
   const inspectorSurfaceTab: ThreadInspectorSurfaceTab = executionPlacement === 'inspector'
     && executionInspectorActive
@@ -4467,6 +4475,19 @@ function ThreadWorkspaceContent({
     })
     return()=>onBindWorkbenchQuickMessage?.(null)
   },[onBindWorkbenchQuickMessage,composerInteractionDisabled,composerDraft,snapshot.thread.id])
+  useEffect(()=>{
+    onBindWorkbenchFiles?.(async files=>{
+      const target=snapshot.thread.id
+      if(composerInteractionDisabled||composerDraft?.threadId!==target||draftThreadId.current!==target)return false
+      await composerHandleRef.current?.flush()
+      for(const file of files){
+        if(draftThreadId.current!==target)throw new Error(uiAttribute('原对话已切换，图片没有加入其他对话。'))
+        await draftCoordinator.addSourceAttachment(file)
+      }
+      return draftThreadId.current===target
+    })
+    return()=>onBindWorkbenchFiles?.(null)
+  },[onBindWorkbenchFiles,composerInteractionDisabled,composerDraft?.threadId,snapshot.thread.id,draftCoordinator])
 
   const selectInspectorTab = (tab: ThreadInspectorTab): void => {
     if (controlledInspectorTab === undefined) setLocalInspectorTab(tab)

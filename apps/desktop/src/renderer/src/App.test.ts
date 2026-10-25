@@ -3702,7 +3702,7 @@ describe('task event projections', () => {
       onError: () => undefined
     }))
 
-    expect(markup).toMatch(/aria-label="选择工作目录"[^>]*disabled=""/)
+    expect(markup).toMatch(/aria-label="添加项目"[^>]*disabled=""/)
   })
 
   it('keeps an unready Default Lead selectable while warning that execution is blocked', () => {

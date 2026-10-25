@@ -1,4 +1,7 @@
 import { useThreadClient } from './camp-client'
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
+import { FolderOpen, Plus } from 'lucide-react'
+import { WorkspaceToolItems, workspaceTools, requestWorkspaceTool } from './WorkspaceToolMenu'
 import { useShortcutActions } from './useShortcutActions'
 import { NUMBERED_TAB_ACTION_IDS } from '../../shared/codeg-keyboard-shortcuts'
 import type { ShortcutActions } from './shortcut-action-driver'
@@ -35,6 +38,7 @@ function revealTab(strip: HTMLDivElement, tab: HTMLElement): void {
 }
 
 export function FilePreviewTabs({ compact = false }: { compact?: boolean } = {}): React.JSX.Element | null {
+  const preview = useFilePreview()
   const language = useInterfaceLanguage()
   const client = useThreadClient()
   const {
@@ -256,7 +260,8 @@ export function FilePreviewTabs({ compact = false }: { compact?: boolean } = {})
         <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m9.5 3.5-4.5 4.5 4.5 4.5M5 8h7" /></svg>
         <span><UiText zh={"返回会话"} /></span>
       </button>
-      <span className="engineering-preview-switch" data-engineering-preview-entry={domScope??'global'} />
+      <button type="button" className="workspace-strip-icon" title={uiAttribute('工程文件')} aria-label={uiAttribute('工程文件')} disabled={!preview.threadId}
+        onClick={() => preview.openWorkspace('files', undefined, '工程文件')}><FolderOpen size={16} /></button>
       <div className={`file-preview-tab-rail${edges.left ? ' can-scroll-left' : ''}${edges.right ? ' can-scroll-right' : ''}`}>
         <button
           ref={leftButtonRef}
@@ -324,13 +329,14 @@ export function FilePreviewTabs({ compact = false }: { compact?: boolean } = {})
                   onClick={() => activate(tab.id)}
                   onKeyDown={(event) => handleTabKeyDown(event, index)}
                 >
-                  {tab.kind === 'mission_activity' ? <Icon name="history" /> : tab.kind === 'execution' ? (
+                  {tab.kind === 'workspace' ? (() => { const ToolIcon = workspaceTools.find(tool => tool.id === tab.tool)?.Icon ?? FolderOpen; return <ToolIcon size={15} /> })() : tab.kind === 'mission_activity' ? <Icon name="history" /> : tab.kind === 'execution' ? (
                     <ExecutionIcon className="icon file-preview-execution-icon" />
                   ) : <FilePreviewTabIcon
                     kind={icon}
                     fileType={tab.kind === 'file' ? tab.file?.kind : 'file_change'}
                   />}
                   <span className="file-preview-tab-label">{label}</span>
+                  {tab.kind === 'workspace' && tab.dirty && <i className="workspace-tab-dirty" aria-label={uiAttribute('未保存')} />}
                   {hasExternalUpdate && <i className="file-preview-tab-update" aria-hidden="true" />}
                 </button>
                 <button
@@ -366,6 +372,11 @@ export function FilePreviewTabs({ compact = false }: { compact?: boolean } = {})
           onClick={() => scrollTabs(1)}
         ><svg viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3.5 4.5 4.5L6 12.5" /></svg></button>
       </div>
+      <DropdownMenu.Root><DropdownMenu.Trigger asChild><button type="button" className="workspace-strip-icon" title={uiAttribute('打开工作区工具')} aria-label={uiAttribute('打开工作区工具')} disabled={!preview.threadId}><Plus size={16} /></button></DropdownMenu.Trigger>
+        <DropdownMenu.Portal><DropdownMenu.Content className="workspace-menu" align="start" sideOffset={6}>
+          <WorkspaceToolItems onSelect={tool => { if (preview.threadId) requestWorkspaceTool(preview.threadId, tool) }} />
+        </DropdownMenu.Content></DropdownMenu.Portal>
+      </DropdownMenu.Root>
       {menu && createPortal((() => {
         const index = tabs.findIndex((tab) => tab.id === menu.tabId)
         const tab = tabs[index]

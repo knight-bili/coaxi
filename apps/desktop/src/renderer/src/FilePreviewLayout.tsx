@@ -30,6 +30,8 @@ import { UiText, uiAttribute } from './interface-language'
 
 interface FilePreviewLayoutValue {
   visible: boolean
+  maximized: boolean
+  toggleMaximized(): void
   activityMode: boolean
   compact: boolean
   width: number
@@ -71,6 +73,8 @@ export function FilePreviewLayoutProvider({
 }): React.JSX.Element {
   const [workspace, setWorkspace] = useState<HTMLDivElement | null>(null)
   const [availableWidth, setAvailableWidth] = useState(0)
+  const [maximized, setMaximized] = useState(false)
+  useEffect(() => { setMaximized(false) }, [visible, threadId])
   const availableWidthRef = useRef(0)
   const [preferredRatio, setPreferredRatio] = useState(readPreferredRatio)
   const [initialRatios, setInitialRatios] = useState<ReadonlyMap<string, number>>(() => new Map())
@@ -144,11 +148,13 @@ export function FilePreviewLayoutProvider({
     setDragWidth(filePreviewDragWidth(availableWidthRef.current, width))
   }, [])
 
-  const compact = availableWidth < filePreviewSplitMinWidth(activityMode)
+  const compact = maximized || availableWidth < filePreviewSplitMinWidth(activityMode)
   const ratio = preferredRatio ?? initialRatios.get(threadId ?? '') ?? DEFAULT_FILE_PREVIEW_RATIO
-  const width = dragWidth ?? filePreviewWidthForRatio(availableWidth, ratio)
+  const width = maximized ? availableWidth : dragWidth ?? filePreviewWidthForRatio(availableWidth, ratio)
   const value = useMemo<FilePreviewLayoutValue>(() => ({
     visible,
+    maximized,
+    toggleMaximized: () => setMaximized(value => !value),
     activityMode,
     compact,
     width,
@@ -167,7 +173,7 @@ export function FilePreviewLayoutProvider({
     commitWidth,
     cancelResize,
     resetRatio
-  }), [activityMode, availableWidth, cancelResize, commitWidth, compact, dragWidth, previewWidth, resetRatio, snapping, visible, width, workspace])
+  }), [activityMode, availableWidth, cancelResize, commitWidth, compact, dragWidth, previewWidth, resetRatio, snapping, visible, width, workspace, maximized])
 
   return <FilePreviewInitialWidthContext.Provider value={initializeMinimumWidth}>
     <FilePreviewLayoutContext.Provider value={value}>{children}</FilePreviewLayoutContext.Provider>

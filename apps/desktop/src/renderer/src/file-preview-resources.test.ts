@@ -574,3 +574,49 @@ it('loads the newly visible cold tab when its active neighbor is closed', async 
   expect(active(a).id).toBe(first)
   expect(api.readText).toHaveBeenCalledTimes(before + 1)
 })
+
+
+it('keeps workspace resources in the same deck, deduplicates opens and preserves dirty close guards', () => {
+  const { owner } = fixture(); owner.activate('a')
+  const session=owner.session('a'),actions=session.actions
+  const file=actions.openWorkspace('files','中文.txt','中文.txt')!
+  const git=actions.openWorkspace('git',undefined,'Git',true)!
+  expect(actions.openWorkspace('files','中文.txt')).toBe(file)
+  expect(session.getSnapshot().tabs).toHaveLength(2)
+  expect(session.getSnapshot().activeTabId).toBe(file)
+  actions.updateWorkspaceTab(file,{dirty:true})
+  actions.close(file)
+  expect(session.getSnapshot().tabs.map(row=>row.id)).toContain(file)
+  const release=actions.bindWorkspaceClose(row=>row.id!==file)
+  actions.closeMany([file,git])
+  expect(session.getSnapshot().tabs.map(row=>row.id)).toEqual([file])
+  release(); actions.updateWorkspaceTab(file,{dirty:false}); actions.close(file)
+  expect(session.getSnapshot().tabs).toEqual([])
+})
+
+it('retains workspace selection when collapsed and across a cooled Thread without restoring file handles', async () => {
+  const {owner,api}=fixture();owner.activate('a');const session=owner.session('a')
+  const id=session.actions.openWorkspace('browser','page-1','网页')!
+  session.actions.hidePane();expect(session.getSnapshot()).toMatchObject({paneVisible:false,activeTabId:id})
+  session.cool();session.actions.showPane();await owner.sync()
+  expect(session.getSnapshot()).toMatchObject({paneVisible:true,activeTabId:id,tabs:[{kind:'workspace',resource:'page-1'}]})
+  expect(api.restore).not.toHaveBeenCalled()
+})
+
+it('keeps browser resources until the workspace can close the page and revoke its grants', () => {
+  const { owner } = fixture(); owner.activate('a')
+  const session = owner.session('a'), actions = session.actions
+  const browser = actions.openWorkspace('browser', 'page-1', '网页')!
+  const files = actions.openWorkspace('files', undefined, '工程文件')!
+  actions.closeMany([browser, files])
+  expect(session.getSnapshot().tabs.map(row => row.id)).toEqual([browser])
+  const close = vi.fn(() => false)
+  const unbind = actions.bindWorkspaceClose(close)
+  actions.close(browser)
+  expect(close).toHaveBeenCalledWith(expect.objectContaining({ tool: 'browser', resource: 'page-1' }))
+  expect(session.getSnapshot().tabs).toHaveLength(1)
+  close.mockReturnValue(true)
+  actions.close(browser)
+  expect(session.getSnapshot().tabs).toEqual([])
+  unbind()
+})

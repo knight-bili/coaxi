@@ -171,6 +171,7 @@ export function ThreadNavigation({
   onMemory,
   pendingMemoryCount,
   onSettings,
+  showSettingsEntry = true,
   onOpenUpdates = () => undefined,
   onSettingsSectionChange = () => undefined,
   onSettingsBack = () => undefined,
@@ -227,6 +228,7 @@ export function ThreadNavigation({
   onMemory(): void
   pendingMemoryCount: number
   onSettings(): void
+  showSettingsEntry?: boolean
   onOpenUpdates?(): void
   onSettingsSectionChange?(section: NavigationSettingsSection): void
   onSettingsBack?(): void
@@ -606,7 +608,7 @@ export function ThreadNavigation({
           </div>
       <div className="unified-sidebar-footer">
         {footer}
-        <div className="sidebar-settings-entry" role="group" aria-label={uiAttribute("设置与应用更新")}>
+        {showSettingsEntry && <div className="sidebar-settings-entry" role="group" aria-label={uiAttribute("设置与应用更新")}>
           <button
             className={`rail-button sidebar-settings-main${mobile && view === 'settings' ? ' active' : ''}`}
             aria-current={mobile && view === 'settings' ? 'page' : undefined}
@@ -632,7 +634,7 @@ export function ThreadNavigation({
               <span>{updateBadge.label}</span>
             </button>
           )}
-        </div>
+        </div>}
       </div>
               </>
             )}

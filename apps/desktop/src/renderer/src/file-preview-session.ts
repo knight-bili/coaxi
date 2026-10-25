@@ -66,7 +66,17 @@ export interface ExecutionTabSnapshot {
   reading?: FilePreviewReadingState
 }
 
-export type FilePreviewTabSnapshot = FilePreviewFileTabSnapshot | FilePreviewChangesTabSnapshot | MissionActivityTabSnapshot | ExecutionTabSnapshot
+export type WorkspaceTool = 'files' | 'git' | 'browser' | 'computer' | 'history' | 'organizer' | 'forge' | 'trash' | 'office'
+export interface WorkspaceTabSnapshot {
+  kind: 'workspace'
+  id: string
+  tool: WorkspaceTool
+  resource?: string
+  label: string
+  dirty?: boolean
+  reading?: FilePreviewReadingState
+}
+export type FilePreviewTabSnapshot = FilePreviewFileTabSnapshot | FilePreviewChangesTabSnapshot | MissionActivityTabSnapshot | ExecutionTabSnapshot | WorkspaceTabSnapshot
 
 export interface FilePreviewSessionSnapshot {
   tabs: FilePreviewTabSnapshot[]
@@ -78,7 +88,7 @@ const DEFAULT_SESSION_LIMIT = filePreviewRetentionLimits.snapshots
 
 function copySnapshot(snapshot: FilePreviewSessionSnapshot): FilePreviewSessionSnapshot {
   return {
-    tabs: snapshot.tabs.map((tab) => tab.kind === 'mission_activity' || tab.kind === 'execution'
+    tabs: snapshot.tabs.map((tab) => tab.kind === 'mission_activity' || tab.kind === 'execution' || tab.kind === 'workspace'
       ? { ...tab, reading: tab.reading ? { ...tab.reading } : undefined }
       : tab.kind === 'file_change'
       ? {

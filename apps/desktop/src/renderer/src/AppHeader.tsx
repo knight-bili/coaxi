@@ -1,6 +1,7 @@
 import type { ThreadSnapshot } from '@contracts'
 import type { ReactNode, Ref } from 'react'
 import { PanelToggleIcon } from './PanelToggleIcon'
+import { Maximize2, Minimize2 } from 'lucide-react'
 import { MobileBack } from './MobileLayout'
 import { useOptionalFilePreview } from './FilePreviewContext'
 import { useOptionalFilePreviewLayout } from './FilePreviewLayout'
@@ -43,7 +44,8 @@ export function AppHeader({
   const title = threadTitle ?? uiAttribute('正在打开对话')
   const pendingApprovals = thread?.approvals.filter((approval) => approval.status === 'pending').length ?? 0
   const previewControls = (filePreview || thread) && <div className="file-preview-toggle-group">
-    {filePreview && filePreview.activeTab?.kind !== 'mission_activity' && filePreview.activeTab?.kind !== 'execution' && <FileFindButton />}
+    {previewVisible && previewLayout && <button type="button" className="file-preview-toggle" title={uiAttribute(previewLayout.maximized ? '恢复并排' : '工作区全屏')} aria-label={uiAttribute(previewLayout.maximized ? '恢复并排' : '工作区全屏')} onClick={previewLayout.toggleMaximized}>{previewLayout.maximized ? <Minimize2 size={16} /> : <Maximize2 size={16} />}</button>}
+    {filePreview && filePreview.activeTab?.kind !== 'workspace' && filePreview.activeTab?.kind !== 'mission_activity' && filePreview.activeTab?.kind !== 'execution' && <FileFindButton />}
     {thread && <span data-engineering-entry={thread.thread.id} />}
     {filePreview && <button className="file-preview-toggle file-preview-toggle-fallback" type="button" aria-label={previewVisible ? uiAttribute("收起文件预览") : uiAttribute("展开文件预览")}
       title={previewVisible ? uiAttribute("收起文件预览") : uiAttribute("展开文件预览")} aria-expanded={previewVisible} aria-controls="file-preview-pane"

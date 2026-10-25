@@ -9,6 +9,11 @@ export function previewTabPresentation(tab: PreviewTabModel, language: Interface
   displayPath: string
   icon: ResourceVisualKind
 } {
+  if (tab.kind === 'workspace') return {
+    fileName: translateUi(language, tab.label),
+    displayPath: tab.resource ?? translateUi(language, tab.label),
+    icon: tab.tool === 'git' ? 'patch' : getResourceVisualKind(tab.resource ?? '')
+  }
   if (tab.kind === 'mission_activity') {
     const label = translateUi(language, '活动')
     return { fileName: label, displayPath: label, icon: 'text' }

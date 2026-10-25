@@ -86,6 +86,10 @@ let preview: FilePreviewContextValue
 beforeEach(() => {
   const tabs = [tab('first'), tab('second')]
   preview = {
+    openWorkspace: vi.fn(),
+    updateWorkspaceTab: vi.fn(),
+    bindWorkspaceClose: vi.fn(() => () => {}),
+
     tabs,
     activeTab: tabs[1],
     activeTabId: 'second',

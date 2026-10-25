@@ -55,7 +55,9 @@ export interface FileChangesPreviewTabModel {
 
 export type MissionActivityTabModel = import('./file-preview-session').MissionActivityTabSnapshot
 export type ExecutionTabModel = import('./file-preview-session').ExecutionTabSnapshot
-export type PreviewTabModel = FilePreviewTabModel | FileChangesPreviewTabModel | MissionActivityTabModel | ExecutionTabModel
+export type WorkspaceTabModel = import('./file-preview-session').WorkspaceTabSnapshot
+export type { WorkspaceTool } from './file-preview-session'
+export type PreviewTabModel = FilePreviewTabModel | FileChangesPreviewTabModel | MissionActivityTabModel | ExecutionTabModel | WorkspaceTabModel
 
 export type FilePreviewOpenOutcome =
   | { kind: 'preview'; tabId: string }
@@ -83,6 +85,7 @@ export interface FilePreviewOpenOptions {
 }
 
 export interface FilePreviewContextValue {
+  threadId?: string
   isCurrentThread?: boolean
   domScope?: string
   isFocusedSurface?: boolean
@@ -102,6 +105,9 @@ export interface FilePreviewContextValue {
   syncFileChanges(threadId: string, changes: readonly AgentRunFileChangesView[]): void
   openMissionActivity(missionId: string): void
   openExecution(): void
+  openWorkspace(tool: WorkspaceTabModel['tool'], resource?: string, label?: string, background?: boolean): string | undefined
+  updateWorkspaceTab(id: string, changes: Partial<Pick<WorkspaceTabModel, 'dirty' | 'label'>>): void
+  bindWorkspaceClose(handler: (tab: WorkspaceTabModel) => boolean): () => void
   loadChanges(tabId: string, read: () => Promise<AgentRunFileChangesDetailView>, retry?: boolean): Promise<void>
   selectChangedFile(tabId: string, evidenceFileId: string): void
   showPane(): void
@@ -236,6 +242,7 @@ export function createFilePreviewSession(api: FilePreviewApi, threadId: string, 
   const bindingPromiseRef = { current: Promise.resolve() }
   const objectUrls = { current: new Set<string>() }
   let disposed = false
+  let workspaceClose: ((tab: WorkspaceTabModel) => boolean) | null = null
   let openFeedback: FilePreviewOpenFeedback | null = null
   const retired = new Map<string, { file: ResolvedFilePreview | null; content: FilePreviewContent | null }>()
   const closedFiles:Array<{request:import('@contracts').RestoreFilePreviewRequest;presentation:FilePreviewPresentation;reading:FilePreviewReadingState|undefined}>=[]
@@ -261,7 +268,7 @@ export function createFilePreviewSession(api: FilePreviewApi, threadId: string, 
 
   const saveSession = (targetThreadId: string) => {
     const snapshot: FilePreviewSessionSnapshot = {
-      tabs: tabsRef.current.map((tab) => tab.kind === 'mission_activity' || tab.kind === 'execution' ? { ...tab } : tab.kind === 'file_change'
+      tabs: tabsRef.current.map((tab) => tab.kind === 'mission_activity' || tab.kind === 'execution' || tab.kind === 'workspace' ? { ...tab } : tab.kind === 'file_change'
         ? { kind: 'file_change', id: tab.id, threadId: tab.threadId, changes: tab.changes, selectedEvidenceFileId: tab.selectedEvidenceFileId, reading: tab.reading }
         : {
           kind: 'file',
@@ -980,6 +987,27 @@ export function createFilePreviewSession(api: FilePreviewApi, threadId: string, 
     setOpenFeedback(previous => ({ tabId, sequence: (previous?.sequence ?? 0) + 1, isNew: !existing }))
   }
 
+  const openWorkspace: FilePreviewContextValue['openWorkspace'] = (tool, resource, label, background = false) => {
+    if (disposed || !threadId) return undefined
+    const tabId = `workspace:${tool}:${resource ?? ''}`
+    const existing = tabsRef.current.find(tab => tab.id === tabId)
+    if (!existing) setTabs(tabs => [...tabs, { kind: 'workspace', id: tabId, tool, resource, label: label ?? tool }])
+    if (!background) {
+      activate(tabId)
+      setOpenFeedback(previous => ({ tabId, sequence: (previous?.sequence ?? 0) + 1, isNew: !existing }))
+    }
+    return tabId
+  }
+  const updateWorkspaceTab: FilePreviewContextValue['updateWorkspaceTab'] = (id, changes) => {
+    const tab = tabsRef.current.find(tab => tab.id === id)
+    if (tab?.kind !== 'workspace' || (changes.label === undefined || tab.label === changes.label) && (changes.dirty === undefined || !!tab.dirty === !!changes.dirty)) return
+    setTabs(tabs => tabs.map(tab => tab.id === id ? { ...tab, ...changes } : tab))
+  }
+  const bindWorkspaceClose: FilePreviewContextValue['bindWorkspaceClose'] = handler => {
+    workspaceClose = handler
+    return () => { if (workspaceClose === handler) workspaceClose = null }
+  }
+
   const move = (tabId: string, direction: -1 | 1) => {
     setTabs((current) => {
       const index = current.findIndex((tab) => tab.id === tabId)
@@ -994,6 +1022,10 @@ export function createFilePreviewSession(api: FilePreviewApi, threadId: string, 
 
   const closeMany = (tabIds: string[]) => {
     const ids = new Set(tabIds)
+    for (const tab of tabsRef.current) {
+      if (!ids.has(tab.id) || tab.kind !== 'workspace') continue
+      if (workspaceClose ? !workspaceClose(tab) : tab.dirty || (tab.tool === 'browser' && Boolean(tab.resource))) ids.delete(tab.id)
+    }
     if (ids.size === 0) return
     const previous = tabsRef.current
     const closing = previous.filter((tab) => ids.has(tab.id))
@@ -1301,7 +1333,7 @@ export function createFilePreviewSession(api: FilePreviewApi, threadId: string, 
     retired,
     cool: () => { scopeGenerationRef.current += 1; committedLoads.clear(); for (const tab of tabsRef.current) session.evict(tab.id); session.id = newCommandId(); bindingPromiseRef.current = owner.sync() },
     setBinding: (binding: Promise<void>) => { bindingPromiseRef.current = binding },
-    actions: { open, openFileChanges, syncFileChanges, openMissionActivity, openExecution, loadChanges, selectChangedFile, showPane, hidePane, activate, move, close, closeMany, reopenLastClosedFile, download, openInSystem, revealInFolder, copyPath, toggleHtmlSource, reload, reopen, retry, changePage, saveReading, loadHtmlSource, saveHtmlSource, completeHtmlRefresh, displayed },
+    actions: { open, openFileChanges, syncFileChanges, openMissionActivity, openExecution, openWorkspace, updateWorkspaceTab, bindWorkspaceClose, loadChanges, selectChangedFile, showPane, hidePane, activate, move, close, closeMany, reopenLastClosedFile, download, openInSystem, revealInFolder, copyPath, toggleHtmlSource, reload, reopen, retry, changePage, saveReading, loadHtmlSource, saveHtmlSource, completeHtmlRefresh, displayed },
     ensureActive: () => { if (paneVisibleRef.current && activeTabIdRef.current) restoreTab(activeTabIdRef.current, true) },
     externalUpdate: (previewKeys: string[]) => {
       const changed = new Set(previewKeys)
@@ -1323,7 +1355,7 @@ export function createFilePreviewSession(api: FilePreviewApi, threadId: string, 
     evict: (tabId: string, handleOnly = false, alreadyReleased = false, htmlOnly = false) => {
       const tab = tabsRef.current.find(tab => tab.id === tabId)
       if (!tab) return
-      if (tab.kind === 'mission_activity' || tab.kind === 'execution') return
+      if (tab.kind === 'mission_activity' || tab.kind === 'execution' || tab.kind === 'workspace') return
       if (tab.kind === 'file_change') {
         changeRequests.delete(tabId)
         setTabs(tabs => tabs.map(entry => entry.id === tabId ? { ...tab, detail: undefined, detailBytes: undefined, detailStatus: undefined } : entry))
