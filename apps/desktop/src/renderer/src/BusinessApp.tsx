@@ -1,3 +1,6 @@
+import {prepareCreatedProject} from './project-launcher-handoff'
+import {createPortal} from 'react-dom'
+import {ProjectLauncher} from './ProjectLauncher'
 import { BrandMark } from './BrandMark'
 import { PetExtensionHost } from './PetExtensionHost'
 import {useDesktopDeepLinks} from './useDesktopDeepLinks'
@@ -2658,6 +2661,36 @@ function BusinessAppContent({
     } finally { newConversationRequestBusy.current = false }
   }
 
+  const [projectLauncherOpen,setProjectLauncherOpen]=useState(false)
+  const launcherHandoffBusy=useRef(false)
+  const launcherHandoffAgain=useRef(false)
+  const launcherDestination=useRef({open:newConversationOpen,creating:busy==='create-camp'})
+  launcherDestination.current={open:newConversationOpen,creating:busy==='create-camp'}
+  const assertLauncherDestination=():void=>{
+    assertProjectGroupScope()
+    if(launcherDestination.current.open||launcherDestination.current.creating||newConversationRequestBusy.current)throw new Error(uiAttribute('请先完成或取消当前新对话，再从启动器进入项目。'))
+  }
+  const enterCreatedProject=async(path:string):Promise<boolean>=>{
+    let entered=false
+    assertLauncherDestination()
+    await requestMemberTransition(()=>leaveActiveSurface(()=>prepareCreatedProject({path,assertCurrent:assertLauncherDestination,
+      inspect:path=>client.request<WorkspaceInspection>('workspaces.inspect',{path}),
+      register:workspace=>restoreNavigationProject(workspace.projectPath),
+      enter:workspace=>{chooseCurrentProject({kind:'directory',projectPath:workspace.projectPath},workspace);openNewConversation(workspace,null);setProjectLauncherOpen(false);entered=true}
+    })).then(()=>undefined))
+    return entered
+  }
+  const consumeCreatedProject=async():Promise<void>=>{
+    if(!client.projectLauncher)return
+    if(launcherHandoffBusy.current){launcherHandoffAgain.current=true;return}
+    launcherHandoffBusy.current=true
+    try{const pending=await client.projectLauncher.peek();if(pending&&await enterCreatedProject(pending.path))await client.projectLauncher.acknowledge(pending.id)}
+    catch(error){notifyError(errorMessage(error))}
+    finally{launcherHandoffBusy.current=false;if(launcherHandoffAgain.current){launcherHandoffAgain.current=false;void launcherHandoff.current()}}
+  }
+  const launcherHandoff=useRef(consumeCreatedProject);launcherHandoff.current=consumeCreatedProject
+  useEffect(()=>{const api=client.projectLauncher;if(!api)return;const unsubscribe=api.onAvailable(()=>void launcherHandoff.current());void launcherHandoff.current();return unsubscribe},[client])
+  const openProjectLauncher=():void=>{if(client.projectLauncher)void client.projectLauncher.open().catch(error=>notifyError(errorMessage(error)));else setProjectLauncherOpen(true)}
   const chooseWorkspaceDirectory = async (): Promise<WorkspaceSelection | null> => {
     setBusy('open-project')
     try {
@@ -2927,7 +2960,7 @@ function BusinessAppContent({
       await requestNewConversation(currentProjectWorkspace(displayNavigation, currentProject))
     })
   }
-  useShortcutActions({new_conversation:()=>{if(busy)return false;beginNewConversation()},open_folder:()=>{if(busy)return false;void openProject().catch(error=>notifyError(errorMessage(error)))},open_settings:()=>openSettings()})
+  useShortcutActions({new_conversation:()=>{if(busy)return false;beginNewConversation()},open_folder:()=>{if(busy)return false;void openProject().catch(error=>notifyError(errorMessage(error)))},open_settings:()=>openSettings()},{active:()=>!projectLauncherOpen&&!document.querySelector('[role="dialog"][aria-modal="true"], [role="menu"][data-state="open"]')})
 
   const setThreadUnread = async (thread: NavigationThreadItem, unread: boolean): Promise<void> => {
     await saveThreadReadState(thread.id, navigationThreadReadState(thread, unread, threadReadStatesRef.current[thread.id]))
@@ -3849,7 +3882,7 @@ function BusinessAppContent({
   }
 
   const renderNavigation = (drawer = false): React.JSX.Element => <ThreadNavigation
-    disabled={openingWorktreePath !== null}
+    disabled={openingWorktreePath !== null || projectLauncherOpen}
     navigationId={drawer ? 'mobile-conversation-navigation' : 'global-navigation'}
     platform={client.platform}
     footer={sidebarFooter}
@@ -3896,6 +3929,7 @@ function BusinessAppContent({
     onOpenUpdates={() => { setMobileConversationDrawerOpen(false); void openUpdateSettings() }}
     onSettingsSectionChange={chooseSettingsSection}
     onSettingsBack={closeSettings}
+    onCreateProject={()=>{setMobileConversationDrawerOpen(false);openProjectLauncher()}}
     onOpenProject={() => { setMobileConversationDrawerOpen(false); void openProject() }}
     onSelectProject={(project) => {
       cancelPendingThreadActivation()
@@ -4019,7 +4053,7 @@ function BusinessAppContent({
     <FilePreviewProvider api={environment.files} threadId={view === 'camp' ? activeThreadId : null} resolvedTheme={appearance.resolvedTheme}
       missionActivity={activeMission && view === 'camp' ? <MissionActivityDocument mission={activeMission} agents={agents} onSource={missionSource} onNotify={notify} onWorkspaceCleanupRequested={refreshMissionAfterWorkspaceCleanup}/> : null}>
     <MissionInteractionProvider missions={missionList.missions} projects={displayNavigation?.projects ?? []} agents={agents} installations={installations} onChanged={refreshMission} onWorkspaceCleaned={refreshMissionAfterWorkspaceCleanup} onDeleted={onMissionDeleted} onOpen={mission => { void openMission(mission).catch(error => notifyError(missionError(error))) }} onError={notifyError}>
-    <NavigationShell platform={client.platform} settings={view === 'settings'} navigation={desktopNavigation} nativeWindowControls={desktop?.windowControls} browser={!desktop} disabled={startupStatus !== 'resolved' || shuttingDown} className={view === 'camp' && !missionDrawer ? 'app-shell-camp' : ''} data-mobile-view={mobile ? view : undefined} data-mobile-settings-list={mobile && view === 'settings' && mobileSettingsList || undefined}>
+    <NavigationShell platform={client.platform} settings={view === 'settings'} navigation={desktopNavigation} nativeWindowControls={desktop?.windowControls} browser={!desktop} inert={projectLauncherOpen||undefined} disabled={startupStatus !== 'resolved' || shuttingDown || projectLauncherOpen} className={view === 'camp' && !missionDrawer ? 'app-shell-camp' : ''} data-mobile-view={mobile ? view : undefined} data-mobile-settings-list={mobile && view === 'settings' && mobileSettingsList || undefined}>
       {!mobile && renderNavigation()}
       {!startupGateVisible && mobile && ['compose', 'members', 'memory', 'automations'].includes(view) && <MobilePageHeader
         title={({ compose:uiAttribute("新对话"), members:uiAttribute("队员"), memory:uiAttribute("记忆"), automations:uiAttribute("定时任务") } as Record<string, string>)[view]}
@@ -4285,6 +4319,7 @@ function BusinessAppContent({
         </Dialog.Portal>
       </Dialog.Root>}
 
+      {projectLauncherOpen&&createPortal(<div className="launcher-web-page"><ProjectLauncher key={client.presentationScope??'web'} storageKey={'coaxi.project-launcher.'+(client.presentationScope??'web')} request={input=>client.request('workbench.projectLauncher',input)} chooseDirectory={async()=>{const value=await environment.selectWorkspaceDirectory();return value?.projectPath??null}} onEnter={async(_commandId,path)=>{await enterCreatedProject(path)}} onClose={()=>setProjectLauncherOpen(false)}/></div>,document.body)}
       <NewConversationDialog
         open={newConversationOpen}
         initialWorkspace={newConversationInitialWorkspace}

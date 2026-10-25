@@ -22,7 +22,7 @@ export default defineConfig({
     plugins: [externalizeDepsPlugin()],
     build: {
       rollupOptions: {
-        input: {index:resolve(root, 'apps/desktop/src/preload/index.ts'),pet:resolve(root,'apps/desktop/src/preload/pet.ts')},
+        input: {'project-launcher':resolve(root,'apps/desktop/src/preload/project-launcher.ts'),index:resolve(root, 'apps/desktop/src/preload/index.ts'),pet:resolve(root,'apps/desktop/src/preload/pet.ts')},
         output: {
           format: 'cjs',
           entryFileNames: '[name].js'
@@ -40,7 +40,7 @@ export default defineConfig({
     plugins: [react()],
     build: {
       rollupOptions: {
-        input: {index:resolve(root, 'apps/desktop/src/renderer/index.html'),pet:resolve(root,'apps/desktop/src/renderer/pet.html')}
+        input: {projectLauncher:resolve(root,'apps/desktop/src/renderer/project-launcher.html'),index:resolve(root, 'apps/desktop/src/renderer/index.html'),pet:resolve(root,'apps/desktop/src/renderer/pet.html')}
       }
     },
     resolve: {

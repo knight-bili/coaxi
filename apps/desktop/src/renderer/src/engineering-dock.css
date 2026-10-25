@@ -1,0 +1,14 @@
+.engineering-layout{display:flex;position:relative;flex:1;min-width:0;min-height:0;height:100%;overflow:hidden}
+.engineering-conversation{display:flex;flex:1;min-width:0;min-height:0;flex-direction:column}
+.engineering-conversation>.workspace-shell{flex:1;min-height:0}
+.engineering-pane{display:flex;flex-direction:column;flex:0 0 var(--engineering-width,54%);min-width:0;min-height:0;overflow:hidden;background:var(--surface-raised);border-left:1px solid var(--line)}
+.engineering-layout.is-maximized>.engineering-pane{flex:1}
+.engineering-divider{flex:0 0 5px;cursor:col-resize;touch-action:none;background:transparent}
+.engineering-divider:hover,.engineering-divider:focus-visible{background:var(--surface-selected);outline:2px solid var(--accent);outline-offset:-2px}
+.engineering-toggle,.workbench-icon{display:inline-flex!important;align-items:center;justify-content:center;gap:0!important;width:32px;height:32px;flex:none;padding:7px!important;border-radius:6px}
+.engineering-toggle.is-active,.workbench-icon.is-active{background:var(--surface-selected);color:var(--ink)}
+.engineering-entry-error{position:absolute;right:12px;top:100%;max-width:360px;padding:12px;background:var(--surface-raised);border:1px solid var(--line);z-index:40;color:var(--danger)}
+.engineering-layout [hidden]{display:none!important}
+@media(max-width:1050px){.engineering-pane{position:absolute;inset:0 0 0 auto;width:min(90%,760px);z-index:20;box-shadow:-12px 0 32px #0004}.engineering-divider{display:none}.engineering-layout.is-maximized>.engineering-pane{width:100%}}
+
+.engineering-layout{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei UI","Microsoft YaHei",sans-serif}

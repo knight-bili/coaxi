@@ -1,0 +1,60 @@
+html[data-coaxi-surface="project-launcher"][data-rovai-platform] #root{display:block}
+.project-launcher-page{height:100%;display:flex;flex-direction:column;min-height:0;overflow:hidden;background:var(--surface);color:var(--ink);font-size:13px}
+.launcher-page-heading{display:flex;align-items:center;gap:12px;padding:14px 24px;border-bottom:1px solid var(--line);flex:none}
+.launcher-page-heading>span{color:var(--muted);font-size:12px}
+.launcher-type-tabs{display:flex;gap:4px;align-items:center;padding:12px 24px;border-bottom:1px solid var(--line);flex:none}
+.launcher-type-tabs>button{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border:1px solid transparent;border-radius:8px;background:transparent;color:var(--muted)}
+.launcher-type-tabs>button.is-active{background:var(--surface-selected);border-color:var(--line);color:var(--ink)}
+.launcher-type-tabs small{color:var(--muted)}
+.launcher-design-layout{display:flex;flex:1;min-height:0;overflow:hidden}
+.launcher-design-sidebar{display:flex;flex:0 0 300px;flex-direction:column;min-height:0;border-right:1px solid var(--line)}
+.launcher-config-scroll{flex:1;min-height:0;overflow:auto;padding:20px}
+.project-launcher-page fieldset{min-width:0;border:0;padding:0;margin:0 0 24px}
+.project-launcher-page legend{padding:0;margin-bottom:12px;font-weight:600;color:var(--ink)}
+.launcher-config-scroll fieldset{border-bottom:1px solid var(--line);padding-bottom:20px;margin-bottom:20px}
+.launcher-config-scroll fieldset+fieldset{border-top:0;padding-top:0}
+.launcher-config-scroll fieldset:last-child{border-bottom:0;margin-bottom:0}
+.launcher-field-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 12px}
+.project-launcher-page label,.launcher-create-dialog .app-dialog-body>label{display:flex;flex-direction:column;gap:8px;min-width:0;font-size:12px;color:var(--muted)}
+.project-launcher-page .workspace-field{min-width:0;width:100%;min-height:36px;height:36px;font-size:13px;color:var(--ink)}
+.launcher-design-sidebar footer{padding:16px 20px;border-top:1px solid var(--line)}
+.launcher-design-sidebar footer>button{width:100%;min-height:38px}
+.launcher-preview-area{flex:1;min-width:0;display:flex;flex-direction:column}
+.launcher-preview-area>header{display:flex;align-items:center;gap:10px;padding:8px 20px;min-height:48px;border-bottom:1px solid var(--line)}
+.launcher-preview-area>header>span{font-size:12px;color:var(--muted)}
+.launcher-spacer{flex:1}
+.launcher-preview-scroll{overflow:auto;flex:1;min-height:0;padding:20px;display:flex;flex-direction:column;align-items:center;gap:16px}
+.launcher-preview-scroll>iframe{border:1px solid var(--line);border-radius:10px;width:100%;flex:1;min-height:450px;background:var(--surface-raised)}
+.launcher-preview-scroll>iframe.is-mobile{max-width:390px}
+.launcher-video-scroll{overflow:auto;min-height:0;flex:1;padding:28px 24px}
+.launcher-video-form{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:24px}
+.launcher-video-form>header{display:flex;align-items:flex-start;gap:12px;padding-bottom:20px;border-bottom:1px solid var(--line)}
+.launcher-video-form h1{font-size:22px;line-height:1.3;margin:0 0 8px}
+.launcher-video-form p{margin:0;color:var(--muted);line-height:1.6}
+.launcher-video-form .workspace-field{height:42px}
+.launcher-video-form fieldset{margin:0}
+.launcher-resolution-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.launcher-resolution-grid>button{position:relative;text-align:left;display:flex;flex-direction:column;gap:8px;padding:18px 42px 18px 18px;min-width:0;border:1px solid var(--line);background:transparent;border-radius:10px;color:var(--ink)}
+.launcher-resolution-grid>button[aria-pressed=true]{background:var(--surface-selected);border-color:var(--accent)}
+.launcher-resolution-grid small{color:var(--muted)}
+.launcher-resolution-grid>button>svg{position:absolute;right:16px;top:18px}
+.launcher-directory{display:flex;align-items:center;gap:12px;text-align:left;background:var(--surface-raised)}
+.launcher-directory span{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.launcher-video-footer{padding:16px 24px;border-top:1px solid var(--line);flex:none}
+.launcher-video-footer>button{display:block;max-width:760px;width:100%;min-height:40px;margin:auto}
+.launcher-task{width:100%;border:1px solid var(--line);padding:16px;border-radius:10px;overflow-wrap:anywhere}
+.launcher-task header{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.launcher-task pre{max-height:160px;overflow:auto;font-size:12px;white-space:pre-wrap}
+.launcher-error{color:var(--danger);padding:12px 24px;font-size:12px;overflow-wrap:anywhere}
+.launcher-helper,.launcher-progress-notice{color:var(--muted);font-size:12px;line-height:1.6}
+.launcher-progress-notice{padding:8px 24px;border-top:1px solid var(--line)}
+@media(max-width:760px){.launcher-design-sidebar{flex-basis:240px}.launcher-field-grid{grid-template-columns:1fr}.launcher-page-heading>span,.launcher-type-tabs small{display:none}}
+
+.launcher-web-page{position:fixed;inset:0;z-index:90;background:var(--surface)}
+
+html[data-coaxi-surface="project-launcher"] .launcher-page-heading{display:none}
+.project-launcher-page,.launcher-create-dialog{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei UI","Microsoft YaHei",sans-serif}
+.launcher-design-sidebar .launcher-type-tabs{padding:12px;gap:4px}
+.launcher-design-sidebar .launcher-type-tabs>button{font-size:12px;gap:6px;padding:8px 7px;white-space:nowrap}
+.launcher-design-sidebar .launcher-type-tabs small{font-size:10px}
+.project-launcher-page .primary-button,.launcher-create-dialog .primary-button{background:var(--ink);color:var(--surface);border-color:var(--ink)}

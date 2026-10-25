@@ -1,26 +1,40 @@
-import { readErrorMessage } from './error-message'
-import {useMemo,useRef,useState,type ComponentProps} from 'react'
-import {Files} from 'lucide-react'
+import {createContext,useContext,useId,useLayoutEffect,useMemo,useRef,useState,type ComponentProps,type ReactNode} from 'react'
+import {createPortal} from 'react-dom'
+import {LoaderCircle,PanelRightClose,PanelRightOpen} from 'lucide-react'
+import {readErrorMessage} from './error-message'
 import {useThreadClient} from './camp-client'
 import {WorkspaceWorkbench} from './WorkspaceWorkbench'
 import {useUiText} from './interface-language'
 import {useShortcutActions} from './useShortcutActions'
+import './engineering-dock.css'
 
-type Props=Omit<ComponentProps<typeof WorkspaceWorkbench>,'initialTab'|'initiallyOpen'|'onClosed'> & {missionId?:string|null}
-type Ready={root:string;owner:object;initialTab:'files'|'terminals'}
+type Props=Omit<ComponentProps<typeof WorkspaceWorkbench>,'initialTab'|'initiallyOpen'|'onClosed'|'onMaximize'|'maximized'|'visible'|'terminalRequest'> & {missionId?:string|null;children?:ReactNode;headerEntry?:boolean;enabled?:boolean}
+type Ready={root:string;owner:object}
+const EngineeringDockContext=createContext({opened:0,collapse:(_restoreFocus?:boolean)=>{}})
+export const useEngineeringDock=()=>useContext(EngineeringDockContext)
 
-/** All engineering panels share the directory verified by Core for this exact Thread/Mission. */
-export function WorkspaceWorkbenchEntry(props:Props):React.JSX.Element{
+/** The verified root and mounted editor survive folding; another owner never inherits them. */
+export function WorkspaceWorkbenchEntry({children,headerEntry=true,enabled=true,...props}:Props):React.JSX.Element{
   const client=useThreadClient(),t=useUiText()
+  const paneId=useId()
   const owner=useMemo(()=>({client,threadId:props.threadId,missionId:props.missionId??null}),[client,props.threadId,props.missionId])
   const current=useRef(owner);current.current=owner
   const generation=useRef(0),generationOwner=useRef(owner)
   if(generationOwner.current!==owner){generationOwner.current=owner;generation.current+=1}
-  const busyOwnerRef=useRef<object|null>(null)
+  const busyOwnerRef=useRef<object|null>(null),shell=useRef<HTMLDivElement>(null),trigger=useRef<HTMLButtonElement>(null)
   const [ready,setReady]=useState<Ready|null>(null),[busyOwner,setBusyOwner]=useState<object|null>(null),[issue,setIssue]=useState<{owner:object;message:string}|null>(null)
-  const visible=ready?.owner===owner?ready:null
-  const busy=busyOwner===owner
-  const open=async(initialTab:'files'|'terminals'='files'):Promise<void>=>{
+  const [shown,setShown]=useState<object|null>(null),[maximized,setMaximized]=useState(false),[opened,setOpened]=useState(0),[terminalCommand,setTerminalCommand]=useState({owner,value:0})
+  const terminalRequest=terminalCommand.owner===owner?terminalCommand.value:0
+  const [host,setHost]=useState<Element|null>(null),[width,setWidth]=useState(()=>{try{const n=Number(localStorage.getItem('coaxi.engineering.width'));return n>=30&&n<=75?n:54}catch{return 54}})
+  const active=ready?.owner===owner?ready:null,visible=enabled&&shown===owner&&!!active,busy=busyOwner===owner
+  const collapse=(restoreFocus=false):void=>{setShown(null);setMaximized(false);if(restoreFocus&&visible)trigger.current?.focus()}
+  useLayoutEffect(()=>{
+    if(!headerEntry){setHost(null);return}
+    let target:Element|null=null
+    const resolve=():void=>{if(target?.isConnected)return;target=[...document.querySelectorAll('[data-engineering-entry]')].find(el=>(el as HTMLElement).dataset.engineeringEntry===props.threadId)??null;setHost(target)}
+    resolve();const observer=new MutationObserver(resolve);observer.observe(document.body,{childList:true,subtree:true});return()=>observer.disconnect()
+  },[props.threadId,headerEntry])
+  const open=async(terminal=false):Promise<void>=>{
     if(busyOwnerRef.current===owner)return
     const captured=owner,capturedGeneration=generation.current
     const isCurrent=():boolean=>current.current===captured&&generation.current===capturedGeneration
@@ -29,14 +43,21 @@ export function WorkspaceWorkbenchEntry(props:Props):React.JSX.Element{
       const result=await client.request<{workspaceRoot:string}>('workbench.files.list',{scope:{threadId:props.threadId,missionId:props.missionId??null},path:''})
       if(!isCurrent())return
       if(typeof result.workspaceRoot!=='string'||!result.workspaceRoot)throw new Error(t('当前主机尚未提供已核实的工程目录。'))
-      setReady({root:result.workspaceRoot,owner:captured,initialTab})
+      if(active&&active.root!==result.workspaceRoot)throw new Error(t('工程目录已变化，请先保存当前草稿，再重新进入对话。'))
+      setReady(previous=>previous?.owner===captured?previous:{root:result.workspaceRoot,owner:captured});setShown(captured);setOpened(value=>value+1)
+      if(terminal)setTerminalCommand(value=>({owner:captured,value:visible?-(Math.abs(value.owner===captured?value.value:0)+1):Math.abs(value.owner===captured?value.value:0)+1}))
     }catch(error){if(isCurrent())setIssue({owner:captured,message:readErrorMessage(error)})}
     finally{if(isCurrent()){busyOwnerRef.current=null;setBusyOwner(null)}}
   }
-  useShortcutActions({
-    toggle_terminal:()=>{void open('terminals')},
-    toggle_aux_panel:()=>{void open('files')},
-  },{priority:25,active:()=>!visible&&!document.querySelector('[role="dialog"][aria-modal="true"], [role="menu"][data-state="open"]')})
-  if(visible)return <WorkspaceWorkbench {...props} projectPath={visible.root} initiallyOpen initialTab={visible.initialTab} onClosed={()=>setReady(value=>value?.owner===owner?null:value)}/>
-  return <><button type="button" className="quiet-button conversation-tool-button" disabled={busy} title={t('文件与 Git 工程工作区')} onClick={()=>void open()}><Files size={15}/><span>{t(busy?'正在核对工程…':'工程')}</span></button>{issue?.owner===owner&&<span role="alert" className="workbench-error">{issue.message}</span>}</>
+  useShortcutActions({toggle_terminal:()=>{void open(true)},toggle_aux_panel:()=>{if(visible)collapse();else void open()}},{priority:25,active:()=>enabled&&!document.querySelector('.launcher-web-page, [role="dialog"][aria-modal="true"], [role="menu"][data-state="open"]')})
+  const rememberWidth=(value:number):void=>{const next=Math.min(75,Math.max(30,value));setWidth(next);try{localStorage.setItem('coaxi.engineering.width',String(next))}catch{}}
+  const control=<button ref={trigger} type="button" className={`quiet-button engineering-toggle${visible?' is-active':''}`} disabled={busy} title={t(busy?'正在核对工程…':visible?'收起工程区':'展开工程区')} aria-label={t(visible?'收起工程区':'展开工程区')} aria-expanded={visible} aria-controls={paneId} onClick={()=>visible?collapse():void open()}>{busy?<LoaderCircle size={18}/>:visible?<PanelRightClose size={18}/>:<PanelRightOpen size={18}/>}</button>
+  return <EngineeringDockContext.Provider value={{opened,collapse}}><div ref={shell} className={`engineering-layout${visible?' is-open':''}${visible&&maximized?' is-maximized':''}`} style={{'--engineering-width':`${width}%`} as React.CSSProperties}>
+    <div className="engineering-conversation" hidden={visible&&maximized}>{children}{!host&&control}{issue?.owner===owner&&<div role="alert" className="workbench-notice">{issue.message}</div>}</div>
+    {host&&createPortal(<>{control}{issue?.owner===owner&&<span role="alert" className="engineering-entry-error">{issue.message}</span>}</>,host)}
+    <div className="engineering-divider" hidden={!visible||maximized} role="separator" tabIndex={0} aria-label={t('调整工程区宽度')} aria-orientation="vertical" aria-valuemin={30} aria-valuemax={75} aria-valuenow={Math.round(width)} onDoubleClick={()=>rememberWidth(54)} onKeyDown={event=>{if(event.key==='ArrowLeft'||event.key==='ArrowRight'){event.preventDefault();rememberWidth(width+(event.key==='ArrowLeft'?2:-2))}if(event.key==='Home')rememberWidth(54)}} onPointerDown={event=>{if(event.button!==0)return;event.preventDefault();event.currentTarget.setPointerCapture(event.pointerId)}} onPointerMove={event=>{if(!event.currentTarget.hasPointerCapture(event.pointerId)||!shell.current)return;const rect=shell.current.getBoundingClientRect();rememberWidth((rect.right-event.clientX)/rect.width*100)}}/>
+    <aside id={paneId} className="engineering-pane" aria-label={t('工程区')} hidden={!visible}>
+      {active&&<WorkspaceWorkbench {...props} projectPath={active.root} initiallyOpen visible={visible} terminalRequest={terminalRequest} maximized={maximized} onMaximize={()=>setMaximized(value=>!value)} onClosed={()=>collapse(true)}/>}
+    </aside>
+  </div></EngineeringDockContext.Provider>
 }

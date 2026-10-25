@@ -2336,3 +2336,9 @@ I04旧代理后台读取接续复用原Registry线程/16读者/4 worker/关闭�
 不能拥有本次启动协调，因此新增一个extended-tests owner；不访问日常数据、账号、原生Session或模型。
 定向命令：`cargo test --locked -p rovai-core --features extended-tests --lib coaxi_builtin_names_preserve_custom_configured_and_used_members -- --exact`，
 执行时使用完整列册名称，先确认非零。真实安装旧数据与UI另行验证，组件通过不代表客户验收通过。
+
+### 独立启动器与工程隐藏恢复
+
+相关定向Renderer/Main测试：`pnpm exec vitest run apps/desktop/src/renderer/src/ProjectLauncher.test.tsx apps/desktop/src/main/project-launcher-window.test.ts apps/desktop/src/renderer/src/project-launcher-handoff.test.ts apps/desktop/src/renderer/src/workspace-workbench-entry-shortcuts.test.tsx apps/desktop/src/renderer/src/workspace-workbench-files.test.tsx`。
+
+`node --test scripts/lib/project-launcher.test.mjs`需要先构建真实Core。测试自行准备私有authority根，使用本地受管模板命令验证独立目录准入、中文文件、同command幂等、错根、同名不覆盖及真实文件读写；它不证明npm下载或真实模板服务可用。实际联网创建与完整App的窗口/编辑保持需独立验收，不用组件测试替代。

@@ -251,3 +251,13 @@ final result: source drawer and isolated component verified; complete viewer and
 原首次主卡与行组件函数体/JSX与固定供体一致；恢复组件仅两行移除显示前的trim，纯解析器相对本批基线仅一处保留reason原文，展开条件仍拒绝纯空白。直接运行供体组件作参考，明确 Core UUID/模型/查看器、Runtime标签/图标和既有主题/本地化接缝，不是完整Codeg App。生产与参考同为1000/390宽、日/夜两套主题，8张新窗口静止帧已检查；首卡4组像素检查3组完全一致、夜间宽屏仅左侧14px窄边带不同，不宣称全App逐像素一致。隐藏窗口复用会出现陈旧合成帧；过程截图保留，最终静止对照每张使用独立WebContents，原始像素差异如实记录，不改生产动画或GPU配置。原原因区有实际长内容时才滚动，末行可达，不统一隐藏滚动条。
 
 生产组件33组检查包括完整任务/原因、拒绝、原记录、状态共享、错误/只读重试、原会话导航、行卸载后查看器保留、换Host/Thread、隐藏以及已打开正文认证失效清空。运输明确为synthetic Core；不冒充真实Core/Host/Runtime/完整App或正式84场景资格。非windowed完整历史已单列start/resume，分页Core block的独立分类与Shell carrier保持仍待补齐；完整富内容、原完整App和真实两端继续按I04候选处理。
+
+## 2026-10-25 右侧工程与独立项目启动器
+
+实施用户已批准三图，工程支持固定图标开关、拖宽/键盘、放大恢复、隐藏保留编辑器和底终端；启动器桌面独立窗口、浏览器全页。来源、状态和局限见 integration/inventory/engineering-launcher-ui-reference.md。
+
+已在完整隔离Electron App操作并取图：中文文件编辑写盘、同一编辑器收起恢复、最大化恢复、终端区域收放、980宽抽屉、视频末项可达与固定创建按钮、网页桌面移动预览。实际截图与批准稿已目视比较；官方实时模板替换静态中文示例，视口及未配置模型的空对话差异已明确。日间为临时根Token切换渲染验证，不冒充系统主题持久化验收。
+
+独立启动器曾受Windows主窗口菜单grid影响而全内容裁剪，已用专属surface布局修复；新增背景改用已有语义Token。现不存在这一裁剪。shadcn真实CLI仍因官方色板网络超时未完成；旧三项Electron fixture未通过，其中bridge在基线同样失败。未将受阻项记为通过，未宣称全产品/UI或真实模型通过。
+
+final result: approved layout implemented; isolated App checks verified; live template network acceptance incomplete

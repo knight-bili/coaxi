@@ -31,6 +31,7 @@ export type ThreadClient = Pick<RovaiApi,
   workbenchEditorRecovery?:RovaiApi['workbenchEditorRecovery']
   nativeCustomSkills?: RovaiApi['nativeCustomSkills']
   nativeHistory?: RovaiApi['nativeHistory']
+  projectLauncher?:RovaiApi['projectLauncher']
   officeWorkspace?: RovaiApi['officeWorkspace']
   interactionComputer?:RovaiApi['interactionComputer']
   interactionWorkspace?: RovaiApi['interactionWorkspace']

@@ -3,7 +3,7 @@ import type { WorkbenchEditorSnapshot,WorkbenchEditorState } from '@contracts'
 import { WorkbenchEditorDrafts } from './workbench-editor-drafts'
 import type { EditorRecoveryCopy } from './workbench-editor-recovery'
 import * as Dialog from '@radix-ui/react-dialog'
-import { AlertCircle, FileSearch, Files, FolderPlus, GitBranch, Plus, RefreshCw, Save, Trash2 } from 'lucide-react'
+import { AlertCircle, FileSearch, Files, FolderPlus, GitBranch, Plus, RefreshCw, Save, Trash2, Globe, Monitor, History, Archive, Boxes, TerminalSquare, MoreHorizontal, Maximize2, Minimize2, PanelRightClose } from 'lucide-react'
 import { readErrorMessage } from './error-message'
 import { PinnedFilePreview, useOptionalFilePreview, useOptionalFilePreviewApi } from './FilePreviewContext'
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels'
@@ -19,7 +19,7 @@ import {WorkspaceFileMenu,WorkspaceFileActionDialog,WorkspaceFileSearch,Workspac
 import { WorkspaceCodeEditor } from './WorkspaceCodeEditor'
 import { SplitTabDeck } from './SplitTabDeck'
 import {WorkspaceTerminals} from './WorkspaceTerminals'
-import {ProjectLauncher} from './ProjectLauncher'
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import {WorkspaceGitViews} from './WorkspaceGitViews'
 import { WorkspaceMergeEditor } from './WorkspaceMergeEditor'
 import { WorkspaceOrganizer } from './WorkspaceOrganizer'
@@ -36,7 +36,7 @@ type Entry = { name: string; path: string; directory: boolean; link: boolean; ma
 type Directory = { entries: Entry[]; next: string | null }
 type Document = { path: string; text: string; saved: string; digest: string | null; conflict?: boolean }
 type GitResult = { success: boolean; exitCode: number | null; output: string; error: string }
-type WorkbenchTab = 'files' | 'git' | 'organizer' | 'forge' | 'browser' | 'computer' | 'office' | 'history' | 'trash' | 'launcher' | 'terminals'
+type WorkbenchTab = 'files' | 'git' | 'organizer' | 'forge' | 'browser' | 'computer' | 'office' | 'history' | 'trash' | 'terminals'
 const gitActions = {
   stage: '暂存文件', unstage: '取消暂存', commit: '提交暂存内容', stash_save: '保存到 Stash', stash_apply: '应用 Stash', stash_pop: '取出 Stash', stash_drop: '删除 Stash',
   clone:'克隆到子目录',worktree_add:'创建独立工作目录',worktree_remove:'移除托管工作目录',branch_delete:'删除已合并分支',branch_rename:'重命名分支',tag_create:'创建标签',tag_delete:'删除标签',discard:'放弃指定工作区改动',branch_create: '新建分支', checkout: '切换分支', reset: '重置历史', merge: '合并分支', rebase: '变基', merge_continue: '继续合并', merge_abort: '中止合并',
@@ -45,14 +45,14 @@ const gitActions = {
 } as const
 
 /** Codeg file-tree and Git auxiliary-panel structure, hosted in Rovai's dialog. */
-export function WorkspaceWorkbench({ threadId, projectPath, members, bindLeaveGuard, onQuickMessage, onOpenNativeConversation, initiallyOpen=false, initialTab='files', onClosed }: {
-  threadId: string; projectPath:string; members:Array<{id:string;name:string}>; bindLeaveGuard(guard: (() => void) | null): void; onQuickMessage?(text:string):boolean;onOpenNativeConversation?(reference:import('@contracts').CanvasConversationRef):Promise<boolean>;initiallyOpen?:boolean;initialTab?:'files'|'terminals';onClosed?():void
+export function WorkspaceWorkbench({ threadId, projectPath, members, bindLeaveGuard, onQuickMessage, onOpenNativeConversation, initiallyOpen=false, initialTab='files', onClosed, onMaximize, maximized=false, visible=true, terminalRequest=0 }: {
+  threadId: string; projectPath:string; members:Array<{id:string;name:string}>; bindLeaveGuard(guard: (() => void) | null): void; onQuickMessage?(text:string):boolean;onOpenNativeConversation?(reference:import('@contracts').CanvasConversationRef):Promise<boolean>;initiallyOpen?:boolean;initialTab?:'files'|'terminals';onClosed?():void;onMaximize?():void;maximized?:boolean;visible?:boolean;terminalRequest?:number
 }): React.JSX.Element {
   const client = useThreadClient(), t = useUiText(), scope = useMemo(() => ({ threadId }), [threadId])
   const filePreview = useOptionalFilePreview(), filePreviewApi = useOptionalFilePreviewApi()
   const [previewPath, setPreviewPath] = useState<string | null>(null), [previewActions, setPreviewActions] = useState<HTMLDivElement | null>(null)
   const previewSource = useMemo(() => previewPath ? { kind: 'camp_workspace' as const, threadId, rawReference: previewPath } : null, [threadId, previewPath])
-  const [open, setOpen] = useState(initiallyOpen), [tab, setTab] = useState<WorkbenchTab>(initialTab)
+  const open = true, [tab, setTab] = useState<WorkbenchTab>('files')
   const [fileAction,setFileAction]=useState<FileAction|null>(null),[searchVisible,setSearchVisible]=useState(false),[cursorLine,setCursorLine]=useState<number|undefined>(undefined)
   const [organizerDirty,setOrganizerDirty]=useState(false)
   const [forgeDirty,setForgeDirty]=useState(false)
@@ -68,7 +68,8 @@ export function WorkspaceWorkbench({ threadId, projectPath, members, bindLeaveGu
   useEffect(()=>{if(hydrated.current&&draftStatus.ready)editorDrafts.update({documents,selected,layout:splitLayout})},[editorDrafts,documents,selected,splitLayout,draftStatus.ready])
   const closedFiles=useRef<string[]>([])
   const [busy, setBusy] = useState(false), [error, setError] = useState<string | null>(null), epoch = useRef(0)
-  const [closing, setClosing] = useState(false)
+  const [terminalShown,setTerminalShown]=useState(initialTab==='terminals'),[terminalMounted,setTerminalMounted]=useState(initialTab==='terminals')
+  useEffect(()=>{if(terminalRequest){setTerminalMounted(true);setTerminalShown(value=>terminalRequest>0?true:!value)}},[terminalRequest])
   const [creation, setCreation] = useState<'file' | 'directory' | 'rename' | null>(null), [name, setName] = useState('')
   const [terminalUnsettled,setTerminalUnsettled]=useState(false)
   const [gitDirty,setGitDirty]=useState(false),[gitVersion,setGitVersion]=useState(0)
@@ -80,19 +81,6 @@ export function WorkspaceWorkbench({ threadId, projectPath, members, bindLeaveGu
   const dirty = terminalUnsettled || organizerDirty || forgeDirty || gitDirty || documents.some(document => document.text !== document.saved)
   const current = documents.find(document => document.path === selected)
   const guard = useCallback(() => { if (busy) throw new Error(t('工程操作仍在进行，请稍后离开。')); if (dirty) throw new Error(t('工程文件尚未保存，请先保存或关闭对应标签。'));if(editorDrafts.snapshot().pending||editorDrafts.snapshot().saving)throw new Error(t('编辑草稿或布局仍未补存，请在工程内核对后再离开。')) }, [busy, dirty, t,editorDrafts])
-  const closeWorkspace = async (): Promise<void> => {
-    if (closing) return
-    setError(null)
-    setClosing(true)
-    try {
-      if (busy || dirty) guard()
-      if (editorDrafts.snapshot().pending || editorDrafts.snapshot().saving) await editorDrafts.flush()
-      guard()
-      setOpen(false)
-      onClosed?.()
-    } catch (failure) { setError(readErrorMessage(failure)) }
-    finally { setClosing(false) }
-  }
   useEffect(() => { bindLeaveGuard(guard); return () => bindLeaveGuard(null) }, [bindLeaveGuard, guard])
   useEffect(() => () => { ++epoch.current }, [])
   useEffect(() => {
@@ -167,12 +155,8 @@ export function WorkspaceWorkbench({ threadId, projectPath, members, bindLeaveGu
       : <FileTreeFile key={entry.path} path={entry.path} name={entry.name} depth={depth} actions={<WorkspaceFileMenu path={entry.path} disabled={busy||dirty||entry.link} onAction={setFileAction}/>} aria-disabled={entry.link} onDoubleClick={() => { if (!entry.link) void openFile(entry.path) }} />)}
     {directories.get(path)?.next && <button type="button" className="quiet-button" disabled={busy} onClick={() => void operation(() => loadDirectory(path, directories.get(path)!.next!))}>{t('加载更多')}</button>}
   </>
-  const activeShortcutSurface=():boolean=>{const dialogs=[...document.querySelectorAll('[role="dialog"][data-state="open"]')];return open&&dialogs.at(-1)?.classList.contains('workspace-workbench')===true}
+  const activeShortcutSurface=():boolean=>{return open&&visible&&!document.querySelector('[role="dialog"][aria-modal="true"]')&&Boolean(document.activeElement?.closest('.workspace-workbench'))}
   const moveTab=(delta:number):void=>{const index=documents.findIndex(row=>row.path===selected);if(documents.length){setPreviewPath(null);setSelected(documents[(Math.max(0,index)+delta+documents.length)%documents.length].path)}}
-  useShortcutActions({
-    toggle_terminal:()=>{if(organizerDirty||forgeDirty||terminalUnsettled)return true;setOpen(true);setTab(value=>value==='terminals'?'files':'terminals')},
-    toggle_aux_panel:()=>{if(open)void closeWorkspace();else setOpen(true)},
-  },{priority:25,active:()=>!document.querySelector('[role="dialog"][aria-modal="true"]')||activeShortcutSurface()})
   useShortcutActions({
     close_current_tab:()=>{if(tab==='files'){if(previewPath)setPreviewPath(null);else if(selected)closeDocument(selected)}},
     close_all_file_tabs:()=>{if(busy)return true;if(documents.some(row=>row.text!==row.saved)&&!window.confirm(t('放弃所有文件尚未保存的修改？')))return true;closedFiles.current=[...documents.map(row=>row.path).reverse(),...closedFiles.current].slice(0,100);setDocuments([]);setSelected(null)},
@@ -211,29 +195,28 @@ export function WorkspaceWorkbench({ threadId, projectPath, members, bindLeaveGu
   }
   const showFiles = merge !== null || tab === 'files' || tab === 'git' || tab === 'office'
   return <>
-    <button type="button" className="quiet-button conversation-tool-button" title={t('文件与 Git 工程工作区')} onClick={() => setOpen(true)}><Files size={15} /><span>{t('工程')}</span></button>
-    <Dialog.Root open={open} onOpenChange={next => { if (!next) void closeWorkspace(); else setOpen(true) }}>
-      <Dialog.Portal><Dialog.Overlay className="dialog-overlay" /><AppDialogContent className="workspace-workbench" width="large">
-        <AppDialogHeader title={t('工程工作区')} description={<span title={projectPath}>{projectPath.split(/[\\/]/).filter(Boolean).at(-1)}</span>} closeLabel={t('关闭工程工作区')} closeDisabled={closing} />
-        <nav className="workbench-toolbar workbench-view-tabs" aria-label={t('工程视图')}>
-          <button disabled={organizerDirty||forgeDirty||terminalUnsettled} className={tab==='terminals'?'quiet-button is-active':'quiet-button'} onClick={()=>setTab('terminals')}>{t('终端')}</button>
-          <button disabled={organizerDirty||forgeDirty||terminalUnsettled} className={tab==='launcher'?'quiet-button is-active':'quiet-button'} onClick={()=>setTab('launcher')}>{t('项目启动器')}</button>
-          <button type="button" className={tab === 'files' ? 'quiet-button is-active' : 'quiet-button'} disabled={organizerDirty||forgeDirty} onClick={() => setTab('files')}><Files size={14} />{t('文件')}</button>
-          <button type="button" className={tab === 'git' ? 'quiet-button is-active' : 'quiet-button'} disabled={organizerDirty||forgeDirty} onClick={() => { setTab('git'); void readGit() }}><GitBranch size={14} />Git</button>
-          <button type="button" className={tab==='organizer'?'quiet-button is-active':'quiet-button'} disabled={forgeDirty} onClick={()=>setTab('organizer')}>{t('整理')}</button>
-          <button type="button" className={tab==='history'?'quiet-button is-active':'quiet-button'} disabled={organizerDirty||forgeDirty} onClick={()=>setTab('history')}>{t('会话历史')}</button>
-          <button type="button" className={tab==='computer'?'quiet-button is-active':'quiet-button'} disabled={organizerDirty||forgeDirty} onClick={()=>setTab('computer')}>{t('电脑')}</button>
-          <button type="button" className={tab==='browser'?'quiet-button is-active':'quiet-button'} disabled={organizerDirty||forgeDirty} onClick={()=>setTab('browser')}>{t('浏览器')}</button>
-          <button type="button" className={tab==='forge'?'quiet-button is-active':'quiet-button'} disabled={organizerDirty} onClick={()=>setTab('forge')}>{t('仓库面板')}</button>
-        </nav>
+    <section className="workspace-workbench" aria-label={t('工程工作区')}>
+      <header className="workbench-dock-heading"><Files size={16}/><strong title={projectPath}>{projectPath.split(/[\\/]/).filter(Boolean).at(-1)}</strong><span className="workbench-toolbar-spacer"/>
+        {onMaximize&&<button type="button" className="quiet-button workbench-icon" title={t(maximized?'恢复并排':'放大工程区')} aria-label={t(maximized?'恢复并排':'放大工程区')} onClick={onMaximize}>{maximized?<Minimize2 size={16}/>:<Maximize2 size={16}/>}</button>}
+        <button type="button" className="quiet-button workbench-icon" title={t('收起工程区')} aria-label={t('收起工程区')} onClick={onClosed}><PanelRightClose size={16}/></button>
+      </header>
+      <nav className="workbench-toolbar workbench-view-tabs" aria-label={t('工程视图')}>
+        {([{id:'files',label:'文件',Icon:Files},{id:'git',label:'Git',Icon:GitBranch},{id:'browser',label:'浏览器',Icon:Globe}] as const).map(({id,label,Icon})=><button key={id} type="button" title={t(label)} aria-label={t(label)} aria-pressed={tab===id} disabled={organizerDirty||forgeDirty} className={`quiet-button workbench-icon${tab===id?' is-active':''}`} onClick={()=>{setTab(id);if(id==='git')void readGit()}}><Icon size={17}/></button>)}
+        <span className="workbench-view-label">{t(({files:'文件',git:'Git',browser:'浏览器',computer:'电脑',history:'会话历史',forge:'仓库面板',organizer:'整理',office:'文档',trash:'回收站',terminals:'终端'} as const)[tab])}</span>
+        <span className="workbench-toolbar-spacer"/>
+        <button type="button" title={t(terminalShown?'收起终端':'展开终端')} aria-label={t(terminalShown?'收起终端':'展开终端')} aria-expanded={terminalShown} className={`quiet-button workbench-icon${terminalShown?' is-active':''}`} onClick={()=>{setTerminalMounted(true);setTerminalShown(value=>!value)}}><TerminalSquare size={17}/></button>
+        <DropdownMenu.Root><DropdownMenu.Trigger asChild><button type="button" className="quiet-button workbench-icon" title={t('更多工程工具')} aria-label={t('更多工程工具')}><MoreHorizontal size={17}/></button></DropdownMenu.Trigger><DropdownMenu.Portal><DropdownMenu.Content className="dropdown-menu" align="end" sideOffset={6}>
+          {([{id:'computer',label:'电脑',Icon:Monitor},{id:'history',label:'会话历史',Icon:History},{id:'organizer',label:'整理',Icon:Archive},{id:'forge',label:'仓库面板',Icon:Boxes},{id:'trash',label:'回收站',Icon:Trash2}] as const).map(({id,label,Icon})=><DropdownMenu.Item key={id} className="dropdown-item" disabled={organizerDirty||forgeDirty} onSelect={()=>setTab(id)}><Icon size={16}/>{t(label)}</DropdownMenu.Item>)}
+        </DropdownMenu.Content></DropdownMenu.Portal></DropdownMenu.Root>
+      </nav>
         {showFiles && <div className="workbench-toolbar workbench-file-actions">
           <strong className="workbench-file-heading"><Files size={15}/>{t('工程文件')}</strong>
-          <button type="button" className={searchVisible?'quiet-button is-active':'quiet-button'} onClick={()=>setSearchVisible(value=>!value)}><FileSearch size={14}/>{t(searchVisible?'文件树':'搜索文件')}</button>
-          <button type="button" className="quiet-button" onClick={()=>setTab('trash')}><Trash2 size={14}/>{t('回收站')}</button>
+          <button type="button" className={`workbench-icon ${searchVisible?'quiet-button is-active':'quiet-button'}`} title={t(searchVisible?'文件树':'搜索文件')} aria-label={t(searchVisible?'文件树':'搜索文件')} onClick={()=>setSearchVisible(value=>!value)}><FileSearch size={15}/></button>
+          <button type="button" className="quiet-button workbench-icon" title={t('回收站')} aria-label={t('回收站')} onClick={()=>setTab('trash')}><Trash2 size={15}/></button>
           <span className="workbench-toolbar-spacer"/>
           <button type="button" className="quiet-button" disabled={busy} onClick={() => void operation(() => loadDirectory(''))} aria-label={t('刷新工程')}><RefreshCw size={14} /></button>
-          <button type="button" className="quiet-button" disabled={busy} onClick={() => {setCreation('file');setName('')}}><Plus size={14} />{t('新文件')}</button>
-          <button type="button" className="quiet-button" disabled={busy} onClick={() => {setCreation('directory');setName('')}}><FolderPlus size={14} />{t('新目录')}</button>
+          <button type="button" className="quiet-button workbench-icon" title={t('新文件')} aria-label={t('新文件')} disabled={busy} onClick={() => {setCreation('file');setName('')}}><Plus size={15} /></button>
+          <button type="button" className="quiet-button workbench-icon" title={t('新目录')} aria-label={t('新目录')} disabled={busy} onClick={() => {setCreation('directory');setName('')}}><FolderPlus size={15} /></button>
         </div>}
         {error && <div className="workbench-notice" role="alert"><AlertCircle size={16}/><p>{error}</p><button type="button" className="quiet-button" onClick={()=>setError(null)}>{t('收起')}</button></div>}
         {(showFiles || draftRestoreError || draftStatus.issue || draftStatus.pending) && <details className="workbench-draft-status" open={Boolean(!draftStatus.ready || draftRestoreError || draftStatus.issue || draftStatus.pending)}><summary>{t(!draftStatus.ready?'正在读取编辑草稿':draftStatus.saving?'正在保存编辑草稿':draftStatus.pending?'编辑草稿需要处理':'草稿与恢复')}</summary><div className="workbench-toolbar"><span role="status">{t(!draftStatus.ready?'正在恢复工程编辑草稿':draftStatus.saving?'正在保存编辑草稿':draftStatus.pending?'原编辑草稿等待补存':'编辑草稿已保存')}</span>{(draftRestoreError||draftStatus.issue)&&<span role="alert" className="workbench-error">{draftRestoreError||draftStatus.issue}</span>}{!draftStatus.ready&&<button className="quiet-button" type="button" disabled={busy} onClick={()=>setDraftReadAttempt(value=>value+1)}>{t('重新读取编辑草稿')}</button>}{draftStatus.pending&&<button className="quiet-button" type="button" disabled={draftStatus.saving||busy} onClick={()=>void editorDrafts.flush().catch(error=>setError(readErrorMessage(error)))}>{t('原样补存')}</button>}{draftStatus.issue&&<button className="quiet-button" type="button" disabled={busy||draftStatus.saving} onClick={()=>void editorDrafts.readHost().then(setHostDraft).catch(error=>setError(readErrorMessage(error)))}>{t('查看主机草稿')}</button>}<button className="quiet-button" type="button" disabled={busy||!draftStatus.ready} onClick={()=>void editorDrafts.copies().then(value=>{setDraftCopies(value.items);setDraftCopiesNext(value.next)}).catch(error=>setError(readErrorMessage(error)))}>{t('取回保留的编辑副本')}</button></div></details>}
@@ -246,7 +229,7 @@ export function WorkspaceWorkbench({ threadId, projectPath, members, bindLeaveGu
           }}>{renderTree('')}</FileTree>}</div></Panel>}
           {showFiles && <PanelResizeHandle className="workbench-resize" />}
           <Panel id="workbench-content" order={2} minSize={25}>
-            {merge ? <WorkspaceMergeEditor {...merge} onClose={()=>setMerge(null)} onApply={text=>{setDocuments(previous=>previous.map(document=>document.path===merge.path?{...document,text}:document));setMerge(null)}} /> : tab==='terminals'?<WorkspaceTerminals projectPath={projectPath} onUnsettledChange={setTerminalUnsettled}/> : tab==='launcher'?<ProjectLauncher threadId={threadId} onCreated={async()=>{await loadDirectory('')}}/> : tab==='trash'?<WorkspaceTrash threadId={threadId} onRestored={async()=>{for(const path of ['',...expanded])await loadDirectory(path).catch(()=>{})}}/> : tab==='history'?<NativeHistoryWorkbench threadId={threadId} onOpenConversation={onOpenNativeConversation?async reference=>{guard();const opened=await onOpenNativeConversation(reference);if(opened)setOpen(false);return opened}:undefined}/> : tab==='office'&&officePath?<OfficePreviewWorkbench key={officePath} threadId={threadId} path={officePath}/> : tab==='computer'?<ComputerWorkbench key={threadId} threadId={threadId}/> : tab==='browser'?<BrowserWorkbench key={threadId} threadId={threadId}/> : tab==='forge'?<ForgeWorkbench threadId={threadId} projectPath={projectPath} members={members} onDirtyChange={setForgeDirty}/> : tab==='organizer'?<WorkspaceOrganizer threadId={threadId} onDirtyChange={setOrganizerDirty} onDirectoryAliasesApplied={()=>{setDirectories(new Map());setExpanded(new Set());void loadDirectory('')}} onUseMessage={onQuickMessage?text=>{if(dirty||!onQuickMessage(text))return false;setOpen(false);return true}:undefined}/> : tab === 'files' ? <div className="workbench-editor">
+            {merge ? <WorkspaceMergeEditor {...merge} onClose={()=>setMerge(null)} onApply={text=>{setDocuments(previous=>previous.map(document=>document.path===merge.path?{...document,text}:document));setMerge(null)}} />  : tab==='trash'?<WorkspaceTrash threadId={threadId} onRestored={async()=>{for(const path of ['',...expanded])await loadDirectory(path).catch(()=>{})}}/> : tab==='history'?<NativeHistoryWorkbench threadId={threadId} onOpenConversation={onOpenNativeConversation?async reference=>{guard();const opened=await onOpenNativeConversation(reference);if(opened)onClosed?.();return opened}:undefined}/> : tab==='office'&&officePath?<OfficePreviewWorkbench key={officePath} threadId={threadId} path={officePath}/> : tab==='computer'?<ComputerWorkbench key={threadId} threadId={threadId}/> : tab==='browser'?<BrowserWorkbench key={threadId} threadId={threadId}/> : tab==='forge'?<ForgeWorkbench threadId={threadId} projectPath={projectPath} members={members} onDirtyChange={setForgeDirty}/> : tab==='organizer'?<WorkspaceOrganizer threadId={threadId} onDirtyChange={setOrganizerDirty} onDirectoryAliasesApplied={()=>{setDirectories(new Map());setExpanded(new Set());void loadDirectory('')}} onUseMessage={onQuickMessage?text=>{if(dirty||!onQuickMessage(text))return false;onClosed?.();return true}:undefined}/> : tab === 'files' ? <div className="workbench-editor">
               {previewSource && filePreviewApi ? <><div className="workbench-toolbar workbench-preview-heading"><span title={previewPath!}>{previewPath}</span><div ref={setPreviewActions} className="workbench-preview-actions"/><button type="button" className="quiet-button" onClick={()=>setPreviewPath(null)}>{t('返回编辑器')}</button></div><PinnedFilePreview api={filePreviewApi} source={previewSource} resolvedTheme={filePreview?.resolvedTheme ?? 'night'} actionsHost={previewActions}/></> : current ? <><div className="workbench-toolbar"><span title={current.path}>{current.path}</span><button type="button" className="quiet-button" disabled={busy || current.text === current.saved} onClick={() => void save()}><Save size={14} />{t('保存')}</button><button type="button" className="quiet-button" disabled={busy || dirty} onClick={() => {setCreation('rename');setName(current.path)}}>{t('重命名')}</button><button type="button" className="quiet-button" disabled={busy} onClick={()=>void openMerge()}>{t('解决冲突')}</button></div>
                 {current.conflict && <div className="workbench-error" role="alert">{t('文件在外部发生变化，本地修改已保留。')}<button className="quiet-button" disabled={busy} onClick={()=>void mergeExternal()}>{t('比较并合并外部版本')}</button></div>}
                 <SplitTabDeck key={`${threadId}:${projectPath}`} scopeKey={`${threadId}:${projectPath}`} items={documents.map(item=>({id:item.path,label:item.path,dirty:item.text!==item.saved}))} selected={selected} disabled={busy||!draftStatus.ready} restoredLayout={restoredSplitLayout.current} restoreToken={restoreToken} onLayoutChange={setSplitLayout} onSelect={setSelected} onClose={closeDocument} renderBody={(item,visible)=>{const document=documents.find(row=>row.path===item.id)!;return <WorkspaceCodeEditor path={document.path} text={document.text} visible={visible} line={document.path===selected?cursorLine:undefined} onSave={()=>void save(document.path)} onChange={text=>setDocuments(previous=>previous.map(row=>row.path===document.path?{...row,text}:row))}/>}}/>
@@ -265,8 +248,8 @@ export function WorkspaceWorkbench({ threadId, projectPath, members, bindLeaveGu
             </div>}
           </Panel>
         </PanelGroup>
-      </AppDialogContent></Dialog.Portal>
-    </Dialog.Root>
+      {terminalMounted&&<section className="workbench-bottom-terminal" hidden={!terminalShown}><WorkspaceTerminals projectPath={projectPath} onUnsettledChange={setTerminalUnsettled}/></section>}
+    </section>
     {fileAction&&<WorkspaceFileActionDialog key={`${fileAction.operation}:${fileAction.path}`} threadId={threadId} action={fileAction} onClose={()=>setFileAction(null)} onApplied={async(action,destination)=>{
       const moved=(path:string):string=>destination?destination+path.slice(action.path.length):path
       if(action.operation==='move'){setDocuments(previous=>previous.map(document=>document.path===action.path||document.path.startsWith(`${action.path}/`)?{...document,path:moved(document.path)}:document));setSelected(previous=>previous&&(previous===action.path||previous.startsWith(`${action.path}/`))?moved(previous):previous)}

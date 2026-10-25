@@ -8,7 +8,7 @@ use tokio_util::sync::CancellationToken;
 #[derive(Deserialize, Serialize, Clone)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 struct Options {
-    scope: Scope,
+    scope: Option<Scope>,
     kind: String,
     name: String,
     #[serde(default)]
@@ -32,7 +32,8 @@ struct Plan {
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 struct Request {
-    scope: Scope,
+    scope: Option<Scope>,
+    project_path: Option<String>,
     operation: String,
     options: Option<Options>,
     plan_id: Option<String>,
@@ -168,7 +169,6 @@ fn recipe(options: &Options) -> Result<(PathBuf, Vec<String>)> {
 impl Core {
     pub(super) async fn project_launcher(&self, value: Value) -> Result<Value> {
         let request: Request = serde_json::from_value(value)?;
-        let root = self.workbench_root(&request.scope).await?;
         if request.operation == "detect" {
             let mut tools = Vec::new();
             for name in ["npm", "pnpm", "yarn", "bun"] {
@@ -177,13 +177,24 @@ impl Core {
             }
             return Ok(json!({"tools":tools}));
         }
+        let root = match (&request.scope, &request.project_path) {
+            (Some(scope), None) => self.workbench_root(scope).await?,
+            (None, Some(path)) => crate::git::validate_workspace_directory(
+                Path::new(path), &self.data_dir, false
+            )?,
+            _ => anyhow::bail!("launcher.directory_required"),
+        };
         let plans = self.data_dir.join("project-launcher-plans");
         crate::platform::private_storage::prepare_private_directory(&plans)?;
         if request.operation == "preview" {
             let options = request.options.context("launcher.options_required")?;
             ensure!(
-                options.scope.thread_id == request.scope.thread_id
-                    && options.scope.mission_id == request.scope.mission_id,
+                match (&options.scope, &request.scope) {
+                    (Some(options), Some(request)) => options.thread_id == request.thread_id
+                        && options.mission_id == request.mission_id,
+                    (None, None) => true,
+                    _ => false,
+                },
                 "launcher.scope_changed"
             );
             let parent = relative(&root, &options.parent, false)?;

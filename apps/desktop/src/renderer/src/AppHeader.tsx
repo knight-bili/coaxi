@@ -84,6 +84,7 @@ export function AppHeader({
           )}
         </div>
         <div className="camp-detail-entry-host" ref={detailEntryHostRef} />
+        {thread && <span data-engineering-entry={thread.thread.id} />}
         {conversationActions}
         {previewTabsInPane && previewControls}
       </div>

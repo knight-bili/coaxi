@@ -178,7 +178,7 @@ import type { FeedbackMessageSource } from './CardFeedbackFields'
 import { RuntimeInteractionDock } from './RuntimeInteractionDock'
 import { DelegationViewerHost, DelegationChildren } from './DelegationViewer'
 import { NativeSubagentEntries } from './NativeSubagentEntries'
-import { WorkspaceWorkbenchEntry } from './WorkspaceWorkbenchEntry'
+import { useEngineeringDock, WorkspaceWorkbenchEntry } from './WorkspaceWorkbenchEntry'
 import { FilePreviewPane } from './FilePreviewPane'
 import { FilePreviewResizeHandle, FilePreviewWorkspace, useInitializeFilePreviewMinimumWidth, useOptionalFilePreviewLayout } from './FilePreviewLayout'
 import { useExecutionPreviewHost, useOptionalFilePreview } from './FilePreviewContext'
@@ -1648,17 +1648,16 @@ export function ThreadWorkspace(props: Parameters<typeof ThreadWorkspaceContent>
   const key = JSON.stringify([owner.current.generation, props.snapshot.thread.id, props.composerContext ? canvasComposerContextKey(props.composerContext) : null])
   return <DelegationViewerHost key={key} visible={props.surfaceVisible} onLeaveGuardChange={bindViewerGuard} threadId={props.snapshot.thread.id} members={props.snapshot.members} profileById={new Map(props.agents.map(agent => [agent.agentId, agent]))}
     busy={props.busy} onResolveApproval={props.onResolveApproval} onNotify={props.onNotify}>
-    <ThreadWorkspaceContent {...props} onThreadLeaveGuardChange={bindWorkspaceGuard}
-      onBindWorkbenchQuickMessage={bindWorkbenchQuickMessage}
-      workbenchEntry={<WorkspaceWorkbenchEntry key={`${props.snapshot.thread.id}:${props.snapshot.thread.missionId??''}`} threadId={props.snapshot.thread.id} missionId={props.snapshot.thread.missionId} projectPath={props.snapshot.thread.projectPath??''}
-        members={props.snapshot.members.map(member=>({id:member.agentId,name:props.agents.find(agent=>agent.agentId===member.agentId)?.displayName??member.agentId}))}
-        bindLeaveGuard={bindWorkbenchGuard} onQuickMessage={insertWorkbenchQuickMessage} onOpenNativeConversation={props.onOpenNativeConversation} />} />
+    <WorkspaceWorkbenchEntry headerEntry={!props.composerContext} enabled={props.surfaceVisible!==false} threadId={props.snapshot.thread.id} missionId={props.snapshot.thread.missionId} projectPath={props.snapshot.thread.projectPath??''}
+      members={props.snapshot.members.map(member=>({id:member.agentId,name:props.agents.find(agent=>agent.agentId===member.agentId)?.displayName??member.agentId}))}
+      bindLeaveGuard={bindWorkbenchGuard} onQuickMessage={insertWorkbenchQuickMessage} onOpenNativeConversation={props.onOpenNativeConversation}>
+      <ThreadWorkspaceContent {...props} onThreadLeaveGuardChange={bindWorkspaceGuard} onBindWorkbenchQuickMessage={bindWorkbenchQuickMessage}/>
+    </WorkspaceWorkbenchEntry>
   </DelegationViewerHost>
 }
 
 function ThreadWorkspaceContent({
   snapshot,
-  workbenchEntry,
   onBindWorkbenchQuickMessage,
   composerContext,
   userAnchorNavigation,
@@ -1723,7 +1722,6 @@ function ThreadWorkspaceContent({
   onNotifyError
 }: {
   snapshot: ThreadSnapshot
-  workbenchEntry?: React.ReactNode
   onBindWorkbenchQuickMessage?(insert:((text:string)=>boolean)|null):void
   surfaceVisible?: boolean
   composerContext?: CanvasComposerContext
@@ -2126,6 +2124,17 @@ function ThreadWorkspaceContent({
     portal.className = 'execution-drawer-portal'
     return portal
   })
+  const engineeringDock=useEngineeringDock()
+  useEffect(()=>{
+    if(!engineeringDock.opened)return
+    setExecutionInspectorActive(false)
+    setExecutionDrawerAgentId(null)
+    onCloseInspector()
+    filePreview?.hidePane()
+  },[engineeringDock.opened])
+  useEffect(()=>{
+    if(inspectorVisible || filePreview?.paneVisible || executionDrawerAgentId)engineeringDock.collapse()
+  },[inspectorVisible,filePreview?.paneVisible,executionDrawerAgentId])
   const inspectorTab = controlledInspectorTab ?? localInspectorTab
   const inspectorSurfaceTab: ThreadInspectorSurfaceTab = executionPlacement === 'inspector'
     && executionInspectorActive
@@ -4924,7 +4933,6 @@ function ThreadWorkspaceContent({
         >
           <div className={`camp-conversation-stage ${conversationFind.open ? 'conversation-find-open' : ''}`.trim()}>
             <div className={`conversation-floating-tools ${conversationFind.open ? 'find-open' : ''}`.trim()}>
-              {snapshot.thread.projectPath && workbenchEntry}
               {conversationFind.open && (
                 <div className="conversation-find-surface" ref={conversationFindSurfaceRef}>
                   <form

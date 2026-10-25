@@ -16,13 +16,13 @@ vi.mock('./WorkspaceWorkbench', async () => {
       threadId: string
       projectPath: string
       initiallyOpen?: boolean
-      initialTab?: 'files' | 'terminals'
+      terminalRequest?: number
       onClosed?: () => void
     }) => React.createElement('section', {
       'data-testid': 'workbench',
       'data-thread': props.threadId,
       'data-root': props.projectPath,
-      'data-tab': props.initialTab,
+      'data-tab': props.terminalRequest ? 'terminals' : 'files',
       'data-open': String(props.initiallyOpen),
     }, React.createElement('button', { type: 'button', onClick: props.onClosed }, '关闭工作区')),
   }
@@ -51,30 +51,30 @@ function ownerTree(client: ThreadClient, threadId: string) {
 }
 
 describe('WorkspaceWorkbenchEntry 快捷键', () => {
-  it('先核验工程目录再按快捷键打开对应页，关闭后重新核验且打开期间入口不抢快捷键', async () => {
-    const roots = ['/verified/first', '/verified/second']
-    const request = vi.fn(async (method: CoreMethod, params?: unknown) => {
-      if (method !== 'workbench.files.list') throw new Error(`Unexpected request: ${method}`)
-      expect(params).toEqual({ scope: { threadId: 'thread-a', missionId: 'mission-current' }, path: '' })
-      return { workspaceRoot: roots.shift() }
+  it('收起保留同一编辑器，重新展开核验目录，目录变更拒绝迁移旧草稿', async () => {
+    const roots=['/verified/first','/verified/first','/verified/changed']
+    const request=vi.fn(async(method:CoreMethod,params?:unknown)=>{
+      expect(method).toBe('workbench.files.list')
+      expect(params).toEqual({scope:{threadId:'thread-a',missionId:'mission-current'},path:''})
+      return {workspaceRoot:roots.shift()}
     })
-    const view = render(ownerTree(createClient(request), 'thread-a'))
-
-    await act(async () => { expect(dispatchShortcutAction('toggle_terminal')).toBe(true) })
-    await waitFor(() => expect(view.getByTestId('workbench').getAttribute('data-tab')).toBe('terminals'))
-    expect(view.getByTestId('workbench').getAttribute('data-root')).toBe('/verified/first')
-    expect(view.getByTestId('workbench').getAttribute('data-open')).toBe('true')
-    expect(request).toHaveBeenCalledTimes(1)
-
-    await act(async () => { expect(dispatchShortcutAction('toggle_aux_panel')).toBe(false) })
-    expect(request).toHaveBeenCalledTimes(1)
-
-    fireEvent.click(view.getByRole('button', { name: '关闭工作区' }))
-    expect(view.queryByTestId('workbench')).toBeNull()
-    await act(async () => { expect(dispatchShortcutAction('toggle_aux_panel')).toBe(true) })
-    await waitFor(() => expect(view.getByTestId('workbench').getAttribute('data-tab')).toBe('files'))
-    expect(view.getByTestId('workbench').getAttribute('data-root')).toBe('/verified/second')
-    expect(request).toHaveBeenCalledTimes(2)
+    const view=render(ownerTree(createClient(request),'thread-a'))
+    await act(async()=>{expect(dispatchShortcutAction('toggle_terminal')).toBe(true)})
+    const editor=await view.findByTestId('workbench')
+    expect(editor.getAttribute('data-tab')).toBe('terminals')
+    expect(editor.closest('aside')?.hidden).toBe(false)
+    await act(async()=>{expect(dispatchShortcutAction('toggle_aux_panel')).toBe(true)})
+    expect(editor.closest('aside')?.hidden).toBe(true)
+    expect(view.getByTestId('workbench')).toBe(editor)
+    fireEvent.click(view.getByRole('button',{name:'展开工程区'}))
+    await waitFor(()=>expect(editor.closest('aside')?.hidden).toBe(false))
+    expect(view.getByTestId('workbench')).toBe(editor)
+    fireEvent.click(view.getByRole('button',{name:'关闭工作区'}))
+    fireEvent.click(view.getByRole('button',{name:'展开工程区'}))
+    await waitFor(()=>expect(view.getByRole('alert').textContent).toContain('工程目录已变化'))
+    expect(editor.getAttribute('data-root')).toBe('/verified/first')
+    expect(editor.closest('aside')?.hidden).toBe(true)
+    expect(request).toHaveBeenCalledTimes(3)
   })
 
   it('模态框或菜单打开时不核验；Core 未返回已核实目录时不挂载工作区', async () => {

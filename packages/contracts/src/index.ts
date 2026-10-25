@@ -5267,6 +5267,7 @@ export interface RovaiApi {
     scan<T>(threadId:string,provider:'codex'|'claude'|'qoder'|'grok'|'opencode'|'gemini'|'openclaw'|'cline'|'hermes'|'codebuddy'|'kimi_code'|'pi'|'cursor'|'deepseek'|'antigravity'):Promise<T|null>
     request<T>(threadId:string,input:{operation:'preview'|'import';planId:string;entryId:string;expectedDigest?:string}):Promise<T>
   }
+  projectLauncher?: {open():Promise<void>;peek():Promise<{id:string;path:string}|null>;acknowledge(id:string):Promise<void>;onAvailable(listener:()=>void):()=>void}
   officeWorkspace?: {open(threadId:string,path:string,editable:boolean):Promise<{opened:true}>}
   browserWorkspace?: BrowserWorkspaceApi
   computerWorkspace?: { request<T>(threadId:string,input:{operation:string;targetId?:string;level?:'none'|'read'|'control';permission?:'accessibility'|'screenRecording';action?:unknown;enabled?:boolean}):Promise<T> }

@@ -3,6 +3,7 @@ import { recoverLocalDataBeforeStores } from './configuration-recovery'
 import { PetWindowService } from './pet-window'
 import { WebdavWorkspace } from './webdav-workspace'
 import { BackupWorkspace } from './backup-workspace'
+import { ProjectLauncherWindow } from './project-launcher-window'
 import { OfficeWorkspace } from './office-workspace'
 import { BrowserWorkspace } from './browser-workspace'
 import { InteractionWorkspace } from './interaction-workspace'
@@ -1312,6 +1313,8 @@ app.on('second-instance', (_event,arguments_) => {
   mainWindow.focus()
 })
 
+const projectLauncherWindow=new ProjectLauncherWindow((method,params)=>core.request(method,params),()=>mainWindow,()=>({appearance:appearanceSnapshot(),language:generalPreferences?.get().interfaceLanguage??'zh-CN'}))
+ipcMain.handle('rovai:project-launcher',(event,action,input)=>projectLauncherWindow.invoke(event,action,input))
 const officeWorkspace = new OfficeWorkspace((method,params)=>core.request(method,params),()=>mainWindow)
 ipcMain.handle('rovai:office-workspace',(event,input)=>officeWorkspace.open(event,input))
 app.on('before-quit',()=>officeWorkspace.closeAll())
@@ -2896,6 +2899,7 @@ const appQuitCoordinator = new AppQuitCoordinator({
     ? windowsWindowClose.settlePending().then(() => requestRendererQuitPreparation(mainWindow, () => new MessageChannelMain()))
     : requestRendererQuitPreparation(mainWindow, () => new MessageChannelMain()),
   drain: async () => {
+    projectLauncherWindow.closeAll()
     if (desktopBackgroundTimer) {
       clearInterval(desktopBackgroundTimer)
       desktopBackgroundTimer = null

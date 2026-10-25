@@ -86,6 +86,12 @@ const api: RovaiApi = {
   keyboardShortcuts:{get:()=>ipcRenderer.invoke('rovai:keyboard-shortcuts','get'),save:input=>ipcRenderer.invoke('rovai:keyboard-shortcuts','save',input),recording:value=>ipcRenderer.invoke('rovai:keyboard-shortcuts','recording',value),onNativeInput:listener=>{const receive=(_event:Electron.IpcRendererEvent,input:import('@contracts').NativeShortcutInput):void=>listener(input);ipcRenderer.on('rovai:keyboard-input',receive);return()=>ipcRenderer.removeListener('rovai:keyboard-input',receive)}},
   nativeCustomSkills: {importDirectory:input=>ipcRenderer.invoke('rovai:custom-skill-import',input)},
   nativeHistory: {export:(threadId,importId,expectedRevision)=>ipcRenderer.invoke('rovai:native-history','export',{threadId,importId,expectedRevision}),scan:(threadId,provider)=>ipcRenderer.invoke('rovai:native-history','scan',{threadId,provider}),request:(threadId,input)=>ipcRenderer.invoke('rovai:native-history','request',{threadId,input})},
+  projectLauncher: {
+    open:()=>ipcRenderer.invoke('rovai:project-launcher','open'),
+    peek:()=>ipcRenderer.invoke('rovai:project-launcher','peek'),
+    acknowledge:id=>ipcRenderer.invoke('rovai:project-launcher','acknowledge',id),
+    onAvailable:listener=>{const handler=():void=>listener();ipcRenderer.on('rovai:project-launcher-available',handler);return()=>ipcRenderer.removeListener('rovai:project-launcher-available',handler)}
+  },
   officeWorkspace: {open:(threadId,path,editable)=>ipcRenderer.invoke('rovai:office-workspace',{threadId,path,editable})},
   computerWorkspace: { request: (threadId,input)=>ipcRenderer.invoke('rovai:computer-workspace',{threadId,input,commandId:globalThis.crypto.randomUUID()}) },
   interactionComputer:{request:(method,input)=>ipcRenderer.invoke('rovai:interaction-computer',method,input)},

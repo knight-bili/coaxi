@@ -175,6 +175,7 @@ export function ThreadNavigation({
   onSettingsSectionChange = () => undefined,
   onSettingsBack = () => undefined,
   onOpenProject,
+  onCreateProject,
   onSelectProject = () => undefined,
   onOpenProjectHome,
   onCreateInProject = () => undefined,
@@ -230,6 +231,7 @@ export function ThreadNavigation({
   onSettingsSectionChange?(section: NavigationSettingsSection): void
   onSettingsBack?(): void
   onOpenProject(): void
+  onCreateProject?(): void
   onSelectProject?(project: ProjectNavigationGroup | null): void
   onOpenProjectHome?(project: ProjectNavigationGroup): void
   onCreateInProject?(project: ProjectNavigationGroup | null): void
@@ -563,7 +565,7 @@ export function ThreadNavigation({
         <section className="navigation-projects" aria-labelledby="projects-heading">
           <div className="sidebar-group-title navigation-section-title navigation-project-section-title"><span id="projects-heading"><UiText zh={"项目"} /></span><div className="navigation-project-actions">
             {onManageProjectGroups && <button className="section-create-button" type="button" aria-label={uiAttribute('管理项目分组')} title={uiAttribute('管理项目分组')} onClick={() => onManageProjectGroups()} disabled={state !== 'ready'}>⋯</button>}
-            <button className="section-create-button" type="button" aria-label={uiAttribute("选择工作目录")} title={uiAttribute("选择工作目录")} onClick={onOpenProject} disabled={state !== 'ready'}>＋</button></div></div>
+            <DropdownMenu.Root><DropdownMenu.Trigger asChild><button className="section-create-button" type="button" aria-label={uiAttribute('添加项目')} title={uiAttribute('添加项目')} disabled={state!=='ready'}>＋</button></DropdownMenu.Trigger><DropdownMenu.Portal><DropdownMenu.Content className="dropdown-menu" align="end" sideOffset={6}><DropdownMenu.Item className="dropdown-item" onSelect={onOpenProject}><NavigationIcon name="folder-open"/>{uiAttribute('打开已有目录')}</DropdownMenu.Item>{onCreateProject&&<DropdownMenu.Item className="dropdown-item" onSelect={onCreateProject}>{uiAttribute('从模板创建项目')}</DropdownMenu.Item>}</DropdownMenu.Content></DropdownMenu.Portal></DropdownMenu.Root></div></div>
           {navigation && navigationProjectSidebarLayout(projectTrees.map(tree => tree.project), resolvedFolderGroups, projectOrder).map(entry => entry.kind === 'project' ? renderProjectTree(entry.project) : (
             <section key={entry.key} className="navigation-folder-group" data-color={entry.group.color ?? undefined}>
               <ProjectFolderGroupHeader group={entry.group} expanded={!collapsedFolderGroups.has(entry.group.id)} complete={entry.group.relationshipsComplete && entry.projects.every(project => projectTrees.find(tree => tree.project === project)?.complete)}

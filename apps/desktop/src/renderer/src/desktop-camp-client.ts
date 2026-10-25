@@ -15,6 +15,7 @@ export const desktopThreadClient: ThreadClient = {
   get workbenchEditorRecovery(){return desktopBridge()?.workbenchEditorRecovery},
   get nativeCustomSkills() { return desktopBridge()?.nativeCustomSkills },
   get nativeHistory() { return desktopBridge()?.nativeHistory },
+  get projectLauncher(){return desktopBridge()?.projectLauncher},
   get officeWorkspace() { return desktopBridge()?.officeWorkspace },
   get interactionComputer(){return desktopBridge()?.interactionComputer},
   get interactionWorkspace() { return desktopBridge()?.interactionWorkspace },
