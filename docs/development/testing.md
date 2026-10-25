@@ -105,6 +105,13 @@ active/retained 分支、完整交换、同 key 镜像锁、只读核对/明确�
 
 ## Rust 测试准入与退役门槛
 
+文字与卡片反馈的摘要格式回归由默认层纯 owner
+`ui_feedback::tests::generated_digests_match_feedback_shapes_and_fence_bindings` 拥有：
+实际摘要生成器必须满足冻结合同的全部 15 个摘要字段，完整 Binding、私有进程配置与领取请求可校验，
+裸摘要、错误 epoch 摘要和撤销后领取仍被拒绝；真实反馈端点生成器须满足共享 IPC 名称校验且每次独立。
+只使用内存 JSON、Registry 与端点字符串，不绑定管道，不创建数据库、文件、进程或模型请求。
+先按完整名称 `-- --exact --list` 确认 1 项，再同名执行；新对话、退出、重开与同原生会话续发仍需隔离 App/Runtime 实测。
+
 Codex 启动读取新增唯一最低层 `codex::tests::startup_discovery_retries_only_the_completed_account_timeout_once`，
 位于 `extended-tests`。既有真实进程启动 owner 仅 Unix，且不拥有跨平台的有界重试；本 owner 使用虚拟时钟和内存 RPC 结果，
 验证 account/read 明确路由超时只重读一次、成功保留、持续失败停止、认证/运输未知/其他方法不重试，以及占用错误的可信方法来源与公开分类。

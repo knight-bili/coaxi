@@ -154,20 +154,7 @@ impl Core {
         )?;
         let token = self.feedback_tools.register(binding.clone())?;
         drop(database);
-        #[cfg(windows)]
-        let endpoint = format!(
-            r"\\.\pipe\rovai-feedback-{}-{}",
-            std::process::id(),
-            uuid::Uuid::new_v4()
-        );
-        #[cfg(unix)]
-        let endpoint = std::env::temp_dir()
-            .join(format!("rvf-{}", uuid::Uuid::new_v4().simple()))
-            .join("i")
-            .to_string_lossy()
-            .into_owned();
-        #[cfg(not(any(windows, unix)))]
-        anyhow::bail!("runtime_unavailable");
+        let endpoint = feedback::stdio::create_endpoint()?;
         let mut listener = LocalIpcListener::bind(&feedback::stdio::endpoint(&endpoint)?)?;
         let directory = self.data_dir.join("ui-feedback/bridges").join(&bridge);
         crate::platform::private_storage::prepare_private_directory(&directory)?;

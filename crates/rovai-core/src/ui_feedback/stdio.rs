@@ -24,6 +24,25 @@ pub struct IpcRequest {
     pub operation: String,
     pub payload: Value,
 }
+pub fn create_endpoint() -> Result<String> {
+    #[cfg(windows)]
+    let value = format!(
+        r"\\.\pipe\rovai-ai-{}-{}",
+        std::process::id(),
+        uuid::Uuid::new_v4()
+    );
+    #[cfg(unix)]
+    let value = std::env::temp_dir()
+        .join(format!("rvf-{}", uuid::Uuid::new_v4().simple()))
+        .join("i")
+        .to_string_lossy()
+        .into_owned();
+    #[cfg(not(any(windows, unix)))]
+    anyhow::bail!("runtime_unavailable");
+    endpoint(&value)?;
+    Ok(value)
+}
+
 pub fn endpoint(value: &str) -> Result<LocalIpcEndpoint> {
     #[cfg(windows)]
     let endpoint = LocalIpcEndpoint::WindowsNamedPipe {

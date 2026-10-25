@@ -22,7 +22,10 @@ pub fn catalog() -> Value {
     CONTRACT["after"]["tool"].clone()
 }
 pub fn digest(value: &Value) -> Result<String> {
-    crate::command::canonical_json_digest(value)
+    Ok(format!(
+        "sha256:{}",
+        crate::command::canonical_json_digest(value)?
+    ))
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
@@ -414,3 +417,92 @@ pub fn render_feedback_result(outcome: &Value) -> Value {
 }
 
 mod spec_stream;
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn generated_digests_match_feedback_shapes_and_fence_bindings() {
+        let endpoint = stdio::create_endpoint().unwrap();
+        stdio::endpoint(&endpoint).unwrap();
+        assert_ne!(endpoint, stdio::create_endpoint().unwrap());
+        #[cfg(windows)]
+        assert!(stdio::endpoint(
+            r"\\.\pipe\rovai-feedback-42-7b5db24c-4a43-4cab-9217-d982b08f7691"
+        ).is_err());
+        let value = json!({"source": "普通文字与卡片反馈", "count": 1});
+        let generated = digest(&value).unwrap();
+        let bare = crate::command::canonical_json_digest(&value).unwrap();
+        assert_ne!(generated, bare);
+        assert_eq!(generated, digest(&json!({"count": 1, "source": "普通文字与卡片反馈"})).unwrap());
+
+        fn check_digest_fields(schema: &Value, generated: &str, bare: &str) -> usize {
+            let mut count = 0;
+            if schema["pattern"] == "^sha256:[0-9a-f]{64}$" {
+                validate_value(schema, &json!(generated), 0).unwrap();
+                assert!(validate_value(schema, &json!(bare), 0).is_err());
+                count += 1;
+            }
+            match schema {
+                Value::Object(fields) => {
+                    for child in fields.values() {
+                        count += check_digest_fields(child, generated, bare);
+                    }
+                }
+                Value::Array(fields) => {
+                    for child in fields {
+                        count += check_digest_fields(child, generated, bare);
+                    }
+                }
+                _ => {}
+            }
+            count
+        }
+        assert_eq!(check_digest_fields(&CONTRACT["after"]["schemas"], &generated, &bare), 15);
+
+        let binding = Binding {
+            schema_version: 1,
+            bridge_instance_id: "00000000-0000-4000-8000-000000000001".into(),
+            core_instance_id: "00000000-0000-4000-8000-000000000002".into(),
+            scope: Scope {
+                thread_id: "rvcamp_01m5rrxr54em9tzpjv7m350m6t".into(),
+                conversation_id: None,
+                scope_kind: "public".into(),
+            },
+            agent_id: "agent_1".into(),
+            agent_run_id: "00000000-0000-4000-8000-000000000003".into(),
+            execution_epoch: 1,
+            native_binding_id: "00000000-0000-4000-8000-000000000004".into(),
+            native_binding_generation: 1,
+            native_session_id: None,
+            membership_generation: 1,
+            policy_revision: 1,
+            catalog_digest: digest(&catalog()).unwrap(),
+            expires_at: "9999-01-01T00:00:00Z".into(),
+        };
+        let binding_digest = digest(&serde_json::to_value(&binding).unwrap()).unwrap();
+        let config = json!({
+            "schemaVersion": 1, "binding": binding, "bindingDigest": binding_digest,
+            "coreEndpoint": endpoint, "authorizationToken": "a".repeat(64),
+            "maxFrameBytes": MAX_FRAME_BYTES
+        });
+        validate_shape("privateProcessConfig", &config).unwrap();
+        validate_shape("privatePrepareRequest", &json!({
+            "schemaVersion": 1, "bindingDigest": binding_digest,
+            "transportRpcId": 1, "argumentsDigest": digest(&json!({})).unwrap()
+        })).unwrap();
+
+        let registry = broker::Registry::default();
+        let token = registry.register(binding.clone()).unwrap();
+        registry.authenticate(&binding.bridge_instance_id, &token, &binding_digest, false).unwrap();
+        assert!(registry.authenticate(&binding.bridge_instance_id, &token, &bare, false).is_err());
+        let mut changed = binding.clone();
+        changed.execution_epoch += 1;
+        let changed_digest = digest(&serde_json::to_value(&changed).unwrap()).unwrap();
+        assert!(registry.authenticate(&binding.bridge_instance_id, &token, &changed_digest, false).is_err());
+        registry.revoke(&binding.bridge_instance_id).unwrap();
+        assert!(registry.authenticate(&binding.bridge_instance_id, &token, &binding_digest, false).is_err());
+        registry.authenticate(&binding.bridge_instance_id, &token, &binding_digest, true).unwrap();
+    }
+}
