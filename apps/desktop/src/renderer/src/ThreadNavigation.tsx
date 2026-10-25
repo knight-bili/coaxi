@@ -912,7 +912,7 @@ function CommandPalette({
             }}
           />
           {tags.length > 0 && <label className="navigation-tag-filter"><UiText zh="按标签筛选已加载对话" />
-            <select aria-label={uiAttribute('按标签筛选已加载对话')} value={query.startsWith('#') && tags.includes(query.slice(1)) ? query.slice(1) : ''}
+            <select className="workspace-field" aria-label={uiAttribute('按标签筛选已加载对话')} value={query.startsWith('#') && tags.includes(query.slice(1)) ? query.slice(1) : ''}
               onChange={event => { setQuery(event.target.value ? `#${event.target.value}` : ''); setActiveIndex(0) }}>
               <option value="">{uiAttribute('全部标签')}</option>{tags.map(tag => <option key={tag} value={tag}>{tag}</option>)}
             </select>

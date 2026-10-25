@@ -64,6 +64,8 @@ describe('Runtime Renderer Core method allowlist', () => {
     expect(allowlistStart).toBeGreaterThan(-1)
     expect(allowlistEnd).toBeGreaterThan(allowlistStart)
     const allowlist = mainSource.slice(allowlistStart, allowlistEnd)
+    expect(allowlist).toContain("'navigation.projectGroups'")
+    expect(allowlist).toContain("'navigation.activity'")
     expect(allowlist).not.toContain("'core.shutdown'")
     expect(allowlist).not.toContain("'runtime.arbitrary.invoke'")
   })

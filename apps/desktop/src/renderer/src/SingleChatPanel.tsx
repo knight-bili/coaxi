@@ -1934,7 +1934,7 @@ export function SingleChatPanel({
         </div>
         {retainedInputKey && <div className="single-chat-retained-inputs" role="status">
           <span><UiText zh="保留的正文副本（不含附件和引用）" /></span>
-          <select aria-label={uiAttribute('选择保留输入')} value={retainedInputKey} disabled={sending} onChange={event => setRetainedInputSelection(event.target.value)}>
+          <select className="workspace-field" aria-label={uiAttribute('选择保留输入')} value={retainedInputKey} disabled={sending} onChange={event => setRetainedInputSelection(event.target.value)}>
             {retainedInputKeys.map((key, index) => <option key={key} value={key}>{uiAttribute('保留输入 {0}：{1}', index + 1, bodyDrafts[key].slice(0, 36))}</option>)}
           </select>
           <button type="button" disabled={sending || inputState.pending || Boolean(sharedDraftState.error)} onClick={() => { draftStore.swapBodies(retainedInputKey, bodyDraftKey) }}><UiText zh="切换正文副本" /></button>

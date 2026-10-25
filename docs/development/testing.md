@@ -105,6 +105,13 @@ active/retained 分支、完整交换、同 key 镜像锁、只读核对/明确�
 
 ## Rust 测试准入与退役门槛
 
+Codex 启动读取新增唯一最低层 `codex::tests::startup_discovery_retries_only_the_completed_account_timeout_once`，
+位于 `extended-tests`。既有真实进程启动 owner 仅 Unix，且不拥有跨平台的有界重试；本 owner 使用虚拟时钟和内存 RPC 结果，
+验证 account/read 明确路由超时只重读一次、成功保留、持续失败停止、认证/运输未知/其他方法不重试，以及占用错误的可信方法来源与公开分类。
+不创建 SQLite、文件、进程或模型请求，不替代实际提供方与完整 App 验收。最低命令先
+`cargo test --locked -p rovai-core --features extended-tests --lib codex::tests::startup_discovery_retries_only_the_completed_account_timeout_once -- --exact --list`，
+确认 1 项后去掉 `--list` 执行。
+
 I04 Claude/Qoder启动来源新增最低层纯owner：
 `runtime_subagent_session::origin::tests::final_launch_roots_keep_adapter_precedence_and_qoder_node_path_semantics`。
 它只读取传入的最终环境/工作目录，覆盖四Runtime独立根、Qoder各变量优先级/空值回落/自定义目录名、

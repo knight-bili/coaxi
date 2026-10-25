@@ -29,7 +29,7 @@ export function PortableCodexOverrides({value,disabled,onChange}:{value:Record<s
   const update=(key:string,next:unknown,inherit=false):void=>{const copy={...value};if(inherit)delete copy[key];else copy[key]=next;onChange(copy)}
   const choices=(rows:ChoiceField[]):React.JSX.Element=><div className="portable-provider-fields">{rows.map(field=>{
     const raw=value[field.key],available=field.options.some(option=>Object.is(option,raw)),current=!owns(field.key)?'inherit':available?JSON.stringify(raw):'stored'
-    return <label key={field.key}><span>{t(field.label)}</span><select disabled={disabled} value={current} onChange={event=>{if(event.target.value==='stored')return;update(field.key,event.target.value==='inherit'?undefined:JSON.parse(event.target.value),event.target.value==='inherit')}}>
+    return <label key={field.key}><span>{t(field.label)}</span><select className="workspace-field" disabled={disabled} value={current} onChange={event=>{if(event.target.value==='stored')return;update(field.key,event.target.value==='inherit'?undefined:JSON.parse(event.target.value),event.target.value==='inherit')}}>
       <option value="inherit">{t('继承基准模型')}</option>{current==='stored'&&<option value="stored">{t('保留原设置（由原程序核对）')}</option>}
       {field.options.map(option=><option key={JSON.stringify(option)} value={JSON.stringify(option)}>{option===null?t('不使用'):typeof option==='boolean'?t(option?'开启':'关闭'):option}</option>)}
     </select></label>

@@ -39,7 +39,7 @@ export function PrivateInputRecoveryPanel({ controller, state, busy, onError }: 
     {state.error && <p role="alert">{privateInputErrorMessage(state.error)}</p>}
     {selected && <div>
       <label htmlFor={selectId}><UiText zh="保留的完整输入" /></label>
-      <select id={selectId} value={selected.id} disabled={busy || state.pending} onChange={event => setSelection(event.target.value)}>
+      <select className="workspace-field" id={selectId} value={selected.id} disabled={busy || state.pending} onChange={event => setSelection(event.target.value)}>
         {state.retained.map(input => <option key={input.id} value={input.id}>{input.body.slice(0, 36) || uiAttribute('附件消息 · {0}', String(input.attachments.length))}</option>)}
       </select>
       <button type="button" disabled={busy || state.pending || !state.snapshot} onClick={() => perform(controller.swap(selected))}><UiText zh="切换完整输入" /></button>

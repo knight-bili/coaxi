@@ -14179,7 +14179,8 @@ impl Core {
                         error
                             .downcast_ref::<RuntimeFailureError>()
                             .map(|error| error.failure.clone())
-                    });
+                    })
+                    .or_else(|| codex::startup_failure(&error, &[]));
                 let error_code = if error.downcast_ref::<ContextPayloadTooLarge>().is_some() {
                     "context_payload_too_large".to_string()
                 } else if let Some(model_error) =

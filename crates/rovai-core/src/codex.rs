@@ -53,6 +53,77 @@ use crate::{
     },
 };
 
+#[derive(Debug, thiserror::Error)]
+#[error("{method}: {message}")]
+struct CodexRpcError {
+    method: String,
+    message: String,
+}
+
+impl CodexRpcError {
+    fn is_account_routing_timeout(&self) -> bool {
+        self.method == "account/read" && self.message == "workspace routing discovery timed out"
+    }
+}
+
+pub(crate) fn startup_failure(
+    error: &anyhow::Error,
+    sensitive_paths: &[(&Path, &str)],
+) -> Option<rovai_core::runtime_failure::RuntimeFailureView> {
+    use rovai_core::runtime_failure::{
+        RuntimeFailureOrigin, RuntimeFailurePhase, RuntimeFailureView,
+        sanitize_public_runtime_error,
+    };
+    let rpc = error.downcast_ref::<CodexRpcError>()?;
+    let (phase, code, summary) = if rpc.is_account_routing_timeout() {
+        (
+            RuntimeFailurePhase::Authentication,
+            "runtime_account_routing_timeout",
+            "Codex 账号路由读取超时，请稍后重试；本次未发送输入。",
+        )
+    } else if rpc.method == "thread/resume"
+        && rpc.message.starts_with("thread ")
+        && rpc.message.ends_with(" already has an active writer")
+    {
+        (
+            RuntimeFailurePhase::Execution,
+            "runtime_native_session_busy",
+            "该会话已有写入进程，请在占用它的应用中释放会话后重试；本次未发送输入。",
+        )
+    } else {
+        return None;
+    };
+    Some(RuntimeFailureView::new(
+        AdapterKind::CodexCli,
+        RuntimeFailureOrigin::Runtime,
+        phase,
+        code,
+        summary,
+        sanitize_public_runtime_error(&rpc.to_string(), sensitive_paths),
+        true,
+    ))
+}
+
+async fn read_account_with_retry<F, Fut>(mut read: F) -> Result<Value>
+where
+    F: FnMut() -> Fut,
+    Fut: std::future::Future<Output = Result<Value>>,
+{
+    match read().await {
+        Err(error)
+            if error
+                .downcast_ref::<CodexRpcError>()
+                .is_some_and(CodexRpcError::is_account_routing_timeout) =>
+        {
+            // Only retry this completed, read-only discovery failure. Never
+            // retry thread activation or a possibly accepted business input.
+            tokio::time::sleep(Duration::from_millis(500)).await;
+            read().await
+        }
+        result => result,
+    }
+}
+
 #[derive(Debug)]
 pub enum CodexIncoming {
     Message {
@@ -811,7 +882,13 @@ impl CodexHost {
             .await
             .with_context(|| format!("Codex request timed out: {method}"))?
             .with_context(|| format!("Codex response channel closed: {method}"))?;
-        response.map_err(|message| anyhow::anyhow!("{method}: {message}"))
+        response.map_err(|message| {
+            CodexRpcError {
+                method: method.to_string(),
+                message,
+            }
+            .into()
+        })
     }
 
     async fn notify(&self, method: &str, params: Value) -> Result<()> {
@@ -952,9 +1029,9 @@ impl CodexRuntime {
     }
 
     pub async fn authentication_available(&self) -> Result<bool> {
-        let account = self
-            .rpc("account/read", json!({"refreshToken": false}))
-            .await?;
+        let account =
+            read_account_with_retry(|| self.rpc("account/read", json!({"refreshToken": false})))
+                .await?;
         Ok(account.get("account").is_some_and(Value::is_object)
             || account.get("requiresOpenaiAuth").and_then(Value::as_bool) == Some(false))
     }
@@ -2392,6 +2469,71 @@ pub fn completed_turn(params: &Value) -> Result<CompletedTurn> {
 #[cfg(all(test, feature = "extended-tests"))]
 mod tests {
     use super::*;
+
+    #[tokio::test(start_paused = true)]
+    async fn startup_discovery_retries_only_the_completed_account_timeout_once() {
+        fn failure(method: &str, message: &str) -> anyhow::Error {
+            CodexRpcError {
+                method: method.into(),
+                message: message.into(),
+            }
+            .into()
+        }
+        let timeout = "workspace routing discovery timed out";
+        for (method, message, expected_calls) in [
+            ("account/read", timeout, 2),
+            ("account/read", "authentication required", 1),
+            ("thread/resume", timeout, 1),
+            ("turn/start", timeout, 1),
+        ] {
+            let mut calls = 0;
+            let error = read_account_with_retry(|| {
+                calls += 1;
+                std::future::ready(Err(failure(method, message)))
+            })
+            .await
+            .unwrap_err();
+            assert_eq!(calls, expected_calls);
+            assert!(error.to_string().contains(message));
+        }
+        let mut calls = 0;
+        let result = read_account_with_retry(|| {
+            calls += 1;
+            std::future::ready(if calls == 1 {
+                Err(failure("account/read", timeout))
+            } else {
+                Ok(json!({"account": {"type":"chatgpt"}}))
+            })
+        })
+        .await
+        .unwrap();
+        assert_eq!(calls, 2);
+        assert_eq!(result["account"]["type"], "chatgpt");
+        let mut calls = 0;
+        read_account_with_retry(|| {
+            calls += 1;
+            std::future::ready(Err(anyhow::anyhow!(
+                "Codex request timed out: account/read"
+            )))
+        })
+        .await
+        .unwrap_err();
+        assert_eq!(calls, 1, "an unknown transport outcome is never retried");
+        let routing = startup_failure(&failure("account/read", timeout), &[]).unwrap();
+        assert_eq!(routing.code, "runtime_account_routing_timeout");
+        routing.validate().unwrap();
+        let occupied = "thread 01a16d27-0478-7873-8d33-594d739e4ad7 already has an active writer";
+        let writer = startup_failure(
+            &failure("thread/resume", occupied).context("resume failed"),
+            &[],
+        )
+        .unwrap();
+        assert_eq!(writer.code, "runtime_native_session_busy");
+        assert!(writer.summary.contains("未发送输入"));
+        writer.validate().unwrap();
+        assert!(startup_failure(&failure("turn/start", occupied), &[]).is_none());
+        assert!(startup_failure(&anyhow::anyhow!(occupied), &[]).is_none());
+    }
 
     #[cfg(unix)]
     fn make_test_executable(path: &Path, body: &str) {
