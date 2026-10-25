@@ -9,7 +9,7 @@ app.setPath('userData', userData)
 app.setPath('sessionData', join(userData, 'session'))
 // This fixture mounts production components against an in-memory bridge. No Core or Runtime runs.
 app.whenReady().then(async () => {
-  const window = new BrowserWindow({ show: process.platform === 'linux', width: 1440, height: 920, useContentSize: true, ...(process.platform === 'darwin' ? { titleBarStyle: 'hidden', trafficLightPosition: { x: 12, y: 14 } } : {}), webPreferences: { contextIsolation: true, sandbox: true, nodeIntegration: false, backgroundThrottling: false } })
+  const window = new BrowserWindow({ show: process.platform !== 'darwin', width: 1440, height: 920, useContentSize: true, ...(process.platform === 'darwin' ? { titleBarStyle: 'hidden', trafficLightPosition: { x: 12, y: 14 } } : {}), webPreferences: { contextIsolation: true, sandbox: true, nodeIntegration: false, backgroundThrottling: false } })
   window.webContents.on('console-message', event => console.error(event.message))
   const run = code => window.webContents.executeJavaScript(code, true)
   const settle = () => run('window.capabilityTest.settle()')

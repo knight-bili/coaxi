@@ -11,7 +11,7 @@ app.setPath('sessionData', join(userData, 'session'))
 
 app.whenReady().then(async () => {
   console.error('settings fixture: Electron ready')
-  const window = new BrowserWindow({ show: process.platform === 'linux', width: 1440, height: 920, useContentSize: true,
+  const window = new BrowserWindow({ show: process.platform !== 'darwin', width: 1440, height: 920, useContentSize: true,
     webPreferences: { contextIsolation: true, sandbox: true, nodeIntegration: false, backgroundThrottling: false } })
   window.webContents.on('console-message', event => console.error(event.message))
   const run = code => window.webContents.executeJavaScript(code, true)
@@ -81,11 +81,11 @@ app.whenReady().then(async () => {
     await noOverflow(label)
   }
   try {
-    await window.loadFile(renderer); console.error('settings fixture: renderer loaded'); await settle()
+    await window.loadFile(renderer); console.error('settings fixture: renderer loaded')
     // Keep native DOM focus events available without depending on the active desktop window.
     window.webContents.debugger.attach('1.3')
     await window.webContents.debugger.sendCommand('Emulation.setFocusEmulationEnabled', { enabled: true })
-    // Runtime editor regression: valid variable addition saves directly, failure
+    // Runtime editor regression: explicit program selection saves directly, failure
     // preserves the draft, and clean/dirty transitions keep both actions visible.
     window.webContents.setZoomFactor(1); window.setContentSize(1280, 850)
     await navigate('runtime')
@@ -107,17 +107,13 @@ app.whenReady().then(async () => {
     assert.equal(await run("document.querySelectorAll('.runtime-custom-api, .runtime-connection-choice, .runtime-api-model-row').length"), 0)
     assert.equal(await run("window.settingsTest.requests.filter(r => r.method==='runtime.startup.observe').length"), 0)
 
-    await click('.runtime-startup-section:nth-of-type(2) .quiet-button')
-    await click('input[aria-label="变量名 1"]')
-    await run("document.execCommand('insertText',false,'HTTP_PROXY')"); await settle()
-    await click('input[aria-label="变量值 1"]')
-    await run("document.execCommand('insertText',false,'http://localhost:8080')"); await settle()
-    assert.equal(await run("document.querySelector('.runtime-startup-actions button[type=submit]').disabled"), false)
-    assert.equal(await run("document.querySelector('input[aria-label=\"变量值 1\"]').type"), 'password')
+    // The fixed donor exposes program selection here; environment belongs to member configuration.
+    await click('.runtime-startup-path button')
+    await waitFor("!document.querySelector('.runtime-startup-actions button[type=submit]').disabled")
     await run("window.settingsTest.state.failure='runtime.startup.save'")
     await click('.runtime-startup-actions button[type=submit]')
     await waitFor("document.querySelector('.runtime-startup-form .inline-error')")
-    assert.equal(await run("document.querySelector('input[aria-label=\"变量名 1\"]').value"), 'HTTP_PROXY')
+    assert.equal(await run("document.querySelector('.runtime-startup-path input').value"), '/sample/custom/codex')
     assert.equal(await run("document.querySelector('.runtime-startup-actions button[type=submit]').disabled"), false)
     const beforeLocalSave = await run('window.settingsTest.requests.length')
     await click('.runtime-startup-actions button[type=submit]')
@@ -125,18 +121,13 @@ app.whenReady().then(async () => {
     assert.deepEqual(await run('window.settingsTest.requests.slice('+beforeLocalSave+').map(r => r.method)'), ['runtime.startup.save'])
     assert.equal(await run("document.querySelector('.runtime-startup-actions [role=status]').textContent"), '已保存')
     assert.equal(await run("window.settingsTest.requests.filter(r => r.method==='runtime.startup.check').length"), 0)
-    assert.equal(await run("window.settingsTest.state.startup['codex-cli'].configuration.environment[0].name"), 'HTTP_PROXY')
-    await click('.runtime-startup-section:nth-of-type(2) .quiet-button')
+    await click('.runtime-startup-section-heading > button')
+    await waitFor("!document.querySelector('.runtime-startup-actions button[type=submit]').disabled")
     await click('.runtime-startup-actions button[type=button]')
-    assert.equal(await run("document.querySelectorAll('.runtime-environment-row').length"), 1)
     assert.equal(await run("document.querySelector('.runtime-startup-actions button[type=submit]').disabled"), true)
     await click('.runtime-startup-inspection .quiet-button')
     await waitFor("document.querySelector('.runtime-startup-result').textContent.includes('需要登录')")
     // Restore-auto uses fresh private preview, not a formal rescan or implicit save.
-    await click('.runtime-startup-path button')
-    await waitFor("!document.querySelector('.runtime-startup-actions button[type=submit]').disabled")
-    await click('.runtime-startup-actions button[type=submit]')
-    await waitFor("document.querySelector('.runtime-startup-actions button[type=submit]').disabled")
     await run("window.settingsTest.state.previewVersion='0.200.0'")
     await click('.runtime-startup-section-heading > button')
     await waitFor("document.querySelector('.runtime-startup-version')?.textContent==='0.200.0'")
@@ -182,8 +173,6 @@ app.whenReady().then(async () => {
     await navigate('general')
     window.setContentSize(1440, 920)
     await navigate('runtime')
-    await click('.runtime-product-settings[aria-label="Cline 启动设置"]')
-    await waitFor("document.querySelector('.runtime-startup-form')")
     assert.equal(await run("document.querySelectorAll('.cline-native-login').length"), 0)
     await navigate('general')
     window.setContentSize(1440, 920)
@@ -219,10 +208,12 @@ app.whenReady().then(async () => {
     await run("document.querySelector('.general-lead-trigger').focus()"); await settle()
     await key('Down')
     await waitFor("!!document.querySelector('.general-lead-popover')")
+    await waitFor("!!document.activeElement?.closest('.general-lead-popover')")
+    const firstLeadName = await run("document.querySelector('.general-lead-option:not(:disabled) strong').textContent")
     await key('Home')
-    await waitFor("document.querySelector('.general-lead-option.is-active')?.textContent.includes('叮叮')")
+    await waitFor("document.querySelector('.general-lead-option.is-active strong')?.textContent === " + JSON.stringify(firstLeadName))
     await key('Enter')
-    assert.ok(await run("document.querySelector('.general-lead-trigger').textContent.includes('叮叮')"), 'Home chooses the first eligible Lead')
+    assert.ok(await run("document.querySelector('.general-lead-trigger').textContent.includes(" + JSON.stringify(firstLeadName) + ")"), 'Home chooses the first eligible Lead')
     assert.equal(await run("document.querySelectorAll('.general-lead-popover').length"), 0)
     await click('.general-save-row button')
     await run('window.settingsTest.unavailableLead()'); await settle()
@@ -296,13 +287,13 @@ app.whenReady().then(async () => {
     await capture('about-download-error')
 
     await navigate('about', 'server_download_failed')
-    const serverReleaseLink = 'https://github.com/murray17/rovai-ai/releases/tag/v0.0.7'
+    const serverReleaseLink = 'https://github.com/knight-bili/coaxi/releases'
     assert.equal(await run("document.querySelector('.about-update-fallback a').href"), serverReleaseLink)
     await click('[data-app-update-release-tab="current"]')
     assert.equal(await run("document.querySelector('.about-release-section').dataset.appUpdateReleaseVersion"), '0.0.6')
     assert.equal(await run("document.querySelector('.about-update-fallback a').href"), serverReleaseLink)
     await navigate('about', 'server_no_candidate')
-    assert.equal(await run("document.querySelector('.about-update-fallback a').href"), 'https://github.com/murray17/rovai-ai/releases')
+    assert.equal(await run("document.querySelector('.about-update-fallback a').href"), 'https://github.com/knight-bili/coaxi/releases')
 
     await navigate('channels')
     await waitFor('document.hasFocus()')

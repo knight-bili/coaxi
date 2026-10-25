@@ -687,7 +687,7 @@ html:not([data-rovai-platform="win32"]) .navigation-collapsed .mission-full .top
 .changes-search-clear:hover { color: var(--ink); background: var(--neutral-hover); }
 .changes-search-clear .dialog-glyph { width: 12px; height: 12px; }
 .changes-tree { --mission-tree-row-height: 29px; display: flex; min-width: 0; flex-direction: column; gap: 0; padding: 0; }
-#mission-detail-tree { max-height: 480px; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; }
+.changes-tree[data-tree-scope="detail"] { max-height: 480px; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; }
 .changes-tree-spacer { width: 1px; flex: 0 0 auto; pointer-events: none; }
 .changes-tree-row { position: relative; display: flex; width: 100%; max-width: 100%; height: var(--mission-tree-row-height); min-height: var(--mission-tree-row-height); flex: 0 0 auto; flex-direction: row; align-items: center; gap: 8px; overflow: hidden; margin: 0; padding: 0 7px 0 min(calc(4px + var(--depth,0) * 18px),35%); border: 0; border-radius: 7px; color: var(--muted); background: transparent; text-align: left; cursor: pointer; overflow-wrap: normal; }
 .changes-tree-row:hover,.changes-tree-row[aria-selected="true"] { color: var(--ink); background: var(--neutral-hover); }
@@ -735,7 +735,7 @@ html:not([data-rovai-platform="win32"]) .navigation-collapsed .mission-full .top
 .modal-tree-heading > small { color: var(--faint); font: 10px ui-monospace,monospace; }
 .modal-tree-heading > .mission-icon-button { width: 25px; height: 25px; }
 .modal-tree-heading > .mission-icon-button > svg { width: 14px; height: 14px; }
-#mission-modal-tree { width: 100%; min-width: 0; max-width: 100%; min-height: 0; flex: 1; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; }
+.changes-tree[data-tree-scope="modal"] { width: 100%; min-width: 0; max-width: 100%; min-height: 0; flex: 1; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; }
 .mission-diff-file-list .changes-tree-row { gap: 7px; padding-left: min(calc(3px + var(--depth,0) * 16px),35%); border-radius: 6px; }
 .mission-diff-file-list .changes-tree-row .node-name { font-size: 12px; letter-spacing: 0; }
 .mission-diff-file-list .tree-guide { left: calc(10px + var(--guide) * 16px); }
@@ -769,11 +769,11 @@ html.diff-resizing .mission-diff-file-list,html.diff-resizing .mission-diff-read
 .rename-route { display: flex; max-width: min(620px,80vw); align-items: center; gap: 8px; margin-top: 4px; }
 .rename-route code { min-width: 0; overflow-wrap: anywhere; color: var(--muted); font-size: 10.5px; }
 .mobile-files-toggle { display: none; }
-:is(#mission-detail-tree,#mission-modal-tree) { scrollbar-color: var(--surface-selected) transparent; }
-@supports selector(::-webkit-scrollbar) { :is(#mission-detail-tree,#mission-modal-tree) { scrollbar-color: auto; } }
-:is(#mission-detail-tree,#mission-modal-tree)::-webkit-scrollbar { width: 12px; height: 0; background: transparent; }
-:is(#mission-detail-tree,#mission-modal-tree)::-webkit-scrollbar-button { display: none; width: 0; height: 0; }
-:is(#mission-detail-tree,#mission-modal-tree)::-webkit-scrollbar-thumb { min-height: 44px; border: 2px solid transparent; border-radius: 999px; background: var(--surface-selected); background-clip: padding-box; box-shadow: inset 0 0 0 1px color-mix(in srgb,var(--ink) 6%,transparent); }
+:is(.changes-tree[data-tree-scope="detail"],.changes-tree[data-tree-scope="modal"]) { scrollbar-color: var(--surface-selected) transparent; }
+@supports selector(::-webkit-scrollbar) { :is(.changes-tree[data-tree-scope="detail"],.changes-tree[data-tree-scope="modal"]) { scrollbar-color: auto; } }
+:is(.changes-tree[data-tree-scope="detail"],.changes-tree[data-tree-scope="modal"])::-webkit-scrollbar { width: 12px; height: 0; background: transparent; }
+:is(.changes-tree[data-tree-scope="detail"],.changes-tree[data-tree-scope="modal"])::-webkit-scrollbar-button { display: none; width: 0; height: 0; }
+:is(.changes-tree[data-tree-scope="detail"],.changes-tree[data-tree-scope="modal"])::-webkit-scrollbar-thumb { min-height: 44px; border: 2px solid transparent; border-radius: 999px; background: var(--surface-selected); background-clip: padding-box; box-shadow: inset 0 0 0 1px color-mix(in srgb,var(--ink) 6%,transparent); }
 @media (max-width: 760px) {
   .mission-diff-dialog > .compact-header { gap: 12px; }
   .diff-dialog-summary { flex-direction: column; align-items: flex-end; gap: 8px; }
@@ -795,7 +795,7 @@ html.diff-resizing .mission-diff-file-list,html.diff-resizing .mission-diff-read
   .mission-diff-reading > header { gap: 8px; padding: 12px 14px; }
   .diff-header-stats { margin-left: 24px; }
   .changes-tree-search input { font-size: 16px; }
-  :is(#mission-detail-tree,#mission-modal-tree) { --mission-tree-row-height: 32px; }
+  :is(.changes-tree[data-tree-scope="detail"],.changes-tree[data-tree-scope="modal"]) { --mission-tree-row-height: 32px; }
 }
 @media (pointer: coarse) {
   .changes-tree { --mission-tree-row-height: 40px; }

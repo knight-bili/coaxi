@@ -1,6 +1,7 @@
 import React from 'react'
 import { createRoot } from 'react-dom/client'
 import { GeneralSettings } from '@renderer/GeneralSettings'
+import { ThreadClientProvider } from '@renderer/camp-client'
 import { WindowCloseDialog } from '@renderer/WindowCloseSettings'
 import { DEFAULT_GENERAL_PREFERENCES } from '@shared/general-preferences-model'
 import { initializeInterfaceLanguage, changeInterfaceLanguage } from '@renderer/interface-language'
@@ -17,11 +18,12 @@ const api = {
 const controls = { getResetCapability: async () => ({ canReset: true, reason: null }), resetBounds: async () => ({ performed: true, reason: null }) }
 initializeInterfaceLanguage(preferences)
 document.documentElement.dataset.theme = 'day'
-createRoot(document.getElementById('root')).render(<>
+const client = { platform: 'win32', request: async method => { if (method === 'extensions.catalog') return { contractVersion: 1, descriptors: [] }; throw Error('Unsupported fixture request: ' + method) } }
+createRoot(document.getElementById('root')).render(<ThreadClientProvider client={client}>
   <div className="settings-panel settings-panel-general" style={{ height: '100vh', overflow: 'auto' }}>
     <GeneralSettings api={api} windowControls={controls} windowClose={window.closeTestApi} initialPreferences={preferences} />
     <input id="preserved-draft" aria-label="Fixture draft" defaultValue="Keep this unsaved draft" />
   </div>
   <WindowCloseDialog api={window.closeTestApi} />
-</>)
+</ThreadClientProvider>)
 window.closeFixture = { language: interfaceLanguage => changeInterfaceLanguage(api, interfaceLanguage) }

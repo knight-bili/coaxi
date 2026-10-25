@@ -253,7 +253,7 @@ export async function runMissionAcceptance(): Promise<{ ok: true; cases: string[
   const drawerHeader = document.querySelector('.mission-session-header')!.getBoundingClientRect()
   const preview = visiblePreview()!.getBoundingClientRect()
   const previewWorkspace = document.querySelector<HTMLElement>('.mission-drawer .workspace-grid')!.getBoundingClientRect()
-  const previewToggle = button('收起文件预览').getBoundingClientRect()
+  const previewToggle = button('收起工作区').getBoundingClientRect()
   const detailEntries = [...document.querySelectorAll<HTMLElement>('.mission-session-header .camp-detail-entry')]
   check(preview.width >= 420 && Math.abs(preview.width / previewWorkspace.width - .56) <= .01, `Activity uses the shared preview ratio and 420px stable minimum (received ${preview.width}px of ${previewWorkspace.width}px)`)
   check(detailEntries.length === 4 && detailEntries.every(entry => entry.getBoundingClientRect().right <= preview.left + 1), 'Four Camp tools stay in the message area')
@@ -284,22 +284,22 @@ export async function runMissionAcceptance(): Promise<{ ok: true; cases: string[
   await new Promise(resolve => setTimeout(resolve, 180))
   check(qa.calls.filter((call:any) => call.method === 'missions.changes' || call.method === 'missions.fileDiff').length === 0, 'Run completion, focus and visibility do not read unopened changes')
   document.querySelector<HTMLButtonElement>('.mission-changes-disclosure')!.click()
-  await until(() => document.querySelectorAll('#mission-detail-tree [data-file-id]').length === 7, 'Cumulative changes render the entire expanded file tree')
+  await until(() => document.querySelectorAll('.changes-tree[data-tree-scope=detail] [data-file-id]').length === 7, 'Cumulative changes render the entire expanded file tree')
   check(qa.calls.filter((call:any) => call.method === 'missions.changes').length === 1 && qa.calls.every((call:any) => call.method !== 'missions.fileDiff'), 'First explicit expansion reads one changed-file view and no file Diff')
   check([...document.querySelectorAll('.mission-delivery-section .mission-evidence-row code')].some(node => node.textContent === 'rovai/mission/018-validation'), 'Activity labels the Worktree checkout observed by the read')
   document.querySelector<HTMLButtonElement>('.mission-changes-disclosure')!.click(); await frames()
   document.querySelector<HTMLButtonElement>('.mission-changes-disclosure')!.click(); await frames()
   check(qa.calls.filter((call:any) => call.method === 'missions.changes').length === 1, 'Collapsing and reopening a mounted result does not rescan Git')
   check(!document.querySelector('.mission-changed-file') && !document.querySelector('.mission-changes-more-files'), 'Cumulative changes no longer use a truncated flat list')
-  check(document.querySelector('#mission-detail-tree [title="src/runtime"]')?.textContent?.includes('runtime'), 'Nested paths are grouped into directories')
-  check(parseFloat(getComputedStyle(document.querySelector('#mission-detail-tree')!).maxHeight) === 480, 'Detail tree uses the approved 480px scroll ceiling')
-  check(!document.querySelector('#mission-detail-tree')?.textContent?.includes('修改'), 'Tree rows use compact status glyphs without status words')
+  check(document.querySelector('.changes-tree[data-tree-scope=detail] [title="src/runtime"]')?.textContent?.includes('runtime'), 'Nested paths are grouped into directories')
+  check(parseFloat(getComputedStyle(document.querySelector('.changes-tree[data-tree-scope=detail]')!).maxHeight) === 480, 'Detail tree uses the approved 480px scroll ceiling')
+  check(!document.querySelector('.changes-tree[data-tree-scope=detail]')?.textContent?.includes('修改'), 'Tree rows use compact status glyphs without status words')
   const detailSearch = document.querySelector<HTMLInputElement>('.mission-delivery-section .changes-tree-search input')!
   fill(detailSearch, 'cache')
-  await until(() => document.querySelectorAll('#mission-detail-tree [data-file-id]').length === 1, 'Detail file search filters paths')
+  await until(() => document.querySelectorAll('.changes-tree[data-tree-scope=detail] [data-file-id]').length === 1, 'Detail file search filters paths')
   document.querySelector<HTMLButtonElement>('.mission-delivery-section .changes-search-clear')!.click()
-  await until(() => document.querySelectorAll('#mission-detail-tree [data-file-id]').length === 7, 'Clearing detail search restores the tree')
-  const originalDiffTrigger = document.querySelector<HTMLButtonElement>('#mission-detail-tree [data-file-id="file-a"]')!
+  await until(() => document.querySelectorAll('.changes-tree[data-tree-scope=detail] [data-file-id]').length === 7, 'Clearing detail search restores the tree')
+  const originalDiffTrigger = document.querySelector<HTMLButtonElement>('.changes-tree[data-tree-scope=detail] [data-file-id="file-a"]')!
   originalDiffTrigger.click()
   await until(() => document.querySelector('.mission-diff-dialog'), 'Cumulative diff dialog opens')
   await until(() => document.querySelector('.mission-diff-reading header strong')?.textContent === 'src/mission.ts', 'First selected file diff loads')
@@ -315,9 +315,9 @@ export async function runMissionAcceptance(): Promise<{ ok: true; cases: string[
   check(!document.querySelector('.mission-diff-dialog')!.textContent?.includes('Git 文件模式'), 'Cumulative diff omits raw Git mode rows')
   const modalSearch = document.querySelector<HTMLInputElement>('.mission-diff-file-list .changes-tree-search input')!
   fill(modalSearch, 'worker')
-  await until(() => document.querySelectorAll('#mission-modal-tree [data-file-id]').length === 1, 'Dialog tree search filters file paths')
+  await until(() => document.querySelectorAll('.changes-tree[data-tree-scope=modal] [data-file-id]').length === 1, 'Dialog tree search filters file paths')
   document.querySelector<HTMLButtonElement>('.mission-diff-file-list .changes-search-clear')!.click()
-  await until(() => document.querySelectorAll('#mission-modal-tree [data-file-id]').length === 7, 'Dialog tree search clears without closing the reader')
+  await until(() => document.querySelectorAll('.changes-tree[data-tree-scope=modal] [data-file-id]').length === 7, 'Dialog tree search clears without closing the reader')
   const splitter = document.querySelector<HTMLElement>('.diff-resize-handle')!, treeNavigation = document.querySelector<HTMLElement>('.mission-diff-file-list')!
   const initialTreeWidth = Math.round(treeNavigation.getBoundingClientRect().width)
   splitter.focus(); splitter.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }))
@@ -464,7 +464,7 @@ export async function runMissionAcceptance(): Promise<{ ok: true; cases: string[
   creationProperties()[0].click()
   await until(() => document.querySelector('.mission-editor-project-popover'), 'Mission project picker opens')
   const projectList = document.querySelector<HTMLElement>('.mission-editor-project-list')!
-  check(projectList.scrollHeight > projectList.clientHeight, 'Long project catalog remains vertically scrollable')
+  check(projectList.scrollHeight > projectList.clientHeight, `Long project catalog remains vertically scrollable ${JSON.stringify({height:projectList.clientHeight,scroll:projectList.scrollHeight,overflow:getComputedStyle(projectList).overflowY,count:projectList.querySelectorAll('button').length})}`)
   fill(document.querySelector<HTMLInputElement>('input[aria-label="搜索项目"]')!, '示例项目 12')
   await until(() => document.querySelectorAll('.mission-editor-project-list .compact-option').length === 1, 'Project search filters the catalog')
   document.querySelector<HTMLButtonElement>('.mission-editor-project-list [title="/workspace/sample-12"]')!.click()
@@ -715,9 +715,9 @@ export async function runMissionLargeDiffAcceptance(): Promise<{ ok: true; cases
   await until(() => document.querySelector('.mission-changes-disclosure'), 'Large-diff disclosure loads')
   check(qa.calls.filter((call:any) => call.method === 'missions.changes').length === 0, 'Large-diff Activity stays idle before disclosure')
   document.querySelector<HTMLButtonElement>('.mission-changes-disclosure')!.click()
-  await until(() => document.querySelector('#mission-detail-tree'), 'Large-diff detail tree loads')
+  await until(() => document.querySelector('.changes-tree[data-tree-scope=detail]'), 'Large-diff detail tree loads')
   await until(() => document.querySelector('.mission-changes-count')?.textContent === '1200', 'Large-diff heading reports every changed file')
-  const detail = document.querySelector<HTMLElement>('#mission-detail-tree')!
+  const detail = document.querySelector<HTMLElement>('.changes-tree[data-tree-scope=detail]')!
   await until(() => detail.scrollHeight > detail.clientHeight, 'Large-diff detail tree exposes a bounded scroll viewport')
   check(detail.querySelectorAll('[role=treeitem]').length < 80, 'Large-diff detail tree virtualizes mounted rows')
   check(!detail.querySelector('[role=treeitem][aria-expanded=false]'), 'Large-diff directories remain expanded by default')
@@ -728,15 +728,15 @@ export async function runMissionLargeDiffAcceptance(): Promise<{ ok: true; cases
   await until(() => (document.activeElement as HTMLElement | null)?.dataset.fileId === 'large-1192', 'End reveals and focuses the last logical tree row')
   check(detail.scrollTop > 0, 'Keyboard navigation scrolls the virtual detail tree')
 
-  const search = document.querySelector<HTMLInputElement>('input[aria-controls="mission-detail-tree"]')!
+  const search = document.querySelector<HTMLInputElement>('.mission-changes-section .changes-tree-search input')!
   fill(search, 'file-0420.ts')
   await until(() => detail.querySelectorAll('.changes-tree-row.is-file').length === 1, 'Large-diff search narrows to one file')
   const match = detail.querySelector<HTMLButtonElement>('.changes-tree-row.is-file')!
   check(match.dataset.fileId === 'large-420', 'Large-diff search keeps the matching file identity')
   match.click()
-  await until(() => document.querySelector('#mission-modal-tree'), 'Large-diff reader opens from a filtered tree result')
+  await until(() => document.querySelector('.changes-tree[data-tree-scope=modal]'), 'Large-diff reader opens from a filtered tree result')
 
-  const modal = document.querySelector<HTMLElement>('#mission-modal-tree')!
+  const modal = document.querySelector<HTMLElement>('.changes-tree[data-tree-scope=modal]')!
   await until(() => modal.scrollHeight > modal.clientHeight, 'Large-diff modal tree exposes a bounded scroll viewport')
   check(modal.querySelectorAll('[role=treeitem]').length < 80, 'Large-diff modal tree reuses virtualized rows')
   await until(() => modal.querySelector('[data-file-id="large-420"]'), 'Modal reveals its selected virtual row on open')
@@ -770,13 +770,13 @@ export async function runMissionCheckoutViewAcceptance(): Promise<{ ok: true; ca
 
   const disclosure = document.querySelector<HTMLButtonElement>('.mission-changes-disclosure')!
   disclosure.click()
-  await until(() => document.querySelectorAll('#mission-detail-tree [data-file-id]').length === 7, 'First expansion loads cumulative changes')
+  await until(() => document.querySelectorAll('.changes-tree[data-tree-scope=detail] [data-file-id]').length === 7, 'First expansion loads cumulative changes')
   check(qa.calls.filter((call: any) => call.method === 'missions.changes').length === 1, 'First expansion issues one changed-file read')
   check(checkoutLabels().includes('rovai/mission/018-validation') && checkoutLabels().includes('rovai/mission/018'), 'Activity distinguishes the managed branch from the read-time checkout')
   disclosure.click(); await frames(); disclosure.click(); await frames()
   check(qa.calls.filter((call: any) => call.method === 'missions.changes').length === 1, 'Collapse and reopen reuse the mounted result')
 
-  document.querySelector<HTMLButtonElement>('#mission-detail-tree [data-file-id="file-a"]')!.click()
+  document.querySelector<HTMLButtonElement>('.changes-tree[data-tree-scope=detail] [data-file-id="file-a"]')!.click()
   await until(() => document.querySelector('.mission-diff-reading header strong')?.textContent === 'src/mission.ts', 'A file Diff loads from the current view')
   await until(() => qa.calls.some((call: any) => call.method === 'missions.fileDiff' && call.p.fileId === 'file-a'), 'The selected file starts its associated Diff request')
   const fileDiffCall = qa.calls.findLast((call: any) => call.method === 'missions.fileDiff')
@@ -803,7 +803,7 @@ export async function runMissionCheckoutViewAcceptance(): Promise<{ ok: true; ca
   qa.failNextMissionChanges()
   document.querySelector<HTMLButtonElement>('[aria-label="刷新累计文件变更"]')!.click()
   await until(() => document.querySelector('.mission-diff-error')?.textContent?.includes('刷新失败，保留上次结果'), 'A failed refresh reports retained results')
-  check(checkoutLabels().includes('rovai/mission/018-live') && document.querySelectorAll('#mission-detail-tree [data-file-id]').length === 7, 'Refresh failure retains checkout, files and reading state')
+  check(checkoutLabels().includes('rovai/mission/018-live') && document.querySelectorAll('.changes-tree[data-tree-scope=detail] [data-file-id]').length === 7, 'Refresh failure retains checkout, files and reading state')
   const readsBeforeClose = qa.calls.filter((call: any) => call.method === 'missions.changes').length
   qa.delayNextMissionChanges()
   document.querySelector<HTMLButtonElement>('[aria-label="刷新累计文件变更"]')!.click()
@@ -811,7 +811,7 @@ export async function runMissionCheckoutViewAcceptance(): Promise<{ ok: true; ca
   qa.terminalMissionRun(qa.items[0].threadId)
   await new Promise(resolve => setTimeout(resolve, 150))
   Array.from(document.querySelectorAll<HTMLButtonElement>('button')).find(button => button.textContent?.trim() === '活动')!.click()
-  await until(() => !document.querySelector('#mission-detail-tree'), 'Closing Activity unmounts the workspace change view')
+  await until(() => !document.querySelector('.changes-tree[data-tree-scope=detail]'), 'Closing Activity unmounts the workspace change view')
   await new Promise(resolve => setTimeout(resolve, 180))
   check(qa.calls.filter((call: any) => call.method === 'missions.changes').length === readsBeforeClose + 1, 'Unmounting ignores the late response without a follow-up read')
   check(qa.errors.length === 0, qa.errors.join('\n'))

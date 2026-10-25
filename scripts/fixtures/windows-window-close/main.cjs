@@ -17,8 +17,10 @@ const pause = ms => new Promise(resolve => setTimeout(resolve, ms))
 app.whenReady().then(async () => {
   const file = join(userData, 'window-close.json')
   const store = new WindowClosePreferences(file)
-  window = new BrowserWindow({ width: 1040, height: 700, useContentSize: true, show: false,
+  window = new BrowserWindow({ width: 1040, height: 700, useContentSize: true, show: process.platform !== 'darwin',
     webPreferences: { preload: join(fixture, 'preload/index.cjs'), sandbox: true, contextIsolation: true, nodeIntegration: false, backgroundThrottling: false } })
+  window.webContents.on('console-message', event => console.error('renderer:', event.message))
+  window.webContents.on('preload-error', (_event, _path, error) => console.error('preload:', error))
   owner = new WindowsWindowClose({
     preferences: { get: () => store.get(), loadFailed: store.loadFailed, set: async value => { if (failSave) throw Error('fixture disk full'); await store.set(value) } },
     window: () => window,

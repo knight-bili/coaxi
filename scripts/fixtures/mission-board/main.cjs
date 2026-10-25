@@ -9,7 +9,7 @@ mkdirSync(userData, { recursive: true })
 app.setPath('userData', userData); app.setPath('sessionData', join(userData, 'session'))
 // In-memory Renderer projections only. No Core, SQLite, Skill Library or Runtime.
 app.whenReady().then(async () => {
-  const window = new BrowserWindow({ show: process.platform === 'linux', width: 1440, height: 920, useContentSize: true,
+  const window = new BrowserWindow({ show: process.platform !== 'darwin', width: 1440, height: 920, useContentSize: true,
     webPreferences: { contextIsolation: true, sandbox: true, nodeIntegration: false, backgroundThrottling: false } })
   await window.loadFile(renderer, mode === 'large-diff'
     ? { query: { largeDiff: '1' } }
@@ -63,6 +63,7 @@ app.whenReady().then(async () => {
     await waitFor("!!document.querySelector('.mission-editor-project-popover')", 'Pointer click did not open the project picker', 1500)
     await settle()
     await wheel('.mission-editor-project-list')
+    console.error('project wheel diagnostics', await window.webContents.executeJavaScript("(()=>{const n=document.querySelector('.mission-editor-project-list');return n?JSON.stringify({top:n.scrollTop,height:n.clientHeight,scroll:n.scrollHeight,count:n.querySelectorAll('button').length,inside:!!n.closest('.mission-create-dialog'),overflow:getComputedStyle(n).overflowY,rect:n.getBoundingClientRect().toJSON()}):'missing'})()"))
     await waitFor("document.querySelector('.mission-editor-project-list')?.scrollTop > 0 && document.querySelector('.mission-create-dialog')?.contains(document.querySelector('.mission-editor-project-popover'))", 'Project picker did not remain in the Mission dialog and scroll under wheel input', 1500)
     await click('.mission-editor-project-list .compact-option:last-of-type')
     await waitFor("!!document.querySelector('.mission-create-dialog') && !document.querySelector('.mission-editor-project-popover') && document.querySelector('.mission-editor-project-property')?.textContent?.includes('示例项目 14')", 'Project pointer selection did not commit inside the Mission dialog', 1500)
