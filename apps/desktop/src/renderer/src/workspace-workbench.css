@@ -3,7 +3,25 @@
 .workspace-workbench .workbench-view-tabs { gap:4px; padding:6px 0 10px; }
 .workspace-workbench .workbench-view-tabs .quiet-button { border:0; padding:6px 10px; font-size:12px; }
 .workspace-workbench .workbench-view-tabs .is-active { background:var(--surface-selected);color:var(--ink);font-weight:600; }
-.workspace-workbench .workbench-file-actions { justify-content:flex-end; }
+.workspace-workbench .workbench-file-actions { gap:6px;padding:8px 0; }
+.workbench-file-heading { display:inline-flex;align-items:center;gap:7px;margin-right:10px;font-size:12px; }
+.workbench-toolbar-spacer { flex:1; }
+.workbench-draft-status { flex:none;padding:8px 0;color:var(--muted);font-size:11px;border-bottom:1px solid var(--line); }
+.workbench-draft-status>summary { width:fit-content;cursor:pointer; }
+.workbench-draft-status>.workbench-toolbar { border:0;padding-bottom:0; }
+.workspace-workbench .workbench-notice { display:flex;align-items:flex-start;gap:8px;flex:none;max-height:100px;overflow:auto;margin:10px 0;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface-subtle);color:var(--danger);font-size:12px; }
+.workbench-notice>svg { flex:none;margin-top:2px; }
+.workbench-notice>p { flex:1;margin:0;overflow-wrap:anywhere; }
+.workbench-notice>.quiet-button { flex:none; }
+.workspace-workbench>.app-dialog-header .app-dialog-description { margin-top:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px; }
+.workbench-preview-heading>span { flex:1; }
+.workbench-preview-actions { display:flex;align-items:center;gap:8px; }
+.workbench-preview-actions>button { border:0;background:transparent;color:var(--muted);font:inherit;cursor:pointer; }
+.workbench-editor>.canvas-file-preview { flex:1;min-height:0;overflow:auto; }
+.workspace-workbench .workbench-files-empty { display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:32px;text-align:center; }
+.workbench-files-empty>svg { color:var(--muted); }
+.workbench-files-empty>strong { color:var(--ink);font-size:14px;font-weight:500; }
+.workbench-files-empty>p { max-width:42ch;margin:0;font-size:12px;line-height:1.7; }
 .workspace-workbench .workbench-toolbar .quiet-button { display:inline-flex;align-items:center;justify-content:center;gap:6px; }
 .workspace-workbench .workbench-toolbar [role="status"] { font-size:11px;color:var(--muted); }
 .workspace-workbench .workbench-git-actions { grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); }

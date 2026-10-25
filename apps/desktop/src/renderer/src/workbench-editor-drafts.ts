@@ -1,9 +1,12 @@
 import type { WorkbenchEditorSnapshot,WorkbenchEditorState } from '@contracts'
 import type { ThreadClient } from './camp-client'
 import { readCanvasViewScope } from './canvas-view-state'
+import { readErrorMessage } from './error-message'
 import { listEditorCopies,loadEditorRecovery,readEditorCopy,saveEditorRecovery,type EditorRecoveryRecord } from './workbench-editor-recovery'
 const canonical=(value:unknown):unknown=>Array.isArray(value)?value.map(canonical):value&&typeof value==='object'?Object.fromEntries(Object.entries(value).sort(([left],[right])=>left<right?-1:left>right?1:0).map(([key,value])=>[key,canonical(value)])):value
 const same=(left:unknown,right:unknown):boolean=>JSON.stringify(canonical(left))===JSON.stringify(canonical(right))
+const missingSelection=(value:WorkbenchEditorState|null|undefined):boolean=>Boolean(value?.selected&&!value.documents.some(document=>document.path===value.selected))
+const validSelection=(value:WorkbenchEditorState):WorkbenchEditorState=>missingSelection(value)?{...value,selected:null}:value
 export interface EditorDraftStatus {ready:boolean;saving:boolean;pending:boolean;issue:string|null;revision:string|null}
 
 /** 原文件缓冲与恢复入口共用一个队列；只有原 workbench.files.mutate 会写工程文件。 */
@@ -32,6 +35,15 @@ export class WorkbenchEditorDrafts {
     const result=await this.client.request<WorkbenchEditorSnapshot>('workbench.editor',{operation:'get',scope:{threadId:this.threadId},editorId:record.editorId})
     if(this.disposed||generation!==this.generation)return null
     if(record.workspaceRoot&&record.workspaceRoot!==result.workspaceRoot)throw new Error('原工程目录已改变，本机原草稿保留，请先恢复原工程。')
+    // Failed binary reads previously selected a file absent from the text buffers.
+    // Core rejects that state before writing it. Keep a copy before repairing only
+    // the invalid selection; text, layout and the original revision stay intact.
+    if(missingSelection(record.latest)||missingSelection(record.pending?.value)){
+      await saveEditorRecovery({...structuredClone(record),key:`${record.key}:copy:${crypto.randomUUID()}`},this.client.workbenchEditorRecovery)
+      if(record.latest)record.latest=validSelection(record.latest)
+      if(record.pending)record.pending={...record.pending,commandId:crypto.randomUUID(),value:validSelection(record.pending.value)}
+      await saveEditorRecovery(record,this.client.workbenchEditorRecovery)
+    }
     this.record=record;record.workspaceRoot=result.workspaceRoot;this.acknowledged=result.value
     if(record.pending&&same(record.pending.value,result.value)){record.pending=null;record.revision=result.revision}
     else if(!record.pending){if(record.latest&&record.revision!==result.revision&&!same(record.latest,result.value)){this.publish({ready:true,pending:true,issue:'其他窗口已改变工程草稿。本机原输入仍保留，请查看主机版本后选择。',revision:result.revision});return structuredClone(record.latest)}record.revision=result.revision}
@@ -42,7 +54,7 @@ export class WorkbenchEditorDrafts {
   }
   update(value:WorkbenchEditorState):void{
     if(!this.record||!this.current.ready||this.disposed)return
-    this.record.latest={...structuredClone(value),documents:value.documents.map(document=>({...document,conflict:Boolean(document.conflict)}))};this.publish({pending:Boolean(this.record.pending)||!same(this.record.latest,this.acknowledged)})
+    this.record.latest={...structuredClone(validSelection(value)),documents:value.documents.map(document=>({...document,conflict:Boolean(document.conflict)}))};this.publish({pending:Boolean(this.record.pending)||!same(this.record.latest,this.acknowledged)})
     if(this.timer)clearTimeout(this.timer)
     this.timer=setTimeout(()=>{this.timer=null;void this.flush().catch(()=>undefined)},500)
   }
@@ -84,7 +96,7 @@ export class WorkbenchEditorDrafts {
         record.revision=result.revision;record.pending=null;this.acknowledged=result.value;await this.cache()
       }
       this.publish({pending:Boolean(record.pending)||!same(record.latest,this.acknowledged),revision:record.revision})
-    }catch(error){this.publish({pending:true,issue:String(error)});throw error}finally{this.publish({saving:false})}
+    }catch(error){this.publish({pending:true,issue:readErrorMessage(error)});throw error}finally{this.publish({saving:false})}
   }
   dispose():void{this.disposed=true;this.generation++;if(this.timer)clearTimeout(this.timer);this.timer=null;if(this.record)void this.cache().catch(()=>undefined)}
   localDraft():WorkbenchEditorState|null{return this.record?.latest?structuredClone(this.record.latest):null}

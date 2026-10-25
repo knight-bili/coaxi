@@ -3,7 +3,9 @@ import type { WorkbenchEditorSnapshot,WorkbenchEditorState } from '@contracts'
 import { WorkbenchEditorDrafts } from './workbench-editor-drafts'
 import type { EditorRecoveryCopy } from './workbench-editor-recovery'
 import * as Dialog from '@radix-ui/react-dialog'
-import { Files, FolderPlus, GitBranch, Plus, RefreshCw, Save } from 'lucide-react'
+import { AlertCircle, FileSearch, Files, FolderPlus, GitBranch, Plus, RefreshCw, Save, Trash2 } from 'lucide-react'
+import { readErrorMessage } from './error-message'
+import { PinnedFilePreview, useOptionalFilePreview, useOptionalFilePreviewApi } from './FilePreviewContext'
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels'
 import { AppDialogContent, AppDialogHeader, AppDialogBody, AppDialogFooter } from './AppDialog'
 import { useThreadClient } from './camp-client'
@@ -47,6 +49,9 @@ export function WorkspaceWorkbench({ threadId, projectPath, members, bindLeaveGu
   threadId: string; projectPath:string; members:Array<{id:string;name:string}>; bindLeaveGuard(guard: (() => void) | null): void; onQuickMessage?(text:string):boolean;onOpenNativeConversation?(reference:import('@contracts').CanvasConversationRef):Promise<boolean>;initiallyOpen?:boolean;initialTab?:'files'|'terminals';onClosed?():void
 }): React.JSX.Element {
   const client = useThreadClient(), t = useUiText(), scope = useMemo(() => ({ threadId }), [threadId])
+  const filePreview = useOptionalFilePreview(), filePreviewApi = useOptionalFilePreviewApi()
+  const [previewPath, setPreviewPath] = useState<string | null>(null), [previewActions, setPreviewActions] = useState<HTMLDivElement | null>(null)
+  const previewSource = useMemo(() => previewPath ? { kind: 'camp_workspace' as const, threadId, rawReference: previewPath } : null, [threadId, previewPath])
   const [open, setOpen] = useState(initiallyOpen), [tab, setTab] = useState<WorkbenchTab>(initialTab)
   const [fileAction,setFileAction]=useState<FileAction|null>(null),[searchVisible,setSearchVisible]=useState(false),[cursorLine,setCursorLine]=useState<number|undefined>(undefined)
   const [organizerDirty,setOrganizerDirty]=useState(false)
@@ -59,10 +64,11 @@ export function WorkspaceWorkbench({ threadId, projectPath, members, bindLeaveGu
   const [draftCopies,setDraftCopies]=useState<EditorRecoveryCopy[]|null>(null),[draftCopiesNext,setDraftCopiesNext]=useState<string|null>(null)
   const [splitLayout,setSplitLayout]=useState<unknown|null>(null),[restoreToken,setRestoreToken]=useState(0),restoredSplitLayout=useRef<unknown>(null)
   const acceptRestoredDraft=(value:WorkbenchEditorState|null):void=>{const next=value??{documents:[],selected:null,layout:null};setDocuments(next.documents);setSelected(next.selected);setSplitLayout(next.layout);restoredSplitLayout.current=next.layout;setRestoreToken(value=>value+1)}
-  useEffect(()=>{if(!open)return;let active=true;hydrated.current=false;setDraftRestoreError('');void editorDrafts.start().then(value=>{if(active){acceptRestoredDraft(value);hydrated.current=true}}).catch(error=>{if(active)setDraftRestoreError(String(error))});return()=>{active=false;hydrated.current=false;editorDrafts.dispose()}},[editorDrafts,draftReadAttempt,open])
+  useEffect(()=>{if(!open)return;let active=true;hydrated.current=false;setDraftRestoreError('');void editorDrafts.start().then(value=>{if(active){acceptRestoredDraft(value);hydrated.current=true}}).catch(error=>{if(active)setDraftRestoreError(readErrorMessage(error))});return()=>{active=false;hydrated.current=false;editorDrafts.dispose()}},[editorDrafts,draftReadAttempt,open])
   useEffect(()=>{if(hydrated.current&&draftStatus.ready)editorDrafts.update({documents,selected,layout:splitLayout})},[editorDrafts,documents,selected,splitLayout,draftStatus.ready])
   const closedFiles=useRef<string[]>([])
   const [busy, setBusy] = useState(false), [error, setError] = useState<string | null>(null), epoch = useRef(0)
+  const [closing, setClosing] = useState(false)
   const [creation, setCreation] = useState<'file' | 'directory' | 'rename' | null>(null), [name, setName] = useState('')
   const [terminalUnsettled,setTerminalUnsettled]=useState(false)
   const [gitDirty,setGitDirty]=useState(false),[gitVersion,setGitVersion]=useState(0)
@@ -74,6 +80,19 @@ export function WorkspaceWorkbench({ threadId, projectPath, members, bindLeaveGu
   const dirty = terminalUnsettled || organizerDirty || forgeDirty || gitDirty || documents.some(document => document.text !== document.saved)
   const current = documents.find(document => document.path === selected)
   const guard = useCallback(() => { if (busy) throw new Error(t('工程操作仍在进行，请稍后离开。')); if (dirty) throw new Error(t('工程文件尚未保存，请先保存或关闭对应标签。'));if(editorDrafts.snapshot().pending||editorDrafts.snapshot().saving)throw new Error(t('编辑草稿或布局仍未补存，请在工程内核对后再离开。')) }, [busy, dirty, t,editorDrafts])
+  const closeWorkspace = async (): Promise<void> => {
+    if (closing) return
+    setError(null)
+    setClosing(true)
+    try {
+      if (busy || dirty) guard()
+      if (editorDrafts.snapshot().pending || editorDrafts.snapshot().saving) await editorDrafts.flush()
+      guard()
+      setOpen(false)
+      onClosed?.()
+    } catch (failure) { setError(readErrorMessage(failure)) }
+    finally { setClosing(false) }
+  }
   useEffect(() => { bindLeaveGuard(guard); return () => bindLeaveGuard(null) }, [bindLeaveGuard, guard])
   useEffect(() => () => { ++epoch.current }, [])
   useEffect(() => {
@@ -84,7 +103,7 @@ export function WorkspaceWorkbench({ threadId, projectPath, members, bindLeaveGu
   const operation = async <T,>(run: () => Promise<T>): Promise<T | undefined> => {
     if (busy) return
     const generation = epoch.current; setBusy(true); setError(null)
-    try { return await run() } catch (failure) { if (generation === epoch.current) setError(failure instanceof Error ? failure.message : t('工程操作失败。')); return undefined }
+    try { return await run() } catch (failure) { if (generation === epoch.current) setError(readErrorMessage(failure, t('工程操作失败。'))); return undefined }
     finally { if (generation === epoch.current) setBusy(false) }
   }
   const loadDirectory = async (path: string, after?: string): Promise<void> => {
@@ -94,14 +113,19 @@ export function WorkspaceWorkbench({ threadId, projectPath, members, bindLeaveGu
   }
   useEffect(() => { if (open && !directories.has('')) void operation(() => loadDirectory('')) }, [open])
   const openFile = async (path: string,line?:number): Promise<void> => {
+    if (/\.(png|jpe?g|gif|webp|bmp|ico|avif|svg|pdf|html?)$/i.test(path)) {
+      setError(null)
+      if (!filePreviewApi) { setError(t('文件预览服务暂不可用，请重新打开工程。')); return }
+      setTab('files'); setPreviewPath(path); return
+    }
     if(!draftStatus.ready){setError(t('工程编辑草稿尚未读取成功，请先重新读取。'));return}
     setCursorLine(line);setTab('files')
     if(/\.(docx|xlsx|pptx)$/i.test(path)){setOfficePath(path);setTab('office');return}
-    setSelected(path)
-    if (documents.some(document => document.path === path)) return
+    if (documents.some(document => document.path === path)) { setSelected(path); setPreviewPath(null); return }
     await operation(async () => {
       const result = await client.request<{ path: string; text: string; digest: string }>('workbench.files.read', { scope, path })
       setDocuments(previous => previous.some(document => document.path === path) ? previous : [...previous, { ...result, saved: result.text }])
+      setSelected(path); setPreviewPath(null)
     })
   }
   const save = async (path:string|null=selected): Promise<void> => {
@@ -138,13 +162,13 @@ export function WorkspaceWorkbench({ threadId, projectPath, members, bindLeaveGu
     {directories.get(path)?.next && <button type="button" className="quiet-button" disabled={busy} onClick={() => void operation(() => loadDirectory(path, directories.get(path)!.next!))}>{t('加载更多')}</button>}
   </>
   const activeShortcutSurface=():boolean=>{const dialogs=[...document.querySelectorAll('[role="dialog"][data-state="open"]')];return open&&dialogs.at(-1)?.classList.contains('workspace-workbench')===true}
-  const moveTab=(delta:number):void=>{const index=documents.findIndex(row=>row.path===selected);if(documents.length)setSelected(documents[(Math.max(0,index)+delta+documents.length)%documents.length].path)}
+  const moveTab=(delta:number):void=>{const index=documents.findIndex(row=>row.path===selected);if(documents.length){setPreviewPath(null);setSelected(documents[(Math.max(0,index)+delta+documents.length)%documents.length].path)}}
   useShortcutActions({
     toggle_terminal:()=>{if(organizerDirty||forgeDirty||terminalUnsettled)return true;setOpen(true);setTab(value=>value==='terminals'?'files':'terminals')},
-    toggle_aux_panel:()=>{try{if(open)guard();setOpen(value=>!value)}catch(error){setError(String(error))}},
+    toggle_aux_panel:()=>{if(open)void closeWorkspace();else setOpen(true)},
   },{priority:25,active:()=>!document.querySelector('[role="dialog"][aria-modal="true"]')||activeShortcutSurface()})
   useShortcutActions({
-    close_current_tab:()=>{if(tab==='files'&&selected)closeDocument(selected)},
+    close_current_tab:()=>{if(tab==='files'){if(previewPath)setPreviewPath(null);else if(selected)closeDocument(selected)}},
     close_all_file_tabs:()=>{if(busy)return true;if(documents.some(row=>row.text!==row.saved)&&!window.confirm(t('放弃所有文件尚未保存的修改？')))return true;closedFiles.current=[...documents.map(row=>row.path).reverse(),...closedFiles.current].slice(0,100);setDocuments([]);setSelected(null)},
     reopen_last_closed_tab:()=>{if(busy)return true;const path=closedFiles.current[0];if(path){closedFiles.current.shift();void openFile(path)}},
     next_tab:()=>{if(tab!=='files')return false;moveTab(1)},prev_tab:()=>{if(tab!=='files')return false;moveTab(-1)},
@@ -182,9 +206,9 @@ export function WorkspaceWorkbench({ threadId, projectPath, members, bindLeaveGu
   const showFiles = merge !== null || tab === 'files' || tab === 'git' || tab === 'office'
   return <>
     <button type="button" className="quiet-button conversation-tool-button" title={t('文件与 Git 工程工作区')} onClick={() => setOpen(true)}><Files size={15} /><span>{t('工程')}</span></button>
-    <Dialog.Root open={open} onOpenChange={next => { if (!next) { try { guard() } catch (failure) { setError(String(failure)); return } }; setOpen(next);if(!next)onClosed?.() }}>
+    <Dialog.Root open={open} onOpenChange={next => { if (!next) void closeWorkspace(); else setOpen(true) }}>
       <Dialog.Portal><Dialog.Overlay className="dialog-overlay" /><AppDialogContent className="workspace-workbench" width="large">
-        <AppDialogHeader title={t('工程工作区')} description={t('文件与 Git')} hideDescription closeDisabled={busy || dirty} />
+        <AppDialogHeader title={t('工程工作区')} description={projectPath} closeLabel={t('关闭工程工作区')} closeDisabled={closing} />
         <nav className="workbench-toolbar workbench-view-tabs" aria-label={t('工程视图')}>
           <button disabled={organizerDirty||forgeDirty||terminalUnsettled} className={tab==='terminals'?'quiet-button is-active':'quiet-button'} onClick={()=>setTab('terminals')}>{t('终端')}</button>
           <button disabled={organizerDirty||forgeDirty||terminalUnsettled} className={tab==='launcher'?'quiet-button is-active':'quiet-button'} onClick={()=>setTab('launcher')}>{t('项目启动器')}</button>
@@ -197,27 +221,30 @@ export function WorkspaceWorkbench({ threadId, projectPath, members, bindLeaveGu
           <button type="button" className={tab==='forge'?'quiet-button is-active':'quiet-button'} disabled={organizerDirty} onClick={()=>setTab('forge')}>{t('仓库面板')}</button>
         </nav>
         {showFiles && <div className="workbench-toolbar workbench-file-actions">
+          <strong className="workbench-file-heading"><Files size={15}/>{t('工程文件')}</strong>
+          <button type="button" className={searchVisible?'quiet-button is-active':'quiet-button'} onClick={()=>setSearchVisible(value=>!value)}><FileSearch size={14}/>{t(searchVisible?'文件树':'搜索文件')}</button>
+          <button type="button" className="quiet-button" onClick={()=>setTab('trash')}><Trash2 size={14}/>{t('回收站')}</button>
+          <span className="workbench-toolbar-spacer"/>
           <button type="button" className="quiet-button" disabled={busy} onClick={() => void operation(() => loadDirectory(''))} aria-label={t('刷新工程')}><RefreshCw size={14} /></button>
           <button type="button" className="quiet-button" disabled={busy} onClick={() => {setCreation('file');setName('')}}><Plus size={14} />{t('新文件')}</button>
           <button type="button" className="quiet-button" disabled={busy} onClick={() => {setCreation('directory');setName('')}}><FolderPlus size={14} />{t('新目录')}</button>
         </div>}
-        {error && <p className="workbench-error" role="alert">{error}</p>}
-        {(showFiles || draftRestoreError || draftStatus.issue || draftStatus.pending) && <div className="workbench-toolbar"><span role="status">{t(!draftStatus.ready?'正在恢复工程编辑草稿':draftStatus.saving?'正在保存编辑草稿':draftStatus.pending?'原编辑草稿等待补存':'编辑草稿已保存')}</span>{(draftRestoreError||draftStatus.issue)&&<span role="alert" className="workbench-error">{draftRestoreError||draftStatus.issue}</span>}{!draftStatus.ready&&<button className="quiet-button" type="button" disabled={busy} onClick={()=>setDraftReadAttempt(value=>value+1)}>{t('重新读取编辑草稿')}</button>}{draftStatus.pending&&<button className="quiet-button" type="button" disabled={draftStatus.saving||busy} onClick={()=>void editorDrafts.flush().catch(error=>setError(String(error)))}>{t('原样补存')}</button>}{draftStatus.issue&&<button className="quiet-button" type="button" disabled={busy||draftStatus.saving} onClick={()=>void editorDrafts.readHost().then(setHostDraft).catch(error=>setError(String(error)))}>{t('查看主机草稿')}</button>}<button className="quiet-button" type="button" disabled={busy||!draftStatus.ready} onClick={()=>void editorDrafts.copies().then(value=>{setDraftCopies(value.items);setDraftCopiesNext(value.next)}).catch(error=>setError(String(error)))}>{t('取回保留的编辑副本')}</button></div>}
-        {draftCopies&&<details className="workbench-draft-comparison" open><summary>{t('本机保留的编辑副本')}</summary><p>{t('取回只替换编辑器中的草稿，不会写回工程文件。当前输入也会另存为副本。')}</p>{draftCopies.map((copy,index)=><div className="workbench-toolbar" key={copy.key}><span>{t('副本')} {index+1} · {copy.documentCount} {t('个文件')} · {copy.paths.join(' · ')}</span><button className="quiet-button" type="button" disabled={busy||draftStatus.saving} onClick={()=>void editorDrafts.restoreCopy(copy.key).then(value=>{acceptRestoredDraft(value);setDraftCopies(null)}).catch(error=>setError(String(error)))}>{t('把这份副本放回编辑器')}</button></div>)}{!draftCopies.length&&<p>{t('当前没有保留的编辑副本。')}</p>}{draftCopiesNext&&<button className="quiet-button" type="button" onClick={()=>void editorDrafts.copies(draftCopiesNext).then(value=>{setDraftCopies(previous=>[...(previous??[]),...value.items]);setDraftCopiesNext(value.next)}).catch(error=>setError(String(error)))}>{t('加载更多副本')}</button>}<button className="quiet-button" type="button" onClick={()=>setDraftCopies(null)}>{t('收起副本列表')}</button></details>}
-        {hostDraft&&<details className="workbench-draft-comparison" open><summary>{t('主机当前草稿')}</summary>{hostDraft.value?.documents.map(item=><details key={item.path}><summary>{item.path}</summary><pre>{item.text}</pre></details>)}<button className="quiet-button" type="button" disabled={busy||draftStatus.saving} onClick={()=>void editorDrafts.useHostVersion().then(value=>{acceptRestoredDraft(value);setHostDraft(null)}).catch(error=>setError(String(error)))}>{t('保留本机副本并使用主机草稿')}</button><button className="quiet-button" type="button" onClick={()=>setHostDraft(null)}>{t('继续保留当前输入')}</button></details>}
+        {error && <div className="workbench-notice" role="alert"><AlertCircle size={16}/><p>{error}</p><button type="button" className="quiet-button" onClick={()=>setError(null)}>{t('收起')}</button></div>}
+        {(showFiles || draftRestoreError || draftStatus.issue || draftStatus.pending) && <details className="workbench-draft-status" open={Boolean(!draftStatus.ready || draftRestoreError || draftStatus.issue || draftStatus.pending)}><summary>{t(!draftStatus.ready?'正在读取编辑草稿':draftStatus.saving?'正在保存编辑草稿':draftStatus.pending?'编辑草稿需要处理':'草稿与恢复')}</summary><div className="workbench-toolbar"><span role="status">{t(!draftStatus.ready?'正在恢复工程编辑草稿':draftStatus.saving?'正在保存编辑草稿':draftStatus.pending?'原编辑草稿等待补存':'编辑草稿已保存')}</span>{(draftRestoreError||draftStatus.issue)&&<span role="alert" className="workbench-error">{draftRestoreError||draftStatus.issue}</span>}{!draftStatus.ready&&<button className="quiet-button" type="button" disabled={busy} onClick={()=>setDraftReadAttempt(value=>value+1)}>{t('重新读取编辑草稿')}</button>}{draftStatus.pending&&<button className="quiet-button" type="button" disabled={draftStatus.saving||busy} onClick={()=>void editorDrafts.flush().catch(error=>setError(readErrorMessage(error)))}>{t('原样补存')}</button>}{draftStatus.issue&&<button className="quiet-button" type="button" disabled={busy||draftStatus.saving} onClick={()=>void editorDrafts.readHost().then(setHostDraft).catch(error=>setError(readErrorMessage(error)))}>{t('查看主机草稿')}</button>}<button className="quiet-button" type="button" disabled={busy||!draftStatus.ready} onClick={()=>void editorDrafts.copies().then(value=>{setDraftCopies(value.items);setDraftCopiesNext(value.next)}).catch(error=>setError(readErrorMessage(error)))}>{t('取回保留的编辑副本')}</button></div></details>}
+        {draftCopies&&<details className="workbench-draft-comparison" open><summary>{t('本机保留的编辑副本')}</summary><p>{t('取回只替换编辑器中的草稿，不会写回工程文件。当前输入也会另存为副本。')}</p>{draftCopies.map((copy,index)=><div className="workbench-toolbar" key={copy.key}><span>{t('副本')} {index+1} · {copy.documentCount} {t('个文件')} · {copy.paths.join(' · ')}</span><button className="quiet-button" type="button" disabled={busy||draftStatus.saving} onClick={()=>void editorDrafts.restoreCopy(copy.key).then(value=>{acceptRestoredDraft(value);setDraftCopies(null)}).catch(error=>setError(readErrorMessage(error)))}>{t('把这份副本放回编辑器')}</button></div>)}{!draftCopies.length&&<p>{t('当前没有保留的编辑副本。')}</p>}{draftCopiesNext&&<button className="quiet-button" type="button" onClick={()=>void editorDrafts.copies(draftCopiesNext).then(value=>{setDraftCopies(previous=>[...(previous??[]),...value.items]);setDraftCopiesNext(value.next)}).catch(error=>setError(readErrorMessage(error)))}>{t('加载更多副本')}</button>}<button className="quiet-button" type="button" onClick={()=>setDraftCopies(null)}>{t('收起副本列表')}</button></details>}
+        {hostDraft&&<details className="workbench-draft-comparison" open><summary>{t('主机当前草稿')}</summary>{hostDraft.value?.documents.map(item=><details key={item.path}><summary>{item.path}</summary><pre>{item.text}</pre></details>)}<button className="quiet-button" type="button" disabled={busy||draftStatus.saving} onClick={()=>void editorDrafts.useHostVersion().then(value=>{acceptRestoredDraft(value);setHostDraft(null)}).catch(error=>setError(readErrorMessage(error)))}>{t('保留本机副本并使用主机草稿')}</button><button className="quiet-button" type="button" onClick={()=>setHostDraft(null)}>{t('继续保留当前输入')}</button></details>}
         {creation && <form className="workbench-toolbar" onSubmit={event => {event.preventDefault();void create()}}><input className="workspace-field" aria-label={t('相对路径')} value={name} onChange={event => setName(event.target.value)} placeholder={t('相对工程的路径')} /><button className="primary-button" type="submit" disabled={busy || !name.trim()}>{t('确认')}</button><button className="quiet-button" type="button" onClick={() => setCreation(null)}>{t('取消')}</button></form>}
-        {showFiles && <div className="workbench-toolbar"><button className={searchVisible?'quiet-button is-active':'quiet-button'} onClick={()=>setSearchVisible(value=>!value)}>{t(searchVisible?'文件树':'搜索文件')}</button><button className="quiet-button" onClick={()=>setTab('trash')}>{t('回收站')}</button></div>}
         <PanelGroup direction="horizontal" className="workbench-panels">
-          {showFiles && <Panel id="workbench-files" order={1} defaultSize={23} minSize={15}><div className="workbench-tree codeg-native-rich">{searchVisible?<WorkspaceFileSearch threadId={threadId} onOpen={(path,line)=>void openFile(path,line)}/>:<FileTree expanded={expanded} selectedPath={selected ?? undefined} onSelect={path => { if (![...directories.values()].some(directory => directory.entries.some(entry => entry.path === path && (entry.directory || entry.link)))) void openFile(path) }} onExpandedChange={next => {
+          {showFiles && <Panel id="workbench-files" order={1} defaultSize={23} minSize={15}><div className="workbench-tree codeg-native-rich">{searchVisible?<WorkspaceFileSearch threadId={threadId} onOpen={(path,line)=>void openFile(path,line)}/>:<FileTree expanded={expanded} selectedPath={previewPath ?? selected ?? undefined} onSelect={path => { if (![...directories.values()].some(directory => directory.entries.some(entry => entry.path === path && (entry.directory || entry.link)))) void openFile(path) }} onExpandedChange={next => {
             setExpanded(next); void operation(async () => { for (const path of next) if (!directories.has(path)) await loadDirectory(path) })
           }}>{renderTree('')}</FileTree>}</div></Panel>}
           {showFiles && <PanelResizeHandle className="workbench-resize" />}
           <Panel id="workbench-content" order={2} minSize={25}>
             {merge ? <WorkspaceMergeEditor {...merge} onClose={()=>setMerge(null)} onApply={text=>{setDocuments(previous=>previous.map(document=>document.path===merge.path?{...document,text}:document));setMerge(null)}} /> : tab==='terminals'?<WorkspaceTerminals projectPath={projectPath} onUnsettledChange={setTerminalUnsettled}/> : tab==='launcher'?<ProjectLauncher threadId={threadId} onCreated={async()=>{await loadDirectory('')}}/> : tab==='trash'?<WorkspaceTrash threadId={threadId} onRestored={async()=>{for(const path of ['',...expanded])await loadDirectory(path).catch(()=>{})}}/> : tab==='history'?<NativeHistoryWorkbench threadId={threadId} onOpenConversation={onOpenNativeConversation?async reference=>{guard();const opened=await onOpenNativeConversation(reference);if(opened)setOpen(false);return opened}:undefined}/> : tab==='office'&&officePath?<OfficePreviewWorkbench key={officePath} threadId={threadId} path={officePath}/> : tab==='computer'?<ComputerWorkbench key={threadId} threadId={threadId}/> : tab==='browser'?<BrowserWorkbench key={threadId} threadId={threadId}/> : tab==='forge'?<ForgeWorkbench threadId={threadId} projectPath={projectPath} members={members} onDirtyChange={setForgeDirty}/> : tab==='organizer'?<WorkspaceOrganizer threadId={threadId} onDirtyChange={setOrganizerDirty} onDirectoryAliasesApplied={()=>{setDirectories(new Map());setExpanded(new Set());void loadDirectory('')}} onUseMessage={onQuickMessage?text=>{if(dirty||!onQuickMessage(text))return false;setOpen(false);return true}:undefined}/> : tab === 'files' ? <div className="workbench-editor">
-              {current ? <><div className="workbench-toolbar"><span title={current.path}>{current.path}</span><button type="button" className="quiet-button" disabled={busy || current.text === current.saved} onClick={() => void save()}><Save size={14} />{t('保存')}</button><button type="button" className="quiet-button" disabled={busy || dirty} onClick={() => {setCreation('rename');setName(current.path)}}>{t('重命名')}</button><button type="button" className="quiet-button" disabled={busy} onClick={()=>void openMerge()}>{t('解决冲突')}</button></div>
+              {previewSource && filePreviewApi ? <><div className="workbench-toolbar workbench-preview-heading"><span title={previewPath!}>{previewPath}</span><div ref={setPreviewActions} className="workbench-preview-actions"/><button type="button" className="quiet-button" onClick={()=>setPreviewPath(null)}>{t('返回编辑器')}</button></div><PinnedFilePreview api={filePreviewApi} source={previewSource} resolvedTheme={filePreview?.resolvedTheme ?? 'night'} actionsHost={previewActions}/></> : current ? <><div className="workbench-toolbar"><span title={current.path}>{current.path}</span><button type="button" className="quiet-button" disabled={busy || current.text === current.saved} onClick={() => void save()}><Save size={14} />{t('保存')}</button><button type="button" className="quiet-button" disabled={busy || dirty} onClick={() => {setCreation('rename');setName(current.path)}}>{t('重命名')}</button><button type="button" className="quiet-button" disabled={busy} onClick={()=>void openMerge()}>{t('解决冲突')}</button></div>
                 {current.conflict && <div className="workbench-error" role="alert">{t('文件在外部发生变化，本地修改已保留。')}<button className="quiet-button" disabled={busy} onClick={()=>void mergeExternal()}>{t('比较并合并外部版本')}</button></div>}
                 <SplitTabDeck key={`${threadId}:${projectPath}`} scopeKey={`${threadId}:${projectPath}`} items={documents.map(item=>({id:item.path,label:item.path,dirty:item.text!==item.saved}))} selected={selected} disabled={busy||!draftStatus.ready} restoredLayout={restoredSplitLayout.current} restoreToken={restoreToken} onLayoutChange={setSplitLayout} onSelect={setSelected} onClose={closeDocument} renderBody={(item,visible)=>{const document=documents.find(row=>row.path===item.id)!;return <WorkspaceCodeEditor path={document.path} text={document.text} visible={visible} line={document.path===selected?cursorLine:undefined} onSave={()=>void save(document.path)} onChange={text=>setDocuments(previous=>previous.map(row=>row.path===document.path?{...row,text}:row))}/>}}/>
-              </> : <div className="workbench-empty">{t('从文件树打开文件')}</div>}
+              </> : <div className="workbench-empty workbench-files-empty"><Files size={30}/><strong>{t('选择文件，开始查看')}</strong><p>{t('点击左侧文件。图片和网页会显示预览，文本文件可直接编辑。')}</p></div>}
             </div> : <div className="workbench-git">
               <div className="workbench-toolbar"><select className="workspace-field" aria-label={t('Git 视图')} value={gitView} onChange={event => {setGitView(event.target.value);void readGit(event.target.value)}}>{Object.entries({status:'变更',diff:'工作区 Diff',diff_staged:'暂存 Diff',log:'历史',branches:'分支',stash:'Stash',remotes:'远程',worktrees:'Worktree',conflicts:'冲突',tags:'标签',reflog:'引用历史'}).map(([value,label]) => <option key={value} value={value}>{t(label)}</option>)}</select><button className="quiet-button" type="button" disabled={busy} onClick={() => void readGit()}>{t('刷新')}</button></div>
               {gitResult && (gitView==='diff'||gitView==='diff_staged') && gitResult.success ? <div className="workbench-git-output codeg-native-rich"><UnifiedDiffPreview diffText={gitResult.output} clickableFilePath={false} /></div> : gitResult?<WorkspaceGitViews key={gitVersion} threadId={threadId} view={gitView} result={gitResult} disabled={busy} onAction={prepareGitAction} onDirtyChange={setGitDirty} onOpenFile={path=>{if(!gitDirty)void openFile(path)}}/>:<div className="workbench-empty">{t('选择 Git 视图')}</div>}
