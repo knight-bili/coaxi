@@ -1,7 +1,7 @@
 import {ConfigurationCacheCleanup} from './ConfigurationCacheCleanup'
 import {useEffect,useRef,useState} from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
-import {AppDialogContent,AppDialogHeader} from './AppDialog'
+import {AppDialogContent,AppDialogHeader, AppDialogFooter } from './AppDialog'
 import {useConfigurationSyncHost} from './configuration-sync-host'
 import {useUiText} from './interface-language'
 import {newCommandId} from '../../shared/command-id'
@@ -24,6 +24,6 @@ export function ConfigurationSyncSettings({remoteReady}:{remoteReady:boolean}):R
       {(error||saved.state.lastError)&&<div role="alert"><p>{t('配置同步尚未完成，原设置和任务记录已保留。')}</p><details><summary>{t('查看原因')}</summary><p>{error??saved.state.lastError}</p></details></div>}
     </>:<p>{t('请在这台主机的桌面设置中管理配置自动上传。')}</p>}
     <ConfigurationCacheCleanup revision={saved.revision} disabled={busy||dirty||!!active}/>
-    <Dialog.Root open={archive!==null} onOpenChange={open=>{if(!open&&!busy)setArchive(null)}}><Dialog.Portal><Dialog.Overlay className="dialog-overlay"/><AppDialogContent width="compact"><AppDialogHeader title={t('保留原记录并继续新上传')} description={t('会保留原任务的未决记录，之后的上传使用新任务编号。远端可能已有原副本。')} closeDisabled={busy}/><div className="dialog-actions"><button className="quiet-button" disabled={busy} onClick={()=>setArchive(null)}>{t('返回')}</button><button className="quiet-button" disabled={busy} onClick={()=>void run(async()=>{if(!archive||!native)return;const value=await native.request<SyncSettings>({operation:'config_archive',expectedRevision:archive.revision,commandId:archive.id,confirmed:true});if(value)accept(value);setArchive(null)})}>{t('确认保留记录并继续')}</button></div></AppDialogContent></Dialog.Portal></Dialog.Root>
+    <Dialog.Root open={archive!==null} onOpenChange={open=>{if(!open&&!busy)setArchive(null)}}><Dialog.Portal><Dialog.Overlay className="dialog-overlay"/><AppDialogContent width="compact"><AppDialogHeader title={t('保留原记录并继续新上传')} description={t('会保留原任务的未决记录，之后的上传使用新任务编号。远端可能已有原副本。')} closeDisabled={busy}/><AppDialogFooter><button className="quiet-button" disabled={busy} onClick={()=>setArchive(null)}>{t('返回')}</button><button className="quiet-button" disabled={busy} onClick={()=>void run(async()=>{if(!archive||!native)return;const value=await native.request<SyncSettings>({operation:'config_archive',expectedRevision:archive.revision,commandId:archive.id,confirmed:true});if(value)accept(value);setArchive(null)})}>{t('确认保留记录并继续')}</button></AppDialogFooter></AppDialogContent></Dialog.Portal></Dialog.Root>
   </section>
 }

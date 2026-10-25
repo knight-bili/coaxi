@@ -5,7 +5,7 @@ import type { EditorRecoveryCopy } from './workbench-editor-recovery'
 import * as Dialog from '@radix-ui/react-dialog'
 import { Files, FolderPlus, GitBranch, Plus, RefreshCw, Save } from 'lucide-react'
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels'
-import { AppDialogContent, AppDialogHeader } from './AppDialog'
+import { AppDialogContent, AppDialogHeader, AppDialogBody, AppDialogFooter } from './AppDialog'
 import { useThreadClient } from './camp-client'
 import { useUiText } from './interface-language'
 import { useShortcutActions } from './useShortcutActions'
@@ -240,9 +240,6 @@ export function WorkspaceWorkbench({ threadId, projectPath, members, bindLeaveGu
       if(action.operation==='trash'){setDocuments(previous=>previous.filter(document=>document.path!==action.path&&!document.path.startsWith(`${action.path}/`)));setSelected(previous=>previous&&(previous===action.path||previous.startsWith(`${action.path}/`))?null:previous)}
       setDirectories(new Map());await loadDirectory('');for(const path of expanded)await loadDirectory(path).catch(()=>{})
     }}/>}
-    <Dialog.Root open={preview !== null} onOpenChange={next => {if(!next && !busy)setPreview(null)}}><Dialog.Portal><Dialog.Overlay className="dialog-overlay" /><AppDialogContent tone="attention"><AppDialogHeader title={t('确认 Git 操作')} description={t('仅对当前预览的工程状态执行；工程变化时需重新预览。')} closeDisabled={busy} />
-      <pre className="workbench-confirm">{preview?.arguments.join(' ')}{preview?.cleanPreview ? `\n${preview.cleanPreview}` : ''}</pre>
-      <button className="quiet-button" type="button" disabled={busy} onClick={() => void operation(async () => { if(!preview)return; const result=await client.request<GitResult>('workbench.git.execute',{...preview.request,expectedRevision:preview.revision,confirmed:true});setGitResult(result);setPreview(null);if(result.success){if(preview.request.action==='commit'){setGitVersion(value=>value+1);setGitDirty(false);setMessage('')}const fresh=await client.request<GitResult>('workbench.git.read',{scope,action:gitView});setGitResult(fresh)}else setError(result.error) })}>{t('确认执行')}</button>
-    </AppDialogContent></Dialog.Portal></Dialog.Root>
+    <Dialog.Root open={preview !== null} onOpenChange={next => {if(!next && !busy)setPreview(null)}}><Dialog.Portal><Dialog.Overlay className="dialog-overlay" /><AppDialogContent tone="attention"><AppDialogHeader title={t('确认 Git 操作')} description={t('仅对当前预览的工程状态执行；工程变化时需重新预览。')} closeDisabled={busy} /><AppDialogBody className="app-dialog-stack"><pre className="workbench-confirm">{preview?.arguments.join(' ')}{preview?.cleanPreview ? `\n${preview.cleanPreview}` : ''}</pre></AppDialogBody><AppDialogFooter><button className="quiet-button" type="button" disabled={busy} onClick={() => void operation(async () => { if(!preview)return; const result=await client.request<GitResult>('workbench.git.execute',{...preview.request,expectedRevision:preview.revision,confirmed:true});setGitResult(result);setPreview(null);if(result.success){if(preview.request.action==='commit'){setGitVersion(value=>value+1);setGitDirty(false);setMessage('')}const fresh=await client.request<GitResult>('workbench.git.read',{scope,action:gitView});setGitResult(fresh)}else setError(result.error) })}>{t('确认执行')}</button></AppDialogFooter></AppDialogContent></Dialog.Portal></Dialog.Root>
   </>
 }

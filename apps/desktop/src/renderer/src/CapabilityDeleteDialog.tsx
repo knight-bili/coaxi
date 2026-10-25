@@ -1,6 +1,6 @@
 import { useRef } from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
-import { AppDialogContent, AppDialogFooter, AppDialogHeader } from './AppDialog'
+import { AppDialogBody, AppDialogContent, AppDialogFooter, AppDialogHeader } from './AppDialog'
 import { CapabilityError } from './CapabilityWorkspace'
 import { UiText, uiAttribute } from './interface-language'
 
@@ -51,7 +51,7 @@ export function CapabilityDeleteDialog({
           }}
         >
           <AppDialogHeader title={title} description={description} closeDisabled={busy} />
-          <CapabilityError error={error} />
+          <AppDialogBody><CapabilityError error={error} /></AppDialogBody>
           <AppDialogFooter>
             <Dialog.Close asChild>
               <button ref={cancel} className="quiet-button" type="button" disabled={busy}><UiText zh={"取消"} /></button>

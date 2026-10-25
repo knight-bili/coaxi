@@ -763,6 +763,10 @@ html[lang="en"] .settings-app-update-badge svg { display: none; }
 .approve-button,
 .safe-button,
 .icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   min-height: 32px;
   border-radius: 7px;
   padding: 7px 12px;
@@ -782,6 +786,7 @@ html[lang="en"] .settings-app-update-badge svg { display: none; }
 .approve-button { border: 1px solid var(--info); color: var(--info); background: var(--info-soft); }
 .icon-button { display: grid; width: 32px; padding: 0; place-items: center; border: 0; background: transparent; font-size: 18px; }
 .icon-button:hover:not(:disabled) { background: var(--surface-muted); }
+:is(.primary-button,.quiet-button,.danger-button,.approve-button,.safe-button) > svg { display: block; flex-shrink: 0; }
 
 .bootstrap-shell {
   display: grid;
@@ -4908,7 +4913,7 @@ body:has(.composer-image-attachment[data-context-open="true"]) .image-action-not
 .diagnostics-state p { margin: 5px 0 0; color: var(--muted); font-size: 10.5px; line-height: 1.6; }
 .diagnostics-state-error > span:first-child { color: var(--danger); background: var(--danger-soft); }
 .diagnostics-spinner { display: inline-block; width: 14px; height: 14px; flex: 0 0 14px; border: 2px solid color-mix(in srgb, currentColor 28%, transparent); border-top-color: currentColor; border-radius: 50%; animation: diagnostics-spin 850ms linear infinite; }
-.primary-button .diagnostics-spinner { margin-right: 7px; vertical-align: -2px; }
+.primary-button .diagnostics-spinner { flex-shrink: 0; }
 @keyframes diagnostics-spin { to { transform: rotate(360deg); } }
 .diagnostics-running, .diagnostics-recovery, .diagnostics-notice { display: flex; gap: 10px; align-items: center; padding: 10px 13px; border: 0; border-radius: 10px; color: var(--info); background: var(--info-soft); }
 .diagnostics-running > div, .diagnostics-recovery > div, .diagnostics-notice > div { display: grid; min-width: 0; gap: 2px; }
@@ -8882,6 +8887,15 @@ html[lang="en"] .runtime-parameter-picker-menu:has(.permission-menu-guidance) { 
 .app-dialog-title-row h2 { margin:0; font:600 19px/1.45 -apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-serif; letter-spacing:-.015em; }
 .app-dialog-description { margin:8px 0 0; color:var(--muted); font-size:12.5px; line-height:1.7; }
 :root .app-dialog-body { padding:2px 24px 0; border:0; gap:16px; }
+.app-dialog-body:empty,.app-dialog-body.app-dialog-stack:empty { display:none; }
+.app-dialog-body.app-dialog-stack { display:grid; align-content:start; gap:16px; }
+.app-dialog-stack > :is(p,ul,ol,details) { margin-block:0; }
+.app-dialog-stack > label { display:grid; min-width:0; gap:6px; font-size:13px; }
+.app-dialog-stack > label:has(>input:is([type=checkbox],[type=radio])) { display:flex; align-items:center; gap:8px; }
+.app-dialog-stack > label > :is(input:not([type=checkbox],[type=radio]),select,textarea) { width:100%; min-width:0; }
+.app-dialog-field-caption { display:inline-flex; align-items:center; gap:6px; }
+.app-dialog-field-caption>svg { display:block; flex:none; }
+:root .app-dialog > .app-dialog-body:last-child { padding-bottom:24px; }
 :root .app-dialog-body .field-label { margin-top:0; gap:6px; }
 :root .app-dialog-body .field-label > small { font-size:11px; }
 .app-dialog-footer { display:flex; flex-wrap:wrap; align-items:center; gap:12px; padding:20px 24px 22px; }

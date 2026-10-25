@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
-import { AppDialogContent, AppDialogFooter, AppDialogHeader } from './AppDialog'
+import { AppDialogContent, AppDialogFooter, AppDialogHeader, AppDialogBody } from './AppDialog'
 import { useThreadClient } from './camp-client'
 import { uiAttribute as t, useInterfaceLanguage } from './interface-language'
 import { readErrorMessage } from './error-message'
@@ -38,17 +38,13 @@ export function MemberSessionReset({ campId, member, onClose, onNotify }: {
   }
   return <Dialog.Root open onOpenChange={open => { if (!open && !pending) onClose() }}>
     <Dialog.Portal><Dialog.Overlay className="dialog-overlay app-dialog-overlay"/>
-      <AppDialogContent aria-describedby="member-session-reset-description">
-        <AppDialogHeader title={t('重置{0}的会话', member.displayName)} descriptionId="member-session-reset-description"
-          description={t('下次启动将建立新的队员会话，不再续接原生会话历史。Camp 中的消息保留。')}/>
-        {loading ? <p>{t('正在读取会话…')}</p> : session?.active ? <p>{t('队员正在执行任务，请结束后再重置会话。')}</p>
+      <AppDialogContent aria-describedby="member-session-reset-description"><AppDialogHeader title={t('重置{0}的会话', member.displayName)} descriptionId="member-session-reset-description"
+          description={t('下次启动将建立新的队员会话，不再续接原生会话历史。Camp 中的消息保留。')}/><AppDialogBody className="app-dialog-stack">{loading ? <p>{t('正在读取会话…')}</p> : session?.active ? <p>{t('队员正在执行任务，请结束后再重置会话。')}</p>
           : !session && !error ? <p>{t('该队员尚未建立会话。')}</p> : null}
-        {error && <p className="environment-error" role="alert">{error}</p>}
-        <AppDialogFooter>
+        {error && <p className="environment-error" role="alert">{error}</p>}</AppDialogBody><AppDialogFooter>
           <button type="button" className="quiet-button" disabled={pending} onClick={onClose}>{t('取消')}</button>
           <button type="button" className="danger-button" disabled={loading || pending || !session || session.active} onClick={() => void reset()}>{pending ? t('正在重置…') : t('重置会话')}</button>
-        </AppDialogFooter>
-      </AppDialogContent>
+        </AppDialogFooter></AppDialogContent>
     </Dialog.Portal>
   </Dialog.Root>
 }

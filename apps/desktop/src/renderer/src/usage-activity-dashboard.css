@@ -1,4 +1,4 @@
-.runtime-monitoring-switcher{display:flex;flex-direction:column;flex:1;min-height:0;height:100%;overflow:hidden}.runtime-monitoring-switcher>.runtime-monitoring{flex:1;min-height:0;height:auto}
+.runtime-monitoring-switcher{display:flex;flex-direction:column;flex:1;min-height:0;height:100%;overflow:hidden}.runtime-monitoring-switcher>.runtime-monitoring{flex:1;min-height:0;height:auto;align-content:start;overflow:auto}
 .usage-monitoring-tabs{display:flex;gap:4px;flex:none;border-bottom:1px solid var(--line);padding:4px 20px;background:var(--surface)}
 .usage-monitoring-tabs button{border:0;background:transparent;border-radius:999px;padding:7px 14px;color:var(--muted);font:inherit;cursor:pointer}
 .usage-monitoring-tabs button[aria-selected=true]{background:var(--surface-selected);color:var(--ink)}

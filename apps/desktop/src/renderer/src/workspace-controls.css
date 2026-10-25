@@ -40,7 +40,7 @@ textarea.workspace-field { min-height: 84px; resize: vertical; }
 .forge-form p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.7; }
 .forge-form .workbench-toolbar { margin: 0; padding: 0; border: 0; }
 .app-dialog .forge-form { min-height: 0; padding: 0 24px 24px; overflow: auto; }
-.app-dialog-body .forge-form, .app-dialog form .forge-form { padding: 0; overflow: visible; }
+.app-dialog-body .forge-form, .app-dialog form .forge-form:not(.app-dialog-body) { padding: 0; overflow: visible; }
 .workbench-toolbar .workspace-field { min-width: 0; }
 .dialog-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 8px; padding-top: 12px; }
 .dialog-actions :is(.quiet-button,.primary-button) { display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
