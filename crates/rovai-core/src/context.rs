@@ -15120,6 +15120,7 @@ mod slow_tests {
             \n\
             - Use the local `rovai` CLI for built-in operations. Use `rovai --help` to discover commands and exact command help for syntax; reuse help already in context.\n\
             - `rovai send` publishes one public Thread message. When your responsibility has a Thread-visible answer, result, status or summary, send it successfully before ending; Runtime output is not a Thread message.\n\
+            - Deliver generated images and other requested files with repeated `--file <path>` options on that `rovai send`. Tool previews and local paths are not published attachments. Confirm every requested file was attached successfully before saying it is shown or delivered; report any missing file instead.\n\
             - Use `--public-only` when no Agent should wake. Otherwise, `--to` may schedule work. Address Agents only for a concrete new action or blocking question, never as CC, courtesy replies or repeated conclusions.\n\
             - Thread messages are already visible to the User. Use `--to-user` only for a new decision, answer or action needed from them, or an explicitly requested important-result notification.\n\
             "
@@ -15287,6 +15288,14 @@ mod slow_tests {
             "../../../integration/proposals/native-delegation-r1-contract.json"
         ))
         .unwrap();
+        // The common CLI contract is asserted above. Keep the historical R1
+        // delegation vectors unchanged while comparing its role-specific rules.
+        let without_file_delivery_guidance = |text: String| {
+            text.replace(
+                "\n- Deliver generated images and other requested files with repeated `--file <path>` options on that `rovai send`. Tool previews and local paths are not published attachments. Confirm every requested file was attached successfully before saying it is shown or delivered; report any missing file instead.",
+                "",
+            )
+        };
         let base_runtime: FrozenAgentRuntimeConfig =
             serde_json::from_value(snapshot.effective_config["runtime"].clone()).unwrap();
         {
@@ -15353,7 +15362,9 @@ mod slow_tests {
                     for feishu in [false, true] {
                         for mission in [false, true] {
                             assert_eq!(
-                                build_session_charter(&snapshot, feishu, mission).unwrap(),
+                                without_file_delivery_guidance(
+                                    build_session_charter(&snapshot, feishu, mission).unwrap()
+                                ),
                                 approved["after"]["public_charters_enabled"]
                                     [format!("feishu_{feishu}_mission_{mission}")]
                                 .as_str()
