@@ -42,13 +42,14 @@ export function AppHeader({
   const previewVisible = Boolean(filePreview?.paneVisible)
   const title = threadTitle ?? uiAttribute('正在打开对话')
   const pendingApprovals = thread?.approvals.filter((approval) => approval.status === 'pending').length ?? 0
-  const previewControls = filePreview && <div className="file-preview-toggle-group">
-    {filePreview.activeTab?.kind !== 'mission_activity' && filePreview.activeTab?.kind !== 'execution' && <FileFindButton />}
-    <button className="file-preview-toggle" type="button" aria-label={previewVisible ? uiAttribute("收起文件预览") : uiAttribute("展开文件预览")}
+  const previewControls = (filePreview || thread) && <div className="file-preview-toggle-group">
+    {filePreview && filePreview.activeTab?.kind !== 'mission_activity' && filePreview.activeTab?.kind !== 'execution' && <FileFindButton />}
+    {thread && <span data-engineering-entry={thread.thread.id} />}
+    {filePreview && <button className="file-preview-toggle file-preview-toggle-fallback" type="button" aria-label={previewVisible ? uiAttribute("收起文件预览") : uiAttribute("展开文件预览")}
       title={previewVisible ? uiAttribute("收起文件预览") : uiAttribute("展开文件预览")} aria-expanded={previewVisible} aria-controls="file-preview-pane"
       onClick={previewVisible ? filePreview.hidePane : filePreview.showPane}>
       <PanelToggleIcon side="right" visible={previewVisible}/>
-    </button>
+    </button>}
   </div>
   return (
     <header
@@ -84,7 +85,6 @@ export function AppHeader({
           )}
         </div>
         <div className="camp-detail-entry-host" ref={detailEntryHostRef} />
-        {thread && <span data-engineering-entry={thread.thread.id} />}
         {conversationActions}
         {previewTabsInPane && previewControls}
       </div>

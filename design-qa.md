@@ -263,3 +263,5 @@ final result: source drawer and isolated component verified; complete viewer and
 final result: approved layout implemented; isolated App checks verified; live template network acceptance incomplete
 
 2026-10-25追加：按用户Codex截图将工程放大/恢复和右栏收放集中右上固定图标组；左侧复用已有独立收放。新增4项工程Entry回归通过，组件未因收放卸载。
+
+2026-10-25入口去重：顶部仅保留最右侧侧栏开关，工程和预览共用；预览标签栏内补返回工程入口避免鼠标不可达。真实隔离App截图确认单一可见开关、相同编辑器恢复、实际中文文件预览和980宽无整页溢出；不改变其他页面的fallback。

@@ -8,6 +8,10 @@ import { ThreadClientProvider, type ThreadClient } from './camp-client'
 import { desktopThreadClient } from './desktop-camp-client'
 import { WorkspaceWorkbenchEntry } from './WorkspaceWorkbenchEntry'
 import { dispatchShortcutAction } from './shortcut-action-driver'
+import type {FilePreviewContextValue} from './FilePreviewContext'
+
+const previewState=vi.hoisted(()=>({value:null as FilePreviewContextValue|null}))
+vi.mock('./FilePreviewContext',()=>({useOptionalFilePreview:()=>previewState.value}))
 
 vi.mock('./WorkspaceWorkbench', async () => {
   const React = await import('react')
@@ -28,7 +32,7 @@ vi.mock('./WorkspaceWorkbench', async () => {
   }
 })
 
-afterEach(cleanup)
+afterEach(()=>{cleanup();previewState.value=null})
 
 function createClient(request: (method: CoreMethod, params?: unknown) => Promise<unknown>): ThreadClient {
   const client = Object.create(desktopThreadClient) as ThreadClient
@@ -51,6 +55,30 @@ function ownerTree(client: ThreadClient, threadId: string) {
 }
 
 describe('WorkspaceWorkbenchEntry 快捷键', () => {
+  it('预览标签区可以返回工程，不必增加第二个顶栏开关',async()=>{
+    const host=document.createElement('span');host.dataset.engineeringPreviewEntry='global';document.body.append(host)
+    previewState.value={paneVisible:true,activeTab:{kind:'file'}} as unknown as FilePreviewContextValue
+    const request=vi.fn(async()=>({workspaceRoot:'/verified'}))
+    try{
+      const view=render(ownerTree(createClient(request),'thread-a'))
+      fireEvent.click(view.getByRole('button',{name:'打开工程区'}))
+      const editor=await view.findByTestId('workbench')
+      expect(editor.closest('aside')?.hidden).toBe(false)
+      expect(request).toHaveBeenCalledOnce()
+    }finally{host.remove()}
+  })
+  it('统一入口收起文件预览后恢复原预览，不误开工程或重新读取目录',()=>{
+    const hidePane=vi.fn(),showPane=vi.fn(),request=vi.fn(),client=createClient(request)
+    previewState.value={paneVisible:true,activeTab:{kind:'file'},hidePane,showPane} as unknown as FilePreviewContextValue
+    const view=render(ownerTree(client,'thread-a'))
+    fireEvent.click(view.getByRole('button',{name:'收起文件预览'}))
+    expect(hidePane).toHaveBeenCalledOnce()
+    previewState.value={...previewState.value,paneVisible:false}
+    view.rerender(ownerTree(client,'thread-a'))
+    fireEvent.click(view.getByRole('button',{name:'展开文件预览'}))
+    expect(showPane).toHaveBeenCalledOnce()
+    expect(request).not.toHaveBeenCalled()
+  })
   it('右上固定控制保持可达，放大、恢复与收起不重建编辑器', async () => {
     const host=document.createElement('span');host.dataset.engineeringEntry='thread-a';document.body.append(host)
     try{

@@ -9,6 +9,10 @@
 .engineering-toggle.is-active,.workbench-icon.is-active{background:var(--surface-selected);color:var(--ink)}
 .engineering-controls{display:inline-flex;align-items:center;gap:4px;flex:none;position:relative}
 .engineering-controls[data-floating]{position:absolute;top:8px;right:8px;z-index:30}
+.file-preview-toggle-group:has(>[data-engineering-entry]>.engineering-controls)>.file-preview-toggle-fallback{display:none}
+.file-preview-toggle-group .engineering-toggle{width:28px;height:28px;padding:5px!important}
+.engineering-preview-switch{display:inline-flex;align-items:center;flex:none;-webkit-app-region:no-drag}
+.engineering-preview-switch:empty{display:none}
 .engineering-entry-error{position:absolute;right:12px;top:100%;max-width:360px;padding:12px;background:var(--surface-raised);border:1px solid var(--line);z-index:40;color:var(--danger)}
 .engineering-layout [hidden]{display:none!important}
 @media(max-width:1050px){.engineering-pane{position:absolute;inset:0 0 0 auto;width:min(90%,760px);z-index:20;box-shadow:-12px 0 32px #0004}.engineering-divider{display:none}.engineering-layout.is-maximized>.engineering-pane{width:100%}}

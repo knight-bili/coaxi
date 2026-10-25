@@ -256,6 +256,7 @@ export function FilePreviewTabs({ compact = false }: { compact?: boolean } = {})
         <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m9.5 3.5-4.5 4.5 4.5 4.5M5 8h7" /></svg>
         <span><UiText zh={"返回会话"} /></span>
       </button>
+      <span className="engineering-preview-switch" data-engineering-preview-entry={domScope??'global'} />
       <div className={`file-preview-tab-rail${edges.left ? ' can-scroll-left' : ''}${edges.right ? ' can-scroll-right' : ''}`}>
         <button
           ref={leftButtonRef}
