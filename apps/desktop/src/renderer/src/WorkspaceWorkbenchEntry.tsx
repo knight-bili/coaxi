@@ -1,6 +1,6 @@
 import {createContext,useContext,useId,useLayoutEffect,useMemo,useRef,useState,type ComponentProps,type ReactNode} from 'react'
 import {createPortal} from 'react-dom'
-import {LoaderCircle,PanelRightClose,PanelRightOpen} from 'lucide-react'
+import {LoaderCircle,Maximize2,Minimize2,PanelRight} from 'lucide-react'
 import {readErrorMessage} from './error-message'
 import {useThreadClient} from './camp-client'
 import {WorkspaceWorkbench} from './WorkspaceWorkbench'
@@ -51,13 +51,17 @@ export function WorkspaceWorkbenchEntry({children,headerEntry=true,enabled=true,
   }
   useShortcutActions({toggle_terminal:()=>{void open(true)},toggle_aux_panel:()=>{if(visible)collapse();else void open()}},{priority:25,active:()=>enabled&&!document.querySelector('.launcher-web-page, [role="dialog"][aria-modal="true"], [role="menu"][data-state="open"]')})
   const rememberWidth=(value:number):void=>{const next=Math.min(75,Math.max(30,value));setWidth(next);try{localStorage.setItem('coaxi.engineering.width',String(next))}catch{}}
-  const control=<button ref={trigger} type="button" className={`quiet-button engineering-toggle${visible?' is-active':''}`} disabled={busy} title={t(busy?'正在核对工程…':visible?'收起工程区':'展开工程区')} aria-label={t(visible?'收起工程区':'展开工程区')} aria-expanded={visible} aria-controls={paneId} onClick={()=>visible?collapse():void open()}>{busy?<LoaderCircle size={18}/>:visible?<PanelRightClose size={18}/>:<PanelRightOpen size={18}/>}</button>
+  const control=<div className="engineering-controls" role="group" aria-label={t('工程区显示')} data-floating={!host||undefined}>
+    {visible&&<button type="button" className="quiet-button engineering-toggle" title={t(maximized?'恢复并排':'放大工程区')} aria-label={t(maximized?'恢复并排':'放大工程区')} aria-controls={paneId} onClick={()=>setMaximized(value=>!value)}>{maximized?<Minimize2 size={18}/>:<Maximize2 size={18}/>}</button>}
+    <button ref={trigger} type="button" className={`quiet-button engineering-toggle${visible?' is-active':''}`} disabled={busy} title={t(busy?'正在核对工程…':visible?'收起工程区':'展开工程区')} aria-label={t(visible?'收起工程区':'展开工程区')} aria-expanded={visible} aria-controls={paneId} onClick={()=>visible?collapse():void open()}>{busy?<LoaderCircle size={18}/>:<PanelRight size={18}/>}</button>
+  </div>
   return <EngineeringDockContext.Provider value={{opened,collapse}}><div ref={shell} className={`engineering-layout${visible?' is-open':''}${visible&&maximized?' is-maximized':''}`} style={{'--engineering-width':`${width}%`} as React.CSSProperties}>
-    <div className="engineering-conversation" hidden={visible&&maximized}>{children}{!host&&control}{issue?.owner===owner&&<div role="alert" className="workbench-notice">{issue.message}</div>}</div>
+    <div className="engineering-conversation" hidden={visible&&maximized}>{children}{issue?.owner===owner&&<div role="alert" className="workbench-notice">{issue.message}</div>}</div>
+    {!host&&control}
     {host&&createPortal(<>{control}{issue?.owner===owner&&<span role="alert" className="engineering-entry-error">{issue.message}</span>}</>,host)}
     <div className="engineering-divider" hidden={!visible||maximized} role="separator" tabIndex={0} aria-label={t('调整工程区宽度')} aria-orientation="vertical" aria-valuemin={30} aria-valuemax={75} aria-valuenow={Math.round(width)} onDoubleClick={()=>rememberWidth(54)} onKeyDown={event=>{if(event.key==='ArrowLeft'||event.key==='ArrowRight'){event.preventDefault();rememberWidth(width+(event.key==='ArrowLeft'?2:-2))}if(event.key==='Home')rememberWidth(54)}} onPointerDown={event=>{if(event.button!==0)return;event.preventDefault();event.currentTarget.setPointerCapture(event.pointerId)}} onPointerMove={event=>{if(!event.currentTarget.hasPointerCapture(event.pointerId)||!shell.current)return;const rect=shell.current.getBoundingClientRect();rememberWidth((rect.right-event.clientX)/rect.width*100)}}/>
     <aside id={paneId} className="engineering-pane" aria-label={t('工程区')} hidden={!visible}>
-      {active&&<WorkspaceWorkbench {...props} projectPath={active.root} initiallyOpen visible={visible} terminalRequest={terminalRequest} maximized={maximized} onMaximize={()=>setMaximized(value=>!value)} onClosed={()=>collapse(true)}/>}
+      {active&&<WorkspaceWorkbench {...props} projectPath={active.root} initiallyOpen visible={visible} terminalRequest={terminalRequest} onClosed={()=>collapse(true)}/>}
     </aside>
   </div></EngineeringDockContext.Provider>
 }

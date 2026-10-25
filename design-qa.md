@@ -261,3 +261,5 @@ final result: source drawer and isolated component verified; complete viewer and
 独立启动器曾受Windows主窗口菜单grid影响而全内容裁剪，已用专属surface布局修复；新增背景改用已有语义Token。现不存在这一裁剪。shadcn真实CLI仍因官方色板网络超时未完成；旧三项Electron fixture未通过，其中bridge在基线同样失败。未将受阻项记为通过，未宣称全产品/UI或真实模型通过。
 
 final result: approved layout implemented; isolated App checks verified; live template network acceptance incomplete
+
+2026-10-25追加：按用户Codex截图将工程放大/恢复和右栏收放集中右上固定图标组；左侧复用已有独立收放。新增4项工程Entry回归通过，组件未因收放卸载。

@@ -51,6 +51,24 @@ function ownerTree(client: ThreadClient, threadId: string) {
 }
 
 describe('WorkspaceWorkbenchEntry 快捷键', () => {
+  it('右上固定控制保持可达，放大、恢复与收起不重建编辑器', async () => {
+    const host=document.createElement('span');host.dataset.engineeringEntry='thread-a';document.body.append(host)
+    try{
+      const view=render(ownerTree(createClient(vi.fn(async()=>({workspaceRoot:'/verified'}))),'thread-a'))
+      fireEvent.click(view.getByRole('button',{name:'展开工程区'}))
+      const editor=await view.findByTestId('workbench')
+      const controls=view.getByRole('group',{name:'工程区显示'})
+      expect(controls.parentElement).toBe(host)
+      fireEvent.click(view.getByRole('button',{name:'放大工程区'}))
+      expect(view.container.querySelector('.engineering-layout.is-maximized')).toBeTruthy()
+      expect(host.querySelector('button[aria-label="恢复并排"]')).toBeTruthy()
+      fireEvent.click(view.getByRole('button',{name:'恢复并排'}))
+      fireEvent.click(view.getByRole('button',{name:'收起工程区'}))
+      expect(editor.closest('aside')?.hidden).toBe(true)
+      expect(host.querySelector('button[aria-label="展开工程区"]')).toBeTruthy()
+      expect(view.getByTestId('workbench')).toBe(editor)
+    }finally{host.remove()}
+  })
   it('收起保留同一编辑器，重新展开核验目录，目录变更拒绝迁移旧草稿', async () => {
     const roots=['/verified/first','/verified/first','/verified/changed']
     const request=vi.fn(async(method:CoreMethod,params?:unknown)=>{
