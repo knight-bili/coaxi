@@ -27,7 +27,7 @@ pub struct IpcRequest {
 impl ProcessConfig {
     pub async fn request(&self, operation: &str, params: Value) -> Result<Value> {
         let request = IpcRequest {
-            schema_version: 1,
+            schema_version: self.schema_version,
             bridge_instance_id: self.bridge_instance_id.clone(),
             secret: self.secret.clone(),
             operation: operation.to_owned(),
@@ -73,7 +73,7 @@ fn load(path: &Path) -> Result<ProcessConfig> {
     config.core_endpoint.validate()?;
     uuid::Uuid::parse_str(&config.bridge_instance_id)?;
     ensure!(
-        config.schema_version == 1
+        matches!(config.schema_version, 1 | 2)
             && config.secret.len() == 64
             && config.secret.bytes().all(|byte| byte.is_ascii_hexdigit()),
         "interaction.invalid_config"
@@ -251,6 +251,17 @@ async fn invoke(
     name: &str,
     arguments: Value,
 ) -> Result<Value> {
+    if name == DIAGNOSTIC_NAME {
+        ensure!(
+            config.schema_version == 2
+                && arguments.as_object().is_some_and(|value| value.is_empty()),
+            "invalid_arguments"
+        );
+        let value = config.request("diagnose", json!({})).await?;
+        return Ok(
+            json!({"content":[{"type":"text","text":serde_json::to_string(&value)?}],"structuredContent":value,"isError":false}),
+        );
+    }
     let call = json!({"schemaVersion":1,"bridgeInstanceId":config.bridge_instance_id,"bridgeCallId":call_id,"rpcId":rpc_id,"nativeToolCallId":null,"toolName":name,"argumentsDigest":super::broker::digest(&arguments)?,"arguments":arguments});
     config.request("call", call).await?;
     let deadline = tokio::time::Instant::now() + std::time::Duration::from_secs(600);

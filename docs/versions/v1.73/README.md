@@ -11,6 +11,10 @@ last_updated: 2026-10-19
 
 # v1.73：Core 独立帮手
 
+2026-10-27 用户批准的 Coaxi 设置排版 r2 与原生路由／只读自查 r1 已实施。设置沿现有页面统一展开入口，保留三张主题卡与真实数据；运行监控只调整页头／滚动，聊天补充和引用收进 + 菜单，记忆页减轻背景。原工具参数、资源权限和旧 Run 冻结目录保留；新诊断区分配置、冻结、发现、成功调用和授权，无法核实的阶段保持 unknown/null。精确前后合同及验证边界见[独立说明 r1](model-context-change-coaxi-native-routing.md)。这是本地候选更新，真实模型 Gate、完整原 App 对照和一期正式资格不由本轮单元／组件检查代替。
+
+本批九范围影响：Version lifecycle 保持 v1.73；Decisions／Architecture 沿原 Core 单一权威；Contracts 新增仅当前 Run 的只读诊断和 v2 stdio，旧 v1 保持；UI 为批准的入口／排版微调；Runtime Activity 无新增映射；Runtime compatibility 仍 candidate；Documentation routing 由本页链接独立说明；Root README 产品范围不变。
+
 原生后台阅读及四个User读取入口已编码：注册层持有真实worker名额至结束，关闭/迟到/重试和空闲租约分离于Runtime控制；每次取页重新解析原Core引用，后代保留原root归属。Native/Web名单和闭合Web投影已接。[本批记录](../../../integration/execution/i04-native-reader-result.json)区分源码/组件资格与实际Core/Host/网络/原UI资格，I04仍开发中。
 
 原生完整投影已有私有签名快照及UTF8窗口，整份消息、长工具JSON、嵌套元数据、摘要和统计不逐字段裁剪。引用绑定冻结身份与来源摘要，仅为核实后代签发入口；首次发现/hash及序列化可取消。最低extended编译和精确原文件owner通过，[本批证据](../../../integration/execution/i04-native-snapshot-result.json)不包含该批当时未接的后台任务注册/销毁和每页Core重授权，现已按上方新记录接入源码；其旧分项记录仍不授予原只读UI或实际网络资格，I04全范围不变。

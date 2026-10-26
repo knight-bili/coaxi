@@ -2,7 +2,7 @@
 use super::*;
 use crate::interaction_tools::{
     self as tools,
-    broker::{Broker, digest},
+    broker::{digest, Broker},
     stdio::IpcRequest,
 };
 use anyhow::ensure;
@@ -73,9 +73,6 @@ impl Core {
         execution: &AgentRunExecution,
     ) -> Result<Option<tools::Policy>> {
         let policy = self.interaction_tools.policies.read()?;
-        if !policy.features(&execution.agent_id).any() {
-            return Ok(None);
-        }
         let capability =
             AgentRuntimeAdapterRegistry::default().mcp_projection_for_runtime(&execution.runtime);
         if capability.external_mcp_projection
@@ -127,7 +124,43 @@ impl Core {
         };
         let features = policy.features(&execution.agent_id);
         let bridge_id = uuid::Uuid::new_v4().to_string();
-        let catalog_digest = digest(&json!({"schemaVersion":1,"tools":features.catalog()}))?;
+        // Persist catalog selection separately so an existing frozen run never gains tools.
+        let selection_dir = self.data_dir.join("interaction-tools/run-catalogs");
+        prepare_private_directory(&selection_dir)?;
+        let selection_path = selection_dir.join(format!("{}.json", execution.agent_run_id));
+        let database = self.database.lock().await;
+        let has_manifest: bool = database.connection().query_row(
+            "SELECT EXISTS(SELECT 1 FROM context_manifest WHERE agent_run_id=?1)",
+            [&execution.agent_run_id],
+            |row| row.get(0),
+        )?;
+        drop(database);
+        let diagnostics = if selection_path.exists() {
+            let file = crate::platform::private_storage::open_private_read_file(&selection_path)?;
+            ensure!(
+                file.metadata()?.len() <= 1024,
+                "interaction.invalid_catalog_selection"
+            );
+            let value: Value = serde_json::from_reader(file)?;
+            ensure!(
+                value["schemaVersion"] == 1 && value["diagnostics"].is_boolean(),
+                "interaction.invalid_catalog_selection"
+            );
+            value["schemaVersion"] == 1 && value["diagnostics"] == true
+        } else {
+            let enabled = !has_manifest;
+            atomic_write_private_json(
+                &selection_path,
+                &json!({"schemaVersion":1,"diagnostics":enabled}),
+            )?;
+            enabled
+        };
+        let catalog = if diagnostics {
+            features.catalog_with_diagnostics()
+        } else {
+            features.catalog()
+        };
+        let catalog_digest = digest(&json!({"schemaVersion":1,"tools":catalog}))?;
         let policy_digest = digest(&serde_json::to_value(policy)?)?;
         let catalog_policy_digest =
             digest(&json!({"catalogDigest":catalog_digest,"policyDigest":policy_digest}))?;
@@ -156,8 +189,13 @@ impl Core {
                 })
             })
             .collect();
-        ensure!(usable.len() == 1, "desktop_unavailable");
-        let binding = json!({"schemaVersion":1,"bridgeInstanceId":bridge_id,"coreInstanceId":self.interaction_tools.core_instance(),"desktopPeerId":usable[0]["desktopPeerId"],"scope":{"threadId":execution.camp_id,"conversationId":if scope_kind=="public"{None}else{Some(execution.conversation_id.as_str())},"scopeKind":scope_kind},"agentId":execution.agent_id,"agentRunId":execution.agent_run_id,"executionEpoch":execution.execution_epoch,"nativeBindingId":credential.native_binding_id,"nativeBindingGeneration":credential.native_binding_generation,"nativeSessionId":credential.native_session_id,"membershipGeneration":membership,"permissionRevision":policy.revision,"catalogDigest":catalog_digest,"policyDigest":policy_digest,"expiresAt":(Utc::now()+chrono::Duration::minutes(120)).to_rfc3339(),"revocationEpoch":0});
+        ensure!(diagnostics || usable.len() == 1, "desktop_unavailable");
+        let desktop_peer_id = if usable.len() == 1 {
+            usable[0]["desktopPeerId"].clone()
+        } else {
+            json!(uuid::Uuid::new_v4().to_string())
+        };
+        let binding = json!({"schemaVersion":1,"bridgeInstanceId":bridge_id,"coreInstanceId":self.interaction_tools.core_instance(),"desktopPeerId":desktop_peer_id,"scope":{"threadId":execution.camp_id,"conversationId":if scope_kind=="public"{None}else{Some(execution.conversation_id.as_str())},"scopeKind":scope_kind},"agentId":execution.agent_id,"agentRunId":execution.agent_run_id,"executionEpoch":execution.execution_epoch,"nativeBindingId":credential.native_binding_id,"nativeBindingGeneration":credential.native_binding_generation,"nativeSessionId":credential.native_session_id,"membershipGeneration":membership,"permissionRevision":policy.revision,"catalogDigest":catalog_digest,"policyDigest":policy_digest,"expiresAt":(Utc::now()+chrono::Duration::minutes(120)).to_rfc3339(),"revocationEpoch":0});
         require_binding(&database, &self.interaction_tools, &binding)?;
         let secret = self.interaction_tools.register(binding.clone(), features)?;
         drop(database);
@@ -186,7 +224,7 @@ impl Core {
         anyhow::bail!("runtime_unavailable");
         let mut listener = LocalIpcListener::bind(&endpoint)?;
         let config = crate::interaction_tools::stdio::ProcessConfig {
-            schema_version: 1,
+            schema_version: if diagnostics { 2 } else { 1 },
             core_endpoint: endpoint.clone(),
             bridge_instance_id: bridge_id.clone(),
             secret: secret.clone(),
@@ -435,7 +473,7 @@ impl Core {
         }
     }
     pub(super) async fn interaction_ipc(&self, request: IpcRequest) -> Result<Value> {
-        ensure!(request.schema_version == 1, "transport_failed");
+        ensure!(matches!(request.schema_version, 1 | 2), "transport_failed");
         let broker = &self.interaction_tools;
         let binding = broker.authenticated_binding(&request.bridge_instance_id, &request.secret)?;
         let database = self.database.lock().await;
@@ -444,6 +482,58 @@ impl Core {
             "catalog" => Ok(json!(
                 broker.catalog(&request.bridge_instance_id, &request.secret)?
             )),
+            "diagnose" => {
+                ensure!(
+                    request.schema_version == 2
+                        && request
+                            .params
+                            .as_object()
+                            .is_some_and(|params| params.is_empty()),
+                    "invalid_arguments"
+                );
+                let mut result = broker.diagnose(&request.bridge_instance_id, &request.secret)?;
+                let policy = crate::conversation_tools::policy::get(database.connection())?;
+                let assigned =
+                    serde_json::to_value(policy.member_flags(string(&binding, "agentId")?))?;
+                let global = serde_json::to_value(policy.global_flags)?;
+                let raw: String = database.connection().query_row("SELECT effective_config_json FROM agent_run WHERE id=?1 AND execution_epoch=?2", rusqlite::params![string(&binding,"agentRunId")?,binding["executionEpoch"].as_i64()], |row|row.get(0))?;
+                let config: Value = serde_json::from_str(&raw)?;
+                for (name, flag) in [
+                    ("work_task", "workTasks"),
+                    ("automation", "automations"),
+                    ("session_info", "sessionInfo"),
+                    ("ask_user", "question"),
+                ] {
+                    let row = result["capabilities"]
+                        .as_array_mut()
+                        .context("transport_failed")?
+                        .iter_mut()
+                        .find(|row| row["name"] == name)
+                        .context("transport_failed")?;
+                    row["assigned"] = assigned[flag].clone();
+                    row["frozenForCurrentRun"] = config
+                        .pointer("/runtime/conversationTools/flags")
+                        .map(|flags| flags[flag].clone())
+                        .unwrap_or(json!(false));
+                    row["reason"] = json!(if global[flag] != true {
+                        "disabled_global"
+                    } else if assigned[flag] != true {
+                        "disabled_member"
+                    } else if row["frozenForCurrentRun"] != true {
+                        "not_delivered"
+                    } else {
+                        "unknown"
+                    });
+                    row["recovery"] = json!(if assigned[flag] != true {
+                        vec!["open_member_tools"]
+                    } else if row["frozenForCurrentRun"] != true {
+                        vec!["start_new_run"]
+                    } else {
+                        vec!["retry_discovery"]
+                    });
+                }
+                Ok(result)
+            }
             "call" => {
                 ensure!(
                     request.params["bridgeInstanceId"] == request.bridge_instance_id,

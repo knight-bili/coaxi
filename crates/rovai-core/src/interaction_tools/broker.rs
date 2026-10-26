@@ -13,6 +13,9 @@ struct Bridge {
     features: Features,
     secret: String,
     revoked: bool,
+    diagnostics: bool,
+    discovered: bool,
+    successful_tools: std::collections::BTreeSet<String>,
 }
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
@@ -57,6 +60,201 @@ pub fn digest(value: &Value) -> Result<String> {
 }
 fn same_scope(left: &Value, right: &Value) -> bool {
     left["scope"] == right["scope"] && left["agentId"] == right["agentId"]
+}
+
+fn successful_native_result(name: &str, result: &Value) -> bool {
+    !result.is_null()
+        && result["error"].is_null()
+        && result["isError"] != true
+        && (result.pointer("/action/effect").is_none()
+            || result.pointer("/action/effect") == Some(&json!("confirmed")))
+        && !(name == "browser_list_tabs" && result["note"].is_string())
+        && (name != "computer_verify"
+            || result.pointer("/verify/status") == Some(&json!("satisfied")))
+}
+
+#[cfg(test)]
+mod diagnostic_tests {
+    use super::*;
+
+    fn fixture(features: Features, diagnostic: bool) -> (Broker, String, String) {
+        let root = std::env::temp_dir().join(format!("coaxi-diagnostic-{}", uuid::Uuid::new_v4()));
+        let broker = Broker::new(&root);
+        broker
+            .policies
+            .replace(
+                0,
+                Policy {
+                    schema_version: 1,
+                    revision: 1,
+                    members: vec![MemberPolicy {
+                        agent_id: "member-a".into(),
+                        features,
+                    }],
+                },
+            )
+            .unwrap();
+        let id = uuid::Uuid::new_v4().to_string();
+        let catalog = if diagnostic {
+            features.catalog_with_diagnostics()
+        } else {
+            features.catalog()
+        };
+        let binding = json!({"schemaVersion":1,"bridgeInstanceId":id,"coreInstanceId":broker.core_instance(),"desktopPeerId":uuid::Uuid::new_v4().to_string(),"scope":{"threadId":"thread-a","conversationId":null,"scopeKind":"public"},"agentId":"member-a","agentRunId":"run-a","executionEpoch":1,"nativeBindingId":"binding-a","nativeBindingGeneration":1,"nativeSessionId":null,"membershipGeneration":1,"permissionRevision":1,"catalogDigest":digest(&json!({"schemaVersion":1,"tools":catalog})).unwrap(),"policyDigest":digest(&json!({})).unwrap(),"expiresAt":(Utc::now()+chrono::Duration::minutes(5)).to_rfc3339(),"revocationEpoch":0});
+        let secret = broker.register(binding, features).unwrap();
+        (broker, id, secret)
+    }
+
+    fn row(value: &Value, name: &str) -> Value {
+        value["capabilities"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|row| row["name"] == name)
+            .unwrap()
+            .clone()
+    }
+
+    #[test]
+    fn disabled_features_keep_readonly_diagnosis_without_claiming_success() {
+        let (broker, id, secret) = fixture(Features::default(), true);
+        assert_eq!(broker.catalog(&id, &secret).unwrap().len(), 1);
+        let result = broker.diagnose(&id, &secret).unwrap();
+        assert_eq!(result["capabilities"].as_array().unwrap().len(), 11);
+        assert_eq!(row(&result, "browser")["reason"], "disabled_member");
+        assert_eq!(row(&result, "browser")["successfulCallObserved"], false);
+        assert!(broker.diagnose(&id, "wrong-secret").is_err());
+        assert!(!result.to_string().contains(&secret));
+        assert!(!result.to_string().contains("member-a"));
+    }
+
+    #[test]
+    fn legacy_catalog_is_not_upgraded_and_new_catalog_keeps_old_arguments() {
+        let features = Features {
+            browser: true,
+            browser_eval: true,
+            computer: true,
+            computer_launch: true,
+            computer_clipboard: true,
+        };
+        let (broker, id, secret) = fixture(features, false);
+        let old = broker.catalog(&id, &secret).unwrap();
+        assert_eq!(old.len(), 31);
+        assert!(broker.diagnose(&id, &secret).is_err());
+        let new = features.catalog_with_diagnostics();
+        assert_eq!(new.len(), 32);
+        for (left, right) in old.iter().zip(new.iter()) {
+            assert_eq!(left["name"], right["name"]);
+            assert_eq!(left["inputSchema"], right["inputSchema"]);
+        }
+    }
+
+    #[test]
+    fn grants_are_scoped_and_eval_requires_control_before_code_approval() {
+        let (broker, id, secret) = fixture(
+            Features {
+                browser: true,
+                browser_eval: true,
+                ..Default::default()
+            },
+            true,
+        );
+        let binding = broker.authenticated_binding(&id, &secret).unwrap();
+        let peer_id = binding["desktopPeerId"].as_str().unwrap().to_owned();
+        let grant_id = uuid::Uuid::new_v4().to_string();
+        let grant = json!({"schemaVersion":1,"grantId":grant_id,"scope":binding["scope"],"agentId":"member-a","desktopPeerId":peer_id,"targetKind":"browser_tab","targetId":"tab-a","origin":"https://example.test","level":"read","grantGeneration":1,"expiresAt":(Utc::now()+chrono::Duration::minutes(5)).to_rfc3339()});
+        validate_shape("resourceGrant", &grant).unwrap();
+        {
+            let mut state = broker.locked().unwrap();
+            state
+                .peers
+                .insert(peer_id.clone(), json!({"expiresAt":binding["expiresAt"]}));
+            state.grants.insert(grant_id.clone(), grant.clone());
+            let mut foreign = grant.clone();
+            foreign["agentId"] = json!("other-member");
+            foreign["level"] = json!("control");
+            state.grants.insert("foreign".into(), foreign);
+        }
+        broker.catalog(&id, &secret).unwrap();
+        let result = broker.diagnose(&id, &secret).unwrap();
+        assert_eq!(row(&result, "browser")["resourceAccess"], "read");
+        assert_eq!(row(&result, "browser")["discovered"], true);
+        assert_eq!(row(&result, "browser")["successfulCallObserved"], false);
+        assert_eq!(row(&result, "browser_eval")["reason"], "control_required");
+        broker.locked().unwrap().grants.get_mut(&grant_id).unwrap()["level"] = json!("control");
+        assert_eq!(
+            row(&broker.diagnose(&id, &secret).unwrap(), "browser_eval")["reason"],
+            "approval_required"
+        );
+        broker.locked().unwrap().grants.clear();
+        assert_eq!(
+            row(&broker.diagnose(&id, &secret).unwrap(), "browser")["resourceAccess"],
+            "none"
+        );
+    }
+
+    #[test]
+    fn missing_desktop_fails_calls_immediately_instead_of_leaving_prepared_work() {
+        let (broker, id, secret) = fixture(
+            Features {
+                browser: true,
+                ..Default::default()
+            },
+            true,
+        );
+        let args = json!({});
+        let call = json!({"schemaVersion":1,"bridgeInstanceId":id,"bridgeCallId":uuid::Uuid::new_v4().to_string(),"rpcId":"1","nativeToolCallId":null,"toolName":"browser_list_tabs","arguments":args,"argumentsDigest":digest(&args).unwrap()});
+        assert!(broker
+            .enqueue(call, &secret)
+            .unwrap_err()
+            .to_string()
+            .contains("desktop_unavailable"));
+        assert!(broker.locked().unwrap().ledger.is_empty());
+        assert_eq!(
+            row(&broker.diagnose(&id, &secret).unwrap(), "browser")["recovery"],
+            json!(["start_new_run"])
+        );
+    }
+
+    #[test]
+    fn completed_transport_refusals_and_unverified_effects_are_not_success() {
+        assert!(!successful_native_result(
+            "browser_snapshot",
+            &json!({"error":"browser_tab_missing"})
+        ));
+        assert!(!successful_native_result(
+            "computer_click",
+            &json!({"error":"computer_paused"})
+        ));
+        assert!(!successful_native_result(
+            "computer_click",
+            &json!({"action":{"effect":"unverifiable"}})
+        ));
+        assert!(!successful_native_result(
+            "browser_list_tabs",
+            &json!({"tabs":[],"note":"unsupported"})
+        ));
+        assert!(!successful_native_result(
+            "computer_verify",
+            &json!({"verify":{"status":"unknown"}})
+        ));
+        assert!(!successful_native_result(
+            "computer_verify",
+            &json!({"verify":{"status":"unsatisfied"}})
+        ));
+        assert!(successful_native_result(
+            "computer_verify",
+            &json!({"verify":{"status":"satisfied"}})
+        ));
+        assert!(successful_native_result(
+            "browser_snapshot",
+            &json!({"snapshot":{"text":"example"}})
+        ));
+        assert!(successful_native_result(
+            "computer_click",
+            &json!({"action":{"effect":"confirmed"}})
+        ));
+    }
 }
 
 impl Broker {
@@ -137,8 +335,10 @@ impl Broker {
     pub fn register(&self, binding: Value, features: Features) -> Result<String> {
         validate_shape("binding", &binding)?;
         features.validate()?;
+        let diagnostics = binding["catalogDigest"]
+            == digest(&json!({"schemaVersion":1,"tools":features.catalog_with_diagnostics()}))?;
         ensure!(
-            features.any()
+            (features.any() || diagnostics)
                 && binding["coreInstanceId"] == self.core_instance
                 && unexpired(&binding),
             "binding_changed"
@@ -174,6 +374,9 @@ impl Broker {
                 features,
                 secret: secret.clone(),
                 revoked: false,
+                diagnostics,
+                discovered: false,
+                successful_tools: Default::default(),
             },
         );
         Ok(secret)
@@ -207,8 +410,97 @@ impl Broker {
     }
     pub fn catalog(&self, id: &str, secret: &str) -> Result<Vec<Value>> {
         self.authenticated_binding(id, secret)?;
+        let mut state = self.locked()?;
+        let bridge = self.current_bridge(&state, id)?;
+        state
+            .bridges
+            .get_mut(id)
+            .context("binding_changed")?
+            .discovered = true;
+        Ok(if bridge.diagnostics {
+            bridge.features.catalog_with_diagnostics()
+        } else {
+            bridge.features.catalog()
+        })
+    }
+    /// Only aggregate booleans and access levels for this authenticated run.
+    pub fn diagnose(&self, id: &str, secret: &str) -> Result<Value> {
+        self.authenticated_binding(id, secret)?;
         let state = self.locked()?;
-        Ok(self.current_bridge(&state, id)?.features.catalog())
+        let bridge = self.current_bridge(&state, id)?;
+        ensure!(bridge.diagnostics, "interaction_disabled");
+        let peer_ready = state
+            .peers
+            .get(text(&bridge.binding, "desktopPeerId")?)
+            .is_some_and(unexpired);
+        let mut capabilities = Vec::new();
+        for (name, enabled, prefix) in [
+            ("desktop", bridge.features.computer, "computer_"),
+            ("browser", bridge.features.browser, "browser_"),
+            ("browser_eval", bridge.features.browser_eval, "browser_eval"),
+        ] {
+            let grants: Vec<_> = state
+                .grants
+                .values()
+                .filter(|grant| {
+                    unexpired(grant)
+                        && same_scope(grant, &bridge.binding)
+                        && grant["desktopPeerId"] == bridge.binding["desktopPeerId"]
+                        && if name == "desktop" {
+                            grant["targetKind"] != "browser_tab"
+                        } else {
+                            grant["targetKind"] == "browser_tab"
+                        }
+                })
+                .collect();
+            let read = grants.iter().any(|grant| grant["level"] == "read");
+            let control = grants.iter().any(|grant| grant["level"] == "control");
+            let access = if read && control {
+                "mixed"
+            } else if control {
+                "control"
+            } else if read {
+                "read"
+            } else {
+                "none"
+            };
+            let success = bridge.successful_tools.iter().any(|tool| {
+                if name == "browser_eval" {
+                    tool == prefix
+                } else {
+                    tool.starts_with(prefix)
+                }
+            });
+            let (reason, recovery) = if !enabled {
+                ("disabled_member", vec!["open_member_tools"])
+            } else if !peer_ready {
+                ("transport_unavailable", vec!["start_new_run"])
+            } else if grants.is_empty() {
+                ("grant_required", vec!["share_resource"])
+            } else if name == "browser_eval" && !control {
+                ("control_required", vec!["allow_control"])
+            } else if name == "browser_eval" {
+                ("approval_required", vec!["approve_exact_code"])
+            } else {
+                ("ready", vec![])
+            };
+            capabilities.push(json!({"name":name,"assigned":enabled,"frozenForCurrentRun":enabled,"discovered":bridge.discovered && enabled,"successfulCallObserved":success,"resourceAccess":access,"reason":reason,"recovery":recovery}));
+        }
+        for name in [
+            "work_task",
+            "automation",
+            "session_info",
+            "ask_user",
+            "feedback",
+            "delegation",
+            "member_dispatch",
+            "member_info",
+        ] {
+            capabilities.push(json!({"name":name,"assigned":null,"frozenForCurrentRun":null,"discovered":null,"successfulCallObserved":null,"resourceAccess":"not_applicable","reason":"unknown","recovery":["contact_user"]}));
+        }
+        Ok(
+            json!({"schemaVersion":1,"scope":"current_agent_run","connection":"ready","capabilities":capabilities}),
+        )
     }
     pub fn attach_peer(&self, peer: Value) -> Result<Value> {
         validate_shape("desktopPeer", &peer)?;
@@ -541,6 +833,13 @@ impl Broker {
         let name = text(&call, "toolName")?;
         validate_arguments(bridge.features, name, &call["arguments"])?;
         ensure!(
+            state
+                .peers
+                .get(text(&bridge.binding, "desktopPeerId")?)
+                .is_some_and(unexpired),
+            "desktop_unavailable"
+        );
+        ensure!(
             digest(&call["arguments"])? == text(&call, "argumentsDigest")?,
             "invalid_arguments"
         );
@@ -754,6 +1053,19 @@ impl Broker {
         }
         self.persist(&ledger)?;
         state.ledger.insert(id.to_owned(), ledger.clone());
+        if valid
+            && ledger.receipt["state"] == "completed"
+            && successful_native_result(text(&ledger.call, "toolName")?, result)
+        {
+            if let Some(bridge) = state
+                .bridges
+                .get_mut(text(&ledger.binding, "bridgeInstanceId")?)
+            {
+                bridge
+                    .successful_tools
+                    .insert(text(&ledger.call, "toolName")?.to_owned());
+            }
+        }
         Ok(ledger.receipt)
     }
     pub fn result(

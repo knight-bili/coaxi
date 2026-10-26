@@ -1,8 +1,8 @@
 //! 客户确认的浏览器与电脑工具接线 r1。目录关闭时不改变既有模型输入。
 //! 工具定义来自固定 Codeg 源，版权与 Apache 2.0 NOTICE 由移植清单保留。
-use anyhow::{Context, Result, ensure};
+use anyhow::{ensure, Context, Result};
 use serde::{Deserialize, Serialize};
-use serde_json::{Value, json};
+use serde_json::{json, Value};
 use std::{
     collections::BTreeSet,
     path::{Path, PathBuf},
@@ -21,6 +21,13 @@ pub const MAX_IMAGE_BYTES: usize = 8 * 1024 * 1024;
 pub const MAX_SAFE_INTEGER: u64 = 9_007_199_254_740_991;
 static CATALOG: LazyLock<Vec<Value>> = LazyLock::new(|| {
     serde_json::from_str(include_str!("catalog.json")).expect("frozen interaction catalog")
+});
+static LEGACY_CATALOG: LazyLock<Vec<Value>> = LazyLock::new(|| {
+    serde_json::from_str(include_str!("catalog-v1.json")).expect("legacy interaction catalog")
+});
+pub const DIAGNOSTIC_NAME: &str = "coaxi_diagnose_capabilities";
+static DIAGNOSTIC: LazyLock<Value> = LazyLock::new(|| {
+    serde_json::from_str(include_str!("diagnostic-tool.json")).expect("confirmed diagnostic tool")
 });
 static SCHEMAS: LazyLock<Value> = LazyLock::new(|| {
     serde_json::from_str(include_str!("schemas.json")).expect("frozen interaction shapes")
@@ -69,11 +76,20 @@ impl Features {
         }
     }
     pub fn catalog(self) -> Vec<Value> {
-        CATALOG
+        LEGACY_CATALOG
             .iter()
             .filter(|tool| tool["name"].as_str().is_some_and(|name| self.permits(name)))
             .cloned()
             .collect()
+    }
+    pub fn catalog_with_diagnostics(self) -> Vec<Value> {
+        let mut tools: Vec<Value> = CATALOG
+            .iter()
+            .filter(|tool| tool["name"].as_str().is_some_and(|name| self.permits(name)))
+            .cloned()
+            .collect();
+        tools.push(DIAGNOSTIC.clone());
+        tools
     }
 }
 
