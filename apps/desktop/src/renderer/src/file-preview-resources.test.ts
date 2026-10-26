@@ -57,6 +57,26 @@ function active(session: FilePreviewSession): FilePreviewTabModel {
   return session.getSnapshot().tabs.find(tab => tab.id === session.getSnapshot().activeTabId) as FilePreviewTabModel
 }
 
+it('内嵌文件不保存为顶层页签，关闭工程不会激活它，其他固定预览保留独立资源',async()=>{
+  const {owner}=fixture();owner.activate('a')
+  const session=owner.session('a')
+  const workspace=session.actions.openWorkspace('files')
+  const source={kind:'camp_workspace' as const,threadId:'a',rawReference:'内嵌.txt'}
+  const outcome=await session.actions.open(source,undefined,undefined,{commitOnSuccess:true,previewOnly:true,background:true,embedded:true})
+  expect(outcome.kind).toBe('preview');if(outcome.kind!=='preview')return
+  expect(session.getSnapshot().activeTabId).toBe(workspace)
+  expect(filePreviewSessionStore.get('a')?.tabs.map(tab=>tab.id)).toEqual([workspace])
+  session.actions.close(workspace!)
+  expect(session.getSnapshot().activeTabId).toBeNull()
+  expect(session.getSnapshot().paneVisible).toBe(false)
+  const pinned=await session.actions.open(source,undefined,undefined,{commitOnSuccess:true,previewOnly:true,background:true,revalidateSource:true})
+  expect(pinned.kind).toBe('preview');if(pinned.kind!=='preview')return
+  expect(pinned.tabId).not.toBe(outcome.tabId)
+  session.actions.close(outcome.tabId)
+  expect(session.getSnapshot().tabs.find(tab=>tab.id===pinned.tabId)?.kind).toBe('file')
+  expect(filePreviewSessionStore.get('a')?.tabs.map(tab=>tab.id)).toEqual([pinned.tabId])
+})
+
 it('bounds actual HTML documents across hidden decks and visible mirrors without evicting current readers', () => {
   const { owner } = fixture(), surfaces = Array.from({ length: 9 }, () => ({}))
   const release = surfaces.map(surface => owner.retainHtmlPresentation(surface))

@@ -24,7 +24,8 @@ const WorkbenchPreviewHostContext = createContext<ReadonlyMap<string, HTMLDivEle
 
 function sessionValue(session: FilePreviewSession, resolvedTheme: ResolvedTheme): FilePreviewContextValue {
   const state = session.getSnapshot()
-  return { ...state, ...session.actions, threadId: session.threadId, resolvedTheme, activeTab: state.tabs.find(tab => tab.id === state.activeTabId) ?? null }
+  const tabs=state.tabs.filter(tab=>tab.kind!=='file'||!tab.embedded)
+  return { ...state, tabs, ...session.actions, threadId: session.threadId, resolvedTheme, activeTab: tabs.find(tab => tab.id === state.activeTabId) ?? null }
 }
 
 const RetainedPane = memo(FilePreviewPaneContent)
@@ -199,11 +200,12 @@ export function useExecutionPreviewHost(threadId: string): HTMLDivElement | null
 }
 
 /** A fixed file presentation shares the original Thread session and window resource pool. */
-export function PinnedFilePreview({ api, source, resolvedTheme, actionsHost, onNavigate, onWorkspace }: {
+export function PinnedFilePreview({ api, source, resolvedTheme, actionsHost, onNavigate, onWorkspace, embedded = false }: {
   api: FilePreviewApi; source: RestoreFilePreviewRequest | Extract<import('@contracts').OpenFilePreviewRequest, { kind: 'native_child_file' }>; resolvedTheme: ResolvedTheme
   actionsHost: HTMLElement | null
   onNavigate?: FilePreviewContextValue['open']
   onWorkspace?(tabId: string): Promise<void>
+  embedded?: boolean
 }): React.JSX.Element {
   const resources = useMemo(() => windowFilePreviewResources(api), [api])
   const owner = useRef({}).current, host = useRef<HTMLDivElement>(null), domScope = `file-card-${useId()}`
@@ -232,16 +234,19 @@ export function PinnedFilePreview({ api, source, resolvedTheme, actionsHost, onN
   useEffect(() => {
     if (!armed) return
     let current = true
+    let openedTabId: string | null = null
+    const releaseEmbedded = (): void => {if(openedTabId&&session.getSnapshot().tabs.some(tab=>tab.id===openedTabId&&tab.kind==='file'&&tab.embedded))session.actions.close(openedTabId)}
     pending.current = true; setError(null); setTabId(null)
     // Native snapshots are ephemeral Core grants, never persisted restore paths.
-    void session.actions.open(source, undefined, undefined, { commitOnSuccess: true, previewOnly: source.kind !== 'native_child_file', revalidateSource: true, background: true }).then(outcome => {
-      if (!current) return
+    void session.actions.open(source, undefined, undefined, { commitOnSuccess: true, previewOnly: source.kind !== 'native_child_file', revalidateSource: true, background: true, embedded }).then(outcome => {
+      if(outcome.kind==='preview')openedTabId=outcome.tabId
+      if (!current) {releaseEmbedded();return}
       if (outcome.kind === 'preview') setTabId(outcome.tabId)
       else setError(outcome.kind === 'error' ? outcome.error.message : uiAttribute('无法在这里预览这个文件'))
     }).catch(() => { if (current) setError(uiAttribute('暂时无法读取文件')) })
       .finally(() => { if (current) pending.current = false })
-    return () => { current = false }
-  }, [session, source, retry, armed])
+    return () => { current = false; releaseEmbedded() }
+  }, [session, source, retry, armed, embedded])
   useEffect(() => {
     if (tabId && !tab && !pending.current) { setTabId(null); setRetry(value => value + 1) }
   }, [tabId, tab])

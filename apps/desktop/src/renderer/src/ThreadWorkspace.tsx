@@ -178,7 +178,7 @@ import type { FeedbackMessageSource } from './CardFeedbackFields'
 import { RuntimeInteractionDock } from './RuntimeInteractionDock'
 import { DelegationViewerHost, DelegationChildren } from './DelegationViewer'
 import { NativeSubagentEntries } from './NativeSubagentEntries'
-import { useEngineeringDock, WorkspaceWorkbenchEntry } from './WorkspaceWorkbenchEntry'
+import { WorkspaceWorkbenchEntry } from './WorkspaceWorkbenchEntry'
 import { FilePreviewPane } from './FilePreviewPane'
 import { FilePreviewResizeHandle, FilePreviewWorkspace, useInitializeFilePreviewMinimumWidth, useOptionalFilePreviewLayout } from './FilePreviewLayout'
 import { useExecutionPreviewHost, useOptionalFilePreview } from './FilePreviewContext'
@@ -1701,7 +1701,7 @@ function ThreadWorkspaceContent({
   confirmingRunIds = new Set<string>(),
   onCancelAgentRun = async () => undefined,
   stopping,
-  executionPlacement = 'inspector',
+  executionPlacement: preferredExecutionPlacement = 'inspector',
   onExecutionPlacementChange = async () => undefined,
   worldMapEnabled = true,
   workspaceEntrySnapshotReady = true,
@@ -1842,6 +1842,8 @@ function ThreadWorkspaceContent({
   const [composerInviteMessage, setComposerInviteMessage] = useState<string | null>(null)
   const [routingMutating, setRoutingMutating] = useState(false)
   const mobile = useMobileLayout()
+  const workspacePaneActive = !mobile && Boolean(filePreview?.paneVisible
+    && filePreview.activeTab && filePreview.activeTab.kind !== 'execution')
   const composerSubmittingRef = useRef(false)
   const routingMutatingRef = useRef(false)
   const composerLockAwaitingDisabledCommitRef = useRef(false)
@@ -2082,8 +2084,10 @@ function ThreadWorkspaceContent({
   )
   const [worldMapRoutesVisible, setWorldMapRoutesVisible] = useState(false)
   const [localInspectorTab, setLocalInspectorTab] = useState<ThreadInspectorTab>('tasks')
+  const suppressExecutionReveal = suppressExecutionAutoOpen
+    || workspacePaneActive
   const [workspaceEntrySelection] = useState(() =>
-    workspaceEntrySnapshotReady && !suppressExecutionAutoOpen
+    workspaceEntrySnapshotReady && !suppressExecutionReveal
       ? executionWorkspaceEntrySelection(snapshot.agentRuns)
       : null
   )
@@ -2095,8 +2099,11 @@ function ThreadWorkspaceContent({
     target: ExecutionConsolePlacement
   } | null>(null)
   const [executionInspectorActive, setExecutionInspectorActive] = useState(
-    executionPlacement === 'inspector'
+    workspacePaneActive || preferredExecutionPlacement === 'inspector'
   )
+  // Keep an explicitly opened chat overlay in place until the user closes it.
+  const executionPlacement = preferredExecutionPlacement === 'bottom' ? 'bottom'
+    : workspacePaneActive || inspectorVisible && executionInspectorActive ? 'inspector' : preferredExecutionPlacement
   const [executionDrawerAgentId, setExecutionDrawerAgentId] = useState<string | null>(
     workspaceEntrySelection?.selectedAgentId ?? null
   )
@@ -2133,16 +2140,6 @@ function ThreadWorkspaceContent({
     portal.className = 'execution-drawer-portal'
     return portal
   })
-  const engineeringDock=useEngineeringDock()
-  useEffect(()=>{
-    if(!engineeringDock.opened)return
-    setExecutionInspectorActive(false)
-    setExecutionDrawerAgentId(null)
-    onCloseInspector()
-  },[engineeringDock.opened])
-  useEffect(()=>{
-    if(inspectorVisible || executionDrawerAgentId)engineeringDock.collapse()
-  },[inspectorVisible,executionDrawerAgentId])
   const inspectorTab = controlledInspectorTab ?? localInspectorTab
   const inspectorSurfaceTab: ThreadInspectorSurfaceTab = executionPlacement === 'inspector'
     && executionInspectorActive
@@ -2406,7 +2403,7 @@ function ThreadWorkspaceContent({
     if (workspaceEntrySnapshotHandled.current || !workspaceEntrySnapshotReady) return
     workspaceEntrySnapshotHandled.current = true
     if (executionEntryInteractionThreadId.current === snapshot.thread.id) return
-    if (suppressExecutionAutoOpen) return
+    if (suppressExecutionReveal) return
     const entrySelection = executionWorkspaceEntrySelection(snapshot.agentRuns)
     const runningRun = entrySelection?.focusedRun ?? null
     setExecutionDrawerAgentId(entrySelection?.selectedAgentId ?? null)
@@ -2435,13 +2432,13 @@ function ThreadWorkspaceContent({
     filePreview,
     snapshot.agentRuns,
     workspaceEntrySnapshotReady,
-    suppressExecutionAutoOpen
+    suppressExecutionReveal
   ])
   useLayoutEffect(() => {
     if (workspaceEntryInspectorHandled.current) return
     if (!workspaceEntrySnapshotReady) return
     workspaceEntryInspectorHandled.current = true
-    if (suppressExecutionAutoOpen) return
+    if (suppressExecutionReveal) return
     if (!mobile && workspaceEntryRunningRun && executionPlacement === 'inspector') {
       onOpenInspector?.(inspectorTab)
     } else if (workspaceEntryRunningRun && executionPlacement === 'right') {
@@ -2455,14 +2452,14 @@ function ThreadWorkspaceContent({
     filePreview,
     workspaceEntryRunningRun,
     workspaceEntrySnapshotReady,
-    suppressExecutionAutoOpen
+    suppressExecutionReveal
   ])
   useLayoutEffect(() => {
     if (mountedThreadId.current === snapshot.thread.id) return
     mountedThreadId.current = snapshot.thread.id
     executionEntryInteractionThreadId.current = null
     workspaceEntrySnapshotHandled.current = workspaceEntrySnapshotReady
-    const entrySelection = workspaceEntrySnapshotReady && !suppressExecutionAutoOpen
+    const entrySelection = workspaceEntrySnapshotReady && !suppressExecutionReveal
       ? executionWorkspaceEntrySelection(snapshot.agentRuns)
       : null
     const runningRun = entrySelection?.focusedRun ?? null
@@ -2481,7 +2478,7 @@ function ThreadWorkspaceContent({
     } else if (runningRun && executionPlacement === 'right') {
       filePreview?.openExecution()
     }
-  }, [executionPlacement, filePreview, inspectorTab, mobile, onOpenInspector, snapshot.agentRuns, snapshot.thread.id, suppressExecutionAutoOpen, workspaceEntrySnapshotReady])
+  }, [executionPlacement, filePreview, inspectorTab, mobile, onOpenInspector, snapshot.agentRuns, snapshot.thread.id, suppressExecutionReveal, workspaceEntrySnapshotReady])
   useLayoutEffect(() => {
     if (executionDrawerAgentId !== null) return
     const trigger = executionDrawerTriggerRef.current
@@ -4796,7 +4793,7 @@ function ThreadWorkspaceContent({
     const submittedExecutionRequest = submittedExecutionRequests[0]
     if (!submittedExecutionRequest) return
     const consumeRequest = (): void => { setSubmittedExecutionRequests((current) => current.slice(1)) }
-    if (suppressExecutionAutoOpen) { consumeRequest(); return }
+    if (suppressExecutionReveal) { consumeRequest(); return }
     if (taskCreationBlocksSubmittedRunAutoFocus(
       taskCreationActive,
       inspectorVisible,
@@ -4843,7 +4840,7 @@ function ThreadWorkspaceContent({
     initializePreviewMinimumWidth,
     mobile,
     taskCreationActive,
-    suppressExecutionAutoOpen
+    suppressExecutionReveal
   ])
 
   const conversationFindTotal = conversationFind.snapshot?.totalMatchCount ?? 0

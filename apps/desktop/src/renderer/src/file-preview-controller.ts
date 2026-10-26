@@ -14,6 +14,7 @@ export type FilePreviewContent =
 
 export interface FilePreviewTabModel {
   kind: 'file'
+  embedded?: boolean
   id: string
   sourceKey: string
   sourceAliases?: string[]
@@ -78,6 +79,7 @@ interface FilePreviewViewRollback {
 }
 
 export interface FilePreviewOpenOptions {
+  embedded?: boolean
   commitOnSuccess?: boolean
   previewOnly?: boolean
   revalidateSource?: boolean
@@ -268,7 +270,7 @@ export function createFilePreviewSession(api: FilePreviewApi, threadId: string, 
 
   const saveSession = (targetThreadId: string) => {
     const snapshot: FilePreviewSessionSnapshot = {
-      tabs: tabsRef.current.map((tab) => tab.kind === 'mission_activity' || tab.kind === 'execution' || tab.kind === 'workspace' ? { ...tab } : tab.kind === 'file_change'
+      tabs: tabsRef.current.filter(tab=>tab.kind!=='file'||!tab.embedded).map((tab) => tab.kind === 'mission_activity' || tab.kind === 'execution' || tab.kind === 'workspace' ? { ...tab } : tab.kind === 'file_change'
         ? { kind: 'file_change', id: tab.id, threadId: tab.threadId, changes: tab.changes, selectedEvidenceFileId: tab.selectedEvidenceFileId, reading: tab.reading }
         : {
           kind: 'file',
@@ -411,6 +413,7 @@ export function createFilePreviewSession(api: FilePreviewApi, threadId: string, 
 
   const showOpenedTab = (tabId: string, isNew: boolean, focusTab = false) => {
     if (!owner.isCurrent(threadId)) return
+    if(tabsRef.current.some(tab=>tab.id===tabId&&tab.kind==='file'&&tab.embedded))setTabs(tabs=>tabs.map(tab=>tab.id===tabId?{...tab,embedded:false}:tab))
     setActiveTabId(tabId)
     setPaneVisible(true)
     setOpenFeedback((previous) => ({ tabId, sequence: (previous?.sequence ?? 0) + 1, isNew, focusTab }))
@@ -549,6 +552,7 @@ export function createFilePreviewSession(api: FilePreviewApi, threadId: string, 
     const resolvedSource = resolvedFilePreviewSource(request, file)
     const duplicate = tabsRef.current.find((tab) => tab.kind === 'file'
       && tab.id !== requestedTabId
+      && Boolean(tab.embedded) === Boolean(requestedTab.embedded)
       && filePreviewTabMatchesResolvedFile(tab, file, resolvedSource.sourceKey)
     ) as FilePreviewTabModel | undefined
     if (duplicate?.content) {
@@ -735,7 +739,8 @@ export function createFilePreviewSession(api: FilePreviewApi, threadId: string, 
     target: FileLocationTarget | undefined,
     presentationHint: FilePreviewPresentationHint | undefined,
     previewOnly: boolean,
-    background = false
+    background = false,
+    embedded = false
   ): Promise<FilePreviewOpenOutcome> => {
     const interaction = session.lastUsed
     const scopeGeneration = scopeGenerationRef.current
@@ -765,7 +770,7 @@ export function createFilePreviewSession(api: FilePreviewApi, threadId: string, 
       }
 
       const file = target ? { ...result.value.file, target } : result.value.file
-      const duplicate = background ? tabsRef.current.find(tab => tab.kind === 'file' && tab.file && tab.content
+      const duplicate = background ? tabsRef.current.find(tab => tab.kind === 'file' && Boolean(tab.embedded) === embedded && tab.file && tab.content
         && filePreviewTabMatchesResolvedFile(tab, file, resolvedFilePreviewSource(request, file).sourceKey)) as FilePreviewTabModel | undefined : undefined
       if (duplicate) {
         if (disposed || scopeGenerationRef.current !== scopeGeneration || !owner.isCurrent(threadId)) {
@@ -799,6 +804,7 @@ export function createFilePreviewSession(api: FilePreviewApi, threadId: string, 
       const tabId = `file-preview-${newCommandId()}`
       const tab: FilePreviewTabModel = {
         kind: 'file',
+        embedded,
         id: tabId,
         sourceKey: filePreviewSourceKey(request),
         sourceRequest: request,
@@ -843,7 +849,7 @@ export function createFilePreviewSession(api: FilePreviewApi, threadId: string, 
   ): Promise<FilePreviewOpenOutcome> => {
     target ??= 'rawReference' in request ? parseFileReference(request.rawReference)?.target : undefined
     if (!threadId || !owner.isCurrent(threadId)) return { kind: 'error', error: unavailableSourceError() }
-    const cached = tabsRef.current.find(tab => tab.kind === 'file' && (tab.sourceKey === filePreviewSourceKey(request) || tab.sourceAliases?.includes(filePreviewSourceKey(request))))
+    const cached = tabsRef.current.find(tab => tab.kind === 'file' && Boolean(tab.embedded) === Boolean(options?.embedded) && (tab.sourceKey === filePreviewSourceKey(request) || tab.sourceAliases?.includes(filePreviewSourceKey(request))))
     owner.touch(session, cached?.id)
     if (!options?.revalidateSource && cached?.kind === 'file' && (cached.content || cached.loadState === 'opening')) {
       if (target && cached.file) setTabs(tabs => tabs.map(tab => tab.id === cached.id
@@ -866,16 +872,16 @@ export function createFilePreviewSession(api: FilePreviewApi, threadId: string, 
       }
     }
     if (options?.commitOnSuccess === true) {
-      const key = `${filePreviewSourceKey(request)}:${options.previewOnly === true}:${options.background === true}:${options.revalidateSource === true}`
+      const key = `${filePreviewSourceKey(request)}:${options.previewOnly === true}:${options.background === true}:${options.revalidateSource === true}:${options.embedded === true}`
       const pending = committedRequests.get(key)
       if (pending) return pending
-      const operation = performCommittedOpen(request, target, presentationHint, options.previewOnly === true, options.background === true)
+      const operation = performCommittedOpen(request, target, presentationHint, options.previewOnly === true, options.background === true, options.embedded === true)
         .finally(() => committedRequests.delete(key))
       committedRequests.set(key, operation)
       return operation
     }
     const sourceKey = filePreviewSourceKey(request)
-    const existing = tabsRef.current.find((tab) => tab.kind === 'file' && tab.sourceKey === sourceKey)
+    const existing = tabsRef.current.find((tab) => tab.kind === 'file' && !tab.embedded && tab.sourceKey === sourceKey)
     const isNew = !existing
     const tabId = existing?.id ?? `file-preview-${newCommandId()}`
     const rollback = isNew
@@ -1030,23 +1036,25 @@ export function createFilePreviewSession(api: FilePreviewApi, threadId: string, 
     const previous = tabsRef.current
     const closing = previous.filter((tab) => ids.has(tab.id))
     if (closing.length === 0) return
-    for(const tab of closing)if(tab.kind==='file'&&tab.sourceRequest){const request=restorableFilePreviewRequest(tab.sourceRequest);if(request)closedFiles.unshift({request:structuredClone(request),presentation:{...tab.presentation},reading:tab.reading?structuredClone(tab.reading):undefined})}
+    for(const tab of closing)if(tab.kind==='file'&&!tab.embedded&&tab.sourceRequest){const request=restorableFilePreviewRequest(tab.sourceRequest);if(request)closedFiles.unshift({request:structuredClone(request),presentation:{...tab.presentation},reading:tab.reading?structuredClone(tab.reading):undefined})}
     closedFiles.splice(50)
     const remaining = previous.filter((tab) => !ids.has(tab.id))
     const currentActiveTabId = activeTabIdRef.current
-    const activeIndex = previous.findIndex((tab) => tab.id === currentActiveTabId)
-    const nextActiveTabId = remaining.length === 0
+    const visiblePrevious = previous.filter(tab=>tab.kind!=='file'||!tab.embedded)
+    const visibleRemaining = remaining.filter(tab=>tab.kind!=='file'||!tab.embedded)
+    const activeIndex = visiblePrevious.findIndex((tab) => tab.id === currentActiveTabId)
+    const nextActiveTabId = visibleRemaining.length === 0
       ? null
       : currentActiveTabId && !ids.has(currentActiveTabId)
         ? currentActiveTabId
-        : previous.slice(Math.max(0, activeIndex + 1)).find((tab) => !ids.has(tab.id))?.id
-        ?? previous.slice(0, Math.max(0, activeIndex)).reverse().find((tab) => !ids.has(tab.id))?.id
-        ?? remaining[0].id
+        : visiblePrevious.slice(Math.max(0, activeIndex + 1)).find((tab) => !ids.has(tab.id))?.id
+        ?? visiblePrevious.slice(0, Math.max(0, activeIndex)).reverse().find((tab) => !ids.has(tab.id))?.id
+        ?? visibleRemaining[0].id
     for (const tab of closing) if (tab.kind === 'file') { discardCandidate(tab); revokeContent(tab.content); if (tab.file) displayed(tab.id, tab.file.handleId) }
     setTabs(() => remaining)
     setActiveTabId(nextActiveTabId)
     setOpenFeedback((current) => current && ids.has(current.tabId) ? null : current)
-    if (remaining.length === 0) {
+    if (visibleRemaining.length === 0) {
       setPaneVisible(false)
     }
     for (const tab of closing) {

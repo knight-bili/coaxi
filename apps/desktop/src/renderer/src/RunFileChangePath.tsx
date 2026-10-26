@@ -19,9 +19,9 @@ export function RunFileChangePath({ path }: { path: string }): JSX.Element {
     if (!code || !directoryElement || !basenameElement || !context) return
 
     const fitDirectory = (): void => {
-      context.font = getComputedStyle(basenameElement).font
-      const available = Math.max(0, code.clientWidth - context.measureText(basename).width)
-      context.font = getComputedStyle(directoryElement).font
+      const available = Math.max(0, code.clientWidth - basenameElement.scrollWidth)
+      const style = getComputedStyle(directoryElement)
+      context.font = `${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`
       if (context.measureText(directory).width <= available) {
         setVisibleDirectory(directory)
         return

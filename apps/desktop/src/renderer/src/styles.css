@@ -2233,7 +2233,7 @@ button.file-preview-html-feedback:hover,
 }
 .workspace-grid.inspector-collapsed { grid-template-columns: minmax(0, 1fr); }
 .timeline-pane, .activity-pane { min-width: 0; min-height: 0; overflow: hidden; }
-.timeline-pane { display: flex; grid-column: 1; grid-row: 1; flex-direction: column; background: var(--conversation-surface); }
+.timeline-pane { position: relative; display: flex; grid-column: 1; grid-row: 1; flex-direction: column; background: var(--conversation-surface); }
 .run-pulse { display: grid; min-height: 54px; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 8px 20px; border-top: 2px solid var(--line-strong); color: var(--muted); background: var(--conversation-surface); font-size: 11px; }
 .run-pulse-heading { display: grid; min-width: 0; grid-template-rows: auto auto; align-items: center; justify-content: start; gap: 1px; white-space: nowrap; }
 .run-pulse-title { display: flex; min-width: 0; align-items: center; gap: 7px; }

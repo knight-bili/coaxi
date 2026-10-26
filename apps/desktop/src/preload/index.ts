@@ -92,7 +92,7 @@ const api: RovaiApi = {
     acknowledge:id=>ipcRenderer.invoke('rovai:project-launcher','acknowledge',id),
     onAvailable:listener=>{const handler=():void=>listener();ipcRenderer.on('rovai:project-launcher-available',handler);return()=>ipcRenderer.removeListener('rovai:project-launcher-available',handler)}
   },
-  officeWorkspace: {open:(threadId,path,editable)=>ipcRenderer.invoke('rovai:office-workspace',{threadId,path,editable})},
+  officeWorkspace: {open:(threadId,path,editable,embedded)=>ipcRenderer.invoke('rovai:office-workspace',{threadId,path,editable,embedded}),present:input=>ipcRenderer.invoke('rovai:office-workspace',{...input,operation:'present'}),inspect:input=>ipcRenderer.invoke('rovai:office-workspace',{...input,operation:'inspect'}),close:id=>ipcRenderer.invoke('rovai:office-workspace',{id,operation:'close'})},
   computerWorkspace: { request: (threadId,input)=>ipcRenderer.invoke('rovai:computer-workspace',{threadId,input,commandId:globalThis.crypto.randomUUID()}) },
   interactionComputer:{request:(method,input)=>ipcRenderer.invoke('rovai:interaction-computer',method,input)},
   interactionWorkspace: {request:(action,payload)=>ipcRenderer.invoke('rovai:interaction-workspace',action,payload)},

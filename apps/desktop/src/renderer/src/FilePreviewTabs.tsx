@@ -205,7 +205,7 @@ export function FilePreviewTabs({ compact = false }: { compact?: boolean } = {})
   }
   const nextShortcutTab=(delta:number):boolean=>{if(!paneVisible||!tabs.length)return false;const index=tabs.findIndex(tab=>tab.id===activeTabId);activate(tabs[(Math.max(index,0)+delta+tabs.length)%tabs.length].id);return true}
   useShortcutActions({
-    close_current_tab:()=>{if(!paneVisible)return false;const index=tabs.findIndex(tab=>tab.id===activeTabId);if(index>=0)closeAndRestoreFocus(index);return true},
+    close_current_tab:()=>{if(!paneVisible)return false;const index=tabs.findIndex(tab=>tab.id===activeTabId);if(index>=0)closeAndRestoreFocus(index);else{hidePane();focusConversation()}return true},
     close_all_file_tabs:()=>{if(!paneVisible)return false;closeMany(tabs.filter(tab=>tab.kind==='file').map(tab=>tab.id));return true},
     reopen_last_closed_tab:()=>{void reopenLastClosedFile().then(result=>{if(result?.kind==='error')announce(result.error.message)}).catch(error=>announce(String(error)))},
     toggle_aux_panel:()=>{if(!tabs.length)return false;if(paneVisible)hidePane();else showPane();return true},

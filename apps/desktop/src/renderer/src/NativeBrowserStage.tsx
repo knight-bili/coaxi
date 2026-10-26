@@ -9,7 +9,7 @@ export function browserOverlayIntersects(page: DOMRect, overlay: DOMRect): boole
   return overlay.width > 0 && overlay.height > 0 && overlay.left < page.right && overlay.right > page.left && overlay.top < page.bottom && overlay.bottom > page.top
 }
 /** Codeg NativeSurfaceHost: paint a decoded still before hiding a native page under DOM overlays. */
-export function NativeBrowserStage({ api, id }: { api: BrowserWorkspaceApi; id: string }): React.JSX.Element {
+export function NativeBrowserStage({ api, id }: { api: Pick<BrowserWorkspaceApi,'present'|'inspect'>; id: string }): React.JSX.Element {
   const root = useRef<HTMLDivElement>(null), t = useUiText()
   const [error, setError] = useState(''), [frozen, setFrozen] = useState<string | null>(null)
   useEffect(() => {

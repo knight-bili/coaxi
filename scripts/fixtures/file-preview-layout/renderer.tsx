@@ -19,6 +19,7 @@ import { FILE_PREVIEW_RATIO_STORAGE_KEY } from '../../../apps/desktop/src/render
 import { openAgentRunCurrentFilePreview } from '../../../apps/desktop/src/renderer/src/agent-run-file-preview'
 import { applyAppearanceSnapshot } from '../../../apps/desktop/src/renderer/src/theme'
 import { DEFAULT_APPEARANCE } from '../../../apps/desktop/src/shared/appearance'
+import { requestWorkspaceTool } from '../../../apps/desktop/src/renderer/src/WorkspaceToolMenu'
 import { agents, initial, initialDraft, installations, run as fixtureRun } from '../host-web-parity/data'
 import '../../../apps/desktop/src/renderer/src/styles.css'
 
@@ -100,6 +101,9 @@ const readSteps = [readReferences, [toolPreviewReference, toolPreviewReference]]
   return item.step
 })
 const unsupported = async (): Promise<never> => { throw new Error('Unexpected fixture API operation') }
+const editorRecoveryRecords = new Map<string, unknown>()
+let editorState: unknown = null
+let editorRevision = 0
 const fileOpens: OpenFilePreviewRequest[] = []
 const fileRestores: OpenFilePreviewRequest[] = []
 const campBindings: Array<string | null> = []
@@ -251,7 +255,18 @@ Object.assign(window, { rovai: {
   composerAttachments: { discard: async () => {} },
   windowControls: (window as unknown as { previewWindowControls: unknown }).previewWindowControls,
   filePreview: api,
-  request: async (method: string, request: { threadId: string; agentRunId: string; executionEpoch: number }): Promise<unknown> => {
+  workbenchEditorRecovery: {
+    get: async key => structuredClone(editorRecoveryRecords.get(key) ?? null),
+    put: async value => { editorRecoveryRecords.set((value as {key:string}).key, structuredClone(value)) },
+    copies: async () => ({items:[], next:null})
+  },
+  request: async (method: string, request: { threadId: string; agentRunId: string; executionEpoch: number; operation?: string; value?: unknown }): Promise<unknown> => {
+    if(method==='app.info')return {dataDir:'/isolated-fixture'}
+    if(method==='workbench.files.list')return {workspaceRoot:'/fixture',entries:[],next:null}
+    if(method==='workbench.editor'){
+      if(request.operation==='save'){editorState=structuredClone(request.value);editorRevision++}
+      return {revision:editorRevision?String(editorRevision):null,workspaceRoot:'/fixture',value:structuredClone(editorState)}
+    }
     if (method === 'skills.list' || method === 'skills.deliveryGroups.list') return []
     const source = [changes, pickerChanges].find(card => card.agentRunId === request.agentRunId)
     if (method !== 'agentRunFileChanges.get' || request.threadId !== 'camp-1' || !source) return unsupported()
@@ -422,11 +437,14 @@ function ToolRows(): React.JSX.Element {
   </section>
 }
 const initialExecutionCase = new URLSearchParams(location.search).get('initial-execution')
+const initialExecutionPlacement = new URLSearchParams(location.search).get('execution-placement') === 'inspector' ? 'inspector' : 'right'
 let claimFirstRun: () => void
 let executionPhase = ''
 function InitialExecutionWorkspace(): React.JSX.Element {
   previewController = useFilePreview()
   const [phase, setPhase] = useState('pending')
+  const [placement, setPlacement] = useState(initialExecutionPlacement)
+  const [inspector, setInspector] = useState<'tasks' | 'members' | null>(null)
   executionPhase = phase
   claimFirstRun = () => setPhase('running')
   const snapshot = {
@@ -438,7 +456,10 @@ function InitialExecutionWorkspace(): React.JSX.Element {
     agentRuns: phase === 'running' ? [{ ...fixtureRun, inputMessageIds: [initial.messages[0].id] }] : []
   }
   return <ThreadWorkspace snapshot={snapshot} projectName="Fixture" agents={agents} installations={installations}
-    initialComposerDraft={{ ...initialDraft, threadId: 'camp-1' }} busy={false} executionPlacement="right"
+    initialComposerDraft={{ ...initialDraft, threadId: 'camp-1' }} memberCreation={initialExecutionCase!=='existing'} busy={false} executionPlacement={placement}
+    onExecutionPlacementChange={async value=>{setPlacement(value as typeof placement);return value}}
+    inspectorVisible={inspector !== null} inspectorTab={inspector ?? 'tasks'}
+    onOpenInspector={setInspector} onCloseInspector={() => setInspector(null)}
     onSend={async () => {
       setPhase('submitted')
       return { threadMessageId: initial.messages[0].id, deliveryIds: ['delivery-1'], agentRunIds: [], addressedAgentIds: [agents[0].agentId] }
@@ -499,7 +520,10 @@ Object.assign(window, { previewTest: {
   claimFirstRun: () => claimFirstRun(),
   executionPhase: () => executionPhase,
   activeTabKind: () => previewController.activeTab?.kind,
+  paneState: () => ({ visible: previewController.paneVisible, activeTabId: previewController.activeTabId,
+    activeTabKind: previewController.activeTab?.kind, tabCount: previewController.tabs.length }),
   openExecution: () => previewController.openExecution(),
+  openTool: () => requestWorkspaceTool('camp-1','files'),
   openActivity: () => previewController.openMissionActivity('mission-1'),
   selectExecution: () => previewController.activate(previewController.tabs.find(tab => tab.kind === 'execution')!.id),
   hidePane: () => previewController.hidePane(),
@@ -814,7 +838,7 @@ Object.assign(window, { previewTest: {
       selectedFile: previewController.activeTab?.kind === 'file_change' ? previewController.activeTab.selectedEvidenceFileId : null,
       conversationQuery: document.querySelector<HTMLInputElement>('.conversation-find-form input')?.value,
       nativePanel: Boolean(document.querySelector('.cm-panel.cm-search')),
-      toggleBackground: getComputedStyle(element('.file-preview-toggle')!).backgroundColor
+      toggleBackground: getComputedStyle(element('.file-preview-toggle-fallback')!).backgroundColor
     }
   },
   findableMarkdownText() {
@@ -938,7 +962,7 @@ Object.assign(window, { previewTest: {
     const scroll = review?.querySelector<HTMLElement>('.agent-run-file-review-scroll')
     const bar = element('.file-preview-tabs')
     const strip = element('.file-preview-tab-strip')
-    const toggle = element('.file-preview-toggle')!
+    const toggle = element('.file-preview-toggle-fallback')!
     const region = (node: Element | null) => node ? getComputedStyle(node).getPropertyValue('-webkit-app-region') : null
     return {
       reviewVisible: Boolean(review && review.getBoundingClientRect().height > 0),
@@ -960,7 +984,7 @@ Object.assign(window, { previewTest: {
         .filter((node) => node.getBoundingClientRect().width && node.scrollWidth > node.clientWidth + 1).map(node => node.className),
       headerDrag: region(bar), toggleNoDrag: region(toggle.parentElement) === 'no-drag',
       dragSpace: strip ? toggle.parentElement!.getBoundingClientRect().left - strip.getBoundingClientRect().right : null,
-      toggleExpanded: toggle.getAttribute('aria-expanded'), toggleVisible: visible('.file-preview-toggle'),
+      toggleExpanded: toggle.getAttribute('aria-expanded'), toggleVisible: visible('.file-preview-toggle-fallback'),
       separatorVisible: visible('.file-preview-toggle-divider'),
       reviewRequests: [...reviewRequests], fileOpens: [...fileOpens], fileRestores: [...fileRestores],
       campBindings: [...campBindings], fileReads, releases: [...releases], notices: [...toolNotices]

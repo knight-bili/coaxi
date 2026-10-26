@@ -51,7 +51,8 @@ export function WorkspaceWorkbench({ threadId, projectPath, members, bindLeaveGu
   const client = useThreadClient(), t = useUiText(), scope = useMemo(() => ({ threadId }), [threadId])
   const filePreview = useOptionalFilePreview(), filePreviewApi = useOptionalFilePreviewApi()
   const [previewPath, setPreviewPath] = useState<string | null>(null), [previewActions, setPreviewActions] = useState<HTMLDivElement | null>(null)
-  const previewSource = useMemo(() => previewPath ? { kind: 'camp_workspace' as const, threadId, rawReference: previewPath } : null, [threadId, previewPath])
+  const officePreview = previewPath !== null && /\.(docx|xlsx|pptx)$/i.test(previewPath)
+  const previewSource = useMemo(() => previewPath && !officePreview ? { kind: 'camp_workspace' as const, threadId, rawReference: previewPath } : null, [threadId, previewPath, officePreview])
   const [treeShown,setTreeShown]=useState(true)
   const workspaceTab=filePreview?.activeTab?.kind==='workspace'?filePreview.activeTab:null
   const open = true, [tab, setTab] = useState<WorkbenchTab>('files')
@@ -71,7 +72,7 @@ export function WorkspaceWorkbench({ threadId, projectPath, members, bindLeaveGu
   const acceptRestoredDraft=(value:WorkbenchEditorState|null):void=>{const next=value??{documents:[],selected:null,layout:null};setDocuments(next.documents);setSelected(next.selected);setSplitLayout(next.layout);restoredSplitLayout.current=next.layout;setRestoreToken(value=>value+1)}
   useEffect(()=>{if(!open)return;let active=true;hydrated.current=false;setDraftRestoreError('');void editorDrafts.start().then(value=>{if(active){acceptRestoredDraft(value);hydrated.current=true}}).catch(error=>{if(active)setDraftRestoreError(readErrorMessage(error))});return()=>{active=false;hydrated.current=false;editorDrafts.dispose()}},[editorDrafts,draftReadAttempt,open])
   useEffect(()=>{if(hydrated.current&&draftStatus.ready)editorDrafts.update({documents,selected,layout:splitLayout})},[editorDrafts,documents,selected,splitLayout,draftStatus.ready])
-  const closedFiles=useRef<string[]>([]), registeredFiles=useRef(new Set<string>()), retiredFiles=useRef(new Set<string>())
+  const closedFiles=useRef<string[]>([])
   const [busy, setBusy] = useState(false), [error, setError] = useState<string | null>(null), epoch = useRef(0)
   const [terminalShown,setTerminalShown]=useState(initialTab==='terminals'),[terminalMounted,setTerminalMounted]=useState(initialTab==='terminals')
   useEffect(()=>{if(terminalRequest){setTerminalMounted(true);setTerminalShown(value=>terminalRequest>0?true:!value)}},[terminalRequest])
@@ -114,20 +115,19 @@ export function WorkspaceWorkbench({ threadId, projectPath, members, bindLeaveGu
   }
   useEffect(() => { if (open && !directories.has('')) void operation(() => loadDirectory('')) }, [open])
   const openFile = async (path: string,line?:number): Promise<void> => {
-    if (/\.(png|jpe?g|gif|webp|bmp|ico|avif|svg|pdf|html?)$/i.test(path)) {
+    const showFiles = (): void => { setTab('files'); if(workspaceTab?.tool!=='files')filePreview?.openWorkspace('files') }
+    if (/\.(png|jpe?g|gif|webp|bmp|ico|avif|svg|pdf|html?|docx|xlsx|pptx)$/i.test(path)) {
       setError(null)
-      if (!filePreviewApi) { setError(t('文件预览服务暂不可用，请重新打开工程。')); return }
-      if(filePreview){const result=await filePreview.open({kind:'camp_workspace',threadId,rawReference:path});if(result.kind==='error')setError(result.error.message);return}
-      setTab('files'); setPreviewPath(path); return
+      if (!filePreviewApi && !/\.(docx|xlsx|pptx)$/i.test(path)) { setError(t('文件预览服务暂不可用，请重新打开工程。')); return }
+      showFiles(); setPreviewPath(path); return
     }
     if(!draftStatus.ready){setError(t('工程编辑草稿尚未读取成功，请先重新读取。'));return}
-    setCursorLine(line);setTab('files')
-    if(/\.(docx|xlsx|pptx)$/i.test(path)){setOfficePath(path);setTab('office');filePreview?.openWorkspace('office',path,path.split('/').at(-1));return}
-    if (documents.some(document => document.path === path)) { setSelected(path); setPreviewPath(null);filePreview?.openWorkspace('files',path,path.split('/').at(-1)); return }
+    setCursorLine(line);showFiles()
+    if (documents.some(document => document.path === path)) { setSelected(path); setPreviewPath(null); return }
     await operation(async () => {
       const result = await client.request<{ path: string; text: string; digest: string }>('workbench.files.read', { scope, path })
       setDocuments(previous => previous.some(document => document.path === path) ? previous : [...previous, { ...result, saved: result.text }])
-      setSelected(path); setPreviewPath(null);filePreview?.openWorkspace('files',path,path.split('/').at(-1))
+      setSelected(path); setPreviewPath(null)
     })
   }
   const save = async (path:string|null=selected): Promise<void> => {
@@ -167,8 +167,8 @@ export function WorkspaceWorkbench({ threadId, projectPath, members, bindLeaveGu
   const activeShortcutSurface=():boolean=>{return open&&visible&&!document.querySelector('[role="dialog"][aria-modal="true"]')&&Boolean(document.activeElement?.closest('.workspace-workbench'))}
   const moveTab=(delta:number):void=>{if(filePreview){const tabs=filePreview.tabs,index=tabs.findIndex(row=>row.id===filePreview.activeTabId);if(tabs.length)filePreview.activate(tabs[(Math.max(0,index)+delta+tabs.length)%tabs.length].id);return}const index=documents.findIndex(row=>row.path===selected);if(documents.length){setPreviewPath(null);setSelected(documents[(Math.max(0,index)+delta+documents.length)%documents.length].path)}}
   useShortcutActions({
-    close_current_tab:()=>{if(tab==='files'){if(filePreview?.activeTabId)filePreview.close(filePreview.activeTabId);else if(previewPath)setPreviewPath(null);else if(selected)closeDocument(selected)}},
-    close_all_file_tabs:()=>{if(filePreview){filePreview.closeMany(filePreview.tabs.filter(row=>row.kind==='file'||row.kind==='workspace'&&row.tool==='files'&&row.resource).map(row=>row.id));return}if(busy)return true;if(documents.some(row=>row.text!==row.saved)&&!window.confirm(t('放弃所有文件尚未保存的修改？')))return true;closedFiles.current=[...documents.map(row=>row.path).reverse(),...closedFiles.current].slice(0,100);setDocuments([]);setSelected(null)},
+    close_current_tab:()=>{if(tab==='files'){if(previewPath)setPreviewPath(null);else if(selected)closeDocument(selected);else if(filePreview?.activeTabId)filePreview.close(filePreview.activeTabId)}},
+    close_all_file_tabs:()=>{if(busy)return true;if(documents.some(row=>row.text!==row.saved)&&!window.confirm(t('放弃所有文件尚未保存的修改？')))return true;closedFiles.current=[...documents.map(row=>row.path).reverse(),...closedFiles.current].slice(0,100);setDocuments([]);setSelected(null);setPreviewPath(null)},
     reopen_last_closed_tab:()=>{if(busy)return true;const path=closedFiles.current[0];if(path){closedFiles.current.shift();void openFile(path)}},
     next_tab:()=>{if(tab!=='files')return false;moveTab(1)},prev_tab:()=>{if(tab!=='files')return false;moveTab(-1)},
     ...Object.fromEntries(NUMBERED_TAB_ACTION_IDS.map((id,index)=>[id,()=>{if(tab!=='files')return false;if(filePreview){const row=filePreview.tabs[index];if(row)filePreview.activate(row.id);return}const row=documents[index];if(row)setSelected(row.path)}])) as ShortcutActions,
@@ -208,25 +208,18 @@ export function WorkspaceWorkbench({ threadId, projectPath, members, bindLeaveGu
     if(workspaceTab.tool==='git'&&!gitResult)void readGit()
     if(workspaceTab.resource&&workspaceTab.tool==='office')setOfficePath(workspaceTab.resource)
     if(workspaceTab.resource&&workspaceTab.tool==='files'&&draftStatus.ready){
-      if(documents.some(row=>row.path===workspaceTab.resource))setSelected(workspaceTab.resource)
+      if(documents.some(row=>row.path===workspaceTab.resource)){setSelected(workspaceTab.resource);setPreviewPath(null)}
       else void openFile(workspaceTab.resource)
     }
   },[workspaceTab?.id,draftStatus.ready])
+  const filesTabId=filePreview?.tabs.find(row=>row.kind==='workspace'&&row.tool==='files'&&!row.resource)?.id
   useEffect(()=>{
-    if(!filePreview||!draftStatus.ready)return
-    const removed=[...registeredFiles.current].filter(path=>!documents.some(row=>row.path===path))
-    if(workspaceTab?.tool==='files'&&workspaceTab.resource&&removed.includes(workspaceTab.resource)&&selected)filePreview.openWorkspace('files',selected,selected.split('/').at(-1))
-    for(const path of removed){const id='workspace:files:'+path;retiredFiles.current.add(id);filePreview.close(id);retiredFiles.current.delete(id)}
-    registeredFiles.current=new Set(documents.map(row=>row.path))
-    for(const row of documents){
-      const id=filePreview.openWorkspace('files',row.path,row.path.split('/').at(-1),true)
-      if(id)filePreview.updateWorkspaceTab(id,{label:row.path.split('/').at(-1)??row.path,dirty:row.text!==row.saved})
-    }
-  },[filePreview?.openWorkspace,filePreview?.updateWorkspaceTab,documents,draftStatus.ready])
+    if(filesTabId)filePreview?.updateWorkspaceTab(filesTabId,{dirty:documents.some(row=>row.text!==row.saved)})
+  },[filesTabId,filePreview?.updateWorkspaceTab,documents])
   useEffect(()=>filePreview?.bindWorkspaceClose(row=>{
-    if(retiredFiles.current.has(row.id))return true
     if(busy)return false
     if(row.tool==='files'&&row.resource)return closeDocument(row.resource)
+    if(row.tool==='files'&&documents.some(document=>document.text!==document.saved)){setError(t('请先保存或放弃当前修改，再关闭这个页面。'));return false}
     if(row.tool==='browser'&&row.resource&&!closedBrowsers.current.has(row.id)){
       if(!client.browserWorkspace)return false
       if(!closingBrowsers.current.has(row.id)){
@@ -264,9 +257,9 @@ export function WorkspaceWorkbench({ threadId, projectPath, members, bindLeaveGu
           <Panel id="workbench-content" order={2} minSize={25}>
             {merge&&<WorkspaceMergeEditor {...merge} onClose={()=>setMerge(null)} onApply={text=>{setDocuments(previous=>previous.map(document=>document.path===merge.path?{...document,text}:document));setMerge(null)}}/>}
             <div className="workspace-tool-page" hidden={tab!=='files'||!!merge}><div className="workbench-editor">
-              {previewSource && filePreviewApi ? <><div className="workbench-toolbar workbench-preview-heading"><span title={previewPath!}>{previewPath}</span><div ref={setPreviewActions} className="workbench-preview-actions"/><button type="button" className="quiet-button" onClick={()=>setPreviewPath(null)}>{t('返回编辑器')}</button></div><PinnedFilePreview api={filePreviewApi} source={previewSource} resolvedTheme={filePreview?.resolvedTheme ?? 'night'} actionsHost={previewActions}/></> : current ? <><div className="workbench-toolbar"><span title={current.path}>{current.path}</span><button className="quiet-button workbench-icon" type="button" title={t('把选区或文件加入输入')} aria-label={t('把选区或文件加入输入')} disabled={!onQuickMessage} onClick={()=>{const selection=window.getSelection(),text=selection?.anchorNode?.parentElement?.closest('.workbench-editor')?selection.toString():'';if(!onQuickMessage?.('工程文件：'+current.path+String.fromCharCode(10)+(text||current.text).slice(0,16000)))setError(t('当前输入暂不可用，请稍后重试。'))}}><Send size={14}/></button><button type="button" className="quiet-button" disabled={busy || current.text === current.saved} onClick={() => void save()}><Save size={14} />{t('保存')}</button><button type="button" className="quiet-button" disabled={busy || dirty} onClick={() => {setCreation('rename');setName(current.path)}}>{t('重命名')}</button><button type="button" className="quiet-button" disabled={busy} onClick={()=>void openMerge()}>{t('解决冲突')}</button></div>
+              {officePreview ? <><div className="workbench-toolbar workbench-preview-heading"><span>{previewPath}</span><button type="button" className="quiet-button" onClick={()=>setPreviewPath(null)}>{t('返回编辑器')}</button></div><OfficePreviewWorkbench key={previewPath} threadId={threadId} path={previewPath!}/></> : previewSource && filePreviewApi ? <><div className="workbench-toolbar workbench-preview-heading"><span title={previewPath!}>{previewPath}</span><div ref={setPreviewActions} className="workbench-preview-actions"/><button type="button" className="quiet-button" onClick={()=>setPreviewPath(null)}>{t('返回编辑器')}</button></div><PinnedFilePreview embedded api={filePreviewApi} source={previewSource} resolvedTheme={filePreview?.resolvedTheme ?? 'night'} actionsHost={previewActions}/></> : current ? <><div className="workbench-toolbar"><span title={current.path}>{current.path}</span><button className="quiet-button workbench-icon" type="button" title={t('把选区或文件加入输入')} aria-label={t('把选区或文件加入输入')} disabled={!onQuickMessage} onClick={()=>{const selection=window.getSelection(),text=selection?.anchorNode?.parentElement?.closest('.workbench-editor')?selection.toString():'';if(!onQuickMessage?.('工程文件：'+current.path+String.fromCharCode(10)+(text||current.text).slice(0,16000)))setError(t('当前输入暂不可用，请稍后重试。'))}}><Send size={14}/></button><button type="button" className="quiet-button" disabled={busy || current.text === current.saved} onClick={() => void save()}><Save size={14} />{t('保存')}</button><button type="button" className="quiet-button" disabled={busy || dirty} onClick={() => {setCreation('rename');setName(current.path)}}>{t('重命名')}</button><button type="button" className="quiet-button" disabled={busy} onClick={()=>void openMerge()}>{t('解决冲突')}</button></div>
                 {current.conflict && <div className="workbench-error" role="alert">{t('文件在外部发生变化，本地修改已保留。')}<button className="quiet-button" disabled={busy} onClick={()=>void mergeExternal()}>{t('比较并合并外部版本')}</button></div>}
-                <SplitTabDeck key={`${threadId}:${projectPath}`} scopeKey={`${threadId}:${projectPath}`} items={documents.map(item=>({id:item.path,label:item.path,dirty:item.text!==item.saved}))} selected={selected} disabled={busy||!draftStatus.ready} restoredLayout={restoredSplitLayout.current} restoreToken={restoreToken} onLayoutChange={setSplitLayout} externalTabBar={!!filePreview} onSelect={path=>{setSelected(path);filePreview?.openWorkspace('files',path,path.split('/').at(-1))}} onClose={path=>filePreview?filePreview.close('workspace:files:'+path):closeDocument(path)} renderBody={(item,visible)=>{const document=documents.find(row=>row.path===item.id)!;return <WorkspaceCodeEditor path={document.path} text={document.text} visible={visible} line={document.path===selected?cursorLine:undefined} onSave={()=>void save(document.path)} onChange={text=>setDocuments(previous=>previous.map(row=>row.path===document.path?{...row,text}:row))}/>}}/>
+                <SplitTabDeck key={`${threadId}:${projectPath}`} scopeKey={`${threadId}:${projectPath}`} items={documents.map(item=>({id:item.path,label:item.path,dirty:item.text!==item.saved}))} selected={selected} disabled={busy||!draftStatus.ready} restoredLayout={restoredSplitLayout.current} restoreToken={restoreToken} onLayoutChange={setSplitLayout} externalTabBar onSelect={setSelected} onClose={closeDocument} renderBody={(item,visible)=>{const document=documents.find(row=>row.path===item.id)!;return <WorkspaceCodeEditor path={document.path} text={document.text} visible={visible} line={document.path===selected?cursorLine:undefined} onSave={()=>void save(document.path)} onChange={text=>setDocuments(previous=>previous.map(row=>row.path===document.path?{...row,text}:row))}/>}}/>
               </> : <div className="workbench-empty workbench-files-empty"><Files size={30}/><strong>{t('选择文件，开始查看')}</strong><p>{t('点击左侧文件。图片和网页会显示预览，文本文件可直接编辑。')}</p></div>}
             </div></div>
             <div className="workspace-tool-page" hidden={tab!=='git'||!!merge}><div className="workbench-git">

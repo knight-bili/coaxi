@@ -1316,7 +1316,7 @@ app.on('second-instance', (_event,arguments_) => {
 const projectLauncherWindow=new ProjectLauncherWindow((method,params)=>core.request(method,params),()=>mainWindow,()=>({appearance:appearanceSnapshot(),language:generalPreferences?.get().interfaceLanguage??'zh-CN'}))
 ipcMain.handle('rovai:project-launcher',(event,action,input)=>projectLauncherWindow.invoke(event,action,input))
 const officeWorkspace = new OfficeWorkspace((method,params)=>core.request(method,params),()=>mainWindow)
-ipcMain.handle('rovai:office-workspace',(event,input)=>officeWorkspace.open(event,input))
+ipcMain.handle('rovai:office-workspace',(event,input)=>officeWorkspace.invoke(event,input))
 app.on('before-quit',()=>officeWorkspace.closeAll())
 const browserWorkspace = new BrowserWorkspace((method,params)=>core.request(method,params),()=>mainWindow)
 const interactionComputer = new InteractionComputer(core,()=>mainWindow)

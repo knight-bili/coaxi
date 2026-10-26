@@ -14,7 +14,7 @@ app.setPath('sessionData', join(userData, 'session'))
 // Core, SQLite, a Skill Library, a Runtime, or any daily App/data connection.
 app.whenReady().then(async () => {
   const window = new BrowserWindow({
-    show: process.platform === 'linux', width: 1440, height: 920, useContentSize: true,
+    show: true, width: 1440, height: 920, useContentSize: true,
     webPreferences: { preload: shortcutPreload, contextIsolation: true, sandbox: true, nodeIntegration: false, backgroundThrottling: false }
   })
   const { HtmlPreviewSite } = require(siteModule)
@@ -48,7 +48,8 @@ app.whenReady().then(async () => {
   const closeTo = (value, expected, message) => assert.ok(Math.abs(value - expected) < 1, `${message}: ${value}, expected ${expected}`)
   const cases = []
   const check = async (name, operation) => {
-    try { await operation(); cases.push(name) } catch (error) {
+    if (process.env.ROVAI_PREVIEW_CASE && !name.includes(process.env.ROVAI_PREVIEW_CASE)) return
+    try { await operation(); cases.push(name); console.log(`PASS ${name}`) } catch (error) {
       console.error(name, error)
       console.error(await run('JSON.stringify({ state: window.previewTest.snapshot(), pointerEvents: window.previewTest.pointerEvents })'))
       writeFileSync(join(dirname(userData), 'failure.png'), (await window.webContents.capturePage()).toPNG())
@@ -126,10 +127,10 @@ app.whenReady().then(async () => {
     return result.text
   }
 
-  const initialExecutionFixture = async (scenario = 'new', ratio = null, width = 1440) => {
+  const initialExecutionFixture = async (scenario = 'new', ratio = null, width = 1440, placement = 'right') => {
     await run(`localStorage.clear(); sessionStorage.clear();
       ${ratio === null ? '' : `localStorage.setItem('rovai.file-preview.preferred-ratio', '${ratio}')`}`)
-    await window.loadFile(renderer, { query: { 'initial-execution': scenario } })
+    await window.loadFile(renderer, { query: { 'initial-execution': scenario, 'execution-placement': placement } })
     await viewport(width)
   }
   const waitForExecution = async expression => {
@@ -191,7 +192,7 @@ app.whenReady().then(async () => {
     }
   })
 
-  await check('a late first Run preserves files, Activity and previously opened panes', async () => {
+  await check('a late first Run preserves the active file or Activity instead of replacing it with execution', async () => {
     for (const scenario of ['file', 'hidden-file', 'mission', 'opened-empty', 'explicit-execution']) {
       await initialExecutionFixture(scenario)
       await submitFirstMessage()
@@ -204,11 +205,61 @@ app.whenReady().then(async () => {
         await run('window.previewTest.hidePane()')
         await snapshot()
       }
-      const state = await claimFirstRun()
-      closeTo(state.width, state.available * .56, `${scenario} retains width`)
+      const protectedPane = scenario === 'file' || scenario === 'hidden-file' || scenario === 'mission'
+      const before = await run('window.previewTest.paneState()')
+      await run('window.previewTest.claimFirstRun()')
+      if (protectedPane) {
+        await waitForExecution('window.previewTest.executionPhase() === "running"')
+        await snapshot()
+        assert.deepEqual(await run('window.previewTest.paneState()'), before, 'Active content and visibility survive the claimed Run')
+      } else await waitForExecution('window.previewTest.activeTabKind() === "execution"')
+      const state = await snapshot()
+      closeTo(state.width, state.visible ? state.available * .56 : 0, `${scenario} retains width`)
       assert.equal(state.stored, null)
-      assert.equal(await run('window.previewTest.activeTabKind()'), 'execution', 'Existing selection priority is unchanged')
-      if (scenario.includes('file') || scenario === 'mission') assert.equal(state.tabCount, 2)
+      if (protectedPane && state.visible) assert.equal(state.tabCount, before.tabCount)
+    }
+  })
+
+  await check('sending preserves the right pane and explicit execution floats within chat', async () => {
+    for (const placement of ['inspector', 'right']) {
+      await initialExecutionFixture('existing', null, 1840, placement)
+      await run('window.previewTest.openMarkdown()')
+      const before = await run('window.previewTest.paneState()')
+      const viewer = await run('window.savedViewer = document.querySelector(".file-preview-markdown"); !!window.savedViewer')
+      assert.equal(viewer, true)
+      await submitFirstMessage()
+      assert.deepEqual(await run('window.previewTest.paneState()'), before)
+      await run('window.previewTest.claimFirstRun()')
+      await waitForExecution('window.previewTest.executionPhase() === "running"')
+      await snapshot()
+      assert.deepEqual(await run('window.previewTest.paneState()'), before)
+      assert.equal(await run('!!document.querySelector(".camp-detail-popover:not([hidden])")'), false, 'Send must not reveal execution')
+      await click('.camp-execution-entry')
+      await waitForExecution('!!document.querySelector(".camp-detail-popover:not([hidden]) .run-pulse-chip[data-agent-id]")')
+      await click('.camp-detail-popover:not([hidden]) .run-pulse-chip[data-agent-id]')
+      await waitForExecution('!!document.querySelector(".camp-detail-popover:not([hidden]) .execution-drawer")')
+      const geometry = await run(`(() => { const chat=document.querySelector('.timeline-pane').getBoundingClientRect(),
+        panel=document.querySelector('.camp-detail-popover:not([hidden])').getBoundingClientRect(),
+        pane=document.querySelector('.file-preview-pane').getBoundingClientRect();
+        return {left:panel.left, right:panel.right, chatLeft:chat.left, chatRight:chat.right, paneLeft:pane.left,
+          viewerRetained:window.savedViewer===document.querySelector('.file-preview-markdown')}; })()`)
+      assert.ok(geometry.left >= geometry.chatLeft && geometry.right <= geometry.chatRight, JSON.stringify(geometry))
+      assert.ok(geometry.right <= geometry.paneLeft, 'Execution must not cover the right pane')
+      assert.equal(geometry.viewerRetained, true)
+      assert.deepEqual(await run('window.previewTest.paneState()'), before)
+      await capture(`execution-over-chat-${placement}`)
+      await click('.camp-detail-popover:not([hidden]) .camp-detail-collapse')
+      await snapshot()
+      assert.deepEqual(await run('window.previewTest.paneState()'), before, 'Closing execution preserves the pane')
+      await click('.camp-execution-entry')
+      await run('window.previewTest.openTool()')
+      await waitForExecution('window.previewTest.paneState().activeTabId === "workspace:files:"')
+      assert.equal(await run('!!document.querySelector(".camp-detail-popover:not([hidden]) .execution-drawer")'),true,'Opening a workbench tool preserves explicit execution')
+      await click('.camp-detail-popover:not([hidden]) .execution-placement-button')
+      await click('.execution-placement-option[data-placement="bottom"]')
+      await waitForExecution('!!document.querySelector(".execution-drawer-host-bottom .execution-drawer")')
+      assert.equal(await run('window.previewTest.paneState().activeTabId'),'workspace:files:','Moving execution to bottom preserves the file tool')
+      await waitForExecution('!document.querySelector(".workbench-draft-status[open]")')
     }
   })
 
@@ -234,7 +285,7 @@ app.whenReady().then(async () => {
     assert.equal(initial.toggleVisible, true)
     assert.equal(initial.separatorVisible, false)
     assert.equal(initial.toggleExpanded, 'false')
-    const opened = await click('.file-preview-toggle')
+    const opened = await click('.file-preview-toggle-fallback')
     assert.equal(opened.visible, true)
     assert.equal(opened.tabCount, 0, 'An empty preview is not a fake file tab')
     const empty = await reviewSnapshot()
@@ -244,7 +295,7 @@ app.whenReady().then(async () => {
     assert.ok(empty.dragSpace >= 24, 'The toggle leaves a blank native window drag target')
     assert.equal(empty.fileOpens.length, 0)
     await capture('preview-empty')
-    assert.equal((await click('.file-preview-toggle')).visible, false)
+    assert.equal((await click('.file-preview-toggle-fallback')).visible, false)
     assert.equal((await snapshot()).stored, null)
   })
 
@@ -518,7 +569,7 @@ app.whenReady().then(async () => {
     assert.equal(activated.fileRestores.length, before.fileRestores.length)
     assert.equal(activated.fileReads, before.fileReads, 'A cached background tab performs no repeat read')
 
-    await click('.file-preview-toggle')
+    await click('.file-preview-toggle-fallback')
     const hidden = await reviewSnapshot()
     await run('window.previewTest.switchCamp()')
     await run('window.previewTest.switchCamp()')
@@ -528,7 +579,7 @@ app.whenReady().then(async () => {
     assert.equal(stillHidden.fileRestores.length, hidden.fileRestores.length)
     assert.equal(stillHidden.fileReads, hidden.fileReads, 'A hidden Pane does not restore content')
 
-    await click('.file-preview-toggle')
+    await click('.file-preview-toggle-fallback')
     const shown = await reviewSnapshot()
     assert.equal((await snapshot()).tabCount, 2)
     assert.equal(shown.fileRestores.length, hidden.fileRestores.length)
@@ -626,7 +677,7 @@ app.whenReady().then(async () => {
   })
 
   await check('tabs shrink equally before minimum-width overflow, and expand again after closing', async () => {
-    await viewport(1_500)
+    await viewport(1_600)
     const tabs = async () => { await snapshot(); return run('window.previewTest.tabSnapshot()') }
     const equalWidths = (state, width) => state.tabs.forEach(tab => closeTo(tab.width, width, 'Equal tab widths'))
     await run('window.previewTest.openTab(0)')
@@ -677,7 +728,7 @@ app.whenReady().then(async () => {
     await run('window.previewTest.setTheme("night")')
     await snapshot()
     await capture('tabs-minimum-night')
-    await viewport(1_500)
+    await viewport(1_600)
     const expanded = await tabs()
     closeTo(expanded.tabs[0].width, shrinking.tabs[0].width, 'Widening the preview expands tabs')
     assert.equal(expanded.overflow, false)
@@ -745,7 +796,13 @@ app.whenReady().then(async () => {
     assert.deepEqual(await reading(), before)
 
     await click('.file-preview-tab-scroll.is-right')
-    const right = await settledTabs()
+    let right = await settledTabs()
+    for (let attempt = 0; right.edges.right && attempt < 8; attempt++) {
+      const previous = right.scrollLeft
+      await click('.file-preview-tab-scroll.is-right')
+      right = await settledTabs()
+      assert.ok(right.scrollLeft > previous, 'Right navigation continues toward the endpoint')
+    }
     closeTo(right.scrollLeft, right.maximum, 'The right button reaches the end')
     assert.deepEqual(right.edges, { left: true, right: false })
     assert.deepEqual(await reading(), before)
@@ -1085,15 +1142,15 @@ app.whenReady().then(async () => {
     await viewport(1_110)
     assert.equal((await snapshot()).returnVisible, true)
     assert.equal((await reviewSnapshot()).reviewVisible, true)
-    await click('.file-preview-toggle')
+    await click('.file-preview-toggle-fallback')
     assert.equal((await snapshot()).controlsVisible, true)
-    await click('.file-preview-toggle')
+    await click('.file-preview-toggle-fallback')
     assert.equal((await reviewSnapshot()).reviewVisible, true)
     assert.equal((await snapshot()).stored, '0.56')
     await run('window.previewTest.closeAll()')
     assert.equal((await snapshot()).visible, false)
     assert.equal((await reviewSnapshot()).toggleVisible, true)
-    await click('.file-preview-toggle')
+    await click('.file-preview-toggle-fallback')
     assert.equal((await reviewSnapshot()).emptyVisible, true)
     assert.equal((await snapshot()).focused, 'file-preview-return')
     await click('.file-preview-return')
@@ -1137,9 +1194,9 @@ app.whenReady().then(async () => {
     assert.equal(found.query, '文件预览')
     await key('Escape')
     await run('window.previewTest.find(false)')
-    await click('.file-preview-toggle')
+    await click('.file-preview-toggle-fallback')
     assert.equal((await run('window.previewTest.findSnapshot()')).toggleBackground, 'rgba(0, 0, 0, 0)')
-    await click('.file-preview-toggle')
+    await click('.file-preview-toggle-fallback')
     assert.notEqual((await run('window.previewTest.findSnapshot()')).toggleBackground, 'rgba(0, 0, 0, 0)')
     await run('window.previewTest.openReview()')
     await click('.file-preview-find-trigger')
@@ -1352,7 +1409,7 @@ app.whenReady().then(async () => {
     for (const width of [1440, 1040]) {
       await viewport(width)
       await run('window.previewTest.closeAll(); window.previewTest.open()')
-      await run('window.previewTest.openFindFixture("find.html")')
+      await run('window.previewTest.openHtml()')
       await run('document.querySelector(".file-preview-tab-panel:not([hidden]) iframe").focus()')
       assert.equal((await snapshot()).tabCount, 2)
       assert.equal((await key('w', [primary])).tabCount, 1)
@@ -1370,7 +1427,7 @@ app.whenReady().then(async () => {
     assert.equal((await key('w', [primary])).tabCount, 1)
     assert.equal(nativeCloseRequests, 0)
     await run('window.previewTest.closeAll()')
-    await click('.file-preview-toggle')
+    await click('.file-preview-toggle-fallback')
     assert.equal((await key('w', [primary])).visible, false, 'An empty preview closes without closing the window')
     assert.equal(nativeCloseRequests, 0)
     await key('w', [primary])
