@@ -52,6 +52,34 @@ function memory(body: string): MemoryRecord {
 const library = (body: string): MemoryLibraryView => ({ memories: [memory(body)], capacities: [] })
 
 describe('memory library owner lifetime', () => {
+  it.each(['empty', 'accepted'])('keeps %s review history reachable when no candidates are pending', async (history) => {
+    readScope.mockResolvedValue({ host: 'host-a', core: 'core-a' })
+    const request = vi.fn(async (method: string) => {
+      if (method === 'memory.list') return library('Current memory')
+      if (method === 'memory.hearthReviewItems.list') return history === 'empty' ? [] : [{
+        reviewItemId: 'review-accepted', requestedAction: 'add', status: 'accepted', stale: false,
+        version: 2, candidateKind: null, candidateBody: null, candidateRetrievalKeys: null,
+        targetMemoryId: null, baseRevisionId: null, sourceAgentId: 'agent_1', sourceThreadId: 'thread_1',
+        sourceAgentRunId: 'run_1', sourceExecutionEpoch: 0, acceptedMemoryId: 'memory-accepted',
+        acceptedRevisionId: 'revision-accepted', resolvedByUserId: 'user_1', invalidationReason: null,
+        editedBeforeAcceptance: false, createdAt: '2026-10-26T00:00:00Z', resolvedAt: '2026-10-26T01:00:00Z'
+      }]
+      throw new Error(`Unexpected request: ${method}`)
+    })
+    const client = { presentationScope: 'host-a', request } as unknown as ThreadClient
+    render(<ThreadClientProvider client={client}><MemoryLibrary agents={[]} /></ThreadClientProvider>)
+    await screen.findByRole('button', { name: /Current memory/ })
+    fireEvent.click(screen.getByRole('button', { name: '审核记录' }))
+    expect(await screen.findByRole('dialog', { name: '共同记忆审核' })).toBeTruthy()
+    fireEvent.click(screen.getByText('处理记录', { selector: 'summary' }))
+    if (history === 'empty') expect(screen.getByText('还没有已处理的审核记录。')).toBeVisible()
+    else {
+      expect(screen.getByText('已接受')).toBeVisible()
+      expect(screen.getByText('候选内容已从审核区清除，不在历史记录中保留或重建。')).toBeVisible()
+    }
+    expect(request.mock.calls.every(([method]) => ['memory.list', 'memory.hearthReviewItems.list'].includes(method))).toBe(true)
+  })
+
   it('clears old Core drafts, retains its pending create, and ignores its late response', async () => {
     let core = 'core-a'
     let invalidated: (() => void) | undefined

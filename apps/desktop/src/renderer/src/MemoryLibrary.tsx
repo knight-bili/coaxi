@@ -1057,6 +1057,7 @@ export function MemoryLibrary({
         <div className="memory-header-actions">
           {mobile && <button className="quiet-button mobile-memory-overview" type="button" aria-expanded={mobileOverviewOpen} onClick={() => setMobileOverviewOpen((open) => !open)}><UiText zh={"概览 "} /><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
           </button>}
+          <button className="quiet-button" type="button" onClick={() => setReviewDrawerOpen(true)} disabled={!library}><UiText zh={"审核记录"} /></button>
           <button className="primary-button" type="button" onClick={openCreate} disabled={!library}><UiText zh={"新增记忆"} /></button>
         </div>
       </header>

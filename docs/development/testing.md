@@ -6,6 +6,10 @@ last_updated: 2026-10-18
 
 # 测试与 Smoke Test
 
+2026-10-26 内置工具发现错误由最低层 `mcp::tool_discovery::tests::discovery_failure_stays_retryable_without_hiding_or_leaking_the_error` 拥有：验证有效/空目录、连接失败、非数组响应、错误脱敏及随后重试。浏览器/电脑、实时反馈、会话工具三个 stdio 入口复用该响应；不新增数据库或进程测试 owner。该测试不证明 Runtime 实际发现工具或模型按 UI 术语选择工具，真实模型验证另记。
+
+记忆审核的零待审入口与终态展示由 `MemoryLibrary.owner.test.tsx` 覆盖；空记录和已接受记录均可只读查看，不重建候选正文。语义弹窗的 `no-drag` 规则由 `theme-tokens.test.ts` 约束；DOM 点击测试不能替代 Windows 原生命中测试，放大弹窗回归需核对按钮位置返回 `HTCLIENT`，而不是底层拖拽区域的 `HTCAPTION`。
+
 [`package.json#scripts`](../../package.json)是 JavaScript 命令名和组合的真源。Rust 测试
 目标由 Cargo workspace 和测试代码决定。
 

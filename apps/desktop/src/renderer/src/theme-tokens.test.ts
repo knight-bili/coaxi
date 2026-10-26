@@ -396,6 +396,7 @@ describe('Porcelain Day + Steel Night theme tokens', () => {
   })
 
   it('gives every page a controlled drag region and compacts only the Windows sidebar inset', () => {
+    expect(css).toMatch(/\.dialog-overlay,\s*\[role="dialog"\],\s*\[role="alertdialog"\]\s*\{[^}]*-webkit-app-region:\s*no-drag/)
     expect(css).toContain(`.content.compose-content,
 .content.settings-content,
 .content.members-content,

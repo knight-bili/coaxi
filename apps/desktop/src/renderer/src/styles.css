@@ -6301,6 +6301,8 @@ body:has(.composer-image-attachment[data-context-open="true"]) .image-action-not
 }
 
 .dialog-overlay { position: fixed; z-index: 100; inset: 0; background: var(--overlay); animation: fade-in 150ms ease-out; }
+/* Native hit testing must not reuse a draggable titlebar behind a modal. */
+.dialog-overlay, [role="dialog"], [role="alertdialog"] { -webkit-app-region: no-drag; }
 .dialog-content { position: fixed; z-index: 101; top: 50%; left: 50%; width: min(640px, calc(100vw - 48px)); max-height: calc(100vh - 48px); overflow: auto; padding: 22px; transform: translate(-50%, -50%); border: 1px solid var(--line-strong); border-top: 3px solid var(--brand); border-radius: 12px; background: var(--surface-raised); box-shadow: var(--shadow-dialog); }
 @keyframes fade-in { from { opacity: 0; } }
 .dialog-overlay.app-dialog-overlay { z-index: 300; backdrop-filter: blur(2px); }
