@@ -6,6 +6,7 @@ export class BrowserNativeSurface {
   readonly native: WebContentsView
   readonly webContents: Electron.WebContents
   private visible = false
+  private bounds: { x: number; y: number; width: number; height: number } | null = null
   constructor(options: BrowserWindowConstructorOptions, private readonly owner: BrowserWindow) {
     this.native = new WebContentsView({ webPreferences: options.webPreferences })
     this.webContents = this.native.webContents
@@ -32,17 +33,25 @@ export class BrowserNativeSurface {
   destroy(): void { this.close() }
   present(bounds: { x: number; y: number; width: number; height: number } | null): void {
     if (this.isDestroyed() || this.owner.isDestroyed()) return
-    this.visible = false
-    this.native.setVisible(false)
-    if (!bounds || !this.owner.isVisible() || this.owner.isMinimized()) return
+    if (!bounds || !this.owner.isVisible() || this.owner.isMinimized()) {
+      this.setVisible(false)
+      return
+    }
     const scale = this.owner.webContents.getZoomFactor(), available = this.owner.getContentBounds()
     const x = Math.max(0, Math.round(bounds.x * scale)), y = Math.max(0, Math.round(bounds.y * scale))
     const width = Math.min(Math.round(bounds.width * scale), available.width - x)
     const height = Math.min(Math.round(bounds.height * scale), available.height - y)
-    if (width < 2 || height < 2) return
-    this.native.setBounds({ x, y, width, height })
-    this.visible = true
-    this.native.setVisible(true)
+    if (width < 2 || height < 2) { this.setVisible(false); return }
+    if (!this.bounds || this.bounds.x !== x || this.bounds.y !== y || this.bounds.width !== width || this.bounds.height !== height) {
+      this.bounds = { x, y, width, height }
+      this.native.setBounds(this.bounds)
+    }
+    this.setVisible(true)
+  }
+  private setVisible(visible: boolean): void {
+    if (this.visible === visible) return
+    this.visible = visible
+    this.native.setVisible(visible)
   }
 }
 

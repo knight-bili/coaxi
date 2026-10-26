@@ -11,11 +11,12 @@ export function browserOverlayIntersects(page: DOMRect, overlay: DOMRect): boole
 /** Codeg NativeSurfaceHost: paint a decoded still before hiding a native page under DOM overlays. */
 export function NativeBrowserStage({ api, id }: { api: Pick<BrowserWorkspaceApi,'present'|'inspect'>; id: string }): React.JSX.Element {
   const root = useRef<HTMLDivElement>(null), t = useUiText()
+  const text = useRef(t); text.current = t
   const [error, setError] = useState(''), [frozen, setFrozen] = useState<string | null>(null)
   useEffect(() => {
     if (!api.present || !root.current) return
     let live = true, frame: number | null = null, last = '', revision = 0
-    const bounded = <T,>(work:Promise<T>,ms:number):Promise<T> => new Promise((resolve,reject)=>{const timer=setTimeout(()=>reject(new Error(t('网页画面暂不可用'))),ms);work.then(value=>{clearTimeout(timer);resolve(value)},failure=>{clearTimeout(timer);reject(failure)})})
+    const bounded = <T,>(work:Promise<T>,ms:number):Promise<T> => new Promise((resolve,reject)=>{const timer=setTimeout(()=>reject(new Error(text.current('网页画面暂不可用'))),ms);work.then(value=>{clearTimeout(timer);resolve(value)},failure=>{clearTimeout(timer);reject(failure)})})
     const paint = (): Promise<void> => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve())))
     const present = (): void => {
       frame = null
@@ -34,7 +35,7 @@ export function NativeBrowserStage({ api, id }: { api: Pick<BrowserWorkspaceApi,
           try {
           const shot = await bounded(api.inspect({ id, action: 'screenshot' }), 800)
           if (!current()) return
-          if (!shot.data) throw new Error(t('暂时无法保留网页画面，请关闭菜单后重试。'))
+          if (!shot.data) throw new Error(text.current('暂时无法保留网页画面，请关闭菜单后重试。'))
           const src = 'data:image/png;base64,' + shot.data, image = new Image()
           image.src = src
           await bounded(image.decode(), 100)
@@ -46,20 +47,23 @@ export function NativeBrowserStage({ api, id }: { api: Pick<BrowserWorkspaceApi,
         }
         if (!current()) return
         await api.present!({ id, sequence: ++presentationSequence, bounds: covered ? null : bounds })
+        if (!covered && bounds) await bounded(paint(), 100).catch(() => undefined)
         if (current()) { setError(snapshotError); if (!covered) setFrozen(null) }
       })().catch(failure => { if (current()) { last = ''; setError(readErrorMessage(failure)) } })
     }
     const schedule = (): void => { if (frame === null) frame = requestAnimationFrame(present) }
+    // The owner can hide its child on minimize before a throttled renderer sees it.
+    const resume = (): void => { last = ''; schedule() }
     const resize = new ResizeObserver(schedule); resize.observe(root.current)
     const mutations = new MutationObserver(schedule)
     mutations.observe(document.body, { subtree: true, childList: true, attributes: true, attributeFilter: ['hidden', 'inert', 'data-state', 'aria-hidden', 'class', 'style'] })
-    window.addEventListener('resize', schedule); window.addEventListener('scroll', schedule, true); document.addEventListener('visibilitychange', schedule)
+    window.addEventListener('resize', schedule); window.addEventListener('scroll', schedule, true); window.addEventListener('focus', resume); document.addEventListener('visibilitychange', schedule)
     present()
     return () => {
       live = false; revision++; if (frame !== null) cancelAnimationFrame(frame)
-      resize.disconnect(); mutations.disconnect(); window.removeEventListener('resize', schedule); window.removeEventListener('scroll', schedule, true); document.removeEventListener('visibilitychange', schedule)
+      resize.disconnect(); mutations.disconnect(); window.removeEventListener('resize', schedule); window.removeEventListener('scroll', schedule, true); window.removeEventListener('focus', resume); document.removeEventListener('visibilitychange', schedule)
       void api.present!({ id, sequence: ++presentationSequence, bounds: null }).catch(() => undefined)
     }
-  }, [api, id, t])
+  }, [api, id])
   return <div className="native-browser-stage" ref={root} aria-label={t('网页内容')}>{frozen && <img src={frozen} alt="" draggable={false} data-browser-frozen-frame="" style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'fill',pointerEvents:'none'}}/>}{!api.present && <p>{t('当前主机没有内嵌网页能力，请更新桌面端。')}</p>}{error && <p role="alert" className="workbench-error">{error}</p>}</div>
 }

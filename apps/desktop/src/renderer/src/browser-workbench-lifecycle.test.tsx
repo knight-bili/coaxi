@@ -6,22 +6,24 @@ import type {ThreadClient} from './camp-client'
 import {ThreadClientProvider} from './camp-client'
 import {BrowserWorkbench} from './BrowserWorkbench'
 vi.mock('@radix-ui/react-dropdown-menu',()=>({Root:({children}:any)=>children,Trigger:({children}:any)=>children,Portal:({children}:any)=>children,Content:({children}:any)=>createElement('div',null,children),Label:({children}:any)=>children,Separator:()=>null,Item:({children,onSelect}:any)=>createElement('button',{onClick:onSelect},children)}))
-vi.mock('./FilePreviewContext',()=>({useOptionalFilePreview:()=>({openWorkspace:vi.fn(),updateWorkspaceTab:vi.fn()})}))
+const preview=vi.hoisted(()=>({openWorkspace:vi.fn(),updateWorkspaceTab:vi.fn(),close:vi.fn()}))
+vi.mock('./FilePreviewContext',()=>({useOptionalFilePreview:()=>preview}))
 vi.mock('./BrowserSharePopover',()=>({BrowserSharePopover:()=>null}))
 vi.mock('./NativeBrowserStage',()=>({NativeBrowserStage:()=>null}))
 vi.mock('./BrowserSettingsDialog',()=>({BrowserSettingsDialog:()=>null}))
 vi.mock('./BrowserProfiles',()=>({BrowserProfiles:()=>null}))
 vi.mock('./BrowserDownloadBar',()=>({BrowserDownloadBar:()=>null}))
 vi.mock('./InteractionActivity',()=>({InteractionActivity:()=>null}))
-afterEach(cleanup)
+afterEach(()=>{cleanup();vi.clearAllMocks()})
 function fixture(){
  const rows=[{id:'a',url:'http://one.test',title:'One'},{id:'b',url:'http://two.test',title:'Two'}]
  let finish:(value:unknown)=>void=()=>{}
  const inspect=vi.fn((input:any)=>input.action==='pick_cancel'?Promise.resolve({}):new Promise(resolve=>{finish=resolve}))
- const client={browserWorkspace:{list:async()=>rows,preferences:async()=>({devtools:false}),inspect}} as unknown as ThreadClient
+ const control=vi.fn(async()=>undefined),open=vi.fn(async()=>({id:'new-page',title:'New',url:'http://new.test'}))
+ const client={browserWorkspace:{list:async()=>rows,preferences:async()=>({devtools:false}),inspect,control,open}} as unknown as ThreadClient
  const append=vi.fn(()=>true),files=vi.fn(async (_files:File[])=>true)
  const element=(resource:string,threadId='thread')=><ThreadClientProvider client={client}><BrowserWorkbench resource={resource} threadId={threadId} onQuickMessage={append} onWorkspaceFiles={files}/></ThreadClientProvider>
- const view=render(element('a'));return {view,inspect,append,files,finish:(value:unknown)=>finish(value),switch:(resource:string,threadId?:string)=>view.rerender(element(resource,threadId))}
+ const view=render(element('a'));return {view,inspect,append,files,control,open,finish:(value:unknown)=>finish(value),switch:(resource:string,threadId?:string)=>view.rerender(element(resource,threadId))}
 }
 it('replaces an edited address with the real URL when switching page tabs',async()=>{
  const f=fixture();await waitFor(()=>expect((f.view.getByLabelText('网页地址') as HTMLInputElement).value).toBe('http://one.test'))
@@ -61,4 +63,21 @@ it('a refused attachment never reports a successful handoff',async()=>{
  const f=fixture();f.files.mockResolvedValue(false);await waitFor(()=>expect((f.view.getByLabelText('网页地址') as HTMLInputElement).value).toBe('http://one.test'))
  fireEvent.click(f.view.getByText('页面文字与链接'));await act(async()=>f.finish({title:'Page',url:'http://one.test',text:'contents'}))
  await waitFor(()=>expect(f.view.getByRole('alert').textContent).toContain('暂不可用'));expect(f.view.queryByText('已加入对话')).toBeNull()
+})
+
+it('navigates the current page without creating another native page',async()=>{
+ const f=fixture();await waitFor(()=>expect((f.view.getByLabelText('网页地址') as HTMLInputElement).value).toBe('http://one.test'))
+ fireEvent.focus(f.view.getByLabelText('网页地址'));fireEvent.change(f.view.getByLabelText('网页地址'),{target:{value:'http://next.test'}})
+ fireEvent.submit(f.view.getByLabelText('网页地址').closest('form')!)
+ await waitFor(()=>expect(f.control).toHaveBeenCalledWith({id:'a',action:'navigate',url:'http://next.test'}))
+ expect(f.open).not.toHaveBeenCalled();expect(preview.close).not.toHaveBeenCalled()
+})
+
+it('replaces the empty browser tab with its first page instead of leaving an extra tab',async()=>{
+ const f=fixture();f.switch('')
+ fireEvent.focus(f.view.getByLabelText('网页地址'));fireEvent.change(f.view.getByLabelText('网页地址'),{target:{value:'http://new.test'}})
+ fireEvent.submit(f.view.getByLabelText('网页地址').closest('form')!)
+ await waitFor(()=>expect(preview.close).toHaveBeenCalledWith('workspace:browser:'))
+ expect(f.open).toHaveBeenCalledOnce();expect(preview.openWorkspace).toHaveBeenCalledWith('browser','new-page','New')
+ expect(f.view.container.querySelector('.browser-start-page button,.browser-start-page select')).toBeNull()
 })

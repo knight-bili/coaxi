@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
-import { ArrowLeft, ArrowRight, RefreshCw, Globe, MoreHorizontal, Send, Camera, MousePointer2, Pencil, Bug, ExternalLink, Plus, X } from 'lucide-react'
+import { ArrowLeft, ArrowRight, RefreshCw, Globe, MoreHorizontal, Send, Camera, MousePointer2, Pencil, Bug, ExternalLink, Plus, X, Monitor } from 'lucide-react'
 import type { BrowserWorkspaceView } from '@contracts'
 import { useThreadClient } from './camp-client'
 import { useUiText } from './interface-language'
@@ -47,7 +47,7 @@ export function BrowserWorkbench({threadId,resource,active=true,onWorkspaceFiles
   if(!api)return <div className="workbench-empty"><Globe size={32}/><strong>{t('浏览器需要桌面端')}</strong><p>{t('请在桌面端打开要使用的页面。')}</p></div>
   let origin:string|null=null;try{if(current&&/^https?:/.test(current.url))origin=new URL(current.url).origin}catch{}
   return <div className="workbench-browser unified-browser" onPointerDown={()=>{if(notice)setNotice('')}} onWheel={()=>{if(notice)setNotice('')}}>
-    <form className="browser-navigation-row" onSubmit={event=>{event.preventDefault();setEditing(false);void run(async()=>{if(current)await api.control({id:current.id,action:'navigate',url});else{const opened=await api.open(threadId,url,profileId);preview?.openWorkspace('browser',opened.id,opened.title||opened.url)}await refresh()})}}>
+    <form className="browser-navigation-row" onSubmit={event=>{event.preventDefault();setEditing(false);void run(async()=>{if(current)await api.control({id:current.id,action:'navigate',url});else{const opened=await api.open(threadId,url,profileId);if(delivery.current===deliveryToken&&active){preview?.openWorkspace('browser',opened.id,opened.title||opened.url);preview?.close('workspace:browser:')}}await refresh()})}}>
       <button type="button" className="quiet-button workbench-icon" title={t('后退')} aria-label={t('后退')} disabled={busy||!current} onClick={()=>void run(()=>control('back'))}><ArrowLeft size={16}/></button>
       <button type="button" className="quiet-button workbench-icon" title={t('前进')} aria-label={t('前进')} disabled={busy||!current} onClick={()=>void run(()=>control('forward'))}><ArrowRight size={16}/></button>
       <button type="button" className="quiet-button workbench-icon" title={t('刷新页面')} aria-label={t('刷新页面')} disabled={busy||!current} onClick={()=>void run(()=>control('reload'))}><RefreshCw size={16}/></button>
@@ -63,6 +63,7 @@ export function BrowserWorkbench({threadId,resource,active=true,onWorkspaceFiles
       </DropdownMenu.Content></DropdownMenu.Portal></DropdownMenu.Root>
       <DropdownMenu.Root><DropdownMenu.Trigger asChild><button type="button" className="quiet-button workbench-icon" title={t('浏览器更多操作')} aria-label={t('浏览器更多操作')}><MoreHorizontal size={17}/></button></DropdownMenu.Trigger><DropdownMenu.Portal><DropdownMenu.Content className="workspace-menu browser-more-menu" align="end" sideOffset={6}>
         <DropdownMenu.Item onSelect={()=>preview?.openWorkspace('browser')}><Plus size={16}/>{t('新页面')}</DropdownMenu.Item>
+        <DropdownMenu.Item onSelect={()=>preview?.openWorkspace('computer')}><Monitor size={16}/>{t('共享电脑窗口')}</DropdownMenu.Item>
         <DropdownMenu.Item disabled={!current} onSelect={()=>void run(()=>control('system'))}><ExternalLink size={16}/>{t('在系统浏览器打开')}</DropdownMenu.Item>
         {devtools&&<DropdownMenu.Item disabled={!current} onSelect={()=>void run(()=>control('devtools'))}><Bug size={16}/>{t('开发工具')}</DropdownMenu.Item>}
         <DropdownMenu.Separator/><div className="browser-more-controls"><BrowserSettingsDialog api={api} onChanged={value=>setDevtools(value.devtools)}/><BrowserProfiles api={api} value={profileId} onChange={setProfileId}/><InteractionActivity threadId={threadId}/></div>
@@ -72,7 +73,7 @@ export function BrowserWorkbench({threadId,resource,active=true,onWorkspaceFiles
     {notice&&<div className="browser-handoff-toast" role="status" data-native-browser-occluder="">{notice}</div>}
     {picker&&<div className="browser-evidence-notice">{t('在网页上点击一个元素，按 Esc 取消。')}<button className="quiet-button" type="button" onClick={()=>setPicker(null)}><X size={14}/>{t('取消选择')}</button></div>}
     <BrowserDownloadBar api={api} threadId={threadId} tabId={current?.id??null}/>
-    {current?<>{current.error&&<p className="workbench-error" role="alert">{current.error}</p>}{active&&<NativeBrowserStage key={current.id} api={api} id={current.id}/>}</>:<div className="workbench-empty browser-start-page"><Globe size={36}/><strong>{t('打开网页，和队员一起工作')}</strong><p>{t('输入网址或本地开发地址。共享后队员可读取页面；截图、元素和页面文字可加入当前对话。')}</p><div className="browser-new-profile"><BrowserProfiles api={api} value={profileId} onChange={setProfileId}/></div><button type="button" className="quiet-button" onClick={()=>{preview?.openWorkspace('computer')}}>{t('也可以共享电脑窗口')}</button></div>}
+    {current?<>{current.error&&<p className="workbench-error" role="alert">{current.error}</p>}{active&&<NativeBrowserStage key={current.id} api={api} id={current.id}/>}</>:<div className="workbench-empty browser-start-page"><Globe size={36}/><strong>{t('打开网页，和队员一起工作')}</strong><p>{t('输入网址或本地开发地址。共享后队员可读取页面；截图、元素和页面文字可加入当前对话。')}</p></div>}
     {markup&&<BrowserMarkupDialog capture={markup} onClose={()=>setMarkup(null)} onDeliver={file=>deliverFile(file,markup)}/>}
   </div>
 }

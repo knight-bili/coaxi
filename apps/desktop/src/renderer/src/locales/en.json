@@ -6258,6 +6258,7 @@
   "打开网页，和队员一起工作": "Open a page and work with teammates",
   "输入网址或本地开发地址。共享后队员可读取页面；截图、元素和页面文字可加入当前对话。": "Enter a website or local development address. Share it for teammates to read; add screenshots, elements and text to the current conversation.",
   "也可以共享电脑窗口": "You can also share a desktop window",
+  "共享电脑窗口": "Share a desktop window",
   "请先完成或取消当前新对话，再从启动器进入项目。": "Finish or cancel the new conversation before opening a project from the launcher.",
   "先打开一个对话，再选择共享窗口。": "Open a conversation before choosing a shared window.",
   "当前连接未提供本机工具服务。": "This connection does not provide local tool services.",
