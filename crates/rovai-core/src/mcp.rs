@@ -21,6 +21,8 @@ use sha2::{Digest, Sha256};
 use url::Url;
 use uuid::Uuid;
 
+pub(crate) mod tool_discovery;
+
 #[cfg(windows)]
 use crate::platform::private_storage::{
     atomic_write_private_bytes, create_private_bytes, open_private_read_file,

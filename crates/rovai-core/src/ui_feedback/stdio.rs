@@ -210,13 +210,10 @@ async fn serve(config: ProcessConfig) -> Result<()> {
             continue;
         }
         if method == "tools/list" {
-            let tools = config
-                .request("catalog", json!({}))
-                .await
-                .unwrap_or_else(|_| json!([]));
+            let tools = config.request("catalog", json!({})).await;
             answer(
                 &mut output,
-                &json!({"jsonrpc":"2.0","id":id,"result":{"tools":tools}}),
+                &crate::mcp::tool_discovery::response(id, tools),
             )
             .await?;
             continue;

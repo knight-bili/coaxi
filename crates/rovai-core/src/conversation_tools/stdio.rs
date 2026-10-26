@@ -210,7 +210,7 @@ async fn serve(config: ProcessConfig) -> Result<()> {
                 Some("initialize")=>{let proposed=request["params"]["protocolVersion"].as_str().unwrap_or("");let protocol=if matches!(proposed,"2024-11-05"|"2025-03-26"|"2025-06-18"){proposed}else{"2025-06-18"};write(&output,&json!({"jsonrpc":"2.0","id":id,"result":{"protocolVersion":protocol,"capabilities":{"tools":{"listChanged":false}},"serverInfo":{"name":SERVER_NAME,"version":"1"}}})).await?;initialized=true;},
                 _ if !initialized=>write(&output,&json!({"jsonrpc":"2.0","id":id,"error":{"code":-32600,"message":"Initialize first"}})).await?,
                 Some("ping")=>write(&output,&json!({"jsonrpc":"2.0","id":id,"result":{}})).await?,
-                Some("tools/list")=>{let tools=config.request("catalog",json!({})).await?;write(&output,&json!({"jsonrpc":"2.0","id":id,"result":{"tools":tools}})).await?;},
+                Some("tools/list")=>{let tools=config.request("catalog",json!({})).await;write(&output,&crate::mcp::tool_discovery::response(id,tools)).await?;},
                 Some("tools/call")=>{
                     let key=serde_json::to_string(&id)?;let token=CancellationToken::new();let mut pending=calls.lock().await;
                     if pending.len()>=16||pending.contains_key(&key){drop(pending);write(&output,&json!({"jsonrpc":"2.0","id":id,"result":broker::failure("capacity_reached",None)})).await?;continue}
