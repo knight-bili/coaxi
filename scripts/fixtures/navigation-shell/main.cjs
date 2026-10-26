@@ -9,6 +9,7 @@ app.setPath('userData', userData)
 app.setPath('sessionData', join(userData, 'session'))
 app.whenReady().then(async () => {
   const window = new BrowserWindow({ show: process.platform === 'linux', width: 1040, height: 700, useContentSize: true, webPreferences: { contextIsolation: true, sandbox: true, nodeIntegration: false, backgroundThrottling: false, offscreen: process.platform === 'win32' } })
+  window.webContents.on('console-message', event => { if(event.level==='error')console.error(event.message) })
   const run = code => window.webContents.executeJavaScript(code, true)
   const settle = () => run('window.navigationTest.settle()')
   const width = () => run('document.querySelector(".unified-sidebar").getBoundingClientRect().width')
@@ -37,7 +38,7 @@ app.whenReady().then(async () => {
       const unread=status?.querySelector('.camp-unread-dot')
       const title=pinned?.querySelector('.truncate')?.getBoundingClientRect()
       const ordinaryTitle=ordinary?.querySelector('.truncate')?.getBoundingClientRect()
-      if(!pinned||!ordinary||!open||!icon||!status||!ordinaryStatus||!unread||!title||!ordinaryTitle)return null
+      if(!pinned||!ordinary||!open||!icon||!status||!ordinaryStatus||!unread||!title||!ordinaryTitle)return {missing:{pinned:!pinned,ordinary:!ordinary,open:!open,icon:!icon,status:!status,ordinaryStatus:!ordinaryStatus,unread:!unread,title:!title,ordinaryTitle:!ordinaryTitle}}
       const iconRect=icon.getBoundingClientRect(),statusRect=status.getBoundingClientRect()
       const ordinaryStatusRect=ordinaryStatus.getBoundingClientRect(),unreadRect=unread.getBoundingClientRect()
       return {
@@ -57,7 +58,7 @@ app.whenReady().then(async () => {
         titleDelta:Math.abs(title.left-ordinaryTitle.left)
       }
     })()`)
-    assert.ok(desktopPinned, 'Desktop pinned and ordinary conversation rows are visible')
+    assert.ok(!desktopPinned.missing, 'Desktop pinned and ordinary conversation rows are visible: '+JSON.stringify(desktopPinned))
     assert.ok(['flex','inline-flex'].includes(desktopPinned.iconDisplay),'Desktop pinned conversation shows its bubble icon')
     assert.equal(desktopPinned.iconWidth,17,'Desktop bubble icon uses the shared navigation glyph slot')
     assert.equal(desktopPinned.iconHidden,'true','Visible row text keeps the decorative bubble out of the accessibility tree')
@@ -137,7 +138,7 @@ app.whenReady().then(async () => {
     assert.deepEqual(await menuLabels(),['置顶','标记已读','重命名','复制会话 ID','删除'])
     assert.equal(await run('window.navigationTest.actions.length'),opensBefore,'Right click never opens a Thread')
     const popup=await run('(()=>{const r=document.querySelector(".sidebar-action-menu").getBoundingClientRect();return {x:r.x,y:r.y,right:r.right,bottom:r.bottom}})()')
-    assert.ok(Math.abs(popup.x-p.x)<2&&Math.abs(popup.y-p.y)<2,'Context menu follows the pointer')
+    assert.ok(Math.abs(popup.x-p.x)<2&&(Math.abs(popup.y-p.y)<2||Math.abs(popup.bottom-p.y)<2),'Context menu follows the pointer, flipping above it when needed: '+JSON.stringify({p,popup}))
     assert.ok(popup.right<=1032&&popup.bottom<=692,'Menu fits inside window bounds')
     await capture('sidecar-v3-thread-menu')
     await selectItem('标记已读');await moveAway()
@@ -305,5 +306,5 @@ app.whenReady().then(async () => {
     assert.ok((await run('window.navigationTest.actions')).includes('project-thread:rvcamp_01h47kvsy5fk1shh6w1g60eec2'), 'Project home opens the selected authoritative thread identity')
     console.log(JSON.stringify({ok:true,checks:'Existing navigation regressions plus explicit project entry, project context Back/Forward, scoped recent threads and two-theme project home; no Core/Runtime'}))
     window.destroy();app.quit()
-  } catch(error) {console.error(error);console.error(await run('JSON.stringify({events:window.pointerEvents?.slice(-30),shell:document.querySelector(".navigation-shell").outerHTML.slice(0,300)})'));await capture('failure');app.exit(1)}
+  } catch(error) {console.error(error);console.error(await run('JSON.stringify({events:window.pointerEvents?.slice(-30),shell:document.querySelector(".navigation-shell")?.outerHTML.slice(0,300),text:document.body.innerText.slice(0,1000)})'));await capture('failure');app.exit(1)}
 }).catch(error=>{console.error(error);app.exit(1)})

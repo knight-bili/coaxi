@@ -128,6 +128,8 @@ import {
   type DraftMutation
 } from './draft-mutation-coordinator'
 import { AttachmentCard, AttachmentPlaceholder, ComposerAttachmentStrip } from './AttachmentCard'
+import { prepareComposerFileBatch } from './composer-file-batch'
+import { useDrawerPresence } from './useDrawerPresence'
 export { attachmentRevealLabel } from './AttachmentCard'
 import {
   attachmentDragKind,
@@ -506,7 +508,7 @@ export function composerDraftNeedsContinuationRepair(
   return intent.recipientSelectionRequired || !available
 }
 
-async function mutateComposerDraft(
+export async function mutateComposerDraft(
   client: ThreadClient,
   draft: ThreadComposerDraftView,
   mutation: DraftMutation,
@@ -564,6 +566,8 @@ async function mutateComposerDraft(
       )
       return update({ attachments: [...draft.attachments, attachment] })
     }
+    case 'add_source_attachments':
+      return update({ attachments: await prepareComposerFileBatch(client, draft, mutation.files, mutation.isCurrent) })
     case 'remove_source_attachment':
       await client.composerAttachments.discard?.(draft.threadId, [mutation.attachmentId])
         .catch(() => undefined)
@@ -2686,6 +2690,7 @@ function ThreadWorkspaceContent({
     : executionDrawerAgentId
       ? executionProcessByAgentId.get(executionDrawerAgentId) ?? null
       : null
+  const executionPresence = useDrawerPresence(executionDrawerProcess)
   const executionDrawerProfile = executionDrawerProcess && !executionDrawerOverview
     ? profileById.get(executionDrawerProcess.agentId) ?? null
     : null
@@ -4476,12 +4481,14 @@ function ThreadWorkspaceContent({
     onBindWorkbenchFiles?.(async files=>{
       const target=snapshot.thread.id
       if(composerInteractionDisabled||composerDraft?.threadId!==target||draftThreadId.current!==target)return false
-      await composerHandleRef.current?.flush()
-      for(const file of files){
-        if(draftThreadId.current!==target)throw new Error(uiAttribute('原对话已切换，图片没有加入其他对话。'))
-        await draftCoordinator.addSourceAttachment(file)
-      }
-      return draftThreadId.current===target
+      const operation=attachmentPreparationQueue.current.catch(()=>undefined).then(async()=>{
+        await composerHandleRef.current?.flush()
+        if(draftThreadId.current!==target)return false
+        await draftCoordinator.addSourceAttachments(files)
+        return draftThreadId.current===target
+      })
+      attachmentPreparationQueue.current=operation.then(()=>undefined,()=>undefined)
+      return operation
     })
     return()=>onBindWorkbenchFiles?.(null)
   },[onBindWorkbenchFiles,composerInteractionDisabled,composerDraft?.threadId,snapshot.thread.id,draftCoordinator])
@@ -4868,14 +4875,15 @@ function ThreadWorkspaceContent({
   const conversationFindNavigationDisabled = conversationFindBusy
     || conversationFindTotal <= 0
 
-  const executionDrawer = executionDrawerProcess ? (
+  const executionDrawer = executionPresence.value ? (
+    <div className="execution-motion-presence" data-state={executionPresence.closing ? 'closed' : 'open'} inert={executionPresence.closing}>
     <ExecutionDrawer
-      key={executionDrawerProcess.agentId}
+      key={executionPresence.value.agentId}
       placement={executionPlacement}
-      process={executionDrawerProcess}
+      process={executionPresence.value}
       overview={executionDrawerOverview}
       memberFast={memberFast}
-      member={memberById.get(executionDrawerProcess.agentId) ?? null}
+      member={memberById.get(executionPresence.value.agentId) ?? null}
       profile={executionDrawerProfile}
       installation={executionDrawerInstallation}
       turns={snapshot.turns}
@@ -4900,6 +4908,7 @@ function ThreadWorkspaceContent({
       onRevealMessage={(messageId) => void revealReplyParent(messageId)}
       onFileOpenError={notifyError}
     />
+    </div>
   ) : null
   const rightExecutionVisible = executionPlacement === 'right'
     && Boolean(filePreview?.paneVisible && filePreview.activeTab?.kind === 'execution')

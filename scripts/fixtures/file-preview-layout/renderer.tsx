@@ -512,7 +512,8 @@ async function settle(): Promise<void> {
   do {
     await new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())))
     if (performance.now() > deadline) throw new Error('File preview layout did not settle')
-  } while (!element('.workspace-grid') || element('.is-file-preview-snapping'))
+  } while (!element('.workspace-grid') || element('.is-file-preview-snapping') || document.getAnimations().some(animation =>
+    animation instanceof CSSTransition && animation.playState === 'running'))
 }
 
 Object.assign(window, { previewTest: {

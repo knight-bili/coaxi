@@ -11,6 +11,7 @@ import type { FilePreviewContextValue, FilePreviewSession, FilePreviewTabModel }
 import { UiText } from './interface-language'
 import { filePreviewSourceKey } from './file-preview-session'
 import './unified-workspace.css'
+import { useDrawerPresence } from './useDrawerPresence'
 export * from './file-preview-controller'
 
 const FilePreviewApiContext = createContext<FilePreviewApi | null>(null)
@@ -36,18 +37,20 @@ function RetainedPreview({ session, resolvedTheme, current, bounds, resizing, mi
   domScope?: string; isFocusedSurface: boolean
 }): React.JSX.Element {
   const state = session.getSnapshot()
-  const value = useMemo(() => ({ ...sessionValue(session, resolvedTheme), isCurrentThread: current, domScope, isFocusedSurface }), [session, state, resolvedTheme, current, domScope, isFocusedSurface])
-  const visible = current && value.paneVisible && !!bounds
+  const visible = current && state.paneVisible && !!bounds
+  const presence = useDrawerPresence(visible ? true : null)
+  const presented = current && presence.value !== null
+  const value = useMemo(() => ({ ...sessionValue(session, resolvedTheme), paneVisible: presented, isCurrentThread: current, domScope, isFocusedSurface }), [session, state, resolvedTheme, current, presented, domScope, isFocusedSurface])
   const executionHostRef = useCallback(
     (element: HTMLDivElement | null) => registerExecutionHost(session.threadId, element),
     [registerExecutionHost, session.threadId]
   )
   const workbenchHostRef = useCallback((element: HTMLDivElement | null) => registerWorkbenchHost(session.threadId, element), [registerWorkbenchHost, session.threadId])
   return <FilePreviewContext.Provider value={value}>
-    <div className={`file-preview-retained-host${resizing ? ' is-resizing' : ''}`} hidden={!visible} inert={!visible}
+    <div className={`file-preview-retained-host${resizing ? ' is-resizing' : ''}`} hidden={!presented} inert={!visible} data-drawer-state={visible ? 'open' : 'closed'}
       style={bounds ?? undefined} data-preview-camp={session.threadId}>
       <RetainedPane
-        visible={visible}
+        visible={presented}
         missionActivity={missionActivity}
         executionHostRef={executionHostRef}
         workbenchHostRef={workbenchHostRef}
@@ -87,13 +90,8 @@ function PreviewDeck({ resources, anchor, resolvedTheme, missionActivity, regist
     window.addEventListener('scroll', measure, true)
     return () => { observer.disconnect(); window.removeEventListener('resize', measure); window.removeEventListener('scroll', measure, true) }
   }, [anchor, layout?.width, layout?.availableWidth, layout?.compact, contained, host])
-  // The split context updates before a ResizeObserver delivery on a window resize.
-  const width = layout?.workspace ? (layout.compact ? layout.availableWidth : Math.round(layout.width)) : undefined
-  const positioned = bounds && {
-    ...bounds, ...(contained ? { position: 'absolute' as const } : {}), width: width ?? bounds.width,
-    left: typeof bounds.left === 'number' && typeof bounds.width === 'number' && width !== undefined
-      ? bounds.left + bounds.width - width : bounds.left
-  }
+  // Follow the measured split throughout its transition, not its final target width.
+  const positioned = bounds && { ...bounds, ...(contained ? { position: 'absolute' as const } : {}) }
   return <>{[...resources.sessions.values()].filter(session => !contained || session.threadId === threadId).map(session => <RetainedPreview key={session.id} session={session}
     resolvedTheme={resolvedTheme} current={session.threadId === threadId} bounds={positioned} resizing={!!layout?.resizing}
     missionActivity={session.threadId === threadId ? missionActivity : null}

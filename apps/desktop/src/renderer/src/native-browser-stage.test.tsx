@@ -62,3 +62,35 @@ it('paints and keeps a frozen frame for the whole time a menu covers the page', 
  await new Promise(done => setTimeout(done, 30))
  expect(f.view.container.querySelector('[data-browser-frozen-frame]')).not.toBeNull()
 })
+
+it('tracks moving layout bounds during a drawer transition even without resize events', async () => {
+ let left = 500
+ vi.mocked(HTMLElement.prototype.getBoundingClientRect).mockImplementation(() => new DOMRect(left, 50, 600, 600))
+ const present = vi.fn(async () => undefined), api = { present } as unknown as BrowserWorkspaceApi
+ const view = render(<div className="workspace-grid"><NativeBrowserStage id="tab" api={api}/></div>)
+ await waitFor(() => expect(present).toHaveBeenCalledWith(expect.objectContaining({ bounds: expect.objectContaining({ x: 500 }) })))
+ const transition = (type: string) => { const event = new Event(type, { bubbles: true }); Object.defineProperty(event, 'propertyName', { value: 'grid-template-columns' }); view.container.firstElementChild!.dispatchEvent(event) }
+ transition('transitionrun')
+ left = 520
+ await waitFor(() => expect(present).toHaveBeenCalledWith(expect.objectContaining({ bounds: expect.objectContaining({ x: 520 }) })))
+ left = 550
+ await waitFor(() => expect(present).toHaveBeenCalledWith(expect.objectContaining({ bounds: expect.objectContaining({ x: 550 }) })))
+ transition('transitionend')
+ expect(present.mock.calls.some(call => (call as any)[0].bounds === null)).toBe(false)
+})
+
+it('keeps one native stage across close and reopen, with a frozen frame for the exit', async () => {
+ const present = vi.fn(async () => undefined), inspect = vi.fn(async () => ({ data: 'frame', mime: 'image/png' }))
+ const api = { present, inspect } as unknown as BrowserWorkspaceApi
+ const view = render(<NativeBrowserStage id="tab" api={api}/>)
+ const stage = view.container.firstElementChild
+ await waitFor(() => expect(present).toHaveBeenCalledWith(expect.objectContaining({ bounds: expect.objectContaining({ width: 600 }) })))
+ present.mockClear()
+ view.rerender(<NativeBrowserStage id="tab" api={api} active={false}/>)
+ await waitFor(() => expect(present).toHaveBeenCalledWith(expect.objectContaining({ bounds: null })))
+ expect(view.container.querySelector('[data-browser-frozen-frame]')).not.toBeNull()
+ expect(view.container.firstElementChild).toBe(stage)
+ view.rerender(<NativeBrowserStage id="tab" api={api}/>)
+ await waitFor(() => expect(view.container.querySelector('[data-browser-frozen-frame]')).toBeNull())
+ expect(view.container.firstElementChild).toBe(stage)
+})

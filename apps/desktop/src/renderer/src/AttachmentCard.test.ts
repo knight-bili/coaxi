@@ -35,6 +35,20 @@ const composerLocators: Array<[string, LocalAttachmentOwnerLocator, boolean]> = 
 ]]
 
 describe('AttachmentCard composer actions', () => {
+  it('renders a removable blue file reference inside the composer instead of a generic file card', () => {
+    const markup = renderToStaticMarkup(createElement(AttachmentCard, {
+      attachment: fileAttachment,
+      locator: { owner: 'composer', threadId: 'camp-1', attachmentRefId: fileAttachment.id },
+      presentation: 'composer', onRemove: () => undefined
+    }))
+    expect(markup).toContain('composer-file-reference')
+    expect(markup).toContain('data-reference-badge=""')
+    expect(markup).toContain('data-ref-type="file"')
+    expect(markup).toContain('text-blue-700 dark:text-blue-400')
+    expect(markup).toContain('report.md')
+    expect(markup).toContain('移除附件 report.md')
+    expect(markup).not.toContain('attachment-title-line')
+  })
   it.each(composerLocators)('exposes preview and applicable context actions in the %s', (_name, locator, hasContextMenu) => {
     const markup = renderToStaticMarkup(createElement(AttachmentCard, {
       attachment: fileAttachment,

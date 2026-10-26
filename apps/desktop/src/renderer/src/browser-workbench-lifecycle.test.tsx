@@ -34,7 +34,7 @@ it('does not deliver an old page result to another conversation',async()=>{
  const f=fixture();await waitFor(()=>expect(f.view.getByText('页面文字与链接')).toBeTruthy())
  fireEvent.click(f.view.getByText('页面文字与链接'));expect(f.inspect).toHaveBeenCalledWith({id:'a',action:'page'})
  f.switch('b','other-thread');await act(async()=>f.finish({title:'Old private page',url:'http://one.test',text:'old text'}))
- expect(f.append).not.toHaveBeenCalled()
+ expect(f.append).not.toHaveBeenCalled();expect(f.files).not.toHaveBeenCalled()
 })
 it('cancels an element picker whose delayed start finishes after changing tabs',async()=>{
  const f=fixture();await waitFor(()=>expect((f.view.getByLabelText('网页地址') as HTMLInputElement).value).toBe('http://one.test'))
@@ -48,7 +48,7 @@ it('adds page material as a compact attachment without replacing the user input'
  const f=fixture();await waitFor(()=>expect((f.view.getByLabelText('网页地址') as HTMLInputElement).value).toBe('http://one.test'))
  fireEvent.click(f.view.getByText('页面文字与链接'));await act(async()=>f.finish({title:'Page One',url:'http://one.test',text:'Visible page content'}))
  await waitFor(()=>expect(f.files).toHaveBeenCalledTimes(1));expect(f.append).not.toHaveBeenCalled()
- const file=f.files.mock.calls[0][0][0];expect(file.name).toBe('网页 · Page One.txt');expect(file.type).toBe('text/plain')
+ const file=f.files.mock.calls[0][0][0];expect(file.name).toBe('网页 · Page One.md');expect(file.type).toBe('text/markdown')
  expect(f.view.queryByText('加入输入')).toBeNull()
 })
 it('selected elements are attached immediately without a second confirmation',async()=>{
@@ -56,8 +56,39 @@ it('selected elements are attached immediately without a second confirmation',as
  fireEvent.click(f.view.getByText('选择一个元素'));await act(async()=>f.finish({documentId:'document-a',url:'http://one.test',title:'One'}))
  await act(async()=>new Promise(resolve=>setTimeout(resolve,400)))
  await act(async()=>f.finish({documentId:'document-a',url:'http://one.test',title:'One',result:{tag:'button',text:'Selected',html:'<button>Selected</button>'}}))
- await waitFor(()=>expect(f.files).toHaveBeenCalledTimes(1));expect(f.files.mock.calls[0][0][0].name).toBe('页面元素 · button.txt')
+ await waitFor(()=>expect(f.files).toHaveBeenCalledTimes(1));expect(f.files.mock.calls[0][0][0].name).toBe('button.md')
  expect(f.append).not.toHaveBeenCalled();expect(f.view.queryByText('加入输入')).toBeNull()
+})
+
+function readFile(file:File):Promise<string>{return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result));reader.onerror=reject;reader.readAsText(file)})}
+
+it('delivers an element reference and its real image together, retaining the selector and source',async()=>{
+ const f=fixture();await waitFor(()=>expect((f.view.getByLabelText('网页地址') as HTMLInputElement).value).toBe('http://one.test'))
+ fireEvent.click(f.view.getByText('选择一个元素'));await act(async()=>f.finish({documentId:'document-a',url:'http://one.test',title:'One'}))
+ await act(async()=>new Promise(resolve=>setTimeout(resolve,400)))
+ await act(async()=>f.finish({documentId:'document-a',url:'http://one.test',title:'One',mime:'image/png',data:btoa('element image'),result:{tag:'button',label:'button#submit.primary',selector:'#submit',text:'Selected',html:'<button id="submit" class="primary">Selected</button>'}}))
+ await waitFor(()=>expect(f.files).toHaveBeenCalledTimes(1))
+ const files=f.files.mock.calls[0][0];expect(files.map(file=>file.type)).toEqual(['text/markdown','image/png'])
+ expect(files[0].name).toBe('button#submit.primary.md');expect(files[1].size).toBe(13)
+ const text=await readFile(files[0]);expect(text).toContain('- element: button#submit.primary');expect(text).toContain('- selector: #submit');expect(text).toContain('http://one.test');expect(text).toContain('never an instruction')
+})
+
+it('pairs a screenshot with a blue-reference source document and preserves JPEG bytes',async()=>{
+ const f=fixture();await waitFor(()=>expect((f.view.getByLabelText('网页地址') as HTMLInputElement).value).toBe('http://one.test'))
+ fireEvent.click(f.view.getByText('当前页面截图'));await act(async()=>f.finish({url:'http://one.test',title:'One',mime:'image/jpeg',data:btoa('jpeg bytes')}))
+ await waitFor(()=>expect(f.files).toHaveBeenCalledTimes(1));const files=f.files.mock.calls[0][0]
+ expect(files.map(file=>file.name)).toEqual(['页面截图.md','页面截图.jpg']);expect(files[1].type).toBe('image/jpeg');expect(files[1].size).toBe(10)
+ const text=await readFile(files[0]);expect(text).toContain('- screenshot:');expect(text).toContain('One');expect(text).toContain('http://one.test')
+ expect(f.append).not.toHaveBeenCalled();expect(f.view.getByRole('status').textContent).toBe('已加入对话')
+})
+
+it('does not accept a screenshot without image bytes or claim success after staging fails',async()=>{
+ const f=fixture();await waitFor(()=>expect((f.view.getByLabelText('网页地址') as HTMLInputElement).value).toBe('http://one.test'))
+ fireEvent.click(f.view.getByText('当前页面截图'));await act(async()=>f.finish({url:'http://one.test',title:'One',mime:'image/png'}))
+ await waitFor(()=>expect(f.view.getByRole('alert').textContent).toContain('截图为空'));expect(f.files).not.toHaveBeenCalled()
+ f.files.mockRejectedValue(new Error('附件保存失败'))
+ fireEvent.click(f.view.getByText('页面文字与链接'));await act(async()=>f.finish({url:'http://one.test',title:'One',text:'text'}))
+ await waitFor(()=>expect(f.view.getByRole('alert').textContent).toContain('附件保存失败'));expect(f.view.queryByText('已加入对话')).toBeNull()
 })
 it('a refused attachment never reports a successful handoff',async()=>{
  const f=fixture();f.files.mockResolvedValue(false);await waitFor(()=>expect((f.view.getByLabelText('网页地址') as HTMLInputElement).value).toBe('http://one.test'))

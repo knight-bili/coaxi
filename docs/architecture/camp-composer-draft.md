@@ -37,6 +37,11 @@ Core 不保存 public Camp Draft 正文、revision、编辑租约、恢复锁或
 
 ## 发送
 
+内置浏览器交接沿用固定 Codeg 的页面来源 Markdown 和蓝色引用呈现，截图及元素截图另带实际图片文件。
+Coaxi 使用现有 main attachment authority：同一次交接的引用与图片先全部准备，再作为一次本机草稿修改发布；
+任一准备失败或编辑上下文切换时撤销本次新准备的附件身份，不修改已有正文和附件。发送等待附件准备队列完成，
+快照保存与恢复仍使用原 Thread-local store，蓝色引用不新增 Core atom 或独立授权。
+
 ```text
 mounted Renderer edit
   → snapshot content / quotes / reply anchor / targets / Skills / source refs

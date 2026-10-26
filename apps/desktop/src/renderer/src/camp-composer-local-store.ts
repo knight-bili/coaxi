@@ -11,7 +11,7 @@ import type { EditingRecovery } from './camp-client'
 export const THREAD_COMPOSER_STORAGE_PREFIX = 'rovai.camp-composer-draft.v1:'
 const MAX_STORED_DRAFT_BYTES = 4 * 1024 * 1024
 const MAX_SEGMENTS = 4_096
-const MAX_ATTACHMENTS = 10
+export const MAX_COMPOSER_ATTACHMENTS = 10
 const MAX_QUOTES = 32
 
 type DraftStorage = Pick<Storage, 'getItem' | 'setItem' | 'removeItem'>
@@ -123,7 +123,7 @@ function isStoredDraft(value: unknown, threadId: string): value is ThreadCompose
     && value.quotes.length <= MAX_QUOTES
     && value.quotes.every(isQuote)
     && Array.isArray(value.attachments)
-    && value.attachments.length <= MAX_ATTACHMENTS
+    && value.attachments.length <= MAX_COMPOSER_ATTACHMENTS
     && value.attachments.every(isAttachment)
     && isReplyIntent(value.replyIntent)
     && isContinuationIntent(value.continuationIntent)

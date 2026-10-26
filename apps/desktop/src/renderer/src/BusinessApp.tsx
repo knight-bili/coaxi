@@ -131,6 +131,7 @@ import { MissionCommandRejected, missionCommand, missionError, unreadMissionCoun
 import './mission.css'
 import { openRuntimeModelCatalog } from './runtime-check'
 import { MissionSurface } from './MissionSurface'
+import { leaveDrawer } from './useDrawerPresence'
 import { MissionHeader } from './MissionHeader'
 import { FilePreviewProvider } from './FilePreviewContext'
 import { NavigationShell } from './NavigationShell'
@@ -1118,7 +1119,7 @@ function BusinessAppContent({
       !activeThreadSurfaceNeedsLeaveGuard(viewRef.current, leavingThreadId)
       || registration?.threadId !== leavingThreadId
     ) {
-      await transition()
+      await leaveDrawer(document.querySelector('.mission-drawer'), transition)
       return true
     }
 
@@ -1132,7 +1133,7 @@ function BusinessAppContent({
     let prepared: ThreadLeavePreparation | undefined
     try {
       prepared = await preparation.promise
-      await transition()
+      await leaveDrawer(document.querySelector('.mission-drawer'), transition)
       await afterNextPaint()
       preparation.didLeave ||= !activeThreadSurfaceNeedsLeaveGuard(viewRef.current, activeThreadIdRef.current)
         || activeThreadIdRef.current !== leavingThreadId

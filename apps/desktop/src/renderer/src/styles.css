@@ -1,6 +1,7 @@
 @import '../../../../../packages/ui/src/theme.css';
 @import './settings-workspace.css';
 @import './workspace-controls.css';
+@import './drawer-motion.css';
 
 
 
@@ -4688,6 +4689,11 @@ details summary { min-height: 28px; padding: 5px 0; color: var(--muted); font-si
 .attachment-card { --user-file-card-max-width: 220px; position: relative; display: flex; min-width: 0; align-items: stretch; overflow: hidden; border: 1px solid var(--line); color: var(--ink); background: var(--surface); }
 .composer-attachment-card { min-width: var(--user-composer-min-width); max-width: min(var(--user-composer-max-width), var(--user-file-card-max-width)); height: var(--user-composer-file-height); flex: 0 0 auto; border-radius: 11px; background: transparent; scroll-snap-align: start; }
 .composer-image-attachment { width: var(--user-composer-file-height); min-width: var(--user-composer-file-height); max-width: var(--user-composer-file-height); flex-basis: var(--user-composer-file-height); }
+.composer-file-reference { min-width: 0; max-width: min(18rem, 100%); height: 32px; align-self: center; border: 0; border-radius: 5px; }
+.composer-file-reference .attachment-open { display: flex; padding: 4px 24px 4px 0; }
+.composer-file-reference [data-reference-badge] { display: inline-flex; min-width: 0; align-items: center; gap: 4px; color: var(--resource-link); font-size: 13px; line-height: 22px; }
+.composer-file-reference [data-reference-badge] > span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.composer-file-reference [data-reference-badge] svg { display: block; width: 15px; height: 15px; flex-shrink: 0; }
 .user-timeline { max-width: min(var(--user-file-card-max-width), 100%); height: 46px; flex: 0 1 auto; border-radius: 10px; background: transparent; }
 .agent-timeline { --attachment-accent: var(--attachment-generic); width: 100%; min-height: 62px; border-radius: 10px; background: var(--surface-raised); transition: border-color 110ms ease, background-color 110ms ease, transform 110ms ease; }
 .agent-timeline.type-web { --attachment-accent: var(--attachment-web); }

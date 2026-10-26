@@ -15,6 +15,7 @@ import { UiText, uiAttribute } from './interface-language'
 import { ImageContextMenu, type ImageAction, type ImageMenuPosition } from './ImageContextMenu'
 import { writeClipboardImage } from './clipboard'
 import { privateAttachmentOwnerKey } from '../../shared/private-attachment-locator'
+import { ReferenceBadge } from './codeg-native-content/components/chat/composer/badges/reference-badge'
 
 type AttachmentKind = 'file' | 'directory'
 
@@ -283,7 +284,10 @@ export function AttachmentCard({
             : !previewFailed ? <i className="attachment-loading" /> : <b>!</b>}
         </span>
       )
-    : (
+    : presentation === 'composer' ? (
+        <ReferenceBadge data={{ refType: 'file', id: attachment.id, label: attachment.displayName,
+          uri: null, meta: { fileKind: attachment.kind === 'directory' ? 'dir' : 'file' } }} />
+      ) : (
         <>
           {agentPresentation
             ? <AgentArtifactIcon type={displayClassification.agentDisplayType} />
@@ -315,7 +319,7 @@ export function AttachmentCard({
 
   return (
     <div
-      className={`attachment-card ${presentation === 'composer' ? 'composer-attachment-card' : presentation} ${composerImage ? 'composer-image-attachment' : ''} type-${displayClassification.agentDisplayType} ${availabilityLabel ? `attachment-availability-${availability}` : ''}`}
+      className={`attachment-card ${presentation === 'composer' ? 'composer-attachment-card' : presentation} ${composerImage ? 'composer-image-attachment' : presentation === 'composer' ? 'composer-file-reference' : ''} type-${displayClassification.agentDisplayType} ${availabilityLabel ? `attachment-availability-${availability}` : ''}`}
       aria-label={availabilityLabel ? `${attachment.displayName}：${availabilityLabel}` : undefined}
       onMouseEnter={fileLocation.inspect}
       onFocus={fileLocation.inspect}

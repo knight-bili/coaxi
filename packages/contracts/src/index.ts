@@ -5224,7 +5224,7 @@ export interface BrowserProfileView {id:string;name:string;createdAt:number}
 export interface BrowserDownloadView { id:string;threadId:string;tabId:string;fileName:string;path:string;state:'progressing'|'paused'|'interrupted'|'completed'|'cancelled'|'failed';receivedBytes:number;totalBytes:number;canResume:boolean;startedAt:number;updatedAt:number }
 export interface BrowserWorkspaceApi {
   present?(input:{id:string;sequence:number;bounds:{x:number;y:number;width:number;height:number}|null}):Promise<void>
-  inspect?(input:{id:string;action:'page'|'screenshot'|'console'|'pick_start'|'pick_read'|'pick_cancel';documentId?:string}):Promise<{url:string;title:string;documentId?:string;text?:string;mime?:string;data?:string;entries?:Array<{level:string;message:string;at:number}>;result?:{tag:string;text:string;html:string}|null;cancelled?:boolean}>
+  inspect?(input:{id:string;action:'page'|'screenshot'|'console'|'pick_start'|'pick_read'|'pick_cancel';documentId?:string}):Promise<{url:string;title:string;documentId?:string;text?:string;mime?:string;data?:string;entries?:Array<{level:string;message:string;at:number}>;result?:{tag:string;label?:string;selector?:string;text:string;html:string}|null;cancelled?:boolean}>
   preferences():Promise<BrowserPreferences>
   updatePreferences(input:BrowserPreferences):Promise<BrowserPreferences>
   profiles():Promise<{revision:string;profiles:BrowserProfileView[]}>

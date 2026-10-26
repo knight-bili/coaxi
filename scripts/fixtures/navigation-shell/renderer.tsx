@@ -16,8 +16,13 @@ import '../../../apps/web/src/styles.css'
 const noop = (): void => undefined
 const navigationListeners = new Set<(direction: 'back' | 'forward') => void>()
 const actions: string[] = []
-const preferences = browserPreferences('navigation-shell-fixture', { request: async () => undefined } as unknown as ConsoleClient).preferences.navigationPreferences
-Object.assign(window, { rovai: { platform: 'win32', clipboard: { write: async ({ text }: { text: string }) => { actions.push('clipboard:' + text) } }, windowControls: {
+const transport = { request: async (method: string, params: { groupKeys?: string[] }) => {
+  if (method === 'navigation.projectGroups') return { schemaVersion: 1, initialized: false, projectGroupsRevision: 0, projectGroups: [], projectOrder: null }
+  if (method === 'navigation.activity') return { schemaVersion: 1, throughGlobalSequence: 2, groups: (params.groupKeys ?? []).map(groupKey => ({ groupKey, activeThreadCount: 0 })) }
+  throw new Error('Unexpected navigation fixture request: ' + method)
+} } as unknown as ConsoleClient
+const preferences = browserPreferences('navigation-shell-fixture', transport).preferences.navigationPreferences
+Object.assign(window, { rovai: { platform: 'win32', request: transport.request, onEvent: () => noop, clipboard: { write: async ({ text }: { text: string }) => { actions.push('clipboard:' + text) } }, windowControls: {
   popupApplicationMenu: async () => undefined,
   onNavigationRequested: (listener: (direction: 'back' | 'forward') => void) => {
     navigationListeners.add(listener)
@@ -76,10 +81,17 @@ function Fixture(): React.JSX.Element {
   Object.assign(window, { navigationTest: {
     renders: () => renders, setSettings, setPlatform, setDisabled, setBrowser, navigation, target, actions, setRunning, setProjectHome,
     threadReadStates, preferences,
-    projectPreferences: browserPreferences('project-concurrency-fixture', { request: async () => undefined } as unknown as ConsoleClient).preferences.navigationPreferences,
+    projectPreferences: browserPreferences('project-concurrency-fixture', transport).preferences.navigationPreferences,
     hostNavigation: (direction: 'back' | 'forward') => navigationListeners.forEach(listener => listener(direction)),
     hostListenerCount: () => navigationListeners.size,
-    settle: () => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(() => setTimeout(resolve, 150))))
+    settle: async () => {
+      const deadline = performance.now() + 3_000
+      await new Promise(resolve => setTimeout(resolve, 150))
+      do {
+        await new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve())))
+        if (performance.now() > deadline) throw new Error('Navigation layout did not settle')
+      } while (document.getAnimations().some(animation => animation instanceof CSSTransition && animation.playState === 'running'))
+    }
   } })
   return <><WindowsApplicationMenu /><NavigationShell platform={platform} browser={browser} disabled={disabled} settings={settings} navigation={navigation} nativeWindowControls={browser ? undefined : window.rovai.windowControls}>
     <ThreadNavigation platform={platform} view={settings ? 'settings' : 'compose'} state="ready"

@@ -13,6 +13,7 @@ export type DraftMutation =
   | { kind: 'quote'; action: MessageQuoteAction; commandId: string }
   | { kind: 'save_content'; content: ComposerDocument }
   | { kind: 'add_source_attachment'; file: File }
+  | { kind: 'add_source_attachments'; files: File[]; isCurrent: () => boolean }
   | { kind: 'remove_source_attachment'; attachmentId: string }
   | { kind: 'start_reply'; message: ThreadMessageView }
   | { kind: 'cancel_reply' }
@@ -130,6 +131,14 @@ export class DraftMutationCoordinator {
       current,
       { kind: 'remove_source_attachment', attachmentId }
     ))
+  }
+
+  addSourceAttachments(files: File[]): Promise<ThreadComposerDraftView> {
+    const epoch = this.epoch
+    const threadId = this.requireThreadId()
+    return this.enqueue('add_source_attachments', current => this.bindings.mutate(current, {
+      kind: 'add_source_attachments', files: [...files], isCurrent: () => this.isActive(epoch, threadId)
+    }))
   }
 
   startReply(message: ThreadMessageView): Promise<ThreadComposerDraftView> {

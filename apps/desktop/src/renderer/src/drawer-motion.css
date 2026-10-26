@@ -1,0 +1,58 @@
+/* One timing for retained drawers. Native pages follow layout bounds, never transforms. */
+:root { --drawer-duration: 200ms; --drawer-ease: cubic-bezier(.22, 1, .36, 1); }
+:root .navigation-shell { transition: grid-template-columns var(--drawer-duration) var(--drawer-ease); }
+:root .navigation-shell.navigation-resizing { transition: none; }
+:root .navigation-shell > .unified-sidebar { overflow-x: clip; transition: opacity var(--drawer-duration) var(--drawer-ease), display var(--drawer-duration) allow-discrete; }
+:root .navigation-shell > .unified-sidebar.is-collapsed { opacity: 0; }
+
+/* Equal track counts let both opening and closing interpolate. */
+:root .workspace-grid.inspector-collapsed:not(.file-preview-open) { grid-template-columns: minmax(0, 1fr) 0px; }
+:root .camp-topbar:not(.has-file-preview) { grid-template-columns: minmax(0, 1fr) 0px; }
+:root .workspace-grid.inspector-collapsed,
+:root .camp-topbar { transition: grid-template-columns var(--drawer-duration) var(--drawer-ease); }
+:root .workspace-grid.is-file-preview-resizing,
+:root .camp-topbar.is-file-preview-resizing { transition: none; }
+:root .file-preview-pane { transition: display var(--drawer-duration) allow-discrete; }
+:root .file-preview-retained-host { overflow: hidden; clip-path: inset(0); transition: clip-path var(--drawer-duration) var(--drawer-ease); }
+:root .file-preview-retained-host[data-drawer-state="closed"] { clip-path: inset(0 0 0 100%); }
+:root .native-browser-stage { transition: display var(--drawer-duration) allow-discrete; }
+:root :is(.file-preview-pane, .native-browser-stage, .unified-sidebar, .workbench-bottom-terminal)[hidden] { pointer-events: none; }
+:root .camp-topbar.has-file-preview.file-preview-compact,
+:root .workspace-grid.file-preview-open.inspector-collapsed.file-preview-compact { grid-template-columns: minmax(0, 1fr) 100%; }
+:root .workspace-grid.file-preview-open.file-preview-compact .file-preview-pane,
+:root .camp-topbar.file-preview-compact .file-preview-tabs { grid-column: 2; }
+:root .member-sidebar { transition: width var(--drawer-duration) var(--drawer-ease), flex-basis var(--drawer-duration) var(--drawer-ease); }
+:root .mission-drawer { animation: drawer-enter var(--drawer-duration) var(--drawer-ease); transition: width var(--drawer-duration) var(--drawer-ease); }
+:root .mission-drawer.is-resizing { transition: none; }
+:root .mobile-conversation-drawer[data-state="open"] { animation: drawer-enter var(--drawer-duration) var(--drawer-ease); }
+:root .mobile-conversation-drawer[data-state="closed"] { animation: drawer-exit var(--drawer-duration) var(--drawer-ease); }
+:root .delegation-drawer { transition-duration: var(--drawer-duration); transition-timing-function: var(--drawer-ease); }
+:root .delegation-drawer:is([data-swiping], [data-nested-drawer-swiping]) { transition-duration: 0ms; }
+
+:root :is(.camp-detail-popover, .single-chat-popover) {
+  opacity: 1;
+  transform: translateX(0);
+  transition: opacity var(--drawer-duration) var(--drawer-ease), transform var(--drawer-duration) var(--drawer-ease), display var(--drawer-duration) allow-discrete;
+}
+:root :is(.camp-detail-popover, .single-chat-popover)[hidden] { opacity: 0; transform: translateX(12px); pointer-events: none; }
+@starting-style {
+  :root .navigation-shell > .unified-sidebar { opacity: 0; }
+  :root :is(.camp-detail-popover, .single-chat-popover) { opacity: 0; transform: translateX(12px); }
+}
+
+:root .engineering-terminal-host { transition: height var(--drawer-duration) var(--drawer-ease), min-height var(--drawer-duration) var(--drawer-ease); }
+:root .engineering-terminal-host:has(.workspace-terminal-resize:active) { transition: none; }
+:root .workbench-bottom-terminal { transition: display var(--drawer-duration) allow-discrete; }
+
+:root .execution-motion-presence { display: contents; }
+:root .execution-motion-presence[data-state="open"] > .execution-drawer { animation: drawer-enter var(--drawer-duration) var(--drawer-ease); }
+:root .execution-motion-presence[data-state="closed"] > .execution-drawer { opacity: 0; pointer-events: none; animation: drawer-exit var(--drawer-duration) var(--drawer-ease); }
+:root .memory-review-drawer[data-state="open"] { animation: drawer-enter var(--drawer-duration) var(--drawer-ease); }
+:root .memory-review-drawer[data-state="closed"] { animation: drawer-exit var(--drawer-duration) var(--drawer-ease); }
+@keyframes drawer-enter { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes drawer-exit { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(8px); } }
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --drawer-duration: 0ms; }
+  :root :is(.navigation-shell, .unified-sidebar, .workspace-grid, .camp-topbar, .file-preview-pane, .file-preview-retained-host, .native-browser-stage, .member-sidebar, .mission-drawer, .mobile-conversation-drawer, .delegation-drawer, .camp-detail-popover, .single-chat-popover, .engineering-terminal-host, .workbench-bottom-terminal, .memory-review-drawer, .execution-motion-presence > .execution-drawer) { transition: none; animation: none; }
+}

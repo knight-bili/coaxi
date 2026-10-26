@@ -6,12 +6,12 @@ import { drawMarkup,markFromDrag,renderMarkedScreenshot,type MarkupMark,type Mar
 import { readErrorMessage } from './error-message'
 import { useUiText } from './interface-language'
 
-export interface BrowserCapture{data:string;url:string;title:string}
+export interface BrowserCapture{data:string;mime?:string;url:string;title:string}
 /** Uses Codeg's image-coordinate markup renderer; the captured picture stays frozen while drawing. */
 export function BrowserMarkupDialog({capture,onClose,onDeliver}:{capture:BrowserCapture;onClose():void;onDeliver(file:File):Promise<boolean>}):React.JSX.Element{
   const t=useUiText(),canvas=useRef<HTMLCanvasElement>(null),image=useRef<HTMLImageElement|null>(null),drag=useRef<MarkupPoint|null>(null),live=useRef(true)
   const [tool,setTool]=useState<MarkupTool>('box'),[marks,setMarks]=useState<MarkupMark[]>([]),[draft,setDraft]=useState<MarkupMark|null>(null),[ready,setReady]=useState(false),[busy,setBusy]=useState(false),[error,setError]=useState('')
-  useEffect(()=>{live.current=true;const value=new Image();value.onload=()=>{if(live.current){image.current=value;setReady(true)}};value.onerror=()=>setError(t('截图无法读取，请重新截图。'));value.src='data:image/png;base64,'+capture.data;return()=>{live.current=false}},[capture.data,t])
+  useEffect(()=>{live.current=true;let cancelled=false;const value=new Image();value.onload=()=>{if(!cancelled){image.current=value;setReady(true)}};value.onerror=()=>{if(!cancelled)setError('截图无法读取，请重新截图。')};value.src='data:'+(capture.mime||'image/png')+';base64,'+capture.data;return()=>{cancelled=true;live.current=false}},[capture.data,capture.mime])
   useEffect(()=>{const node=canvas.current,img=image.current;if(!node||!img)return;node.width=img.naturalWidth;node.height=img.naturalHeight;const context=node.getContext('2d');if(context)drawMarkup(context,img,draft?[...marks,draft]:marks,{width:node.width,height:node.height})},[ready,marks,draft])
   const point=(event:React.PointerEvent<HTMLCanvasElement>):MarkupPoint=>{const node=event.currentTarget,rect=node.getBoundingClientRect();return {x:Math.max(0,Math.min(node.width,(event.clientX-rect.left)*node.width/rect.width)),y:Math.max(0,Math.min(node.height,(event.clientY-rect.top)*node.height/rect.height))}}
   const deliver=async():Promise<void>=>{if(!image.current||!canvas.current||busy)return;setBusy(true);setError('');try{const node=canvas.current,blob=await renderMarkedScreenshot(image.current,marks,{width:node.width,height:node.height});if(!live.current)return;const accepted=await onDeliver(new File([blob],'页面标注.'+(blob.type==='image/jpeg'?'jpg':'png'),{type:blob.type}));if(live.current&&accepted)onClose();else if(live.current)setError(t('未加入当前输入，标注仍保留。'))}catch(failure){if(live.current)setError(readErrorMessage(failure))}finally{if(live.current)setBusy(false)}}

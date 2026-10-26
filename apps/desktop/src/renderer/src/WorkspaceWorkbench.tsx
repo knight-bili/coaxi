@@ -79,7 +79,7 @@ export function WorkspaceWorkbench({ threadId, projectPath, members, bindLeaveGu
   const [creation, setCreation] = useState<'file' | 'directory' | 'rename' | null>(null), [name, setName] = useState('')
   const [terminalUnsettled,setTerminalUnsettled]=useState(false)
   const [terminalHeight,setTerminalHeight]=useState(260),terminalDrag=useRef<{y:number;height:number}|null>(null)
-  useEffect(()=>{if(terminalHost)terminalHost.style.height=terminalShown?terminalHeight+'px':''},[terminalHost,terminalShown,terminalHeight])
+  useEffect(()=>{if(terminalHost)terminalHost.style.height=terminalShown?terminalHeight+'px':'0px'},[terminalHost,terminalShown,terminalHeight])
   const [gitDirty,setGitDirty]=useState(false),[gitVersion,setGitVersion]=useState(0)
   const [gitView, setGitView] = useState('status'), [gitResult, setGitResult] = useState<GitResult | null>(null)
   const [action, setAction] = useState<keyof typeof gitActions>('stage'), [target, setTarget] = useState(''), [paths, setPaths] = useState('')
