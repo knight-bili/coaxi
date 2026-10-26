@@ -47,3 +47,11 @@
 .feedback-error details{color:var(--muted)}
 .feedback-error details>p{user-select:text;overflow-wrap:anywhere}
 @media(max-width:640px){.conversation-tools-rail{width:calc(100% - 24px)}}
+
+.composer-tools-menu { z-index: 120; min-width: 210px; max-width: calc(100vw - 24px); padding: 6px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--ink); box-shadow: 0 12px 36px var(--overlay-shadow); }
+.composer-tools-menu [role=menuitem] { display: flex; align-items: center; gap: 10px; min-height: 38px; padding: 8px 12px; border-radius: 6px; cursor: pointer; outline: none; font-size: 12px; }
+.composer-tools-menu [role=menuitem][data-highlighted] { background: var(--neutral-hover); }
+.dialog-content.app-dialog.composer-feedback-dialog { max-height: calc(100dvh - 48px); overflow: hidden; }
+.dialog-content.app-dialog.composer-feedback-dialog > .feedback-dock-body { min-height: 0; overflow-y: auto; border: 0; padding: 0; }
+.composer-tools-menu [role=menuitem][data-disabled] { opacity: .45; cursor: default; }
+.conversation-tools-rail:empty { display: none; }

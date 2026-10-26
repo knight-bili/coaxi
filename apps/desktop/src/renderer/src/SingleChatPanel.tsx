@@ -1,3 +1,4 @@
+import { ComposerToolsMenu } from './ComposerToolsMenu'
 import { singleChatComposerStore, type SingleChatComposerStore } from './single-chat-composer-store'
 import { privateInputController, type PrivateInputController, type PrivateInputState } from './private-input-controller'
 import { PrivateInputRecoveryPanel, privateInputErrorMessage } from './PrivateInputRecoveryPanel'
@@ -772,6 +773,8 @@ export function SingleChatPanel({
   const [cancelling, setCancelling] = useState(false)
   const [ending, setEnding] = useState(false)
   const [preparingAttachments, setPreparingAttachments] = useState<PreparingSingleChatAttachment[]>([])
+  const [feedbackToolsOpen, setFeedbackToolsOpen] = useState(false)
+  const [sourcesToolsOpen, setSourcesToolsOpen] = useState(false)
   const [attachmentDragState, setAttachmentDragState] = useState<AttachmentDragKind | null>(null)
   const returningPendingRef = useRef(false)
   const leaveLeaseCountRef = useRef(0)
@@ -1809,11 +1812,11 @@ export function SingleChatPanel({
         onAdd={(selection) => mutateDraftQuote({ type: 'add', selection })} />}
       <div className="conversation-tools-rail">
       {currentSnapshot&&<ConversationQuestionsDock key={`questions:${currentSnapshot.conversation.id}`} scope={{threadId,conversationId:currentSnapshot.conversation.id,scopeKind:conversationKind}} members={members}/>}
-      {currentSnapshot&&<ConversationSources key={`sources:${currentSnapshot.conversation.id}`} scope={{threadId,conversationId:currentSnapshot.conversation.id,scopeKind:conversationKind}} disabled={!sharedDraftState.ready||sending||returningPending||ending||!!inputState.pending} onInsert={async source=>{
+      {currentSnapshot&&<ConversationSources open={sourcesToolsOpen} onOpenChange={setSourcesToolsOpen} key={`sources:${currentSnapshot.conversation.id}`} scope={{threadId,conversationId:currentSnapshot.conversation.id,scopeKind:conversationKind}} disabled={!sharedDraftState.ready||sending||returningPending||ending||!!inputState.pending} onInsert={async source=>{
         if(!draftStore.update(current=>{const body=current[bodyDraftKey]??'';return body.includes(`rovai-source:${source.sourceSessionId}`)?current:{...current,[bodyDraftKey]:`${body}${body?'\n':''}${conversationSourceReference(source)}`}}))throw new Error(uiAttribute('当前输入已变化，资料授权记录已保留。'));
         if(input)await input.prepareBody();
       }}/>}
-      {currentSnapshot&&<UserFeedbackDock key={`feedback:${currentSnapshot.conversation.id}`} scope={{threadId,conversationId:currentSnapshot.conversation.id,scopeKind:conversationKind}} agentId={currentSnapshot.conversation.agentId} members={members}
+      {currentSnapshot&&<UserFeedbackDock open={feedbackToolsOpen} onOpenChange={setFeedbackToolsOpen} key={`feedback:${currentSnapshot.conversation.id}`} scope={{threadId,conversationId:currentSnapshot.conversation.id,scopeKind:conversationKind}} agentId={currentSnapshot.conversation.agentId} members={members}
         materials={currentSnapshot.draft.attachments} composerScope={input?.origin.scope??null}
         getPrivateInput={()=>{
           if(!sharedDraftState.ready||sharedDraftState.error||draft.length||sending||returningPending||ending||quoteBusy||inputState.pending||uploadBusy||leaving||preparingAttachments.length||currentSnapshot.draft.attachments.length||(currentSnapshot.draft.quotes?.length??0))throw new Error(uiAttribute('请先处理普通输入中的草稿和材料，再确认反馈续办。'))
@@ -1901,24 +1904,21 @@ export function SingleChatPanel({
                   if (files.length > 0) void prepareFiles(files)
                 }}
               />
-              <button
-                className="composer-attachment-button"
-                type="button"
-                aria-label={uiAttribute("添加文件")}
-                title={uiAttribute("添加文件")}
-                disabled={((Boolean(composerContext) || child) && (!uploads?.supported || !inputState.snapshot)) || uploadBusy || inputState.pending || !selectedMember || !currentTargetReady || sending || returningPending || ending || quoteBusy || preparingAttachments.some((item) => !item.error)}
-                onClick={() => fileInputRef.current?.click()}
-              >
-                <svg aria-hidden="true" viewBox="0 0 18 18"><path d="m6.2 9.8 4.65-4.65a2.5 2.5 0 0 1 3.54 3.54l-6.1 6.1a4 4 0 0 1-5.66-5.66l6.1-6.1" /></svg>
-              </button>
+              <ComposerToolsMenu
+                disabled={sending || returningPending || ending || !sharedDraftState.ready || !!inputState.pending}
+                attachmentDisabled={((Boolean(composerContext) || child) && (!uploads?.supported || !inputState.snapshot))
+                  || uploadBusy || !!inputState.pending || !selectedMember || !currentTargetReady
+                  || sending || returningPending || ending || quoteBusy
+                  || preparingAttachments.some(item => !item.error)}
+                onAttach={() => fileInputRef.current?.click()}
+                onFeedback={() => setFeedbackToolsOpen(true)}
+                onSources={() => setSourcesToolsOpen(true)}
+              />
             </div>
             <div className="composer-actions">
               {!activeRun && (
                 <span className="composer-hint">
                   <span className="sr-only"><UiText zh={"Enter 发送，Shift+Enter 换行"} /></span>
-                  <span className="composer-hint-visual" aria-hidden="true">
-                    <kbd>↵</kbd><span><UiText zh={"发送"} /></span><span className="composer-hint-separator">·</span><kbd>⇧↵</kbd><span><UiText zh={"换行"} /></span>
-                  </span>
                 </span>
               )}
               {activeRun && !draft.trim() && (currentSnapshot?.draft.attachments.length ?? 0) === 0

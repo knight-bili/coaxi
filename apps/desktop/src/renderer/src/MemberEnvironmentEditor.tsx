@@ -1,3 +1,4 @@
+import { SettingsDisclosureHint } from './SettingsDisclosureHint'
 import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
 import type { AdapterKind, ModelSelection } from '@contracts'
 import { useThreadClient } from './camp-client'
@@ -100,7 +101,7 @@ export function MemberEnvironmentEditor({ environment: env, disabled }: { enviro
   }, [env.text, open])
   useEffect(() => { if (env.error) setOpen(true) }, [env.error])
   return <details className="member-environment-disclosure" open={open} onToggle={event => { setOpen(event.currentTarget.open); if (!event.currentTarget.open) env.mask() }}>
-    <summary className="member-environment-entry"><DialogControlIcon name="chevron"/><span>{t('环境变量')}</span>{env.count > 0 && <small>{t('{0} 项', env.count)}</small>}</summary>
+    <summary className="member-environment-entry"><DialogControlIcon name="chevron"/><span>{t('环境变量')}</span>{env.count > 0 && <small>{t('{0} 项', env.count)}</small>}<SettingsDisclosureHint /></summary>
     <div className="member-environment-body">
       <textarea ref={textarea} id={id} className="member-environment-json" aria-label={t('环境变量 JSON')} aria-invalid={!!env.error} aria-describedby={env.error ? `${id}-error` : undefined} placeholder={ENVIRONMENT_PLACEHOLDER} value={env.text} disabled={disabled || env.loading} spellCheck={false} autoComplete="off" rows={4} onChange={event => env.update(event.target.value)}/>
       {env.error && <p id={`${id}-error`} className="environment-error" role="alert">{env.error}{env.loading && <button type="button" className="quiet-button" onClick={env.reset}>{t('重试')}</button>}</p>}

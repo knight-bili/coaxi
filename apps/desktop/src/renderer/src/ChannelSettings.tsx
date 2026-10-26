@@ -1,3 +1,4 @@
+import { SettingsDisclosureHint } from './SettingsDisclosureHint'
 import { useThreadClient, type ThreadClient } from './camp-client'
 import {TransportChannelSettings} from './TransportChannelSettings'
 import { feishuLoginFailureDetail } from '../../shared/feishu-login-progress'
@@ -422,7 +423,7 @@ export function ChannelSettingsView({
                   {uiAttribute(qualificationNote)}
                 </p>
               )}
-              <details className="settings-disclosure channel-policy"><summary><OwnerShieldIcon /><span><UiText zh={"连接与权限"} /></span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m6 8 4 4 4-4" /></svg></summary><div><p><UiText zh={"只有 Coaxi Owner 可以从外部渠道触发队员；项目选择与执行管理仍由运行服务的 Desktop 掌控。"} /></p><p><UiText zh={"连接只决定后续 Bot 的发布目标，切换连接不会迁移或停用已发布 Bot。"} /></p><p><UiText zh={"账号会话和应用凭据保存在运行服务的 Desktop 所在设备。项目绝对路径不会发送到外部渠道。"} /></p><p>{localizedChannelCopy('{0}中的 Owner 消息不获得本机管理权限。', channelCopy`${providerName}中的 Owner 消息不获得本机管理权限。`, providerName)}</p></div></details>
+              <details className="settings-disclosure channel-policy"><summary><OwnerShieldIcon /><span><UiText zh={"连接与权限"} /></span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m6 8 4 4 4-4" /></svg><SettingsDisclosureHint /></summary><div><p><UiText zh={"只有 Coaxi Owner 可以从外部渠道触发队员；项目选择与执行管理仍由运行服务的 Desktop 掌控。"} /></p><p><UiText zh={"连接只决定后续 Bot 的发布目标，切换连接不会迁移或停用已发布 Bot。"} /></p><p><UiText zh={"账号会话和应用凭据保存在运行服务的 Desktop 所在设备。项目绝对路径不会发送到外部渠道。"} /></p><p>{localizedChannelCopy('{0}中的 Owner 消息不获得本机管理权限。', channelCopy`${providerName}中的 Owner 消息不获得本机管理权限。`, providerName)}</p></div></details>
             </section>
 
             <section className="channel-settings-section" aria-labelledby="channel-member-bots-heading">
@@ -529,7 +530,7 @@ export function ExecutionWebSettingsPanel(): React.JSX.Element {
             <path d="m5.5 7.75 4.5 4.5 4.5-4.5" />
           </svg>
         </span>
-      </summary>
+      <SettingsDisclosureHint /></summary>
       <form className="execution-web-form" onSubmit={(event) => void save(event)}>
         <label className="execution-web-switch-row">
           <span><strong><UiText zh={"允许局域网访问"} /></strong><small><UiText zh={"仅提供只读页面"} /></small></span>

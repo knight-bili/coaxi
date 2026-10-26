@@ -1,4 +1,12 @@
-.runtime-monitoring-switcher{display:flex;flex-direction:column;flex:1;min-height:0;height:100%;overflow:hidden}.runtime-monitoring-switcher>.runtime-monitoring{flex:1;min-height:0;height:auto;align-content:start;overflow:auto}
+.runtime-monitoring-switcher{display:flex;flex-direction:column;flex:1;min-height:0;height:100%;overflow:auto;scrollbar-width:thin}
+.runtime-monitoring-switcher>:is(.runtime-monitoring,.usage-activity-dashboard){display:contents}
+.runtime-monitoring-switcher .settings-page-heading,.runtime-monitoring-switcher .usage-dashboard-heading{order:0;flex:none;padding:0 0 22px;margin:0;align-items:center}
+.runtime-monitoring-switcher>.usage-monitoring-tabs{order:1;padding:0 0 14px;margin-bottom:24px;background:transparent;gap:8px;flex-wrap:wrap}
+.runtime-monitoring-switcher .runtime-monitoring-body,.runtime-monitoring-switcher .usage-dashboard-toolbar{order:2;flex:none}
+.runtime-monitoring-switcher .usage-dashboard-content{order:3;overflow:visible;flex:none;min-height:auto;padding:24px 0}
+.runtime-monitoring-switcher .usage-dashboard-toolbar{padding:0 0 18px}
+.runtime-monitoring-switcher .settings-page-heading-copy{padding-left:0}
+.runtime-monitoring-switcher .settings-page-heading-copy::before{content:none}
 .usage-monitoring-tabs{display:flex;gap:4px;flex:none;border-bottom:1px solid var(--line);padding:4px 20px;background:var(--surface)}
 .usage-monitoring-tabs button{border:0;background:transparent;border-radius:999px;padding:7px 14px;color:var(--muted);font:inherit;cursor:pointer}
 .usage-monitoring-tabs button[aria-selected=true]{background:var(--surface-selected);color:var(--ink)}

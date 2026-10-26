@@ -3824,12 +3824,12 @@ describe('task event projections', () => {
     expect(markup).toContain('配置洛可的智能体')
     expect(markup.indexOf('class="runtime-recovery-dock"')).toBeLessThan(markup.indexOf('class="composer"'))
     expect(markup).toMatch(
-      /<div class="composer-actions"><span class="composer-hint"><span class="sr-only">Enter 发送，Shift\+Enter 换行<\/span><span class="composer-hint-visual" aria-hidden="true"><kbd>↵<\/kbd><span>发送<\/span><span class="composer-hint-separator">·<\/span><kbd>⇧↵<\/kbd><span>换行<\/span><\/span><\/span><button class="composer-primary-action is-send"/
+      /<div class="composer-actions"><span class="composer-hint"><span class="sr-only">Enter 发送，Shift\+Enter 换行<\/span><\/span><button class="composer-primary-action is-send"/
     )
     expect(markup).toContain('aria-label="发送消息"')
     expect(markup).not.toContain('<span class="composer-hint">Enter</span>')
     expect(markup).not.toContain('agent_run.runtime_not_ready')
-    expect(markup).toMatch(/class="[^"]*runtime-model-picker-trigger[^"]*"[^>]*>[\s\S]*?洛可/u)
+    expect(markup).toContain('aria-label="正在加载接收者路由" aria-busy="true"')
     expect(markup).not.toMatch(/>[^<]*agent_1[^<]*</u)
     expect(markup).not.toMatch(/(?:aria-label|title)="[^"]*agent_1/u)
     expect(markup).not.toContain('Runtime')

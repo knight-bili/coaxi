@@ -91,7 +91,7 @@
   font-weight: 600;
 }
 :root .settings-panel:not(.settings-panel-mcp,.settings-panel-skills) .quiet-button {
-  min-height: 30px;
+  min-height: 36px;
   border-color: transparent;
   background: transparent;
   color: var(--muted);
@@ -102,7 +102,7 @@
   color: var(--ink);
 }
 :root .settings-panel:not(.settings-panel-mcp,.settings-panel-skills) .primary-button {
-  min-height: 30px;
+  min-height: 36px;
   border-color: transparent;
   font-weight: 500;
 }
@@ -122,8 +122,8 @@
   max-width: 880px;
 }
 :root .settings-panel:not(.settings-panel-mcp,.settings-panel-skills) .general-settings-section {
-  padding: 24px 0;
-  gap: 16px;
+  padding: 28px 0;
+  gap: 18px;
   grid-template-columns: minmax(0,1fr);
   border-bottom: 1px solid var(--line);
 }
@@ -131,7 +131,7 @@
   border-bottom: 0;
 }
 :root .settings-panel:not(.settings-panel-mcp,.settings-panel-skills) .general-settings-section .section-heading p {
-  display: none;
+  display: block;
 }
 :root .settings-panel:not(.settings-panel-mcp,.settings-panel-skills) .general-settings-section .section-heading {
   margin: 0;
@@ -1501,3 +1501,23 @@
 .runtime-conflict-actions .quiet-button { min-height: 32px; }
 
 .extension-catalog-settings>summary{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px}.extension-catalog-settings>p{font-size:12px;color:var(--muted)}.extension-catalog-rows>details{padding:10px 0;border-top:1px solid var(--line)}.extension-catalog-rows summary{display:flex;align-items:center;gap:10px;cursor:pointer}.extension-catalog-rows summary>strong{font-size:12px;flex:1}.extension-catalog-rows summary>small{font:11px monospace;color:var(--muted)}.extension-catalog-rows dl{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;font-size:11px}.extension-catalog-rows dd{margin:0;overflow-wrap:anywhere}.extension-catalog-rows dt{color:var(--muted)}.extension-catalog-rows a{display:inline-flex;align-items:center;gap:6px;font-size:12px}
+
+/* Shared, restrained disclosure affordances across every settings page. */
+:root .settings-panel .settings-page-heading-copy { padding-left: 0; }
+:root .settings-panel .settings-page-heading-copy::before { content: none; }
+:root :is(.settings-panel,.member-editor-view) details:has(> summary > .settings-disclosure-hint) { margin-block: 12px; border: 1px solid var(--line); border-radius: 9px; background: transparent; }
+:root :is(.settings-panel,.member-editor-view) details > summary:has(> .settings-disclosure-hint) { display: flex; align-items: center; gap: 10px; min-height: 46px; width: 100%; padding: 10px 14px; list-style: none; color: var(--ink); cursor: pointer; font-size: 12px; font-weight: 500; }
+:root :is(.settings-panel,.member-editor-view) details > summary:has(> .settings-disclosure-hint)::-webkit-details-marker { display: none; }
+:root :is(.settings-panel,.member-editor-view) details > summary:has(> .settings-disclosure-hint):hover { background: var(--neutral-hover); }
+:root :is(.settings-panel,.member-editor-view) details > summary:has(> .settings-disclosure-hint):focus-visible { outline: 2px solid var(--settings-choice-selected-line); outline-offset: 2px; }
+.settings-disclosure-hint { display: inline-flex; flex: 0 0 auto; margin-left: auto; color: var(--muted); font-size: 11px; font-weight: 400; }
+.settings-disclosure-hint .when-open, details[open] > summary > .settings-disclosure-hint .when-closed { display: none; }
+details[open] > summary > .settings-disclosure-hint .when-open { display: inline; }
+:root :is(.settings-panel,.member-editor-view) details:has(> summary > .settings-disclosure-hint)[open] > :not(summary) { margin-inline: 14px; max-width: calc(100% - 28px); }
+:root :is(.settings-panel,.member-editor-view) details:has(> summary > .settings-disclosure-hint)[open] > :last-child { margin-bottom: 14px; }
+:root .settings-panel :is(input:not([type=checkbox],[type=radio],[type=range],[type=file]),select) { min-height: 36px; }
+:root .settings-panel :is(.workbench-toolbar,.general-save-row) { flex-wrap: wrap; gap: 10px; }
+:root .settings-panel .workbench-toolbar > button { min-height: 36px; padding-inline: 12px; border: 1px solid var(--line); border-radius: 8px; }
+:root .member-editor-disclosure { min-height: 46px; padding: 10px 14px; border: 1px solid var(--line); border-radius: 9px; }
+.member-disclosure-action { color: var(--muted); font-size: 11px; }
+:root .member-environment-entry { width: 100%; }

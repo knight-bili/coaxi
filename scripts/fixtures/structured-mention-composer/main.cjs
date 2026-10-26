@@ -20,7 +20,8 @@ app.whenReady().then(async () => {
       contextIsolation: true,
       sandbox: true,
       nodeIntegration: false,
-      backgroundThrottling: false
+      backgroundThrottling: false,
+      offscreen: process.platform === 'win32'
     }
   })
 
@@ -41,6 +42,9 @@ app.whenReady().then(async () => {
     }
   }
 
+  window.webContents.on('console-message', (event) => {
+    if (event.level === 'error' || event.level === 'warning') trace(`Renderer: ${event.message}`)
+  })
   const evaluate = source => complete(window.webContents.executeJavaScript(source, true), source)
   const frames = () => evaluate(
     'new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))'

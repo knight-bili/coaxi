@@ -409,6 +409,7 @@ export const MemberIdentityEditor = forwardRef<
           >
             <span><UiText zh={"工作准则与成长课题"} /></span>
             <small>{filled ? uiAttribute("已填写 {0} 项", String(filled)) : uiAttribute("未填写")}</small>
+            <span className="member-disclosure-action"><UiText zh={advancedOpen ? "收起" : "展开"} /></span>
             <DialogControlIcon name="chevron" />
           </button>
           <div

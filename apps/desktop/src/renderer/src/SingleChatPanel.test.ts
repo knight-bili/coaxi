@@ -359,7 +359,8 @@ describe('Single Chat presentation', () => {
   it('uses the Thread composer contract and keeps agent output unboxed', () => {
     expect(source).toContain('className="composer single-chat-composer"')
     expect(source).toContain('composer-box single-chat-composer-box')
-    expect(source).toContain('className="composer-attachment-button"')
+    expect(source).toContain('<ComposerToolsMenu')
+    expect(source).toContain('attachmentDisabled=')
     expect(source).toContain('<ComposerPrimaryAction action="stop"')
     expect(source).toContain('action="send"')
     expect(source).not.toContain('正在提交停止请求…')

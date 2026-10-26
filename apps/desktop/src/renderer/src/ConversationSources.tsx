@@ -16,9 +16,10 @@ type Sources = { items: ConversationSourceDescriptor[]; next: string | null }
 type HistoryEntry = { id: string; linkedThreadId?: string; revision?: string; summary?: { title?: string } }
 const kindText: Record<ConversationSourceDescriptor['sourceKind'], string> = { public: '团队讨论', single_chat: '私聊', delegation_child: '帮手讨论', imported: '导入的历史讨论' }
 /** 沿原Rovai反馈弹窗与资料列表容器；引用进入已有消息草稿，不另建模型输入章节。 */
-export function ConversationSources({ scope, disabled = false, onInsert }: { scope: ConversationToolScope; disabled?: boolean; onInsert(source: ConversationSourceDescriptor): Promise<void> | void }): React.JSX.Element {
+export function ConversationSources({ scope, disabled = false, onInsert, open: controlledOpen, onOpenChange }: { open?: boolean; onOpenChange?(value: boolean): void; scope: ConversationToolScope; disabled?: boolean; onInsert(source: ConversationSourceDescriptor): Promise<void> | void }): React.JSX.Element {
   const client = useThreadClient(), t = useUiText(), generation = useRef(0), locked = useRef(false)
-  const [open, setOpen] = useState(false), [page, setPage] = useState<Sources>({ items: [], next: null }), [history, setHistory] = useState<HistoryEntry[]>([]), [historyLimit, setHistoryLimit] = useState(25)
+  const [localOpen, setLocalOpen] = useState(false), open = controlledOpen ?? localOpen, setOpen = onOpenChange ?? setLocalOpen
+  const [page, setPage] = useState<Sources>({ items: [], next: null }), [history, setHistory] = useState<HistoryEntry[]>([]), [historyLimit, setHistoryLimit] = useState(25)
   const [grants, setGrants] = useState<ConversationSourceGrant[]>([]), [grantNext, setGrantNext] = useState<string | null>(null), [selected, setSelected] = useState<ConversationSourceDescriptor | null>(null), [preview, setPreview] = useState<ConversationGrantPreview | null>(null), [confirmed, setConfirmed] = useState<ConversationSourceGrant | null>(null)
   const [pending, setPending] = useState<ConversationOriginal | null>(null), [busy, setBusy] = useState(false), [ready, setReady] = useState(false), [error, setError] = useState('')
   const scopeKey = JSON.stringify(scope), key = `conversation-sources:${client.presentationScope ?? ''}:${scopeKey}`
@@ -86,7 +87,7 @@ export function ConversationSources({ scope, disabled = false, onInsert }: { sco
     const preview = await conversationToolRequest(client, 'conversationTools.grants.preview', { scope, sourceSessionId: value.source.sourceSessionId, sourceDigest: value.source.sourceDigest, throughSequence: value.source.throughSequence })
     if (observed === generation.current) { setSelected(value.source); setPreview(preview); setConfirmed(null) }
   }) }
-  return <><button type="button" className="quiet-button" disabled={disabled} onClick={() => setOpen(true)}>{t('参考旧讨论')}</button><Dialog.Root open={open} onOpenChange={setOpen}><Dialog.Portal><Dialog.Overlay className="dialog-overlay app-dialog-overlay" /><Dialog.Content className="dialog-content app-dialog feedback-dialog" aria-describedby={undefined}>
+  return <>{controlledOpen === undefined && <button type="button" className="quiet-button" disabled={disabled} onClick={() => setOpen(true)}>{t('参考旧讨论')}</button>}<Dialog.Root open={open} onOpenChange={setOpen}><Dialog.Portal><Dialog.Overlay className="dialog-overlay app-dialog-overlay" /><Dialog.Content className="dialog-content app-dialog feedback-dialog" aria-describedby={undefined}>
     <header><Dialog.Title>{t('选择这次参考的资料')}</Dialog.Title><Dialog.Close className="quiet-button" aria-label={t('关闭')}>×</Dialog.Close></header>
     <div className="feedback-dialog-body"><p>{t('由你选择讨论并确认授权，引用加入当前消息后再按原方式发送。只读取选中时已经保存的可见文字和工具名称；图片、隐藏思考和凭据不会一起交给队员。')}</p>
       <p>{t(scope.scopeKind === 'public' ? '当前是团队公开讨论，只列出可公开参考的来源。私聊和私人导入资料可以在私聊或帮手讨论中选择。' : '资料只授权给当前私聊或帮手讨论，不会因此开放给整个团队。')}</p>

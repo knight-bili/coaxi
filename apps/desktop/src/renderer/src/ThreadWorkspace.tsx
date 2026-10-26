@@ -1,3 +1,4 @@
+import { ComposerToolsMenu } from './ComposerToolsMenu'
 import { BrandMark } from './BrandMark'
 import { canvasComposerContextKey, canvasComposerDraftStorage, canvasComposerDraftCopies, type CanvasComposerContext } from './canvas-composer-drafts'
 import { readCanvasViewScope } from './canvas-view-state'
@@ -1841,6 +1842,8 @@ function ThreadWorkspaceContent({
   }, [])
   const [preparingAttachments, setPreparingAttachments] = useState<Array<{ id: string; name: string; kind: AttachmentKind }>>([])
   const [failedAttachments, setFailedAttachments] = useState<Array<{ id: string; name: string; kind: AttachmentKind; error: string }>>([])
+  const [feedbackToolsOpen, setFeedbackToolsOpen] = useState(false)
+  const [sourcesToolsOpen, setSourcesToolsOpen] = useState(false)
   const [attachmentDragState, setAttachmentDragState] = useState<AttachmentDragKind | null>(null)
   const [composerSubmitting, setComposerSubmitting] = useState(false)
   const [composerInviteMessage, setComposerInviteMessage] = useState<string | null>(null)
@@ -5922,9 +5925,9 @@ function ThreadWorkspaceContent({
           )}
 
           <div className="conversation-tools-rail">
-          <UserFeedbackDock key={`feedback:${snapshot.thread.id}`} scope={{threadId:snapshot.thread.id,conversationId:null,scopeKind:'public'}} members={snapshot.members} materials={composerDraft?.attachments??[]}/>
+          <UserFeedbackDock open={feedbackToolsOpen} onOpenChange={setFeedbackToolsOpen} key={`feedback:${snapshot.thread.id}`} scope={{threadId:snapshot.thread.id,conversationId:null,scopeKind:'public'}} members={snapshot.members} materials={composerDraft?.attachments??[]}/>
           <ConversationQuestionsDock key={`questions:${snapshot.thread.id}`} scope={{threadId:snapshot.thread.id,conversationId:null,scopeKind:'public'}} members={snapshot.members}/>
-          <ConversationSources key={`sources:${snapshot.thread.id}`} scope={{threadId:snapshot.thread.id,conversationId:null,scopeKind:'public'}} disabled={composerInteractionDisabled} onInsert={async source=>{
+          <ConversationSources open={sourcesToolsOpen} onOpenChange={setSourcesToolsOpen} key={`sources:${snapshot.thread.id}`} scope={{threadId:snapshot.thread.id,conversationId:null,scopeKind:'public'}} disabled={composerInteractionDisabled} onInsert={async source=>{
             const handle=composerHandleRef.current;if(!handle||composerInteractionDisabled)throw new Error(uiAttribute('当前输入尚未就绪，资料授权记录已保留。'));
             const before=await handle.flush();if(!JSON.stringify(before.document).includes(`rovai-source:${source.sourceSessionId}`)&&!handle.appendText(conversationSourceReference(source)))throw new Error(uiAttribute('当前输入已锁定，资料授权记录已保留。'));
             await handle.flush();handle.focus('end');
@@ -6269,32 +6272,13 @@ function ThreadWorkspaceContent({
                   }
                 }}
               />
-              <button
-                className="composer-attachment-button"
-                type="button"
-                aria-label={uiAttribute("添加文件")}
-                title={uiAttribute("添加文件")}
-                disabled={busy || composerInteractionDisabled}
-                onClick={() => composerFileInputRef.current?.click()}
-              >
-                <svg aria-hidden="true" viewBox="0 0 18 18">
-                  <path d="m6.2 9.8 4.65-4.65a2.5 2.5 0 0 1 3.54 3.54l-6.1 6.1a4 4 0 0 1-5.66-5.66l6.1-6.1" />
-                </svg>
-              </button>
+              <ComposerToolsMenu disabled={busy || composerInteractionDisabled} onAttach={()=>composerFileInputRef.current?.click()} onFeedback={()=>setFeedbackToolsOpen(true)} onSources={()=>setSourcesToolsOpen(true)}/>
               {mobile && <button className="composer-attachment-button" type="button" aria-label={uiAttribute("提及队员")} disabled={busy || composerInteractionDisabled} onPointerDown={(event) => event.preventDefault()} onClick={() => composerHandleRef.current?.startMention()}>@</button>}
             </div>
             <div className="composer-actions">
               {!executionBlocked && (
                 <span className="composer-hint">
                   <span className="sr-only"><UiText zh={"Enter 发送，Shift+Enter 换行"} /></span>
-                  <span className="composer-hint-visual" aria-hidden="true">
-                    <kbd>↵</kbd>
-                    <span>{pendingInviteIds.length > 0
-                      ? <UiText zh={'邀请并发送'} /> : <UiText zh={'发送'} />}</span>
-                    <span className="composer-hint-separator">·</span>
-                    <kbd>⇧↵</kbd>
-                    <span><UiText zh={"换行"} /></span>
-                  </span>
                 </span>
               )}
               <ComposerPrimaryAction

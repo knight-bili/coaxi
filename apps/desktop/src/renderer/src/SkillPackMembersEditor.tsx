@@ -1,3 +1,4 @@
+import { SettingsDisclosureHint } from './SettingsDisclosureHint'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { AgentProfile, SetSkillPackMembersCommand, SkillPackMembersView, StoredCommandResult } from '@contracts'
 import { useThreadClient } from './camp-client'
@@ -68,7 +69,7 @@ export function SkillPackMembersEditor({ skillId, agents, disabled, onBusy }: {
   }
   const unavailable = disabled || saving || loading || !view?.installed || !!pending.current
   return <details className="skill-pack-member-settings">
-    <summary><UiText zh="队员选择" /> · {view ? uiAttribute('已选 {0} 人', String(view.memberIds.length)) : '—'}</summary>
+    <summary><UiText zh="队员选择" /> · {view ? uiAttribute('已选 {0} 人', String(view.memberIds.length)) : '—'}<SettingsDisclosureHint /></summary>
     <p><UiText zh="勾选后用于队员的新任务；取消选择不改写旧任务。" /></p>
     {loadError && <div className="rebuilt-skills-error" role="alert">{loadError}<button type="button" disabled={saving || loading} onClick={() => void load()}><UiText zh="重试" /></button></div>}
     {error && <div className="rebuilt-skills-error" role="alert">{error}{pending.current && <button type="button" disabled={saving} onClick={() => { if (pending.current) void save(pending.current.command.memberIds, pending.current) }}><UiText zh="重试保存" /></button>}</div>}

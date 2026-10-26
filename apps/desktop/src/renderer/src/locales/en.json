@@ -6336,5 +6336,8 @@
   "暂时无法保留网页画面，请关闭菜单后重试。": "Unable to preserve the page image. Close the menu and try again.",
   "网页画面暂不可用": "The page image is temporarily unavailable",
   "请先在队员设置中启用电脑工具，再共享窗口。": "Enable computer tools in member settings before sharing a window.",
-  "文档预览未能打开，请重新连接。": "Unable to open the document preview. Reconnect and try again."
+  "文档预览未能打开，请重新连接。": "Unable to open the document preview. Reconnect and try again.",
+  "添加文件或引用": "Add a file or reference",
+  "审核记录": "Review history",
+  "补充当前工作": "Add feedback to current work"
 }
