@@ -51,7 +51,7 @@ async function admitCase(directory) {
     throw new Error('qualification admission requires a relative referenceDirectory')
   }
   const referencePath = join(contract.root, referenceLocator)
-  const temporaryRoot = await makeTemporaryDirectory('rovai-qualification-admission-')
+  const temporaryRoot = await makeTemporaryDirectory('coaxi-qualification-admission-')
   try {
     const firstInitial = join(temporaryRoot, 'initial-a')
     const secondInitial = join(temporaryRoot, 'initial-b')

@@ -9,15 +9,15 @@ import { pathToFileURL } from 'node:url'
 import { access, mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises'
 
 test('production conversation presence matches the divider design and durable retry recovery', {timeout:180_000}, async t => {
-const chrome = process.env.ROVAI_TEST_CHROME ?? process.env.ROVAI_REVIEW_CHROME ?? (process.platform === 'darwin'
+const chrome = process.env.COAXI_TEST_CHROME ?? process.env.COAXI_REVIEW_CHROME ?? (process.platform === 'darwin'
   ? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' : process.platform === 'win32'
     ? join(process.env.PROGRAMFILES ?? 'C:\\Program Files', 'Google/Chrome/Application/chrome.exe') : '/usr/bin/google-chrome')
 if (!await access(chrome).then(() => true, () => false)) {
   t.skip('Chrome is not installed; conversation presence acceptance did not run')
   return
 }
-const root = await mkdtemp(join(tmpdir(), 'rovai-run-presence-'))
-const out = process.env.ROVAI_PRESENCE_UI_OUTPUT ?? join(root, 'screenshots')
+const root = await mkdtemp(join(tmpdir(), 'coaxi-run-presence-'))
+const out = process.env.COAXI_PRESENCE_UI_OUTPUT ?? join(root, 'screenshots')
 await promisify(execFile)(process.execPath, [resolve(import.meta.dirname, '../fixtures/run-presence/build.mjs'), root])
 await mkdir(out, { recursive:true })
 const native = await launchAcceptanceBrowser({executable:chrome,
@@ -34,7 +34,7 @@ const rest = async () => { await b.send('Input.dispatchMouseEvent',{type:'mouseM
 const row = '[data-presence-run="run-alice"]'
 const identity = () => b.evaluate(`(() => {const row=document.querySelector('${row}');return {continuation:row.dataset.continuation,avatar:!!row.querySelector('.member-avatar'),after:Array.from(document.querySelectorAll('[data-message-id]')).filter(e=>Boolean(e.compareDocumentPosition(row)&Node.DOCUMENT_POSITION_FOLLOWING)).at(-1)?.dataset.messageId,top:row.getBoundingClientRect().top}})()`)
 try {
-  await b.send('Page.navigate',{url:pathToFileURL(join(root,'rovai-teammate-presence.html')).href})
+  await b.send('Page.navigate',{url:pathToFileURL(join(root,'coaxi-teammate-presence.html')).href})
   await b.wait('!!window.__presence && !!document.querySelector(".composer-box")')
   for (const [name,total] of Object.entries({stream:5,parallel:5,single:5,interleaved:6,same_member:5,followup:5,failed:3,silent:3})) {
     for(let n=0;n<total;n++) {
@@ -440,7 +440,7 @@ try {
 
   // Real Thread open projections omit Evidence. Re-entry must restore the tail
   // from the same bounded block API as the drawer, before any new live event.
-  const windowedUrl=pathToFileURL(join(root,'rovai-teammate-presence.html'));windowedUrl.search='windowed=1&scenario=stream&stage=1'
+  const windowedUrl=pathToFileURL(join(root,'coaxi-teammate-presence.html'));windowedUrl.search='windowed=1&scenario=stream&stage=1'
   await b.send('Page.navigate',{url:windowedUrl.href})
   await b.wait('!!window.__presence && document.querySelector(".run-presence-open")?.dataset.previewKind === "command"')
   assert.match(await b.evaluate('document.querySelector(".run-presence-preview").textContent'),/rg -n/)
@@ -490,10 +490,10 @@ try {
     assert.equal(await b.evaluate(changeReads),1,'one trailing refresh catches up without another notification')
   }
   report.interactions.push('slow initial page retains its invalidation and catches up once; newer live narration stays visible while both page and trailing changes are delayed')
-  await b.send('Page.navigate',{url:pathToFileURL(join(root,'rovai-teammate-presence.html')).href})
+  await b.send('Page.navigate',{url:pathToFileURL(join(root,'coaxi-teammate-presence.html')).href})
   await b.wait('!!window.__presence && !!document.querySelector(".composer-box")')
 
-  if (process.env.ROVAI_PRESENCE_REFERENCE_HTML) {
+  if (process.env.COAXI_PRESENCE_REFERENCE_HTML) {
     const metrics=async (prefix,rootSelector) => b.evaluate(`(() => {
       const row=document.querySelector('${rootSelector}'),line=row.querySelector('${prefix}line'),preview=row.querySelector('${prefix}preview'),stop=row.querySelector('${prefix}stop'),rect=row.getBoundingClientRect();
       const offset=e=>{const r=e.getBoundingClientRect();return [Math.round((r.left-rect.left)*100)/100,Math.round((r.top-rect.top)*100)/100,r.width,r.height]};
@@ -505,7 +505,7 @@ try {
       await b.evaluate(`__presence.setTheme('${theme}')`);await scenario('stream',1)
       actual.push({theme,size,metrics:await metrics('.run-presence-','.conversation-run-presence')})
     }
-    const referenceUrl = pathToFileURL(process.env.ROVAI_PRESENCE_REFERENCE_HTML); referenceUrl.search = 'row=divider'
+    const referenceUrl = pathToFileURL(process.env.COAXI_PRESENCE_REFERENCE_HTML); referenceUrl.search = 'row=divider'
     await b.send('Page.navigate',{url:referenceUrl.href})
     await b.wait('!!window.__presence && !!document.querySelector(".composer-box")')
     for(const expected of actual) {
@@ -513,7 +513,7 @@ try {
       await b.evaluate(`__presence.setTheme('${expected.theme}')`);await scenario('stream',1)
       assert.deepEqual(expected.metrics,await metrics('.run-presence-','.conversation-run-presence'),`v10 divider reference ${expected.theme}/${expected.size}`)
     }
-    report.reference={path:process.env.ROVAI_PRESENCE_REFERENCE_HTML,comparisons:actual}
+    report.reference={path:process.env.COAXI_PRESENCE_REFERENCE_HTML,comparisons:actual}
   }
 
   assert.deepEqual(b.errors,[])

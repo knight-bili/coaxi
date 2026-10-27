@@ -39,14 +39,14 @@ export class WebdavWorkspace{
     }
     if(['status','cancel','resume'].includes(input.operation))return this.request('backup.webdav.local',{operation:input.operation,commandId:input.commandId,expectedRevision:input.expectedRevision})
     if(input.operation==='push'){
-      const selected=await dialog.showOpenDialog(owner,{title:'选择要上传的加密备份',properties:['openFile'],filters:[{name:'加密备份',extensions:['rovai-backup','codegbak','rovai-config']}]})
+      const selected=await dialog.showOpenDialog(owner,{title:'选择要上传的加密备份',properties:['openFile'],filters:[{name:'加密备份',extensions:['coaxi-backup','coaxibak','coaxi-config']}]})
       if(selected.canceled||!selected.filePaths[0])return null
       const path=selected.filePaths[0],expectedDigest=await backupFileDigest(path)
-      return this.request('backup.webdav.local',{operation:'push',expectedRevision:input.expectedRevision,commandId:input.commandId,path,expectedDigest,kind:path.toLowerCase().endsWith('.rovai-config')?'configuration':'backup'})
+      return this.request('backup.webdav.local',{operation:'push',expectedRevision:input.expectedRevision,commandId:input.commandId,path,expectedDigest,kind:path.toLowerCase().endsWith('.coaxi-config')?'configuration':'backup'})
     }
     if(input.operation==='pull'){
       if(typeof input.snapshotId!=='string'||typeof input.expectedDigest!=='string')throw new Error('webdav.snapshot_required')
-      const selected=await dialog.showSaveDialog(owner,{title:'保存下载的加密备份',defaultPath:`Rovai-${input.snapshotId}.${input.kind==='configuration'?'rovai-config':'rovai-backup'}`,filters:[{name:'加密备份',extensions:['rovai-backup']}]})
+      const selected=await dialog.showSaveDialog(owner,{title:'保存下载的加密备份',defaultPath:`Coaxi-${input.snapshotId}.${input.kind==='configuration'?'coaxi-config':'coaxi-backup'}`,filters:[{name:'加密备份',extensions:['coaxi-backup']}]})
       if(selected.canceled||!selected.filePath)return null
       return this.request('backup.webdav.local',{operation:'pull',expectedRevision:input.expectedRevision,commandId:input.commandId,snapshotId:input.snapshotId,path:selected.filePath,expectedDigest:input.expectedDigest})
     }

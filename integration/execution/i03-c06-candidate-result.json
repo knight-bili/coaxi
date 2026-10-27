@@ -15,16 +15,16 @@
       "apps/desktop/src/main/file-preview/file-preview-authority.ts": "18f533d393fd5f89be73b5644e68785c5aeacf5ef057f2c5b5038b2114a632c8",
       "apps/desktop/src/renderer/src/CanvasTerminal.tsx": "5b9415e1531478efdff5acb368a38ba838c12991bae0bafd754c6b7b72c3df92",
       "apps/desktop/src/preload/index.ts": "6e967337ab894d853dab1bcd459af6106f749de76fdc93e6b414de85b34ab1c8",
-      "crates/rovai-core/src/canvas_node.rs": "e18a62ced0d45ef17acd437991654d60054ecc3f36176ce7c816c2ba14f25498",
+      "crates/coaxi-core/src/canvas_node.rs": "e18a62ced0d45ef17acd437991654d60054ecc3f36176ce7c816c2ba14f25498",
       "integration/planning/stage-versions.json": "8174569f07323b80c29a0f76917b67356e1210b9ab73780e3ccba644c0c5238c",
       "apps/desktop/src/main/file-preview/file-preview-access.ts": "855527a6e86c487cf356a401b02d3bace30e33922fddbf5ec3567b9168888873",
       "integration/execution/goal-state.json": "8e874efa0ab45b058e08f9dd590b64b9fa4231705b8b11e3a8dbfc59578ff668",
-      "crates/rovai-core/src/application.rs": "6dd5d2070103fe562c52bf91d997ec5bf40cd67d9cc77833e350c1936de76110",
-      "crates/rovai-core/src/canvas_terminal/manager.rs": "706df64aa5c67216209266abed21d441a69eab6500b3252ee490295d4a091caf",
-      "crates/rovai-core/src/canvas_terminal/helper.rs": "53ea8b282231798d1c4303e9fcddd7a4c38f62f51ee0c0876907c816d55ac4e6",
+      "crates/coaxi-core/src/application.rs": "6dd5d2070103fe562c52bf91d997ec5bf40cd67d9cc77833e350c1936de76110",
+      "crates/coaxi-core/src/canvas_terminal/manager.rs": "706df64aa5c67216209266abed21d441a69eab6500b3252ee490295d4a091caf",
+      "crates/coaxi-core/src/canvas_terminal/helper.rs": "53ea8b282231798d1c4303e9fcddd7a4c38f62f51ee0c0876907c816d55ac4e6",
       "apps/desktop/src/file-preview-reference.ts": "7463017c138c751fafa837337b3144e226af062f5080beb01657913479362a3f",
       "integration/execution/i03-closeout.json": "0d74526489f467682e3b2096be0fcb795f52a82f6ad060b6da444446df20cd9f",
-      "crates/rovai-core/src/canvas_terminal/manager/tests.rs": "b80c8bc020d6a892ce0408ef58a1d013ae00fe2db426f787b2e343983fb31fbe",
+      "crates/coaxi-core/src/canvas_terminal/manager/tests.rs": "b80c8bc020d6a892ce0408ef58a1d013ae00fe2db426f787b2e343983fb31fbe",
       "integration/execution/i03-c06-native-result.json": "1445815ffed792ef9e73a98b22ea06e2558427e7d762edbcc4f348ade63eb04c",
       "apps/desktop/src/main/index.ts": "6e225d0010a7d820209a969207e0dffb46b1d7c974a86279ecac8a5f39f66a5a",
       "apps/desktop/src/renderer/src/canvas-terminal-controller.ts": "ccd7319816088174101decd55deff9a01d5a8d4a73eecfadd01822641dedc2da",
@@ -149,10 +149,10 @@
     "work/i03/record-c06-rc5-result.py": "4e3f3f01710f24f4e10bfbab7bcf103d9fc3228fec5c708c73e40fb26d8e5f4f"
   },
   "frozen_authority_files": {
-    "crates/rovai-core/src/local_attachment_source.rs": "8830581e72fc103b2f359be17a0072c5ee0cedc6eb5fe58b179ae3d255dbc1ca",
-    "crates/rovai-core/src/context.rs": "329144f38675ebedeaf5652858d457d42369455eb26c6159af61d19c02218784",
-    "crates/rovai-core/src/message_quote.rs": "efb6e962946b85c089483bb1120fe92f32458bb3b3b5e5eb668e26f8aa96481e",
-    "crates/rovai-core/src/command.rs": "22258f81dc5b76040cd0fdba20074321b5be7104e648a8278412c0736ef0d85a"
+    "crates/coaxi-core/src/local_attachment_source.rs": "8830581e72fc103b2f359be17a0072c5ee0cedc6eb5fe58b179ae3d255dbc1ca",
+    "crates/coaxi-core/src/context.rs": "329144f38675ebedeaf5652858d457d42369455eb26c6159af61d19c02218784",
+    "crates/coaxi-core/src/message_quote.rs": "efb6e962946b85c089483bb1120fe92f32458bb3b3b5e5eb668e26f8aa96481e",
+    "crates/coaxi-core/src/command.rs": "22258f81dc5b76040cd0fdba20074321b5be7104e648a8278412c0736ef0d85a"
   },
   "candidates": [
     {
@@ -164,7 +164,7 @@
         "candidate": "fusion-i03-rc.1",
         "started_at": "2026-10-16T04:05:56.4204015Z",
         "finished_at": "2026-10-16T04:08:12.0440560Z",
-        "command": "cargo build --locked --package rovai-core --package rovai-host",
+        "command": "cargo build --locked --package coaxi-core --package coaxi-host",
         "exit_code": 0,
         "status": "passed"
       },
@@ -193,14 +193,14 @@
         "started_at": "2026-10-16T04:18:25.5099909Z",
         "finished_at": "2026-10-16T04:18:36.3430189Z",
         "exit_code": 0,
-        "output": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\c06\\fusion-i03-rc.2\\web-ui",
+        "output": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\c06\\fusion-i03-rc.2\\web-ui",
         "command": "pnpm run build:web --outDir <candidate>/web-ui"
       },
       "rust_test_owner_list": {
         "source_commit": "9a2eaef5d8000371c69ca30283ab6daa539802a8",
         "started_at": "2026-10-16T04:18:02.5120970Z",
         "finished_at": "2026-10-16T04:19:26.2978353Z",
-        "command": "cargo test --locked --offline -p rovai-core --lib --features extended-tests,slow-tests single_chat_composer::tests -- --list",
+        "command": "cargo test --locked --offline -p coaxi-core --lib --features extended-tests,slow-tests single_chat_composer::tests -- --list",
         "exit_code": 101
       }
     },
@@ -213,21 +213,21 @@
           "source_commit": "18984d69134a7314939ca13b0e114bbd2ceece6d",
           "started_at": "2026-10-16T04:36:12.6124793Z",
           "finished_at": "2026-10-16T04:37:21.8522192Z",
-          "command": "cargo build --locked --offline --package rovai-core --package rovai-host",
+          "command": "cargo build --locked --offline --package coaxi-core --package coaxi-host",
           "exit_code": 0
         },
         "rust-owner-list": {
           "source_commit": "18984d69134a7314939ca13b0e114bbd2ceece6d",
           "started_at": "2026-10-16T04:37:22.0917993Z",
           "finished_at": "2026-10-16T04:40:13.5451941Z",
-          "command": "cargo test --locked --offline -p rovai-core --lib --features extended-tests,slow-tests single_chat_composer::tests -- --list",
+          "command": "cargo test --locked --offline -p coaxi-core --lib --features extended-tests,slow-tests single_chat_composer::tests -- --list",
           "exit_code": 0
         },
         "private-material-tests": {
           "source_commit": "18984d69134a7314939ca13b0e114bbd2ceece6d",
           "started_at": "2026-10-16T04:40:13.6002203Z",
           "finished_at": "2026-10-16T04:40:24.2709091Z",
-          "command": "cargo test --locked --offline -p rovai-core --lib --features extended-tests,slow-tests single_chat_composer::tests -- --test-threads=1",
+          "command": "cargo test --locked --offline -p coaxi-core --lib --features extended-tests,slow-tests single_chat_composer::tests -- --test-threads=1",
           "exit_code": 0
         },
         "host-lifecycle": {
@@ -236,10 +236,10 @@
           "finished_at": "2026-10-16T04:42:10.3142129Z",
           "exit_code": 1,
           "timed_out": false,
-          "harness_root": "C:\\Users\\JiaLe\\AppData\\Local\\Temp\\rovai-host-harness-9fa50169a60144ffabf3180a2e1b160d",
-          "node": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\tools\\node-v24.21.0\\node-v24.21.0-win-x64\\node.exe",
-          "host_binary": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\target\\debug\\rovai-host.exe",
-          "web": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\c06\\fusion-i03-rc.2\\web-ui",
+          "harness_root": "C:\\Users\\JiaLe\\AppData\\Local\\Temp\\coaxi-host-harness-9fa50169a60144ffabf3180a2e1b160d",
+          "node": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\tools\\node-v24.21.0\\node-v24.21.0-win-x64\\node.exe",
+          "host_binary": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\target\\debug\\coaxi-host.exe",
+          "web": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\c06\\fusion-i03-rc.2\\web-ui",
           "scope": "actual isolated Host/HTTP/Core/PTY lifecycle, no agent model"
         }
       }
@@ -285,24 +285,24 @@
   ],
   "windows_binaries": [
     {
-      "name": "rovai-core.exe",
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\target\\debug\\rovai-core.exe",
+      "name": "coaxi-core.exe",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\target\\debug\\coaxi-core.exe",
       "length": 79862272,
       "last_write_utc": "2026-10-16T05:03:14.7500155Z",
       "sha256": "2345fdd7ad001ce45420e2285acdfe371bf2b809cadba3b7d24cd93d6fb6d0ac",
       "source_commit": "391e21fe62ade0ed5eade33c7b8335df84c9cca3"
     },
     {
-      "name": "rovai-host.exe",
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\target\\debug\\rovai-host.exe",
+      "name": "coaxi-host.exe",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\target\\debug\\coaxi-host.exe",
       "length": 85946880,
       "last_write_utc": "2026-10-16T05:03:17.8049047Z",
       "sha256": "f54e9bba856e8310fe0088baeba6590b23994d6f6a39851738d043fba208e37d",
       "source_commit": "391e21fe62ade0ed5eade33c7b8335df84c9cca3"
     },
     {
-      "name": "rovai.exe",
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\target\\debug\\rovai.exe",
+      "name": "coaxi.exe",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\target\\debug\\coaxi.exe",
       "length": 6582784,
       "last_write_utc": "2026-10-16T05:03:18.5375722Z",
       "sha256": "d6f5bb6e8847b8bf4490b295ddafe0a45a5ae794a7d1ea57209a47c099231327",
@@ -317,7 +317,7 @@
   "reuse_boundary": "Production application prefix unchanged; preserve actual rc.3 binary source commit and hashes, rc.2 TS/Web and unaffected3 material owners",
   "web_asset_inventory": {
     "source_commit": "9a2eaef5d8000371c69ca30283ab6daa539802a8",
-    "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\c06\\fusion-i03-rc.2\\web-ui",
+    "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\c06\\fusion-i03-rc.2\\web-ui",
     "files": 141,
     "all_sha256_verified": true,
     "manifest_sha256": "8d56a5815d03334687fcb0e2db33d5f2db0b8dacf0647e74ffd97baba849e162"
@@ -384,7 +384,7 @@
   "desktop_build": {
     "source_commit": "b43416d3b2d161868cb0aa4204a4fc92de550942",
     "exit_code": 0,
-    "inventory": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\c06\\fusion-i03-rc.4\\desktop-output-inventory.json"
+    "inventory": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\c06\\fusion-i03-rc.4\\desktop-output-inventory.json"
   },
   "host_lifecycle": {
     "source_commit": "391e21fe62ade0ed5eade33c7b8335df84c9cca3",

@@ -15,7 +15,7 @@ test('taken-over child chat preserves exact owner, input recovery and embedded d
 async function runFixture(t, mode = '--readonly') {
   if (!admitElectronIntegrationTest(t)) return
   const root = resolve(import.meta.dirname, '../..'), source = join(root, 'scripts/fixtures/delegation-viewer')
-  const fixture = await mkdtemp(join(tmpdir(), 'rovai-delegation-viewer-'))
+  const fixture = await mkdtemp(join(tmpdir(), 'coaxi-delegation-viewer-'))
   let child, closed
   try {
     await build({ configFile: false, root: source, base: './', logLevel: 'error', plugins: [react()],
@@ -34,7 +34,7 @@ async function runFixture(t, mode = '--readonly') {
     assert.equal(JSON.parse(result).ok, true); process.stdout.write(result + '\n')
   } finally {
     if (child && child.exitCode === null && child.signalCode === null) { child.kill('SIGKILL'); await closed }
-    if (process.env.ROVAI_KEEP_DELEGATION_VIEWER_FIXTURE === '1') process.stdout.write(`Viewer screenshots: ${fixture}\n`)
+    if (process.env.COAXI_KEEP_DELEGATION_VIEWER_FIXTURE === '1') process.stdout.write(`Viewer screenshots: ${fixture}\n`)
     else await rm(fixture, { recursive: true, force: true })
   }
 }

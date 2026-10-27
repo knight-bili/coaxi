@@ -26,11 +26,11 @@
     "apps/desktop/src/renderer/src/CanvasThreadReader.tsx": "fce2c05e6b3bd73636437777104bfa3d9bf43d6643230edde90a12072ad75db7",
     "apps/desktop/src/renderer/src/thread-projection-store.ts": "6cb15336b6b683ddf7650b8c35326641a0ed415e64d5476daa8753f18954b1dd",
     "apps/desktop/src/renderer/src/canvas-terminal-sessions.ts": "1c5e6732f745770610fc7cd9e3713378e7a7ad098774cb885b8b7c62121ae738",
-    "crates/rovai-core/src/private_source_observation.rs": "ebb690e5d96560399f83dd9c81b6e3cc946ff2a09ccd56cb9446c9654cf9e526",
-    "crates/rovai-core/src/local_attachment_snapshot.rs": "77141c47a8e9e466cffc0627c1be2e3c035ac06051e5026077f3a6681591ee1c",
-    "crates/rovai-core/src/single_chat.rs": "a674f9e3e4c383cf031f67c89d56b4941cb61e30e66bd67dfa6b6599fd0efda1",
-    "crates/rovai-core/src/single_chat_composer.rs": "d40d86f063828cc1bced4d90ff98cf6b8e0c84728148ceada5134e143d3c9fec",
-    "crates/rovai-core/src/web_upload.rs": "7266c11c9a4cf610649c46676320f1629a548a8567e3c5bdba4b8ad0d17b239f",
+    "crates/coaxi-core/src/private_source_observation.rs": "ebb690e5d96560399f83dd9c81b6e3cc946ff2a09ccd56cb9446c9654cf9e526",
+    "crates/coaxi-core/src/local_attachment_snapshot.rs": "77141c47a8e9e466cffc0627c1be2e3c035ac06051e5026077f3a6681591ee1c",
+    "crates/coaxi-core/src/single_chat.rs": "a674f9e3e4c383cf031f67c89d56b4941cb61e30e66bd67dfa6b6599fd0efda1",
+    "crates/coaxi-core/src/single_chat_composer.rs": "d40d86f063828cc1bced4d90ff98cf6b8e0c84728148ceada5134e143d3c9fec",
+    "crates/coaxi-core/src/web_upload.rs": "7266c11c9a4cf610649c46676320f1629a548a8567e3c5bdba4b8ad0d17b239f",
     "docs/contracts/single-chat-composer-scope-v1.md": "cdc8f6a8d6f1fc09028085040fdfd8d418f6b19be1a7b0b7dff01e41e78d6118"
   },
   "artifact_binding": {
@@ -43,10 +43,10 @@
     "work/i03/canvas-c05-docs-final.log": "6eb03e1b66af4f3a2ae337d42e11ddb5a595f11fc6e89cd079e7d49f34c7f9e8"
   },
   "frozen_authority_files": {
-    "crates/rovai-core/src/local_attachment_source.rs": "8830581e72fc103b2f359be17a0072c5ee0cedc6eb5fe58b179ae3d255dbc1ca",
-    "crates/rovai-core/src/context.rs": "329144f38675ebedeaf5652858d457d42369455eb26c6159af61d19c02218784",
-    "crates/rovai-core/src/message_quote.rs": "efb6e962946b85c089483bb1120fe92f32458bb3b3b5e5eb668e26f8aa96481e",
-    "crates/rovai-core/src/command.rs": "22258f81dc5b76040cd0fdba20074321b5be7104e648a8278412c0736ef0d85a"
+    "crates/coaxi-core/src/local_attachment_source.rs": "8830581e72fc103b2f359be17a0072c5ee0cedc6eb5fe58b179ae3d255dbc1ca",
+    "crates/coaxi-core/src/context.rs": "329144f38675ebedeaf5652858d457d42369455eb26c6159af61d19c02218784",
+    "crates/coaxi-core/src/message_quote.rs": "efb6e962946b85c089483bb1120fe92f32458bb3b3b5e5eb668e26f8aa96481e",
+    "crates/coaxi-core/src/command.rs": "22258f81dc5b76040cd0fdba20074321b5be7104e648a8278412c0736ef0d85a"
   },
   "implemented": [
     "Clip visible notification sources to both layout and visual viewport CSS bounds, without multiplying by pinch scale",

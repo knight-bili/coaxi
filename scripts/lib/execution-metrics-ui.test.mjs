@@ -15,7 +15,7 @@ const fixtureSource = join(root, 'scripts/fixtures/camp-fast-layout')
 
 test('production execution metrics scope visible Runs and pause hidden UI without losing late Usage', { timeout: 90_000 }, async (t) => {
   if (!admitElectronIntegrationTest(t)) return
-  const fixture = await mkdtemp(join(tmpdir(), 'rovai-execution-metrics-test-'))
+  const fixture = await mkdtemp(join(tmpdir(), 'coaxi-execution-metrics-test-'))
   let child
   let closed
   try {
@@ -47,7 +47,7 @@ test('production execution metrics scope visible Runs and pause hidden UI withou
       child.kill('SIGKILL')
       await closed
     }
-    if (process.env.ROVAI_KEEP_EXECUTION_METRICS_FIXTURE === '1') {
+    if (process.env.COAXI_KEEP_EXECUTION_METRICS_FIXTURE === '1') {
       process.stdout.write(`Execution metrics fixture: ${fixture}\n`)
     } else {
       await rm(fixture, { recursive: true, force: true })

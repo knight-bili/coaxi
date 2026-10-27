@@ -17,8 +17,8 @@ const result = await build({ configFile: false, root: import.meta.dirname, base:
 const bundle = (Array.isArray(result) ? result[0] : result).output
 const js = bundle.filter(x => x.type === 'chunk').map(x => x.code).join('\n')
 const css = bundle.filter(x => x.type === 'asset' && x.fileName.endsWith('.css')).map(x => x.source).join('\n')
-const html = `<!doctype html><html lang="zh-CN" data-theme="day"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><title>Rovai · 队员占位交互稿</title><meta name="description" content="直接复用当前 Rovai 生产组件的离线交互稿。固定演示数据。"><!-- Production source ${sourceCommit}. Prototype only; no Host or Runtime connection. --><style>${css}</style></head><body><div id="root"></div><script type="module">${js.replaceAll('</script', '<\\/script')}</script></body></html>`
+const html = `<!doctype html><html lang="zh-CN" data-theme="day"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><title>Coaxi · 队员占位交互稿</title><meta name="description" content="直接复用当前 Coaxi 生产组件的离线交互稿。固定演示数据。"><!-- Production source ${sourceCommit}. Prototype only; no Host or Runtime connection. --><style>${css}</style></head><body><div id="root"></div><script type="module">${js.replaceAll('</script', '<\\/script')}</script></body></html>`
 await mkdir(out, { recursive: true })
-const output = join(out, 'rovai-teammate-presence.html')
+const output = join(out, 'coaxi-teammate-presence.html')
 await writeFile(output, html)
 console.log(JSON.stringify({ output, bytes: Buffer.byteLength(html), sourceCommit }))

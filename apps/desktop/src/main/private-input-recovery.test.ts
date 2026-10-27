@@ -6,7 +6,7 @@ import { expect, it } from 'vitest'
 import { NativePrivateInputRecovery } from './private-input-recovery'
 
 it('persists separate private bodies and the exact in-flight request across new store instances', () => {
-  const root = mkdtempSync(join(tmpdir(), 'rovai-private-input-recovery-'))
+  const root = mkdtempSync(join(tmpdir(), 'coaxi-private-input-recovery-'))
   const first = new NativePrivateInputRecovery(root), bodyKey = 'single-chat:thread:canvas:a'
   const intentKey = 'single-chat-input-intent:v1:{"conversationId":"private","contextKey":"a"}'
   const intent = { version: 1, params: { commandId: 'original', command: { body: '原文' } } }
@@ -21,7 +21,7 @@ it('persists separate private bodies and the exact in-flight request across new 
 })
 
 it('refuses damaged or mismatched records without replacing the original bytes', () => {
-  const root = mkdtempSync(join(tmpdir(), 'rovai-private-input-recovery-'))
+  const root = mkdtempSync(join(tmpdir(), 'coaxi-private-input-recovery-'))
   const store = new NativePrivateInputRecovery(root), key = 'single-chat:owned'
   store.set(key, { private: '原文' })
   const path = join(root, createHash('sha256').update(key).digest('hex')+'.json')
@@ -38,7 +38,7 @@ it('refuses damaged or mismatched records without replacing the original bytes',
 })
 
 it('rejects non-private keys and never maps supplied paths directly to files', () => {
-  const root = mkdtempSync(join(tmpdir(), 'rovai-private-input-recovery-')), store = new NativePrivateInputRecovery(root)
+  const root = mkdtempSync(join(tmpdir(), 'coaxi-private-input-recovery-')), store = new NativePrivateInputRecovery(root)
   for (const key of ['../outside', 'public-input', '', 'single-chat:\0bad']) expect(() => store.set(key, {})).toThrow()
   store.set('single-chat:../../owned', {})
   expect(readdirSync(root)).toHaveLength(1)

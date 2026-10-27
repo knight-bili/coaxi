@@ -7,7 +7,7 @@ import react from '@vitejs/plugin-react'
 // Only emitted, content-addressed build outputs enter the cache inventory.
 // Public/copied files and page entries do not gain caching from their directory.
 function assetCacheManifest(): Plugin {
-  return { name: 'rovai-asset-cache-manifest', apply: 'build', enforce: 'post', writeBundle: {
+  return { name: 'coaxi-asset-cache-manifest', apply: 'build', enforce: 'post', writeBundle: {
     order: 'post', async handler(options, bundle) {
       if (!options.dir) throw new Error('Web build requires an output directory')
       const files: Record<string, string> = {}

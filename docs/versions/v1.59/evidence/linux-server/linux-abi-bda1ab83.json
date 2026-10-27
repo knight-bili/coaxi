@@ -3,7 +3,7 @@
   "target": "linux-x64",
   "maximumRequiredGlibc": "2.35",
   "files": {
-    "rovai": {
+    "coaxi": {
       "requiredSymbolVersions": {
         "GLIBC": "2.34",
         "GLIBCXX": null,
@@ -17,7 +17,7 @@
       ],
       "interpreter": "/lib64/ld-linux-x86-64.so.2"
     },
-    "rovai-host": {
+    "coaxi-host": {
       "requiredSymbolVersions": {
         "GLIBC": "2.34",
         "GLIBCXX": null,
@@ -31,7 +31,7 @@
       ],
       "interpreter": "/lib64/ld-linux-x86-64.so.2"
     },
-    "rovai-server": {
+    "coaxi-server": {
       "requiredSymbolVersions": {
         "GLIBC": "2.34",
         "GLIBCXX": null,

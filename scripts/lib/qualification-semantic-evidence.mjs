@@ -16,7 +16,7 @@ import {
 
 export const SEMANTIC_JUDGE_CONTENT_POLICY_ID = 'semantic-judge-content-allowlist-v1'
 export const COLLABORATION_MESSAGE_EVIDENCE_SCHEMA_ID =
-  'rovai.qualification.collaboration-message-evidence'
+  'coaxi.qualification.collaboration-message-evidence'
 export const COLLABORATION_MESSAGE_EVIDENCE_SCHEMA_VERSION = '2.0.0'
 
 // This is an executable allowlist, not documentation about what the caller
@@ -162,7 +162,7 @@ export function buildCollaborationMessageEvidence({
     schemaId: COLLABORATION_MESSAGE_EVIDENCE_SCHEMA_ID,
     schemaVersion: COLLABORATION_MESSAGE_EVIDENCE_SCHEMA_VERSION,
     producer: {
-      id: 'rovai-qualification-runner',
+      id: 'coaxi-qualification-runner',
       version: QUALIFICATION_RUNNER_VERSION,
       digest: withSha256Prefix(producerDigest)
     },

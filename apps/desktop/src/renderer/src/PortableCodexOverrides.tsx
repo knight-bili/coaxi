@@ -1,7 +1,7 @@
 import {useUiText} from './interface-language'
 
 type ChoiceField={key:string;label:string;options:ReadonlyArray<string|boolean|null>}
-// 字段与闭集来源：Codeg aff1e6c 的 codex-model-list-editor.tsx。
+// 字段与闭集来源：Coaxi aff1e6c 的 codex-model-list-editor.tsx。
 const protocol:ChoiceField[]=[
   {key:'tool_mode',label:'工具调用方式',options:[null,'direct','code_mode','code_mode_only']},
   {key:'multi_agent_version',label:'多智能体协议',options:[null,'v1','v2']},

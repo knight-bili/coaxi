@@ -5,7 +5,7 @@ import { useUiText } from './interface-language'
 
 const bytes = (value: number): string => value >= 1048576 ? `${(value / 1048576).toFixed(1)} MB` : value >= 1024 ? `${(value / 1024).toFixed(0)} KB` : `${value} B`
 
-/** Codeg BrowserDownloadBar: compact rows above content; no auto-open. */
+/** Coaxi BrowserDownloadBar: compact rows above content; no auto-open. */
 export function BrowserDownloadBar({ api, threadId, tabId }: { api: BrowserWorkspaceApi; threadId: string; tabId: string | null }): React.JSX.Element | null {
   const t = useUiText()
   const [downloads, setDownloads] = useState<BrowserDownloadView[]>([])

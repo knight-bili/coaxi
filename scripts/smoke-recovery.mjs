@@ -11,11 +11,11 @@ import {
 } from './lib/runtime-camp-files-root.mjs'
 
 const root = resolve(import.meta.dirname, '..')
-const fixtureRoot = await realpath(await mkdtemp(join(tmpdir(), 'rovai-recovery-smoke-')))
+const fixtureRoot = await realpath(await mkdtemp(join(tmpdir(), 'coaxi-recovery-smoke-')))
 const projectRoot = join(fixtureRoot, 'project')
 const dataDir = join(fixtureRoot, 'data')
-const adapterKind = process.env.ROVAI_RECOVERY_ADAPTER ?? 'opencode-cli'
-const coreBinary = resolve(process.env.ROVAI_RECOVERY_BIN ?? join(root, 'target/debug/rovai-core'))
+const adapterKind = process.env.COAXI_RECOVERY_ADAPTER ?? 'opencode-cli'
+const coreBinary = resolve(process.env.COAXI_RECOVERY_BIN ?? join(root, 'target/debug/coaxi-core'))
 console.log(JSON.stringify({ channel: 'automatic_acceptance', fixtureRoot, dataDir, skillLibraryRoot: join(dataDir, 'managed-skill-library'), mcpConfigPath: join(dataDir, 'mcp.json'), coreBinary, adapterKind }))
 const agentId = 'agent_1'
 let firstCore = null
@@ -26,8 +26,8 @@ try {
   await mkdir(projectRoot)
   await writeFile(join(projectRoot, 'README.md'), '# Recovery Smoke\n')
   await git(['init', '-b', 'main'], projectRoot)
-  await git(['config', 'user.name', 'Rovai-ai Recovery Smoke'], projectRoot)
-  await git(['config', 'user.email', 'recovery@rovai.local'], projectRoot)
+  await git(['config', 'user.name', 'Coaxi Recovery Smoke'], projectRoot)
+  await git(['config', 'user.email', 'recovery@coaxi.local'], projectRoot)
   await git(['add', 'README.md'], projectRoot)
   await git(['commit', '-m', 'fixture'], projectRoot)
 
@@ -44,9 +44,9 @@ try {
     commandId: crypto.randomUUID(),
     workspace,
     body: [
-      '执行 Rovai-ai 硬崩溃恢复验收。',
+      '执行 Coaxi 硬崩溃恢复验收。',
       '必须使用你的 Shell/Bash 工具执行命令 `sleep 20`。',
-      '命令结束后只回复 RECOVERY_OK，不要修改文件，也不要调用 rovai Built-in CLI。'
+      '命令结束后只回复 RECOVERY_OK，不要修改文件，也不要调用 coaxi Built-in CLI。'
     ].join('\n'),
     purpose: 'Prove that one durable AgentRun resumes after the Core process is killed.',
   })
@@ -74,7 +74,7 @@ try {
   }, 'accepted Runtime input before crash injection', 120_000)
 
   // Give the Runtime time to enter the requested long-running command. Native
-  // Runtime tools are not necessarily reflected as Rovai-ai Action rows, so the
+  // Runtime tools are not necessarily reflected as Coaxi Action rows, so the
   // durable condition here is accepted input plus a still-running AgentRun.
   await wait(1_500)
   const crashSnapshot = await firstCore.request('camps.snapshot', { threadId })
@@ -100,7 +100,7 @@ try {
   const originalEpoch = beforeCrash.run.executionEpoch
   const manifestId = beforeCrash.manifest.id
   await firstCore.crash()
-  if (!firstCore.stderr.includes('rovai-core') && !firstCore.stderr.includes('Host')) {
+  if (!firstCore.stderr.includes('coaxi-core') && !firstCore.stderr.includes('Host')) {
     throw new Error(`First Core produced no startup diagnostics: ${firstCore.stderr}`)
   }
   firstCore = null
@@ -259,7 +259,7 @@ function startCore(dataDirectory) {
   child.once('error', rejectPending)
   child.once('close', (code, signal) => {
     if (!shuttingDown) {
-      rejectPending(new Error(`rovai-core exited early (code=${code}, signal=${signal})`))
+      rejectPending(new Error(`coaxi-core exited early (code=${code}, signal=${signal})`))
     }
   })
   createInterface({ input: child.stdout }).on('line', (line) => {
@@ -297,7 +297,7 @@ function startCore(dataDirectory) {
     shuttingDown = true
     child.kill('SIGKILL')
     await waitForExit()
-    rejectPending(new Error('rovai-core was killed for recovery smoke'))
+    rejectPending(new Error('coaxi-core was killed for recovery smoke'))
   }
   return {
     events,

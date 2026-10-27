@@ -11,7 +11,7 @@ export interface DelegationViewerState {
   error: boolean
 }
 type Client = Pick<ThreadClient, 'request' | 'onEvent' | 'onInvalidated'>
-/** Codeg target names are not Rovai adapter-kind identifiers. */
+/** Coaxi target names are not Coaxi adapter-kind identifiers. */
 export function delegationRuntimeLabel(target: DelegationRuntimeTarget): string {
   const labels: Record<Exclude<DelegationRuntimeTarget, `custom:${string}`>, string> = {
     antigravity: 'Google Antigravity', claude_code: 'Claude Code', cline: 'Cline', code_buddy: 'CodeBuddy', codex: 'Codex', command_code: 'Command Code',

@@ -8,14 +8,14 @@
     "base_commit": "34fc207ca89ae96ccde60bd643fb8d00b4d21141",
     "kind": "exact_worktree_sha256_before_commit",
     "files": {
-      "crates/rovai-core/src/application.rs": "b88b6108f0dce3e383c26c8fc76450a0900c729818974f7370f5dc1fb8eddaba",
-      "crates/rovai-core/src/application/private_composer.rs": "59599da07a437958c63b8f39346134bc80dc6ceefb7d98bfded436b124c0ce41",
-      "crates/rovai-core/src/application/private_sources.rs": "b8d529d50e53d6feb5d658a398dd898810f3045af6c55693684f7cfb009a5dcd",
-      "crates/rovai-core/src/private_source_observation.rs": "32f83555d68a4fdb0a4df76bc2459105d3c142eb7e80cc0a074146bf9bdb71bc",
-      "crates/rovai-core/src/single_chat.rs": "d42900cb08156c8628e48ef9545e60735ab7635ca5991aed17ef368d3fbe5f9d",
-      "crates/rovai-core/src/single_chat_composer.rs": "d0b8d9980fd13e66917a6e61d1a38a1fe2abf4cffe1d70928e70b44b24a63610",
-      "crates/rovai-core/src/single_chat_composer_tests.rs": "63028fcfa351e7dcc6470f405e303ecd69969dd6194417271adafd10aa8d3f6d",
-      "crates/rovai-core/src/web_upload.rs": "8f7558e7e27e5b70b2ca466b3d910663bed40bc7bebafd03085aaaabec986e15",
+      "crates/coaxi-core/src/application.rs": "b88b6108f0dce3e383c26c8fc76450a0900c729818974f7370f5dc1fb8eddaba",
+      "crates/coaxi-core/src/application/private_composer.rs": "59599da07a437958c63b8f39346134bc80dc6ceefb7d98bfded436b124c0ce41",
+      "crates/coaxi-core/src/application/private_sources.rs": "b8d529d50e53d6feb5d658a398dd898810f3045af6c55693684f7cfb009a5dcd",
+      "crates/coaxi-core/src/private_source_observation.rs": "32f83555d68a4fdb0a4df76bc2459105d3c142eb7e80cc0a074146bf9bdb71bc",
+      "crates/coaxi-core/src/single_chat.rs": "d42900cb08156c8628e48ef9545e60735ab7635ca5991aed17ef368d3fbe5f9d",
+      "crates/coaxi-core/src/single_chat_composer.rs": "d0b8d9980fd13e66917a6e61d1a38a1fe2abf4cffe1d70928e70b44b24a63610",
+      "crates/coaxi-core/src/single_chat_composer_tests.rs": "63028fcfa351e7dcc6470f405e303ecd69969dd6194417271adafd10aa8d3f6d",
+      "crates/coaxi-core/src/web_upload.rs": "8f7558e7e27e5b70b2ca466b3d910663bed40bc7bebafd03085aaaabec986e15",
       "docs/architecture/canvas.md": "a66a899f8fd89fa197e09cb09bb55ee72bd99e8857a6655d333a2763699bf585",
       "docs/contracts/single-chat-composer-scope-v1.md": "8e1d0f173008dfda3d7d9de127f7b3cd0d15e6339bd4cfc1f9ef3effce3ee97c",
       "docs/development/testing.md": "cb840a2e331eceeaefabe5eff461580c23580b7c74cb8d7e5a407c30021aaab5",
@@ -30,10 +30,10 @@
     "work/i03/canvas-c05-source-preparation-docs-final.log": "6eb03e1b66af4f3a2ae337d42e11ddb5a595f11fc6e89cd079e7d49f34c7f9e8"
   },
   "frozen_authority_files": {
-    "crates/rovai-core/src/local_attachment_source.rs": "8830581e72fc103b2f359be17a0072c5ee0cedc6eb5fe58b179ae3d255dbc1ca",
-    "crates/rovai-core/src/context.rs": "329144f38675ebedeaf5652858d457d42369455eb26c6159af61d19c02218784",
-    "crates/rovai-core/src/message_quote.rs": "efb6e962946b85c089483bb1120fe92f32458bb3b3b5e5eb668e26f8aa96481e",
-    "crates/rovai-core/src/command.rs": "22258f81dc5b76040cd0fdba20074321b5be7104e648a8278412c0736ef0d85a"
+    "crates/coaxi-core/src/local_attachment_source.rs": "8830581e72fc103b2f359be17a0072c5ee0cedc6eb5fe58b179ae3d255dbc1ca",
+    "crates/coaxi-core/src/context.rs": "329144f38675ebedeaf5652858d457d42369455eb26c6159af61d19c02218784",
+    "crates/coaxi-core/src/message_quote.rs": "efb6e962946b85c089483bb1120fe92f32458bb3b3b5e5eb668e26f8aa96481e",
+    "crates/coaxi-core/src/command.rs": "22258f81dc5b76040cd0fdba20074321b5be7104e648a8278412c0736ef0d85a"
   },
   "implemented": [
     "Per-operation PreparedSources binds complete ordered SourceRef encoding to full content/identity observations and original IO failure details",
@@ -56,31 +56,31 @@
     "test_admission": {
       "new_rust_owners": 0,
       "test_attributes_unchanged": {
-        "crates/rovai-core/src/application.rs": {
+        "crates/coaxi-core/src/application.rs": {
           "before": 67,
           "after": 67
         },
-        "crates/rovai-core/src/application/private_composer.rs": {
+        "crates/coaxi-core/src/application/private_composer.rs": {
           "before": 0,
           "after": 0
         },
-        "crates/rovai-core/src/private_source_observation.rs": {
+        "crates/coaxi-core/src/private_source_observation.rs": {
           "before": 0,
           "after": 0
         },
-        "crates/rovai-core/src/single_chat.rs": {
+        "crates/coaxi-core/src/single_chat.rs": {
           "before": 9,
           "after": 9
         },
-        "crates/rovai-core/src/single_chat_composer.rs": {
+        "crates/coaxi-core/src/single_chat_composer.rs": {
           "before": 0,
           "after": 0
         },
-        "crates/rovai-core/src/single_chat_composer_tests.rs": {
+        "crates/coaxi-core/src/single_chat_composer_tests.rs": {
           "before": 3,
           "after": 3
         },
-        "crates/rovai-core/src/web_upload.rs": {
+        "crates/coaxi-core/src/web_upload.rs": {
           "before": 0,
           "after": 0
         }

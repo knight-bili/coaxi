@@ -38,7 +38,7 @@ export function startNavigationThreadLookup(
   threadId: string,
   publish: (result: NavigationThreadLookup) => void,
   findThread: (threadId: string) => Promise<NavigationThreadTarget | null> = (id) =>
-    window.rovai.request('navigation.findThread', { threadId: id })
+    window.coaxi.request('navigation.findThread', { threadId: id })
 ): () => void {
   let cancelled = false
   // A complete ID can still be edited quickly; only dispatch the settled input.

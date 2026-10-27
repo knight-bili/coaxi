@@ -13,35 +13,35 @@ import {
 
 test('default development userData is deterministic per repository and outside daily data', () => {
   const first = defaultDevelopmentUserDataDirectory({
-    repositoryRoot: '/workspace/rovai-ai',
+    repositoryRoot: '/workspace/coaxi',
     temporaryRoot: '/temporary'
   })
   const second = defaultDevelopmentUserDataDirectory({
-    repositoryRoot: '/workspace/rovai-ai',
+    repositoryRoot: '/workspace/coaxi',
     temporaryRoot: '/temporary'
   })
   assert.equal(first, second)
-  assert.match(first, /rovai-ai-development[\\/][^\\/]+[\\/]user-data$/)
+  assert.match(first, /coaxi-development[\\/][^\\/]+[\\/]user-data$/)
 })
 
 test('development userData rejects daily directories and their descendants', () => {
-  const dailyDirectory = '/users/example/application-support/Rovai-ai'
+  const dailyDirectory = '/users/example/application-support/Coaxi'
   assert.throws(
     () => assertDevelopmentUserDataIsIsolated(dailyDirectory, { dailyDirectories: [dailyDirectory] }),
-    /must not use the daily Rovai directory/
+    /must not use the daily Coaxi directory/
   )
   assert.throws(
     () => assertDevelopmentUserDataIsIsolated(join(dailyDirectory, 'child'), { dailyDirectories: [dailyDirectory] }),
-    /must not use the daily Rovai directory/
+    /must not use the daily Coaxi directory/
   )
   assert.equal(
-    assertDevelopmentUserDataIsIsolated('/temporary/rovai-dev', { dailyDirectories: [dailyDirectory] }),
-    resolve('/temporary/rovai-dev')
+    assertDevelopmentUserDataIsIsolated('/temporary/coaxi-dev', { dailyDirectories: [dailyDirectory] }),
+    resolve('/temporary/coaxi-dev')
   )
 })
 
 test('every isolated channel requires an explicit path and rejects aliases of daily data', (context) => {
-  const root = mkdtempSync(join(tmpdir(), 'rovai-user-data-alias-'))
+  const root = mkdtempSync(join(tmpdir(), 'coaxi-user-data-alias-'))
   context.after(() => rmSync(root, { recursive: true, force: true }))
   const dailyDirectory = join(root, 'daily')
   const alias = join(root, 'daily-alias')
@@ -51,12 +51,12 @@ test('every isolated channel requires an explicit path and rejects aliases of da
   assert.throws(() => assertUserDataIsIsolated(), /explicit isolated userData/)
   assert.throws(
     () => assertUserDataIsIsolated(join(alias, 'child'), { dailyDirectories: [dailyDirectory] }),
-    /must not use the daily Rovai directory/
+    /must not use the daily Coaxi directory/
   )
 })
 
 test('development launch lock rejects a live owner and can be released', (context) => {
-  const root = mkdtempSync(join(tmpdir(), 'rovai-dev-lock-'))
+  const root = mkdtempSync(join(tmpdir(), 'coaxi-dev-lock-'))
   context.after(() => rmSync(root, { recursive: true, force: true }))
   const release = acquireDevelopmentLaunchLock(root)
   assert.equal(readFileSync(join(root, '.development-instance.lock'), 'utf8').trim(), String(process.pid))
@@ -67,7 +67,7 @@ test('development launch lock rejects a live owner and can be released', (contex
 })
 
 test('generic App acceptance can seed a private completed onboarding fixture', (context) => {
-  const root = mkdtempSync(join(tmpdir(), 'rovai-onboarding-fixture-'))
+  const root = mkdtempSync(join(tmpdir(), 'coaxi-onboarding-fixture-'))
   context.after(() => rmSync(root, { recursive: true, force: true }))
   const dailyDirectory = join(root, 'daily')
   const userDataDirectory = join(root, 'isolated')
@@ -88,6 +88,6 @@ test('generic App acceptance can seed a private completed onboarding fixture', (
     () => seedCompletedOnboardingForAcceptance(dailyDirectory, {
       dailyDirectories: [dailyDirectory]
     }),
-    /must not use the daily Rovai directory/
+    /must not use the daily Coaxi directory/
   )
 })

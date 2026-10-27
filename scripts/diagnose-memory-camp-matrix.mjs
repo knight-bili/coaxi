@@ -7,12 +7,12 @@ import { dirname, join, resolve } from 'node:path'
  * Sequential matrix driver for the real-token Memory Camp diagnostic.
  *
  * Environment:
- *   ROVAI_MEMORY_CAMP_ADAPTERS=all|adapter,adapter  (default: all)
- *   ROVAI_MEMORY_CAMP_MODE=preflight|natural|stewarded|both
- *   ROVAI_MEMORY_CAMP_SUITE=probe|quick|full
- *   ROVAI_MEMORY_CAMP_STRICT=0|1                    (default: 1)
- *   ROVAI_MEMORY_CAMP_REPORT_DIR=<directory>
- *   ROVAI_MEMORY_CAMP_MATRIX_REPORT=<json path>
+ *   COAXI_MEMORY_CAMP_ADAPTERS=all|adapter,adapter  (default: all)
+ *   COAXI_MEMORY_CAMP_MODE=preflight|natural|stewarded|both
+ *   COAXI_MEMORY_CAMP_SUITE=probe|quick|full
+ *   COAXI_MEMORY_CAMP_STRICT=0|1                    (default: 1)
+ *   COAXI_MEMORY_CAMP_REPORT_DIR=<directory>
+ *   COAXI_MEMORY_CAMP_MATRIX_REPORT=<json path>
  *
  * All worker-specific environment variables are forwarded unchanged.
  */
@@ -31,13 +31,13 @@ const allAdapterKinds = [
   'qwen-code',
   'trae-cn-cli'
 ]
-const adapters = selectAdapters(process.env.ROVAI_MEMORY_CAMP_ADAPTERS ?? 'all')
+const adapters = selectAdapters(process.env.COAXI_MEMORY_CAMP_ADAPTERS ?? 'all')
 const runStamp = new Date().toISOString().replaceAll(':', '').replaceAll('.', '-')
-const reportDirectory = process.env.ROVAI_MEMORY_CAMP_REPORT_DIR
-  ? resolve(process.env.ROVAI_MEMORY_CAMP_REPORT_DIR)
+const reportDirectory = process.env.COAXI_MEMORY_CAMP_REPORT_DIR
+  ? resolve(process.env.COAXI_MEMORY_CAMP_REPORT_DIR)
   : join(root, 'artifacts', `memory-camp-matrix-${runStamp}`)
-const aggregatePath = process.env.ROVAI_MEMORY_CAMP_MATRIX_REPORT
-  ? resolve(process.env.ROVAI_MEMORY_CAMP_MATRIX_REPORT)
+const aggregatePath = process.env.COAXI_MEMORY_CAMP_MATRIX_REPORT
+  ? resolve(process.env.COAXI_MEMORY_CAMP_MATRIX_REPORT)
   : join(reportDirectory, 'summary.json')
 const aggregate = {
   schemaVersion: 1,
@@ -45,9 +45,9 @@ const aggregate = {
   ok: false,
   startedAt: new Date().toISOString(),
   completedAt: null,
-  mode: process.env.ROVAI_MEMORY_CAMP_MODE ?? 'both',
-  suite: process.env.ROVAI_MEMORY_CAMP_SUITE ?? 'probe',
-  strict: (process.env.ROVAI_MEMORY_CAMP_STRICT ?? '1') === '1',
+  mode: process.env.COAXI_MEMORY_CAMP_MODE ?? 'both',
+  suite: process.env.COAXI_MEMORY_CAMP_SUITE ?? 'probe',
+  strict: (process.env.COAXI_MEMORY_CAMP_STRICT ?? '1') === '1',
   adapters,
   reportDirectory,
   results: []
@@ -121,11 +121,11 @@ if (!aggregate.ok) process.exitCode = 1
 function selectAdapters(value) {
   const selected = value.split(',').map((entry) => entry.trim()).filter(Boolean)
   if (selected.length === 1 && selected[0] === 'all') return [...allAdapterKinds]
-  if (selected.length === 0) throw new Error('ROVAI_MEMORY_CAMP_ADAPTERS selected no Runtime')
+  if (selected.length === 0) throw new Error('COAXI_MEMORY_CAMP_ADAPTERS selected no Runtime')
   const unique = [...new Set(selected)]
   for (const adapterKind of unique) {
     if (!allAdapterKinds.includes(adapterKind)) {
-      throw new Error(`Unsupported ROVAI_MEMORY_CAMP_ADAPTERS value: ${adapterKind}`)
+      throw new Error(`Unsupported COAXI_MEMORY_CAMP_ADAPTERS value: ${adapterKind}`)
     }
   }
   return unique
@@ -137,11 +137,11 @@ function runWorker(adapterKind, reportPath) {
       cwd: root,
       env: {
         ...process.env,
-        ROVAI_MEMORY_CAMP_ADAPTER: adapterKind,
-        ROVAI_MEMORY_CAMP_MODE: aggregate.mode,
-        ROVAI_MEMORY_CAMP_SUITE: aggregate.suite,
-        ROVAI_MEMORY_CAMP_STRICT: aggregate.strict ? '1' : '0',
-        ROVAI_MEMORY_CAMP_REPORT: reportPath
+        COAXI_MEMORY_CAMP_ADAPTER: adapterKind,
+        COAXI_MEMORY_CAMP_MODE: aggregate.mode,
+        COAXI_MEMORY_CAMP_SUITE: aggregate.suite,
+        COAXI_MEMORY_CAMP_STRICT: aggregate.strict ? '1' : '0',
+        COAXI_MEMORY_CAMP_REPORT: reportPath
       },
       stdio: ['ignore', 'pipe', 'pipe']
     })

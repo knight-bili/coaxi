@@ -13,7 +13,7 @@ import {admitElectronIntegrationTest} from './electron-sandbox-capability.mjs'
 
 test('Canvas source cards and embedded Mission search retain their own sizing and selection', {timeout:180_000},async t=>{
  if(!admitElectronIntegrationTest(t))return
- const root=resolve(import.meta.dirname,'../..'),source=join(root,'scripts/fixtures/mission-board'),fixture=await mkdtemp(join(tmpdir(),'rovai-canvas-source-ui-'))
+ const root=resolve(import.meta.dirname,'../..'),source=join(root,'scripts/fixtures/mission-board'),fixture=await mkdtemp(join(tmpdir(),'coaxi-canvas-source-ui-'))
  await mkdir(join(fixture,'home'),{recursive:true})
  console.log(`Automatic acceptance: ${fixture}; isolated Renderer only, no Core/SQLite/Skill Library/MCP/Runtime`)
  const entry=join(fixture,'canvas-source.cjs')
@@ -25,7 +25,7 @@ test('Canvas source cards and embedded Mission search retain their own sizing an
  await writeFile(join(fixture,'source-files.json'),JSON.stringify(manifest,null,2)+'\n')
  await build({configFile:false,root:source,base:'./',logLevel:'error',plugins:[react()],resolve:{alias:{'@contracts':join(root,'packages/contracts/src/index.ts')}},build:{outDir:join(fixture,'renderer'),minify:false}})
  const results=[]
- const modes=(process.env.ROVAI_CANVAS_SOURCE_MODES??'diff,resize,boards').split(',')
+ const modes=(process.env.COAXI_CANVAS_SOURCE_MODES??'diff,resize,boards').split(',')
  assert(modes.length&&modes.every(mode=>['diff','resize','boards'].includes(mode)))
  for(const theme of ['day','night'])for(const mode of modes){
   const userData=join(fixture,`${mode}-${theme}`),env={}

@@ -8,7 +8,7 @@ describe('member environment JSON boundary', () => {
     expect(parseMemberEnvironment('', false, 'pi', undefined)).toEqual({})
   })
   it('rejects duplicate decoded keys, Windows aliases, non-string values and reserved variables', () => {
-    for (const text of ['{"A":"x","\\u0041":"y"}', '[]', 'null', '{"A":1}', '{"rovai_TOKEN":"secret"}', '{"CLAUDE_CODE_PROVIDER_MANAGED_BY_HOST":"1"}', '{"X":"\\u0000"}']) {
+    for (const text of ['{"A":"x","\\u0041":"y"}', '[]', 'null', '{"A":1}', '{"coaxi_TOKEN":"secret"}', '{"CLAUDE_CODE_PROVIDER_MANAGED_BY_HOST":"1"}', '{"X":"\\u0000"}']) {
       expect(() => parseMemberEnvironment(text, false, 'pi', undefined)).toThrow()
     }
     expect(() => parseMemberEnvironment('{"Path":"a","PATH":"b"}', true, 'pi', undefined)).toThrow()

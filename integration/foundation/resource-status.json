@@ -47,7 +47,7 @@
       "owner": "研发",
       "neededBeforePhase": "I08",
       "baselineDate": "2027-01-15",
-      "action": "安排隔离Linux环境并补Rovai桌面准入；当前无WSL发行版证据"
+      "action": "安排隔离Linux环境并补Coaxi桌面准入；当前无WSL发行版证据"
     },
     {
       "id": "RES-OFFICE",

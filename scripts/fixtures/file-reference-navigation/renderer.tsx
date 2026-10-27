@@ -21,7 +21,7 @@ const notices: string[] = []
 let chooseRootCalls = 0
 const unsupported = async (): Promise<never> => { throw new Error('Unexpected navigation fixture operation') }
 const api: FilePreviewApi = {
-  bindCamp: async () => {},
+  bindThread: async () => {},
   open: async (request) => {
     opens.push(request)
     if (request.kind === 'message_reference' && request.rawReference === '../outside/config.toml') {
@@ -59,7 +59,7 @@ const draft = { threadId, body: '保留原有草稿', content: {
   segments: [{ kind: 'text' as const, text: '保留原有草稿' }]
 }, revision: 1,
   attachments: [], replyIntent: null, continuationIntent: null, updatedAt: null, expiresAt: null }
-Object.assign(window, { rovai: {
+Object.assign(window, { coaxi: {
   windowControls: { onCloseTabRequested: () => () => {} },
   filePreview: api, platform: 'darwin', onEvent: () => () => {},
   request: async (method: string) => {
@@ -122,8 +122,8 @@ let setSurface: (surface: FixtureSurface) => void
 function Workspace({ surface }: { surface: FixtureSurface }): React.JSX.Element {
   const preview = useFilePreview()
   if (surface === 'home') return <div className="app-shell">
-    <aside style={{ gridRow: '1 / -1', padding: '48px 24px', background: 'var(--rail)' }}>Rovai AI</aside>
-    <AppHeader threadTitle={null} contextLabel="Rovai AI" thread={null} onFocusApprovals={() => {}} />
+    <aside style={{ gridRow: '1 / -1', padding: '48px 24px', background: 'var(--rail)' }}>Coaxi AI</aside>
+    <AppHeader threadTitle={null} contextLabel="Coaxi AI" thread={null} onFocusApprovals={() => {}} />
     <main className="content task-content">
       <QuickChatWorkspace agents={[]} recentThreads={recentThreads} onOpenCamp={() => {}}
         onNewConversation={() => {}} onOpenMembers={() => {}} onOpenRuntimeSettings={() => {}} />
@@ -212,6 +212,7 @@ Object.assign(window, { navigationTest: {
       timelineScrollLeft: scroll.scrollLeft,
       bottomGap: scroll.scrollHeight - scroll.scrollTop - scroll.clientHeight,
       visible: Boolean(element('.file-preview-pane')?.getBoundingClientRect().width),
+      previewGeometry: [...document.querySelectorAll<HTMLElement>('.file-preview-retained-host, .file-preview-pane, .file-preview-anchor')].map(node => ({ className: node.className, hidden: node.hidden, rect: node.getBoundingClientRect().toJSON(), display: getComputedStyle(node).display, visibility: getComputedStyle(node).visibility })),
       sameTimeline: scroll === bookmarkedTimeline, sameLink: link() === bookmarkedLink,
       targetLines: [...document.querySelectorAll<HTMLElement>('.cm-location-target')]
         .map((row) => Number(/value_(\d+)/u.exec(row.textContent ?? '')?.[1])),

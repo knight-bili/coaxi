@@ -12,7 +12,7 @@ import { createConfiguredCampAndSend } from '../../scripts/lib/create-configured
 // Owns the real Core process/controlled ACP seam. The Context owner owns the
 // input matrix. No external Runtime identity, provider, or model is used here.
 const root = path.resolve(import.meta.dirname, '../..')
-const workItemMarker = 'ROVAI_SKILL_RECOVERY_HELD_INPUT'
+const workItemMarker = 'COAXI_SKILL_RECOVERY_HELD_INPUT'
 const [binary, launcher, evidenceRoot] = process.argv.slice(2)
 assert([binary, launcher, evidenceRoot].every(value => value && path.isAbsolute(value)),
   'Provide absolute Host binary, compiled fixture launcher and evidence root paths')
@@ -31,9 +31,9 @@ Object.assign(environment, {
   PATH: [path.dirname(process.execPath), ...(process.platform === 'win32' ? [path.join(process.env.SystemRoot, 'System32')] : ['/usr/bin', '/bin'])].join(path.delimiter),
   HOME: home, USERPROFILE: home, APPDATA: path.join(home, 'AppData/Roaming'),
   LOCALAPPDATA: path.join(home, 'AppData/Local'), TEMP: temp, TMP: temp,
-  ROVAI_BUNDLED_SKILLS_ROOT: path.join(root, 'skills'), ROVAI_QWEN_BIN: launcher,
-  ROVAI_ACCEPTANCE_NODE: process.execPath, ROVAI_ACCEPTANCE_SCRIPT: script,
-  ROVAI_SKILL_RECOVERY_CAPTURE: capture
+  COAXI_BUNDLED_SKILLS_ROOT: path.join(root, 'skills'), COAXI_QWEN_BIN: launcher,
+  COAXI_ACCEPTANCE_NODE: process.execPath, COAXI_ACCEPTANCE_SCRIPT: script,
+  COAXI_SKILL_RECOVERY_CAPTURE: capture
 })
 await mkdir(environment.APPDATA, { recursive: true })
 await mkdir(environment.LOCALAPPDATA, { recursive: true })
@@ -83,7 +83,7 @@ async function captures() {
   return text.trim().split('\n').filter(Boolean).map(line => JSON.parse(line))
 }
 async function frozen(runId) {
-  const db = new DatabaseSync(path.join(dataDir, 'rovai.sqlite'), { readOnly: true })
+  const db = new DatabaseSync(path.join(dataDir, 'coaxi.sqlite'), { readOnly: true })
   let row
   try {
     row = db.prepare(`SELECT c.id,c.rendered_payload_blob_id,c.rendered_payload_digest,
@@ -132,10 +132,10 @@ try {
   const original = await frozen(before.run.id)
   assert.equal(original.row.context_manifest_version, 34)
   const dynamic = original.bytes.toString('utf8')
-  assert(dynamic.includes('[ROVAI_SKILL_PACKS]') && dynamic.includes('brainstorming'))
+  assert(dynamic.includes('[COAXI_SKILL_PACKS]') && dynamic.includes('brainstorming'))
   const prompt = before.input.params.prompt.filter(value => value.type === 'text').map(value => value.text).join('\n')
   assert(prompt.includes(dynamic), 'Controlled ACP must actually receive the persisted dynamic payload')
-  const deliveryDb = new DatabaseSync(path.join(dataDir, 'rovai.sqlite'), { readOnly: true })
+  const deliveryDb = new DatabaseSync(path.join(dataDir, 'coaxi.sqlite'), { readOnly: true })
   let delivery
   try {
     delivery = deliveryDb.prepare('SELECT status,dispatch_started_at,accepted_at FROM runtime_input_delivery WHERE agent_run_id=?').get(before.run.id)
@@ -164,7 +164,7 @@ try {
     const run = snapshot.agentRuns.find(value => value.id === before.run.id)
     return run?.status === 'failed' ? { snapshot, run } : null
   }, 'honest terminal settlement of unknown dispatched input')
-  const recoveryDb = new DatabaseSync(path.join(dataDir, 'rovai.sqlite'), { readOnly: true })
+  const recoveryDb = new DatabaseSync(path.join(dataDir, 'coaxi.sqlite'), { readOnly: true })
   let terminal
   try {
     terminal = recoveryDb.prepare(`SELECT r.last_error_code,d.status AS delivery_status,d.accepted_at

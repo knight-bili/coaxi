@@ -90,7 +90,7 @@ export type ExecutionPlanStep = {
   status: 'pending' | 'inProgress' | 'completed'
 }
 
-export type ActivityIconKind = 'terminal' | 'file' | 'file-read' | 'file-write' | 'web' | 'tool' | 'rovai' | 'runtime' | 'unknown'
+export type ActivityIconKind = 'terminal' | 'file' | 'file-read' | 'file-write' | 'web' | 'tool' | 'coaxi' | 'runtime' | 'unknown'
 
 export type ShellReadSummary = {
   title: string
@@ -1391,7 +1391,7 @@ export function activityIconKind(
       canonical.sourceAuthority === 'core'
       && canonical.credibility === 'core_verified'
       && canonical.toolName
-    ) return 'rovai'
+    ) return 'coaxi'
     return 'tool'
   }
   if (canonical?.activityDomain === 'runtime') return 'runtime'
@@ -1533,7 +1533,7 @@ function unwrapShellCommand(command: string): string {
   return current
 }
 
-function rovaiCommandCursor(tokens: ShellPreviewToken[]): number | null {
+function coaxiCommandCursor(tokens: ShellPreviewToken[]): number | null {
   let cursor = 0
   if (shellExecutable(tokens[cursor]?.value ?? '') === 'env') cursor += 1
   while (cursor < tokens.length && shellAssignment(tokens[cursor].value)) cursor += 1
@@ -1541,10 +1541,10 @@ function rovaiCommandCursor(tokens: ShellPreviewToken[]): number | null {
     cursor += 1
     if (['--yes', '-y'].includes(tokens[cursor]?.value)) cursor += 1
   }
-  return shellExecutable(tokens[cursor]?.value ?? '') === 'rovai' ? cursor : null
+  return shellExecutable(tokens[cursor]?.value ?? '') === 'coaxi' ? cursor : null
 }
 
-/** Omit Rovai stdin before the one-line tokenizer can expose its JSON as commands.
+/** Omit Coaxi stdin before the one-line tokenizer can expose its JSON as commands.
  * Preserve every independent command and non-Coaxi heredoc, including mixed Shells. */
 function omitBuiltinStdin(command: string): { command: string; complete: boolean; hasExpansion: boolean } {
   const lines = command.split(/\r?\n/u)
@@ -1573,7 +1573,7 @@ function omitBuiltinStdin(command: string): { command: string; complete: boolean
       const value = attached || valueToken?.value
       if (!valueToken || valueToken.operator || !value) continue
       const segment = tokens.slice(segmentStart, index)
-      const cursor = rovaiCommandCursor(segment)
+      const cursor = coaxiCommandCursor(segment)
       const words = cursor === null ? [] : segment.slice(cursor + 1).map(part => part.value)
       const builtin = cursor !== null && Object.values(BUILTIN_CLI_NAMES).some(name =>
         name.split(' ').slice(1).every((part, position) => words[position] === part))
@@ -1634,7 +1634,7 @@ export function pureBuiltinShellOperation(command: string): string | null {
   const tokens = tokenizeShellPreview(stdin.command)
   // Dynamic commands, redirection and additional work cannot be hidden as a CLI carrier.
   if (tokens.some(token => token.operator || activeShellSyntax(token.raw))) return null
-  const cursor = rovaiCommandCursor(tokens)
+  const cursor = coaxiCommandCursor(tokens)
   if (cursor === null) return null
   const words = tokens.slice(cursor + 1).map(token => token.value)
   if (words.some(word => ['--help', '-h', '--version', '-V'].includes(word))) return null
@@ -1765,7 +1765,7 @@ const COMMANDS_WITH_SUBCOMMAND = new Set([
   'yarn'
 ])
 
-const ROVAI_CAMP_ACTIONS = new Set(['list', 'read', 'search'])
+const COAXI_CAMP_ACTIONS = new Set(['list', 'read', 'search'])
 
 type ShellToken = { value: string; operator: boolean }
 
@@ -1970,7 +1970,7 @@ function shellSegmentLabel(tokens: string[], depth: number): string | null {
   const labelParts = [executable]
   const following = tokens.slice(cursor + 1)
   let displayedArgumentCount = 0
-  if (executable === 'rovai') {
+  if (executable === 'coaxi') {
     const command = following[0]
     const safeCommand = command && !command.startsWith('-') ? shellLabelPart(command) : null
     if (safeCommand) {
@@ -1979,7 +1979,7 @@ function shellSegmentLabel(tokens: string[], depth: number): string | null {
       if (safeCommand === 'camp') {
         const action = following[1]
         const safeAction = action && !action.startsWith('-') ? shellLabelPart(action) : null
-        if (safeAction && ROVAI_CAMP_ACTIONS.has(safeAction)) {
+        if (safeAction && COAXI_CAMP_ACTIONS.has(safeAction)) {
           labelParts.push(safeAction)
           displayedArgumentCount = 2
         }

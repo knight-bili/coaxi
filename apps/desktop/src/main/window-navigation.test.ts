@@ -23,7 +23,7 @@ it('uses native Mac swipe events without also subscribing to mouse host commands
   window.emit('swipe', event, 'right'); window.emit('swipe', event, 'left'); window.emit('swipe', event, 'up')
   expect(window.listenerCount('app-command')).toBe(0)
   expect(window.webContents.send.mock.calls).toEqual([
-    ['rovai:navigation-requested', 'back'], ['rovai:navigation-requested', 'forward']
+    ['coaxi:navigation-requested', 'back'], ['coaxi:navigation-requested', 'forward']
   ])
   expect(event.preventDefault).toHaveBeenCalledTimes(2)
 })

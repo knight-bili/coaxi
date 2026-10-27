@@ -7,8 +7,8 @@ import { spawnSync } from 'node:child_process';
 import test from 'node:test';
 
 test('Command Code required Mod binds each Session and exits before inference on invalid Bootstrap', () => {
-  const root = mkdtempSync(join(tmpdir(), 'rovai-command-bootstrap-'));
-  const module = new URL('../../crates/rovai-core/src/command_code/bootstrap.mjs', import.meta.url).href;
+  const root = mkdtempSync(join(tmpdir(), 'coaxi-command-bootstrap-'));
+  const module = new URL('../../crates/coaxi-core/src/command_code/bootstrap.mjs', import.meta.url).href;
   const binding = (sessionId, bootstrap) => ({ schemaVersion: 1, sessionId, bootstrap,
     sha256: createHash('sha256').update(bootstrap).digest('hex') });
   try {
@@ -31,8 +31,8 @@ test('Command Code required Mod binds each Session and exits before inference on
         const replies = ${JSON.stringify(ids)}.map(sessionId => hooks.appendSystemPrompt({state:{sessionId}}));
         console.log(JSON.stringify(replies));
         console.log('MODEL_WOULD_RUN');
-      `], { env: { ...process.env, ROVAI_COMMAND_CODE_BOOTSTRAP_ROOT: root,
-        ROVAI_COMMAND_CODE_BOOTSTRAP_NONCE: nonce }, encoding: 'utf8' });
+      `], { env: { ...process.env, COAXI_COMMAND_CODE_BOOTSTRAP_ROOT: root,
+        COAXI_COMMAND_CODE_BOOTSTRAP_NONCE: nonce }, encoding: 'utf8' });
     };
     const valid = run(['session-A', 'session-B', 'session-A'], 'nonce-ok');
     assert.equal(valid.status, 0, valid.stderr);

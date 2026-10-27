@@ -141,8 +141,8 @@ const terminalSnapshot: SingleChatSnapshot = {
   ],
   executionEvidence: [
     narration('narration-complete', 'run-complete', 1, '我先检查领域身份和 terminal route，再核对取消边界。'),
-    command('read-contract', 'run-complete', 2, 'rg -n "response_delivery" crates/rovai-core/src'),
-    command('run-tests', 'run-complete', 3, 'cargo test -p rovai-core single_chat::tests'),
+    command('read-contract', 'run-complete', 2, 'rg -n "response_delivery" crates/coaxi-core/src'),
+    command('run-tests', 'run-complete', 3, 'cargo test -p coaxi-core single_chat::tests'),
     command('check-ui', 'run-complete', 4, 'pnpm vitest run SingleChatPanel.test.ts'),
     narration('narration-cancelled', 'run-cancelled', 1, '正在核对取消后的状态投影。')
   ]
@@ -286,7 +286,7 @@ function PublicExecutionFixture({ phase }: { phase: Phase }): React.JSX.Element 
 }
 
 Object.assign(window, {
-  rovai: {
+  coaxi: {
     platform: 'darwin',
     onEvent: (listener: (event: CoreEvent) => void) => {
       eventListeners.add(listener)
@@ -397,7 +397,7 @@ function Fixture(): React.JSX.Element {
   }, [])
   return <div className="single-chat-fixture">
     <header className="single-chat-fixture-header">
-      <div className="single-chat-fixture-title"><span>rovai-ai</span><strong>单聊样式验收</strong></div>
+      <div className="single-chat-fixture-title"><span>coaxi</span><strong>单聊样式验收</strong></div>
       <div className="single-chat-fixture-entries" ref={setEntryHost} />
     </header>
     <main className="single-chat-fixture-stage"

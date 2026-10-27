@@ -523,51 +523,51 @@
     },
     "implementationFiles": [
       {
-        "file": "crates/rovai-core/src/openclaw_gateway.rs",
+        "file": "crates/coaxi-core/src/openclaw_gateway.rs",
         "sha256": "6463ec27f7dae9de483c433e319cbb81c0dbf41d2697c95f978dc4e2eac901f9"
       },
       {
-        "file": "crates/rovai-core/src/acp.rs",
+        "file": "crates/coaxi-core/src/acp.rs",
         "sha256": "d15a75f0f8cd34eea13e75d6c4d297e1c17a60014e04e8e0fb0be7f372369de4"
       },
       {
-        "file": "crates/rovai-core/src/agent_profile.rs",
+        "file": "crates/coaxi-core/src/agent_profile.rs",
         "sha256": "8bddd4b62eba98672cf96988c9011b5a4dda8fc71b89b60b12ea1570c41339fa"
       },
       {
-        "file": "crates/rovai-core/src/agent_runtime_adapter.rs",
+        "file": "crates/coaxi-core/src/agent_runtime_adapter.rs",
         "sha256": "13845a195caf3515c7f7612dcd661003a35f1fd211f2e5b7709772009c16d743"
       },
       {
-        "file": "crates/rovai-core/src/application.rs",
+        "file": "crates/coaxi-core/src/application.rs",
         "sha256": "d0b12a1f4d17235159adec149188297565fa591808379c8c9990e72e5905b65e"
       },
       {
-        "file": "crates/rovai-core/src/db.rs",
+        "file": "crates/coaxi-core/src/db.rs",
         "sha256": "8823998d5cb40299b5ca75f0ceaa255e5fb7195c0b7751e4f77a015dbc58a553"
       },
       {
-        "file": "crates/rovai-core/src/health.rs",
+        "file": "crates/coaxi-core/src/health.rs",
         "sha256": "6299161923139e1c1bea95011bf77215bcbe62d7fd23c19a957a3f9ceb2d811b"
       },
       {
-        "file": "crates/rovai-core/src/runtime_probe_process.rs",
+        "file": "crates/coaxi-core/src/runtime_probe_process.rs",
         "sha256": "1abd2e63838b077693f227285caf8b16ac51d03a998576041e3a37940850dfa5"
       },
       {
-        "file": "crates/rovai-core/src/runtime_discovery_windows.rs",
+        "file": "crates/coaxi-core/src/runtime_discovery_windows.rs",
         "sha256": "b4418760e325f1065c08b9121b1215f5a70ed08532bf9299a5b2b87b306681c3"
       },
       {
-        "file": "crates/rovai-core/src/runtime_platform_admission.rs",
+        "file": "crates/coaxi-core/src/runtime_platform_admission.rs",
         "sha256": "3ae4c11c8944fa028f068167347a8dcbcb1af6dc367f59a16a79e55a11a9ba68"
       },
       {
-        "file": "crates/rovai-core/src/monitoring.rs",
+        "file": "crates/coaxi-core/src/monitoring.rs",
         "sha256": "24c80cef01aa7b6254b26999470599b3ab1cf1a686a13a7e719a94dab0b5b6d6"
       },
       {
-        "file": "crates/rovai-core/src/native_skills.rs",
+        "file": "crates/coaxi-core/src/native_skills.rs",
         "sha256": "6f5b035b8c1b4adfa8c6b1a1e88f68d1dabdd1ac550a0a643f2fe07cd6edb0e0"
       },
       {
@@ -598,7 +598,7 @@
   },
   "change": {
     "catalogAdapters": 21,
-    "fixedRovaiAdapters": 18,
+    "fixedCoaxiAdapters": 18,
     "addedKinds": [
       "gemini-cli",
       "hermes-cli",
@@ -700,7 +700,7 @@
     ]
   },
   "selfReview": {
-    "authority": "不引入Codeg第二执行层或私有Gateway池；进程由Fleet Host统一收敛",
+    "authority": "不引入Coaxi第二执行层或私有Gateway池；进程由Fleet Host统一收敛",
     "credentials": "Gateway独立随机凭据只存私有文件和冻结环境，argv/公开输出脱敏；原生日常可写会话目录禁止直接挂接",
     "shutdown": "并行尝试Gateway/ACP/终端清理，不能因一个失败而跳过其他进程",
     "windows": "保留通用批处理argv拒绝；官方npm模板/包身份校验后用Node直接传JSON，并冻结shim/script摘要",

@@ -17,7 +17,7 @@ afterEach(async () => {
 
 describe('navigation preferences', () => {
   it('upgrades valid legacy schemas without a degradation or rewriting the old file', async () => {
-    const directory = await mkdtemp(join(tmpdir(), 'rovai-navigation-read-'))
+    const directory = await mkdtemp(join(tmpdir(), 'coaxi-navigation-read-'))
     cleanup.push(directory)
     const path = join(directory, 'navigation.json')
     for (const source of [
@@ -36,7 +36,7 @@ describe('navigation preferences', () => {
   })
 
   it('persists reminders and groups, merges concurrent pin writes and keeps read boundaries monotonic', async () => {
-    const directory = await mkdtemp(join(tmpdir(), 'rovai-navigation-read-'))
+    const directory = await mkdtemp(join(tmpdir(), 'coaxi-navigation-read-'))
     cleanup.push(directory)
     const path = join(directory, 'navigation.json')
     const store = NavigationPreferencesStore.defaults(path)
@@ -66,7 +66,7 @@ describe('navigation preferences', () => {
   })
 
   it('rejects invalid read state and retains the previous snapshot when saving fails', async () => {
-    const directory = await mkdtemp(join(tmpdir(), 'rovai-navigation-read-'))
+    const directory = await mkdtemp(join(tmpdir(), 'coaxi-navigation-read-'))
     cleanup.push(directory)
     const path = join(directory, 'navigation.json')
     const store = NavigationPreferencesStore.defaults(path)
@@ -83,7 +83,7 @@ describe('navigation preferences', () => {
   })
 
   it('upgrades valid schema 3 without a degradation or rewriting the old file', async () => {
-    const directory = await mkdtemp(join(tmpdir(), 'rovai-project-name-'))
+    const directory = await mkdtemp(join(tmpdir(), 'coaxi-project-name-'))
     cleanup.push(directory)
     const filePath = join(directory, 'navigation.json')
     const source = JSON.stringify({ schemaVersion: 3, pins: [], removedProjects: [], projectOrder: ['directory:/a/frontend'] })
@@ -95,7 +95,7 @@ describe('navigation preferences', () => {
   })
 
   it('serializes independent names with pin and order writes and retains names across removal', async () => {
-    const directory = await mkdtemp(join(tmpdir(), 'rovai-project-name-'))
+    const directory = await mkdtemp(join(tmpdir(), 'coaxi-project-name-'))
     cleanup.push(directory)
     const filePath = join(directory, 'navigation.json')
     const store = await NavigationPreferencesStore.load(filePath)
@@ -120,7 +120,7 @@ describe('navigation preferences', () => {
   })
 
   it('rejects invalid names and counts Unicode scalars while permitting duplicate display names', async () => {
-    const directory = await mkdtemp(join(tmpdir(), 'rovai-project-name-'))
+    const directory = await mkdtemp(join(tmpdir(), 'coaxi-project-name-'))
     cleanup.push(directory)
     const filePath = join(directory, 'navigation.json')
     const store = await NavigationPreferencesStore.load(filePath)
@@ -133,7 +133,7 @@ describe('navigation preferences', () => {
   })
 
   it('keeps the previous snapshot on a write failure and allows a later retry', async () => {
-    const directory = await mkdtemp(join(tmpdir(), 'rovai-project-name-'))
+    const directory = await mkdtemp(join(tmpdir(), 'coaxi-project-name-'))
     cleanup.push(directory)
     const filePath = join(directory, 'navigation.json')
     const store = NavigationPreferencesStore.defaults(filePath)
@@ -146,7 +146,7 @@ describe('navigation preferences', () => {
   })
 
   it('normalizes damaged name records only in memory and preserves other preferences', async () => {
-    const directory = await mkdtemp(join(tmpdir(), 'rovai-project-name-'))
+    const directory = await mkdtemp(join(tmpdir(), 'coaxi-project-name-'))
     cleanup.push(directory)
     const filePath = join(directory, 'navigation.json')
     const source = JSON.stringify({ schemaVersion: 4, pins: [], removedProjects: [], projectOrder: ['directory:/a'],
@@ -160,7 +160,7 @@ describe('navigation preferences', () => {
   })
 
   it('normalizes legacy pins in memory without overwriting the source file', async () => {
-    const directory = await mkdtemp(join(tmpdir(), 'rovai-navigation-preferences-'))
+    const directory = await mkdtemp(join(tmpdir(), 'coaxi-navigation-preferences-'))
     cleanup.push(directory)
     const filePath = join(directory, 'navigation.json')
     const persisted = {
@@ -193,7 +193,7 @@ describe('navigation preferences', () => {
   })
 
   it('removes one project locally and atomically clears its Project and Thread pins', async () => {
-    const directory = await mkdtemp(join(tmpdir(), 'rovai-navigation-preferences-'))
+    const directory = await mkdtemp(join(tmpdir(), 'coaxi-navigation-preferences-'))
     cleanup.push(directory)
     const filePath = join(directory, 'navigation.json')
     const store = await NavigationPreferencesStore.load(
@@ -228,7 +228,7 @@ describe('navigation preferences', () => {
   })
 
   it('restores a removed project without changing the surviving pins', async () => {
-    const directory = await mkdtemp(join(tmpdir(), 'rovai-navigation-preferences-'))
+    const directory = await mkdtemp(join(tmpdir(), 'coaxi-navigation-preferences-'))
     cleanup.push(directory)
     const filePath = join(directory, 'navigation.json')
     await writeFile(filePath, JSON.stringify({
@@ -256,7 +256,7 @@ describe('navigation preferences', () => {
   })
 
   it('reinstates the exact removed record when a Core restore transaction rolls back', async () => {
-    const directory = await mkdtemp(join(tmpdir(), 'rovai-navigation-preferences-'))
+    const directory = await mkdtemp(join(tmpdir(), 'coaxi-navigation-preferences-'))
     cleanup.push(directory)
     const filePath = join(directory, 'navigation.json')
     const removedProject = {
@@ -289,7 +289,7 @@ describe('navigation preferences', () => {
   })
 
   it('cleans malformed records in memory and leaves recovery evidence untouched', async () => {
-    const directory = await mkdtemp(join(tmpdir(), 'rovai-navigation-preferences-'))
+    const directory = await mkdtemp(join(tmpdir(), 'coaxi-navigation-preferences-'))
     cleanup.push(directory)
     const filePath = join(directory, 'navigation.json')
     const persisted = {
@@ -326,7 +326,7 @@ describe('navigation preferences', () => {
   })
 
   it('retains legacy order and changes membership only through directory operations', async () => {
-    const directory = await mkdtemp(join(tmpdir(), 'rovai-navigation-preferences-'))
+    const directory = await mkdtemp(join(tmpdir(), 'coaxi-navigation-preferences-'))
     cleanup.push(directory)
     const filePath = join(directory, 'navigation.json')
     await writeFile(filePath, JSON.stringify({
@@ -371,7 +371,7 @@ describe('navigation preferences', () => {
   })
 
   it('deduplicates canonical directories and rejects invalid paths without changing the saved order', async () => {
-    const directory = await mkdtemp(join(tmpdir(), 'rovai-navigation-preferences-'))
+    const directory = await mkdtemp(join(tmpdir(), 'coaxi-navigation-preferences-'))
     cleanup.push(directory)
     const filePath = join(directory, 'navigation.json')
     const store = await NavigationPreferencesStore.load(filePath)
@@ -385,7 +385,7 @@ describe('navigation preferences', () => {
 
 // This owner exercises the real atomic file writer, not an in-memory substitute.
 it('saves empty directories and the legacy marker once while preserving names, pins, ordering and removals', async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'rovai-directory-json-'))
+  const directory = await mkdtemp(join(tmpdir(), 'coaxi-directory-json-'))
   cleanup.push(directory)
   const path = join(directory, 'navigation.json')
   const original = { schemaVersion: 5, pins: [{ kind: 'project', targetKey: 'directory:/a', pinnedAt: '2026-10-01T00:00:00Z' }],
@@ -416,7 +416,7 @@ it('saves empty directories and the legacy marker once while preserving names, p
 })
 
 it('never completes or overwrites unreadable preferences and retries only an explicit write against repaired storage', async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'rovai-directory-json-'))
+  const directory = await mkdtemp(join(tmpdir(), 'coaxi-directory-json-'))
   cleanup.push(directory)
   const path = join(directory, 'navigation.json')
   const corrupt = '{"projectNames": '

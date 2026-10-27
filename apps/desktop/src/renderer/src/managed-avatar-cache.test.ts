@@ -8,7 +8,7 @@ import {
 } from './managed-avatar-cache'
 
 const AVATAR_REF =
-  'rovai://member-avatar/managed/123e4567-e89b-12d3-a456-426614174000'
+  'coaxi://member-avatar/managed/123e4567-e89b-12d3-a456-426614174000'
 
 describe('managed avatar object URL cache', () => {
   const originalCreateObjectUrl = URL.createObjectURL

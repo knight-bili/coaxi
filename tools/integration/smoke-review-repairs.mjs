@@ -9,11 +9,11 @@ import { launchHost, within } from '../../scripts/lib/host-test-client.mjs'
 import { coreDataDirectoryArguments } from '../../scripts/lib/runtime-camp-files-root.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
-const binary = process.env.ROVAI_HOST_BIN
-const ui = process.env.ROVAI_WEB_UI
+const binary = process.env.COAXI_HOST_BIN
+const ui = process.env.COAXI_WEB_UI
 const evidenceRoot = process.env.WORKBENCH_EVIDENCE_ROOT
 assert(binary && ui && evidenceRoot && [binary, ui, evidenceRoot].every(path.isAbsolute),
-  'ROVAI_HOST_BIN、ROVAI_WEB_UI、WORKBENCH_EVIDENCE_ROOT 必须是绝对路径')
+  'COAXI_HOST_BIN、COAXI_WEB_UI、WORKBENCH_EVIDENCE_ROOT 必须是绝对路径')
 await mkdir(evidenceRoot, { recursive: true })
 const fixture = await realpath(await mkdtemp(path.join(evidenceRoot, 'review-repairs-')))
 const formal = path.join(fixture, 'formal')
@@ -34,7 +34,7 @@ function git(...args) {
 
 function gitCommit(message) {
   git('add', '--all')
-  git('-c', 'user.name=Rovai Acceptance', '-c', 'user.email=acceptance@example.invalid', 'commit', '-m', message)
+  git('-c', 'user.name=Coaxi Acceptance', '-c', 'user.email=acceptance@example.invalid', 'commit', '-m', message)
 }
 
 function commitCount() {
@@ -44,7 +44,7 @@ function commitCount() {
 git('init')
 git('branch', '-M', 'main')
 git('config', 'core.autocrlf', 'false')
-git('config', 'user.name', 'Rovai Acceptance')
+git('config', 'user.name', 'Coaxi Acceptance')
 git('config', 'user.email', 'acceptance@example.invalid')
 const originalHistoryText = Array.from({ length: 1024 }, (_, index) => `历史完整内容第 ${index + 1} 行：用于核对文件版本不截断。\n`).join('')
 await writeFile(path.join(repository, 'old history [record].txt'), originalHistoryText)
@@ -538,7 +538,7 @@ try {
 } finally {
   if (host) await host.close()
   if (finalResult) {
-    const database = new DatabaseSync(path.join(dataDir, 'rovai.sqlite'), { readOnly: true })
+    const database = new DatabaseSync(path.join(dataDir, 'coaxi.sqlite'), { readOnly: true })
     try {
       assert.equal(database.prepare('SELECT count(*) AS n FROM agent_run').get().n, 0, '禁止启动真实 Runtime')
       assert.equal(Object.values(database.prepare('PRAGMA integrity_check').get())[0], 'ok')

@@ -116,7 +116,7 @@ class RPC:
         self.errors=asyncio.create_task(self.p.stderr.read()); self.n=0; self.notes=[]
         if initialize:
             try:
-                await self.call('initialize',{'clientInfo':{'name':'rovai-memory-probe','version':'1'},'capabilities':{'experimentalApi':True}})
+                await self.call('initialize',{'clientInfo':{'name':'coaxi-memory-probe','version':'1'},'capabilities':{'experimentalApi':True}})
                 self.send({'method':'initialized','params':{}})
             except BaseException:
                 await self.close(); raise

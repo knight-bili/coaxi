@@ -18,7 +18,7 @@ export function defaultDevelopmentUserDataDirectory({
     .update(resolve(repositoryRoot))
     .digest('hex')
     .slice(0, 12)
-  return join(temporaryRoot, 'rovai-ai-development', repositoryKey, 'user-data')
+  return join(temporaryRoot, 'coaxi-development', repositoryKey, 'user-data')
 }
 
 export function knownDailyUserDataDirectories({
@@ -27,15 +27,15 @@ export function knownDailyUserDataDirectories({
 } = {}) {
   if (platform === 'darwin') {
     const applicationSupport = join(homeDirectory, 'Library', 'Application Support')
-    return ['Rovai-ai', 'lumen-ai', 'Lumen AI'].map((name) => join(applicationSupport, name))
+    return ['Coaxi', 'lumen-ai', 'Lumen AI'].map((name) => join(applicationSupport, name))
   }
   if (platform === 'win32') {
     const applicationData = process.env.APPDATA
     return applicationData
-      ? ['Rovai-ai', 'lumen-ai', 'Lumen AI'].map((name) => join(applicationData, name))
+      ? ['Coaxi', 'lumen-ai', 'Lumen AI'].map((name) => join(applicationData, name))
       : []
   }
-  return ['Rovai-ai', 'lumen-ai', 'Lumen AI'].map((name) => join(homeDirectory, '.local', 'share', name))
+  return ['Coaxi', 'lumen-ai', 'Lumen AI'].map((name) => join(homeDirectory, '.local', 'share', name))
 }
 
 export function assertDevelopmentUserDataIsIsolated(
@@ -57,7 +57,7 @@ export function assertUserDataIsIsolated(
   for (const dailyDirectory of dailyDirectories.map((path) => canonicalPathIdentity(path))) {
     if (candidateIdentity === dailyDirectory || candidateIdentity.startsWith(`${dailyDirectory}${sep}`)) {
       throw new Error(
-        `Isolated userData must not use the daily Rovai directory: ${resolvedCandidate}`
+        `Isolated userData must not use the daily Coaxi directory: ${resolvedCandidate}`
       )
     }
   }

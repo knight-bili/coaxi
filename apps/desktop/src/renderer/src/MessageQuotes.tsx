@@ -209,7 +209,7 @@ export function MessageQuoteSelectionToolbar({ ownerKey, messages, disabled, onA
     document.addEventListener('keydown', key, true)
     document.addEventListener('scroll', update, true)
     window.addEventListener('blur', dismiss)
-    window.addEventListener('rovai-dismiss-message-quote', dismiss)
+    window.addEventListener('coaxi-dismiss-message-quote', dismiss)
     return () => {
       window.cancelAnimationFrame(frame)
       document.removeEventListener('selectionchange', update)
@@ -221,7 +221,7 @@ export function MessageQuoteSelectionToolbar({ ownerKey, messages, disabled, onA
       document.removeEventListener('keydown', key, true)
       document.removeEventListener('scroll', update, true)
       window.removeEventListener('blur', dismiss)
-      window.removeEventListener('rovai-dismiss-message-quote', dismiss)
+      window.removeEventListener('coaxi-dismiss-message-quote', dismiss)
       setCandidate(null); dismissed.current = null
     }
   }, [ownerKey])

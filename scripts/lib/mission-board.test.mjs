@@ -15,7 +15,7 @@ const fixtureSource = join(root, 'scripts/fixtures/mission-board')
 
 async function runFixture(t, expectedCases, mode = 'standard') {
   if (!admitElectronIntegrationTest(t)) return
-  const fixture = await mkdtemp(join(tmpdir(), 'rovai-mission-board-test-'))
+  const fixture = await mkdtemp(join(tmpdir(), 'coaxi-mission-board-test-'))
   let child
   let closed
   try {
@@ -49,7 +49,7 @@ async function runFixture(t, expectedCases, mode = 'standard') {
       child.kill('SIGKILL')
       await closed
     }
-    if (process.env.ROVAI_KEEP_MISSION_BOARD_FIXTURE === '1') {
+    if (process.env.COAXI_KEEP_MISSION_BOARD_FIXTURE === '1') {
       process.stdout.write(`Preserved Mission board fixture: ${fixture}\n`)
     } else {
       await rm(fixture, { recursive: true, force: true })

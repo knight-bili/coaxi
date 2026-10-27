@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url'
 
 // The handwritten Rust public enum is the authority. This does not inspect the
 // Core dispatcher or admit private Host methods into any network interface.
-const source = fileURLToPath(new URL('../crates/rovai-web/src/operations.rs', import.meta.url))
+const source = fileURLToPath(new URL('../crates/coaxi-web/src/operations.rs', import.meta.url))
 const target = fileURLToPath(new URL('../packages/contracts/src/web-operations.ts', import.meta.url))
 const text = readFileSync(source, 'utf8')
 const start = text.indexOf('pub enum Operation {')

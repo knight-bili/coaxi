@@ -16,7 +16,7 @@ if ((await readdir(root)).length) throw new Error('Acceptance root must exist an
 const input = JSON.parse(await readFile(resolve(args[3]), 'utf8'))
 // macOS owner IPC uses a Unix socket with a 104-byte pathname limit. Keep
 // acceptance userData short; the durable isolation record names its exact path.
-const data = await mkdtemp('/private/tmp/rovai-eval-host-'), workspace = join(root, 'analysis'), output = join(workspace, 'reports')
+const data = await mkdtemp('/private/tmp/coaxi-eval-host-'), workspace = join(root, 'analysis'), output = join(workspace, 'reports')
 await mkdir(workspace, { mode: 0o700 })
 await writePrivateJsonExclusive(join(root, 'isolation.json'), { channel: 'automatic_acceptance', dataDirectory: data, skillLibrary: join(data, 'managed-skill-library'), mcpConfig: join(data, 'mcp.json'), workspace, source, electronAppStarted: false, productionServices: ['UserAutomationServer', 'EvaluationHostService', 'Core Automation Scheduler', 'Qualification Runner'] })
 const product = await buildProduct(source, join(root, 'product'))
@@ -30,7 +30,7 @@ const server = new UserAutomationServer(ownerRoot, { core, evaluation: host, app
 const pause = ms => new Promise(resolveWait => setTimeout(resolveWait, ms))
 let lastSummary = null
 async function cli(id, args, env = {}) {
-  const execution = await runCaptured(product.cli, ['app', 'eval', ...args], { env: { ...process.env, ROVAI_APP_AUTOMATION_CONTEXT: server.contextPath, ...env }, timeoutMs: 60_000 })
+  const execution = await runCaptured(product.cli, ['app', 'eval', ...args], { env: { ...process.env, COAXI_APP_AUTOMATION_CONTEXT: server.contextPath, ...env }, timeoutMs: 60_000 })
   await writePrivateJsonExclusive(join(root, `${id}.json`), execution)
   if (execution.code !== 0) throw new Error(`Owner CLI ${id} failed: ${execution.stdout}`)
   return JSON.parse(execution.stdout)
@@ -61,7 +61,7 @@ try {
   const start = new Date()
   await core.request('automations.schedulerControl', { epoch: 1, recoveryBoundary: start.toISOString(), paused: false })
   await writePrivateJsonExclusive(join(root, 'automation-definition.json'), await core.request('automations.get', { automationId }))
-  const denied = await runCaptured(product.cli, ['app', 'eval', 'status'], { env: { ...process.env, ROVAI_CLI_CONTEXT: 'managed-boundary-check', ROVAI_APP_AUTOMATION_CONTEXT: server.contextPath } })
+  const denied = await runCaptured(product.cli, ['app', 'eval', 'status'], { env: { ...process.env, COAXI_CLI_CONTEXT: 'managed-boundary-check', COAXI_APP_AUTOMATION_CONTEXT: server.contextPath } })
   await writePrivateJsonExclusive(join(root, 'managed-cli-denial.json'), denied)
   if (denied.code !== 2 || !denied.stdout.includes('unavailable_in_managed_runtime')) throw new Error('Managed CLI owner boundary failed')
   console.log(JSON.stringify({ stage: 'awaiting_real_schedule', automationId, due: { date: localDate, at }, root }))

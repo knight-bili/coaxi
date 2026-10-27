@@ -25,7 +25,7 @@
         "revision": "r1",
         "status": "failed",
         "checks": [],
-        "error": "Error: Native condition timed out: window.rovai.request('canvas.nodes.snapshot',{boardId:\"4dc38945-ff27-4d27-959e-cdc6a68b46fc\"}).then(graph=>graph.nodes.find(node=>node.id===\"4304e710-92aa-4971-a06a-8a0f08350ef3\")?.data.x===72)\n    at wait (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/codeg-rovai-ai-rovai-core-codeg/work/integration/integration/local/i03-c06-rc14/app/c06-native-notes-r1.mjs:38:163)\n    at async qualifyNotes (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/codeg-rovai-ai-rovai-core-codeg/work/integration/integration/local/i03-c06-rc14/app/c06-native-notes-r1.mjs:622:2)\n    at async qualify (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/codeg-rovai-ai-rovai-core-codeg/work/integration/integration/local/i03-c06-rc14/app/c06-native-notes-r1.mjs:82:4)",
+        "error": "Error: Native condition timed out: window.coaxi.request('canvas.nodes.snapshot',{boardId:\"4dc38945-ff27-4d27-959e-cdc6a68b46fc\"}).then(graph=>graph.nodes.find(node=>node.id===\"4304e710-92aa-4971-a06a-8a0f08350ef3\")?.data.x===72)\n    at wait (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/coaxi-coaxi-coaxi-core-coaxi/work/integration/integration/local/i03-c06-rc14/app/c06-native-notes-r1.mjs:38:163)\n    at async qualifyNotes (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/coaxi-coaxi-coaxi-core-coaxi/work/integration/integration/local/i03-c06-rc14/app/c06-native-notes-r1.mjs:622:2)\n    at async qualify (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/coaxi-coaxi-coaxi-core-coaxi/work/integration/integration/local/i03-c06-rc14/app/c06-native-notes-r1.mjs:82:4)",
         "renderer_errors": [],
         "runtime_errors": [],
         "shutdown": {
@@ -51,7 +51,7 @@
         "revision": "r2",
         "status": "failed",
         "checks": [],
-        "error": "Error: Native condition timed out: window.rovai.request('canvas.nodes.snapshot',{boardId:\"2be856d9-5171-4a9d-8c75-f4929959fafa\"}).then(graph=>graph.nodes.find(node=>node.id===\"c3d917e3-5f35-4d0e-bb77-ed906ac1eac0\")?.data.x===72)\n    at wait (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/codeg-rovai-ai-rovai-core-codeg/work/integration/integration/local/i03-c06-rc14/app/c06-native-notes-r2.mjs:38:163)\n    at async qualifyNotes (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/codeg-rovai-ai-rovai-core-codeg/work/integration/integration/local/i03-c06-rc14/app/c06-native-notes-r2.mjs:627:2)\n    at async qualify (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/codeg-rovai-ai-rovai-core-codeg/work/integration/integration/local/i03-c06-rc14/app/c06-native-notes-r2.mjs:82:4)",
+        "error": "Error: Native condition timed out: window.coaxi.request('canvas.nodes.snapshot',{boardId:\"2be856d9-5171-4a9d-8c75-f4929959fafa\"}).then(graph=>graph.nodes.find(node=>node.id===\"c3d917e3-5f35-4d0e-bb77-ed906ac1eac0\")?.data.x===72)\n    at wait (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/coaxi-coaxi-coaxi-core-coaxi/work/integration/integration/local/i03-c06-rc14/app/c06-native-notes-r2.mjs:38:163)\n    at async qualifyNotes (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/coaxi-coaxi-coaxi-core-coaxi/work/integration/integration/local/i03-c06-rc14/app/c06-native-notes-r2.mjs:627:2)\n    at async qualify (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/coaxi-coaxi-coaxi-core-coaxi/work/integration/integration/local/i03-c06-rc14/app/c06-native-notes-r2.mjs:82:4)",
         "renderer_errors": [
           "ResizeObserver loop completed with undelivered notifications."
         ],
@@ -84,7 +84,7 @@
         "revision": "r3",
         "status": "failed",
         "checks": [],
-        "error": "Error: Native condition timed out: window.rovai.request('canvas.nodes.snapshot',{boardId:\"d21630d8-6fa2-4f13-8843-ea5de50b0155\"}).then(graph=>graph.nodes.find(node=>node.id===\"af28f4f5-1a7b-42ae-80c8-db43639541a8\")?.data.x===72)\n    at wait (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/codeg-rovai-ai-rovai-core-codeg/work/integration/integration/local/i03-c06-rc14/app/c06-native-notes-r3.mjs:38:163)\n    at async qualifyNotes (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/codeg-rovai-ai-rovai-core-codeg/work/integration/integration/local/i03-c06-rc14/app/c06-native-notes-r3.mjs:635:2)\n    at async qualify (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/codeg-rovai-ai-rovai-core-codeg/work/integration/integration/local/i03-c06-rc14/app/c06-native-notes-r3.mjs:82:4)",
+        "error": "Error: Native condition timed out: window.coaxi.request('canvas.nodes.snapshot',{boardId:\"d21630d8-6fa2-4f13-8843-ea5de50b0155\"}).then(graph=>graph.nodes.find(node=>node.id===\"af28f4f5-1a7b-42ae-80c8-db43639541a8\")?.data.x===72)\n    at wait (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/coaxi-coaxi-coaxi-core-coaxi/work/integration/integration/local/i03-c06-rc14/app/c06-native-notes-r3.mjs:38:163)\n    at async qualifyNotes (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/coaxi-coaxi-coaxi-core-coaxi/work/integration/integration/local/i03-c06-rc14/app/c06-native-notes-r3.mjs:635:2)\n    at async qualify (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/coaxi-coaxi-coaxi-core-coaxi/work/integration/integration/local/i03-c06-rc14/app/c06-native-notes-r3.mjs:82:4)",
         "renderer_errors": [],
         "runtime_errors": [],
         "shutdown": {
@@ -277,7 +277,7 @@
         "status": "passed",
         "checks": [
           {
-            "name": "codeg_canvas_dock_viewport_keyboard_menus_and_minimap_toggle",
+            "name": "coaxi_canvas_dock_viewport_keyboard_menus_and_minimap_toggle",
             "passed": true
           },
           {
@@ -426,7 +426,7 @@
       "native-private-ui-r1/02-private-conversation-returned.png"
     ],
     "remaining": [
-      "便笺正文仍受原文档字号影响，继续按Codeg便笺13px对照；未经新候选不改当前构建",
+      "便笺正文仍受原文档字号影响，继续按Coaxi便笺13px对照；未经新候选不改当前构建",
       "各类完整状态/长标题、日主题、冷恢复/规模与既定I03场景仍未完成"
     ]
   },

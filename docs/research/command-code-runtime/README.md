@@ -82,7 +82,7 @@ python3 docs/research/command-code-runtime/fixtures/local_headless_probe.py --cl
 | 发布包 `--version` | `1.64.0`，且创建 `telemetry-install-id` | 该临时入口可在本机启动至版本输出；不能直接视为无副作用浅检 |
 | 发布包 `--help` | `-p`、`--output-format json`、`--resume`、`--session`、`--mod`、`--skill`、`--skip-onboarding`、`--no-auto-update`；没有 `acp` 子命令或 `--mcp-config` 参数 | 对 1.64.0 已公布 CLI 入口的观察；不能证明不存在其他未公开接口 |
 | 发布包 `mcp --help` | `add/list/get/remove/add-json/auth` | MCP 管理命令存在；没有展示单次 Run 配置参数 |
-| 本仓库 [`AdapterKind::ALL`](../../../crates/rovai-core/src/agent_profile.rs) | 16 个 closed identity，尚无 Command Code | 当前 Product Runtime Catalog 未接入 |
+| 本仓库 [`AdapterKind::ALL`](../../../crates/coaxi-core/src/agent_profile.rs) | 16 个 closed identity，尚无 Command Code | 当前 Product Runtime Catalog 未接入 |
 
 官方 [CLI Reference](https://commandcode.ai/docs/reference/cli) 与 [Headless Mode](https://commandcode.ai/docs/headless) 描述 `json` 输出为逐行 `AgentEvent`，最后一行是 `result`；`sessionId` 和 `stopReason` 在早期失败时可缺失。`--resume <id>` 可恢复指定 headless Session；`--continue` 取当前目录最近一次，不能用于 Rovai 的精确绑定。官方 [Sessions](https://commandcode.ai/docs/sessions) 说明 Session 存储与 cwd/project slug 关联，恢复还会读取原生模型状态。上述是文档证据，不是本次真实模型运行证据。
 
@@ -95,7 +95,7 @@ python3 docs/research/command-code-runtime/fixtures/local_headless_probe.py --cl
 | one-shot 原生协议 | Claude Code stream-json、Antigravity | 进程寿命相近，但 Command Code 使用自己的 `AgentEvent`/`result` NDJSON、Session 文件、权限与扩展 API，不能复用 Claude parser。 |
 | 扩展投递 | Pi 受管 Extension | Command Code `--mod` 能按本次 CLI 启动加载 Mod；Mod API 标为 Experimental，且 print 模式的 UI 确认默认拒绝，不能照搬 Pi 的 Bootstrap 或 Approval 结论。 |
 
-本仓库的 [`AgentRuntimeAdapter` registry](../../../crates/rovai-core/src/agent_runtime_adapter.rs) 是编译期接口，不是插件 ABI。新增 identity 还会触及可执行发现、平台准入、静态/深检、模型与权限 schema、Skill/MCP projection、AgentRun dispatch、Runtime Activity、Usage、终态、取消、设置/诊断投影。现有 [Claude one-shot 实现](../../../crates/rovai-core/src/claude.rs) 可参考 `ManagedProcess`、stdin 交付、进程树清理和 Input ACK 的控制流；[Core dispatch](../../../crates/rovai-core/src/application.rs) 仍需要独立 Command Code 分支。公共 [Managed Runtime Process v2](../../contracts/managed-runtime-process-v2.md) 已覆盖 one-shot 子进程，不需要 Adapter 私有进程池。
+本仓库的 [`AgentRuntimeAdapter` registry](../../../crates/coaxi-core/src/agent_runtime_adapter.rs) 是编译期接口，不是插件 ABI。新增 identity 还会触及可执行发现、平台准入、静态/深检、模型与权限 schema、Skill/MCP projection、AgentRun dispatch、Runtime Activity、Usage、终态、取消、设置/诊断投影。现有 [Claude one-shot 实现](../../../crates/coaxi-core/src/claude.rs) 可参考 `ManagedProcess`、stdin 交付、进程树清理和 Input ACK 的控制流；[Core dispatch](../../../crates/coaxi-core/src/application.rs) 仍需要独立 Command Code 分支。公共 [Managed Runtime Process v2](../../contracts/managed-runtime-process-v2.md) 已覆盖 one-shot 子进程，不需要 Adapter 私有进程池。
 
 ## 需要单独设计的行为
 
@@ -125,7 +125,7 @@ Command Code 的 [Taste](https://commandcode.ai/docs/taste) 默认学习，项�
 
 ### 输出、Usage、更新与发现
 
-只以 `result.subtype=success` 及匹配的 Session/Run 证据形成成功终态，`finalText` 只能作为 [Missing-Send](../../../crates/rovai-core/src/agent_profile.rs) 的 zero-send 恢复候选，不能直接广播。`AgentEvent` 的 Tool ID、cumulative/delta、stderr、非零退出、空输出和取消后的迟到事件仍要按当前 Action/Output 合同逐项映射。最终 `usage` 是文档化的 Run 总量候选；需要核对字段 scope、cache、重试与计数方式，不能从 Session totals 重复累计。
+只以 `result.subtype=success` 及匹配的 Session/Run 证据形成成功终态，`finalText` 只能作为 [Missing-Send](../../../crates/coaxi-core/src/agent_profile.rs) 的 zero-send 恢复候选，不能直接广播。`AgentEvent` 的 Tool ID、cumulative/delta、stderr、非零退出、空输出和取消后的迟到事件仍要按当前 Action/Output 合同逐项映射。最终 `usage` 是文档化的 Run 总量候选；需要核对字段 scope、cache、重试与计数方式，不能从 Session totals 重复累计。
 
 发现时建议首选跨平台 `command-code`，不用 macOS/Linux 的 `cmd` 别名作为 canonical identity；Windows 的 `cmd` 是系统解释器，Command Code 使用 `cmdc`。[CLI Reference](https://commandcode.ai/docs/reference/cli) 已说明此冲突。运行 `--no-auto-update` 可减少执行中版本漂移，但本机 `--version` 试验表明禁用更新不等于零本机写入；浅检要单独设计隔离。仍须以 executable fingerprint、reported version 和目标平台证据对 Ready 与 Qualification 分层；Node `>=22` 是额外的启动前置条件。
 

@@ -16,9 +16,9 @@ const source = join(root, 'scripts/fixtures/dingtalk-login-presentation')
 const require = createRequire(import.meta.url)
 const esbuild = createRequire(require.resolve('vite'))('esbuild')
 
-test('DingTalk login uses the production Rovai dialog and a separate sandboxed native view', { timeout: 60_000 }, async (t) => {
+test('DingTalk login uses the production Coaxi dialog and a separate sandboxed native view', { timeout: 60_000 }, async (t) => {
   if (!admitElectronIntegrationTest(t)) return
-  const fixture = await mkdtemp(join(tmpdir(), 'rovai-dingtalk-login-presentation-'))
+  const fixture = await mkdtemp(join(tmpdir(), 'coaxi-dingtalk-login-presentation-'))
   let child
   let closed
   try {
@@ -54,7 +54,7 @@ test('DingTalk login uses the production Rovai dialog and a separate sandboxed n
     const report = JSON.parse(stdout.split('\n').find(line => line.startsWith('{')))
     assert.equal(report.ok, true)
     assert.ok(report.cases.includes('QR is generated locally without loading the official page'))
-    assert.ok(report.cases.includes('native page has no Rovai bridge or Node'))
+    assert.ok(report.cases.includes('native page has no Coaxi bridge or Node'))
     assert.ok(report.cases.includes('200% zoom clips the native view inside the dialog'))
     assert.ok(report.cases.length >= 10)
   } finally {
@@ -62,7 +62,7 @@ test('DingTalk login uses the production Rovai dialog and a separate sandboxed n
       child.kill('SIGKILL')
       await closed
     }
-    if (process.env.ROVAI_KEEP_DINGTALK_LOGIN_FIXTURE === '1') {
+    if (process.env.COAXI_KEEP_DINGTALK_LOGIN_FIXTURE === '1') {
       process.stdout.write(`DingTalk login fixture: ${fixture}\n`)
     } else {
       await rm(fixture, { recursive: true, force: true })

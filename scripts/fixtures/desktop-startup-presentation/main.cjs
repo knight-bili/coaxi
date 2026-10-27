@@ -21,7 +21,7 @@ app.whenReady().then(async () => {
   })
   window.webContents.on('console-message', event => console.error(event.message))
   await window.loadFile(renderer)
-  if (process.env.ROVAI_PROJECT_DIRECTORIES_ONLY === '1') {
+  if (process.env.COAXI_PROJECT_DIRECTORIES_ONLY === '1') {
     const report = await window.webContents.executeJavaScript('window.startupTest.runProjects()', true)
     writeFileSync(join(dirname(userData), 'project-save-failure.png'), (await window.webContents.capturePage()).toPNG())
     console.log(JSON.stringify(report)); app.exit(0); return

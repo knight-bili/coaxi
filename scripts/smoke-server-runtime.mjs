@@ -21,8 +21,8 @@ await mkdir(project, { mode: 0o700 })
 await writeFile(join(project, 'README.md'), '# Isolated Linux Server Runtime acceptance\n')
 execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: project })
 execFileSync('git', ['add', 'README.md'], { cwd: project })
-execFileSync('git', ['-c', 'user.name=Rovai acceptance', '-c', 'user.email=acceptance@rovai.local', 'commit', '-qm', 'fixture'], { cwd: project })
-const binary = join(packageRoot, 'rovai-server')
+execFileSync('git', ['-c', 'user.name=Coaxi acceptance', '-c', 'user.email=acceptance@coaxi.local', 'commit', '-qm', 'fixture'], { cwd: project })
+const binary = join(packageRoot, 'coaxi-server')
 let child, origin, session, closed, output = ''
 const checks = [], runFacts = []
 const pause = ms => new Promise(resolve => setTimeout(resolve, ms))
@@ -89,7 +89,7 @@ async function send(threadId, body) {
   return sent.commandResult.payload.agentRunIds[0]
 }
 function binding(conversationId) {
-  const db = new DatabaseSync(join(data, 'rovai.sqlite'), { readOnly: true })
+  const db = new DatabaseSync(join(data, 'coaxi.sqlite'), { readOnly: true })
   try {
     db.exec('PRAGMA busy_timeout=5000')
     return db.prepare('SELECT native_session_id, native_binding_id, native_binding_generation FROM conversation WHERE id = ?').get(conversationId)
@@ -123,9 +123,9 @@ try {
   await request('health.check')
   // An explicitly selected native account can be used without copying its
   // credentials into the fixture or exposing unrelated CLIs through host HOME.
-  if (process.env.ROVAI_ACCEPTANCE_NATIVE_HOME) {
-    const nativeHome = process.env.ROVAI_ACCEPTANCE_NATIVE_HOME
-    const programPath = process.env.ROVAI_ACCEPTANCE_RUNTIME_BIN
+  if (process.env.COAXI_ACCEPTANCE_NATIVE_HOME) {
+    const nativeHome = process.env.COAXI_ACCEPTANCE_NATIVE_HOME
+    const programPath = process.env.COAXI_ACCEPTANCE_RUNTIME_BIN
     assert.ok(isAbsolute(nativeHome) && programPath && isAbsolute(programPath))
     const startup = await request('runtime.startup.get', { runtimeKind: kind })
     await request('runtime.startup.save', { runtimeKind: kind, expectedRevision: startup.revision,
@@ -149,7 +149,7 @@ try {
   const configured = await request('members.runtime.set', { commandId: randomUUID(), command: { agentId: 'agent_2', expectedVersion: profile.version, adapterKind: kind, model: profile.runtimeConfiguration.model, permissions: { adapterKind: kind, schemaVersion: 1, values } } })
   assert.equal(configured.status, 'applied')
   checks.push('native_discovery_auth_model_and_permissions')
-  const marker = 'ROVAI_SERVER_' + randomUUID().replaceAll('-', '')
+  const marker = 'COAXI_SERVER_' + randomUUID().replaceAll('-', '')
   const workspace = await request('workspaces.inspect', { path: project })
   const first = await createConfiguredCampAndSend(request, { commandId: randomUUID(), name: 'Linux Runtime acceptance', workspace, memberAgentIds: ['agent_2'], defaultLeadAgentId: 'agent_2', body: `Use tools to write runtime-marker.txt in the current workspace with the single line ${marker}, then read it back. Reply with ${marker}. Do not read files outside this workspace.`, purpose: 'Linux Server tool execution' })
   assert.equal(first.status, 'accepted')
@@ -169,10 +169,10 @@ try {
   assert.equal(runFacts[2].conversationId, runFacts[0].conversationId)
   assert.deepEqual(runFacts[2].nativeBinding, runFacts[0].nativeBinding)
   checks.push('server_restart_persisted_auth_and_cold_conversation_continuation')
-  const publicMarker = 'ROVAI_BUILTIN_' + randomUUID().replaceAll('-', '')
-  const builtin = await waitRun(threadId, await send(threadId, `Use the built-in rovai CLI to send a public Camp message containing exactly ${publicMarker}. Follow the CLI instructions already provided by Rovai. Do not write workspace files. A plain final answer alone is insufficient for this test.`), publicMarker)
+  const publicMarker = 'COAXI_BUILTIN_' + randomUUID().replaceAll('-', '')
+  const builtin = await waitRun(threadId, await send(threadId, `Use the built-in coaxi CLI to send a public Camp message containing exactly ${publicMarker}. Follow the CLI instructions already provided by Coaxi. Do not write workspace files. A plain final answer alone is insufficient for this test.`), publicMarker)
   const builtinEvidence = await execution(threadId, builtin.run.id)
-  assert.ok(builtinEvidence.some(item => ['command', 'tool_call', 'tool_result'].includes(item.kind) && JSON.stringify(item.payload).includes('rovai')), 'Built-in public send must have native CLI execution evidence')
+  assert.ok(builtinEvidence.some(item => ['command', 'tool_call', 'tool_result'].includes(item.kind) && JSON.stringify(item.payload).includes('coaxi')), 'Built-in public send must have native CLI execution evidence')
   checks.push('builtin_cli_public_camp_message')
   // Observe a real, uniquely identifiable child. Some native tools prohibit a
   // standalone sleep, and some ACP versions expose command input only at the

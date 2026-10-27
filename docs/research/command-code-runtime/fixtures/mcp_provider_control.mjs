@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Diagnostic positive control ONLY. This is not Command Code, ACP, or a Rovai Run.
+// Diagnostic positive control ONLY. This is not Command Code, ACP, or a Coaxi Run.
 // It checks the same real BYOK model with the MCP schema actually in tools.
 import { spawn, execFileSync } from 'node:child_process';
 import { createInterface } from 'node:readline';
@@ -52,7 +52,7 @@ try {
     if (!response.ok || observer.parseErrors) throw new Error('Provider control response failed');
     return observer;
   };
-  await rpc('initialize', { protocolVersion: '2024-11-05', clientInfo: { name: 'rovai-provider-control', version: '1' }, capabilities: {} });
+  await rpc('initialize', { protocolVersion: '2024-11-05', clientInfo: { name: 'coaxi-provider-control', version: '1' }, capabilities: {} });
   server.stdin.write(JSON.stringify({ jsonrpc: '2.0', method: 'notifications/initialized' }) + '\n');
   const { tools } = await rpc('tools/list', {});
   const tool = tools.find(tool => tool.name === 'issue_receipt');

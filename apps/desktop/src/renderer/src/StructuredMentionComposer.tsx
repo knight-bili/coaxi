@@ -39,10 +39,10 @@ import { MemberAvatar } from './MemberAvatar'
 import { NavigationIcon } from './NavigationIcon'
 import { MentionRuntimeButton } from './MentionRuntimeButton'
 import {
-  RovaiComposerExtension,
+  CoaxiComposerExtension,
   setComposerExtensionRuntime,
   type ComposerExtensionRuntime
-} from './RovaiComposerExtension'
+} from './CoaxiComposerExtension'
 import { SkillIdentityMark } from './SkillIdentityMark'
 import type { ComposerSkillOption } from './composer-skill-picker'
 import { $replaceEditorWithComposerDocument } from './composer-editor-state'
@@ -52,9 +52,9 @@ import {
 } from './composer-trigger'
 import {
   ComposerDraftSync,
-  ROVAI_ATOM_PRESENTATION_TAG,
-  ROVAI_COMPOSER_INITIALIZE_TAG,
-  ROVAI_COMPOSER_REPLACE_TAG,
+  COAXI_ATOM_PRESENTATION_TAG,
+  COAXI_COMPOSER_INITIALIZE_TAG,
+  COAXI_COMPOSER_REPLACE_TAG,
   type ComposerFlushResult,
   type ComposerPersistContext
 } from './composer-draft-sync'
@@ -248,7 +248,7 @@ export const StructuredMentionComposer = forwardRef<
 >(function StructuredMentionComposer(props, ref): JSX.Element {
   return (
     <LexicalExtensionComposer key={props.draftIdentity}
-      extension={RovaiComposerExtension} contentEditable={null}>
+      extension={CoaxiComposerExtension} contentEditable={null}>
       <ComposerBridge {...props} forwardedRef={ref} />
     </LexicalExtensionComposer>
   )
@@ -408,7 +408,7 @@ function ComposerBridge({
       else $getRoot().selectEnd()
     }, {
       discrete: true,
-      tag: ROVAI_COMPOSER_REPLACE_TAG,
+      tag: COAXI_COMPOSER_REPLACE_TAG,
       onUpdate: () => {
         syncRef.current?.acceptAuthoritativeState(editor.getEditorState())
         editor.dispatchCommand(CLEAR_HISTORY_COMMAND, undefined)
@@ -424,7 +424,7 @@ function ComposerBridge({
     const initialDocument = ready ? document : emptyComposerDocument()
     editor.update(() => {
       $replaceEditorWithComposerDocument(initialDocument)
-    }, { discrete: true, tag: ROVAI_COMPOSER_INITIALIZE_TAG })
+    }, { discrete: true, tag: COAXI_COMPOSER_INITIALIZE_TAG })
     const sync = new ComposerDraftSync(editor, editor.getEditorState(), bindings())
     const runtime: ComposerExtensionRuntime<ThreadComposerDraftView> = {
       sync,
@@ -483,7 +483,7 @@ function ComposerBridge({
     // Refreshing member/Skill labels must not move focus out of an open menu.
     editor.update(() => {
       for (const atom of $nodesOfType(ComposerAtomNode)) atom.markDirty()
-    }, { tag: [ROVAI_ATOM_PRESENTATION_TAG, SKIP_DOM_SELECTION_TAG] })
+    }, { tag: [COAXI_ATOM_PRESENTATION_TAG, SKIP_DOM_SELECTION_TAG] })
   }, [bindings, editor, members, skills])
 
   useLayoutEffect(() => {
@@ -508,7 +508,7 @@ function ComposerBridge({
       onPersistenceErrorChange?.(new Error(uiAttribute('Host 草稿已变化，本标签页的未保存编辑仍保留，暂未覆盖当前草稿。')))
       return
     }
-    editor.update(() => { $replaceEditorWithComposerDocument(local) }, { discrete: true, tag: ROVAI_COMPOSER_INITIALIZE_TAG })
+    editor.update(() => { $replaceEditorWithComposerDocument(local) }, { discrete: true, tag: COAXI_COMPOSER_INITIALIZE_TAG })
     syncRef.current.restoreLocalState(editor.getEditorState())
   }, [document, ready, recovery, draftIdentity, editor, onPersistenceErrorChange])
 

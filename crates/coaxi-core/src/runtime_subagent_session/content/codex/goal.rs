@@ -1,0 +1,179 @@
+// Adapted from fixed Codeg aff1e6c (Apache-2.0).
+// Source ranges and changes: integration/inventory/native-codex-content-port.json.
+//! Shared mapping of Codex's structured goal object into coaxi's canonical
+//! `create_goal`/`update_goal` synthetic tool-call representation.
+//!
+//! codex-acp v1.1.0 (#263) stopped emitting `/goal` transitions as live
+//! `"Goal updated (…)"` agent-message text and now ships them as structured
+//! metadata: a `session_info_update` whose `_meta.codex.goal` carries the goal.
+//! The same goal-object shape is what the Codex CLI has always persisted to its
+//! rollout JSONL as `event_msg.thread_goal_updated.goal`. Both the live path
+//! ([`crate::acp::connection`]) and the history parser ([`crate::parsers::codex`])
+//! funnel a goal object through here so they produce byte-identical goal cards
+//! via the frontend's `groupGoalRuns` / `GoalCard` pipeline.
+//!
+//! The frontend's canonical goal representation is a synthetic `create_goal`
+//! (status `active`, opens a run) / `update_goal` (any other status, closes it)
+//! tool call whose `raw_output` holds `{"goal":{…}}`. `GoalCard` reads
+//! objective/status/token stats straight out of that object, and its
+//! status→tone/label buckets only fold whitespace/hyphens — NOT camelCase — so
+//! the codex `ThreadGoalStatus` (`budgetLimited`, `usageLimited`, …) MUST be
+//! normalized to snake_case here before it reaches the UI.
+
+use serde_json::{Value, json};
+
+/// A Codex goal object mapped to coaxi's canonical synthetic goal marker.
+///
+/// The live path (`crate::acp::connection`) builds an `AcpEvent::ToolCall` from
+/// `title` and `output_json`, letting the frontend backfill the input from the
+/// title. The history parser (`crate::parsers::codex`) builds
+/// `ContentBlock::ToolUse`/`ToolResult` from `tool_name`, `input_json` and
+/// `output_json`. Both resolve to the same adapted tool-call part (identical
+/// tool name, input and output), so live and history render identically. The id
+/// is assigned per-occurrence at the call site (see `goal_tool_call_id`), not
+/// carried on the marker.
+pub(crate) struct CodexGoalMarker {
+    /// Canonical tool name — `"create_goal"` (active / opening) or
+    /// `"update_goal"` (any terminal / non-active status, or a cleared goal).
+    pub tool_name: &'static str,
+    /// The (trimmed) goal objective. Used by [`next_goal_marker`] to remember
+    /// which run is open so a later `goal:null` clear can close it by objective.
+    pub objective: String,
+    /// Tool-call `input` JSON — `{"objective":…}` (create) / `{"status":…,
+    /// "objective":…}` (update), matching the frontend's `resolveLiveToolInput`.
+    /// Used by the history parser's `ToolUse.input_preview`.
+    pub input_json: String,
+    /// `{"goal":{…}}` JSON for the tool call's `raw_output` (live) or the
+    /// `tool_result` block (history). `GoalCard.parseGoal` reads
+    /// objective/status/tokens from here with the highest precedence.
+    pub output_json: String,
+}
+
+/// Synthetic tool-call id for a goal marker, from a per-path occurrence counter
+/// (live: a per-connection sequence in `CodeBuddyLiveState`; history: the parser
+/// message index). Occurrence — NOT content — addressing is deliberate: the live
+/// reducer upserts blocks by `tool_call_id`, so two distinct runs sharing an
+/// objective (`/goal "X"` … clear … `/goal "X"` again) must get DIFFERENT ids or
+/// the second would merge into the first's card. The paired history
+/// `ToolUse`/`ToolResult` still pass the same `occurrence` so they correlate.
+pub(crate) fn goal_tool_call_id(occurrence: u64) -> String {
+    format!("codex-goal-{occurrence}")
+}
+
+/// Map a Codex `goal` sub-object
+/// (`{objective, status, tokenBudget, tokensUsed?, timeUsedSeconds?}`) into a
+/// synthetic goal marker. Returns `None` when it lacks a usable objective.
+pub(crate) fn goal_marker(goal: &Value) -> Option<CodexGoalMarker> {
+    let objective = goal.get("objective").and_then(Value::as_str)?.trim();
+    if objective.is_empty() {
+        return None;
+    }
+    let raw_status = goal
+        .get("status")
+        .and_then(Value::as_str)
+        .unwrap_or("active");
+    // Default a missing/blank status to `active` (a `Goal updated (): …` title
+    // would fail the frontend's goal regex and the card would silently vanish).
+    let mut status = normalize_goal_status(raw_status);
+    if status.is_empty() {
+        status = "active".to_string();
+    }
+    let tool_name = if status == "active" {
+        "create_goal"
+    } else {
+        "update_goal"
+    };
+
+    // Re-emit the goal object with a snake_case status and trimmed objective so
+    // the frontend renders the right tone/label and header. Preserve any extra
+    // stats fields (tokensUsed / tokenBudget / timeUsedSeconds) the source carried.
+    let mut normalized = goal.clone();
+    if let Some(obj) = normalized.as_object_mut() {
+        obj.insert("status".to_string(), Value::String(status.clone()));
+        obj.insert(
+            "objective".to_string(),
+            Value::String(objective.to_string()),
+        );
+    } else {
+        normalized = json!({ "objective": objective, "status": status });
+    }
+    let output_json = json!({ "goal": normalized }).to_string();
+
+    // Mirror the frontend's `resolveLiveToolInput`: create → `{objective}`,
+    // update → `{status, objective}`.
+    let input_json = if tool_name == "create_goal" {
+        json!({ "objective": objective })
+    } else {
+        json!({ "status": status, "objective": objective })
+    }
+    .to_string();
+
+    Some(CodexGoalMarker {
+        tool_name,
+        objective: objective.to_string(),
+        input_json,
+        output_json,
+    })
+}
+
+/// Decide the goal marker (if any) for one live `session_info_update` goal,
+/// updating the per-connection open-run objective.
+///
+/// - A goal object with `active` status opens a run (remember its objective).
+/// - Any terminal status closes the run (forget it) — so a subsequent clear does
+///   not emit a duplicate close card.
+/// - `goal:null` closes the currently-open run by objective (and forgets it);
+///   with no open run it is a no-op (avoids a blank standalone card).
+pub(crate) fn next_goal_marker(
+    open_goal: &mut Option<String>,
+    goal: &Value,
+) -> Option<CodexGoalMarker> {
+    if goal.is_null() {
+        return open_goal.take().map(|objective| cleared_marker(&objective));
+    }
+    let marker = goal_marker(goal)?;
+    *open_goal = if marker.tool_name == "create_goal" {
+        Some(marker.objective.clone())
+    } else {
+        None
+    };
+    Some(marker)
+}
+
+/// Marker that closes an open goal run when Codex clears the goal
+/// (`session_info_update._meta.codex.goal = null`). The null payload carries no
+/// objective, so [`next_goal_marker`] supplies the remembered one — closing the
+/// run as `complete` with a non-blank card and an objective-derived id.
+fn cleared_marker(objective: &str) -> CodexGoalMarker {
+    CodexGoalMarker {
+        tool_name: "update_goal",
+        objective: objective.to_string(),
+        input_json: json!({ "status": "complete", "objective": objective }).to_string(),
+        output_json: json!({ "goal": { "objective": objective, "status": "complete" } })
+            .to_string(),
+    }
+}
+
+/// codex `ThreadGoalStatus` is camelCase (`budgetLimited`); the frontend's goal
+/// status buckets are snake_case (`budget_limited`) and only fold whitespace and
+/// hyphens. Insert `_` before each interior uppercase letter and lowercase it;
+/// collapse runs of whitespace/hyphens to a single `_` (defensive — matches the
+/// legacy `"budget limited"` spelling codex-acp used to emit as text).
+pub(crate) fn normalize_goal_status(status: &str) -> String {
+    let mut out = String::with_capacity(status.len() + 2);
+    for (i, ch) in status.trim().chars().enumerate() {
+        if ch.is_ascii_uppercase() {
+            if i != 0 && !out.ends_with('_') {
+                out.push('_');
+            }
+            out.push(ch.to_ascii_lowercase());
+        } else if ch.is_whitespace() || ch == '-' {
+            if !out.is_empty() && !out.ends_with('_') {
+                out.push('_');
+            }
+        } else {
+            out.push(ch);
+        }
+    }
+    out
+}

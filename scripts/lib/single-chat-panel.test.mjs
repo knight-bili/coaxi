@@ -19,7 +19,7 @@ test('Single Chat pending withdrawal recovers a lost receipt and fences navigati
 
 async function runFixture(t, mode = '--panel') {
   if (!admitElectronIntegrationTest(t)) return
-  const fixture = await mkdtemp(join(tmpdir(), 'rovai-single-chat-panel-test-'))
+  const fixture = await mkdtemp(join(tmpdir(), 'coaxi-single-chat-panel-test-'))
   let child
   let closed
   try {
@@ -97,7 +97,7 @@ async function runFixture(t, mode = '--panel') {
       child.kill('SIGKILL')
       await closed
     }
-    if (process.env.ROVAI_KEEP_SINGLE_CHAT_FIXTURE === '1') {
+    if (process.env.COAXI_KEEP_SINGLE_CHAT_FIXTURE === '1') {
       process.stdout.write(`Single Chat fixture: ${fixture}\n`)
     } else {
       await rm(fixture, { recursive: true, force: true })

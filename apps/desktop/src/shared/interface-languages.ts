@@ -1,5 +1,5 @@
 import type { InterfaceLanguage } from '@contracts'
-/** Codeg aff1e6c src/lib/i18n.ts 的原十种语言，沿用标准 Intl 标签。 */
+/** Coaxi aff1e6c src/lib/i18n.ts 的原十种语言，沿用标准 Intl 标签。 */
 export const INTERFACE_LANGUAGE_OPTIONS:ReadonlyArray<{id:InterfaceLanguage;name:string}>=[
   {id:'en',name:'English'},{id:'zh-CN',name:'简体中文'},{id:'zh-TW',name:'繁體中文'},
   {id:'ja',name:'日本語'},{id:'ko',name:'한국어'},{id:'es',name:'Español'},

@@ -20,30 +20,30 @@ const suppliedAppPath = cliArguments.find((argument) => !argument.startsWith('--
 const appPath = resolve(
   suppliedAppPath ?? join(root, 'dist', 'mac-arm64', 'Coaxi.app')
 )
-const suppliedFixtureRoot = process.env.ROVAI_STRUCTURED_MENTIONS_ACCEPT_DATA_DIR
+const suppliedFixtureRoot = process.env.COAXI_STRUCTURED_MENTIONS_ACCEPT_DATA_DIR
 const fixtureRoot = suppliedFixtureRoot
   ? resolve(suppliedFixtureRoot)
-  : await mkdtemp(join(tmpdir(), 'rovai-structured-mentions-ui-accept-'))
+  : await mkdtemp(join(tmpdir(), 'coaxi-structured-mentions-ui-accept-'))
 const dataDir = join(fixtureRoot, 'user-data')
-const suppliedRuntimeTempDir = process.env.ROVAI_STRUCTURED_MENTIONS_ACCEPT_RUNTIME_TMP
+const suppliedRuntimeTempDir = process.env.COAXI_STRUCTURED_MENTIONS_ACCEPT_RUNTIME_TMP
 const runtimeTempDir = suppliedRuntimeTempDir
   ? resolve(suppliedRuntimeTempDir)
   // The Core owns Unix sockets below TMPDIR. Keep the unique root short enough
   // for sockaddr_un.sun_path on macOS.
   : await mkdtemp('/tmp/rv-sm-')
-const suppliedOutputDir = process.env.ROVAI_STRUCTURED_MENTIONS_ACCEPT_OUTPUT_DIR
+const suppliedOutputDir = process.env.COAXI_STRUCTURED_MENTIONS_ACCEPT_OUTPUT_DIR
 const outputDir = suppliedOutputDir
   ? resolve(suppliedOutputDir)
-  : await mkdtemp(join(tmpdir(), 'rovai-structured-mentions-ui-captures-'))
+  : await mkdtemp(join(tmpdir(), 'coaxi-structured-mentions-ui-captures-'))
 const acceptanceHome = join(fixtureRoot, 'home')
-const debugPort = Number(process.env.ROVAI_STRUCTURED_MENTIONS_ACCEPT_DEBUG_PORT ?? 9491)
+const debugPort = Number(process.env.COAXI_STRUCTURED_MENTIONS_ACCEPT_DEBUG_PORT ?? 9491)
 const skillPickerOnly = cliArguments.includes('--skill-picker-only')
 const skillContextSmoke = cliArguments.includes('--skill-context-smoke')
 const imeNewlineOnly = cliArguments.includes('--ime-newline-only')
 const cutOnly = cliArguments.includes('--cut-only')
 const continuationOnly = cliArguments.includes('--continuation-only')
 const replyBackspaceOnly = cliArguments.includes('--reply-backspace-only')
-const databasePath = join(dataDir, 'rovai.sqlite')
+const databasePath = join(dataDir, 'coaxi.sqlite')
 const acceptanceExecutablePath = skillContextSmoke
   ? join(runtimeTempDir, 'codex-acceptance-runtime.mjs')
   : '/usr/bin/true'
@@ -168,7 +168,7 @@ try {
 
   running = await launchApp(dataDir, debugPort, 1440, 920)
   await setTheme(running.cdp, 'day')
-  await evaluate(running.cdp, 'window.rovai.generalPreferences.setWorldMapEnabled(true)')
+  await evaluate(running.cdp, 'window.coaxi.generalPreferences.setWorldMapEnabled(true)')
   const freshAgents = await request(running.cdp, 'members.list')
   assert(
     targetMemberIds.every((id) => freshAgents.some((agent) =>
@@ -223,7 +223,7 @@ try {
   assert(typeof threadId === 'string' && threadId.length > 0, 'Camp creation returned no threadId')
   // Current candidates come from the Thread roster and toolboxes, not the retired Library assignments.
   const candidates = await request(running.cdp, 'skills.candidates', { threadId })
-  const selectableSkill = candidates.skills.find((skill) => skill.id === 'rovai:member-studio')
+  const selectableSkill = candidates.skills.find((skill) => skill.id === 'coaxi:member-studio')
   assert(selectableSkill?.source === 'toolbox'
     && sameMembers(selectableSkill.memberIds, targetMemberIds),
   `The default toolbox Skill is missing from current candidates: ${JSON.stringify(candidates)}`)
@@ -1804,7 +1804,7 @@ try {
   if (running) {
     try {
       await closeApp(running)
-      const unexpectedRuntimes = await runSqlJson(join(dataDir, 'rovai.sqlite'), `
+      const unexpectedRuntimes = await runSqlJson(join(dataDir, 'coaxi.sqlite'), `
         SELECT id, runtime_executable_path AS executablePath FROM agent_run
         WHERE runtime_executable_path IS NOT NULL
           AND runtime_executable_path <> ${sqlLiteral(acceptanceExecutablePath)};
@@ -2116,7 +2116,7 @@ async function removeDirectoryWithRetry(path) {
 async function launchApp(userDataDir, port, width, height) {
   const stderr = []
   const child = spawn(join(appPath, 'Contents', 'MacOS', 'Coaxi'), [
-    ...(process.env.ROVAI_STRUCTURED_MENTIONS_ACCEPT_DISABLE_SANDBOX === '1'
+    ...(process.env.COAXI_STRUCTURED_MENTIONS_ACCEPT_DISABLE_SANDBOX === '1'
       ? ['--no-sandbox']
       : []),
     `--remote-debugging-port=${port}`,
@@ -2128,7 +2128,7 @@ async function launchApp(userDataDir, port, width, height) {
       HOME: acceptanceHome,
       CODEX_HOME: join(acceptanceHome, '.codex'),
       TMPDIR: runtimeTempDir,
-      ROVAI_ALLOW_ISOLATED_INSTANCE: '1'
+      COAXI_ALLOW_ISOLATED_INSTANCE: '1'
     },
     stdio: ['ignore', 'ignore', 'pipe']
   })
@@ -2150,14 +2150,14 @@ async function launchApp(userDataDir, port, width, height) {
       mobile: false
     })
     await waitForExpression(cdp,
-      `Boolean(window.rovai && document.querySelector('.app-shell'))`, 45_000)
-    await waitForValue(() => evaluate(cdp, 'window.rovai.supervisor.getSnapshot()', true),
+      `Boolean(window.coaxi && document.querySelector('.app-shell'))`, 45_000)
+    await waitForValue(() => evaluate(cdp, 'window.coaxi.supervisor.getSnapshot()', true),
       (snapshot) => snapshot.fullCoreState === 'ready'
         && ['skills', 'mcp', 'attachments', 'builtin-tools'].every((id) =>
           snapshot.coreSubsystems.some((subsystem) => subsystem.id === id && subsystem.state === 'ready')),
       45_000)
     const health = await request(cdp, 'health.check')
-    const expectedDatabasePath = await realpath(join(userDataDir, 'rovai.sqlite'))
+    const expectedDatabasePath = await realpath(join(userDataDir, 'coaxi.sqlite'))
     const actualDatabasePath = await realpath(health.database.path)
     assert(actualDatabasePath === expectedDatabasePath,
       `Isolated App opened the wrong database: ${JSON.stringify({ expectedDatabasePath, actualDatabasePath })}`)
@@ -2203,7 +2203,7 @@ async function closeApp(app) {
 async function reloadRenderer(cdp) {
   await cdp.send('Page.reload', { ignoreCache: true })
   await waitForExpression(cdp,
-    `Boolean(window.rovai && document.querySelector('.app-shell'))`, 45_000)
+    `Boolean(window.coaxi && document.querySelector('.app-shell'))`, 45_000)
   await waitForExpression(cdp,
     `Boolean(document.querySelector('.unified-sidebar button[aria-label="新对话"]:not(:disabled)'))`,
     45_000)
@@ -3138,7 +3138,7 @@ async function pasteWithMetaV(cdp) {
 
 async function setTheme(cdp, preference) {
   await evaluate(cdp,
-    `window.rovai.appearance.setPreference(${JSON.stringify(preference)})`, true)
+    `window.coaxi.appearance.setPreference(${JSON.stringify(preference)})`, true)
   const expectedTheme = preference === 'night' ? 'night' : 'day'
   await waitForExpression(cdp,
     `document.documentElement.dataset.theme === ${JSON.stringify(expectedTheme)}`)
@@ -3235,7 +3235,7 @@ async function inspectLightweightReply(cdp) {
 async function readComposerDraft(cdp, threadId) {
   // Public Thread drafts are client-local. An absent storage row is the persisted empty draft.
   return evaluate(cdp, `(() => {
-    const encoded = localStorage.getItem(${JSON.stringify('rovai.camp-composer-draft.v1:')} + ${JSON.stringify(threadId)})
+    const encoded = localStorage.getItem(${JSON.stringify('coaxi.camp-composer-draft.v1:')} + ${JSON.stringify(threadId)})
     if (!encoded) return {
       threadId: ${JSON.stringify(threadId)}, body: '', content: { version: 2, segments: [] },
       quotes: [], attachments: [], replyIntent: null, continuationIntent: null
@@ -3258,7 +3258,7 @@ async function readComposerDraft(cdp, threadId) {
 
 async function request(cdp, method, params = {}) {
   return evaluate(cdp,
-    `window.rovai.request(${JSON.stringify(method)}, ${JSON.stringify(params)}).catch((failure) => {
+    `window.coaxi.request(${JSON.stringify(method)}, ${JSON.stringify(params)}).catch((failure) => {
       throw new Error(JSON.stringify(failure))
     })`, true)
 }
@@ -3470,7 +3470,7 @@ function structuredClipboardPayload(archive) {
     const htmlFlavor = item.find(({ type }) => type === 'public.html')
     if (!htmlFlavor) continue
     const html = Buffer.from(htmlFlavor.data, 'base64').toString('utf8')
-    const encoded = /data-rovai-structured-camp-message-v1=["']([^"']+)["']/i.exec(html)?.[1]
+    const encoded = /data-coaxi-structured-camp-message-v1=["']([^"']+)["']/i.exec(html)?.[1]
     if (!encoded) continue
     try {
       return JSON.parse(Buffer.from(encoded, 'base64').toString('utf8'))
@@ -3515,7 +3515,7 @@ for await (const line of lines) {
   if (message.id === undefined) continue
   const method = message.method
   if (method === 'initialize') {
-    send({ jsonrpc: '2.0', id: message.id, result: { serverInfo: { name: 'rovai-acceptance', version: '1' } } })
+    send({ jsonrpc: '2.0', id: message.id, result: { serverInfo: { name: 'coaxi-acceptance', version: '1' } } })
     continue
   }
   if (method === 'config/read') {

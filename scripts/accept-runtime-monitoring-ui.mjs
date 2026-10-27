@@ -6,13 +6,13 @@ import { seedCompletedOnboardingForAcceptance } from './lib/dev-desktop.mjs'
 
 const root = resolve(import.meta.dirname, '..')
 const appPath = resolve(process.argv[2] ?? join(root, 'dist', 'mac-arm64', 'Coaxi.app'))
-const fixtureRoot = process.env.ROVAI_MONITORING_ACCEPT_FIXTURE_ROOT
-  ?? await mkdtemp(join(tmpdir(), 'rovai-monitoring-ui-accept-'))
+const fixtureRoot = process.env.COAXI_MONITORING_ACCEPT_FIXTURE_ROOT
+  ?? await mkdtemp(join(tmpdir(), 'coaxi-monitoring-ui-accept-'))
 const dataDir = join(fixtureRoot, 'user-data')
 const homeDir = join(fixtureRoot, 'home')
-const outputDir = process.env.ROVAI_MONITORING_ACCEPT_OUTPUT_DIR
-  ?? await mkdtemp(join(tmpdir(), 'rovai-monitoring-ui-captures-'))
-const port = Number(process.env.ROVAI_MONITORING_ACCEPT_DEBUG_PORT ?? 9501)
+const outputDir = process.env.COAXI_MONITORING_ACCEPT_OUTPUT_DIR
+  ?? await mkdtemp(join(tmpdir(), 'coaxi-monitoring-ui-captures-'))
+const port = Number(process.env.COAXI_MONITORING_ACCEPT_DEBUG_PORT ?? 9501)
 
 await mkdir(dataDir, { recursive: true })
 await mkdir(homeDir, { recursive: true })
@@ -122,11 +122,11 @@ async function assertNoHorizontalOverflow(cdp, context) {
 }
 
 async function request(cdp, method, params = {}) {
-  return evaluate(cdp, 'window.rovai.request(' + JSON.stringify(method) + ', ' + JSON.stringify(params) + ')', true)
+  return evaluate(cdp, 'window.coaxi.request(' + JSON.stringify(method) + ', ' + JSON.stringify(params) + ')', true)
 }
 
 async function setTheme(cdp, preference) {
-  await evaluate(cdp, 'window.rovai.appearance.setPreference(' + JSON.stringify(preference) + ')', true)
+  await evaluate(cdp, 'window.coaxi.appearance.setPreference(' + JSON.stringify(preference) + ')', true)
   const expected = preference === 'night' ? 'night' : 'day'
   await waitForExpression(cdp, 'document.documentElement.dataset.theme === ' + JSON.stringify(expected))
 }
@@ -143,7 +143,7 @@ async function launchApp(width, height) {
     env: {
       ...process.env,
       HOME: homeDir,
-      ROVAI_ALLOW_ISOLATED_INSTANCE: '1'
+      COAXI_ALLOW_ISOLATED_INSTANCE: '1'
     }
   })
   child.stderr.on('data', (chunk) => stderr.push(String(chunk)))
@@ -159,9 +159,9 @@ async function launchApp(width, height) {
       deviceScaleFactor: 1,
       mobile: false
     })
-    await waitForExpression(cdp, "Boolean(window.rovai && document.querySelector('.app-shell'))", 45_000)
+    await waitForExpression(cdp, "Boolean(window.coaxi && document.querySelector('.app-shell'))", 45_000)
     const health = await request(cdp, 'health.check')
-    assert(await realpath(health.database.path) === await realpath(join(dataDir, 'rovai.sqlite')),
+    assert(await realpath(health.database.path) === await realpath(join(dataDir, 'coaxi.sqlite')),
       'isolated Application opened the wrong database')
     return { cdp, child }
   } catch (error) {

@@ -8,14 +8,14 @@ import { join, resolve } from 'node:path'
 import test from 'node:test'
 
 const repository = resolve(import.meta.dirname, '../..')
-const cli = join(repository, 'target/debug', process.platform === 'win32' ? 'rovai.exe' : 'rovai')
+const cli = join(repository, 'target/debug', process.platform === 'win32' ? 'coaxi.exe' : 'coaxi')
 
 // Owns the CLI process/IPC seam. Input matrices belong to the Rust parser tests;
 // this fixture neither starts Core nor claims actual message publication.
 test('Send files preserve the IPC request, fail before dispatch and never wait on inherited stdin', async () => {
-  const root = await mkdtemp(join(tmpdir(), 'rovai-send-cli-'))
+  const root = await mkdtemp(join(tmpdir(), 'coaxi-send-cli-'))
   const socket = process.platform === 'win32'
-    ? `\\\\.\\pipe\\rovai-ai-${process.pid}-4b812837-7ffc-4ca2-ab62-d5dc89bcd411`
+    ? `\\\\.\\pipe\\coaxi-${process.pid}-4b812837-7ffc-4ca2-ab62-d5dc89bcd411`
     : join(root, 'cli.sock')
   const requests = []
   const rejection = { code: 'message.invalid_input', message: 'Fixture business rejection.', recovery: 'fix_input' }
@@ -36,7 +36,7 @@ test('Send files preserve the IPC request, fail before dispatch and never wait o
   server.listen(socket)
   await once(server, 'listening')
   const contextPath = join(root, 'context.json')
-  const version = Number((await readFile(join(repository, 'crates/rovai-core/src/builtin_tool_transport.rs'), 'utf8'))
+  const version = Number((await readFile(join(repository, 'crates/coaxi-core/src/builtin_tool_transport.rs'), 'utf8'))
     .match(/BUILTIN_TOOL_CONTRACT_VERSION: u32 = (\d+);/u)[1])
   await writeFile(contextPath, JSON.stringify({
     contractVersion: version, ipcProtocolVersion: 3,
@@ -47,7 +47,7 @@ test('Send files preserve the IPC request, fail before dispatch and never wait o
   }))
   async function run(args, stdin) {
     const child = spawn(cli, args, {
-      cwd: root, env: { ...process.env, ROVAI_CLI_CONTEXT: contextPath, ROVAI_RUN_TMP: root },
+      cwd: root, env: { ...process.env, COAXI_CLI_CONTEXT: contextPath, COAXI_RUN_TMP: root },
       stdio: ['pipe', 'pipe', 'pipe']
     })
     const timer = setTimeout(() => child.kill(), 5000)

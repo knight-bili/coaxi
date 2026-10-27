@@ -175,7 +175,7 @@ must not silently move Camps between product groups.
 - [v0.23 version scope](README.md)
 - [ADR-0071: Configured Camp Creation and Lazy Conversations](../v0.22/decisions.md#adr-0071)
 - [Domain vocabulary](../../../CONTEXT.md)
-- [Workspace and Git capability implementation](../../../crates/rovai-core/src/git.rs)
-- [Directory workspace migration](../../../crates/rovai-core/src/db.rs)
+- [Workspace and Git capability implementation](../../../crates/coaxi-core/src/git.rs)
+- [Directory workspace migration](../../../crates/coaxi-core/src/db.rs)
 <!-- legacy-adr-body:end id=ADR-0072 -->
 <!-- legacy-adr:end id=ADR-0072 -->

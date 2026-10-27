@@ -5,10 +5,10 @@ import type { InteractionComputer } from './interaction-computer'
 const actions:Record<string,string>={click:'点击',drag:'拖动',scroll:'滚动',type:'输入',key:'按键','hold-key':'按住按键','set-value':'设置值',restore:'还原窗口',menu:'选择菜单','set-frame':'调整窗口',launch:'启动应用','clipboard-write':'写入剪贴板'}
 const escape=(value:string):string=>value.replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]!))
 
-/** Codeg computer-indicator 的独立窄提示条、四秒动作提示与直接停止。 */
+/** Coaxi computer-indicator 的独立窄提示条、四秒动作提示与直接停止。 */
 export class InteractionComputerIndicator {
   private window:BrowserWindow|null=null
-  private readonly stopUrl=`rovai-interaction://stop/${randomBytes(32).toString('hex')}`
+  private readonly stopUrl=`coaxi-interaction://stop/${randomBytes(32).toString('hex')}`
   private readonly timer:ReturnType<typeof setInterval>
   private disposed=false
   private busy=false

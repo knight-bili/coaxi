@@ -1,7 +1,7 @@
 import { useEffect,useState } from 'react'
 import { useThreadClient } from './camp-client'
 import { PET_SETTINGS_CHANGED,PetThumbnail,type PetSettingsValue } from './PetSettings'
-import type { PetState } from './codeg-pets/animation'
+import type { PetState } from './coaxi-pets/animation'
 export function PetExtensionHost():React.JSX.Element|null{
   const client=useThreadClient(),native=client.nativePets
   const [settings,setSettings]=useState<PetSettingsValue>({enabled:false,activeId:null,scale:.75}),[state,setState]=useState<PetState>('idle')

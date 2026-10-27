@@ -33,7 +33,7 @@ async function writeFixture(root, {
 }
 
 test('Skill authoring validation accepts a complete self-contained bundle with LF or CRLF', async () => {
-  const root = await mkdtemp(join(tmpdir(), 'rovai-skill-authoring-'))
+  const root = await mkdtemp(join(tmpdir(), 'coaxi-skill-authoring-'))
   try {
     const directory = await writeFixture(root)
     assert.deepEqual(await validateSkillDirectory(directory), [])
@@ -47,18 +47,18 @@ test('Skill authoring validation accepts a complete self-contained bundle with L
 })
 
 test('Skill authoring validation reports routing, metadata, and link failures together', async () => {
-  const root = await mkdtemp(join(tmpdir(), 'rovai-skill-authoring-'))
+  const root = await mkdtemp(join(tmpdir(), 'coaxi-skill-authoring-'))
   try {
     const directory = await writeFixture(root, {
       name: 'wrong-name',
-      description: 'Use when gather_completed resumes this workflow, then run rovai send.',
+      description: 'Use when gather_completed resumes this workflow, then run coaxi send.',
       body: 'Read [missing guide](references/missing.md).',
       shortDescription: 'Too short',
     })
     const errors = await validateSkillDirectory(directory)
     assert(errors.some((error) => error.includes('name must match directory')))
     assert(errors.some((error) => error.includes('internal token gather_completed')))
-    assert(errors.some((error) => error.includes('command syntax rovai send')))
+    assert(errors.some((error) => error.includes('command syntax coaxi send')))
     assert(errors.some((error) => error.includes('short_description must be 25–64')))
     assert(errors.some((error) => error.includes('relative link target does not exist')))
   } finally {
@@ -67,7 +67,7 @@ test('Skill authoring validation reports routing, metadata, and link failures to
 })
 
 test('Skill authoring validation ignores example links inside code', async () => {
-  const root = await mkdtemp(join(tmpdir(), 'rovai-skill-authoring-'))
+  const root = await mkdtemp(join(tmpdir(), 'coaxi-skill-authoring-'))
   try {
     const directory = await writeFixture(root, {
       body: [

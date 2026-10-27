@@ -11,7 +11,7 @@ describe('explicit Runtime check targeting', () => {
       ready: true,
       runtimeKind: 'qwen-code'
     })
-    vi.stubGlobal('window', { rovai: { request } })
+    vi.stubGlobal('window', { coaxi: { request } })
 
     await requestProductRuntimeCheck('qwen-code')
 
@@ -34,7 +34,7 @@ describe('explicit Runtime check targeting', () => {
       refreshStatus: 'not_required',
       diagnosticCode: null
     })
-    vi.stubGlobal('window', { rovai: { request } })
+    vi.stubGlobal('window', { coaxi: { request } })
 
     await openRuntimeModelCatalog('copilot-cli')
 
@@ -47,7 +47,7 @@ describe('explicit Runtime check targeting', () => {
     let finishCheck!: (result: unknown) => void
     const completion = new Promise(resolve => { finishCheck = resolve })
     const request = vi.fn().mockReturnValueOnce(completion)
-    vi.stubGlobal('window', { rovai: { request } })
+    vi.stubGlobal('window', { coaxi: { request } })
 
     const check = requestProductRuntimeCheck('codex-cli')
     expect(request).toHaveBeenCalledExactlyOnceWith('runtime.product.check', { runtimeKind: 'codex-cli' })
@@ -58,7 +58,7 @@ describe('explicit Runtime check targeting', () => {
 
   it('does not hide a backend environment-read failure or retry with cached discovery', async () => {
     const request = vi.fn().mockRejectedValue(new Error('discovery failed'))
-    vi.stubGlobal('window', { rovai: { request } })
+    vi.stubGlobal('window', { coaxi: { request } })
     await expect(requestProductRuntimeCheck('codex-cli')).rejects.toThrow('discovery failed')
     expect(request).toHaveBeenCalledTimes(1)
   })

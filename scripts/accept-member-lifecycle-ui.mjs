@@ -9,13 +9,13 @@ const root = resolve(import.meta.dirname, '..')
 const appPath = resolve(
   process.argv[2] ?? join(root, 'dist', 'mac-arm64', 'Coaxi.app')
 )
-const fixtureRoot = process.env.ROVAI_MEMBER_LIFECYCLE_ACCEPT_DATA_DIR
-  ?? await mkdtemp(join(tmpdir(), 'rovai-member-lifecycle-ui-accept-'))
+const fixtureRoot = process.env.COAXI_MEMBER_LIFECYCLE_ACCEPT_DATA_DIR
+  ?? await mkdtemp(join(tmpdir(), 'coaxi-member-lifecycle-ui-accept-'))
 const freshDataDir = join(fixtureRoot, 'fresh')
 const upgradeDataDir = join(fixtureRoot, 'upgrade-v014')
-const outputDir = process.env.ROVAI_MEMBER_LIFECYCLE_ACCEPT_OUTPUT_DIR
-  ?? await mkdtemp(join(tmpdir(), 'rovai-member-lifecycle-ui-captures-'))
-const firstPort = Number(process.env.ROVAI_MEMBER_LIFECYCLE_ACCEPT_DEBUG_PORT ?? 9471)
+const outputDir = process.env.COAXI_MEMBER_LIFECYCLE_ACCEPT_OUTPUT_DIR
+  ?? await mkdtemp(join(tmpdir(), 'coaxi-member-lifecycle-ui-captures-'))
+const firstPort = Number(process.env.COAXI_MEMBER_LIFECYCLE_ACCEPT_DEBUG_PORT ?? 9471)
 const fallbackAcceptanceExecutablePath = '/usr/bin/true'
 const fallbackAcceptanceExecutableFingerprint = `sha256:${createHash('sha256')
   .update(await readFile(fallbackAcceptanceExecutablePath))
@@ -110,11 +110,11 @@ try {
     `Fresh Profile state is not present/no-Runtime: ${JSON.stringify(freshProfiles)}`
   )
   assert(
-    await migrationApplied(join(freshDataDir, 'rovai.sqlite'), 41),
+    await migrationApplied(join(freshDataDir, 'coaxi.sqlite'), 41),
     'Fresh database did not record schema Migration v41'
   )
   assert(
-    await migrationApplied(join(freshDataDir, 'rovai.sqlite'), 110),
+    await migrationApplied(join(freshDataDir, 'coaxi.sqlite'), 110),
     'Fresh database did not record dynamic Camp membership Migration v110'
   )
 
@@ -604,12 +604,12 @@ try {
   running = null
 
   await installAcceptanceRuntime(
-    join(freshDataDir, 'rovai.sqlite'),
+    join(freshDataDir, 'coaxi.sqlite'),
     ['agent_1', 'agent_3', 'agent_4'],
     acceptanceRuntime
   )
-  await seedCampFixtureContent(join(freshDataDir, 'rovai.sqlite'), threadId)
-  await seedCampFixtureContent(join(freshDataDir, 'rovai.sqlite'), projectCampId)
+  await seedCampFixtureContent(join(freshDataDir, 'coaxi.sqlite'), threadId)
+  await seedCampFixtureContent(join(freshDataDir, 'coaxi.sqlite'), projectCampId)
   running = await launchApp(freshDataDir, firstPort + 1, 1040, 700)
   const configuredPreflight = await request(running.cdp, 'camps.creationPreflight')
   assert(
@@ -1211,7 +1211,7 @@ try {
   await waitForExpression(running.cdp, `![...document.querySelectorAll('.member-sidebar-copy strong')]
     .some((node) => node.textContent === '小兔')`)
   const qiluAfterRemoval = await historicalProfile(
-    join(freshDataDir, 'rovai.sqlite'),
+    join(freshDataDir, 'coaxi.sqlite'),
     'agent_4'
   )
   const activeAfterRemoval = await request(running.cdp, 'members.list')
@@ -1342,7 +1342,7 @@ try {
       && !((await request(running.cdp, 'members.list'))
         .some((profile) => profile.agentId === 'agent_4'))
       && (await historicalProfile(
-        join(freshDataDir, 'rovai.sqlite'),
+        join(freshDataDir, 'coaxi.sqlite'),
         'agent_4'
       )).presence === 'removed',
     'Fresh restart did not preserve inherited Lead and terminal removal'
@@ -1353,7 +1353,7 @@ try {
   running = await launchApp(upgradeDataDir, firstPort + 3, 1040, 700)
   await closeApp(running)
   running = null
-  await simulateV14Database(join(upgradeDataDir, 'rovai.sqlite'))
+  await simulateV14Database(join(upgradeDataDir, 'coaxi.sqlite'))
 
   running = await launchApp(upgradeDataDir, firstPort + 4, 1440, 920)
   const upgradedProfiles = await request(running.cdp, 'members.list')
@@ -1371,7 +1371,7 @@ try {
     `v41 did not delete every legacy member Runtime configuration: ${JSON.stringify(upgradedProfiles)}`
   )
   assert(
-    await migrationApplied(join(upgradeDataDir, 'rovai.sqlite'), 41),
+    await migrationApplied(join(upgradeDataDir, 'coaxi.sqlite'), 41),
     'v0.14 fixture did not apply the member Runtime reset Migration v41'
   )
   await openMembers(running.cdp)
@@ -1946,7 +1946,7 @@ async function pressKey(cdp, key, { meta = false } = {}) {
 async function request(cdp, method, params = {}) {
   return evaluate(
     cdp,
-    `window.rovai.request(${JSON.stringify(method)}, ${JSON.stringify(params)})`,
+    `window.coaxi.request(${JSON.stringify(method)}, ${JSON.stringify(params)})`,
     true
   )
 }
@@ -1954,7 +1954,7 @@ async function request(cdp, method, params = {}) {
 async function setTheme(cdp, preference) {
   await evaluate(
     cdp,
-    `window.rovai.appearance.setPreference(${JSON.stringify(preference)})`,
+    `window.coaxi.appearance.setPreference(${JSON.stringify(preference)})`,
     true
   )
   const expectedTheme = preference === 'night' ? 'night' : 'day'
@@ -2038,7 +2038,7 @@ async function assertExecutionEngineProductCopy(cdp) {
 async function reloadRenderer(cdp) {
   await cdp.send('Page.reload', { ignoreCache: true })
   await waitForExpression(cdp,
-    `Boolean(window.rovai && document.querySelector('.app-shell'))`, 45_000)
+    `Boolean(window.coaxi && document.querySelector('.app-shell'))`, 45_000)
   await waitForExpression(cdp,
     `Boolean(document.querySelector('.unified-sidebar button[aria-label="队员"]:not(:disabled)'))`,
     45_000)
@@ -2046,7 +2046,7 @@ async function reloadRenderer(cdp) {
 
 async function launchApp(dataDir, port, width, height) {
   const stderr = []
-  const acceptanceOnlyFlags = process.env.ROVAI_MEMBER_LIFECYCLE_ACCEPT_NO_SANDBOX === '1'
+  const acceptanceOnlyFlags = process.env.COAXI_MEMBER_LIFECYCLE_ACCEPT_NO_SANDBOX === '1'
     ? ['--no-sandbox']
     : []
   const child = spawn(join(appPath, 'Contents', 'MacOS', 'Coaxi'), [
@@ -2055,7 +2055,7 @@ async function launchApp(dataDir, port, width, height) {
     ...acceptanceOnlyFlags
   ], {
     cwd: root,
-    env: { ...process.env, ROVAI_ALLOW_ISOLATED_INSTANCE: '1' },
+    env: { ...process.env, COAXI_ALLOW_ISOLATED_INSTANCE: '1' },
     stdio: ['ignore', 'ignore', 'pipe']
   })
   child.stderr.on('data', (chunk) => stderr.push(String(chunk)))
@@ -2067,12 +2067,12 @@ async function launchApp(dataDir, port, width, height) {
     await cdp.send('Page.bringToFront')
     await setViewport(cdp, width, height)
     await waitForExpression(cdp,
-      `Boolean(window.rovai && document.querySelector('.app-shell'))`, 45_000)
+      `Boolean(window.coaxi && document.querySelector('.app-shell'))`, 45_000)
     await waitForExpression(cdp,
       `Boolean(document.querySelector('.unified-sidebar button[aria-label="队员"]:not(:disabled)'))`,
       45_000)
     const health = await request(cdp, 'health.check')
-    const expectedDatabasePath = await realpath(join(dataDir, 'rovai.sqlite'))
+    const expectedDatabasePath = await realpath(join(dataDir, 'coaxi.sqlite'))
     const actualDatabasePath = await realpath(health.database.path)
     assert(
       actualDatabasePath === expectedDatabasePath,
@@ -2117,7 +2117,7 @@ async function closeApp(app) {
 }
 
 async function waitForCoreProcessExit(dataDir, timeoutMs = 15_000) {
-  const lockPath = join(dataDir, '.rovai-core-instance.lock')
+  const lockPath = join(dataDir, '.coaxi-core-instance.lock')
   const startedAt = Date.now()
   while (Date.now() - startedAt < timeoutMs) {
     let processId = null
@@ -2130,7 +2130,7 @@ async function waitForCoreProcessExit(dataDir, timeoutMs = 15_000) {
     if (processId === null || !processIsAlive(processId)) return
     await wait(100)
   }
-  throw new Error(`Isolated rovai-core did not exit for ${dataDir}`)
+  throw new Error(`Isolated coaxi-core did not exit for ${dataDir}`)
 }
 
 function processIsAlive(processId) {

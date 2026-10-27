@@ -7,7 +7,7 @@ export function installCanvasMissionIpc(ipcMain) {
   const matches = (spec, method, params) => spec.method === method && spec.missionId === params?.missionId
     && (spec.fileId === undefined || spec.fileId === params?.fileId)
   ipcMain.handle = function (channel, handler) {
-    if (channel !== 'rovai:request') return register.call(this, channel, handler)
+    if (channel !== 'coaxi:request') return register.call(this, channel, handler)
     registered = true
     return register.call(this, channel, async (event, method, params) => {
       const entry = {method, params:structuredClone(params), at:Date.now()}; requests.push(entry)

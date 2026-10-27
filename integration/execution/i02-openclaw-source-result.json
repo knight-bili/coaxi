@@ -4,8 +4,8 @@
   "task": "I02-T02",
   "status": "source_and_isolated_version_verified_core_port_pending",
   "source": {
-    "codegCommit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
-    "codegPath": "src-tauri/src/acp/registry.rs",
+    "coaxiCommit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
+    "coaxiPath": "src-tauri/src/acp/registry.rs",
     "officialVersion": "2026.9.8",
     "officialCommit": "fc23bc864e4553c2d215e479eeec47b67a0bf943",
     "tag": "https://github.com/openclaw/openclaw/tree/v2026.9.8",

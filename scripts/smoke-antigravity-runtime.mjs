@@ -12,7 +12,7 @@ import {
 } from './lib/runtime-camp-files-root.mjs'
 
 const root = resolve(import.meta.dirname, '..')
-const fixtureRoot = await mkdtemp(join(tmpdir(), 'rovai-antigravity-runtime-smoke-'))
+const fixtureRoot = await mkdtemp(join(tmpdir(), 'coaxi-antigravity-runtime-smoke-'))
 const projectRoot = join(fixtureRoot, 'project')
 const dataDir = join(fixtureRoot, 'data')
 let core
@@ -22,12 +22,12 @@ try {
   await mkdir(projectRoot)
   await writeFile(join(projectRoot, 'README.md'), '# Antigravity Runtime fixture\n')
   await run('git', ['init', '-b', 'main'], projectRoot)
-  await run('git', ['config', 'user.name', 'Rovai-ai Antigravity Runtime Smoke'], projectRoot)
-  await run('git', ['config', 'user.email', 'antigravity-runtime@rovai.local'], projectRoot)
+  await run('git', ['config', 'user.name', 'Coaxi Antigravity Runtime Smoke'], projectRoot)
+  await run('git', ['config', 'user.email', 'antigravity-runtime@coaxi.local'], projectRoot)
   await run('git', ['add', 'README.md'], projectRoot)
   await run('git', ['commit', '-m', 'fixture'], projectRoot)
 
-  core = spawn(join(root, 'target', 'debug', 'rovai-core'), [
+  core = spawn(join(root, 'target', 'debug', 'coaxi-core'), [
     ...coreDataDirectoryArguments(dataDir),
     '--skill-library-root', join(dataDir, 'managed-skill-library')
   ], {
@@ -47,7 +47,7 @@ try {
   }
   core.once('error', rejectPending)
   core.once('close', (code, signal) => {
-    if (!shuttingDown) rejectPending(new Error(`rovai-core exited early (code=${code}, signal=${signal})`))
+    if (!shuttingDown) rejectPending(new Error(`coaxi-core exited early (code=${code}, signal=${signal})`))
   })
   createInterface({ input: core.stdout }).on('line', (line) => {
     const message = JSON.parse(line)
@@ -129,7 +129,7 @@ try {
     request,
     null,
     profile.agentId,
-    'ROVAI_ANTIGRAVITY_RUN_ONE',
+    'COAXI_ANTIGRAVITY_RUN_ONE',
     workspace
   )
   const camp = { id: first.threadId, defaultLeadAgentId: profile.agentId }
@@ -141,7 +141,7 @@ try {
     throw new Error(`Antigravity did not expose a verified Native Session: ${JSON.stringify(firstBound)}`)
   }
 
-  const second = await executeToken(request, camp, profile.agentId, 'ROVAI_ANTIGRAVITY_RUN_TWO')
+  const second = await executeToken(request, camp, profile.agentId, 'COAXI_ANTIGRAVITY_RUN_TWO')
   const secondBound = events.find((event) =>
     event.method === 'agent_run.native_session_bound' && event.params?.agentRunId === second.agentRunId
   )
@@ -161,7 +161,7 @@ try {
     })}`)
   }
   await configureCodexRuntime(request, health, [profile.agentId])
-  const handoff = await executeToken(request, camp, profile.agentId, 'ROVAI_ANTIGRAVITY_TO_CODEX_HANDOFF')
+  const handoff = await executeToken(request, camp, profile.agentId, 'COAXI_ANTIGRAVITY_TO_CODEX_HANDOFF')
   const handoffStart = events.find((event) =>
     event.method === 'agent_run.started' && event.params?.agentRunId === handoff.agentRunId
   )
@@ -258,12 +258,12 @@ async function executeToken(request, camp, agentId, token, workspace = null) {
 }
 
 async function executeCommandOutput(request, camp, agentId, events) {
-  const marker = 'ROVAI_AGY_PRINTF_OK'
+  const marker = 'COAXI_AGY_PRINTF_OK'
   const sent = await sendThreadMessage(
     request,
     camp.id,
     agentId,
-    `Use the run_command tool exactly once to run this cross-platform command without changing files: echo ${marker}. Do not call any other tool. Then immediately reply exactly ROVAI_ANTIGRAVITY_COMMAND_OUTPUT_OK.`,
+    `Use the run_command tool exactly once to run this cross-platform command without changing files: echo ${marker}. Do not call any other tool. Then immediately reply exactly COAXI_ANTIGRAVITY_COMMAND_OUTPUT_OK.`,
     'Verify Antigravity run_command output projection'
   )
   const commandResult = sent.commandResult ?? sent

@@ -3,7 +3,7 @@ type PlatformAttributeTarget = {
   setAttribute(name: string, value: string): void
 }
 
-export const RENDERER_PLATFORM_ATTRIBUTE = 'data-rovai-platform'
+export const RENDERER_PLATFORM_ATTRIBUTE = 'data-coaxi-platform'
 
 export function applyRendererPlatform(
   target: PlatformAttributeTarget,

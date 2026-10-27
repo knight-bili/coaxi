@@ -11,9 +11,9 @@ export async function startPackagedAcceptance({ app, data, cwd, onNotification }
   await new Promise(resolve => reservation.listen(0, '127.0.0.1', resolve))
   const port = reservation.address().port
   await new Promise(resolve => reservation.close(resolve))
-  const child = spawn(join(app, 'Contents/MacOS/Rovai AI'), [
+  const child = spawn(join(app, 'Contents/MacOS/Coaxi AI'), [
     `--user-data-dir=${data}`, `--remote-debugging-port=${port}`
-  ], { cwd, env: { ...process.env, ROVAI_ALLOW_ISOLATED_INSTANCE: '1', ROVAI_DISABLE_AUTO_UPDATE_CHECKS: '1' },
+  ], { cwd, env: { ...process.env, COAXI_ALLOW_ISOLATED_INSTANCE: '1', COAXI_DISABLE_AUTO_UPDATE_CHECKS: '1' },
     stdio: ['ignore', 'ignore', 'pipe'] })
   let stderr = '', socket, sequence = 0
   const pending = new Map()
@@ -54,7 +54,7 @@ export async function startPackagedAcceptance({ app, data, cwd, onNotification }
     socket = new WebSocket(target.webSocketDebuggerUrl)
     socket.addEventListener('message', ({ data }) => {
       const message = JSON.parse(String(data))
-      if (message.method === 'Runtime.bindingCalled' && message.params.name === 'rovaiAcceptanceEvent') {
+      if (message.method === 'Runtime.bindingCalled' && message.params.name === 'coaxiAcceptanceEvent') {
         onNotification?.(JSON.parse(message.params.payload))
       }
       const entry = pending.get(message.id)
@@ -74,22 +74,22 @@ export async function startPackagedAcceptance({ app, data, cwd, onNotification }
     await send('Runtime.enable'); await send('Page.enable')
     let ready = false
     for (let i = 0; i < 450 && !ready; i++) {
-      ready = await evaluate('Boolean(window.rovai && document.querySelector(".app-shell"))')
+      ready = await evaluate('Boolean(window.coaxi && document.querySelector(".app-shell"))')
       if (!ready) await sleep(100)
     }
     assert(ready, 'packaged App shell is not ready')
-    await send('Runtime.addBinding', { name: 'rovaiAcceptanceEvent' })
-    await evaluate('window.rovai.onEvent(event => window.rovaiAcceptanceEvent(JSON.stringify(event))); true')
-    const request = (method, params = {}) => evaluate(`window.rovai.request(${JSON.stringify(method)}, ${JSON.stringify(params)})`)
+    await send('Runtime.addBinding', { name: 'coaxiAcceptanceEvent' })
+    await evaluate('window.coaxi.onEvent(event => window.coaxiAcceptanceEvent(JSON.stringify(event))); true')
+    const request = (method, params = {}) => evaluate(`window.coaxi.request(${JSON.stringify(method)}, ${JSON.stringify(params)})`)
     let health
     for (let i = 0; i < 600 && !health; i++) {
-      const result = await evaluate('window.rovai.request("health.check").then(value => ({ok:true,value}), error => ({ok:false,error}))')
+      const result = await evaluate('window.coaxi.request("health.check").then(value => ({ok:true,value}), error => ({ok:false,error}))')
       if (result.ok) health = result.value
       else if (result.error?.code !== 'full_core_unavailable') throw new Error('Packaged Core startup: ' + JSON.stringify(result.error))
       if (!health) await sleep(100)
     }
     assert(health, 'packaged full Core did not become ready')
-    assert.equal(await realpath(health.database.path), await realpath(join(data, 'rovai.sqlite')))
+    assert.equal(await realpath(health.database.path), await realpath(join(data, 'coaxi.sqlite')))
     return { pid: child.pid, request, stop,
       async capture(path, threadId) {
         assert(threadId, 'capture requires the actual accepted Thread')

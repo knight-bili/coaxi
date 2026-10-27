@@ -10,15 +10,15 @@
     "kind": "exact_worktree_sha256_before_commit",
     "files": {
       "Cargo.lock": "c5cfe55f4fa91e28b3ba629846570cd7f7ab3036779c9161d03f0b3e2388dbb5",
-      "crates/rovai-core/Cargo.toml": "57d3e5815aa4dca32a36e0a4f9d766a3f5daf15cc4bd4a051f741cba79244270",
-      "crates/rovai-core/src/lib.rs": "d20eb0bf1b0f96c60c6e956999ada57d9b8f451b5fb5fa4b56b614057675ee76",
+      "crates/coaxi-core/Cargo.toml": "57d3e5815aa4dca32a36e0a4f9d766a3f5daf15cc4bd4a051f741cba79244270",
+      "crates/coaxi-core/src/lib.rs": "d20eb0bf1b0f96c60c6e956999ada57d9b8f451b5fb5fa4b56b614057675ee76",
       "docs/architecture/canvas.md": "9b8576c4a019f7fb6598394945bbc2bf4b859bd97db7e8cd61dd2c38093a4354",
       "docs/contracts/canvas-nodes-v1.md": "c8779a755591232faaf31fb0d3d606e73354a3af23260536d5cd1468b2802890",
       "docs/development/testing.md": "d295461b6837855928aa2d80a861d6cd7d96a529bb5229579d0c7821bc3bef7e",
       "integration/licenses/README.md": "41a70489fc628bc1e8a6feece2e0ec7fe048d75a860b3074f5a16849c78aea98",
-      "crates/rovai-core/src/canvas_terminal.rs": "1d87ee28626eaac373a92de9aad3c87652a880b12452312dc2e0aed4734ccae9",
-      "crates/rovai-core/src/canvas_terminal/helper.rs": "e632555107f87510f04274834f09e0090add611dca4b91801252b2e60aa5d3e8",
-      "crates/rovai-core/src/canvas_terminal/state.rs": "d91db5a47038c4784af8093350c4d7a23b13d8bc3632c58a98eccd1fee7053e9",
+      "crates/coaxi-core/src/canvas_terminal.rs": "1d87ee28626eaac373a92de9aad3c87652a880b12452312dc2e0aed4734ccae9",
+      "crates/coaxi-core/src/canvas_terminal/helper.rs": "e632555107f87510f04274834f09e0090add611dca4b91801252b2e60aa5d3e8",
+      "crates/coaxi-core/src/canvas_terminal/state.rs": "d91db5a47038c4784af8093350c4d7a23b13d8bc3632c58a98eccd1fee7053e9",
       "integration/licenses/portable-pty/LICENSE.md": "191c46fcf52061382b1c51a70311eb9081381cc158e5899f3739473a9432185b",
       "integration/licenses/portable-pty/source.json": "6e9fa62cf508c809715b008f36876709cfc527fa33c3c8557b2831d924c176b4"
     }
@@ -155,10 +155,10 @@
     "full324/fullPC01-PC24/paid models/devices; complete transitive release notices remain I12"
   ],
   "preserved_authorities": {
-    "crates/rovai-core/src/local_attachment_source.rs": "8830581e72fc103b2f359be17a0072c5ee0cedc6eb5fe58b179ae3d255dbc1ca",
-    "crates/rovai-core/src/context.rs": "329144f38675ebedeaf5652858d457d42369455eb26c6159af61d19c02218784",
-    "crates/rovai-core/src/message_quote.rs": "efb6e962946b85c089483bb1120fe92f32458bb3b3b5e5eb668e26f8aa96481e",
-    "crates/rovai-core/src/command.rs": "22258f81dc5b76040cd0fdba20074321b5be7104e648a8278412c0736ef0d85a"
+    "crates/coaxi-core/src/local_attachment_source.rs": "8830581e72fc103b2f359be17a0072c5ee0cedc6eb5fe58b179ae3d255dbc1ca",
+    "crates/coaxi-core/src/context.rs": "329144f38675ebedeaf5652858d457d42369455eb26c6159af61d19c02218784",
+    "crates/coaxi-core/src/message_quote.rs": "efb6e962946b85c089483bb1120fe92f32458bb3b3b5e5eb668e26f8aa96481e",
+    "crates/coaxi-core/src/command.rs": "22258f81dc5b76040cd0fdba20074321b5be7104e648a8278412c0736ef0d85a"
   },
   "artifacts": {
     "i03/canvas-terminal-state-compile.log": "ccacbeb562b6592f16f516cb857c27445f8f55181f404f6857ff0f957c93c66c",

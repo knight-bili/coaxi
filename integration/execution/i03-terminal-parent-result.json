@@ -9,20 +9,20 @@
     "base_commit": "97274ea12c300d31157bb134d7c9690dfa9a7b0a",
     "kind": "exact_worktree_sha256_before_commit",
     "files": {
-      "crates/rovai-core/src/application.rs": "1f6c47f5f025e85bfd31d20576bf0c2cf5c1d5624b3d5a2148487efc1e86e56f",
-      "crates/rovai-core/src/canvas_terminal.rs": "3e53563e841a584d12a53be79d590d22ad82bb1c697c42408e5621b85d1332fa",
-      "crates/rovai-core/src/canvas_terminal/helper.rs": "c265b9af1f15cfb3b1ca7c10daf3bbaff4661425fa5c8f83a2108322146fac4e",
-      "crates/rovai-core/src/canvas_terminal/state.rs": "85b8ef4a9f11356074a0e742c3fbfd4c08b4afaf7917591801c7626391a43f40",
-      "crates/rovai-core/src/main.rs": "89b2e81bdd30c39da293a620838946b81c9c6b77f89331bc368f4eae8aa3da86",
-      "crates/rovai-core/src/managed_process.rs": "e60ec364e179a894f0f84fb94912092b6b4b87e2933ac44c3414e23f25db9d12",
-      "crates/rovai-host/src/bin/rovai-server.rs": "c54d92b7d3f88b53458e1ce41a53678816fa438cb6e3820ff260ee155586751a",
-      "crates/rovai-host/src/main.rs": "0cd4c8ee56b7395f2db7887d1508deb841d1f72fe1ed35e260fe5e4d84fe0909",
+      "crates/coaxi-core/src/application.rs": "1f6c47f5f025e85bfd31d20576bf0c2cf5c1d5624b3d5a2148487efc1e86e56f",
+      "crates/coaxi-core/src/canvas_terminal.rs": "3e53563e841a584d12a53be79d590d22ad82bb1c697c42408e5621b85d1332fa",
+      "crates/coaxi-core/src/canvas_terminal/helper.rs": "c265b9af1f15cfb3b1ca7c10daf3bbaff4661425fa5c8f83a2108322146fac4e",
+      "crates/coaxi-core/src/canvas_terminal/state.rs": "85b8ef4a9f11356074a0e742c3fbfd4c08b4afaf7917591801c7626391a43f40",
+      "crates/coaxi-core/src/main.rs": "89b2e81bdd30c39da293a620838946b81c9c6b77f89331bc368f4eae8aa3da86",
+      "crates/coaxi-core/src/managed_process.rs": "e60ec364e179a894f0f84fb94912092b6b4b87e2933ac44c3414e23f25db9d12",
+      "crates/coaxi-host/src/bin/coaxi-server.rs": "c54d92b7d3f88b53458e1ce41a53678816fa438cb6e3820ff260ee155586751a",
+      "crates/coaxi-host/src/main.rs": "0cd4c8ee56b7395f2db7887d1508deb841d1f72fe1ed35e260fe5e4d84fe0909",
       "docs/architecture/canvas.md": "f9c1a15eb062637400f7b4b455ed0969b5ab40a7f3f23df635af87498ec02ab9",
       "docs/contracts/canvas-nodes-v1.md": "5c471851ac086b6dbc886f6805006daf2c40fe60c584553936296d8d95798b8c",
       "docs/development/testing.md": "de05e0c32e567e0108c1bdc09a32b4d61883e4f8793baeff4d2ea973c8c2d158",
-      "crates/rovai-core/src/application/canvas_terminal.rs": "dce0435909e573d01aa438219cfcfaaad4c8c9104b43b6e79ab2c0fac6111735",
-      "crates/rovai-core/src/canvas_terminal/manager.rs": "fe440a4d606acfacf6d1c0a33d8b8178b2bcd5ccf279ef2b02df6d0125813592",
-      "crates/rovai-core/src/canvas_terminal/manager/tests.rs": "1d76f7a80a8199de698f27c0eb933905927331239f2782e644394385c19833fe"
+      "crates/coaxi-core/src/application/canvas_terminal.rs": "dce0435909e573d01aa438219cfcfaaad4c8c9104b43b6e79ab2c0fac6111735",
+      "crates/coaxi-core/src/canvas_terminal/manager.rs": "fe440a4d606acfacf6d1c0a33d8b8178b2bcd5ccf279ef2b02df6d0125813592",
+      "crates/coaxi-core/src/canvas_terminal/manager/tests.rs": "1d76f7a80a8199de698f27c0eb933905927331239f2782e644394385c19833fe"
     }
   },
   "previous_foundation": {
@@ -81,10 +81,10 @@
     "actual platform/UNC directory/ConPTY/macOS qualification and formal324/fullPC01-PC24"
   ],
   "preserved_authorities": {
-    "crates/rovai-core/src/local_attachment_source.rs": "8830581e72fc103b2f359be17a0072c5ee0cedc6eb5fe58b179ae3d255dbc1ca",
-    "crates/rovai-core/src/context.rs": "329144f38675ebedeaf5652858d457d42369455eb26c6159af61d19c02218784",
-    "crates/rovai-core/src/message_quote.rs": "efb6e962946b85c089483bb1120fe92f32458bb3b3b5e5eb668e26f8aa96481e",
-    "crates/rovai-core/src/command.rs": "22258f81dc5b76040cd0fdba20074321b5be7104e648a8278412c0736ef0d85a"
+    "crates/coaxi-core/src/local_attachment_source.rs": "8830581e72fc103b2f359be17a0072c5ee0cedc6eb5fe58b179ae3d255dbc1ca",
+    "crates/coaxi-core/src/context.rs": "329144f38675ebedeaf5652858d457d42369455eb26c6159af61d19c02218784",
+    "crates/coaxi-core/src/message_quote.rs": "efb6e962946b85c089483bb1120fe92f32458bb3b3b5e5eb668e26f8aa96481e",
+    "crates/coaxi-core/src/command.rs": "22258f81dc5b76040cd0fdba20074321b5be7104e648a8278412c0736ef0d85a"
   },
   "artifacts": {
     "i03/check-canvas-terminal-parent-state.ps1": "dc599022756be84a5d8f9b8968acc38ff47372eb8376826306bd929fafc6c4f1",

@@ -8,7 +8,7 @@ const SKILL_NAME_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 const INTERNAL_ROUTING_TOKEN_PATTERN =
   /\b(?:[a-z][a-z0-9]*(?:_[a-z0-9]+)+|[a-z][A-Za-z0-9]*(?:Id|Generation|Disposition)|effectiveRecipients)\b/
 const DESCRIPTION_COMMAND_PATTERN =
-  /(?:^|[\s`])(?:rovai\s+[a-z][a-z-]*(?:\s+[a-z][a-z-]*)?|--[a-z][a-z-]*)/
+  /(?:^|[\s`])(?:coaxi\s+[a-z][a-z-]*(?:\s+[a-z][a-z-]*)?|--[a-z][a-z-]*)/
 
 function add(errors, file, message) {
   errors.push(`${file}: ${message}`)

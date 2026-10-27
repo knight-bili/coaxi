@@ -1,2 +1,2 @@
 // Copy this file to Signing.local.xcconfig and replace the placeholder.
-CODEG_DEVELOPMENT_TEAM = YOUR_TEAM_ID
+COAXI_DEVELOPMENT_TEAM = YOUR_TEAM_ID

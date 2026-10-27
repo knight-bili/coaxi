@@ -7,7 +7,7 @@
   "source": {
     "commit": "16e9d327b33fa1cf000e4dc508a7959d300a4c6d",
     "CoreBinary": {
-      "path": "work/i02/native-artifacts/core148/rovai-host.exe",
+      "path": "work/i02/native-artifacts/core148/coaxi-host.exe",
       "sha256": "06d3917aec0bf520ada65ba7db824ee1ef56af64d63774dd1516a3e984fcb728",
       "contract_version": "v1.72",
       "projection_schema_version": 148,
@@ -122,10 +122,10 @@
     ]
   },
   "isolation": {
-    "dataDir": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i02\\core148-live-evidence\\live-T54zpi\\formal\\Core",
-    "skillRoot": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i02\\core148-live-evidence\\live-T54zpi\\formal\\Core\\skills",
-    "mcpConfigPath": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i02\\core148-live-evidence\\live-T54zpi\\formal\\Core\\mcp.json",
-    "browserProfile": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i02\\core148-live-evidence\\live-T54zpi\\formal\\Core\\acceptance-browser",
+    "dataDir": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i02\\core148-live-evidence\\live-T54zpi\\formal\\Core",
+    "skillRoot": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i02\\core148-live-evidence\\live-T54zpi\\formal\\Core\\skills",
+    "mcpConfigPath": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i02\\core148-live-evidence\\live-T54zpi\\formal\\Core\\mcp.json",
+    "browserProfile": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i02\\core148-live-evidence\\live-T54zpi\\formal\\Core\\acceptance-browser",
     "dailyData": false
   },
   "limits": {

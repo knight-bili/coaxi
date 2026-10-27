@@ -1,7 +1,7 @@
 [
   {
     "id": "01-collaboration",
-    "title": "Rovai AI 系统全景架构",
+    "title": "Coaxi AI 系统全景架构",
     "subtitle": "长期队员 × 对等协作 × 原生 Agent Runtime：从用户目标、任务责任到协作成果与长期经验。"
   },
   {
@@ -31,8 +31,8 @@
   },
   {
     "id": "07-toolkit",
-    "title": "Rovai CLI：平台内置 Toolkit",
-    "description": "Skill 提供协作方法，原生 Runtime 发现并读取；rovai CLI 经认证本地 IPC 调用 Core BuiltinToolRouter，领域服务执行业务操作并返回 Agent Result Projection。"
+    "title": "Coaxi CLI：平台内置 Toolkit",
+    "description": "Skill 提供协作方法，原生 Runtime 发现并读取；coaxi CLI 经认证本地 IPC 调用 Core BuiltinToolRouter，领域服务执行业务操作并返回 Agent Result Projection。"
   },
   {
     "id": "08-dynamic-context",
@@ -51,7 +51,7 @@
   },
   {
     "id": "11-technology-stack",
-    "title": "Rovai AI 技术栈架构",
+    "title": "Coaxi AI 技术栈架构",
     "description": "React Renderer、Electron Main、Rust Core、Native Agent Runtime 与本地存储分层协作；图中标注前端依赖、进程协议、原生 Runtime 适配、构建验证与发布工具。"
   }
 ]

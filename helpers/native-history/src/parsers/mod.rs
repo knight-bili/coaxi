@@ -20,7 +20,7 @@ use std::sync::OnceLock;
 
 /// A root of external agent-CLI transcript data, archived under
 /// `external/<agent>/` by the optional "include conversation content" toggle.
-/// These paths are owned by the respective CLIs — codeg only reads them.
+/// These paths are owned by the respective CLIs — coaxi only reads them.
 #[derive(Clone)]
 pub struct ExternalSource {
     /// Stable directory name inside the archive (`external/<agent>/`).
@@ -125,7 +125,7 @@ pub trait AgentParser {
 ///
 /// Every caller goes through here so the internal `@agent` routing frame is
 /// stripped from every agent's history — not just the one agent whose parser
-/// happens to know about it. `codeg-mcp` is injected into every MCP-capable
+/// happens to know about it. `coaxi-mcp` is injected into every MCP-capable
 /// agent, so the frame lands in each of their native transcripts; a per-parser
 /// fix would silently miss whichever parser was written next.
 pub fn build_parser_at(agent:&str,base:PathBuf)->Result<Box<dyn AgentParser>,ParseError>{
@@ -145,7 +145,7 @@ pub fn build_parser_at(agent:&str,base:PathBuf)->Result<Box<dyn AgentParser>,Par
  };Ok(Box::new(RouteSanitized(inner)))
 }
 
-/// Removes Codeg's internal `@agent` routing frame from whatever a parser read
+/// Removes Coaxi's internal `@agent` routing frame from whatever a parser read
 /// back out of an agent's own transcript.
 ///
 /// Only complete frames that re-render byte-for-byte are touched (see
@@ -267,7 +267,7 @@ fn sanitize_text(text: &mut String) -> bool {
 /// on `GEMINI_HOME` (`acp_server/paths.py`) and DeepSeek expands `DSH_HOME`
 /// (`dsh-home-paths`' `expandHomePath`), but Hermes's `get_hermes_home` is a
 /// bare `Path(val.strip())` and Codex, Claude and the rest are likewise
-/// verbatim. Expanding for one of those would point codeg at `$HOME/...` while
+/// verbatim. Expanding for one of those would point coaxi at `$HOME/...` while
 /// the agent used a literal `~` directory — and, in the fs sandbox, would hand
 /// out `$HOME` as a writable root the user never selected.
 ///
@@ -967,7 +967,7 @@ pub fn merge_context_window_stats(
 /// Stamp a context-window occupancy the AGENT stated directly, overriding
 /// whatever [`merge_context_window_stats`] recomputed from used/max.
 ///
-/// Most agents publish token counts and codeg derives the percentage. Qoder
+/// Most agents publish token counts and coaxi derives the percentage. Qoder
 /// publishes the percentage (`usage.context_usage_ratio`) and, for its own
 /// hosted models, redacts the token counters to zero — so for those sessions
 /// the stated figure is the ONLY occupancy signal that exists, and
@@ -1008,12 +1008,12 @@ pub fn with_reported_context_percent(
 /// The live reader stamps it on every call it translates from the ACP
 /// compaction lifecycle (`acp::connection::session_compaction_event`); a history
 /// parser stamps it through [`attach_compaction_summary`] on a divider whose
-/// summary its transcript still holds. Codeg-namespaced (like
-/// `codeg.delegation`) rather than nested in `contextCompaction`, whose members
+/// summary its transcript still holds. Coaxi-namespaced (like
+/// `coaxi.delegation`) rather than nested in `contextCompaction`, whose members
 /// are the adapters' reserved vocabulary. The frontend twin is
 /// `COMPACTION_SUMMARY_META_KEY` in `src/lib/context-compaction.ts`, which shows
 /// a compaction call's output as its summary only under this claim.
-pub(crate) const COMPACTION_SUMMARY_META_KEY: &str = "codeg.compactionSummary";
+pub(crate) const COMPACTION_SUMMARY_META_KEY: &str = "coaxi.compactionSummary";
 
 /// Hand a synthesized compaction divider — the `_meta.contextCompaction`
 /// ToolUse and its paired ToolResult that every parser emits for a compaction —

@@ -1,4 +1,4 @@
-import { isShortcutRecorderArmed,matchShortcutEvent,type ShortcutActionId,type ShortcutEventLike,type ShortcutSettings } from '../../shared/codeg-keyboard-shortcuts'
+import { isShortcutRecorderArmed,matchShortcutEvent,type ShortcutActionId,type ShortcutEventLike,type ShortcutSettings } from '../../shared/coaxi-keyboard-shortcuts'
 export type ShortcutActions=Partial<Record<ShortcutActionId,()=>boolean|void>>
 export interface ShortcutRegistration {priority:number;active():boolean;bindings():ShortcutSettings|null;actions():ShortcutActions}
 const registrations=new Set<ShortcutRegistration>()

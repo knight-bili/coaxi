@@ -38,12 +38,12 @@ test('phone system message copy control aligns with its message surface', async 
 // Real Host + production Web entry. No Electron profile, Runtime, or daily data.
 test('phone workbench uses shared navigation, schedules and per-tab drafts', { timeout: 180_000 }, async t => {
   if (process.platform !== 'darwin' || !await access(executable).then(() => true, () => false)) { t.skip('Requires macOS Chrome; does not qualify real phones or other OSes'); return }
-  const fixture = await realpath(await mkdtemp(join(tmpdir(), 'rovai-mobile-web-')))
+  const fixture = await realpath(await mkdtemp(join(tmpdir(), 'coaxi-mobile-web-')))
   const dataDir = join(fixture, 'core')
-  const output = process.env.ROVAI_MOBILE_OUTPUT ?? join(fixture, 'evidence')
+  const output = process.env.COAXI_MOBILE_OUTPUT ?? join(fixture, 'evidence')
   await mkdir(output, { recursive: true })
   console.log(JSON.stringify({ channel: 'automatic_acceptance', dataDir, skillLibraryRoot: join(dataDir, 'skills'), mcpConfigPath: join(dataDir, 'mcp.json'), chromeProfile: join(fixture, 'chrome'), runtime: false }))
-  const host = launchHost(process.env.ROVAI_HOST_BIN ?? join(repository, 'target/debug/rovai-host'), [
+  const host = launchHost(process.env.COAXI_HOST_BIN ?? join(repository, 'target/debug/coaxi-host'), [
     ...coreDataDirectoryArguments(dataDir), '--skill-library-root', join(dataDir, 'skills'), '--mcp-config-path', join(dataDir, 'mcp.json')
   ], { cwd: repository })
   let browser
@@ -58,7 +58,7 @@ test('phone workbench uses shared navigation, schedules and per-tab drafts', { t
     assert.equal(result.status, 'applied')
     const threadId = result.payload.threadId
     const uiDirectory = join(fixture, 'web')
-    await cp(process.env.ROVAI_WEB_UI ?? join(repository, 'out/web'), uiDirectory, { recursive: true })
+    await cp(process.env.COAXI_WEB_UI ?? join(repository, 'out/web'), uiDirectory, { recursive: true })
     const service = await host.request('host.web.start', { listen: '127.0.0.1:0', uiDirectory })
     browser = await launchAcceptanceBrowser({ executable, args: ['--headless=new', `--user-data-dir=${join(fixture, 'chrome')}`, '--no-first-run', '--no-default-browser-check', '--remote-debugging-port=0', 'about:blank'] })
     await browser.send('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 1, mobile: true })
@@ -562,8 +562,8 @@ test('phone workbench uses shared navigation, schedules and per-tab drafts', { t
 
 test('phone execution shares Desktop evidence, wraps avatars and retains Run disclosures', { timeout: 120_000 }, async t => {
   if (process.platform !== 'darwin' || !await access(executable).then(() => true, () => false)) { t.skip('Requires macOS Chrome'); return }
-  const fixture = await realpath(await mkdtemp(join(tmpdir(), 'rovai-mobile-execution-')))
-  const output = process.env.ROVAI_MOBILE_OUTPUT ?? join(fixture, 'evidence')
+  const fixture = await realpath(await mkdtemp(join(tmpdir(), 'coaxi-mobile-execution-')))
+  const output = process.env.COAXI_MOBILE_OUTPUT ?? join(fixture, 'evidence')
   await mkdir(output, { recursive: true })
   console.log(JSON.stringify({ channel: 'component_fixture', chromeProfile: join(fixture, 'chrome'), host: false, runtime: false }))
   const { productPath } = await buildHostWebParity(join(fixture, 'product'))
@@ -646,14 +646,14 @@ test('phone execution shares Desktop evidence, wraps avatars and retains Run dis
 
 test('standalone Server phone settings expose update controls, initial login and hide channels', { timeout: 60_000 }, async t => {
   if (process.platform !== 'darwin' || !await access(executable).then(() => true, () => false)) { t.skip('Requires macOS Chrome'); return }
-  const fixture = await realpath(await mkdtemp(join(tmpdir(), 'rovai-mobile-server-')))
+  const fixture = await realpath(await mkdtemp(join(tmpdir(), 'coaxi-mobile-server-')))
   const dataDir = join(fixture, 'server')
-  const output = process.env.ROVAI_MOBILE_OUTPUT ?? join(fixture, 'evidence')
+  const output = process.env.COAXI_MOBILE_OUTPUT ?? join(fixture, 'evidence')
   await mkdir(output, { recursive: true })
   console.log(JSON.stringify({ channel: 'automatic_acceptance', dataDir, skillLibraryRoot: join(dataDir, 'skills'), mcpConfigPath: join(dataDir, 'mcp.json'), chromeProfile: join(fixture, 'chrome'), runtime: false }))
   const uiDirectory = join(fixture, 'web')
-  await cp(process.env.ROVAI_WEB_UI ?? join(repository, 'out/web'), uiDirectory, { recursive: true })
-  const child = spawn(process.env.ROVAI_SERVER_BIN ?? join(repository, 'target/debug/rovai-server'), ['--data-dir', dataDir, '--web-ui', uiDirectory, '--listen', '127.0.0.1:0'], { cwd: fixture, stdio: ['ignore', 'pipe', 'pipe'] })
+  await cp(process.env.COAXI_WEB_UI ?? join(repository, 'out/web'), uiDirectory, { recursive: true })
+  const child = spawn(process.env.COAXI_SERVER_BIN ?? join(repository, 'target/debug/coaxi-server'), ['--data-dir', dataDir, '--web-ui', uiDirectory, '--listen', '127.0.0.1:0'], { cwd: fixture, stdio: ['ignore', 'pipe', 'pipe'] })
   let log = ''; let readyResolve, readyReject
   const ready = new Promise((resolve, reject) => { readyResolve = resolve; readyReject = reject })
   const collect = data => { log = (log + data).slice(-16000); if (log.includes('· Ready')) readyResolve() }

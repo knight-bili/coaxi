@@ -4,7 +4,7 @@ import { spawn } from 'node:child_process'
 import { seedCompletedOnboardingForAcceptance } from './lib/dev-desktop.mjs'
 
 const appPath = process.argv[2]
-const outputPath = process.argv[3] ?? '/tmp/rovai-skills.png'
+const outputPath = process.argv[3] ?? '/tmp/coaxi-skills.png'
 const cleanOutputPath = outputPath.endsWith('.png')
   ? `${outputPath.slice(0, -'.png'.length)}-clean.png`
   : `${outputPath}-clean.png`
@@ -14,21 +14,21 @@ const settingsOverviewPaths = {
   appearance: `${outputStem}-appearance.png`,
   runtime: `${outputStem}-runtime.png`
 }
-const userDataDir = process.env.ROVAI_CAPTURE_USER_DATA_DIR
-const port = Number(process.env.ROVAI_DEBUG_PORT ?? 9443)
-const width = Number(process.env.ROVAI_CAPTURE_WIDTH ?? 1440)
-const height = Number(process.env.ROVAI_CAPTURE_HEIGHT ?? 920)
-const zoomFactor = Number(process.env.ROVAI_CAPTURE_ZOOM_FACTOR ?? 1)
+const userDataDir = process.env.COAXI_CAPTURE_USER_DATA_DIR
+const port = Number(process.env.COAXI_DEBUG_PORT ?? 9443)
+const width = Number(process.env.COAXI_CAPTURE_WIDTH ?? 1440)
+const height = Number(process.env.COAXI_CAPTURE_HEIGHT ?? 920)
+const zoomFactor = Number(process.env.COAXI_CAPTURE_ZOOM_FACTOR ?? 1)
 const cssWidth = Math.round(width / zoomFactor)
 const cssHeight = Math.round(height / zoomFactor)
-const theme = process.env.ROVAI_CAPTURE_THEME ?? 'day'
+const theme = process.env.COAXI_CAPTURE_THEME ?? 'day'
 
 if (!appPath || !userDataDir) {
-  throw new Error('Usage: ROVAI_CAPTURE_USER_DATA_DIR=<data> node scripts/capture-skills.mjs <Coaxi.app> [output.png]')
+  throw new Error('Usage: COAXI_CAPTURE_USER_DATA_DIR=<data> node scripts/capture-skills.mjs <Coaxi.app> [output.png]')
 }
-if (!['day', 'night'].includes(theme)) throw new Error(`Unknown ROVAI_CAPTURE_THEME: ${theme}`)
+if (!['day', 'night'].includes(theme)) throw new Error(`Unknown COAXI_CAPTURE_THEME: ${theme}`)
 if (!Number.isFinite(zoomFactor) || zoomFactor <= 0) {
-  throw new Error(`ROVAI_CAPTURE_ZOOM_FACTOR must be greater than zero: ${zoomFactor}`)
+  throw new Error(`COAXI_CAPTURE_ZOOM_FACTOR must be greater than zero: ${zoomFactor}`)
 }
 seedCompletedOnboardingForAcceptance(userDataDir)
 
@@ -37,7 +37,7 @@ const app = spawn(executable, [
   `--remote-debugging-port=${port}`,
   `--user-data-dir=${userDataDir}`
 ], {
-  env: { ...process.env, ROVAI_ALLOW_ISOLATED_INSTANCE: '1' },
+  env: { ...process.env, COAXI_ALLOW_ISOLATED_INSTANCE: '1' },
   stdio: ['ignore', 'ignore', 'pipe']
 })
 const stderr = []
@@ -65,7 +65,7 @@ try {
   await waitForExpression(cdp, `Boolean(document.querySelector('.unified-sidebar-footer button[aria-label="设置"]'))`, 45_000)
   await waitForExpression(cdp, `document.querySelector('.startup-gate') === null`, 45_000)
   await cdp.send('Runtime.evaluate', {
-    expression: `window.rovai.appearance.setPreference(${JSON.stringify(theme)})`,
+    expression: `window.coaxi.appearance.setPreference(${JSON.stringify(theme)})`,
     awaitPromise: true,
     returnByValue: true
   })
@@ -96,14 +96,14 @@ try {
   }
 
   await waitForEvaluation(cdp, `(async () => (
-    await window.rovai.request('runtime.installations.list')
+    await window.coaxi.request('runtime.installations.list')
   ).some((candidate) => candidate.adapterKind === 'codex-cli' && candidate.memberRuntimeDefaults))()`, 45_000)
   const runtimeConfiguration = await evaluate(cdp, `(async () => {
-    const profile = await window.rovai.request('members.get', { agentId: 'agent_1' })
-    const installation = (await window.rovai.request('runtime.installations.list'))
+    const profile = await window.coaxi.request('members.get', { agentId: 'agent_1' })
+    const installation = (await window.coaxi.request('runtime.installations.list'))
       .find((candidate) => candidate.adapterKind === 'codex-cli' && candidate.memberRuntimeDefaults)
     if (!installation) throw new Error('Codex Runtime defaults are unavailable')
-    return window.rovai.request('members.runtime.set', {
+    return window.coaxi.request('members.runtime.set', {
       commandId: crypto.randomUUID(),
       command: {
         agentId: profile.agentId,
@@ -126,7 +126,7 @@ try {
     const subnavButtons = [...document.querySelectorAll('.settings-sidebar-menu button')]
     const active = document.querySelector('.settings-sidebar-menu button.active')
     const skillCards = [...document.querySelectorAll('.skill-card')]
-    const skillViews = await window.rovai.request('skills.list')
+    const skillViews = await window.coaxi.request('skills.list')
     const skillViewByName = new Map(skillViews.map((skill) => [skill.name, skill]))
     const identityColorIndex = (identityId) => {
       let hash = 0x811c9dc5
@@ -259,11 +259,11 @@ try {
       importButton: [...document.querySelectorAll('.skill-settings button')]
         .some((button) => button.textContent?.trim() === '选择文件夹'),
       projectionStatusVisible: document.querySelector('.skill-settings')?.textContent?.includes('项目投影状态'),
-      legacyOfficialVisible: document.querySelector('.skill-settings')?.textContent?.includes('Rovai 官方'),
+      legacyOfficialVisible: document.querySelector('.skill-settings')?.textContent?.includes('Coaxi 官方'),
       loadingVisible: document.querySelector('.skill-settings')?.textContent?.includes('正在读取 Skill Library'),
       legacyLongSourceLabelVisible: skillCards.some((card) => {
         const badge = card.querySelector('.skill-source')?.textContent?.trim()
-        return badge === 'Rovai 内置' || badge === 'GitHub 三方'
+        return badge === 'Coaxi 内置' || badge === 'GitHub 三方'
       })
     }
   })()`)
@@ -331,7 +331,7 @@ try {
         'memory-stewardship'
       ])
       || result.bundledCount !== 7
-      || !result.bundledBadges.every((badge) => badge === 'Rovai')
+      || !result.bundledBadges.every((badge) => badge === 'Coaxi')
       || result.thirdPartyCount !== 5
       || result.enabledOfficialCount !== 11
       || result.uiSkillDefaults.tastefulUiEnabled !== 'false'

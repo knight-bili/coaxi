@@ -14,7 +14,7 @@ interface Policy { schemaVersion: 1; revision: number; members: Array<{ agentId:
 const emptyFeatures = (): InteractionFeatures => ({ browser: false, browserEval: false, computer: false, computerLaunch: false, computerClipboard: false })
 const knownRejection = /interaction_disabled|desktop_unavailable|scope_changed|origin_changed|membership_changed|permission_changed|policy_changed|invalid_arguments/
 
-/** Codeg agent-access menu, with Core's per-recipient permissions retained. */
+/** Coaxi agent-access menu, with Core's per-recipient permissions retained. */
 export function BrowserSharePopover({ threadId, targetId, origin }: { threadId: string; targetId: string; origin: string | null }): React.JSX.Element {
   const api = useThreadClient().interactionWorkspace, t = useUiText(), epoch = useRef(0), lock = useRef<{epoch:number}|null>(null)
   const [open, setOpen] = useState(false), [targets, setTargets] = useState<Target[]>([]), [byTarget, setByTarget] = useState<Record<string, Grant[]>>({})

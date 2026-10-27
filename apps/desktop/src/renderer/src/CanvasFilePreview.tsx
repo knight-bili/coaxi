@@ -1,5 +1,5 @@
-// Fixed read-only file-card behavior follows Codeg aff1e6c278453ed8d0b96a5f664edcdca621aa3f
-// src/components/canvas/nodes/file-node.tsx; license: integration/licenses/codeg/LICENSE.
+// Fixed read-only file-card behavior follows Coaxi aff1e6c278453ed8d0b96a5f664edcdca621aa3f
+// src/components/canvas/nodes/file-node.tsx; license: integration/licenses/coaxi/LICENSE.
 import { useMemo } from 'react'
 import type { CanvasNode, FilePreviewApi, ResolvedTheme } from '@contracts'
 import { PinnedFilePreview } from './FilePreviewContext'

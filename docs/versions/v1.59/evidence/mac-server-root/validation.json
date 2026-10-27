@@ -14,7 +14,7 @@
   "uiEntrySha256": "edb94dad4a1c691453df1daf6eb6548989b49ef3f8f4763646396e756dd8dc37",
   "checks": [
     {
-      "command": "ROVAI_SERVER_BIN=<package>/rovai-server ROVAI_HOST_BIN=<package>/rovai-host ROVAI_WEB_UI=<package>/web-ui ROVAI_SERVER_RELEASE_DIR=<release-assets> node --test scripts/lib/server-entry.test.mjs",
+      "command": "COAXI_SERVER_BIN=<package>/coaxi-server COAXI_HOST_BIN=<package>/coaxi-host COAXI_WEB_UI=<package>/web-ui COAXI_SERVER_RELEASE_DIR=<release-assets> node --test scripts/lib/server-entry.test.mjs",
       "exitCode": 0,
       "passed": 2,
       "skipped": 0,
@@ -45,7 +45,7 @@
       ]
     },
     {
-      "command": "ROVAI_HOST_BIN=<package>/rovai-host ROVAI_WEB_UI=<package>/web-ui node --test scripts/lib/host-lifecycle.test.mjs scripts/lib/host-web.test.mjs",
+      "command": "COAXI_HOST_BIN=<package>/coaxi-host COAXI_WEB_UI=<package>/web-ui node --test scripts/lib/host-lifecycle.test.mjs scripts/lib/host-web.test.mjs",
       "exitCode": 0,
       "passed": 4,
       "skipped": 0

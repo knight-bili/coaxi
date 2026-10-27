@@ -23,7 +23,7 @@ function phase(s, y, h, n, title, tone, body, rightTitle, rightBody = []) {
 
 export function renderRunLifecycle() {
   const s = sketch();
-  const headings = label(134, 39, 'Rovai Core · 加载与调度', 25, { color: P.ink, weight: 600 })
+  const headings = label(134, 39, 'Coaxi Core · 加载与调度', 25, { color: P.ink, weight: 600 })
     + label(815, 39, '输入与原生执行 · Codex 示例', 25, { color: P.runtime.main, weight: 600 })
     + connection('M51 116 V1665', P.resource, { width: 2.1 });
 
@@ -61,7 +61,7 @@ export function renderRunLifecycle() {
     + pill(1002, 709, 208, 'MEMBER_IDENTITY', T.gugu, 17)
     + pill(1223, 709, 235, 'Memory Entrypoint', T.gugu, 17)
     + box(s, 814, 771, 644, 65, '#fff', T.gugu.border, false, 10)
-    + label(836, 811, '轮换 Lease · Rovai CLI 绑定本轮身份', 20, { color: T.gugu.main });
+    + label(836, 811, '轮换 Lease · Coaxi CLI 绑定本轮身份', 20, { color: T.gugu.main });
 
   const context = phase(s, 880, 209, '4', '物化输入，交给本轮执行', T.green,
     ['Context Profile → Model Context Projection', 'ContextManifest → Runtime Input Delivery'],
@@ -74,7 +74,7 @@ export function renderRunLifecycle() {
       + label(834, 966 + i * 43, name, 18, { color: tone.main, weight: 600 })).join('');
 
   const running = phase(s, 1111, 292, '5', '执行中，按需获取信息和动作', T.teal,
-    ['原生工具执行 Rovai CLI → Core 领域服务'],
+    ['原生工具执行 Coaxi CLI → Core 领域服务'],
     'Codex 原生模型循环')
     + pill(135, 1222, 180, 'A2A / Task', T.teal, 20)
     + pill(333, 1222, 180, 'History', T.teal, 20)

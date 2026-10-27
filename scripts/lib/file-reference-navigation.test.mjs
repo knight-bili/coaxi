@@ -14,7 +14,7 @@ const root = resolve(import.meta.dirname, '../..')
 const source = join(root, 'scripts/fixtures/file-reference-navigation')
 test('message file links preserve reading anchors and production workspaces contain wide content', { timeout: 90_000 }, async (t) => {
   if (!admitElectronIntegrationTest(t)) return
-  const fixture = await mkdtemp(join(tmpdir(), 'rovai-file-navigation-test-'))
+  const fixture = await mkdtemp(join(tmpdir(), 'coaxi-file-navigation-test-'))
   let child
   let closed
   try {
@@ -36,7 +36,7 @@ test('message file links preserve reading anchors and production workspaces cont
     assert.equal(JSON.parse(output.split('\n').find(line => line.startsWith('{'))).ok, true)
   } finally {
     if (child && child.exitCode === null && child.signalCode === null) { child.kill('SIGKILL'); await closed }
-    if (process.env.ROVAI_KEEP_FILE_PREVIEW_FIXTURE === '1') process.stdout.write(`File navigation fixture: ${fixture}\n`)
+    if (process.env.COAXI_KEEP_FILE_PREVIEW_FIXTURE === '1') process.stdout.write(`File navigation fixture: ${fixture}\n`)
     else await rm(fixture, { recursive: true, force: true })
   }
 })

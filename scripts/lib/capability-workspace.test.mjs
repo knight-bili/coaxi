@@ -15,7 +15,7 @@ const source = join(root, 'scripts/fixtures/capability-workspace')
 
 test('capability workspaces keep imports, credential reveal and long content usable in one pane', { timeout: 120_000 }, async (t) => {
   if (!admitElectronIntegrationTest(t)) return
-  const fixture = await mkdtemp(join(tmpdir(), 'rovai-capability-workspace-test-'))
+  const fixture = await mkdtemp(join(tmpdir(), 'coaxi-capability-workspace-test-'))
   let child
   let closed
   try {
@@ -38,7 +38,7 @@ test('capability workspaces keep imports, credential reveal and long content usa
     assert.equal(JSON.parse(output.split('\n').find(line => line.startsWith('{'))).ok, true)
   } finally {
     if (child && child.exitCode === null && child.signalCode === null) { child.kill('SIGKILL'); await closed }
-    if (process.env.ROVAI_KEEP_CAPABILITY_FIXTURE === '1') process.stdout.write(`Capability screenshots: ${fixture}\n`)
+    if (process.env.COAXI_KEEP_CAPABILITY_FIXTURE === '1') process.stdout.write(`Capability screenshots: ${fixture}\n`)
     else await rm(fixture, { recursive: true, force: true })
   }
 })

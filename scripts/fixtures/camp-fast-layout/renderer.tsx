@@ -95,7 +95,7 @@ const delayResponse = async (): Promise<void> => {
   holdNext = false
   await new Promise<void>(resolve => { releaseResponse = resolve })
 }
-Object.assign(window, { rovai: {
+Object.assign(window, { coaxi: {
   platform: 'darwin', onEvent: (listener: (event: CoreEvent) => void) => {
     eventListeners.add(listener)
     return () => eventListeners.delete(listener)
@@ -153,7 +153,7 @@ function Fixture(): React.JSX.Element {
   updateSnapshot = setSnapshot
   updateAgents = setProfiles
   return <MobileLayoutProvider value={mobile}><div className="app-shell app-shell-camp">
-    {!mobile && <aside style={{ gridRow: '1 / -1', padding: '48px 24px', background: 'var(--rail)' }}>Rovai AI</aside>}
+    {!mobile && <aside style={{ gridRow: '1 / -1', padding: '48px 24px', background: 'var(--rail)' }}>Coaxi AI</aside>}
     <AppHeader threadTitle={snapshot.thread.title} contextLabel="隔离验收" thread={snapshot} detailEntryHostRef={setEntryHost} onFocusApprovals={() => {}} />
     <main className="content task-content">
       <ThreadWorkspace snapshot={snapshot} projectName="隔离验收" agents={profiles} busy={false} stopping={false}

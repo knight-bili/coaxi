@@ -102,10 +102,10 @@ try {
     [System.IO.Path]::DirectorySeparatorChar
   $managedNames = @(
     $ExecutableName,
-  'Codeg Rovai Workbench.exe', # Previous product name; still constrained to this installation path.
-    'rovai-host.exe',
-    'rovai-core.exe',
-    'rovai.exe'
+  'Coaxi.exe', # Previous product name; still constrained to this installation path.
+    'coaxi-host.exe',
+    'coaxi-core.exe',
+    'coaxi.exe'
   ) | Sort-Object -Unique
 
   if ($Action -eq 'WaitForExit') {
@@ -191,6 +191,6 @@ try {
   if ($unresolvedIds.Count -gt 0 -or $forceErrors.Count -gt 0) { exit 11 }
   exit 0
 } catch {
-  Write-Error "Rovai installer process coordination failed: $($_.Exception.Message)"
+  Write-Error "Coaxi installer process coordination failed: $($_.Exception.Message)"
   exit 20
 }

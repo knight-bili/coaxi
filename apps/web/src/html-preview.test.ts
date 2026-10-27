@@ -16,7 +16,7 @@ it('injects the shared bridge into authorized HTML without resaving source or in
   const preview = result.value
   expect(validPreviewOrigin(preview, location.origin)).toBe(true)
   expect(files).toHaveBeenCalledExactlyOnceWith('readHtml', { handleId: 'handle-not-for-the-frame', expectedGeneration: 'g' })
-  const tag = /<script src="(data:text\/javascript;base64,[^"]+)" data-rovai-preview-diagnostic><\/script>/u.exec(preview.sandboxedDocument!)!
+  const tag = /<script src="(data:text\/javascript;base64,[^"]+)" data-coaxi-preview-diagnostic><\/script>/u.exec(preview.sandboxedDocument!)!
   expect(preview.sandboxedDocument!.replace(tag[0], '')).toBe(original)
   const script = new TextDecoder().decode(Uint8Array.from(atob(tag[1].split(',')[1]), ch => ch.charCodeAt(0)))
   const config = JSON.parse(/\)\((\{"previewId".*?\}),function/u.exec(script)![1])

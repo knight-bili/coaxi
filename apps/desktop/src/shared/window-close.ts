@@ -1,7 +1,7 @@
 import type { WindowCloseBehavior, WindowCloseResponse } from '@contracts'
 
-export const WINDOW_CLOSE_CHANNEL = 'rovai:window-close'
-export const WINDOW_CLOSE_CHANGED = 'rovai:window-close-changed'
+export const WINDOW_CLOSE_CHANNEL = 'coaxi:window-close'
+export const WINDOW_CLOSE_CHANGED = 'coaxi:window-close-changed'
 
 export function isWindowCloseBehavior(value: unknown): value is WindowCloseBehavior {
   return value === 'ask' || value === 'tray' || value === 'exit'

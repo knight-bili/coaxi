@@ -2,11 +2,11 @@ import { BrowserWindow, shell, type IpcMainInvokeEvent } from 'electron'
 import { BrowserNativeSurface, inspectBrowserPage } from './browser-native-surface'
 import { createHash, randomUUID } from 'node:crypto'
 import type { BrowserWorkspaceApi, BrowserWorkspaceView, BrowserPreferences, CoreMethod } from '@contracts'
-import agentBundle from './codeg-browser-agent.js?raw'
+import agentBundle from './coaxi-browser-agent.js?raw'
 import { BrowserDownloads } from './browser-downloads'
 import { BrowserProfiles } from './browser-profiles'
 import { BrowserPreferenceStore } from './browser-preferences'
-import evalRenderer from './codeg-eval-render.js?raw'
+import evalRenderer from './coaxi-eval-render.js?raw'
 import { InteractionLateResult, sameInteractionScope, type InteractionWork, type InteractionScope, type InteractionGrant } from './interaction-types'
 
 type Request = <T>(method: CoreMethod, params?: unknown) => Promise<T>
@@ -23,7 +23,7 @@ const address=(value:string):string=>{
   return url.href
 }
 
-/** Codeg's native window surface and isolated snapshot engine, adapted to
+/** Coaxi's native window surface and isolated snapshot engine, adapted to
  * Electron. Only a trusted local owner can create/share/control a surface. */
 export class BrowserWorkspace {
   private presentationSequence = 0
@@ -192,8 +192,8 @@ export class BrowserWorkspace {
         if(value.action==='console')result=[...surface.console]
         else if(value.action==='screenshot')result={mime:'image/png',data:(await surface.window.webContents.capturePage()).toPNG().toString('base64')}
         else {
-          await evaluate(`if(!globalThis.__codegAgent){${agentBundle}\n}`)
-          if(value.action==='snapshot')result=await evaluate('globalThis.__codegAgent.snapshot({maxChars:250000})')
+          await evaluate(`if(!globalThis.__coaxiAgent){${agentBundle}\n}`)
+          if(value.action==='snapshot')result=await evaluate('globalThis.__coaxiAgent.snapshot({maxChars:250000})')
           else if(value.action==='scroll'){
             const x=Number(value.x??0),y=Number(value.y??0)
             if(!Number.isFinite(x)||!Number.isFinite(y)||Math.abs(x)>10000||Math.abs(y)>10000)throw new Error('browser.invalid_scroll')
@@ -201,7 +201,7 @@ export class BrowserWorkspace {
           }else {
             if(typeof value.generation!=='string')throw new Error('browser.snapshot_required')
             const action={kind:value.action,text:value.text,key:value.key,values:value.values}
-            result=await evaluate(`globalThis.__codegAgent.act(${JSON.stringify(value.generation)},${JSON.stringify(value.ref??null)},${JSON.stringify(action)})`)
+            result=await evaluate(`globalThis.__coaxiAgent.act(${JSON.stringify(value.generation)},${JSON.stringify(value.ref??null)},${JSON.stringify(action)})`)
           }
         }
         outcome='completed'
@@ -257,10 +257,10 @@ export class BrowserWorkspace {
       let world=surface.modelWorlds.get(binding.bridgeInstanceId)
       if(world===undefined){if(surface.modelWorlds.size>=64)throw new Error('runtime_unavailable');world=WORLD+100+surface.modelWorlds.size;surface.modelWorlds.set(binding.bridgeInstanceId,world)}
       const evaluate=async(code:string):Promise<unknown>=>surface.window.webContents.executeJavaScriptInIsolatedWorld(world!,[{code}],false)
-      await evaluate(`if(!globalThis.__codegAgent){${agentBundle}\n}`)
+      await evaluate(`if(!globalThis.__coaxiAgent){${agentBundle}\n}`)
       let result:Record<string,unknown>
       if(name==='browser_snapshot'){
-        const snapshot=await evaluate(`globalThis.__codegAgent.snapshot(${JSON.stringify({maxChars:args.maxChars??15000,epoch:binding.bridgeInstanceId})})`)
+        const snapshot=await evaluate(`globalThis.__coaxiAgent.snapshot(${JSON.stringify({maxChars:args.maxChars??15000,epoch:binding.bridgeInstanceId})})`)
         result={tabId:surface.view.id,snapshot}
       }else if(name==='browser_console_messages'){
         const levels=['debug','log','info','warn','error'],minimum=levels.indexOf(String(args.minLevel??'debug')),since=Number(args.since??0),limit=Number(args.limit??100)
@@ -269,7 +269,7 @@ export class BrowserWorkspace {
         result={tabId:surface.view.id,console:{url:surface.window.webContents.getURL(),entries:selected.map(entry=>({seq:entry.seq,at:entry.at,level:entry.level,source:'console',text:entry.message,top:entry.top,...(entry.url?{url:entry.url}:{}),...(entry.line?{line:entry.line}:{})})),dropped:surface.console.length?Math.max(0,surface.console[0].seq-since-1):0,nextSince:selected.at(-1)?.seq??since,more:eligible.length>selected.length}}
       }else if(name==='browser_screenshot'){
         let region=await evaluate('({x:0,y:0,width:innerWidth,height:innerHeight})') as {x:number;y:number;width:number;height:number;ok?:boolean}
-        if(args.ref!==undefined){if(typeof args.generation!=='string')throw new Error('generation_changed');region=await evaluate(`globalThis.__codegAgent.rectOf(${JSON.stringify(args.generation)},${JSON.stringify(args.ref)})`) as typeof region;if(region.ok!==true)throw new Error('generation_changed')}
+        if(args.ref!==undefined){if(typeof args.generation!=='string')throw new Error('generation_changed');region=await evaluate(`globalThis.__coaxiAgent.rectOf(${JSON.stringify(args.generation)},${JSON.stringify(args.ref)})`) as typeof region;if(region.ok!==true)throw new Error('generation_changed')}
         await current()
         let image=await surface.window.webContents.capturePage({x:Math.floor(region.x),y:Math.floor(region.y),width:Math.ceil(region.width),height:Math.ceil(region.height)})
         const maxWidth=Number(args.maxWidth??1600);if(image.getSize().width>maxWidth)image=image.resize({width:maxWidth})
@@ -279,7 +279,7 @@ export class BrowserWorkspace {
       }else if(name==='browser_eval'){
         if(typeof args.code!=='string'||!args.code.trim()||Array.from(args.code).length>4000)throw new Error('invalid_arguments')
         await current()
-        const raw=await surface.window.webContents.executeJavaScript(`(function(){\n${evalRenderer}\ntry {\nvar __codegEvalValue=(function(){\n${args.code}\n})();\nreturn __codegEvalRender(__codegEvalValue);\n}catch(e){return __codegEvalError(e);}\n})()`,false)
+        const raw=await surface.window.webContents.executeJavaScript(`(function(){\n${evalRenderer}\ntry {\nvar __coaxiEvalValue=(function(){\n${args.code}\n})();\nreturn __coaxiEvalRender(__coaxiEvalValue);\n}catch(e){return __coaxiEvalError(e);}\n})()`,false)
         if(typeof raw!=='string'||Buffer.byteLength(raw)>256*1024)throw new Error('result_too_large')
         const answer=JSON.parse(raw) as {ok:boolean;kind?:string;value?:string;error?:string;truncated?:boolean},value=Array.from(String(answer.ok?answer.value??'':answer.error??'the code threw, and the page did not say what'))
         result={tabId:surface.view.id,result:{kind:answer.ok&&typeof answer.kind==='string'&&Array.from(answer.kind).length<=32?answer.kind:answer.ok?'unknown':'exception',value:value.slice(0,4000).join(''),truncated:Boolean(answer.truncated)||value.length>4000,url:surface.window.webContents.getURL()}}
@@ -287,7 +287,7 @@ export class BrowserWorkspace {
         const kind=({browser_click:'click',browser_hover:'hover',browser_type:'type',browser_press_key:'press',browser_select_option:'select'} as Record<string,string>)[name]
         if(!kind||typeof args.generation!=='string')throw new Error('invalid_arguments')
         await current()
-        const action=await evaluate(`globalThis.__codegAgent.act(${JSON.stringify(args.generation)},${JSON.stringify(args.ref??null)},${JSON.stringify({kind,text:args.text,key:args.key,values:args.values,submit:args.submit,button:args.button,count:args.doubleClick?2:1})})`) as {ok:boolean;url:string;error?:string;detail?:string;scrolled?:unknown}
+        const action=await evaluate(`globalThis.__coaxiAgent.act(${JSON.stringify(args.generation)},${JSON.stringify(args.ref??null)},${JSON.stringify({kind,text:args.text,key:args.key,values:args.values,submit:args.submit,button:args.button,count:args.doubleClick?2:1})})`) as {ok:boolean;url:string;error?:string;detail?:string;scrolled?:unknown}
         result=action.ok?{tabId:surface.view.id,action:{fidelity:'synthetic',url:action.url,...(action.scrolled?{scrolled:action.scrolled}:{})}}:{tabId:surface.view.id,error:`browser_${action.error??'failed'}`,note:action.detail??'Browser action did not complete.'}
       }
       if(Buffer.byteLength(JSON.stringify(result))>32*1024*1024)throw new Error('result_too_large')

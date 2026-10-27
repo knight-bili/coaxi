@@ -141,10 +141,10 @@ describe('Feishu execution console card', () => {
   })
 
   it('keeps a live card compact with one local history panel, safe commands and no result output', () => {
-    const card = executionConsoleCard(snapshot('running', { evidence: [narration(1, '正在检查项目。'), command(2, "sed -n '5p;15p' .rovai-validation/merge-target.txt", '05 echo-v4')] }))
+    const card = executionConsoleCard(snapshot('running', { evidence: [narration(1, '正在检查项目。'), command(2, "sed -n '5p;15p' .coaxi-validation/merge-target.txt", '05 echo-v4')] }))
     expect(card).toMatchObject({ schema: '2.0', header: { title: { content: '芝士 · 执行中' }, template: 'blue' } })
     expect(bodyText(card)).toContain('正在检查项目。')
-    expect(bodyText(card)).toContain("sed -n '5p;15p' .rovai-validation/merge-target.txt")
+    expect(bodyText(card)).toContain("sed -n '5p;15p' .coaxi-validation/merge-target.txt")
     expect(bodyText(card)).not.toContain('05 echo-v4')
     expect(panels(card)).toEqual([])
     expect(outerPanel(card)).toMatchObject({ expanded: false, header: { title: { content: '执行过程 · 最近 1 条 / 共 1 条' } } })
@@ -158,14 +158,14 @@ describe('Feishu execution console card', () => {
       narration(1, '最早的正文。'),
       ...Array.from({ length: 21 }, (_, index) => command(index + 2, `check-${index + 1} --path repo/${index + 1}`, `private output ${index + 1}`)),
       narration(23, Array.from({ length: 12 }, (_, index) => `当前正文第 ${index + 1} 行`).join('\n')),
-      runningCommand(24, "sed -n '5p;15p' .rovai-validation/merge-target.txt")
+      runningCommand(24, "sed -n '5p;15p' .coaxi-validation/merge-target.txt")
     ] }))
     const top = elements(card).filter((element) => element.tag === 'markdown')
     expect(top).toHaveLength(3)
     expect((top[0].content as string).split('\n')).toHaveLength(5)
     expect(top[0].content).toContain('当前正文第 1 行')
     expect(top[0].content).toContain('… 已截断 8 行 …')
-    expect(top[1].content).toBe("● sed -n '5p;15p' .rovai-validation/merge-target.txt")
+    expect(top[1].content).toBe("● sed -n '5p;15p' .coaxi-validation/merge-target.txt")
     expect(top[2].content).toBe('已完成 21 条指令 · 当前 1 条执行中')
     expect(header(outerPanel(card)!)).toBe('执行过程 · 最近 10 条 / 共 22 条')
     expect(timeline(card)[0].content).toBe('… 更早 12 条将在执行完成后查看 …')
@@ -368,15 +368,15 @@ describe('Feishu execution console card', () => {
 
   it('retains textual results and command bodies without treating input envelopes or reasoning as output', () => {
     const card = executionConsoleCard(snapshot('succeeded', { evidence: [
-      command(1, "TOKEN=top-secret rovai send --public-only --body 'private message' && curl -H 'Cookie: session=private-cookie' https://example.test", 'private message'),
+      command(1, "TOKEN=top-secret coaxi send --public-only --body 'private message' && curl -H 'Cookie: session=private-cookie' https://example.test", 'private message'),
       evidence(2, 'runtime.action', 'tool_result', 'completed', { kind: 'tool', input: { token: 'private-input', stdin: 'typed-password' }, output: { body: 'private-output', token: 'private-token' } }),
       evidence(3, 'agent.reasoning.summary.delta', 'reasoning_summary', 'updated', { delta: 'private reasoning' }),
       command(4, 'json-command', '{"tool_input":{"body":"json-private-input"},"output":"json-private-output"}'),
-      command(5, 'npx rovai send --public-only --body="wrapped-private-body"', 'wrapped-private-body'),
-      command(6, String.raw`C:\tools\rovai.exe send --body "windows-private-body"`, 'windows-private-body'),
+      command(5, 'npx coaxi send --public-only --body="wrapped-private-body"', 'wrapped-private-body'),
+      command(6, String.raw`C:\tools\coaxi.exe send --body "windows-private-body"`, 'windows-private-body'),
       { ...evidence(7, 'runtime.action', 'tool_result', 'completed', { kind: 'shell', input: { cmd: 'verify-cli', stdin: ['typed-password', 'nested-private-stdin'] }, output: { stdout: 'ok', stderr: 'echoed typed-password and private-input; nested-private-stdin' } }), canonical: canonical('op-7') }
     ] }))
-    expect(header(panels(card)[0])).toContain('rovai send --public-only')
+    expect(header(panels(card)[0])).toContain('coaxi send --public-only')
     expect(result(panels(card)[2])).toContain('json-private-input')
     for (const value of ['top-secret', 'private message', 'private-cookie', 'private-input', 'typed-password', 'json-private-input', 'json-private-output', 'wrapped-private-body', 'windows-private-body', 'nested-private-stdin']) expect(JSON.stringify(card)).toContain(value)
     expect(result(panels(card)[1])).toBe('（无可展示结果）')
@@ -386,11 +386,11 @@ describe('Feishu execution console card', () => {
   })
 
   it('updates a canonical operation in place, retains its command and only extracts textual results', () => {
-    const started = { ...evidence(2, 'runtime.action', 'tool_call', 'started', { kind: 'shell', input: { cmd: 'cargo test -p rovai-core' }, status: 'inProgress' }), canonical: canonical('op-1') }
+    const started = { ...evidence(2, 'runtime.action', 'tool_call', 'started', { kind: 'shell', input: { cmd: 'cargo test -p coaxi-core' }, status: 'inProgress' }), canonical: canonical('op-1') }
     const finished = { ...evidence(4, 'runtime.action', 'tool_result', 'completed', { kind: 'shell', output: { content: [{ type: 'text', text: '27 tests passed' }] }, status: 'completed' }), canonical: canonical('op-1') }
     const card = executionConsoleCard(snapshot('succeeded', { evidence: [narration(1, '现在检查。'), started, narration(3, '检查仍在运行。'), finished] }))
     expect(panels(card)).toHaveLength(1)
-    expect(header(panels(card)[0])).toBe('✓ cargo test -p rovai-core')
+    expect(header(panels(card)[0])).toBe('✓ cargo test -p coaxi-core')
     expect(result(panels(card)[0])).toBe('27 tests passed')
     expect(timeline(card).map((element) => element.tag)).toEqual(['markdown', 'collapsible_panel', 'markdown'])
   })
@@ -519,10 +519,10 @@ describe('Feishu execution console card', () => {
   })
 
   it.each(['failed', 'cancelled'] as const)('preserves %s status with original stderr and initially closed commands', (status) => {
-    const card = executionConsoleCard(snapshot(status, { evidence: [command(1, 'pnpm typecheck'), command(2, 'cargo test -p rovai-core', '2 tests failed\nAPI_KEY=private-failure-token', 'failed')] }))
+    const card = executionConsoleCard(snapshot(status, { evidence: [command(1, 'pnpm typecheck'), command(2, 'cargo test -p coaxi-core', '2 tests failed\nAPI_KEY=private-failure-token', 'failed')] }))
     expect(card.header).toMatchObject({ template: status === 'failed' ? 'red' : 'grey' })
     expect(panels(card).every((panel) => panel.expanded === false)).toBe(true)
-    expect(header(panels(card)[1])).toBe('✕ cargo test -p rovai-core')
+    expect(header(panels(card)[1])).toBe('✕ cargo test -p coaxi-core')
     expect(result(panels(card)[1])).toContain('2 tests failed')
     expect(result(panels(card)[1])).toContain('API_KEY=private-failure-token')
     expect(JSON.stringify(card)).not.toContain('命令执行失败')

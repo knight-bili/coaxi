@@ -505,7 +505,7 @@ export type RuntimeFailureOrigin =
   | 'runtime'
   | 'compatibility'
   | 'environment'
-  | 'rovai'
+  | 'coaxi'
   | 'unknown'
 
 export type RuntimeFailurePhase =
@@ -1602,7 +1602,7 @@ export interface LegacyCurrentInputSkillResolution {
 export interface SourceCurrentInputSkillResolutionEntry {
   skillId: string
   nameAtSend: string
-  source: 'rovai' | 'native' | 'legacy' | 'pack'
+  source: 'coaxi' | 'native' | 'legacy' | 'pack'
   sourcePath: string | null
   outcome: 'available' | 'unavailable'
   reason?: CurrentInputSkillOmissionReason
@@ -1613,7 +1613,7 @@ export type CurrentInputSkillResolutionEntry = LegacyCurrentInputSkillResolution
   | (SourceCurrentInputSkillResolutionEntry & { sourceVersion: string | null })
 
 export type CurrentInputSkillResolution = LegacyCurrentInputSkillResolution
-  | { schemaVersion: 2; selectionSnapshotDigest: string; entries: Array<Omit<SourceCurrentInputSkillResolutionEntry, 'source'> & { source: 'rovai' | 'native' | 'legacy' }> }
+  | { schemaVersion: 2; selectionSnapshotDigest: string; entries: Array<Omit<SourceCurrentInputSkillResolutionEntry, 'source'> & { source: 'coaxi' | 'native' | 'legacy' }> }
   | { schemaVersion: 3; selectionSnapshotDigest: string; entries: Array<SourceCurrentInputSkillResolutionEntry & { sourceVersion: string | null }> }
 
 export interface ThreadMessageView {
@@ -2611,7 +2611,7 @@ export interface McpExposureSnapshot {
   configDigest: string
   configStatus: 'ready' | 'invalid'
   projectionMode: 'additive_per_run' | 'unsupported'
-  sameNamePolicy: 'native_wins_skip' | 'rovai_wins' | null
+  sameNamePolicy: 'native_wins_skip' | 'coaxi_wins' | null
   warnings: string[]
   servers: McpExposureEntry[]
 }
@@ -3262,20 +3262,20 @@ export interface StructuredError {
   details: unknown
 }
 
-export type RovaiRequestFailureKind =
+export type CoaxiRequestFailureKind =
   | 'domain_rejection'
   | 'infrastructure_failure'
   | 'full_core_unavailable'
   | 'shutdown'
 
-export interface RovaiRequestFailure extends StructuredError {
-  kind: RovaiRequestFailureKind
+export interface CoaxiRequestFailure extends StructuredError {
+  kind: CoaxiRequestFailureKind
   generation: number
 }
 
-export type RovaiRequestTransport<T> =
+export type CoaxiRequestTransport<T> =
   | { kind: 'value'; value: T }
-  | { kind: 'failure'; failure: RovaiRequestFailure }
+  | { kind: 'failure'; failure: CoaxiRequestFailure }
 
 export type RuntimeMode = 'bootstrap_only' | 'full_core'
 export type FullCoreState =
@@ -3466,7 +3466,7 @@ export type ChannelConversationKind = 'p2p' | 'group' | 'topic'
 
 export type ChannelQrAttemptPurpose = 'account_login'
 
-/** A presentation-only viewport in the trusted Rovai Renderer, never a URL. */
+/** A presentation-only viewport in the trusted Coaxi Renderer, never a URL. */
 export interface ChannelLoginViewBounds {
   x: number
   y: number
@@ -5252,7 +5252,7 @@ export interface DesktopDeepLinksApi {
   onAvailable(listener:()=>void):()=>void
 }
 
-export interface RovaiApi {
+export interface CoaxiApi {
   deepLinks?:DesktopDeepLinksApi
   workbenchEditorRecovery?:{get(key:string):Promise<unknown|null>;put(value:unknown):Promise<void>;copies(key:string,after:string|null):Promise<{items:Array<{key:string;documentCount:number;paths:string[]}>;next:string|null}>}
   keyboardShortcuts?:KeyboardShortcutsApi

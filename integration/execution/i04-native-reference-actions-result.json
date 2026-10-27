@@ -43,7 +43,7 @@
     "original_source_audit": [
       {
         "source": "src/components/chat/composer/badges/reference-badge.tsx",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/chat/composer/badges/reference-badge.tsx",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/chat/composer/badges/reference-badge.tsx",
         "sourceSha256": "7c01ff446118e0c85f39b0adb0e800074066b83bb8d8c9c929f79dff6f0c87a4",
         "portedSha256": "69877e0c1b395e8b74fe06ba33ef9375257cd0403bb6b5ece4d89be3413aa5d4",
         "extraction": null,
@@ -54,7 +54,7 @@
       },
       {
         "source": "src/components/chat/composer/badges/reference-badge.test.tsx",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/chat/composer/badges/reference-badge.test.tsx",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/chat/composer/badges/reference-badge.test.tsx",
         "sourceSha256": "d91f60dcb0b411cc02454de59ebb69106d96fd56906095ce36aada8fe5cff6c1",
         "portedSha256": "54df5dfd9232a2f957119a89574e1dfef67e2b228a852f838d228b12d14e28e1",
         "extraction": null,
@@ -66,7 +66,7 @@
       },
       {
         "source": "src/components/chat/composer/reference-uri.test.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/chat/composer/reference-uri.test.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/chat/composer/reference-uri.test.ts",
         "sourceSha256": "d745ee30b18165ceba6da542977c601f44e8128528752d348ccf62c9ece9d95a",
         "portedSha256": "13f835944ce02e252cb0a75babcff2daa39d73868b549110b639c0a7637baafe",
         "extraction": null,
@@ -77,7 +77,7 @@
       },
       {
         "source": "src/lib/resource-kind.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/resource-kind.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/lib/resource-kind.ts",
         "sourceSha256": "3a8ab2a7ec09085276886b8c2ca48f678f4f4e9211cb67f519e0fa8fc200e04c",
         "portedSha256": "240412e6c6c2e9754a0547f8d8b9c49ab0f1110cfab9eaaacea3db9d7044c297",
         "extraction": null,
@@ -88,7 +88,7 @@
       },
       {
         "source": "src/lib/resource-kind.test.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/resource-kind.test.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/lib/resource-kind.test.ts",
         "sourceSha256": "eb3eeda10a5d021487988cfe63c5303fa5370c19cc4e3a2d4e44759ed6bbdfde",
         "portedSha256": "070a750e6f27e4411dc2dfe706861ff1401668ab7fe0796e33b5418c00248e0e",
         "extraction": null,
@@ -99,7 +99,7 @@
       },
       {
         "source": "src/components/ui/context-menu.tsx",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ui/context-menu.tsx",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/ui/context-menu.tsx",
         "sourceSha256": "208730cd12fcfa4fdd158c69225dd6026bc76a250615e9df5ffecca4d0851ce1",
         "portedSha256": "07e0d159e6d4a26ac7454e09ac5515c0f8ab3fcea7d1c2eafda8e3130f6037f8",
         "extraction": null,
@@ -110,7 +110,7 @@
       },
       {
         "source": "src/components/message/file-reference-actions.tsx",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/message/file-reference-actions.tsx",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/message/file-reference-actions.tsx",
         "sourceSha256": "04bdb5a003c05f65bccf6909fc254136272609e3156e546da8486cb138e5599f",
         "portedSha256": "7e651a85c6ea853df184d693e36ecd703732e8a57bf2f2895182679f4ef38859",
         "extraction": "original systemFileManagerLabelKey, complete menu return JSX and complete FileReferenceActions wrapper; source root/path IO replaced by Core scope hook; added async loading/retry rows",
@@ -123,7 +123,7 @@
     "reused_source_audit": [
       {
         "source": "src/components/chat/composer/types.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/chat/composer/types.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/chat/composer/types.ts",
         "sourceSha256": "5c1871b4e31803edd62f1982d8f8a8478537ea793d309ec98764e8c766b712b5",
         "portedSha256": "806ce8ca70f445fd765f639fa3f602e4e280efa6b18df9d04b6f66a84392e92c",
         "body": "existing exact original type declarations; unused REFERENCE_KINDS constant excluded by prior extraction; not rewritten",
@@ -131,7 +131,7 @@
       },
       {
         "source": "src/components/chat/composer/reference-uri.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/chat/composer/reference-uri.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/chat/composer/reference-uri.ts",
         "sourceSha256": "4ecba4dab6cc9fd01be9d5e21ddaa1a6cb75bc371e0f9f69fbd6d3c1a6bed666",
         "portedSha256": "e564e6ed3a27c25e2a56531c566404ff796dd9377e65647464627d5b951958a5",
         "body": "existing exact source AST after excluding documented import/header/EOL bindings; not rewritten",
@@ -240,22 +240,22 @@
       "git_blob_with_filters": "a7731038e8122f5d69d0d2e7d2f8c4cfaef71a91"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/source-message-math.test.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/source-message-math.test.tsx",
       "sha256": "64129d94182a025dc560bc9be9f0b3270df9464e34bc4ce33920e40a7e3d18e5",
       "git_blob_with_filters": "51add30b9fc837f052c206424c68cebaea85b54b"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/native-markdown-context.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/ui/native-markdown-context.tsx",
       "sha256": "24a8f40d545996e1a8e0820b9dfc5a6a7af2c1fd3a3a6ca70a90b1837b5b254f",
       "git_blob_with_filters": "0968996f681c585b4044935e9161886929a935f2"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/native-markdown-links.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/ui/native-markdown-links.tsx",
       "sha256": "68e3e5383c93235f61b1bee65e88cad865aebb527fc95d1fdf65167de437c928",
       "git_blob_with_filters": "df8d67c81cf8a1f846f852f5832a48a8c45ce713"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/source-copy.json",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/ui/source-copy.json",
       "sha256": "6786948aaa63a188e4d060e1050af95655e259de950e31a6beb39dc59909c4ed",
       "git_blob_with_filters": "850af5c78c00438d2231883ec7cddef2eea58ad1"
     },
@@ -320,67 +320,67 @@
       "git_blob_with_filters": "2b0adf0b7c565e8b9c61c60e024433fc036855f8"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/chat/composer/badges/reference-badge.test.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/chat/composer/badges/reference-badge.test.tsx",
       "sha256": "54df5dfd9232a2f957119a89574e1dfef67e2b228a852f838d228b12d14e28e1",
       "git_blob_with_filters": "88c1c803c7021c409571090ef27892c27ebfcfd1"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/chat/composer/badges/reference-badge.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/chat/composer/badges/reference-badge.tsx",
       "sha256": "69877e0c1b395e8b74fe06ba33ef9375257cd0403bb6b5ece4d89be3413aa5d4",
       "git_blob_with_filters": "cb8629a5a00a9f15f20b9995d17a04d5d6d2cebf"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/chat/composer/reference-uri.test.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/chat/composer/reference-uri.test.ts",
       "sha256": "13f835944ce02e252cb0a75babcff2daa39d73868b549110b639c0a7637baafe",
       "git_blob_with_filters": "a8d0eeae71cb1501b6aa9b8b2c8fb77f23bb9609"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/file-reference-actions.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/message/file-reference-actions.tsx",
       "sha256": "7e651a85c6ea853df184d693e36ecd703732e8a57bf2f2895182679f4ef38859",
       "git_blob_with_filters": "29554863e251f62828c03a57b6a824f5310e2a9f"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/ui/context-menu.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/ui/context-menu.tsx",
       "sha256": "07e0d159e6d4a26ac7454e09ac5515c0f8ab3fcea7d1c2eafda8e3130f6037f8",
       "git_blob_with_filters": "19f723f1e70b944f4d42da06b120d434415d149f"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/resource-kind.test.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/lib/resource-kind.test.ts",
       "sha256": "070a750e6f27e4411dc2dfe706861ff1401668ab7fe0796e33b5418c00248e0e",
       "git_blob_with_filters": "8a0bef673afa2fd8663a6709de987d4bb6750748"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/resource-kind.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/lib/resource-kind.ts",
       "sha256": "240412e6c6c2e9754a0547f8d8b9c49ab0f1110cfab9eaaacea3db9d7044c297",
       "git_blob_with_filters": "348f7d8702656bf1a19917d1f9c1174e602912e3"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/source-reference.css",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/source-reference.css",
       "sha256": "f705e4cd3550db10b3b473b4b54e4ad807c447260f56955ae426c60c6add6c58",
       "git_blob_with_filters": "43194a7b814b57127d2f37f5032ee3dd5d3b5b38"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/native-reference-agent-icon.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/ui/native-reference-agent-icon.tsx",
       "sha256": "6560ad17aa7f1b069e3ff598c2b5d7f90cecf781d93d9766f10cab1720138647",
       "git_blob_with_filters": "50e923f9b8d107dbc6dd555d86b9e14fedf8dd60"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/native-reference-host.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/ui/native-reference-host.tsx",
       "sha256": "fe4ac7e3db409abd3c8cc58b2dd2e5249a310f0506279b2e6153948740bb0731",
       "git_blob_with_filters": "8df5524616010d70679ecb27d5804914064799d9"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/native-reference-operations.test.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/ui/native-reference-operations.test.ts",
       "sha256": "14f15ed1775dcbb5545a2d91cd6d8fe26ca5654abf6eb44bce359bbd8600fbd1",
       "git_blob_with_filters": "b97fbe87eff520a2faa9adbfcb77d5a7a6c13648"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/native-reference-operations.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/ui/native-reference-operations.ts",
       "sha256": "bd8abaa45600f03e1796430f07608570ca3bfd57a26ed5b4f17e96827f8f65a4",
       "git_blob_with_filters": "7a0f771952c83387c6c066b39414996b65af399a"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/native-reference-owner.test.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/ui/native-reference-owner.test.tsx",
       "sha256": "7748a8b211155746780189c0caa3c27ddd4659ea8f26f7a27b48afe96893a2fc",
       "git_blob_with_filters": "d9fdfce99f763f2afbfe2a257b33dc6792664404"
     },

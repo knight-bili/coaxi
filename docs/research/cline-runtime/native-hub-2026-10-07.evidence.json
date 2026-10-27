@@ -46,12 +46,12 @@
       "builtinToolContractVersion": 35,
       "builtinToolEvidenceProjectionVersion": 4,
       "builtinToolIpcProtocolVersion": 2,
-      "dataDir": "/private/var/folders/pm/zmpfxggd0glcm8vx3p3y3mmr0000gq/T/rovai-cline76-hub-f7ql4y9r/core-data",
+      "dataDir": "/private/var/folders/pm/zmpfxggd0glcm8vx3p3y3mmr0000gq/T/coaxi-cline76-hub-f7ql4y9r/core-data",
       "ok": true,
       "readModelSchema": 35,
       "version": "0.4.3"
     },
-    "coreExecutable": "/Users/murray.xue/Library/Application Support/RovaiRuntimeAcceptance/mission-052-cline-20261004-swrfa_xh/Application/Rovai AI.app/Contents/Resources/bin/rovai-core",
+    "coreExecutable": "/Users/murray.xue/Library/Application Support/CoaxiRuntimeAcceptance/mission-052-cline-20261004-swrfa_xh/Application/Coaxi AI.app/Contents/Resources/bin/coaxi-core",
     "stop": {
       "code": 0,
       "signal": null,
@@ -146,7 +146,7 @@
       "requestId": "05ed3947-64d6-498d-8d87-82cb589eeac0",
       "ok": true,
       "payload": {
-        "clientId": "rovai-research-3d65ef7e-aebc-417a-b089-917f4ac0851f"
+        "clientId": "coaxi-research-3d65ef7e-aebc-417a-b089-917f4ac0851f"
       }
     },
     "sessions": {
@@ -217,7 +217,7 @@
       "requestId": "4e8d4f3a-667d-4cb5-af62-3288fedcfa77",
       "ok": true,
       "payload": {
-        "clientId": "rovai-research-7a903fc6-8799-48a8-8991-a66a8fe6df0f"
+        "clientId": "coaxi-research-7a903fc6-8799-48a8-8991-a66a8fe6df0f"
       }
     },
     "settingsRead": {
@@ -282,7 +282,7 @@
         "protocolVersion": "v1",
         "buildId": "0.0.41"
       },
-      "clientId": "rovai-research-331d6a21-7626-4f04-94eb-a6883a3142cb",
+      "clientId": "coaxi-research-331d6a21-7626-4f04-94eb-a6883a3142cb",
       "startedAt": "2026-10-07T11:33:49.418Z",
       "endedAt": "2026-10-07T11:37:14.639Z",
       "compaction": {
@@ -1544,7 +1544,7 @@
         "protocolVersion": "v1",
         "buildId": "0.0.41"
       },
-      "clientId": "rovai-research-5e8e2e22-ad5f-4572-92dc-17146403caae",
+      "clientId": "coaxi-research-5e8e2e22-ad5f-4572-92dc-17146403caae",
       "startedAt": "2026-10-07T11:37:14.700Z",
       "endedAt": "2026-10-07T11:39:29.743Z",
       "compaction": null,
@@ -2803,7 +2803,7 @@
         "protocolVersion": "v1",
         "buildId": "0.0.41"
       },
-      "clientId": "rovai-research-621f0c5f-2592-4ae6-828b-31cdd61f430a",
+      "clientId": "coaxi-research-621f0c5f-2592-4ae6-828b-31cdd61f430a",
       "startedAt": "2026-10-07T11:39:29.801Z",
       "endedAt": "2026-10-07T11:42:10.715Z",
       "compaction": {
@@ -4066,7 +4066,7 @@
         "protocolVersion": "v1",
         "buildId": "0.0.41"
       },
-      "clientId": "rovai-research-57082a2d-98f6-4981-99dc-64517fcf37e8",
+      "clientId": "coaxi-research-57082a2d-98f6-4981-99dc-64517fcf37e8",
       "startedAt": "2026-10-07T11:20:41.909Z",
       "endedAt": "2026-10-07T11:23:58.694Z",
       "compaction": {
@@ -4100,7 +4100,7 @@
         "protocolVersion": "v1",
         "buildId": "0.0.41"
       },
-      "clientId": "rovai-research-7db0419e-b9d1-450b-a30b-94d11f4686ff",
+      "clientId": "coaxi-research-7db0419e-b9d1-450b-a30b-94d11f4686ff",
       "startedAt": "2026-10-07T11:24:47.769Z",
       "endedAt": "2026-10-07T11:28:17.611Z",
       "compaction": null,
@@ -4131,7 +4131,7 @@
         "protocolVersion": "v1",
         "buildId": "0.0.41"
       },
-      "clientId": "rovai-research-399ac35d-baca-4cd5-9544-160df83c16b6",
+      "clientId": "coaxi-research-399ac35d-baca-4cd5-9544-160df83c16b6",
       "startedAt": "2026-10-07T11:28:17.704Z",
       "endedAt": "2026-10-07T11:31:12.273Z",
       "compaction": {
@@ -4254,18 +4254,18 @@
     "retries": 0,
     "clientCompactionContributions": 0,
     "hookCounts": {
-      "rovai.research.beforeRun": 1,
-      "rovai.research.onEvent": 14,
-      "rovai.research.beforeModel": 1,
-      "rovai.research.afterModel": 1,
-      "rovai.research.afterRun": 1
+      "coaxi.research.beforeRun": 1,
+      "coaxi.research.onEvent": 14,
+      "coaxi.research.beforeModel": 1,
+      "coaxi.research.afterModel": 1,
+      "coaxi.research.afterRun": 1
     },
     "nativeRunIds": [
       "run_ZAu3GwbR"
     ],
     "beforeModel": [
       {
-        "name": "rovai.research.beforeModel",
+        "name": "coaxi.research.beforeModel",
         "sessionId": "1791373561713_34be2",
         "requestId": "capreq_1791373561786_5csgy",
         "contextKeys": [
@@ -4303,7 +4303,7 @@
     "systemMatches": true
   },
   "nativePluginFileWitness": {
-    "path": "persistent/config/plugins/rovai-hub-witness/witness.js",
+    "path": "persistent/config/plugins/coaxi-hub-witness/witness.js",
     "outputObserved": false,
     "qualification": "not-observed; native client hook contribution tested separately"
   },
@@ -4313,13 +4313,13 @@
     "compaction cancellation",
     "MCP/Skills/tools/permissions after compaction",
     "native System Rule in Hub",
-    "Rovai Binding and AgentRun mapping",
+    "Coaxi Binding and AgentRun mapping",
     "multi-Session interleaving",
     "approval disconnect/expiry",
-    "Rovai restart",
+    "Coaxi restart",
     "user upgrade/redetection in Hub adapter",
     "other platforms",
-    "Rovai product cold recovery and ACP-to-Hub migration",
+    "Coaxi product cold recovery and ACP-to-Hub migration",
     "native resume across all compaction strategies"
   ],
   "productionBindings": null,
@@ -4428,7 +4428,7 @@
     "privateProviderCopiesRemovedTotal": 2,
     "ephemeralCoreRuntimeFilesRootRemovedEarlier": true
   },
-  "rawEvidenceRoot": "/var/folders/pm/zmpfxggd0glcm8vx3p3y3mmr0000gq/T/rovai-cline76-hub-f7ql4y9r",
+  "rawEvidenceRoot": "/var/folders/pm/zmpfxggd0glcm8vx3p3y3mmr0000gq/T/coaxi-cline76-hub-f7ql4y9r",
   "inputSequenceIdentical": true,
   "nativeResume": {
     "sessionId": "1791372829439_l963j",

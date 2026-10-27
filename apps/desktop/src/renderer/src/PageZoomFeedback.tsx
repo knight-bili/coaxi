@@ -26,7 +26,7 @@ export function PageZoomFeedback(): React.JSX.Element | null {
   const dismissTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
-    const unsubscribe = window.rovai.windowControls.onPageZoomChanged((nextPercentage) => {
+    const unsubscribe = window.coaxi.windowControls.onPageZoomChanged((nextPercentage) => {
       if (dismissTimer.current !== null) clearTimeout(dismissTimer.current)
       setPercentage(nextPercentage)
       dismissTimer.current = setTimeout(() => {

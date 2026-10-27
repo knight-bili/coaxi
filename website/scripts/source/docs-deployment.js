@@ -1,7 +1,7 @@
 // Published behavior: Desktop and Server share the v0.4.8 release.
 // Capture provenance and intentionally untested network paths: website/deployment-notes.md.
 (() => {
-  const {topics,groups}=window.RovaiDocs;
+  const {topics,groups}=window.CoaxiDocs;
   const P=(en,zh,e,z)=>({kind:'prose',title:[en,zh],paragraphs:[e,z]});
   const S=(en,zh,e,z)=>({kind:'steps',title:[en,zh],steps:[e,z]});
   const C=(en,zh,e,z=e)=>({kind:'code',title:[en,zh],body:[e,z]});
@@ -23,11 +23,11 @@
   });
 
   topics.remote=T('Deployment and access overview','部署与访问总览',
-    'Choose where Rovai runs, then choose how your other devices reach it. These are two separate decisions.',
-    '先决定 Rovai 运行在哪里，再选择其他设备怎样连接。这是两个独立的选择。',[
+    'Choose where Coaxi runs, then choose how your other devices reach it. These are two separate decisions.',
+    '先决定 Coaxi 运行在哪里，再选择其他设备怎样连接。这是两个独立的选择。',[
     P('Continue the work on the host you choose','连接哪台主机，就继续那里的工作',
-      ['A browser is another entrance to a running Rovai instance. Conversations, teammates and execution records come from that instance. Agents run on its host and edit the project files available there.', 'Remote access neither migrates nor automatically synchronizes data. Opening a new Server will not bring your Desktop roster, conversations, Agent sign-in or projects with it. To continue a Desktop conversation, connect to that Desktop’s Web service.'],
-      ['浏览器是已运行 Rovai 实例的另一个入口。会话、队员和执行记录来自该实例；智能体在它的主机上运行，操作主机能够访问的项目文件。','远程访问不会迁移或自动同步数据。新装 Server 不会自动获得 Desktop 的名册、会话、智能体登录或项目。想继续桌面端的原会话，就连接那一份 Desktop 的 Web 服务。']),
+      ['A browser is another entrance to a running Coaxi instance. Conversations, teammates and execution records come from that instance. Agents run on its host and edit the project files available there.', 'Remote access neither migrates nor automatically synchronizes data. Opening a new Server will not bring your Desktop roster, conversations, Agent sign-in or projects with it. To continue a Desktop conversation, connect to that Desktop’s Web service.'],
+      ['浏览器是已运行 Coaxi 实例的另一个入口。会话、队员和执行记录来自该实例；智能体在它的主机上运行，操作主机能够访问的项目文件。','远程访问不会迁移或自动同步数据。新装 Server 不会自动获得 Desktop 的名册、会话、智能体登录或项目。想继续桌面端的原会话，就连接那一份 Desktop 的 Web 服务。']),
     D('Choose a route','选择适合你的路径','deployment-choice',
       'First choose Desktop Web or a separate Server. Then choose a trusted LAN, a private Tailscale connection or a public HTTPS entrance supported by that release.',
       '先选 Desktop Web 或独立 Server，再选可信局域网、Tailscale 私网或该版本支持的公网 HTTPS 入口。'),
@@ -65,8 +65,8 @@
         ['公网 HTTPS','希望普通浏览器通过固定域名访问','可达的 Server 主机、域名、HTTPS 反向代理与 Owner 登录']
       ]),
     P('Match the recipe to your release','按版本选择教程',
-      ['These are network arrangements, not three built-in switches. Tailscale and the reverse proxy are configured outside Rovai. Use Server 0.4.8 for the complete Serve HTTPS and public HTTPS recipes in this group.', 'Desktop 0.4.8 offers a Web toggle and port, but no public-origin setting. Use its LAN address or its host’s Tailscale interface address; do not paste Server flags into Desktop.', 'This is a single-owner workspace. A login Token grants access to that instance; publishing an HTTPS address does not create separate accounts or project-level roles.'],
-      ['这三种方式是网络方案，不是 App 内三个一键开关。Tailscale 和反向代理需要在 Rovai 外配置。本组完整的 Serve HTTPS、公网 HTTPS 配方使用 Server 0.4.8。','Desktop 0.4.8 提供 Web 开关和端口，没有公共来源设置。可使用局域网地址或主机的 Tailscale 网卡地址；不要把 Server 参数套到 Desktop。','这是单 Owner 工作台。登录 Token 用于访问对应实例；开放 HTTPS 地址不会自动建立多人账号或项目级权限。']),
+      ['These are network arrangements, not three built-in switches. Tailscale and the reverse proxy are configured outside Coaxi. Use Server 0.4.8 for the complete Serve HTTPS and public HTTPS recipes in this group.', 'Desktop 0.4.8 offers a Web toggle and port, but no public-origin setting. Use its LAN address or its host’s Tailscale interface address; do not paste Server flags into Desktop.', 'This is a single-owner workspace. A login Token grants access to that instance; publishing an HTTPS address does not create separate accounts or project-level roles.'],
+      ['这三种方式是网络方案，不是 App 内三个一键开关。Tailscale 和反向代理需要在 Coaxi 外配置。本组完整的 Serve HTTPS、公网 HTTPS 配方使用 Server 0.4.8。','Desktop 0.4.8 提供 Web 开关和端口，没有公共来源设置。可使用局域网地址或主机的 Tailscale 网卡地址；不要把 Server 参数套到 Desktop。','这是单 Owner 工作台。登录 Token 用于访问对应实例；开放 HTTPS 地址不会自动建立多人账号或项目级权限。']),
     L('Start here','从这里开始',[
       link('desktop-web','Continue an existing Desktop conversation','继续已有桌面会话'),
       link('server-install','Install on a separate host','在独立主机安装 Server'),
@@ -85,7 +85,7 @@
       'An isolated Desktop 0.4.1 instance. The example uses port 18766 because 8766 was occupied; the product default remains 8766. This crop shows the toggle, port and local address; the host’s private network address and credentials are outside the crop.',
       '隔离的 Desktop 0.4.1 实例。截图因 8766 已被占用而使用 18766；产品默认仍为 8766。截取开关、端口与本机地址，主机私网地址和凭据不进入公开画面。'),
     F('Read the address correctly','读懂访问地址',[
-      ['127.0.0.1 / localhost','127.0.0.1 / localhost','These refer to the device running the browser. On your phone they mean the phone, not your Mac. Use them only for a browser on the Rovai host.','这两个地址指向浏览器所在设备。在手机上它们指手机自身，不是你的 Mac；只供 Rovai 主机上的浏览器使用。'],
+      ['127.0.0.1 / localhost','127.0.0.1 / localhost','These refer to the device running the browser. On your phone they mean the phone, not your Mac. Use them only for a browser on the Coaxi host.','这两个地址指向浏览器所在设备。在手机上它们指手机自身，不是你的 Mac；只供 Coaxi 主机上的浏览器使用。'],
       ['LAN address','局域网地址','For example http://192.168.1.50:8766. Use the actual address shown for the host’s reachable network and the chosen port.','例如 http://192.168.1.50:8766。使用主机可达网卡的实际地址及所选端口。'],
       ['0.0.0.0','0.0.0.0','A listening scope, not the address to type into a phone. It means the service accepts traffic on available IPv4 interfaces.','这是监听范围，不是手机应输入的目标地址，表示服务接受可用 IPv4 网卡上的连接。'],
       ['QR shortcut','二维码快捷登录','If you use the login QR option, treat it as a short-lived credential. Generate it when ready, scan privately and regenerate if expired. This tutorial uses the Token form so no live QR is published.','使用登录二维码时，把它视为短期凭据；准备连接时再生成，私下扫码，过期后重新生成。本教程使用 Token 表单，不公开有效二维码。']]),
@@ -117,53 +117,53 @@
       ['本教程使用与 Desktop 0.4.8 同版、同源码发布的 Server 0.4.8（标签 v0.4.8）。选择该标签下的 Server 安装包、安装脚本及 SHA256SUMS。','包内包含服务程序、匹配的 Web 界面和内置 Skill，必须保持完整。运行 Host 本身不依赖 Electron、Node、Rust 或 pnpm；编程智能体仍有各自的安装和认证要求。']),
     TB('Choose your host package','选择主机安装包',
       ['Host','Asset','Requirements / boundary'],['主机','安装包','条件与边界'],[
-        ['macOS Apple Silicon','rovai-server-0.4.8-macos-arm64.tar.gz','Apple Silicon'],
-        ['macOS Intel','rovai-server-0.4.8-macos-x64.tar.gz','Intel x64'],
-        ['Linux x64 GNU','rovai-server-0.4.8-linux-x64.tar.gz','glibc 2.35 baseline; Ubuntu 22.04+ / Debian 12+; no ARM64 or Alpine/musl package'],
-        ['Windows x64','rovai-server-0.4.8-windows-x64.zip','x64 Visual C++ v14 Runtime; installer does not add that system component']
+        ['macOS Apple Silicon','coaxi-server-0.4.8-macos-arm64.tar.gz','Apple Silicon'],
+        ['macOS Intel','coaxi-server-0.4.8-macos-x64.tar.gz','Intel x64'],
+        ['Linux x64 GNU','coaxi-server-0.4.8-linux-x64.tar.gz','glibc 2.35 baseline; Ubuntu 22.04+ / Debian 12+; no ARM64 or Alpine/musl package'],
+        ['Windows x64','coaxi-server-0.4.8-windows-x64.zip','x64 Visual C++ v14 Runtime; installer does not add that system component']
       ],[
-        ['macOS Apple 芯片','rovai-server-0.4.8-macos-arm64.tar.gz','Apple Silicon'],
-        ['macOS Intel','rovai-server-0.4.8-macos-x64.tar.gz','Intel x64'],
-        ['Linux x64 GNU','rovai-server-0.4.8-linux-x64.tar.gz','glibc 2.35 基线；Ubuntu 22.04+ / Debian 12+；无 ARM64 或 Alpine/musl 包'],
-        ['Windows x64','rovai-server-0.4.8-windows-x64.zip','需要 x64 Visual C++ v14 Runtime；安装器不代装该系统组件']
+        ['macOS Apple 芯片','coaxi-server-0.4.8-macos-arm64.tar.gz','Apple Silicon'],
+        ['macOS Intel','coaxi-server-0.4.8-macos-x64.tar.gz','Intel x64'],
+        ['Linux x64 GNU','coaxi-server-0.4.8-linux-x64.tar.gz','glibc 2.35 基线；Ubuntu 22.04+ / Debian 12+；无 ARM64 或 Alpine/musl 包'],
+        ['Windows x64','coaxi-server-0.4.8-windows-x64.zip','需要 x64 Visual C++ v14 Runtime；安装器不代装该系统组件']
       ]),
     L('Get the files and prerequisites','获取文件与前置依赖',[
       ext(release,'Server 0.4.8 release and all assets','Server 0.4.8 发布说明与全部附件'),
       ext('https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist','Microsoft Visual C++ Redistributable','Microsoft Visual C++ 可再发行组件'),
       link('compatibility','Agent availability and platform support','智能体可用性与平台支持')]),
     S('Prepare one ordinary host account','准备一个普通主机账号',
-      ['Use an ordinary OS account for Server and its Agents. Install and sign in to the Agent under that same account; do not start Rovai as root to work around a missing CLI.', 'Put your project in a host directory this account can read and, when needed, write. The browser device’s folders are not automatically mounted on the host.', 'Choose a durable absolute data directory with no symlink components. The default is ~/.rovai-server under the process user’s home. Program files and project files are separate.', 'Confirm the chosen port is free. The examples start at 127.0.0.1:8767 for a local check; use a later connection guide to make it reachable elsewhere.'],
-      ['使用一个普通系统账号运行 Server 和智能体。在同一账号下安装并登录智能体，不要为解决 CLI 找不到而改用 root 启动 Rovai。','项目放在这个账号可以读取、按需要写入的主机目录。浏览器设备的文件夹不会自动挂载到主机。','选择长期保留、没有符号链接路径组件的绝对数据目录。默认是进程账号主目录下的 ~/.rovai-server；程序文件和项目文件另存。','确认端口空闲。先用 127.0.0.1:8767 完成本机检查，再按后续连接教程让其他设备可达。']),
+      ['Use an ordinary OS account for Server and its Agents. Install and sign in to the Agent under that same account; do not start Coaxi as root to work around a missing CLI.', 'Put your project in a host directory this account can read and, when needed, write. The browser device’s folders are not automatically mounted on the host.', 'Choose a durable absolute data directory with no symlink components. The default is ~/.coaxi-server under the process user’s home. Program files and project files are separate.', 'Confirm the chosen port is free. The examples start at 127.0.0.1:8767 for a local check; use a later connection guide to make it reachable elsewhere.'],
+      ['使用一个普通系统账号运行 Server 和智能体。在同一账号下安装并登录智能体，不要为解决 CLI 找不到而改用 root 启动 Coaxi。','项目放在这个账号可以读取、按需要写入的主机目录。浏览器设备的文件夹不会自动挂载到主机。','选择长期保留、没有符号链接路径组件的绝对数据目录。默认是进程账号主目录下的 ~/.coaxi-server；程序文件和项目文件另存。','确认端口空闲。先用 127.0.0.1:8767 完成本机检查，再按后续连接教程让其他设备可达。']),
     C('macOS / Linux · download the installer','macOS / Linux · 下载安装器',
 `curl -fL '${releaseFiles}install-server.sh' -o install-server.sh
 sh install-server.sh --version 0.4.8`),
     P('What the Unix installer changes','Unix 安装器做了什么',
-      ['Run these commands in a working folder. curl is needed to download; the shell installer uses standard archive and SHA-256 utilities. Read the downloaded script if your host has an installation review policy.', 'The default program directory is ~/.local/share/rovai-server, with versioned revisions and a current link. The command link is ~/.local/bin/rovai-server. The installer verifies the selected archive against the same release’s SHA256SUMS and adds guarded PATH entries to common shell profiles. Open a new terminal to pick them up.', 'It does not install a system service, install an Agent, or move Desktop data. For an offline host, download the matching archive and SHA256SUMS from the same tag on another device, transfer them together, and use --from-dir /absolute/release-folder. --prefix and --bin-dir customize the program and command directories.'],
-      ['在一个工作文件夹中运行命令。下载需要 curl，脚本使用系统常见的解包与 SHA-256 工具；主机有安装审查要求时先阅读下载的脚本。','默认程序目录为 ~/.local/share/rovai-server，内含按版本保留的 revisions 和 current 链接；命令链接位于 ~/.local/bin/rovai-server。安装器用同一 Release 的 SHA256SUMS 校验选中归档，并向常用 shell 配置添加有保护的 PATH 项；新开终端使其生效。','安装器不会建立系统服务、安装智能体或迁移 Desktop 数据。离线安装时，在另一设备下载同一标签的匹配归档与 SHA256SUMS，一起传入，再使用 --from-dir /绝对路径/发布文件夹。--prefix 与 --bin-dir 分别指定程序和命令目录。']),
+      ['Run these commands in a working folder. curl is needed to download; the shell installer uses standard archive and SHA-256 utilities. Read the downloaded script if your host has an installation review policy.', 'The default program directory is ~/.local/share/coaxi-server, with versioned revisions and a current link. The command link is ~/.local/bin/coaxi-server. The installer verifies the selected archive against the same release’s SHA256SUMS and adds guarded PATH entries to common shell profiles. Open a new terminal to pick them up.', 'It does not install a system service, install an Agent, or move Desktop data. For an offline host, download the matching archive and SHA256SUMS from the same tag on another device, transfer them together, and use --from-dir /absolute/release-folder. --prefix and --bin-dir customize the program and command directories.'],
+      ['在一个工作文件夹中运行命令。下载需要 curl，脚本使用系统常见的解包与 SHA-256 工具；主机有安装审查要求时先阅读下载的脚本。','默认程序目录为 ~/.local/share/coaxi-server，内含按版本保留的 revisions 和 current 链接；命令链接位于 ~/.local/bin/coaxi-server。安装器用同一 Release 的 SHA256SUMS 校验选中归档，并向常用 shell 配置添加有保护的 PATH 项；新开终端使其生效。','安装器不会建立系统服务、安装智能体或迁移 Desktop 数据。离线安装时，在另一设备下载同一标签的匹配归档与 SHA256SUMS，一起传入，再使用 --from-dir /绝对路径/发布文件夹。--prefix 与 --bin-dir 分别指定程序和命令目录。']),
     C('Windows · install from PowerShell','Windows · 从 PowerShell 安装',
 `Invoke-WebRequest '${releaseFiles}install-server.ps1' -OutFile install-server.ps1
 .\u005cinstall-server.ps1 -Version 0.4.8`),
     P('Windows program location','Windows 程序位置',
-      ['The installer places the package in %LOCALAPPDATA%\\Programs\\RovaiServer\\current and adds it to the user PATH. Open a new PowerShell window, then run rovai-server --version. Use -InstallDirectory to select another program root or -FromDirectory for local release files.', 'If the command reports a missing VCRUNTIME140.dll, install Microsoft’s x64 v14 runtime first. If your organization blocks scripts, follow its approved script policy; changing the machine-wide execution policy is not part of this guide.'],
-      ['程序默认放在 %LOCALAPPDATA%\\Programs\\RovaiServer\\current，并加入用户 PATH。新开 PowerShell，运行 rovai-server --version。-InstallDirectory 可指定程序根目录，-FromDirectory 可使用本地发布文件。','若提示缺少 VCRUNTIME140.dll，先安装 Microsoft 的 x64 v14 组件。如果组织策略阻止脚本，按组织批准的方式执行；本教程不要求更改整机脚本策略。']),
+      ['The installer places the package in %LOCALAPPDATA%\\Programs\\CoaxiServer\\current and adds it to the user PATH. Open a new PowerShell window, then run coaxi-server --version. Use -InstallDirectory to select another program root or -FromDirectory for local release files.', 'If the command reports a missing VCRUNTIME140.dll, install Microsoft’s x64 v14 runtime first. If your organization blocks scripts, follow its approved script policy; changing the machine-wide execution policy is not part of this guide.'],
+      ['程序默认放在 %LOCALAPPDATA%\\Programs\\CoaxiServer\\current，并加入用户 PATH。新开 PowerShell，运行 coaxi-server --version。-InstallDirectory 可指定程序根目录，-FromDirectory 可使用本地发布文件。','若提示缺少 VCRUNTIME140.dll，先安装 Microsoft 的 x64 v14 组件。如果组织策略阻止脚本，按组织批准的方式执行；本教程不要求更改整机脚本策略。']),
     P('Upgrading a macOS 0.4.0 installation','升级 macOS 0.4.0 安装',
-      ['The earlier macOS arm64 package could miss Web UI when launched through ~/.local/bin/rovai-server. Install 0.4.8 over that program directory, keeping the same data directory. The ordinary rovai-server command should then locate its package resources.', 'If you cannot upgrade yet, launch the old current/rovai-server directly for access to existing data. Its missing bundled Skills still prevent Agent work.'],
-      ['早期 macOS arm64 包通过 ~/.local/bin/rovai-server 启动时可能找不到 Web 界面。把 0.4.8 安装到原程序目录，保留原数据目录；之后普通 rovai-server 命令应能找到包内资源。','暂时无法升级时，可直接启动旧版 current/rovai-server 查看原数据，但缺少内置 Skill 仍会阻碍智能体执行。']),
+      ['The earlier macOS arm64 package could miss Web UI when launched through ~/.local/bin/coaxi-server. Install 0.4.8 over that program directory, keeping the same data directory. The ordinary coaxi-server command should then locate its package resources.', 'If you cannot upgrade yet, launch the old current/coaxi-server directly for access to existing data. Its missing bundled Skills still prevent Agent work.'],
+      ['早期 macOS arm64 包通过 ~/.local/bin/coaxi-server 启动时可能找不到 Web 界面。把 0.4.8 安装到原程序目录，保留原数据目录；之后普通 coaxi-server 命令应能找到包内资源。','暂时无法升级时，可直接启动旧版 current/coaxi-server 查看原数据，但缺少内置 Skill 仍会阻碍智能体执行。']),
     C('First start · macOS','首次启动 · macOS',
-`rovai-server \\
-  --data-dir "$HOME/.rovai-server" \\
+`coaxi-server \\
+  --data-dir "$HOME/.coaxi-server" \\
   --listen 127.0.0.1:8767`),
     C('First start · Linux','首次启动 · Linux',
-`rovai-server --data-dir "$HOME/.rovai-server" --listen 127.0.0.1:8767`),
+`coaxi-server --data-dir "$HOME/.coaxi-server" --listen 127.0.0.1:8767`),
     C('First start · Windows PowerShell','首次启动 · Windows PowerShell',
-`rovai-server --data-dir "$HOME/.rovai-server" --listen 127.0.0.1:8767`),
+`coaxi-server --data-dir "$HOME/.coaxi-server" --listen 127.0.0.1:8767`),
     S('Log in and prepare the workspace','登录并准备工作环境',
       ['Keep the terminal open. Wait for Ready and read the address and data directory in the startup summary. A local browser opens http://127.0.0.1:8767/.', 'Use the login Token displayed in an interactive startup terminal. When output is redirected or a service manager starts the process, use the token command in a separate terminal with the same --data-dir.', 'After login, check the Agent/Runtime settings on the Server host. A browser login does not authenticate the Agent.', 'Create or configure a teammate, select a host project directory, create a conversation and send a small read-only request. Open the execution record and compare the answer with actual files.', 'To stop a foreground Server, press Ctrl-C and wait for it to exit. Starting again with the same account and data directory reopens the same workspace.'],
       ['保持终端打开，等启动摘要出现 Ready，并检查地址与数据目录。本机浏览器打开 http://127.0.0.1:8767/。','使用交互式启动终端显示的登录 Token。输出被重定向或由服务管理器启动时，在另一终端用相同 --data-dir 运行 token 命令。','登录后检查 Server 主机的智能体 / Runtime 设置。浏览器登录不等于完成智能体认证。','创建或配置一位队员，选择主机项目目录，新建会话，发送一个小的只读请求。打开执行记录，对照实际文件核对回答。','前台运行时按 Ctrl-C，等待进程退出。用同一账号、同一数据目录再次启动，会重新打开原工作台。']),
     C('Read the Token · Linux / Windows','获取 Token · Linux / Windows',
-`rovai-server --data-dir "$HOME/.rovai-server" token`),
+`coaxi-server --data-dir "$HOME/.coaxi-server" token`),
     C('Read the Token · macOS','获取 Token · macOS',
-`rovai-server --data-dir "$HOME/.rovai-server" token`),
+`coaxi-server --data-dir "$HOME/.coaxi-server" token`),
     I('Browser login','浏览器登录','server-login-zh.jpg',
       'Historical Server 0.4.0 login screen before credentials are entered. That Web UI is Chinese. Use this Server’s Token, not Desktop’s.',
       '历史 Server 0.4.0 登录页，尚未填写凭据。应使用本 Server 实例的 Token，不能混用 Desktop 凭据。'),
@@ -187,11 +187,11 @@ sh install-server.sh --version 0.4.8`),
       ['Desktop Web','Desktop Web','Enable Remote connection. In Desktop 0.4.8 the service listens on network interfaces at the selected port (default 8766). Restrict who can reach it through the host firewall.','在远程连接中开启。Desktop 0.4.8 在所选端口监听网络接口（默认 8766），通过主机防火墙限制可达来源。'],
       ['Independent Server','独立 Server','Stop the previous foreground instance, then start it with a LAN listen address and --allow-insecure-lan. A specific interface address limits the listener; 0.0.0.0 covers all IPv4 interfaces.','先停止原前台实例，再使用局域网监听地址及 --allow-insecure-lan 启动。指定网卡 IP 可缩小监听范围；0.0.0.0 则覆盖全部 IPv4 网卡。']]),
     C('Server · bind one LAN interface','Server · 监听一张局域网网卡',
-`rovai-server --data-dir "$HOME/.rovai-server" \\
+`coaxi-server --data-dir "$HOME/.coaxi-server" \\
   --listen 192.168.1.50:8767 --allow-insecure-lan`),
     P('Use the executable for your installation','使用对应安装的程序入口',
-      ['Replace the IP with your host’s actual address. On macOS 0.4.0, replace rovai-server with "$HOME/.local/share/rovai-server/current/rovai-server" as described in the installation guide. On Windows PowerShell, place the arguments on one line instead of using the shell continuation character above.', 'The flag acknowledges unencrypted HTTP on a trusted network; it does not turn off login. Do not forward this port from your Internet router or permit it from every public address.'],
-      ['把 IP 替换为真实主机地址。macOS 0.4.0 按安装页把 rovai-server 替换为 "$HOME/.local/share/rovai-server/current/rovai-server"。Windows PowerShell 请把参数放在同一行，不使用上方 shell 续行符。','该参数确认在可信网络使用未加密 HTTP，不会关闭登录认证。不要把此端口通过路由器映射到公网，也不要允许全部公网来源访问。']),
+      ['Replace the IP with your host’s actual address. On macOS 0.4.0, replace coaxi-server with "$HOME/.local/share/coaxi-server/current/coaxi-server" as described in the installation guide. On Windows PowerShell, place the arguments on one line instead of using the shell continuation character above.', 'The flag acknowledges unencrypted HTTP on a trusted network; it does not turn off login. Do not forward this port from your Internet router or permit it from every public address.'],
+      ['把 IP 替换为真实主机地址。macOS 0.4.0 按安装页把 coaxi-server 替换为 "$HOME/.local/share/coaxi-server/current/coaxi-server"。Windows PowerShell 请把参数放在同一行，不使用上方 shell 续行符。','该参数确认在可信网络使用未加密 HTTP，不会关闭登录认证。不要把此端口通过路由器映射到公网，也不要允许全部公网来源访问。']),
     S('Allow only the required local traffic','只放行所需局域网流量',
       ['If the host firewall blocks the listener, add an inbound rule for the selected TCP port and your trusted local subnet. Keep the firewall enabled.', 'On macOS, review the firewall’s application permission for Coaxi Desktop or the Server executable. On Windows, limit an inbound rule to the Private profile and the local subnet; do not change an untrusted network to Private just to connect.', 'On Ubuntu using UFW, the example below allows a /24 LAN to port 8767. Substitute your real subnet and use port 8766 only for Desktop. It adds a rule; it does not enable or disable UFW.', 'Open http://192.168.1.50:8767/ for Server, or http://192.168.1.50:8766/ for Desktop, on the other device. Enter that instance’s Token and open the intended conversation.'],
       ['若主机防火墙阻止连接，为所选 TCP 端口和可信局域网网段增加入站规则，保持防火墙开启。','macOS 检查 Coaxi Desktop 或 Server 程序的防火墙应用许可。Windows 将入站规则限定为专用网络和本地子网，不要为连接方便把不可信网络改成专用。','Ubuntu 使用 UFW 时，下方示例允许一个 /24 局域网访问 8767。替换真实网段；Desktop 才使用 8766。命令仅添加规则，不会启停 UFW。','在另一台设备打开 Server 的 http://192.168.1.50:8767/，或 Desktop 的 http://192.168.1.50:8766/。输入对应实例 Token，进入目标会话。']),
@@ -210,14 +210,14 @@ sudo ufw status`),
     'Connect your own devices across networks. Use Serve HTTPS for Server, or a direct tailnet address for Desktop 0.4.8.',
     '跨网络连接自己的设备。Server 使用 Serve HTTPS；Desktop 0.4.8 使用私网网卡地址直连。',[
     P('Three responsibilities','三个组件分别做什么',
-      ['Tailscale connects authorized devices in your private network. Serve adds an HTTPS entrance inside that network and forwards requests to a service on the host. Rovai still owns the workspace and requires its own login.', 'Serve is private to the tailnet under its access rules. Funnel is a different public publishing feature; this tutorial never enables it. These are external tools, not Rovai settings.'],
-      ['Tailscale 把获准设备连接到私有网络；Serve 在私网内提供 HTTPS 入口，并把请求转发给主机服务；Rovai 保存工作台，仍要求自己的登录。','Serve 受私网访问规则约束。Funnel 是另一项公网发布能力，本教程不启用它。它们属于外部工具，不是 Rovai 内置设置。']),
+      ['Tailscale connects authorized devices in your private network. Serve adds an HTTPS entrance inside that network and forwards requests to a service on the host. Coaxi still owns the workspace and requires its own login.', 'Serve is private to the tailnet under its access rules. Funnel is a different public publishing feature; this tutorial never enables it. These are external tools, not Coaxi settings.'],
+      ['Tailscale 把获准设备连接到私有网络；Serve 在私网内提供 HTTPS 入口，并把请求转发给主机服务；Coaxi 保存工作台，仍要求自己的登录。','Serve 受私网访问规则约束。Funnel 是另一项公网发布能力，本教程不启用它。它们属于外部工具，不是 Coaxi 内置设置。']),
     D('Server behind private HTTPS','Server 的私网 HTTPS 路径','deployment-tailscale',
       'An authorized device reaches the host’s ts.net HTTPS name over Tailscale. Serve forwards to Server on 127.0.0.1:8767; the external HTTPS origin is configured on Server.',
       '获准设备通过 Tailscale 访问主机 ts.net HTTPS 名称。Serve 转发至 127.0.0.1:8767，Server 配置同一个外部 HTTPS 来源。'),
     S('Join both devices to the private network','两端加入同一私网',
-      ['Install Tailscale on the Rovai host and on the phone or other computer. Sign in to the intended tailnet and connect both devices.', 'On the host, run tailscale status or inspect the app’s device list. Confirm the second device belongs to the expected network and is permitted to reach this host by the tailnet’s access policy.', 'Use a non-sensitive machine name. For Serve HTTPS, enable the required MagicDNS/HTTPS settings through Tailscale’s setup flow; certificate names can be visible in public certificate transparency records.', 'Keep the Tailscale client connected on the visiting device. A private ts.net address will not become a public website merely because it uses HTTPS.'],
-      ['在 Rovai 主机和手机 / 另一台电脑上安装 Tailscale，登录预期的私网并连接两端。','主机运行 tailscale status，或在应用中查看设备列表。确认另一设备属于正确网络，且私网访问策略允许其到达这台主机。','主机命名避免包含敏感信息。Serve HTTPS 按 Tailscale 设置流程启用所需 MagicDNS / HTTPS；证书名称可能出现在公开证书透明度记录中。','访问设备保持 Tailscale 已连接。私有 ts.net 地址使用 HTTPS，并不意味着它是公网网站。']),
+      ['Install Tailscale on the Coaxi host and on the phone or other computer. Sign in to the intended tailnet and connect both devices.', 'On the host, run tailscale status or inspect the app’s device list. Confirm the second device belongs to the expected network and is permitted to reach this host by the tailnet’s access policy.', 'Use a non-sensitive machine name. For Serve HTTPS, enable the required MagicDNS/HTTPS settings through Tailscale’s setup flow; certificate names can be visible in public certificate transparency records.', 'Keep the Tailscale client connected on the visiting device. A private ts.net address will not become a public website merely because it uses HTTPS.'],
+      ['在 Coaxi 主机和手机 / 另一台电脑上安装 Tailscale，登录预期的私网并连接两端。','主机运行 tailscale status，或在应用中查看设备列表。确认另一设备属于正确网络，且私网访问策略允许其到达这台主机。','主机命名避免包含敏感信息。Serve HTTPS 按 Tailscale 设置流程启用所需 MagicDNS / HTTPS；证书名称可能出现在公开证书透明度记录中。','访问设备保持 Tailscale 已连接。私有 ts.net 地址使用 HTTPS，并不意味着它是公网网站。']),
     L('Tailscale setup references','Tailscale 设置参考',[
       ext('https://tailscale.com/download','Install Tailscale on both devices','在两端安装 Tailscale'),
       ext('https://tailscale.com/docs/how-to/set-up-https-certificates','MagicDNS, HTTPS and certificate names','MagicDNS、HTTPS 与证书名称')]),
@@ -229,18 +229,18 @@ sudo ufw status`),
 sudo tailscale serve --bg --https=443 http://127.0.0.1:8767
 tailscale serve status`),
     C('On the host · start Server','在主机启动 Server',
-`rovai-server --data-dir "$HOME/.rovai-server" \\
+`coaxi-server --data-dir "$HOME/.coaxi-server" \\
   --listen 127.0.0.1:8767 \\
   --public-origin https://orbit-host.example-tailnet.ts.net`),
     P('Match the origin and executable','来源与程序入口必须对应',
-      ['On macOS 0.4.0 use the full current/rovai-server executable from the installation guide. In PowerShell put Server arguments on one line. No --allow-insecure-lan flag is needed for this loopback backend.', 'On the visiting device, connect Tailscale, open the exact HTTPS address, then enter this Server’s Token. Check the Orbit project and last conversation. Serve provides transport; it does not replace Rovai authentication.', 'A page may load while login or live updates fail if the external origin does not match. Correct --public-origin and restart the same instance; do not disable authentication or add arbitrary origins.'],
-      ['macOS 0.4.0 使用安装页所示 current/rovai-server 完整路径；PowerShell 把 Server 参数放在同一行。回环后端无需 --allow-insecure-lan。','访问设备先连接 Tailscale，打开准确 HTTPS 地址，再填写本 Server Token。检查 Orbit 项目和上次会话。Serve 提供传输入口，不代替 Rovai 认证。','外部来源不匹配时可能页面能打开，但登录或实时更新失败。修正 --public-origin，再重启同一实例；不要关闭认证或添加任意来源。']),
+      ['On macOS 0.4.0 use the full current/coaxi-server executable from the installation guide. In PowerShell put Server arguments on one line. No --allow-insecure-lan flag is needed for this loopback backend.', 'On the visiting device, connect Tailscale, open the exact HTTPS address, then enter this Server’s Token. Check the Orbit project and last conversation. Serve provides transport; it does not replace Coaxi authentication.', 'A page may load while login or live updates fail if the external origin does not match. Correct --public-origin and restart the same instance; do not disable authentication or add arbitrary origins.'],
+      ['macOS 0.4.0 使用安装页所示 current/coaxi-server 完整路径；PowerShell 把 Server 参数放在同一行。回环后端无需 --allow-insecure-lan。','访问设备先连接 Tailscale，打开准确 HTTPS 地址，再填写本 Server Token。检查 Orbit 项目和上次会话。Serve 提供传输入口，不代替 Coaxi 认证。','外部来源不匹配时可能页面能打开，但登录或实时更新失败。修正 --public-origin，再重启同一实例；不要关闭认证或添加任意来源。']),
     S('Desktop 0.4.8 · use the tailnet IP','Desktop 0.4.8 · 使用私网 IP',
       ['Keep Tailscale connected on both devices. On the desktop host, find its Tailscale IPv4 address (typically 100.x.y.z) in Tailscale, then enable Desktop Web access.', 'Open http://100.x.y.z:8766/ from the connected device, using the actual address and selected port. The host interface must be available and the tailnet policy and host firewall must allow it.', 'Log in with the Desktop Token. The browser uses HTTP; traffic between the devices travels through the encrypted Tailscale connection. This does not add a browser TLS padlock.', 'Do not apply the Server --public-origin command to Desktop. Desktop 0.4.8 has no settings field for the Serve HTTPS domain. Choose independent Server if that HTTPS entrance is required.'],
       ['两端保持连接 Tailscale。在桌面主机的 Tailscale 中查到私网 IPv4 地址（通常为 100.x.y.z），再开启 Desktop Web。','另一设备打开 http://100.x.y.z:8766/，替换真实地址及所选端口。主机需有该网卡地址，私网策略与主机防火墙均允许连接。','使用 Desktop Token 登录。浏览器采用 HTTP，设备间流量通过加密 Tailscale 连接传输；这不会在浏览器增加 TLS 小锁。','不要把 Server 的 --public-origin 命令用于 Desktop。Desktop 0.4.8 没有 Serve HTTPS 域名设置；需要这种 HTTPS 入口时，选择独立 Server。']),
     P('Keep it running, then close it deliberately','保持运行与关闭入口',
-      ['Serve --bg retains its mapping across Tailscale restarts, but it does not start Rovai. Keep the host awake and configure Server’s own background startup if required. A sleeping laptop is still unavailable.', 'To remove only the HTTPS 443 mapping created in this example, use the matching off command below. Review status afterwards. Do not reset unrelated Serve mappings. Desktop direct access closes when you disable its Web service or revoke the relevant network access.'],
-      ['Serve --bg 会保留转发配置，但不会启动 Rovai。主机需要保持唤醒；有需要时另行配置 Server 后台启动。休眠的笔记本仍不可访问。','仅移除本例创建的 HTTPS 443 映射时，使用下方对应 off 命令，再检查状态；不要重置无关映射。Desktop 直连可通过关闭其 Web 服务或撤销相应网络访问来结束。']),
+      ['Serve --bg retains its mapping across Tailscale restarts, but it does not start Coaxi. Keep the host awake and configure Server’s own background startup if required. A sleeping laptop is still unavailable.', 'To remove only the HTTPS 443 mapping created in this example, use the matching off command below. Review status afterwards. Do not reset unrelated Serve mappings. Desktop direct access closes when you disable its Web service or revoke the relevant network access.'],
+      ['Serve --bg 会保留转发配置，但不会启动 Coaxi。主机需要保持唤醒；有需要时另行配置 Server 后台启动。休眠的笔记本仍不可访问。','仅移除本例创建的 HTTPS 443 映射时，使用下方对应 off 命令，再检查状态；不要重置无关映射。Desktop 直连可通过关闭其 Web 服务或撤销相应网络访问来结束。']),
     C('Remove this Serve mapping','关闭本例 Serve 映射',
 `sudo tailscale serve --bg --https=443 off
 tailscale serve status`),
@@ -252,8 +252,8 @@ tailscale serve status`),
     'Give standalone Server one HTTPS domain using Caddy on a Linux host. Keep the backend on loopback and retain owner login.',
     '在 Linux 主机用 Caddy 为独立 Server 提供一个 HTTPS 域名；后端保持回环监听，保留 Owner 登录。',[
     P('The example deployment','本例部署条件',
-      ['This recipe uses Server 0.4.8 and Caddy on Ubuntu/Debian, on the same reachable host. It assumes you control the host, its firewall and a domain. It is a configuration example; the documentation capture did not publish a live public service.', 'Replace agent.example.com and 203.0.113.10 with your own service domain and host IP. They are reserved examples. Do not reuse the Rovai website’s domain or change its DNS to follow this tutorial.', 'Desktop 0.4.8 lacks a public-origin field in its settings. Use the Server installation for this recipe. Use the root of a dedicated hostname; serving Rovai under /rovai/ is not this configuration.'],
-      ['本例在同一台可达 Ubuntu / Debian 主机上运行 Server 0.4.8 与 Caddy，要求你拥有主机、防火墙及一个域名的管理权。这是配置示例；本次文档采集没有对外发布真实公网服务。','把 agent.example.com 和 203.0.113.10 替换为自己的服务域名和主机 IP，它们是保留示例值。不要借用 Rovai 官网域名，也不要修改官网 DNS 来跟随本教程。','Desktop 0.4.8 设置没有公共来源字段，本配方使用独立 Server。使用独立主机名的根路径，不是部署在 /rovai/ 子路径。']),
+      ['This recipe uses Server 0.4.8 and Caddy on Ubuntu/Debian, on the same reachable host. It assumes you control the host, its firewall and a domain. It is a configuration example; the documentation capture did not publish a live public service.', 'Replace agent.example.com and 203.0.113.10 with your own service domain and host IP. They are reserved examples. Do not reuse the Coaxi website’s domain or change its DNS to follow this tutorial.', 'Desktop 0.4.8 lacks a public-origin field in its settings. Use the Server installation for this recipe. Use the root of a dedicated hostname; serving Coaxi under /coaxi/ is not this configuration.'],
+      ['本例在同一台可达 Ubuntu / Debian 主机上运行 Server 0.4.8 与 Caddy，要求你拥有主机、防火墙及一个域名的管理权。这是配置示例；本次文档采集没有对外发布真实公网服务。','把 agent.example.com 和 203.0.113.10 替换为自己的服务域名和主机 IP，它们是保留示例值。不要借用 Coaxi 官网域名，也不要修改官网 DNS 来跟随本教程。','Desktop 0.4.8 设置没有公共来源字段，本配方使用独立 Server。使用独立主机名的根路径，不是部署在 /coaxi/ 子路径。']),
     D('Public address versus backend address','公网地址与后端地址','deployment-https',
       'The browser reaches agent.example.com over HTTPS 443. Caddy terminates TLS and forwards locally over HTTP to 127.0.0.1:8767. The backend is never an Internet-facing port.',
       '浏览器通过 HTTPS 443 连接 agent.example.com。Caddy 终止 TLS，再通过本机 HTTP 转发到 127.0.0.1:8767；后端端口不向互联网开放。'),
@@ -274,7 +274,7 @@ sudo apt install caddy`),
     L('Caddy installation reference','Caddy 安装参考',[
       ext('https://caddyserver.com/docs/install#debian-ubuntu-raspbian','Official Debian / Ubuntu installation','Debian / Ubuntu 官方安装文档')]),
     C('Start the private backend','启动仅本机可达的后端',
-`rovai-server --data-dir "$HOME/.rovai-server" \\
+`coaxi-server --data-dir "$HOME/.coaxi-server" \\
   --listen 127.0.0.1:8767 \\
   --public-origin https://agent.example.com`),
     P('Set the same external origin','配置相同的外部来源',
@@ -287,8 +287,8 @@ sudo apt install caddy`),
     }
 }`),
     P('Preserve authentication and live responses','保留认证与实时响应',
-      ['Use HTTP to the loopback backend and HTTPS at the public entrance. This configuration leaves the original Host, Origin and Authorization headers intact and disables response buffering for prompt live delivery. Do not cache authenticated API responses.', 'Do not rewrite Host to 127.0.0.1, remove Origin/Authorization, disable Rovai login or route only the HTML page. Proxy the whole root so APIs and live event responses use the same origin. Caddy obtains and renews the public certificate when DNS and reachability requirements are met.'],
-      ['回环后端使用 HTTP，公网入口使用 HTTPS。本配置保留原 Host、Origin 和 Authorization 请求头，关闭响应缓冲以便及时转发实时内容；不要缓存已认证 API 响应。','不要把 Host 改写为 127.0.0.1，不要移除 Origin / Authorization、关闭 Rovai 登录或只代理 HTML。代理整个根路径，使 API 与实时事件保持同源。DNS 与网络条件满足后，Caddy 获取并续期公网证书。']),
+      ['Use HTTP to the loopback backend and HTTPS at the public entrance. This configuration leaves the original Host, Origin and Authorization headers intact and disables response buffering for prompt live delivery. Do not cache authenticated API responses.', 'Do not rewrite Host to 127.0.0.1, remove Origin/Authorization, disable Coaxi login or route only the HTML page. Proxy the whole root so APIs and live event responses use the same origin. Caddy obtains and renews the public certificate when DNS and reachability requirements are met.'],
+      ['回环后端使用 HTTP，公网入口使用 HTTPS。本配置保留原 Host、Origin 和 Authorization 请求头，关闭响应缓冲以便及时转发实时内容；不要缓存已认证 API 响应。','不要把 Host 改写为 127.0.0.1，不要移除 Origin / Authorization、关闭 Coaxi 登录或只代理 HTML。代理整个根路径，使 API 与实时事件保持同源。DNS 与网络条件满足后，Caddy 获取并续期公网证书。']),
     C('Validate and reload','检查并重新加载配置',
 `sudo caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile
 sudo systemctl reload caddy
@@ -315,21 +315,21 @@ sudo systemctl status caddy --no-pager`),
       ['Desktop restart','Desktop 重启','Desktop Web must be enabled again after the App restarts. Get the current Token from the running Desktop rather than assuming an older saved credential remains valid.','App 重启后需要重新开启 Desktop Web。从正在运行的 Desktop 获取当前 Token，不要假定以前保存的凭据仍有效。'],
       ['Scope','权限范围','This release is a single-owner instance. Do not share the Token as if it were a limited project invitation. HTTPS or Tailscale protects the route, not separate user roles.','当前发布版是单 Owner 实例，不要把 Token 当成某个项目的受限邀请。HTTPS 或 Tailscale 保护连接，不提供独立用户角色。']]),
     C('Read paths and Token · same data directory','查看路径与 Token · 使用同一数据目录',
-`rovai-server --data-dir "$HOME/.rovai-server" paths
-rovai-server --data-dir "$HOME/.rovai-server" token`),
+`coaxi-server --data-dir "$HOME/.coaxi-server" paths
+coaxi-server --data-dir "$HOME/.coaxi-server" token`),
     P('Keep credentials private','私下保管凭据',
-      ['On macOS 0.4.0 use the full current/rovai-server path described in Install Server. The paths command reports locations; token prints a secret. Do not paste that output into an issue, a screenshot or a shared terminal recording.', 'There is no documented rotate-token command in Server 0.4.8. If a credential is exposed, close the reachable entrance first and seek recovery guidance for that release. Do not delete the database or invent a token flag.'],
-      ['macOS 0.4.0 使用安装页的 current/rovai-server 完整路径。paths 显示位置，token 输出秘密凭据；不要把输出贴入 Issue、截图或共享终端录屏。','Server 0.4.8 没有公开的 rotate-token 命令。凭据泄露时先关闭可达入口，再按该版本寻求恢复指导；不要删除数据库或尝试虚构参数。']),
+      ['On macOS 0.4.0 use the full current/coaxi-server path described in Install Server. The paths command reports locations; token prints a secret. Do not paste that output into an issue, a screenshot or a shared terminal recording.', 'There is no documented rotate-token command in Server 0.4.8. If a credential is exposed, close the reachable entrance first and seek recovery guidance for that release. Do not delete the database or invent a token flag.'],
+      ['macOS 0.4.0 使用安装页的 current/coaxi-server 完整路径。paths 显示位置，token 输出秘密凭据；不要把输出贴入 Issue、截图或共享终端录屏。','Server 0.4.8 没有公开的 rotate-token 命令。凭据泄露时先关闭可达入口，再按该版本寻求恢复指导；不要删除数据库或尝试虚构参数。']),
     P('Browser connection is not task state','浏览器连接状态不等于任务状态',
       ['A closed tab, lost Wi-Fi connection or proxy restart can disconnect the view while an accepted request continues on the host. Reconnect to the same instance and conversation, then inspect the Run, pending approvals and Files before repeating a request.', 'Stopping Server, quitting Desktop, host shutdown or sleep is different: it affects the execution host. Previously written files are not rolled back by stopping a process. After restart, read the recorded outcome and current files; send only the remaining work.'],
       ['关闭标签页、Wi-Fi 断开或代理重启可能只中断画面，已接收请求仍在主机上继续。重新连接同一实例、同一会话，查看执行、待审批事项和文件，再决定是否重复请求。','停止 Server、退出 Desktop、关机或休眠会影响执行主机。停止进程不会回滚已经写入的文件。重启后结合记录结果与当前文件，只发尚未完成的工作。']),
     S('Foreground operation','前台运行与再次启动',
-      ['Keep the terminal that runs Server open. Closing it can stop the process; closing the browser does not have the same effect.', 'To stop deliberately, finish or stop active work in Rovai, press Ctrl-C in the Server terminal and wait for process exit.', 'Restart with the same executable version, account, data root and network flags. If you changed --public-origin, open its matching browser address.', 'Do not start a second process against the same data root. A lock refusal means an instance still owns it; find that process rather than deleting the lock file.'],
-      ['保持运行 Server 的终端打开。关闭终端可能结束进程；关闭浏览器没有同样作用。','需要停机时，先在 Rovai 完成或停止正在处理的工作，再在 Server 终端按 Ctrl-C 并等待退出。','使用相同版本程序、账号、数据根目录和网络参数重开。修改 --public-origin 后，应打开对应浏览器地址。','不要让第二个进程使用同一数据根目录。锁拒绝表示另一个实例仍持有目录，应查找进程，不要删除锁文件。']),
+      ['Keep the terminal that runs Server open. Closing it can stop the process; closing the browser does not have the same effect.', 'To stop deliberately, finish or stop active work in Coaxi, press Ctrl-C in the Server terminal and wait for process exit.', 'Restart with the same executable version, account, data root and network flags. If you changed --public-origin, open its matching browser address.', 'Do not start a second process against the same data root. A lock refusal means an instance still owns it; find that process rather than deleting the lock file.'],
+      ['保持运行 Server 的终端打开。关闭终端可能结束进程；关闭浏览器没有同样作用。','需要停机时，先在 Coaxi 完成或停止正在处理的工作，再在 Server 终端按 Ctrl-C 并等待退出。','使用相同版本程序、账号、数据根目录和网络参数重开。修改 --public-origin 后，应打开对应浏览器地址。','不要让第二个进程使用同一数据根目录。锁拒绝表示另一个实例仍持有目录，应查找进程，不要删除锁文件。']),
     P('Background startup is configured by the OS','后台启动由系统管理器配置',
-      ['The installer creates no system service. Choose one process owner and one startup mechanism. A service manager’s environment is not your interactive shell: set a PATH that includes the Agent executable and preserve its home/authentication environment.', 'The following Linux example assumes a normal account named rovai, a default installation under /home/rovai, and a data root /home/rovai/.rovai-server. Create or choose the account deliberately and install/sign in as it first. Replace all paths consistently.', 'Restart=no avoids repeatedly relaunching a process whose startup failed. systemctl enable starts it at boot; it does not turn an interrupted request into a completed one. Keep the host’s network and Agent dependencies available.'],
-      ['安装器不建立系统服务。确定一个进程归属账号和一种启动方式。服务管理器环境不是交互 shell，应显式设置包含智能体程序的 PATH，并保留它的主目录与认证环境。','以下 Linux 示例假设普通账号叫 rovai，默认程序位于 /home/rovai，数据根目录为 /home/rovai/.rovai-server。先选择或创建该账号，并以它安装和登录；所有路径要一致替换。','Restart=no 避免启动失败后反复拉起进程；systemctl enable 设置开机启动，不代表中断请求会自动完成。主机网络与智能体依赖仍需可用。']),
-    C('Linux · /etc/systemd/system/rovai-server.service','Linux · /etc/systemd/system/rovai-server.service',
+      ['The installer creates no system service. Choose one process owner and one startup mechanism. A service manager’s environment is not your interactive shell: set a PATH that includes the Agent executable and preserve its home/authentication environment.', 'The following Linux example assumes a normal account named coaxi, a default installation under /home/coaxi, and a data root /home/coaxi/.coaxi-server. Create or choose the account deliberately and install/sign in as it first. Replace all paths consistently.', 'Restart=no avoids repeatedly relaunching a process whose startup failed. systemctl enable starts it at boot; it does not turn an interrupted request into a completed one. Keep the host’s network and Agent dependencies available.'],
+      ['安装器不建立系统服务。确定一个进程归属账号和一种启动方式。服务管理器环境不是交互 shell，应显式设置包含智能体程序的 PATH，并保留它的主目录与认证环境。','以下 Linux 示例假设普通账号叫 coaxi，默认程序位于 /home/coaxi，数据根目录为 /home/coaxi/.coaxi-server。先选择或创建该账号，并以它安装和登录；所有路径要一致替换。','Restart=no 避免启动失败后反复拉起进程；systemctl enable 设置开机启动，不代表中断请求会自动完成。主机网络与智能体依赖仍需可用。']),
+    C('Linux · /etc/systemd/system/coaxi-server.service','Linux · /etc/systemd/system/coaxi-server.service',
 `[Unit]
 Description=Coaxi Server
 Wants=network-online.target
@@ -337,11 +337,11 @@ After=network-online.target
 
 [Service]
 Type=simple
-User=rovai
-WorkingDirectory=/home/rovai
-Environment=HOME=/home/rovai
-Environment=PATH=/home/rovai/.local/bin:/usr/local/bin:/usr/bin:/bin
-ExecStart=/home/rovai/.local/share/rovai-server/current/rovai-server --data-dir /home/rovai/.rovai-server --listen 127.0.0.1:8767
+User=coaxi
+WorkingDirectory=/home/coaxi
+Environment=HOME=/home/coaxi
+Environment=PATH=/home/coaxi/.local/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=/home/coaxi/.local/share/coaxi-server/current/coaxi-server --data-dir /home/coaxi/.coaxi-server --listen 127.0.0.1:8767
 KillMode=control-group
 TimeoutStopSec=90
 Restart=no
@@ -352,38 +352,38 @@ WantedBy=multi-user.target`),
       ['The template listens only on loopback. For Serve or Caddy, append the exact --public-origin https://… to ExecStart. For trusted LAN access, replace --listen and add --allow-insecure-lan as explained in that guide. Never launch a second foreground instance for the same root.', 'Save the unit only after replacing the example account and paths. The commands below check and start it, then enable boot startup. Logs remain in the data directory; journalctl also shows service-level failures.'],
       ['模板仅监听回环。Serve / Caddy 在 ExecStart 末尾添加准确的 --public-origin https://…；可信局域网按相应教程替换 --listen 并添加 --allow-insecure-lan。不要再以前台启动同数据目录的第二个实例。','替换示例账号和路径后保存 unit。下方命令检查、启动并设置开机启动；日志仍保存在数据目录，journalctl 还可查看服务层错误。']),
     C('Linux · start and inspect','Linux · 启动并检查',
-`sudo systemd-analyze verify /etc/systemd/system/rovai-server.service
+`sudo systemd-analyze verify /etc/systemd/system/coaxi-server.service
 sudo systemctl daemon-reload
-sudo systemctl enable --now rovai-server
-sudo systemctl status rovai-server --no-pager
-sudo journalctl -u rovai-server -n 50 --no-pager`),
+sudo systemctl enable --now coaxi-server
+sudo systemctl status coaxi-server --no-pager
+sudo journalctl -u coaxi-server -n 50 --no-pager`),
     C('Linux · stop and disable boot startup','Linux · 停止并取消开机启动',
-`sudo systemctl stop rovai-server
-sudo systemctl disable rovai-server`),
+`sudo systemctl stop coaxi-server
+sudo systemctl disable coaxi-server`),
     S('macOS · start after account login','macOS · 账号登录后启动',
-      ['Use a per-user LaunchAgent rather than assuming the installer installed a daemon. Download the example plist below and replace /Users/rovai everywhere with your account’s absolute home, including program, data, PATH and log paths.', 'Create the log directory before loading the plist. Save the customized file as ~/Library/LaunchAgents/dev.rovai.server.plist. Add --public-origin and its value as separate ProgramArguments entries if your connection requires them.', 'Stop the foreground instance first. Validate with plutil -lint, then load it with launchctl bootstrap gui/$(id -u) and the absolute plist path.', 'RunAtLoad starts this example after that user logs in, not before login. KeepAlive is false; it does not continuously restart failures. Stop/unload with launchctl bootout using the same domain and plist. Inspect the configured logs for launch errors.'],
-      ['使用用户级 LaunchAgent，不要以为安装器已经建立守护进程。下载下方 plist，把所有 /Users/rovai 替换为自己的绝对主目录，包括程序、数据、PATH 与日志路径。','加载前创建日志目录，将修改后的文件保存为 ~/Library/LaunchAgents/dev.rovai.server.plist。需要公共来源时，在 ProgramArguments 中把 --public-origin 和值分别添加为两个条目。','先停止前台实例。用 plutil -lint 检查，再通过 launchctl bootstrap gui/$(id -u) 和 plist 绝对路径加载。','本例 RunAtLoad 在该用户登录后启动，不是登录前启动；KeepAlive 为 false，不会持续重试失败进程。使用同一 domain 和 plist 的 launchctl bootout 停止并卸载，启动错误查看已配置日志。']),
+      ['Use a per-user LaunchAgent rather than assuming the installer installed a daemon. Download the example plist below and replace /Users/coaxi everywhere with your account’s absolute home, including program, data, PATH and log paths.', 'Create the log directory before loading the plist. Save the customized file as ~/Library/LaunchAgents/dev.coaxi.server.plist. Add --public-origin and its value as separate ProgramArguments entries if your connection requires them.', 'Stop the foreground instance first. Validate with plutil -lint, then load it with launchctl bootstrap gui/$(id -u) and the absolute plist path.', 'RunAtLoad starts this example after that user logs in, not before login. KeepAlive is false; it does not continuously restart failures. Stop/unload with launchctl bootout using the same domain and plist. Inspect the configured logs for launch errors.'],
+      ['使用用户级 LaunchAgent，不要以为安装器已经建立守护进程。下载下方 plist，把所有 /Users/coaxi 替换为自己的绝对主目录，包括程序、数据、PATH 与日志路径。','加载前创建日志目录，将修改后的文件保存为 ~/Library/LaunchAgents/dev.coaxi.server.plist。需要公共来源时，在 ProgramArguments 中把 --public-origin 和值分别添加为两个条目。','先停止前台实例。用 plutil -lint 检查，再通过 launchctl bootstrap gui/$(id -u) 和 plist 绝对路径加载。','本例 RunAtLoad 在该用户登录后启动，不是登录前启动；KeepAlive 为 false，不会持续重试失败进程。使用同一 domain 和 plist 的 launchctl bootout 停止并卸载，启动错误查看已配置日志。']),
     C('macOS · load the customized agent','macOS · 加载修改后的配置',
-`mkdir -p "$HOME/.rovai-server/logs"
-plutil -lint "$HOME/Library/LaunchAgents/dev.rovai.server.plist"
-launchctl bootstrap "gui/$(id -u)" "$HOME/Library/LaunchAgents/dev.rovai.server.plist"`),
+`mkdir -p "$HOME/.coaxi-server/logs"
+plutil -lint "$HOME/Library/LaunchAgents/dev.coaxi.server.plist"
+launchctl bootstrap "gui/$(id -u)" "$HOME/Library/LaunchAgents/dev.coaxi.server.plist"`),
     C('macOS · stop and unload','macOS · 停止并卸载',
-`launchctl bootout "gui/$(id -u)" "$HOME/Library/LaunchAgents/dev.rovai.server.plist"`),
+`launchctl bootout "gui/$(id -u)" "$HOME/Library/LaunchAgents/dev.coaxi.server.plist"`),
     S('Windows · a login startup task','Windows · 登录后启动任务',
-      ['Task Scheduler is an optional OS setup, not a Rovai installer feature. Create a task for the same ordinary account that installed and signed in to the Agent. Start with “Run only when user is logged on”; do not enable highest privileges by default.', 'Use an “At log on” trigger. Set Program to the absolute …\\Programs\\RovaiServer\\current\\rovai-server.exe path. Set arguments to --data-dir "C:\\Users\\rovai\\.rovai-server" --listen 127.0.0.1:8767, replacing the account and adding the connection-specific flags.', 'Set Start in to that account’s home. Disable an arbitrary time limit for a continuously running task, choose “Do not start a new instance” for overlap, and review power conditions so the host does not silently stop the process on battery.', 'Run the task once and check its result and Server log. This setup begins after login; it is not a pre-login Windows service. To shut down cleanly, finish active work and use the running console’s Ctrl-C when available. Task Scheduler End may force termination; avoid treating it as a graceful stop or killing all same-name processes. Disable the task before maintenance and verify the specific process has exited before updating.'],
-      ['任务计划程序是可选系统配置，不是 Rovai 安装器功能。用安装并登录智能体的同一个普通账号创建任务，先选择“仅当用户登录时运行”，不要默认勾选最高权限。','触发器选择“登录时”。程序填写绝对 …\\Programs\\RovaiServer\\current\\rovai-server.exe 路径；参数使用 --data-dir "C:\\Users\\rovai\\.rovai-server" --listen 127.0.0.1:8767，替换账号并增加连接所需参数。','“起始于”填写该账号主目录。常驻任务不要设置任意运行时限；重叠选择“不启动新实例”，并检查电源条件，避免电池供电时悄悄停止进程。','先运行一次，检查任务结果和 Server 日志。此方式在登录后启动，不是登录前 Windows 服务。需要正常停止时先完成工作，有运行控制台时使用 Ctrl-C；任务计划程序“结束”可能强制终止，不能当作正常退出，也不要批量杀掉同名程序。维护前禁用任务，确认具体进程已退出再更新。']),
+      ['Task Scheduler is an optional OS setup, not a Coaxi installer feature. Create a task for the same ordinary account that installed and signed in to the Agent. Start with “Run only when user is logged on”; do not enable highest privileges by default.', 'Use an “At log on” trigger. Set Program to the absolute …\\Programs\\CoaxiServer\\current\\coaxi-server.exe path. Set arguments to --data-dir "C:\\Users\\coaxi\\.coaxi-server" --listen 127.0.0.1:8767, replacing the account and adding the connection-specific flags.', 'Set Start in to that account’s home. Disable an arbitrary time limit for a continuously running task, choose “Do not start a new instance” for overlap, and review power conditions so the host does not silently stop the process on battery.', 'Run the task once and check its result and Server log. This setup begins after login; it is not a pre-login Windows service. To shut down cleanly, finish active work and use the running console’s Ctrl-C when available. Task Scheduler End may force termination; avoid treating it as a graceful stop or killing all same-name processes. Disable the task before maintenance and verify the specific process has exited before updating.'],
+      ['任务计划程序是可选系统配置，不是 Coaxi 安装器功能。用安装并登录智能体的同一个普通账号创建任务，先选择“仅当用户登录时运行”，不要默认勾选最高权限。','触发器选择“登录时”。程序填写绝对 …\\Programs\\CoaxiServer\\current\\coaxi-server.exe 路径；参数使用 --data-dir "C:\\Users\\coaxi\\.coaxi-server" --listen 127.0.0.1:8767，替换账号并增加连接所需参数。','“起始于”填写该账号主目录。常驻任务不要设置任意运行时限；重叠选择“不启动新实例”，并检查电源条件，避免电池供电时悄悄停止进程。','先运行一次，检查任务结果和 Server 日志。此方式在登录后启动，不是登录前 Windows 服务。需要正常停止时先完成工作，有运行控制台时使用 Ctrl-C；任务计划程序“结束”可能强制终止，不能当作正常退出，也不要批量杀掉同名程序。维护前禁用任务，确认具体进程已退出再更新。']),
     L('Editable startup examples','可编辑的启动配置示例',[
-      {file:'examples/deployment/rovai-server.service',label:['Linux systemd unit','Linux systemd 配置']},
-      {file:'examples/deployment/dev.rovai.server.plist',label:['macOS LaunchAgent','macOS LaunchAgent 配置']}
+      {file:'examples/deployment/coaxi-server.service',label:['Linux systemd unit','Linux systemd 配置']},
+      {file:'examples/deployment/dev.coaxi.server.plist',label:['macOS LaunchAgent','macOS LaunchAgent 配置']}
     ]),
     F('Logs and update procedure','日志与更新步骤',[
-      ['Server log','Server 日志','<data-dir>/logs/server.log. --verbose adds diagnostic output to the terminal. Service manager logs explain launch/account/path failures; the Rovai log explains host behavior.','<data-dir>/logs/server.log。--verbose 增加终端诊断输出。服务管理器日志排查启动、账号、路径问题，Rovai 日志排查 Host 行为。'],
+      ['Server log','Server 日志','<data-dir>/logs/server.log. --verbose adds diagnostic output to the terminal. Service manager logs explain launch/account/path failures; the Coaxi log explains host behavior.','<data-dir>/logs/server.log。--verbose 增加终端诊断输出。服务管理器日志排查启动、账号、路径问题，Coaxi 日志排查 Host 行为。'],
       ['Before updating','更新前','Read the Server release notes, finish or stop active work, stop the exact Server process and its startup manager, then back up the data root and project files. Record version and launch flags.','先读 Server 发布说明，完成或停止当前工作，停止对应进程及启动管理器，备份数据根目录与项目文件，记录版本和启动参数。'],
-      ['Install the next version','安装新版本','Run that release’s installer with its explicit version. Preserve the existing data directory. On Windows, the installer does not stop the running executable for you. There is no rovai-server upgrade command in 0.4.8.','用目标 Release 安装器及明确版本重新安装，保留原数据目录。Windows 安装器不会替你停止正在运行的程序。0.4.8 没有 rovai-server upgrade 命令。'],
+      ['Install the next version','安装新版本','Run that release’s installer with its explicit version. Preserve the existing data directory. On Windows, the installer does not stop the running executable for you. There is no coaxi-server upgrade command in 0.4.8.','用目标 Release 安装器及明确版本重新安装，保留原数据目录。Windows 安装器不会替你停止正在运行的程序。0.4.8 没有 coaxi-server upgrade 命令。'],
       ['After updating','更新后','Restart the same instance and confirm version, login, teammate configuration, project path and an existing conversation. Desktop’s update mechanism does not update a separately installed Server.','重启同一实例，确认版本、登录、队员配置、项目路径及原会话。Desktop 的升级机制不会更新独立安装的 Server。']]),
     P('Save and back up the right files','保存与备份哪些内容',
-      ['Program revisions are not a backup of workspace data. Stop the instance and copy its whole data directory, including its database, authentication state, managed skills and configuration. Protect the backup like a credential; it can contain private conversations and usable authentication material.', 'Back up project directories separately, including uncommitted files. Agent sign-in/configuration may live outside Rovai’s root, and source attachments can refer to external paths. A database-only copy does not preserve all of these.', 'For a rollback, retain a stopped pre-update data snapshot and the corresponding package. Restoring files in place at the same absolute data root is the conservative recovery path; do not promise that an older binary accepts a migrated database. Copying a data root to a different path or host is not a documented automatic migration.', 'Check a recovery plan on an isolated copy before relying on it. Do not run two hosts against one live data root or delete instance lock/identity files to bypass a refusal.'],
-      ['程序 revisions 不是工作台数据备份。停止实例后复制整个数据目录，包括数据库、认证状态、受管 Skills 与配置。备份可能包含私密会话和可用认证材料，应按凭据保护。','项目目录另行备份，包括未提交文件。智能体登录 / 配置可能在 Rovai 根目录外，来源附件也可能引用外部路径。只复制数据库不会保存这些内容。','需要回退时保留升级前停机快照及匹配安装包。较保守的恢复方式是在相同绝对数据根目录原位还原；不要假定旧程序能读取已迁移数据库。把数据根目录复制到新路径或另一主机，不属于已说明的自动迁移。','依赖备份前先在隔离环境检查恢复方案。不要让两个 Host 使用同一实时数据目录，也不要删除实例锁 / 身份文件绕过拒绝。']),
+      ['Program revisions are not a backup of workspace data. Stop the instance and copy its whole data directory, including its database, authentication state, managed skills and configuration. Protect the backup like a credential; it can contain private conversations and usable authentication material.', 'Back up project directories separately, including uncommitted files. Agent sign-in/configuration may live outside Coaxi’s root, and source attachments can refer to external paths. A database-only copy does not preserve all of these.', 'For a rollback, retain a stopped pre-update data snapshot and the corresponding package. Restoring files in place at the same absolute data root is the conservative recovery path; do not promise that an older binary accepts a migrated database. Copying a data root to a different path or host is not a documented automatic migration.', 'Check a recovery plan on an isolated copy before relying on it. Do not run two hosts against one live data root or delete instance lock/identity files to bypass a refusal.'],
+      ['程序 revisions 不是工作台数据备份。停止实例后复制整个数据目录，包括数据库、认证状态、受管 Skills 与配置。备份可能包含私密会话和可用认证材料，应按凭据保护。','项目目录另行备份，包括未提交文件。智能体登录 / 配置可能在 Coaxi 根目录外，来源附件也可能引用外部路径。只复制数据库不会保存这些内容。','需要回退时保留升级前停机快照及匹配安装包。较保守的恢复方式是在相同绝对数据根目录原位还原；不要假定旧程序能读取已迁移数据库。把数据根目录复制到新路径或另一主机，不属于已说明的自动迁移。','依赖备份前先在隔离环境检查恢复方案。不要让两个 Host 使用同一实时数据目录，也不要删除实例锁 / 身份文件绕过拒绝。']),
     F('Troubleshoot by symptom','按现象排查',[
       ['Address will not open','地址打不开','Check host awake → process running → listener/IP/port → LAN or tailnet routing → scoped firewall. For HTTPS, also check DNS, certificate and proxy status.','依次检查主机唤醒、进程运行、监听 IP / 端口、局域网或私网路由、防火墙。HTTPS 再查 DNS、证书与代理。'],
       ['Page opens, login fails','页面可打开但登录失败','Use the same instance’s Token. Check the exact external origin and proxy headers; a token from a different data root cannot authenticate this one.','使用同一实例 Token，核对外部来源和代理请求头。另一个数据根目录的 Token 无法登录当前实例。'],
@@ -391,7 +391,7 @@ launchctl bootstrap "gui/$(id -u)" "$HOME/Library/LaunchAgents/dev.rovai.server.
       ['Service stops with terminal','关闭终端后服务停止','You ran it in the foreground. Configure one OS startup method above; keep the same data root and inspect its logs.','当前是前台运行。按上文配置一种系统启动方式，使用原数据根目录并检查日志。'],
       ['Browser dropped during a request','请求途中浏览器掉线','Reopen the same conversation and inspect the existing Run before resending. A disconnected view does not tell you whether execution finished.','重新进入原会话查看原执行，再决定是否重发。画面断线不能说明执行是否完成。'],
       ['Bundled Skill resources unavailable','提示 bundled Skill resources are unavailable','Observed before Agent launch in the published macOS arm64 0.4.0 package. Its required bundled resources are missing. Keep the data and install Server 0.4.8 from its release; see Install Server.','已在公开 macOS arm64 0.4.0 包的智能体启动前复现，包缺少所需内置资源。保留数据，按安装页升级到 Server 0.4.8。'],
-      ['Matching WebUI is missing','提示 Matching WebUI is missing','Keep the full package together. On macOS 0.4.0 launch current/rovai-server directly, as shown in Install Server.','保留完整发布包。macOS 0.4.0 按安装页直接启动 current/rovai-server。'],
+      ['Matching WebUI is missing','提示 Matching WebUI is missing','Keep the full package together. On macOS 0.4.0 launch current/coaxi-server directly, as shown in Install Server.','保留完整发布包。macOS 0.4.0 按安装页直接启动 current/coaxi-server。'],
       ['Symlink or root-lock refusal','符号链接或根目录锁拒绝','Use a real absolute data directory; on macOS /tmp is a symlink, so use its canonical /private/tmp path for a disposable fixture. A root lock means another live process may own the instance.','使用真实绝对数据路径。macOS /tmp 是符号链接，临时夹具应使用其规范 /private/tmp 路径。根目录锁表示可能有另一个运行进程持有实例。']])
   ]);
 

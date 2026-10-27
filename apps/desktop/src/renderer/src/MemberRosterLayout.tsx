@@ -14,8 +14,8 @@ import {
 } from 'react'
 import { UiText, uiAttribute } from './interface-language'
 
-const STORAGE_KEY = 'rovai-member-roster-width-v2'
-const LEGACY_STORAGE_KEY = 'rovai-member-roster-width-v1'
+const STORAGE_KEY = 'coaxi-member-roster-width-v2'
+const LEGACY_STORAGE_KEY = 'coaxi-member-roster-width-v1'
 const DEFAULT_WIDTH = 256
 const MIN_WIDTH = 192
 const MAX_WIDTH = 360

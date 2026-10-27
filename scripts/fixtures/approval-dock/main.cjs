@@ -181,7 +181,7 @@ app.whenReady().then(async () => {
       await run("window.approvalTest.setLanguage('zh-CN')")
       state = await snapshot()
       const nativeClaude = source.startsWith('claude')
-      const rememberLabels = source === 'claude-remember' ? ['Yes, and don’t ask again for: rovai send *'] : []
+      const rememberLabels = source === 'claude-remember' ? ['Yes, and don’t ask again for: coaxi send *'] : []
       const chineseLabels = nativeClaude ? ['No', 'Yes', ...rememberLabels] : ['拒绝', '允许一次']
       assert.deepEqual(state.labels, chineseLabels)
       const identities = { optionIds: state.optionIds, nativeResponseDigests: state.nativeResponseDigests }
@@ -213,7 +213,7 @@ app.whenReady().then(async () => {
       await window.webContents.debugger.sendCommand('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile })
       state = await snapshot()
       assert.equal(new Set(state.optionBounds.map(bounds => Math.round(bounds.y))).size, rows, 'Native choices share one row when they fit and wrap to two when needed')
-      assert.deepEqual(state.labels, ['No', 'Yes', 'Yes, and don’t ask again for: rovai send *'])
+      assert.deepEqual(state.labels, ['No', 'Yes', 'Yes, and don’t ask again for: coaxi send *'])
       assert.equal(state.configurationVisible, false)
       assert.equal(state.pageOverflow, false)
       if (mobile) assert.ok(state.touchTargets.every(target => target.width >= 44 && target.height >= 44))

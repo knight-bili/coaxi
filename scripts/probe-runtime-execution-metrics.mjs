@@ -13,40 +13,40 @@ import { querySqliteRows } from './lib/sqlite.mjs'
 
 const repository = resolve(import.meta.dirname, '..')
 const kind = process.argv[2]
-const coldRestart = process.env.ROVAI_METRICS_COLD_RESTART === '1'
-const compactAfterRestart = process.env.ROVAI_METRICS_GROK_COMPACT_AFTER_RESTART === '1'
+const coldRestart = process.env.COAXI_METRICS_COLD_RESTART === '1'
+const compactAfterRestart = process.env.COAXI_METRICS_GROK_COMPACT_AFTER_RESTART === '1'
 if (compactAfterRestart && (kind !== 'grok-build' || !coldRestart)) {
   throw new Error('Native Grok compaction acceptance requires a cold restart')
 }
 const commands = {
-  'codex-cli': ['codex', 'ROVAI_CODEX_BIN'],
-  'claude-code-cli': ['claude', 'ROVAI_CLAUDE_CODE_BIN'],
-  'opencode-cli': ['opencode', 'ROVAI_OPENCODE_BIN'],
-  'copilot-cli': ['copilot', 'ROVAI_COPILOT_BIN'],
-  'codebuddy-cli': ['codebuddy', 'ROVAI_CODEBUDDY_BIN'],
-  'qwen-code': ['qwen', 'ROVAI_QWEN_BIN'],
-  pi: ['pi', 'ROVAI_PI_BIN'],
-  'kimi-code-cli': ['kimi', 'ROVAI_KIMI_BIN'],
-  'grok-build': ['grok', 'ROVAI_GROK_BIN'],
-  'deepseek-harness': ['dsh', 'ROVAI_DEEPSEEK_HARNESS_BIN'],
-  'qoder-cli': ['qoder', 'ROVAI_QODER_BIN'],
-  'kiro-cli': ['kiro-cli', 'ROVAI_KIRO_BIN'],
-  'trae-cn-cli': ['trae-cli', 'ROVAI_TRAE_CN_BIN'],
+  'codex-cli': ['codex', 'COAXI_CODEX_BIN'],
+  'claude-code-cli': ['claude', 'COAXI_CLAUDE_CODE_BIN'],
+  'opencode-cli': ['opencode', 'COAXI_OPENCODE_BIN'],
+  'copilot-cli': ['copilot', 'COAXI_COPILOT_BIN'],
+  'codebuddy-cli': ['codebuddy', 'COAXI_CODEBUDDY_BIN'],
+  'qwen-code': ['qwen', 'COAXI_QWEN_BIN'],
+  pi: ['pi', 'COAXI_PI_BIN'],
+  'kimi-code-cli': ['kimi', 'COAXI_KIMI_BIN'],
+  'grok-build': ['grok', 'COAXI_GROK_BIN'],
+  'deepseek-harness': ['dsh', 'COAXI_DEEPSEEK_HARNESS_BIN'],
+  'qoder-cli': ['qoder', 'COAXI_QODER_BIN'],
+  'kiro-cli': ['kiro-cli', 'COAXI_KIRO_BIN'],
+  'trae-cn-cli': ['trae-cli', 'COAXI_TRAE_CN_BIN'],
   'zcode-app': null,
-  'antigravity-app': ['agy', 'ROVAI_ANTIGRAVITY_BIN']
+  'antigravity-app': ['agy', 'COAXI_ANTIGRAVITY_BIN']
 }
 if (!Object.hasOwn(commands, kind)) throw new Error('Select an in-scope Runtime')
-if (kind === 'kimi-code-cli' && !process.env.ROVAI_METRICS_NATIVE_HOME) {
-  throw new Error('Kimi acceptance requires ROVAI_METRICS_NATIVE_HOME containing official config.toml')
+if (kind === 'kimi-code-cli' && !process.env.COAXI_METRICS_NATIVE_HOME) {
+  throw new Error('Kimi acceptance requires COAXI_METRICS_NATIVE_HOME containing official config.toml')
 }
-const fixture = await realpath(process.env.ROVAI_METRICS_FIXTURE_ROOT ?? await mkdtemp(join(tmpdir(), `rovai-runtime-metrics-${kind}-`)))
+const fixture = await realpath(process.env.COAXI_METRICS_FIXTURE_ROOT ?? await mkdtemp(join(tmpdir(), `coaxi-runtime-metrics-${kind}-`)))
 const data = join(fixture, 'user-data'), workspacePath = join(fixture, 'workspace')
 const rawPath = join(fixture, 'native-shapes.jsonl')
-const coreSource = process.env.ROVAI_METRICS_CORE ?? join(repository, 'resources/bin/macos-arm64/rovai-core')
-const fixtureCore = join(fixture, 'rovai-core')
+const coreSource = process.env.COAXI_METRICS_CORE ?? join(repository, 'resources/bin/macos-arm64/coaxi-core')
+const fixtureCore = join(fixture, 'coaxi-core')
 await copyFile(coreSource, fixtureCore); await chmod(fixtureCore, 0o700)
-await copyFile(join(dirname(coreSource), 'rovai'), join(fixture, 'rovai'))
-await chmod(join(fixture, 'rovai'), 0o700)
+await copyFile(join(dirname(coreSource), 'coaxi'), join(fixture, 'coaxi'))
+await chmod(join(fixture, 'coaxi'), 0o700)
 // Release Core resolves bundled Skills beside its owned executable. Copy the
 // source bundle; the installed library remains isolated under this fixture.
 await cp(join(repository, 'skills'), join(fixture, 'skills'), { recursive: true })
@@ -62,20 +62,20 @@ if (kind === 'pi') {
     await chmod(join(piHome, name), 0o600)
   }
   process.env.PI_CODING_AGENT_DIR = piHome
-  if (process.env.ROVAI_METRICS_THINKING_LEVEL) {
+  if (process.env.COAXI_METRICS_THINKING_LEVEL) {
     const settingsPath = join(piHome, 'settings.json')
     const settings = JSON.parse(await readFile(settingsPath, 'utf8'))
-    settings.defaultThinkingLevel = process.env.ROVAI_METRICS_THINKING_LEVEL
+    settings.defaultThinkingLevel = process.env.COAXI_METRICS_THINKING_LEVEL
     await writeFile(settingsPath, JSON.stringify(settings), { mode: 0o600 })
   }
 }
-if (process.env.ROVAI_METRICS_NATIVE_HOME) {
+if (process.env.COAXI_METRICS_NATIVE_HOME) {
   const nativeHome = join(fixture, 'native-home')
   await mkdir(nativeHome, { mode: 0o700 })
   const names = ['grok-build', 'kimi-code-cli'].includes(kind) ? ['config.toml'] : ['settings.yaml', 'cordis.patch.yml']
   for (const name of names) {
     try {
-      await copyFile(join(process.env.ROVAI_METRICS_NATIVE_HOME, name), join(nativeHome, name))
+      await copyFile(join(process.env.COAXI_METRICS_NATIVE_HOME, name), join(nativeHome, name))
       await chmod(join(nativeHome, name), 0o600)
     } catch (error) { if (error.code !== 'ENOENT') throw error }
   }
@@ -84,11 +84,11 @@ if (process.env.ROVAI_METRICS_NATIVE_HOME) {
     // Use the official provider/model configuration in a fixture-owned Home.
     // OAuth state is optional for BYOK, and no daily sessions are copied.
     await readFile(join(nativeHome, 'config.toml'))
-    try { await cp(join(process.env.ROVAI_METRICS_NATIVE_HOME, 'oauth'), join(nativeHome, 'oauth'), { recursive: true, dereference: true }) } catch (error) { if (error.code !== 'ENOENT') throw error }
+    try { await cp(join(process.env.COAXI_METRICS_NATIVE_HOME, 'oauth'), join(nativeHome, 'oauth'), { recursive: true, dereference: true }) } catch (error) { if (error.code !== 'ENOENT') throw error }
     process.env.KIMI_CODE_HOME = nativeHome
   }
   if (kind === 'deepseek-harness') {
-    try { await cp(join(process.env.ROVAI_METRICS_NATIVE_HOME, 'profiles'), join(nativeHome, 'profiles'), { recursive: true }) } catch (error) { if (error.code !== 'ENOENT') throw error }
+    try { await cp(join(process.env.COAXI_METRICS_NATIVE_HOME, 'profiles'), join(nativeHome, 'profiles'), { recursive: true }) } catch (error) { if (error.code !== 'ENOENT') throw error }
     process.env.DSH_HOME = nativeHome; process.env.DSH_AGENTS_HOME = join(fixture, 'agents-home')
   }
   if (['grok-build', 'deepseek-harness'].includes(kind)) {
@@ -118,9 +118,9 @@ if (process.env.ROVAI_METRICS_NATIVE_HOME) {
       if (!keyName || !token) throw new Error('Probe credential reference is unavailable')
       process.env[keyName] = token
       config = config.replaceAll('gpt-6-sol', claude.ANTHROPIC_MODEL)
-      if (process.env.ROVAI_METRICS_THINKING_LEVEL) {
+      if (process.env.COAXI_METRICS_THINKING_LEVEL) {
         const model = claude.ANTHROPIC_MODEL
-        const effort = process.env.ROVAI_METRICS_THINKING_LEVEL
+        const effort = process.env.COAXI_METRICS_THINKING_LEVEL
         // The copied custom route has no installed catalog metadata. Declare
         // only the effort being exercised, in the supported native settings.
         config = config.replace(new RegExp(`(id: ${model.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*\\n)([ ]+)`),
@@ -177,7 +177,7 @@ def identity(v):
         identities[k]='identity-'+str(len(identities)+1)
     return identities[k]
 def managed_context(v):
-    if v.get('type')!='extension_ui_request' or v.get('method')!='setStatus' or v.get('statusKey')!='rovai-managed-context-usage': return None
+    if v.get('type')!='extension_ui_request' or v.get('method')!='setStatus' or v.get('statusKey')!='coaxi-managed-context-usage': return None
     try:
         status=json.loads(v.get('statusText',''))
         return {k:status[k] for k in ['usedTokens','windowTokens','provider','modelId'] if k in status}
@@ -224,23 +224,23 @@ try {
       new Promise((_, reject) => { configurationDeadline = setTimeout(() => reject(new Error('timed out configuring Runtime')), 90000) })
     ])
   } finally { clearTimeout(configurationDeadline) }
-  if (process.env.ROVAI_METRICS_MODEL) {
+  if (process.env.COAXI_METRICS_MODEL) {
     const profile = await core.request('members.get', { agentId: 'agent_1' })
-    const options = process.env.ROVAI_METRICS_MODEL_OPTIONS ? JSON.parse(process.env.ROVAI_METRICS_MODEL_OPTIONS) : {}
+    const options = process.env.COAXI_METRICS_MODEL_OPTIONS ? JSON.parse(process.env.COAXI_METRICS_MODEL_OPTIONS) : {}
     const changed = await core.request('members.runtime.set', { commandId: crypto.randomUUID(), command: {
       agentId: 'agent_1', expectedVersion: profile.version, adapterKind: kind,
       permissions: profile.runtimeConfiguration.permissions,
-      model: { mode: 'explicit', modelId: process.env.ROVAI_METRICS_MODEL, options }
+      model: { mode: 'explicit', modelId: process.env.COAXI_METRICS_MODEL, options }
     } })
     if (changed.status !== 'applied') throw new Error('Explicit probe model was not applied')
   }
   const workspace = await core.request('workspaces.inspect', { path: workspacePath })
   const accepted = await createConfiguredCampAndSend(core.request, { commandId: crypto.randomUUID(), workspace,
     memberAgentIds: ['agent_1'], defaultLeadAgentId: 'agent_1',
-    body: (process.env.ROVAI_METRICS_PROMPT_FILE ? await readFile(process.env.ROVAI_METRICS_PROMPT_FILE, 'utf8') : process.env.ROVAI_METRICS_PROMPT) ?? 'This is an isolated native usage and context acceptance. Analyze consistency, retries and recovery in a library catalogue. Use a read-only shell command to inspect the workspace, then explain the design in about 600 words. Do not delegate or modify files. Finally use rovai send --public-only for a brief completion, following Session Charter. Finish normally.',
+    body: (process.env.COAXI_METRICS_PROMPT_FILE ? await readFile(process.env.COAXI_METRICS_PROMPT_FILE, 'utf8') : process.env.COAXI_METRICS_PROMPT) ?? 'This is an isolated native usage and context acceptance. Analyze consistency, retries and recovery in a library catalogue. Use a read-only shell command to inspect the workspace, then explain the design in about 600 words. Do not delegate or modify files. Finally use coaxi send --public-only for a brief completion, following Session Charter. Finish normally.',
     purpose: 'Native Usage and Session Context acceptance' })
   campId = accepted.payload.threadId ?? accepted.payload.campId
-  const deadline = performance.now() + Number(process.env.ROVAI_METRICS_TIMEOUT_MS ?? 480000)
+  const deadline = performance.now() + Number(process.env.COAXI_METRICS_TIMEOUT_MS ?? 480000)
   let nextProgress = performance.now() + 30000
   while (performance.now() < deadline) {
     const snapshot = await core.request('camps.snapshot', { campId }, 15000)
@@ -252,7 +252,7 @@ try {
         metrics.push({ atMs: Math.round(now - started), status: run.status, projection })
       }
       if (['succeeded', 'failed', 'cancelled'].includes(run.status)) {
-        const bindings = querySqliteRows(join(data, 'rovai.sqlite'),
+        const bindings = querySqliteRows(join(data, 'coaxi.sqlite'),
           'SELECT id AS conversationId, native_session_id AS nativeSessionId, native_binding_id AS nativeBindingId, native_binding_generation AS generation FROM conversation')
         const nativeBinding = bindings.find(binding => binding.conversationId === run.conversationId) ?? null
         if (coldRestart && (!nativeBinding?.nativeSessionId || (runs.length > 0
@@ -260,12 +260,12 @@ try {
           throw new Error('Cold restart did not retain the exact native Session binding')
         }
         runs.push({ id: run.id, executionEpoch: run.executionEpoch, status: run.status, nativeBinding, projection })
-        if ((process.env.ROVAI_METRICS_RESUME === '1' || coldRestart)
+        if ((process.env.COAXI_METRICS_RESUME === '1' || coldRestart)
           && runs.length === 1 && run.status === 'succeeded') {
           if (coldRestart) {
             const stopped = await core.stop()
             if (stopped.code !== 0) throw new Error('First isolated Core did not stop cleanly')
-            if (compactAfterRestart) process.env.ROVAI_INTERNAL_GROK_COMPACTION_ACCEPTANCE = '1'
+            if (compactAfterRestart) process.env.COAXI_INTERNAL_GROK_COMPACTION_ACCEPTANCE = '1'
             core = startCore()
             await core.request('health.check')
             const recovered = await core.request('monitoring.execution', { campId, agentRunIds: [run.id] })
@@ -274,9 +274,9 @@ try {
               recoveredProjection: recovered, unchanged, compactAfterRestart })
             if (!unchanged) throw new Error('Isolated Core restart changed persisted metrics')
           }
-          const followup = process.env.ROVAI_METRICS_FOLLOWUP_PROMPT_FILE
-            ? await readFile(process.env.ROVAI_METRICS_FOLLOWUP_PROMPT_FILE, 'utf8')
-            : 'Continue in this same native session for a second isolated metrics acceptance. Explain retry ownership in about 250 words, run sleep 3 once, then briefly describe recovery. Do not delegate or change files. Send a short completion with rovai send --public-only and finish normally.'
+          const followup = process.env.COAXI_METRICS_FOLLOWUP_PROMPT_FILE
+            ? await readFile(process.env.COAXI_METRICS_FOLLOWUP_PROMPT_FILE, 'utf8')
+            : 'Continue in this same native session for a second isolated metrics acceptance. Explain retry ownership in about 250 words, run sleep 3 once, then briefly describe recovery. Do not delegate or change files. Send a short completion with coaxi send --public-only and finish normally.'
           await core.request('camp.messages.send', { commandId: crypto.randomUUID(), campId,
             content: composerDocumentForAddress({ mode: 'default' }, followup),
             sourceAttachments: [], quotes: [], replyToCampMessageId: null,
@@ -304,7 +304,7 @@ try {
   events.push({ method: 'probe.failure', categories: ['model', 'auth', 'quota', 'permission', 'protocol', 'version', 'executable', 'unsupported', 'config'].filter(word => error.message.toLowerCase().includes(word)) })
 } finally {
   const stopped = await core.stop()
-  const frozen = (await querySqliteRows(join(data, 'rovai.sqlite'),
+  const frozen = (await querySqliteRows(join(data, 'coaxi.sqlite'),
     'SELECT runtime_observed_model_id, runtime_model_selection_json, public_runtime_failure_json FROM agent_run ORDER BY started_at DESC LIMIT 1'))[0]
   let raw = []
   try { raw = (await readFile(rawPath, 'utf8')).trim().split('\n').filter(Boolean).map(line => JSON.parse(line)) } catch {}

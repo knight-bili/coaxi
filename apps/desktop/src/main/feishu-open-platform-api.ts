@@ -191,7 +191,7 @@ export class OpenPlatformApiClient {
     formData.append(
       'file',
       new Blob([new Uint8Array(input.pngBytes)], { type: 'image/png' }),
-      'rovai-member-bot.png'
+      'coaxi-member-bot.png'
     )
     formData.append('uploadType', '4')
     formData.append('isIsv', 'false')

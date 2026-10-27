@@ -53,7 +53,7 @@ describe('inline member identity save', () => {
       saveMemberIdentity({
         agent: profile,
         draft,
-        avatarRef: 'rovai://member-avatar/builtin/luoke/v1',
+        avatarRef: 'coaxi://member-avatar/builtin/luoke/v1',
         request,
         onCommitted: (value) => committed.push(value)
       })
@@ -79,7 +79,7 @@ describe('inline member identity save', () => {
     const result = await saveMemberIdentity({
       agent: committed[0],
       draft,
-      avatarRef: 'rovai://member-avatar/builtin/luoke/v1',
+      avatarRef: 'coaxi://member-avatar/builtin/luoke/v1',
       request: retry,
       onCommitted: vi.fn()
     })
@@ -89,7 +89,7 @@ describe('inline member identity save', () => {
         {
           agentId: 'agent_1',
           expectedVersion: 5,
-          avatarRef: 'rovai://member-avatar/builtin/luoke/v1'
+          avatarRef: 'coaxi://member-avatar/builtin/luoke/v1'
         }
       ]
     ])
@@ -101,7 +101,7 @@ describe('inline member identity save', () => {
     const result = await saveMemberIdentity({
       agent: null,
       draft: { ...identityDraftFor(null), displayName: '  新队员  ' },
-      avatarRef: 'rovai://member-avatar/builtin/luoke/v1',
+      avatarRef: 'coaxi://member-avatar/builtin/luoke/v1',
       request,
       onCommitted: vi.fn()
     })
@@ -109,7 +109,7 @@ describe('inline member identity save', () => {
     expect(request.mock.calls[0][0]).toBe('members.create')
     expect(request.mock.calls[0][1]).toMatchObject({
       displayName: '新队员',
-      avatarRef: 'rovai://member-avatar/builtin/luoke/v1'
+      avatarRef: 'coaxi://member-avatar/builtin/luoke/v1'
     })
     expect(request.mock.calls[0][1]).not.toHaveProperty('expectedVersion')
     expect(result.runtimeConfiguration).toBeNull()
@@ -132,7 +132,7 @@ describe('inline member identity save', () => {
         saveMemberIdentity({
           agent: profile,
           draft: { ...identityDraftFor(profile), teamRole: '开发者' },
-          avatarRef: 'rovai://member-avatar/builtin/luoke/v1',
+          avatarRef: 'coaxi://member-avatar/builtin/luoke/v1',
           request,
           onCommitted: accepted
         })

@@ -7,7 +7,7 @@ describe('resource-reference visual classification', () => {
     ['docs/README.md#L20-L24', 'markdown'],
     ['prototype/index.HTML?theme=night', 'html'],
     ['src/App.tsx:20:4', 'code'],
-    ['~/.config/rovai/config.toml', 'config'],
+    ['~/.config/coaxi/config.toml', 'config'],
     ['logs/runtime.log', 'text'],
     ['assets/camp.webp', 'image'],
     ['build/icon.svg', 'svg'],
@@ -21,8 +21,8 @@ describe('resource-reference visual classification', () => {
     ['artifacts/source.tar.gz', 'archive'],
     ['recordings/note.m4a', 'audio'],
     ['recordings/demo.mp4', 'video'],
-    ['state/rovai.sqlite3', 'database'],
-    ['release/Rovai.dmg', 'executable'],
+    ['state/coaxi.sqlite3', 'database'],
+    ['release/Coaxi.dmg', 'executable'],
     ['artifacts/unknown.bin', 'file']
   ])('classifies %s as %s', (target, expected) => {
     expect(resourceReferenceVisualKind(target)).toBe(expected)

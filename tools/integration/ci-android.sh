@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 root="$GITHUB_WORKSPACE"
-role=codeg-android
+role=coaxi-android
 evidence="$FOUNDATION_CI_EVIDENCE"
 mkdir -p "$evidence"
 stage=toolchain
@@ -9,7 +9,7 @@ mark() { python3 "$root/tools/integration/record-ci-stage.py" "$role" "$stage" "
 trap 'mark failed' ERR
 { java -version; echo "SDK=$ANDROID_HOME"; } > "$evidence/toolchain.txt" 2>&1
 mark passed
-cd "$RUNNER_TEMP/codeg-android"
+cd "$RUNNER_TEMP/coaxi-android"
 cp foundation-source.json "$evidence/source.json"
 export GRADLE_USER_HOME="$RUNNER_TEMP/foundation-gradle"
 chmod +x gradlew
@@ -73,9 +73,9 @@ timeout 300s bash -e -c 'adb wait-for-device; until [[ "$(adb shell getprop sys.
 sleep 30
 adb shell input keyevent 82
 adb install "$evidence/app-debug.apk" > "$evidence/install.txt"
-adb shell am start -W -n app.codeg.android.debug/app.codeg.android.MainActivity > "$evidence/launch.txt"
+adb shell am start -W -n app.coaxi.android.debug/app.coaxi.android.MainActivity > "$evidence/launch.txt"
 sleep 5
-adb shell pidof app.codeg.android.debug > "$evidence/app-process.txt"
+adb shell pidof app.coaxi.android.debug > "$evidence/app-process.txt"
 adb shell uiautomator dump /sdcard/foundation-window.xml > "$evidence/ui-dump.log"
 adb pull /sdcard/foundation-window.xml "$evidence/startup.xml" > "$evidence/ui-pull.log" 2>&1
 adb exec-out screencap -p > "$evidence/startup.png"
@@ -100,7 +100,7 @@ then
   cp "$evidence/startup.xml" "$evidence/system-ui-blocked.xml"
   cp "$evidence/startup.png" "$evidence/system-ui-blocked.png"
   sleep 30
-  adb shell am start -W -n app.codeg.android.debug/app.codeg.android.MainActivity >> "$evidence/launch.txt"
+  adb shell am start -W -n app.coaxi.android.debug/app.coaxi.android.MainActivity >> "$evidence/launch.txt"
   adb shell uiautomator dump /sdcard/foundation-window.xml >> "$evidence/ui-dump.log"
   adb pull /sdcard/foundation-window.xml "$evidence/startup.xml" >> "$evidence/ui-pull.log" 2>&1
   adb exec-out screencap -p > "$evidence/startup.png"
@@ -108,8 +108,8 @@ fi
 python3 - "$evidence/startup.xml" <<'PY'
 import sys,xml.etree.ElementTree as E
 nodes=list(E.parse(sys.argv[1]).iter('node'))
-assert any(n.get('package')=='app.codeg.android.debug' for n in nodes),'Application is not foreground'
+assert any(n.get('package')=='app.coaxi.android.debug' for n in nodes),'Application is not foreground'
 assert not any(n.get('resource-id')=='android:id/alertTitle' for n in nodes),'Application or system error dialog present'
 PY
-adb shell pidof app.codeg.android.debug > "$evidence/app-process.txt"
+adb shell pidof app.coaxi.android.debug > "$evidence/app-process.txt"
 mark passed

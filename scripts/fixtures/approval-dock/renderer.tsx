@@ -39,8 +39,8 @@ type OptionsSource = 'core' | 'claude' | 'claude-remember' | 'native'
 let setOptionsSource: (source: OptionsSource) => void
 let longRememberRule: () => void
 let nativeResponseDigests: () => string[]
-const rememberLabel = 'Yes, and don’t ask again for: rovai send *'
-const rememberScope = 'Bash(rovai send *)\nlocalSettings · .claude/settings.local.json'
+const rememberLabel = 'Yes, and don’t ask again for: coaxi send *'
+const rememberScope = 'Bash(coaxi send *)\nlocalSettings · .claude/settings.local.json'
 let focusSerial = 0
 const presented: number[] = []
 

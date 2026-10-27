@@ -2,7 +2,7 @@
 
 Create a Task only for responsibility that needs tracking across Runs and independent handoff or acceptance. Use ThreadMessage for brief coordination, answers, progress and questions.
 
-Choose an operation with `rovai task --help`, then read its exact help. Reuse an existing Task where possible; put scope and requirements together in `description`.
+Choose an operation with `coaxi task --help`, then read its exact help. Reuse an existing Task where possible; put scope and requirements together in `description`.
 
 Decide from current Task state; read it when the needed information is missing or stale. Submit only the fields you intend to change.
 

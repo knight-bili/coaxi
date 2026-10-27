@@ -19,9 +19,9 @@
       "apps/web/src/client.ts": "6bf6385a6771308c016cbe6e5206787bb47dc3633b841a610f4276a3935ad793",
       "apps/web/src/private-upload-preparations.test.ts": "a53b4216b0732d6337732e9dba0a92f9d9afc91662041ddc4d6959692c793e95",
       "apps/web/src/private-upload-preparations.ts": "09dd833848c3d98ce78fb9f04a0d3571a23a81d0e28fb5200dcf579e3f2457e1",
-      "crates/rovai-core/src/application.rs": "5c64ca87f3c6018f85400532702bfa9300e63fadfed9da275b5dc9229b3fdbaf",
-      "crates/rovai-web/src/lib.rs": "1e85d79bde4f275086484750e8ea768c733b1daeb7e0f6f5bd2ea4ec98e8fba1",
-      "crates/rovai-web/src/uploads.rs": "96407fcd6e17085afaf147318846e30ecf0047fb6119599a2d4468e637163411",
+      "crates/coaxi-core/src/application.rs": "5c64ca87f3c6018f85400532702bfa9300e63fadfed9da275b5dc9229b3fdbaf",
+      "crates/coaxi-web/src/lib.rs": "1e85d79bde4f275086484750e8ea768c733b1daeb7e0f6f5bd2ea4ec98e8fba1",
+      "crates/coaxi-web/src/uploads.rs": "96407fcd6e17085afaf147318846e30ecf0047fb6119599a2d4468e637163411",
       "docs/architecture/unified-rust-host.md": "227dc3fe7faad195625acf4804e140470b21fdb7cd1f9bb6c87bb5da2609a926",
       "docs/contracts/host-web-v5.md": "5da9899a374d542c0dedd1890535038e56cfe136a54b642ed955937a095cdf54",
       "docs/contracts/single-chat-composer-scope-v1.md": "e5a9f84e4ad771005e2c2c5861c8d0660919e15544ffeceba784a5b86a104137",
@@ -69,10 +69,10 @@
     "I02 remaining, I04-I12/BUF, full PC01-PC24 and formal324 qualification"
   ],
   "preserved_authorities": {
-    "crates/rovai-core/src/local_attachment_source.rs": "8830581e72fc103b2f359be17a0072c5ee0cedc6eb5fe58b179ae3d255dbc1ca",
-    "crates/rovai-core/src/context.rs": "329144f38675ebedeaf5652858d457d42369455eb26c6159af61d19c02218784",
-    "crates/rovai-core/src/message_quote.rs": "efb6e962946b85c089483bb1120fe92f32458bb3b3b5e5eb668e26f8aa96481e",
-    "crates/rovai-core/src/command.rs": "22258f81dc5b76040cd0fdba20074321b5be7104e648a8278412c0736ef0d85a"
+    "crates/coaxi-core/src/local_attachment_source.rs": "8830581e72fc103b2f359be17a0072c5ee0cedc6eb5fe58b179ae3d255dbc1ca",
+    "crates/coaxi-core/src/context.rs": "329144f38675ebedeaf5652858d457d42369455eb26c6159af61d19c02218784",
+    "crates/coaxi-core/src/message_quote.rs": "efb6e962946b85c089483bb1120fe92f32458bb3b3b5e5eb668e26f8aa96481e",
+    "crates/coaxi-core/src/command.rs": "22258f81dc5b76040cd0fdba20074321b5be7104e648a8278412c0736ef0d85a"
   },
   "approved_r1_files": {
     "I03_私聊材料怎么分开用_客户确认版_r1.docx": "87565f57fa0e994f676139e3376fe14e556ac9862c08f1573798d985f4dcecf7",

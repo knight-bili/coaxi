@@ -317,9 +317,9 @@ describe('User Automation transport', () => {
   it(
     'binds each local IPC request to the published App instance and removes discovery on stop',
     async () => {
-      const fixtureRoot = await mkdtemp(join(tmpdir(), 'rovai-automation-'))
+      const fixtureRoot = await mkdtemp(join(tmpdir(), 'coaxi-automation-'))
       const previousQualification = process.env[WINDOWS_USER_AUTOMATION_QUALIFICATION_ENV]
-      const binaryEnvironment = ['ROVAI_HOST_BIN', 'ROVAI_CORE_BIN', 'HORIZONWARD_CORE_BIN', 'LUMEN_CORE_BIN']
+      const binaryEnvironment = ['COAXI_HOST_BIN', 'COAXI_CORE_BIN', 'HORIZONWARD_CORE_BIN', 'LUMEN_CORE_BIN']
         .map(name => [name, process.env[name]] as const)
       let automationRoot = fixtureRoot
       let server: UserAutomationServer | null = null
@@ -331,10 +331,10 @@ describe('User Automation transport', () => {
       }
       try {
         if (process.platform === 'win32') {
-          if (!process.env.ROVAI_CORE_BIN?.trim()) {
-            throw new Error('Windows User Automation integration requires ROVAI_CORE_BIN to point to the real rovai-host.exe.')
+          if (!process.env.COAXI_CORE_BIN?.trim()) {
+            throw new Error('Windows User Automation integration requires COAXI_CORE_BIN to point to the real coaxi-host.exe.')
           }
-          delete process.env.ROVAI_HOST_BIN
+          delete process.env.COAXI_HOST_BIN
           delete process.env.HORIZONWARD_CORE_BIN
           delete process.env.LUMEN_CORE_BIN
           const layout = prepareWindowsDataRoot(resolveCoreBinary(), join(fixtureRoot, 'formal'))

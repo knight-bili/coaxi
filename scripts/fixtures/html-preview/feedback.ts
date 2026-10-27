@@ -81,7 +81,7 @@ export async function feedbackAcceptance(window: BrowserWindow, userData: string
 
   // Hold a real reload at the public API, then remove only the fixture's source.
   // Main produces the actual read failure after release; the old document stays native.
-  await run(`window.previewBookmarkedFrame=${stage}.querySelector('iframe');window.previewOriginalReload=window.rovai.filePreview.reload;window.rovai.filePreview.reload=async args=>{await new Promise(resolve=>window.previewRetryContinue=resolve);return window.previewOriginalReload(args)};undefined`)
+  await run(`window.previewBookmarkedFrame=${stage}.querySelector('iframe');window.previewOriginalReload=window.coaxi.filePreview.reload;window.coaxi.filePreview.reload=async args=>{await new Promise(resolve=>window.previewRetryContinue=resolve);return window.previewOriginalReload(args)};undefined`)
   await rename(join(root, 'errors.html'), join(root, 'errors.html.saved'))
   try {
     await run(`${stage}.querySelector('.file-preview-html-diagnostics button').click()`)
@@ -94,7 +94,7 @@ export async function feedbackAcceptance(window: BrowserWindow, userData: string
     await writeFile(join(userData, 'feedback-retry-failed.png'), (await window.webContents.capturePage()).toPNG())
   } finally {
     await rename(join(root, 'errors.html.saved'), join(root, 'errors.html'))
-    await run('window.rovai.filePreview.reload=window.previewOriginalReload;undefined')
+    await run('window.coaxi.filePreview.reload=window.previewOriginalReload;undefined')
   }
   await run(`${stage}.querySelector('.file-preview-html-diagnostics button').click()`)
   await wait(() => run(`!window.previewAcceptance.activeTab.isRefreshing && !window.previewAcceptance.activeTab.refreshError && ${stage}.dataset.documentState==='loaded' && ${stage}.textContent.includes('5 项问题')`))

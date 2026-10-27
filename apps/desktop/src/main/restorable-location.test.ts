@@ -17,7 +17,7 @@ afterEach(async () => {
 })
 
 async function temporaryDirectory(): Promise<string> {
-  const directory = await mkdtemp(join(tmpdir(), 'rovai-restorable-location-'))
+  const directory = await mkdtemp(join(tmpdir(), 'coaxi-restorable-location-'))
   cleanup.push(directory)
   return directory
 }

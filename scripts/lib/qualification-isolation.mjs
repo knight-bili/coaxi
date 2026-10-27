@@ -2,7 +2,7 @@ import { lstat, readFile } from 'node:fs/promises'
 import { hostname, platform } from 'node:os'
 import { digestJson, runCaptured, sha256 } from './qualification-common.mjs'
 
-const PROFILE_SCHEMA_ID = 'rovai.qualification.intervention-isolation-profile'
+const PROFILE_SCHEMA_ID = 'coaxi.qualification.intervention-isolation-profile'
 const PROFILE_SCHEMA_VERSION = '1.0.0'
 const MAX_PROFILE_BYTES = 1_048_576
 const DIGEST = /^sha256:[a-f0-9]{64}$/

@@ -13,8 +13,8 @@
     "existing original goal/compaction/common rules reused",
     "nested timeline/tool previews retain original bounds, primary content unchanged"
   ],
-  "ported": "crates/rovai-core/src/runtime_subagent_session/content/claude.rs",
-  "bridge": "crates/rovai-core/src/runtime_subagent_session/content/claude_read.rs",
+  "ported": "crates/coaxi-core/src/runtime_subagent_session/content/claude.rs",
+  "bridge": "crates/coaxi-core/src/runtime_subagent_session/content/claude_read.rs",
   "license": "Apache-2.0, integration/licenses/codeg/LICENSE",
   "source_audit": {
     "ok": true,
@@ -106,11 +106,11 @@
     "source_fs_owner_added": false,
     "protected_files_unchanged": [
       "Cargo.lock",
-      "crates/rovai-core/Cargo.toml",
-      "crates/rovai-core/src/runtime_subagent_session.rs",
-      "crates/rovai-core/src/runtime_subagent_session/origin.rs",
-      "crates/rovai-core/src/runtime_subagent_session/source/qoder.rs",
-      "crates/rovai-core/src/runtime_subagent_session/source/claude.rs"
+      "crates/coaxi-core/Cargo.toml",
+      "crates/coaxi-core/src/runtime_subagent_session.rs",
+      "crates/coaxi-core/src/runtime_subagent_session/origin.rs",
+      "crates/coaxi-core/src/runtime_subagent_session/source/qoder.rs",
+      "crates/coaxi-core/src/runtime_subagent_session/source/claude.rs"
     ],
     "approved_r1_artifacts": [
       {

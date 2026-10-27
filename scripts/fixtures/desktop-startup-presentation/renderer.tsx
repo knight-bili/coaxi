@@ -1,6 +1,6 @@
 import { EMPTY_SNAPSHOT, sanitizeSnapshot, registerNavigationProjects } from '../../../apps/desktop/src/shared/navigation-preferences-model'
 import type { NavigationSnapshot, NavigationPreferencesSnapshot } from '@contracts'
-import type { ThreadCreationPreflight, CoreEvent, DesktopStartupSnapshot, HealthStatus, OnboardingSnapshot, RestorableLocation, RovaiApi, SupervisorSnapshot } from '@contracts'
+import type { ThreadCreationPreflight, CoreEvent, DesktopStartupSnapshot, HealthStatus, OnboardingSnapshot, RestorableLocation, CoaxiApi, SupervisorSnapshot } from '@contracts'
 import { createRoot, type Root } from 'react-dom/client'
 import { flushSync } from 'react-dom'
 import { App } from '../../../apps/desktop/src/renderer/src/App'
@@ -156,7 +156,7 @@ async function reset(target: RestorableLocation | null = { kind: 'camp', threadI
   localSession = deferred()
   initialSupervisor = deferred()
   onboarding = deferred()
-  Object.assign(window, { rovai: api() as RovaiApi })
+  Object.assign(window, { coaxi: api() as CoaxiApi })
   if (target) localSession.resolve(session(target))
   if (resolveSupervisor) initialSupervisor.resolve(supervisor)
   root = createRoot(document.getElementById('root')!)
@@ -190,10 +190,10 @@ function pageFrame(kind: string, feedback: boolean) {
       && Math.abs(rect.width - window.innerWidth) < 1 && Math.abs(rect.height - window.innerHeight) < 1,
     'Loading canvas must cover the complete Renderer viewport')
     const mark = canvas.querySelector<SVGElement>('.startup-loading-mark')
-    check(mark, 'Loading canvas must include the Rovai horizon mark')
+    check(mark, 'Loading canvas must include the Coaxi horizon mark')
     check(mark.dataset.brandMark === 'horizon' && mark.querySelectorAll('path').length === 2
       && Boolean(mark.querySelector('[data-brand-point="rendezvous"]')),
-    'Loading canvas must use the complete Rovai horizon mark')
+    'Loading canvas must use the complete Coaxi horizon mark')
     const markRect = mark.getBoundingClientRect()
     check(Math.abs(markRect.width - 48) < 1 && Math.abs(markRect.height - 48) < 1,
       'Loading mark must keep its approved 48px geometry')
@@ -226,7 +226,7 @@ Object.assign(window, { startupTest: {
     const cases: string[] = []
     const emptyNavigation: NavigationSnapshot = { schemaVersion: 3, throughGlobalSequence: 0, projects: [], quickChat: { totalCount: 0, recentThreads: [] } }
     const group = (path: string) => ({ projectKey: `directory:${path}`, projectPath: path, name: path.split('/').at(-1)!, totalCount: 1, recentThreads: [], lastActivityAt: '', lastActivityGlobalSequence: 0 })
-    const health: HealthStatus = { core: { ok: true, version: 'fixture', dataDir: '/isolated/fixture' }, database: { ok: true, path: '/isolated/fixture/rovai.sqlite' }, git: { installed: true, version: 'fixture' }, hostPlatform: 'macos-arm64', runtimeCatalog: [], runtimePlatformAdmission: [], runtimeAvailability: [], searchEnvironment: { generation: 1, createdAt: '2026-08-31T00:00:00Z', pathEntryCount: 0, shell: { status: 'unavailable', interactive: false, shellName: null, entryCount: 0, elapsedMillis: 0 } } }
+    const health: HealthStatus = { core: { ok: true, version: 'fixture', dataDir: '/isolated/fixture' }, database: { ok: true, path: '/isolated/fixture/coaxi.sqlite' }, git: { installed: true, version: 'fixture' }, hostPlatform: 'macos-arm64', runtimeCatalog: [], runtimePlatformAdmission: [], runtimeAvailability: [], searchEnvironment: { generation: 1, createdAt: '2026-08-31T00:00:00Z', pathEntryCount: 0, shell: { status: 'unavailable', interactive: false, shellName: null, entryCount: 0, elapsedMillis: 0 } } }
     const boot = async (preferences: NavigationPreferencesSnapshot, navigation = emptyNavigation, setup?: () => void) => {
       await reset({ kind: 'quick_chat' })
       responses.set('health.check', health)
@@ -255,7 +255,7 @@ Object.assign(window, { startupTest: {
       check(button && !button.disabled, 'Project add must remain available')
       button.click(); await flush(); await flush()
     }
-    localStorage.setItem('rovai.current-project.v1', JSON.stringify({ kind: 'directory', projectPath: '/old-empty' }))
+    localStorage.setItem('coaxi.current-project.v1', JSON.stringify({ kind: 'directory', projectPath: '/old-empty' }))
     await boot({ ...EMPTY_SNAPSHOT, projectNames: { 'directory:/old': '旧别名', 'directory:/alias-only': '残留' }, removedProjects: [{ targetKey: 'directory:/removed', removedAt: '2026-10-01T00:00:00Z' }] }, { ...emptyNavigation, projects: [group('/old'), group('/removed')] })
     check(saved().legacyProjectsSynced && saved().registeredProjects.includes('/old-empty') && saved().registeredProjects.includes('/old'), 'Complete import preserves the old empty selection before startup changes it: ' + JSON.stringify({ saved: saved(), calls }))
     check(!saved().registeredProjects.includes('/removed') && !saved().registeredProjects.includes('/alias-only'), 'Removal wins and aliases do not invent directories')
@@ -281,9 +281,9 @@ Object.assign(window, { startupTest: {
     const failedWrites = calls.filter(call => call === 'navigationPreferences.registerProjects').length
     await refresh(); await refresh()
     check(calls.filter(call => call === 'navigationPreferences.registerProjects').length === failedWrites, 'Failure does not start automatic retry')
-    const previousSelection = localStorage.getItem('rovai.current-project.v1')
+    const previousSelection = localStorage.getItem('coaxi.current-project.v1')
     await add('/unsaved')
-    check(!visible('/unsaved') && !saved().registeredProjects.includes('/unsaved') && localStorage.getItem('rovai.current-project.v1') === previousSelection, 'A failed add neither displays nor selects an unsaved directory')
+    check(!visible('/unsaved') && !saved().registeredProjects.includes('/unsaved') && localStorage.getItem('coaxi.current-project.v1') === previousSelection, 'A failed add neither displays nor selects an unsaved directory')
     check(document.querySelector('.app-toast')?.textContent?.includes('项目目录未保存，请重新添加。') && !document.querySelector('.app-toast-action, .error-banner'), 'A failed add gives one ordinary notice with no recovery action or banner')
     await advance(6000)
     check(!document.querySelector('.app-toast'), 'The ordinary save failure notice expires')
@@ -441,7 +441,7 @@ Object.assign(window, { startupTest: {
     await reset({ kind: 'members', agentId: null, tab: 'runtime' })
     const health: HealthStatus = {
       core: { ok: true, version: 'fixture', dataDir: '/isolated/fixture' },
-      database: { ok: true, path: '/isolated/fixture/rovai.sqlite' },
+      database: { ok: true, path: '/isolated/fixture/coaxi.sqlite' },
       git: { installed: true, version: 'fixture' },
       hostPlatform: 'macos-arm64', runtimeCatalog: [], runtimePlatformAdmission: [], runtimeAvailability: [],
       searchEnvironment: { generation: 1, createdAt: '2026-08-31T00:00:00Z', pathEntryCount: 0,
@@ -693,7 +693,7 @@ Object.assign(window, { startupTest: {
     const navigationHandlers = new Map(requestHandlers)
     captureNavigation = async (theme, collapsed, setup) => {
       appearanceTheme = theme
-      window.localStorage.removeItem('rovai.navigation-layout.v1')
+      window.localStorage.removeItem('coaxi.navigation-layout.v1')
       await reset({ kind: 'quick_chat' })
       for (const [method, response] of navigationResponses) responses.set(method, response)
       for (const [method, handler] of navigationHandlers) requestHandlers.set(method, handler)

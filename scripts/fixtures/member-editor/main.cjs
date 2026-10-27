@@ -287,18 +287,18 @@ app
       assert.equal(await run('document.querySelector(".member-roster-resizer").hasAttribute("aria-disabled")'),false)
     })
     await check('roster preferences preserve old collapse and tolerate corrupt storage', async () => {
-      await run(`localStorage.removeItem('rovai-member-roster-width-v2'); localStorage.setItem('rovai-member-roster-width-v1', 'collapsed')`)
+      await run(`localStorage.removeItem('coaxi-member-roster-width-v2'); localStorage.setItem('coaxi-member-roster-width-v1', 'collapsed')`)
       await reloadPage()
       assert.equal(await rosterWidth(), 76)
       await click('.member-roster-resizer'); await key('Right')
       assert.equal(await rosterWidth(), 256)
-      await run(`localStorage.setItem('rovai-member-roster-width-v2', '{broken')`)
+      await run(`localStorage.setItem('coaxi-member-roster-width-v2', '{broken')`)
       await reloadPage()
       assert.equal(await rosterWidth(), 76)
-      await run(`localStorage.setItem('rovai-member-roster-width-v2', JSON.stringify({ width: 999999, collapsed: false }))`)
+      await run(`localStorage.setItem('coaxi-member-roster-width-v2', JSON.stringify({ width: 999999, collapsed: false }))`)
       await reloadPage()
       assert.equal(await rosterWidth(), 360)
-      await run(`localStorage.removeItem('rovai-member-roster-width-v1'); localStorage.removeItem('rovai-member-roster-width-v2')`)
+      await run(`localStorage.removeItem('coaxi-member-roster-width-v1'); localStorage.removeItem('coaxi-member-roster-width-v2')`)
       await reloadPage()
       assert.equal(await rosterWidth(), 256)
     })
@@ -450,14 +450,14 @@ app
         assert.equal(await roleValue(), '部分保存后的职责')
         assert.equal(
           await run('window.memberFixture.profiles()[0].avatarRef'),
-          'rovai://member-avatar/builtin/luoke/v1'
+          'coaxi://member-avatar/builtin/luoke/v1'
         )
         const updates = await run(
           'window.memberFixture.calls.filter(call => call.method === "members.update").length'
         )
         await saveIdentity()
         await wait(
-          `window.memberFixture.profiles()[0].avatarRef === 'rovai://member-avatar/builtin/muwa/v1' && document.querySelector('${active}.member-identity-form button[type=submit]').disabled`
+          `window.memberFixture.profiles()[0].avatarRef === 'coaxi://member-avatar/builtin/muwa/v1' && document.querySelector('${active}.member-identity-form button[type=submit]').disabled`
         )
         assert.equal(
           await run(
@@ -637,7 +637,7 @@ app
         assert.equal(created.runtimeConfiguration, null)
         assert.equal(
           created.avatarRef,
-          'rovai://member-avatar/builtin/luoke/v1'
+          'coaxi://member-avatar/builtin/luoke/v1'
         )
         await capture('member-create-saved')
       }

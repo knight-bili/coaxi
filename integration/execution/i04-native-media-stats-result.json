@@ -19,11 +19,11 @@
     "Fixed original UserImageAttachments, GeneratedImagesBlock, ImagePreviewDialog, TurnStats, token-format and codex-visualize including original tests retained with declared seams",
     "TurnStats has one readonly owner guard; copy/jump/model/token/completion controls retained, no task write or session fork invented",
     "Complete source summary/session_stats/per-turn metadata remain accessible; invalid optional metrics do not become zero usage",
-    "Original Rovai image menu and clipboard encoder operate complete decoded bytes; image dialog/menu and delayed copy follow exact reader/visibility lifetime",
+    "Original Coaxi image menu and clipboard encoder operate complete decoded bytes; image dialog/menu and delayed copy follow exact reader/visibility lifetime",
     "Local image API reads exact native thread/readId, validates type/MIME/generation and always releases temporary handles; stale owner cannot publish late bytes",
     "Native snapshot source remains non-restorable; pinned media uses Core open with readonly preview policy rather than persisting readId or launching system programs",
     "SafeMarkdown trusted callbacks keep existing default behavior; SourceMarkdownRenderer injection avoids a real module initialization cycle",
-    "Explicit original visualize reference auto-opens HTML; ordinary HTML mentions manually open after streaming, using original Rovai production isolated HTML preview and source controls",
+    "Explicit original visualize reference auto-opens HTML; ordinary HTML mentions manually open after streaming, using original Coaxi production isolated HTML preview and source controls",
     "Dedicated generated CSS is scoped with no global preflight; previous rich/tool/delegation source styles and card bodies unchanged"
   ],
   "verification": {
@@ -44,7 +44,7 @@
       "files": [
         {
           "source": "src/components/ui/image-preview-dialog.tsx",
-          "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ui/image-preview-dialog.tsx",
+          "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/ui/image-preview-dialog.tsx",
           "sourceSha256": "506225d9649be077a7f00145de8fa06d4edddc4ec9582eefedc2399a515c9d24",
           "portedSha256": "b5daa874f17284c5b29a842f4af3526452474e137a6d8550577d2c60ebb6d420",
           "sourceGitBlob": "4387289fe3b86eeb12026abb4ffe26ed713c0de3",
@@ -52,7 +52,7 @@
         },
         {
           "source": "src/components/message/user-image-attachments.tsx",
-          "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/message/user-image-attachments.tsx",
+          "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/message/user-image-attachments.tsx",
           "sourceSha256": "c7fc804213903812bf962897d6589f70ec20a134af32ce21318c73673ee359bd",
           "portedSha256": "47102989cc94d14744be4345f4ec2accb0aae53185d04ae1f9406faf77b470b4",
           "sourceGitBlob": "18dd4e1927d36bb0169b62d509725c6676f417c6",
@@ -60,7 +60,7 @@
         },
         {
           "source": "src/components/message/generated-images-block.tsx",
-          "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/message/generated-images-block.tsx",
+          "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/message/generated-images-block.tsx",
           "sourceSha256": "b4e3ebff6d719996226b57d7c7effd9d0ba07573b89e101f9401cbffb3e1847d",
           "portedSha256": "e9ea4f80193e9f1958e46ca1ed1d5b6344b86ceee368d1214356ede476165081",
           "sourceGitBlob": "08cdd2767def4193e044208639ffd106d14db0c0",
@@ -68,7 +68,7 @@
         },
         {
           "source": "src/lib/token-format.ts",
-          "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/token-format.ts",
+          "destination": "apps/desktop/src/renderer/src/coaxi-native-content/lib/token-format.ts",
           "sourceSha256": "d466ce87c003f6afd6fdc8a69cb231752de3b05252d42d070b6b88f469753721",
           "portedSha256": "b3809cf0d961f4a03269b7ced26d64e895679f4f60ac5ee0ba2080542a69881b",
           "sourceGitBlob": "95acfbcb373d6da702f6314a1a02652aa948bbbf",
@@ -76,7 +76,7 @@
         },
         {
           "source": "src/lib/codex-visualize.ts",
-          "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/codex-visualize.ts",
+          "destination": "apps/desktop/src/renderer/src/coaxi-native-content/lib/codex-visualize.ts",
           "sourceSha256": "73785cdc6e167cdd81e7c8d64bca8e9b1f1d06ec39592b9aae9a9ebbf119ac8a",
           "portedSha256": "eb771ea9bcf70df635879463d47476929c450232ffebf66ca51c88d0b8825f03",
           "sourceGitBlob": "84ee630cddc58928abb74e243d611be4ec3b5c47",
@@ -84,7 +84,7 @@
         },
         {
           "source": "src/lib/codex-visualize.test.ts",
-          "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/codex-visualize.test.ts",
+          "destination": "apps/desktop/src/renderer/src/coaxi-native-content/lib/codex-visualize.test.ts",
           "sourceSha256": "695a089e1d40ea3f36cfeb9b86d6b56e193f566abca2485c6cfff327d287ee69",
           "portedSha256": "26bb1a31f374eda366f5d52d66d49f537acdb07c8e40398f901daf489b6e1a83",
           "sourceGitBlob": "8be812614bce974567a441fcfb030d19ef1811ab",
@@ -92,7 +92,7 @@
         },
         {
           "source": "src/components/message/turn-stats.tsx",
-          "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/message/turn-stats.tsx",
+          "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/message/turn-stats.tsx",
           "sourceSha256": "0aea39e463ed54080e0009b206ea52f5e3048b885b50b260355064346fe8dff7",
           "portedSha256": "8d23aef6553398090e9aca74495fdad5ddb78a050ac063218ff23ff674a8cd89",
           "sourceGitBlob": "d2234f0cd9fcf3316d8ef2567976303abbdd102e",
@@ -123,18 +123,18 @@
       ],
       "hostSeams": [
         "Next Image to strict data-URI img; no direct external resource fetch",
-        "original Rovai clipboard encoding and image context menu; actual Chromium decode, OS clipboard not asserted",
+        "original Coaxi clipboard encoding and image context menu; actual Chromium decode, OS clipboard not asserted",
         "existing Radix Dialog and Base UI Tooltip; portals follow exact reader/visibility lifetime and preserve parent Esc",
         "original message scroll adapter and raw model label fallback; no backend catalog invented",
-        "native Core-scoped file/image reads and original Rovai PinnedFilePreview / HtmlPreviewSite",
+        "native Core-scoped file/image reads and original Coaxi PinnedFilePreview / HtmlPreviewSite",
         "SourceMarkdownRenderer context avoids dependency cycle and confines the new parser seam to native sources"
       ],
       "readonlyTaskAction": "TurnStats hides create-task when its owning Thread write callback is unavailable; original onFork remains optional. Thread task/Mission flows remain owned by Core.",
       "style": {
-        "file": "apps/desktop/src/renderer/src/codeg-native-content/source-media.css",
+        "file": "apps/desktop/src/renderer/src/coaxi-native-content/source-media.css",
         "sha256": "203df27bb442601ec74cb1d391893bc8786c963e994ada6391bee5e12de8c380",
         "generator": "file/I04会话图片统计/build-style.mjs",
-        "scope": ".codeg-native-rich",
+        "scope": ".coaxi-native-rich",
         "noGlobalPreflight": true,
         "oldRichStyleUnchanged": true
       },
@@ -191,7 +191,7 @@
       "night1000 product/source",
       "day390 product/source"
     ],
-    "findings": "Actual fixed source media modules run under declared Next/i18n/actions/tooltip seams with the same source image and stats input; original user thumbnail/generation card composition and source action row retained. Production drawer clips/scrolls only its necessary content, card/media fit narrow width with no horizontal page overflow. Themes use existing Rovai tokens. Original reference is component-level, not a full original App. Full Markdown/code/content engine and HTML control parity remain mandatory."
+    "findings": "Actual fixed source media modules run under declared Next/i18n/actions/tooltip seams with the same source image and stats input; original user thumbnail/generation card composition and source action row retained. Production drawer clips/scrolls only its necessary content, card/media fit narrow width with no horizontal page overflow. Themes use existing Coaxi tokens. Original reference is component-level, not a full original App. Full Markdown/code/content engine and HTML control parity remain mandatory."
   },
   "self_review_fixes": [
     "Removed direct native-Markdown import from common primitives after real Renderer exposed twMerge temporal-dead-zone cycle; injected scoped renderer callback",
@@ -276,12 +276,12 @@
       "git_blob_with_filters": "1d0013aef314f28e16625b699bd125199478cdec"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/source-copy.json",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/ui/source-copy.json",
       "sha256": "4e8887cc3350f408df3dcb534d6b5398a35b456eff3453ab79459ae782d4053c",
       "git_blob_with_filters": "05069cabae7ee92e473cb981ad255e41b3b15152"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/source-primitives.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/ui/source-primitives.tsx",
       "sha256": "8e61c13a283cd8961fe7270c4537700ed3b364ecd3e26cc72a57872137fef0ca",
       "git_blob_with_filters": "e484ed281dc73dd5f5078cb534c9999425f72ba6"
     },
@@ -331,67 +331,67 @@
       "git_blob_with_filters": "f5b582d99b8f660cc1ef494ef392029c21acb0e5"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/generated-images-block.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/message/generated-images-block.tsx",
       "sha256": "e9ea4f80193e9f1958e46ca1ed1d5b6344b86ceee368d1214356ede476165081",
       "git_blob_with_filters": "05fdb1d934c946b39e1df22cc5b8f0ef322514f4"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/turn-stats.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/message/turn-stats.tsx",
       "sha256": "8d23aef6553398090e9aca74495fdad5ddb78a050ac063218ff23ff674a8cd89",
       "git_blob_with_filters": "1c90e443ebdbb955e16bf7c8a29fda323e6974e5"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/user-image-attachments.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/message/user-image-attachments.tsx",
       "sha256": "47102989cc94d14744be4345f4ec2accb0aae53185d04ae1f9406faf77b470b4",
       "git_blob_with_filters": "79d273cfb081dcf622eacefba607f51bd8656b44"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/ui/image-preview-dialog.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/ui/image-preview-dialog.tsx",
       "sha256": "b5daa874f17284c5b29a842f4af3526452474e137a6d8550577d2c60ebb6d420",
       "git_blob_with_filters": "24689956caca705f5cee9cc2e46b6c6ec0722d24"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/codex-visualize.test.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/lib/codex-visualize.test.ts",
       "sha256": "26bb1a31f374eda366f5d52d66d49f537acdb07c8e40398f901daf489b6e1a83",
       "git_blob_with_filters": "84caac93767505cc464ba0d7edc217b92c5a2e40"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/codex-visualize.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/lib/codex-visualize.ts",
       "sha256": "eb771ea9bcf70df635879463d47476929c450232ffebf66ca51c88d0b8825f03",
       "git_blob_with_filters": "d328f00c9b06a29268062d0cd1f0a4fd218db41f"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/token-format.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/lib/token-format.ts",
       "sha256": "b3809cf0d961f4a03269b7ced26d64e895679f4f60ac5ee0ba2080542a69881b",
       "git_blob_with_filters": "3ad0448727bc2d08bdc677f4fff57887dc12eae5"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/source-media.css",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/source-media.css",
       "sha256": "203df27bb442601ec74cb1d391893bc8786c963e994ada6391bee5e12de8c380",
       "git_blob_with_filters": "f3d42f8d46a44a393fa4ed71b5da2ac576379f19"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/native-image-actions.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/ui/native-image-actions.tsx",
       "sha256": "8cc9eb181e5fcf187b051f0c4d82b99dacfdb42c1e5a31af3879a3f8d7fdb8b1",
       "git_blob_with_filters": "b3c4709fca87f9091675fef5c57997a0327a8d05"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/native-image.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/ui/native-image.tsx",
       "sha256": "2c28507f59c7ef0fb5ccd61e59a1a584cc514e82b667d1244840352694e5e306",
       "git_blob_with_filters": "1fc7111ee5d4cb64278ec35207888a962727913d"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/native-markdown.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/ui/native-markdown.tsx",
       "sha256": "2c5d6439bd9ffc631e2c901ef70bf7f8c85b05eb7b13fb7f49e4046f6dd1a064",
       "git_blob_with_filters": "c2b2fe2cfe735a16233e1716eeb0dd14e7e8ff8a"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/native-tooltip.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/ui/native-tooltip.tsx",
       "sha256": "bb9bd96fd80a190a5b3d6647ab52bd476ae67964b95d40f52c0afda7f21cd6dd",
       "git_blob_with_filters": "a3dec8b8c8eb8a5d128cbc0d3c015b986265e366"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/native-turn-actions.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/ui/native-turn-actions.tsx",
       "sha256": "766aff5221c35b5b0440f1d10e915c3ce47ee7b86f4c5e5183965412d8531da7",
       "git_blob_with_filters": "483017888728cc16fe1cdde907285c9e54b0a2a3"
     },

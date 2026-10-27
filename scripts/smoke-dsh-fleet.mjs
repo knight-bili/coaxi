@@ -11,12 +11,12 @@ import { startQualificationCore, processTable, descendantsOf, waitForProcessIden
 import { removeEphemeralRuntimeCampFilesRoot } from './lib/runtime-camp-files-root.mjs'
 
 const repository = resolve(import.meta.dirname, '..')
-const root = await realpath(await mkdtemp(join(tmpdir(), 'rovai-dsh-fleet-')))
+const root = await realpath(await mkdtemp(join(tmpdir(), 'coaxi-dsh-fleet-')))
 const project = join(root, 'project'), data = join(root, 'data')
 await mkdir(project)
 await writeFile(join(project, 'README.md'), '# Isolated DSH Fleet acceptance\n')
 execFileSync('git', ['init', '-b', 'main'], { cwd: project, stdio:'ignore' })
-execFileSync('git', ['-c','user.name=Runtime acceptance','-c','user.email=runtime@rovai.local','commit','--allow-empty','-m','fixture'], { cwd:project, stdio:'ignore' })
+execFileSync('git', ['-c','user.name=Runtime acceptance','-c','user.email=runtime@coaxi.local','commit','--allow-empty','-m','fixture'], { cwd:project, stdio:'ignore' })
 let core, events = [], workspace
 const evidence = { runtime:'deepseek-harness', version:'0.1.5-rc.2', checks:{} }
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
@@ -26,7 +26,7 @@ const delayedReadCommand = file => process.platform === 'win32'
 const delayedReadNeedle = process.platform === 'win32' ? 'Start-Sleep -Seconds 20' : 'sleep 20'
 async function start() {
   events = []
-  core = startQualificationCore({ coreExecutable:join(repository,'target/debug/rovai-core'),
+  core = startQualificationCore({ coreExecutable:join(repository,'target/debug/coaxi-core'),
     dataDirectory:data, workingDirectory:repository, runtimeCacheDirectory:join(root,'cache'),
     mcpConfigPath:join(root,'mcp.json'), onNotification:message=>events.push(message) })
   await core.request('health.check')
@@ -120,7 +120,7 @@ try {
   assert.notEqual(restoredResult.start.params.hostInstanceId,a.start.params.hostInstanceId)
   evidence.checks.crashRecovery={passed:true,exactSession:true}
   console.error('[dsh-fleet] crash process cleanup and exact recovery passed')
-  if(process.env.ROVAI_DSH_FLEET_IDLE_CHECK==='1') {
+  if(process.env.COAXI_DSH_FLEET_IDLE_CHECK==='1') {
     const beforeIdle=await ownedRows(), since=Date.now()
     assert(beforeIdle.length>0)
     console.error('[dsh-fleet] observing production 30-minute idle eviction')

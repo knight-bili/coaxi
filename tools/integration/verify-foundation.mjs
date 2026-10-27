@@ -31,11 +31,11 @@ assert.equal(contract.sourceCommit,source.commit);
 // The locked-source evidence is historical. Current Core evolution has its own
 // explicit snapshot; widening a catalog must not relabel an old binary's proof.
 const current=json('integration/foundation/current-protocol.json');
-const currentWeb=text('crates/rovai-web/src/lib.rs'), currentDb=text('crates/rovai-core/src/db.rs');
+const currentWeb=text('crates/coaxi-web/src/lib.rs'), currentDb=text('crates/coaxi-core/src/db.rs');
 assert.equal(current.hostWebProtocolVersion,Number(currentWeb.match(/HOST_WEB_PROTOCOL_VERSION: u32 = (\d+)/)[1]));
 assert.equal(current.coreDataContractVersion,currentDb.match(/CURRENT_DATA_CONTRACT_VERSION: &str = "([^"]+)"/)[1]);
 assert.equal(current.coreProjectionSchemaVersion,Number(currentDb.match(/CURRENT_PROJECTION_SCHEMA_VERSION: i64 = (\d+)/)[1]));
-assert.deepEqual(current.canonicalWebOperations,Array.from(text('crates/rovai-web/src/operations.rs').split('pub enum Operation {')[1].split('\n}')[0].matchAll(/rename\s*=\s*"([^"]+)"/g),x=>x[1]));
+assert.deepEqual(current.canonicalWebOperations,Array.from(text('crates/coaxi-web/src/operations.rs').split('pub enum Operation {')[1].split('\n}')[0].matchAll(/rename\s*=\s*"([^"]+)"/g),x=>x[1]));
 assert.equal(current.sourceCommit,source.commit);
 const cases=json('integration/foundation/protocol-cases.json');
 assert.equal(new Set(cases.map(x=>x.id)).size,cases.length);

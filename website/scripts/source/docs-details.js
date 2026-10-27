@@ -1,7 +1,7 @@
 // Website teaching content. Keep the English and Chinese halves together.
 // Screens below come from an isolated packaged App with synthetic records.
 (() => {
-  const { topics } = window.RovaiDocs;
+  const { topics } = window.CoaxiDocs;
   const prose = (en, zh, enParagraphs, zhParagraphs) => ({ kind: 'prose', title: [en, zh], paragraphs: [enParagraphs, zhParagraphs] });
   const fields = (en, zh, rows) => ({ kind: 'fields', title: [en, zh], rows: rows.map(([enLabel, zhLabel, enText, zhText]) => ({ label: [enLabel, zhLabel], text: [enText, zhText] })) });
   const points = (en, zh, enItems, zhItems) => ({ kind: 'points', title: [en, zh], points: [enItems, zhItems] });
@@ -22,7 +22,7 @@
     ],
     quickstart: [
       fields('What to prepare', '第一次任务前需要准备什么', [
-        ['Agent', '智能体', 'The coding Agent is installed and signed in on the host. Rovai coordinates it; Rovai does not replace its own account or authentication.', '在主机上安装并登录编程智能体。Rovai 负责协调，不能代替该产品自身的账号认证。'],
+        ['Agent', '智能体', 'The coding Agent is installed and signed in on the host. Coaxi coordinates it; Coaxi does not replace its own account or authentication.', '在主机上安装并登录编程智能体。Coaxi 负责协调，不能代替该产品自身的账号认证。'],
         ['Teammate', '队员', 'The selected teammate has a saved Agent configuration and an available status.', '所选队员已保存智能体运行配置，并显示可用状态。'],
         ['Project', '项目', 'Choose the actual working directory before asking the Agent to read or edit files.', '在请智能体读取或修改文件前，选定实际工作目录。']
       ]),
@@ -249,9 +249,9 @@
     channels: [
       fields('Connection pieces', '渠道接入的几个环节', [
         ['Provider', '平台', 'Choose the Feishu, Lark or DingTalk path that matches the external organization. Each provider has its own app and bot requirements.', '按组织实际使用的平台选择飞书、Lark 或钉钉；各平台的应用和 Bot 要求不同。'],
-        ['Account and app', '账号与应用', 'Complete the provider’s authorization and application setup shown in Rovai. The account must have the permissions needed to publish the bot.', '按 Rovai 页面提示完成平台授权和应用设置；账号需要具备发布 Bot 所需权限。'],
+        ['Account and app', '账号与应用', 'Complete the provider’s authorization and application setup shown in Coaxi. The account must have the permissions needed to publish the bot.', '按 Coaxi 页面提示完成平台授权和应用设置；账号需要具备发布 Bot 所需权限。'],
         ['Teammate bot', '队员 Bot', 'Connect the external bot to the intended teammate so messages reach the right Agent configuration.', '把外部 Bot 关联到目标队员，使外部消息进入正确的智能体配置。'],
-        ['Publication and connection', '发布与连接', 'Finish provider publication, then check Rovai reports the bot connected. Setup in one interface alone may not make the bot usable.', '完成平台发布，再确认 Rovai 显示已连接。只在一边填完设置未必能实际收发。']
+        ['Publication and connection', '发布与连接', 'Finish provider publication, then check Coaxi reports the bot connected. Setup in one interface alone may not make the bot usable.', '完成平台发布，再确认 Coaxi 显示已连接。只在一边填完设置未必能实际收发。']
       ]),
       prose('Test the full route', '做一次完整收发测试',
         ['Send a small message from the intended external chat. Confirm which teammate received it, where the reply appeared and whether an execution record was created.', 'The connected host still runs the Agent. If messages do not arrive, check provider permissions, bot publication, connection state and the target conversation before sending bigger work.'],
@@ -259,7 +259,7 @@
     ],
     remote: [
       fields('Host and browser roles', '主机与浏览器各负责什么', [
-        ['Host App', '主机应用', 'Runs Rovai, keeps the project files and starts the Agent. It must stay running for remote work.', '运行 Rovai、保存项目文件并启动智能体；远程使用时需要保持运行。'],
+        ['Host App', '主机应用', 'Runs Coaxi, keeps the project files and starts the Agent. It must stay running for remote work.', '运行 Coaxi、保存项目文件并启动智能体；远程使用时需要保持运行。'],
         ['Remote service', '远程服务', 'Enabled in Settings → Remote connection. The page displays the address and connection state you should verify.', '在“设置 → 远程连接”启用；页面会显示需要核对的地址与连接状态。'],
         ['Browser', '浏览器', 'Signs in to the host’s workspace and displays conversations. Opening a browser does not copy the repository or move execution to that device.', '登录并显示主机工作台；浏览器不会自动复制仓库，也不会把执行迁到访问设备。'],
         ['Outside the local network', '跨网络访问', 'Arrange a reachable private network or HTTPS entry before using the address away from the host network.', '离开主机所在网络前，先配置可到达主机的私有网络或 HTTPS 入口。']
@@ -298,7 +298,7 @@
         ['One-click creation', '一键创建新对话', 'After confirmation, a supported New entry creates an empty conversation with the saved team, without the creation dialog.', '确认开启后，受支持的新建入口会使用已保存队伍直接创建空白会话，不再显示创建窗口。']
       ]),
       prose('How one-click chooses the project', '一键创建如何决定项目',
-        ['The selected project or entry point still determines where work lives: a project’s plus button uses that project, the Quick chat plus button uses Quick chat, and the top New chat follows the selected project. An entry that needs a workspace choice can still ask for one.', 'One-click creation does not send a message or start an Agent run. If defaults are missing or invalid, Rovai opens the normal creation dialog so you can correct them. Turn one-click off when you want to choose the team, lead or name for each new conversation.'],
+        ['The selected project or entry point still determines where work lives: a project’s plus button uses that project, the Quick chat plus button uses Quick chat, and the top New chat follows the selected project. An entry that needs a workspace choice can still ask for one.', 'One-click creation does not send a message or start an Agent run. If defaults are missing or invalid, Coaxi opens the normal creation dialog so you can correct them. Turn one-click off when you want to choose the team, lead or name for each new conversation.'],
         ['项目入口仍决定工作位置：项目旁的加号使用该项目，快速对话旁的加号使用快速对话，顶部“新对话”跟随当前所选项目；需要选择工作区的入口仍可能要求你选择。', '一键创建只生成空白会话，不会自动发送消息或启动智能体。默认配置缺失或失效时会回退到正常创建窗口。若每次都想改队员、队长或名称，可以关闭一键创建。']),
       points('Other General controls', '通用页其他设置',
         ['World map controls whether its view and controls appear in conversations; it does not change the conversation’s messages.', 'Window size and position are remembered automatically on desktop. Use Reset window if the saved layout becomes inconvenient.', 'Appearance is a separate Settings page. Changing presentation does not rewrite existing conversation content.'],
@@ -332,8 +332,8 @@
         ['Export', '导出', 'Use JSON export when you need to inspect or compare the reported raw entries outside the App.', '需要在应用外检查或比较已报告记录时，可导出 JSON。']
       ]),
       prose('Read the number with its coverage', '看数字时同时看覆盖范围',
-        ['A missing value is unknown, not zero. A cost estimate shown in Rovai may differ from the provider’s final bill or account usage page.', 'When a run appears absent, check its time range and Agent filter, then compare with the execution record. Use Refresh for newly completed work.'],
-        ['缺失值是未知，不是零。Rovai 中显示的成本估算可能与服务商最终账单或账号用量页不同。', '某次执行没出现时，先核对时间范围和智能体筛选，再对照执行记录；新完成的工作可点击刷新。'])
+        ['A missing value is unknown, not zero. A cost estimate shown in Coaxi may differ from the provider’s final bill or account usage page.', 'When a run appears absent, check its time range and Agent filter, then compare with the execution record. Use Refresh for newly completed work.'],
+        ['缺失值是未知，不是零。Coaxi 中显示的成本估算可能与服务商最终账单或账号用量页不同。', '某次执行没出现时，先核对时间范围和智能体筛选，再对照执行记录；新完成的工作可点击刷新。'])
     ]
   };
 

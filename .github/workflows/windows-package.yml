@@ -44,10 +44,10 @@ jobs:
       - name: Upload unsigned package evidence
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: rovai-windows-x64-unsigned-${{ github.sha }}
+          name: coaxi-windows-x64-unsigned-${{ github.sha }}
           path: |
-            dist/Rovai-AI-*-x64.exe
-            dist/Rovai-AI-*-x64.exe.blockmap
+            dist/Coaxi-AI-*-x64.exe
+            dist/Coaxi-AI-*-x64.exe.blockmap
             dist/latest.yml
             dist/windows-release-manifest.json
             dist/windows-verification-report.txt

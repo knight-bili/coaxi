@@ -64,7 +64,7 @@ export function createFeishuExecutionPreviewHost(
     const request = parseFeishuPreviewRequest(argv)
     if (!request || !coreDataPath) return undefined
     return new FeishuExecutionPreviewService(request, {
-      readOwner: (agentId, appId) => readFeishuPreviewOwner(join(coreDataPath, 'rovai.sqlite'), agentId, appId),
+      readOwner: (agentId, appId) => readFeishuPreviewOwner(join(coreDataPath, 'coaxi.sqlite'), agentId, appId),
       report: fields => console.info('[feishu.execution_preview]', JSON.stringify(fields))
     })
   } catch {

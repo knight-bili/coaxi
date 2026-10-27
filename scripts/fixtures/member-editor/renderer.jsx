@@ -32,7 +32,7 @@ console.info = (label, ...values) => {
   if (label === '[model-catalog] display') catalogDisplayTimings.push(values[0])
   fixtureConsoleInfo(label, ...values)
 }
-window.rovai = {
+window.coaxi = {
   platform: 'darwin',
   currentUserProfile: {
     get: async () => JSON.parse(localStorage.getItem('fixture-current-user-profile') ?? '{"displayName":"","avatarDataUrl":null}'),
@@ -63,7 +63,7 @@ window.rovai = {
     },
     selectSource: async () => selectedSource,
     save: async (source) => {
-      const avatarRef = `rovai://member-avatar/managed/${crypto.randomUUID()}`
+      const avatarRef = `coaxi://member-avatar/managed/${crypto.randomUUID()}`
       assets.set(avatarRef, source)
       return { avatarRef, crop: source.crop }
     }

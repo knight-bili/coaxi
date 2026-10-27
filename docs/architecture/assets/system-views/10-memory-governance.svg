@@ -3,7 +3,7 @@
 <desc id="figure-description">队员经 memory.view 对照完整 Scope，通过 memory.write 提报新增或修订，分别归入共同记忆、队员记忆与队员间记忆。Hearth 保留手动晋升审核，Revision、Supersession、Retire 与 Forget 表达修订、替代、退役和显式遗忘。当前有效记忆经按需检索和读取用于下一次实践，实践反馈再回到经验提报，形成持续演进的闭环；成长课题提供实践方向。</desc>
 <rect width="1608" height="1423" fill="#fcfdfc"/>
 <g font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif" fill="#253c31">
-<text x="48" y="40" fill="#708078" font-size="12" font-weight="600" letter-spacing="2">ROVAI AI / ARCHITECTURE</text>
+<text x="48" y="40" fill="#708078" font-size="12" font-weight="600" letter-spacing="2">COAXI AI / ARCHITECTURE</text>
 <text x="1560" y="40" fill="#708078" font-size="13" text-anchor="end">图 10</text>
 <text x="48" y="94" font-size="34" font-weight="600">记忆：主动提报与持续演进</text>
 

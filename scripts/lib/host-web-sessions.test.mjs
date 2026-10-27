@@ -13,17 +13,17 @@ const chrome = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
 // layers cannot prove that production pages release their SSE/request ownership.
 test('closing and reopening more than 32 browser tabs preserves online sessions and separate drafts', { timeout: 180_000 }, async t => {
   if (process.platform !== 'darwin' || !await access(chrome).then(() => true, () => false)) { t.skip('Requires macOS Chrome'); return }
-  const fixture = await realpath(await mkdtemp(join(tmpdir(), 'rovai-session-tabs-')))
+  const fixture = await realpath(await mkdtemp(join(tmpdir(), 'coaxi-session-tabs-')))
   const data = join(fixture, 'core'), profile = join(fixture, 'chrome')
-  const output = process.env.ROVAI_SESSION_OUTPUT ?? join(fixture, 'evidence')
+  const output = process.env.COAXI_SESSION_OUTPUT ?? join(fixture, 'evidence')
   await mkdir(output, { recursive: true })
   console.log(JSON.stringify({ channel: 'automatic_acceptance', dataDir: data, skillLibraryRoot: join(data, 'skills'), mcpConfigPath: join(data, 'mcp.json'), profile, runtime: false }))
-  const host = launchHost(process.env.ROVAI_HOST_BIN ?? join(repository, 'target/debug/rovai-host'), [
+  const host = launchHost(process.env.COAXI_HOST_BIN ?? join(repository, 'target/debug/coaxi-host'), [
     ...coreDataDirectoryArguments(data), '--skill-library-root', join(data, 'skills'), '--mcp-config-path', join(data, 'mcp.json')
   ], { cwd: repository })
   const launch = () => launchAcceptanceBrowser({ executable: chrome, args: ['--headless=new', '--no-first-run', '--no-default-browser-check', '--remote-debugging-port=0', `--user-data-dir=${profile}`, 'about:blank'] })
   const ready = `document.querySelector('.camp-nav-open') && !document.querySelector('.web-login-overlay')`
-  const identity = `JSON.parse(sessionStorage.getItem('rovai.web.session.v1')).editor.clientId`
+  const identity = `JSON.parse(sessionStorage.getItem('coaxi.web.session.v1')).editor.clientId`
   const composer = `document.querySelector('#camp-message')`
   const openCamp = async page => {
     await page.evaluate(`document.querySelector('.camp-nav-open').click()`)
@@ -34,7 +34,7 @@ test('closing and reopening more than 32 browser tabs preserves online sessions 
     await within(host.ready)
     const [member] = await host.request('members.list')
     await host.request('camps.create', { commandId: crypto.randomUUID(), name: 'Session capacity', workspace: null, memberAgentIds: [member.agentId], defaultLeadAgentId: member.agentId, collaborationMode: 'peer' })
-    const web = await host.request('host.web.start', { listen: '127.0.0.1:0', uiDirectory: process.env.ROVAI_WEB_UI ?? join(repository, 'out/web') })
+    const web = await host.request('host.web.start', { listen: '127.0.0.1:0', uiDirectory: process.env.COAXI_WEB_UI ?? join(repository, 'out/web') })
     browser = await launch()
     await browser.send('Page.navigate', { url: web.origin })
     await browser.wait(`document.querySelector('#administrator-token')!==null`)

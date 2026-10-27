@@ -19,8 +19,8 @@ const sha=async p=>createHash('sha256').update(await readFile(p)).digest('hex'),
 const build=await load(join(candidate,'native-build-result.json'));assert.equal(build.exit_code,0)
 assert.equal(execFileSync('git',['diff','--name-only',build.source_commit,'HEAD','--','crates','Cargo.toml','Cargo.lock'],{cwd:root,encoding:'utf8'}).trim(),'')
 assert.equal(execFileSync('git',['diff','--name-only','HEAD','--','crates','Cargo.toml','Cargo.lock'],{cwd:root,encoding:'utf8'}).trim(),'')
-const binary=build.binaries.find(b=>b.name==='rovai-host.exe');assert.equal(await sha(binary.path),binary.sha256)
-const fixture=await realpath(await mkdtemp(join(tmpdir(),'rovai-r08-real-file-wait-')))
+const binary=build.binaries.find(b=>b.name==='coaxi-host.exe');assert.equal(await sha(binary.path),binary.sha256)
+const fixture=await realpath(await mkdtemp(join(tmpdir(),'coaxi-r08-real-file-wait-')))
 const prepared=JSON.parse(execFileSync(binary.path,['--prepare-windows-data-root',join(fixture,'formal')],{encoding:'utf8',windowsHide:true}))
 const dataDir=prepared.core,skillLibraryRoot=join(dataDir,'managed-skill-library'),mcpConfigPath=join(dataDir,'mcp.json'),home=join(fixture,'home')
 for(const p of [home,join(home,'AppData/Roaming'),join(home,'AppData/Local'),join(fixture,'tmp')])await mkdir(p,{recursive:true})
@@ -68,7 +68,7 @@ try{
  assert.equal((await observe(files[4].path)).intent.sha256,files[4].sha256)
  const after=await host.request('singleChat.get',{conversationId});assert.deepEqual(after.draft,before.draft);assert.deepEqual(after.agentRuns,[])
  for(const f of files)assert.equal(await sha(f.path),f.sha256)
- const db=new DatabaseSync(join(dataDir,'rovai.sqlite'),{readOnly:true});try{report.databaseCounts={messages:db.prepare('SELECT (SELECT COUNT(*) FROM camp_message)+(SELECT COUNT(*) FROM conversation_message) n').get().n,runs:db.prepare('SELECT COUNT(*) n FROM agent_run').get().n}}finally{db.close()}
+ const db=new DatabaseSync(join(dataDir,'coaxi.sqlite'),{readOnly:true});try{report.databaseCounts={messages:db.prepare('SELECT (SELECT COUNT(*) FROM camp_message)+(SELECT COUNT(*) FROM conversation_message) n').get().n,runs:db.prepare('SELECT COUNT(*) n FROM agent_run').get().n}}finally{db.close()}
  assert.equal(report.databaseCounts.messages,0);assert.equal(report.databaseCounts.runs,0)
  record('all_slots_reuse_after_io_release_without_draft_write_source_change_message_or_agent_run')
  report.status='passed'

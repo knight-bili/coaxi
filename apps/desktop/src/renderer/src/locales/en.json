@@ -1,4 +1,5 @@
 {
+  "搜索或输入网址": "Search or enter a URL",
   "已接管的帮手会话": "Taken-over helper conversation",
   "帮手会话控制": "Helper conversation controls",
   "停止原任务并接管": "Stop original task and take over",
@@ -3710,7 +3711,7 @@
   "模型 ID 不能重复。": "Model IDs must be unique.",
   "请选择一个默认模型。": "Choose a default model.",
   "变量名需以字母或下划线开头，只含字母、数字、下划线。": "Variable names must start with a letter or underscore and contain only letters, digits, and underscores.",
-  "ROVAI_ 开头的变量由应用管理。": "Variables beginning with ROVAI_ are managed by the app.",
+  "COAXI_ 开头的变量由应用管理。": "Variables beginning with COAXI_ are managed by the app.",
   "请在原生凭据来源中配置此密钥。": "Configure this key in its native credential source.",
   "变量值包含空字符或超过长度限制。": "The value contains a null character or exceeds the length limit.",
   "变量名重复。": "Duplicate variable name.",

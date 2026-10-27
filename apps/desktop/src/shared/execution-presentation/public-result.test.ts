@@ -94,7 +94,7 @@ describe('ExecutionStep publicResult boundary', () => {
   })
 
   it('preserves message arguments and echoed result text', () => {
-    const projected = step([event({ item: { type: 'commandExecution', command: 'rovai send --public-only --body "private-message"', status: 'completed', aggregatedOutput: 'private-message' } }, 'activity.completed')])
+    const projected = step([event({ item: { type: 'commandExecution', command: 'coaxi send --public-only --body "private-message"', status: 'completed', aggregatedOutput: 'private-message' } }, 'activity.completed')])
     expect(projected.publicResult).toBe('private-message')
     expect(projected.publicCommand).toContain('private-message')
   })

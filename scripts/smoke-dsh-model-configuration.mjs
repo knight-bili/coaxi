@@ -13,10 +13,10 @@ const pkg = resolve(process.argv[2])
 const { version } = JSON.parse(await readFile(join(pkg, 'package.json'), 'utf8'))
 const require = createRequire(join(pkg, 'package.json'))
 const { parse } = require('yaml')
-const root = await mkdtemp(join(tmpdir(), 'rovai-dsh-model-config-'))
+const root = await mkdtemp(join(tmpdir(), 'coaxi-dsh-model-config-'))
 const workspace = join(root, 'workspace')
 await mkdir(workspace)
-const plugin = resolve(import.meta.dirname, '../crates/rovai-core/src/dsh/models.mjs')
+const plugin = resolve(import.meta.dirname, '../crates/coaxi-core/src/dsh/models.mjs')
 const requests = [], results = [], requestEfforts = []
 let wireFailure, sequence = 0
 const server = createServer(async (request, response) => {
@@ -68,7 +68,7 @@ async function fixture(name, shared = true) {
 }
 async function start(home) {
   const resultPath = join(root, `result-${++sequence}.json`), patch = `${resultPath}.patch`
-  await json(patch, [{ insert: [{ id: 'rovai-model-configuration', name: plugin, config: { resultPath } }] }])
+  await json(patch, [{ insert: [{ id: 'coaxi-model-configuration', name: plugin, config: { resultPath } }] }])
   const child = spawn(process.execPath, [join(pkg, 'lib/bin.js'), '--profile', 'acp', '--patch', patch], {
     cwd: workspace, env: { PATH: process.env.PATH, HOME: join(root, 'isolated-home'), DSH_HOME: home,
       DSH_AGENTS_HOME: join(home, 'agents'), DSH_TELEMETRY_DISABLED: '1',
@@ -188,7 +188,7 @@ try {
     if (wireFailure) throw wireFailure
   })
   if (supplements) {
-    assert((await readdir(join(home, 'backups'))).some(name => name.startsWith('rovai-settings-')))
+    assert((await readdir(join(home, 'backups'))).some(name => name.startsWith('coaxi-settings-')))
     await json(join(home, 'profiles/web/cordis.patch.yml'), [])
     await check(home, 'delete-web-route-after-native-migration', async runtime => {
       assert(!runtime.models.includes(JSON.stringify(['extra', 'same-model'])))

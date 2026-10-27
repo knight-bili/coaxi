@@ -11,11 +11,11 @@ import { removeEphemeralRuntimeCampFilesRoot } from './lib/runtime-camp-files-ro
 
 // Caller supplies an isolated official HOME: a 36k model context for auto,
 // or a local provider fault proxy for reactive. Never fake native events.
-const mode = process.env.ROVAI_ZCODE_CONTEXT_CASE
-const coldResume = process.env.ROVAI_ZCODE_CONTEXT_COLD_RESUME === '1'
+const mode = process.env.COAXI_ZCODE_CONTEXT_CASE
+const coldResume = process.env.COAXI_ZCODE_CONTEXT_COLD_RESUME === '1'
 assert(['auto', 'reactive'].includes(mode))
 const root = resolve(import.meta.dirname, '..')
-const fixture = await realpath(await mkdtemp(join(tmpdir(), 'rovai-zcode-context-')))
+const fixture = await realpath(await mkdtemp(join(tmpdir(), 'coaxi-zcode-context-')))
 const project = join(fixture, 'project')
 const data = join(fixture, 'data')
 const events = []
@@ -24,8 +24,8 @@ let passed = false
 try {
   await mkdir(project)
   await writeFile(join(project, 'README.md'), '# ZCode context fixture\n')
-  for (const args of [['init', '-b', 'main'], ['add', '.'], ['-c', 'user.name=Rovai Smoke', '-c', 'user.email=smoke@rovai.local', 'commit', '-m', 'fixture']]) execFileSync('git', args, { cwd: project, stdio: 'ignore' })
-  const startCore = () => startQualificationCore({ coreExecutable: join(root, 'target/debug/rovai-core'), dataDirectory: data,
+  for (const args of [['init', '-b', 'main'], ['add', '.'], ['-c', 'user.name=Coaxi Smoke', '-c', 'user.email=smoke@coaxi.local', 'commit', '-m', 'fixture']]) execFileSync('git', args, { cwd: project, stdio: 'ignore' })
+  const startCore = () => startQualificationCore({ coreExecutable: join(root, 'target/debug/coaxi-core'), dataDirectory: data,
     workingDirectory: root, runtimeCacheDirectory: join(fixture, 'cache'), onNotification: (e) => events.push(e) })
   core = startCore()
   const workspace = await core.request('workspaces.inspect', { path: project })
@@ -92,7 +92,7 @@ try {
     throw new Error('Context fixture Run timed out')
   }
   function query(sql) {
-    return JSON.parse(execFileSync('sqlite3', ['-json', join(data, 'rovai.sqlite'), sql], { encoding: 'utf8' }) || '[]')
+    return JSON.parse(execFileSync('sqlite3', ['-json', join(data, 'coaxi.sqlite'), sql], { encoding: 'utf8' }) || '[]')
   }
 } finally {
   if (core) await core.stop()

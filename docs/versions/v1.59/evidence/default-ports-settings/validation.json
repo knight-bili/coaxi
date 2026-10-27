@@ -5,7 +5,7 @@
   "architecture": "arm64",
   "desktopPackagedApp": true,
   "desktopListen": "0.0.0.0:8766",
-  "serverBinary": "target/debug/rovai-server",
+  "serverBinary": "target/debug/coaxi-server",
   "serverDefault": "127.0.0.1:8767",
   "webSettingsWithoutControls": true,
   "webSettingsWidth": 270,

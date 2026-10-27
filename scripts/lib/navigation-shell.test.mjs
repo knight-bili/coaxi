@@ -14,7 +14,7 @@ test('production navigation shell preserves drafts and supports complete collaps
   if (!admitElectronIntegrationTest(t)) return
   const root=resolve(import.meta.dirname,'../..'), source=join(root,'scripts/fixtures/navigation-shell')
   const temporaryRoot=await realpath(tmpdir())
-  const fixture=await mkdtemp(join(temporaryRoot,'rovai-navigation-shell-'))
+  const fixture=await mkdtemp(join(temporaryRoot,'coaxi-navigation-shell-'))
   let child, closed
   try {
     await build({configFile:false,root:source,base:'./',logLevel:'error',plugins:[react()],resolve:{alias:{'@contracts':join(root,'packages/contracts/src/index.ts')}},build:{outDir:join(fixture,'renderer'),minify:false}})
@@ -29,11 +29,11 @@ test('production navigation shell preserves drafts and supports complete collaps
     assert.equal(JSON.parse(output.split('\n').find(line=>line.startsWith('{'))).ok,true)
   } finally {
     if(child&&child.exitCode===null&&child.signalCode===null){child.kill('SIGKILL');await closed}
-    if(process.env.ROVAI_KEEP_NAVIGATION_FIXTURE==='1')process.stdout.write(`Navigation fixture: ${fixture}\n`)
+    if(process.env.COAXI_KEEP_NAVIGATION_FIXTURE==='1')process.stdout.write(`Navigation fixture: ${fixture}\n`)
     else {
       const target=await realpath(fixture)
       assert.equal(dirname(target),temporaryRoot)
-      assert(basename(target).startsWith('rovai-navigation-shell-'))
+      assert(basename(target).startsWith('coaxi-navigation-shell-'))
       await rm(target,{recursive:true,force:true})
     }
   }

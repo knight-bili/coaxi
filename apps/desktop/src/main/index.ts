@@ -13,7 +13,7 @@ import { InteractionComputerIndicator } from './interaction-computer-indicator'
 import { KeyboardShortcutsStore } from './keyboard-shortcuts'
 import { WorkbenchEditorRecovery } from './workbench-editor-recovery'
 import { installUsageCardExport } from './usage-card-export'
-import { resolveWindowZoomAction } from '../shared/codeg-keyboard-shortcuts'
+import { resolveWindowZoomAction } from '../shared/coaxi-keyboard-shortcuts'
 import { systemInterfaceLanguage } from '../shared/interface-languages'
 import { creationPreferences, withHostConversationPreferences } from '../shared/host-general-preferences'
 import { createHostChannelHandler } from './host-channels'
@@ -65,7 +65,7 @@ import type {
 } from '@contracts'
 import {
   CoreClient,
-  RovaiRequestError,
+  CoaxiRequestError,
   desktopSkillLibraryRoot,
   resolveCoreBinary,
   resolveDesktopBootstrapBinary
@@ -478,7 +478,7 @@ const APP_NAME = PRODUCT_NAME
 app.setName(APP_NAME)
 if (process.platform === 'win32') app.setAppUserModelId(PRODUCT_APPLICATION_ID)
 protocol.registerSchemesAsPrivileged([{
-  scheme: 'rovai-preview',
+  scheme: 'coaxi-preview',
   privileges: {
     standard: true,
     secure: true,
@@ -489,7 +489,7 @@ protocol.registerSchemesAsPrivileged([{
 }])
 const hasExplicitUserDataDirectory = app.commandLine.hasSwitch('user-data-dir')
 const isolatedAcceptanceInstance =
-  process.env.ROVAI_ALLOW_ISOLATED_INSTANCE === '1'
+  process.env.COAXI_ALLOW_ISOLATED_INSTANCE === '1'
   && hasExplicitUserDataDirectory
 let coreDataPath: string | null = null
 let windowsBootstrap: WindowsBootstrapAssessment | null = null
@@ -531,10 +531,10 @@ if (windowsBootstrap?.kind === 'blocked') {
 }
 let appUpdates: AppUpdatesService | null = null
 let mainWindow: BrowserWindow | null = null
-const deepLinks=createDeepLinkInbox(()=>{if(mainWindow&&!mainWindow.isDestroyed())mainWindow.webContents.send('rovai:deep-link-available')})
+const deepLinks=createDeepLinkInbox(()=>{if(mainWindow&&!mainWindow.isDestroyed())mainWindow.webContents.send('coaxi:deep-link-available')})
 for(const argument of process.argv)deepLinks.offer(argument)
 app.on('open-url',(event,url)=>{event.preventDefault();if(primaryInstance&&deepLinks.offer(url)&&mainWindow&&!mainWindow.isDestroyed()){if(mainWindow.isMinimized())mainWindow.restore();mainWindow.show();mainWindow.focus()}})
-ipcMain.handle('rovai:deep-links',(event,action:unknown,requestId:unknown)=>{
+ipcMain.handle('coaxi:deep-links',(event,action:unknown,requestId:unknown)=>{
   if(!mainWindow||mainWindow.isDestroyed()||event.sender!==mainWindow.webContents||event.senderFrame!==mainWindow.webContents.mainFrame)throw new Error('deep_link.local_owner_required')
   if(action==='peek')return deepLinks.peek()
   if(action==='acknowledge'&&typeof requestId==='string'){deepLinks.acknowledge(requestId);return}
@@ -652,7 +652,7 @@ const channelHostLifecycle = new ChannelHostLifecycle({
     )
     if (coreDataPath !== null) {
       await removeRetiredChannelCredentialFiles(coreDataPath).catch((error) => {
-        console.warn('[rovai] Retired channel credential file cleanup failed; Channel Hosts remain available.', error)
+        console.warn('[coaxi] Retired channel credential file cleanup failed; Channel Hosts remain available.', error)
       })
     }
   },
@@ -660,14 +660,14 @@ const channelHostLifecycle = new ChannelHostLifecycle({
 })
 channelSettings.onChanged((snapshot) => {
   void executionView.setPublishedChannelBotAvailable(hasPublishedChannelBot(snapshot)).catch((error) => {
-    console.warn('[rovai] Execution Web published Bot gate update failed.', error)
+    console.warn('[coaxi] Execution Web published Bot gate update failed.', error)
   })
   if (!mainWindow || mainWindow.isDestroyed() || mainWindow.webContents.isDestroyed()) return
-  mainWindow.webContents.send('rovai:channels-changed', snapshot)
+  mainWindow.webContents.send('coaxi:channels-changed', snapshot)
 })
 executionView.onChanged((snapshot) => {
   if (!mainWindow || mainWindow.isDestroyed() || mainWindow.webContents.isDestroyed()) return
-  mainWindow.webContents.send('rovai:execution-web-settings-changed', snapshot)
+  mainWindow.webContents.send('coaxi:execution-web-settings-changed', snapshot)
 })
 const localComposerAttachments = new LocalComposerAttachmentRegistry(
   join(app.getPath('userData'), 'local-composer-attachments-v1.json')
@@ -675,7 +675,7 @@ const localComposerAttachments = new LocalComposerAttachmentRegistry(
 const privateInputRecovery = coreDataPath === null ? null : new NativePrivateInputRecovery(
   join(app.getPath('userData'), 'private-input-recovery-v1')
 )
-ipcMain.on('rovai:private-input-recovery', (event, action: unknown, identity: unknown, value: unknown) => {
+ipcMain.on('coaxi:private-input-recovery', (event, action: unknown, identity: unknown, value: unknown) => {
   try {
     if (!privateInputRecovery || event.sender !== mainWindow?.webContents || event.senderFrame !== event.sender.mainFrame
       || typeof identity !== 'string' || (action !== 'get' && action !== 'set')) throw new Error('Private editor unavailable')
@@ -736,7 +736,7 @@ const filePreview = new FilePreviewService(
     },
     publishResourcesReleased(webContentsId, handleIds) {
       if (mainWindow && !mainWindow.isDestroyed() && mainWindow.webContents.id === webContentsId)
-        mainWindow.webContents.send('rovai:file-preview-resources-released', { handleIds })
+        mainWindow.webContents.send('coaxi:file-preview-resources-released', { handleIds })
     },
     publishExternalUpdate(notification) {
       if (
@@ -744,7 +744,7 @@ const filePreview = new FilePreviewService(
         || mainWindow.isDestroyed()
         || mainWindow.webContents.id !== notification.webContentsId
       ) return
-      mainWindow.webContents.send('rovai:file-preview-external-update', {
+      mainWindow.webContents.send('coaxi:file-preview-external-update', {
         threadId: notification.threadId,
         previewKeys: notification.previewKeys
       })
@@ -757,7 +757,7 @@ function installFilePreviewProtocol(window: BrowserWindow): void {
   const targetSession = window.webContents.session
   if (filePreviewProtocolSessions.has(targetSession)) return
   targetSession.webRequest.onBeforeRequest(
-    { urls: ['rovai-preview://asset/*'] },
+    { urls: ['coaxi-preview://asset/*'] },
     (details, callback) => {
       callback({
         cancel: !filePreview.authorizeHtmlAsset(
@@ -768,7 +768,7 @@ function installFilePreviewProtocol(window: BrowserWindow): void {
       })
     }
   )
-  targetSession.protocol.handle('rovai-preview', (request) => filePreview.serveHtmlAsset(request))
+  targetSession.protocol.handle('coaxi-preview', (request) => filePreview.serveHtmlAsset(request))
   filePreviewProtocolSessions.add(targetSession)
 }
 
@@ -829,7 +829,7 @@ async function initializeAppUpdates(): Promise<void> {
       ?? null) as DesktopAutoUpdater | null
     if (!autoUpdater) throw new Error('electron-updater did not expose autoUpdater')
   } catch (error) {
-    console.warn('[rovai] Application updater is unavailable; startup will continue.', error)
+    console.warn('[coaxi] Application updater is unavailable; startup will continue.', error)
   }
   const service = createAppUpdatesServiceFailOpen({
     currentVersion: () => app.getVersion(),
@@ -839,14 +839,14 @@ async function initializeAppUpdates(): Promise<void> {
     updater: autoUpdater as unknown as DesktopAutoUpdater | null,
     automaticChecksEnabled: !(
       isolatedAcceptanceInstance
-      && process.env.ROVAI_DISABLE_AUTO_UPDATE_CHECKS === '1'
+      && process.env.COAXI_DISABLE_AUTO_UPDATE_CHECKS === '1'
     )
   }, (error) => {
-    console.warn('[rovai] Application updater initialization failed; startup will continue.', error)
+    console.warn('[coaxi] Application updater initialization failed; startup will continue.', error)
   })
   service.onChanged((snapshot) => {
     if (!mainWindow || mainWindow.isDestroyed() || mainWindow.webContents.isDestroyed()) return
-    mainWindow.webContents.send('rovai:app-updates-changed', snapshot)
+    mainWindow.webContents.send('coaxi:app-updates-changed', snapshot)
   })
   appUpdates = service
 }
@@ -864,7 +864,7 @@ function removeRetiredLoginItemRegistration(): void {
       openAtLogin: false
     })
   } catch (error) {
-    console.warn('[rovai] Retired macOS login item cleanup failed; continuing.', error)
+    console.warn('[coaxi] Retired macOS login item cleanup failed; continuing.', error)
   }
 }
 
@@ -886,7 +886,7 @@ function publishAppearance(): AppearanceSnapshot {
   if (signature !== lastAppearanceSignature) {
     lastAppearanceSignature = signature
     if (mainWindow && !mainWindow.isDestroyed()) {
-      mainWindow.webContents.send('rovai:appearance-changed', snapshot)
+      mainWindow.webContents.send('coaxi:appearance-changed', snapshot)
     }
   }
   return snapshot
@@ -898,7 +898,7 @@ async function updateAppearancePreferences(patch: Partial<AppearancePreferences>
   nativeTheme.themeSource = nativeThemeSource(preferences.preference)
   if (mainWindow && !mainWindow.isDestroyed()) {
     mainWindow.webContents.setZoomFactor(pageZoomFactor(preferences.zoomPercentage))
-    mainWindow.webContents.send('rovai:page-zoom-changed', preferences.zoomPercentage)
+    mainWindow.webContents.send('coaxi:page-zoom-changed', preferences.zoomPercentage)
   }
   return publishAppearance()
 }
@@ -968,7 +968,7 @@ function createWindow(): void {
   const publishPageZoom = (): void => {
     if (window.isDestroyed() || window.webContents.isDestroyed()) return
     const percentage = pageZoomPercentage(window.webContents.getZoomFactor())
-    if (percentage !== null) window.webContents.send('rovai:page-zoom-changed', percentage)
+    if (percentage !== null) window.webContents.send('coaxi:page-zoom-changed', percentage)
   }
   const queuePageZoomFeedback = (): void => {
     if (pageZoomFeedbackTimer !== null) clearTimeout(pageZoomFeedbackTimer)
@@ -983,15 +983,15 @@ function createWindow(): void {
     if(input.type!=='keyDown'||input.isComposing||keyboardShortcuts.recording)return
     const fields={key:input.key,code:input.code,metaKey:input.meta,ctrlKey:input.control,altKey:input.alt,shiftKey:input.shift,isComposing:input.isComposing}
     const action = resolveWindowZoomAction(fields,keyboardShortcuts.bindings())
-    if (action === null){if(pageZoomAction(input,process.platform)!==null){event.preventDefault();window.webContents.send('rovai:keyboard-input',fields)}return}
+    if (action === null){if(pageZoomAction(input,process.platform)!==null){event.preventDefault();window.webContents.send('coaxi:keyboard-input',fields)}return}
 
     event.preventDefault()
     const percentage = nextPageZoomPercentage(window.webContents.getZoomFactor(), action)
     if (percentage === null) return
     window.webContents.setZoomFactor(pageZoomFactor(percentage))
-    window.webContents.send('rovai:page-zoom-changed', percentage)
+    window.webContents.send('coaxi:page-zoom-changed', percentage)
     void updateAppearancePreferences({ zoomPercentage: percentage }).catch((error) => {
-      console.warn('[rovai] Page zoom preference could not be saved.', error)
+      console.warn('[coaxi] Page zoom preference could not be saved.', error)
       if (!window.isDestroyed()) {
         window.webContents.setZoomFactor(pageZoomFactor(appearanceSnapshot().zoomPercentage))
         publishPageZoom()
@@ -1094,7 +1094,7 @@ async function openThreadFromAutomation(threadId: string): Promise<{ threadId: s
   window.focus()
   const publish = (): void => {
     if (!window.isDestroyed() && !window.webContents.isDestroyed()) {
-      window.webContents.send('rovai:user-automation-open-camp', { threadId })
+      window.webContents.send('coaxi:user-automation-open-camp', { threadId })
     }
   }
   if (window.webContents.isLoadingMainFrame()) {
@@ -1106,24 +1106,24 @@ async function openThreadFromAutomation(threadId: string): Promise<{ threadId: s
 }
 
 if (primaryInstance) void app.whenReady().then(async () => {
-  if(app.isPackaged&&!isolatedAcceptanceInstance){app.setAsDefaultProtocolClient('coaxi');app.setAsDefaultProtocolClient('rovai')}
+  if(app.isPackaged&&!isolatedAcceptanceInstance){app.setAsDefaultProtocolClient('coaxi');app.setAsDefaultProtocolClient('coaxi')}
   console.info(
     `[startup] stage=electron_ready elapsed_ms=${(performance.now() - mainStartupStartedAt).toFixed(1)}`
   )
   powerMonitor.on('suspend', () => {
     void core.notifyAutomationSystemSuspending().catch((error) => {
-      console.warn('[rovai] Scheduled Automation scheduler was not paused before suspend.', error)
+      console.warn('[coaxi] Scheduled Automation scheduler was not paused before suspend.', error)
     })
   })
   powerMonitor.on('resume', () => {
     const resumedAt = new Date().toISOString()
     void core.notifyAutomationSystemResumed(resumedAt).catch((error) => {
-      console.warn('[rovai] Scheduled Automation resume boundary was not updated.', error)
+      console.warn('[coaxi] Scheduled Automation resume boundary was not updated.', error)
     })
   })
   desktopBackgroundTimer = setInterval(() => {
     void dailyAnalysis?.tick().catch(() => undefined)
-    void evaluationHost?.tick().catch((error) => { console.warn('[rovai] Evaluation Host preparation failed:', error.message) })
+    void evaluationHost?.tick().catch((error) => { console.warn('[coaxi] Evaluation Host preparation failed:', error.message) })
   }, 500)
   desktopBackgroundTimer.unref()
   if(coreDataPath){try{await recoverLocalDataBeforeStores(coreDataPath)}catch(error){core.blockStartup({code:'local_data_recovery_required',message:error instanceof Error?error.message:String(error),retryable:false,details:{safetySnapshotPreserved:true}},'recovering_authority')}}
@@ -1137,7 +1137,7 @@ if (primaryInstance) void app.whenReady().then(async () => {
   const restorableLocationPath = join(userDataPath, 'restorable-location.json')
   const navigationPreferencesPath = join(userDataPath, 'navigation.json')
   await executionView.start().catch((error) => {
-    console.warn('[rovai] Execution Web service did not start; channel execution remains available.', error)
+    console.warn('[coaxi] Execution Web service did not start; channel execution remains available.', error)
   })
   generalPreferences = GeneralPreferencesStore.defaults(generalPreferencesPath, () => systemInterfaceLanguage([app.getLocale()]))
   if (process.platform === 'win32') {
@@ -1164,13 +1164,13 @@ if (primaryInstance) void app.whenReady().then(async () => {
   publishAppearance()
   core.onEvent((event) => {
     channelSettings.handleCoreEvent(event)
-    mainWindow?.webContents.send('rovai:event', event)
+    mainWindow?.webContents.send('coaxi:event', event)
   })
   core.onSnapshot((snapshot) => {
-    mainWindow?.webContents.send('rovai:supervisor-changed', snapshot)
+    mainWindow?.webContents.send('coaxi:supervisor-changed', snapshot)
     maybeInitializeOnboarding(snapshot)
     void channelHostLifecycle.update(snapshot).catch((error) => {
-      console.warn('[rovai] Channel Host transition failed; the App will remain available.', error)
+      console.warn('[coaxi] Channel Host transition failed; the App will remain available.', error)
     })
   })
   await keyboardShortcuts.get().catch(error=>console.warn('[shortcuts] saved settings unavailable',String(error)))
@@ -1273,7 +1273,7 @@ if (primaryInstance) void app.whenReady().then(async () => {
     window.focus()
   })
 }).catch((error: unknown) => {
-  console.error('[rovai] Desktop bootstrap initialization failed.', error)
+  console.error('[coaxi] Desktop bootstrap initialization failed.', error)
   if (mainWindow && !mainWindow.isDestroyed()) {
     publishLocalDegradations([{
       code: 'desktop_bootstrap_initialization_failed',
@@ -1314,25 +1314,25 @@ app.on('second-instance', (_event,arguments_) => {
 })
 
 const projectLauncherWindow=new ProjectLauncherWindow((method,params)=>core.request(method,params),()=>mainWindow,()=>({appearance:appearanceSnapshot(),language:generalPreferences?.get().interfaceLanguage??'zh-CN'}))
-ipcMain.handle('rovai:project-launcher',(event,action,input)=>projectLauncherWindow.invoke(event,action,input))
+ipcMain.handle('coaxi:project-launcher',(event,action,input)=>projectLauncherWindow.invoke(event,action,input))
 const officeWorkspace = new OfficeWorkspace((method,params)=>core.request(method,params),()=>mainWindow)
-ipcMain.handle('rovai:office-workspace',(event,input)=>officeWorkspace.invoke(event,input))
+ipcMain.handle('coaxi:office-workspace',(event,input)=>officeWorkspace.invoke(event,input))
 app.on('before-quit',()=>officeWorkspace.closeAll())
 const browserWorkspace = new BrowserWorkspace((method,params)=>core.request(method,params),()=>mainWindow)
 const interactionComputer = new InteractionComputer(core,()=>mainWindow)
 const keyboardShortcuts = new KeyboardShortcutsStore(()=>app.getPath('userData'))
 const workbenchEditorRecovery = new WorkbenchEditorRecovery(()=>app.getPath('userData'))
-ipcMain.handle('rovai:workbench-editor-recovery',(event,action,input)=>{if(!mainWindow||mainWindow.isDestroyed()||event.sender!==mainWindow.webContents||event.senderFrame!==mainWindow.webContents.mainFrame)throw new Error('工程恢复只允许当前桌面窗口使用。');if(action==='get')return workbenchEditorRecovery.get(input?.key);if(action==='put'){workbenchEditorRecovery.put(input);return}if(action==='copies')return workbenchEditorRecovery.copies(input?.key,input?.after??null);throw new Error('工程编辑恢复操作无效。')})
-ipcMain.handle('rovai:keyboard-shortcuts',(event,action,input)=>{if(!mainWindow||mainWindow.isDestroyed()||event.sender!==mainWindow.webContents||event.senderFrame!==mainWindow.webContents.mainFrame)throw new Error('shortcuts.local_owner_required');if(action==='get')return keyboardShortcuts.get();if(action==='save')return keyboardShortcuts.save(input);if(action==='recording'&&typeof input==='boolean'){keyboardShortcuts.recording=input;mainWindow.webContents.setIgnoreMenuShortcuts(input);return}throw new Error('shortcuts.operation_not_admitted')})
+ipcMain.handle('coaxi:workbench-editor-recovery',(event,action,input)=>{if(!mainWindow||mainWindow.isDestroyed()||event.sender!==mainWindow.webContents||event.senderFrame!==mainWindow.webContents.mainFrame)throw new Error('工程恢复只允许当前桌面窗口使用。');if(action==='get')return workbenchEditorRecovery.get(input?.key);if(action==='put'){workbenchEditorRecovery.put(input);return}if(action==='copies')return workbenchEditorRecovery.copies(input?.key,input?.after??null);throw new Error('工程编辑恢复操作无效。')})
+ipcMain.handle('coaxi:keyboard-shortcuts',(event,action,input)=>{if(!mainWindow||mainWindow.isDestroyed()||event.sender!==mainWindow.webContents||event.senderFrame!==mainWindow.webContents.mainFrame)throw new Error('shortcuts.local_owner_required');if(action==='get')return keyboardShortcuts.get();if(action==='save')return keyboardShortcuts.save(input);if(action==='recording'&&typeof input==='boolean'){keyboardShortcuts.recording=input;mainWindow.webContents.setIgnoreMenuShortcuts(input);return}throw new Error('shortcuts.operation_not_admitted')})
 const interactionComputerIndicator = new InteractionComputerIndicator(interactionComputer,()=>mainWindow,async()=>{try{await core.request('interaction.local',{action:'computer.stop',payload:{}})}finally{await interactionComputer.stop()}})
 app.once('will-quit',()=>interactionComputerIndicator.dispose())
 const interactionWorkspace = new InteractionWorkspace(core,browserWorkspace,()=>mainWindow,interactionComputer,new InteractionResultJournal(app.getPath('userData'),()=>coreDataPath))
-ipcMain.handle('rovai:interaction-computer',(event,method,input)=>interactionComputer.invoke(event,method,input))
+ipcMain.handle('coaxi:interaction-computer',(event,method,input)=>interactionComputer.invoke(event,method,input))
 app.on('before-quit',()=>{void interactionComputer.dispose()})
-ipcMain.handle('rovai:interaction-workspace',(event,action,payload)=>interactionWorkspace.invoke(event,action,payload))
+ipcMain.handle('coaxi:interaction-workspace',(event,action,payload)=>interactionWorkspace.invoke(event,action,payload))
 app.on('before-quit',()=>{void interactionWorkspace.dispose()})
 const webdavWorkspace = new WebdavWorkspace((method,params)=>core.request(method,params),()=>mainWindow,()=>app.getPath('userData'),(event,path,passphrase,kind,digest)=>backupWorkspace.inspectDownloaded(event,path,passphrase,kind,digest),(event,path,passphrase,digest,operationId)=>portableConfigurationPrivate.registerDownloaded(event,path,passphrase,digest,operationId))
-ipcMain.handle('rovai:webdav-workspace',(event,input)=>webdavWorkspace.invoke(event,input))
+ipcMain.handle('coaxi:webdav-workspace',(event,input)=>webdavWorkspace.invoke(event,input))
 const backupWorkspace = new BackupWorkspace(core,()=>coreDataPath,()=>mainWindow,()=>requestRendererQuitPreparation(mainWindow,()=>new MessageChannelMain()),()=>{browserWorkspace.revokeAll();officeWorkspace.closeAll()},()=>{app.relaunch();app.quit()},()=>app.getPath('userData'))
 const portableConfigurationPrivate=new PortableConfigurationPrivate(core,()=>mainWindow,async input=>{
   await localStoresLoaded
@@ -1351,7 +1351,7 @@ const portablePreferenceOwner = new PortablePreferenceOwner(core, localStoresLoa
       nativeTheme.themeSource = nativeThemeSource(preferences.preference)
       if (mainWindow && !mainWindow.isDestroyed()) {
         mainWindow.webContents.setZoomFactor(pageZoomFactor(preferences.zoomPercentage))
-        mainWindow.webContents.send('rovai:page-zoom-changed', preferences.zoomPercentage)
+        mainWindow.webContents.send('coaxi:page-zoom-changed', preferences.zoomPercentage)
       }
       publishAppearance()
     }
@@ -1360,7 +1360,7 @@ const portablePreferenceOwner = new PortablePreferenceOwner(core, localStoresLoa
   if (plan.targetId === 'general') {
     const store = requireGeneralPreferences()
     const state = await store.applyConfiguration(plan)
-    if (state === 'applied') mainWindow?.webContents.send('rovai:general-preferences-changed', store.get())
+    if (state === 'applied') mainWindow?.webContents.send('coaxi:general-preferences-changed', store.get())
     return state
   }
   if (plan.targetId === 'windowClose') return windowsWindowClose ? windowsWindowClose.applyConfiguration(plan) : 'pending'
@@ -1371,29 +1371,29 @@ core.onEvent(event => { if (event.method === 'portableConfiguration.filesChanged
 core.onSnapshot(snapshot => { if (snapshot.fullCoreState === 'ready') portablePreferenceOwner.wake() })
 void localStoresLoaded.then(() => portablePreferenceOwner.wake())
 app.on('before-quit', () => portablePreferenceOwner.dispose())
-ipcMain.handle('rovai:portable-configuration-private',(event,operation,input)=>portableConfigurationPrivate.invoke(event,operation,input))
-ipcMain.handle('rovai:backup-workspace',(event,operation,input)=>backupWorkspace.invoke(event,operation,input))
+ipcMain.handle('coaxi:portable-configuration-private',(event,operation,input)=>portableConfigurationPrivate.invoke(event,operation,input))
+ipcMain.handle('coaxi:backup-workspace',(event,operation,input)=>backupWorkspace.invoke(event,operation,input))
 const petWindow = new PetWindowService((method,params)=>core.request(method,params),()=>mainWindow)
 core.onEvent(event=>petWindow.onCoreEvent(event))
-ipcMain.handle('rovai:pets-synchronize',event=>petWindow.synchronize(event))
-ipcMain.handle('rovai:pet-request',(event,input)=>petWindow.read(event,input))
-ipcMain.handle('rovai:pet-control',(event,action)=>petWindow.control(event,action))
-ipcMain.handle('rovai:pet-hit-test',(event,input)=>petWindow.hitTest(event,input))
+ipcMain.handle('coaxi:pets-synchronize',event=>petWindow.synchronize(event))
+ipcMain.handle('coaxi:pet-request',(event,input)=>petWindow.read(event,input))
+ipcMain.handle('coaxi:pet-control',(event,action)=>petWindow.control(event,action))
+ipcMain.handle('coaxi:pet-hit-test',(event,input)=>petWindow.hitTest(event,input))
 app.on('before-quit',()=>petWindow.dispose())
-ipcMain.handle('rovai:pets-import',async event=>{
+ipcMain.handle('coaxi:pets-import',async event=>{
   if(!mainWindow||mainWindow.isDestroyed()||event.sender!==mainWindow.webContents||event.senderFrame!==mainWindow.webContents.mainFrame)throw new Error('pets.local_owner_required')
   const selected=await dialog.showOpenDialog(mainWindow,{title:'选择包含pet.json和spritesheet.webp的宠物文件夹',properties:['openDirectory']})
   if(selected.canceled||!selected.filePaths[0])return null
   return core.request('pets.local',{operation:'import_directory',source:selected.filePaths[0]})
 })
-ipcMain.handle('rovai:custom-skill-import',async(event,input:{skillId:string;expectedRevision?:string})=>{
+ipcMain.handle('coaxi:custom-skill-import',async(event,input:{skillId:string;expectedRevision?:string})=>{
   if(!mainWindow||mainWindow.isDestroyed()||event.sender!==mainWindow.webContents||event.senderFrame!==mainWindow.webContents.mainFrame)throw new Error('skill.local_owner_required')
   if(!input||typeof input.skillId!=='string')throw new Error('skill.invalid_request')
   const selected=await dialog.showOpenDialog(mainWindow,{title:'选择包含 SKILL.md 的技能文件夹',properties:['openDirectory']})
   if(selected.canceled||!selected.filePaths[0])return null
   return core.request('skillPacks.custom.local',{source:selected.filePaths[0],skillId:input.skillId,expectedRevision:input.expectedRevision??null})
 })
-ipcMain.handle('rovai:native-history',async(event,operation,value:unknown)=>{
+ipcMain.handle('coaxi:native-history',async(event,operation,value:unknown)=>{
   if(!mainWindow||mainWindow.isDestroyed()||event.sender!==mainWindow.webContents||event.senderFrame!==mainWindow.webContents.mainFrame)throw new Error('history.local_owner_required')
   if(!value||typeof value!=='object'||Array.isArray(value))throw new Error('history.invalid_request')
   const {threadId,provider,input}=value as {threadId:string;provider:string;input:Record<string,unknown>}
@@ -1414,17 +1414,17 @@ ipcMain.handle('rovai:native-history',async(event,operation,value:unknown)=>{
   if(operation!=='request'||!input||!['preview','import'].includes(String(input.operation)))throw new Error('history.operation_not_admitted')
   return core.request('history.local',{scope:{threadId},operation:input.operation,planId:input.planId,entryId:input.entryId,expectedDigest:input.expectedDigest})
 })
-ipcMain.handle('rovai:computer-workspace',async(event,value:unknown)=>{
+ipcMain.handle('coaxi:computer-workspace',async(event,value:unknown)=>{
   if(!mainWindow||mainWindow.isDestroyed()||event.sender!==mainWindow.webContents||event.senderFrame!==mainWindow.webContents.mainFrame)throw new Error('computer.local_owner_required')
   if(!value||typeof value!=='object'||Array.isArray(value))throw new Error('computer.invalid_request')
   const {threadId,input,commandId}=value as {threadId:string;input:unknown;commandId:string}
   if(typeof threadId!=='string'||typeof commandId!=='string')throw new Error('computer.invalid_request')
   return core.request('computer.local',{scope:{threadId},request:input,commandId})
 })
-ipcMain.handle('rovai:browser-workspace',(event,operation,input)=>browserWorkspace.invoke(event,operation,input))
+ipcMain.handle('coaxi:browser-workspace',(event,operation,input)=>browserWorkspace.invoke(event,operation,input))
 app.on('before-quit',()=>browserWorkspace.closeAll())
 
-ipcMain.handle('rovai:request', async (_event, method: CoreMethod, params?: unknown) => {
+ipcMain.handle('coaxi:request', async (_event, method: CoreMethod, params?: unknown) => {
   if (!allowedMethods.has(method)) {
     return {
       kind: 'failure',
@@ -1453,7 +1453,7 @@ ipcMain.handle('rovai:request', async (_event, method: CoreMethod, params?: unkn
     }
     return { kind: 'value', value }
   } catch (error) {
-    if (error instanceof RovaiRequestError) {
+    if (error instanceof CoaxiRequestError) {
       return { kind: 'failure', failure: error.toFailure() }
     }
     return {
@@ -1470,9 +1470,9 @@ ipcMain.handle('rovai:request', async (_event, method: CoreMethod, params?: unkn
   }
 })
 
-ipcMain.handle('rovai:supervisor-get-snapshot', () => core.getSnapshot())
+ipcMain.handle('coaxi:supervisor-get-snapshot', () => core.getSnapshot())
 
-ipcMain.handle('rovai:host-web', async (event, operation: unknown, value: unknown) => {
+ipcMain.handle('coaxi:host-web', async (event, operation: unknown, value: unknown) => {
   try {
     const result = await (async () => {
       if (!mainWindow || mainWindow.isDestroyed() || event.sender !== mainWindow.webContents
@@ -1502,7 +1502,7 @@ ipcMain.handle('rovai:host-web', async (event, operation: unknown, value: unknow
     })()
     return { kind: 'value', value: result }
   } catch (error) {
-    if (error instanceof RovaiRequestError) {
+    if (error instanceof CoaxiRequestError) {
       return { kind: 'failure', failure: error.toFailure() }
     }
     return { kind: 'failure', failure: {
@@ -1513,7 +1513,7 @@ ipcMain.handle('rovai:host-web', async (event, operation: unknown, value: unknow
   }
 })
 
-ipcMain.handle('rovai:supervisor-retry', () => {
+ipcMain.handle('coaxi:supervisor-retry', () => {
   if (windowsBootstrap?.kind === 'blocked' && core.getSnapshot().capabilities.fullCoreRetry) {
     // sessionData must be bound before ready. Retry the same root in a fresh
     // Desktop process rather than rebinding Chromium or opening a substitute DB.
@@ -1524,119 +1524,119 @@ ipcMain.handle('rovai:supervisor-retry', () => {
   return core.retryFullCore()
 })
 
-ipcMain.handle('rovai:file-preview-retention', (event, value: unknown) => {
+ipcMain.handle('coaxi:file-preview-retention', (event, value: unknown) => {
   // 已关闭主窗口的资源由releaseWindow回收，丢弃它迟到的保留状态，避免重建已释放会话。
   if (closedFilePreviewSenders.has(event.sender)) return
   return filePreview.updateRetention(requireFilePreviewSender(event), parseRetentionState(value))
 })
 
-ipcMain.handle('rovai:file-preview-bind-camp', (event, value: unknown) =>
+ipcMain.handle('coaxi:file-preview-bind-camp', (event, value: unknown) =>
   filePreview.bindThread(requireFilePreviewSender(event), parseFilePreviewThread(value)))
 
-ipcMain.handle('rovai:file-preview-open', (event, value: unknown) =>
+ipcMain.handle('coaxi:file-preview-open', (event, value: unknown) =>
   filePreview.open(requireFilePreviewSender(event), parseOpenFilePreviewRequest(value)))
 
-ipcMain.handle('rovai:file-preview-native-reference', (event, value: unknown) =>
+ipcMain.handle('coaxi:file-preview-native-reference', (event, value: unknown) =>
   filePreview.nativeReference(requireFilePreviewSender(event), parseNativeFileReferenceRequest(value)))
 
-ipcMain.handle('rovai:file-preview-restore', (event, value: unknown) =>
+ipcMain.handle('coaxi:file-preview-restore', (event, value: unknown) =>
   filePreview.restore(requireFilePreviewSender(event), parseRestoreFilePreviewRequest(value)))
 
-ipcMain.handle('rovai:file-preview-reopen', (event, value: unknown) =>
+ipcMain.handle('coaxi:file-preview-reopen', (event, value: unknown) =>
   filePreview.reopen(requireFilePreviewSender(event), parseReopenRequest(value)))
 
-ipcMain.handle('rovai:file-preview-read-text', (event, value: unknown) =>
+ipcMain.handle('coaxi:file-preview-read-text', (event, value: unknown) =>
   filePreview.readText(requireFilePreviewSender(event), parseGenerationRequest(value)))
 
-ipcMain.handle('rovai:file-preview-read-page', (event, value: unknown) =>
+ipcMain.handle('coaxi:file-preview-read-page', (event, value: unknown) =>
   filePreview.readPage(requireFilePreviewSender(event), parsePageRequest(value)))
 
-ipcMain.handle('rovai:file-preview-resolve-line', (event, value: unknown) =>
+ipcMain.handle('coaxi:file-preview-resolve-line', (event, value: unknown) =>
   filePreview.resolveLine(requireFilePreviewSender(event), parseLineRequest(value)))
 
-ipcMain.handle('rovai:file-preview-read-binary', (event, value: unknown) =>
+ipcMain.handle('coaxi:file-preview-read-binary', (event, value: unknown) =>
   filePreview.readBinary(requireFilePreviewSender(event), parseGenerationRequest(value)))
 
-ipcMain.handle('rovai:file-preview-prepare-html-site', (event, value: unknown) =>
+ipcMain.handle('coaxi:file-preview-prepare-html-site', (event, value: unknown) =>
   filePreview.prepareHtmlSite(requireFilePreviewSender(event), parseGenerationRequest(value)))
 
-ipcMain.handle('rovai:file-preview-release-html-site', (event, value: unknown) =>
+ipcMain.handle('coaxi:file-preview-release-html-site', (event, value: unknown) =>
   filePreview.releaseHtmlSite(requireFilePreviewSender(event), parseHtmlSiteRequest(value)))
 
-ipcMain.handle('rovai:file-preview-prepare-html', (event, value: unknown) =>
+ipcMain.handle('coaxi:file-preview-prepare-html', (event, value: unknown) =>
   filePreview.prepareHtml(requireFilePreviewSender(event), parseGenerationRequest(value)))
 
-ipcMain.handle('rovai:file-preview-reload', (event, value: unknown) =>
+ipcMain.handle('coaxi:file-preview-reload', (event, value: unknown) =>
   filePreview.reload(requireFilePreviewSender(event), parseReloadRequest(value)))
 
-ipcMain.handle('rovai:file-preview-release', (event, value: unknown) =>
+ipcMain.handle('coaxi:file-preview-release', (event, value: unknown) =>
   filePreview.release(requireFilePreviewSender(event), parseHandleRequest(value)))
 
-ipcMain.handle('rovai:file-preview-open-in-system', (event, value: unknown) =>
+ipcMain.handle('coaxi:file-preview-open-in-system', (event, value: unknown) =>
   filePreview.openInSystem(requireFilePreviewSender(event), parseHandleRequest(value)))
 
-ipcMain.handle('rovai:file-preview-reveal', (event, value: unknown) =>
+ipcMain.handle('coaxi:file-preview-reveal', (event, value: unknown) =>
   filePreview.revealInFolder(requireFilePreviewSender(event), parseHandleRequest(value)))
 
-ipcMain.handle('rovai:file-preview-copy-path', (event, value: unknown) =>
+ipcMain.handle('coaxi:file-preview-copy-path', (event, value: unknown) =>
   filePreview.copyPath(requireFilePreviewSender(event), parseCopyPathRequest(value)))
 
-ipcMain.handle('rovai:file-preview-choose-root', (event, value: unknown) =>
+ipcMain.handle('coaxi:file-preview-choose-root', (event, value: unknown) =>
   filePreview.chooseAuthorizedRoot(requireFilePreviewSender(event), parseChooseRootRequest(value)))
 
-ipcMain.handle('rovai:clipboard-write', (_event, input: unknown) => {
+ipcMain.handle('coaxi:clipboard-write', (_event, input: unknown) => {
   clipboard.write(parseClipboardWriteRequest(input))
 })
 
-ipcMain.handle('rovai:current-user-profile-get', async (event) => {
+ipcMain.handle('coaxi:current-user-profile-get', async (event) => {
   requireMainWindow(event.sender)
   await localStoresLoaded
   if (!currentUserProfile) throw new Error('个人资料尚未加载。')
   return currentUserProfile.get()
 })
 
-ipcMain.handle('rovai:current-user-profile-save', async (event, input: unknown) => {
+ipcMain.handle('coaxi:current-user-profile-save', async (event, input: unknown) => {
   requireMainWindow(event.sender)
   await localStoresLoaded
   if (!currentUserProfile) throw new Error('个人资料尚未加载。')
   return currentUserProfile.save(input)
 })
 
-ipcMain.handle('rovai:appearance-get', () => appearanceSnapshot())
+ipcMain.handle('coaxi:appearance-get', () => appearanceSnapshot())
 
-ipcMain.handle('rovai:appearance-set', async (event, preference: unknown) => {
+ipcMain.handle('coaxi:appearance-set', async (event, preference: unknown) => {
   requireMainWindow(event.sender)
   if (!isThemePreference(preference)) throw new Error('Unsupported theme preference')
   return updateAppearancePreferences({ preference })
 })
 
-ipcMain.handle('rovai:appearance-update', async (event, patch: unknown) => {
+ipcMain.handle('coaxi:appearance-update', async (event, patch: unknown) => {
   requireMainWindow(event.sender)
   // The store validates the complete allowlisted patch before queueing a write.
   return updateAppearancePreferences(patch as Partial<AppearancePreferences>)
 })
 
-ipcMain.handle('rovai:app-updates-get', (event) => {
+ipcMain.handle('coaxi:app-updates-get', (event) => {
   requireMainWindow(event.sender)
   return requireAppUpdates().get()
 })
 
-ipcMain.handle('rovai:app-updates-check', (event) => {
+ipcMain.handle('coaxi:app-updates-check', (event) => {
   requireMainWindow(event.sender)
   return requireAppUpdates().check('manual')
 })
 
-ipcMain.handle('rovai:app-updates-download', (event) => {
+ipcMain.handle('coaxi:app-updates-download', (event) => {
   requireMainWindow(event.sender)
   return requireAppUpdates().download()
 })
 
-ipcMain.handle('rovai:app-updates-install', (event) => {
+ipcMain.handle('coaxi:app-updates-install', (event) => {
   requireMainWindow(event.sender)
   return requireAppUpdates().install()
 })
 
-ipcMain.handle('rovai:app-updates-dismiss-prompt', (event, promptId: unknown) => {
+ipcMain.handle('coaxi:app-updates-dismiss-prompt', (event, promptId: unknown) => {
   requireMainWindow(event.sender)
   if (typeof promptId !== 'string' || promptId.length === 0 || promptId.length > 200) {
     throw new Error('Invalid application update prompt id')
@@ -1644,7 +1644,7 @@ ipcMain.handle('rovai:app-updates-dismiss-prompt', (event, promptId: unknown) =>
   return requireAppUpdates().dismissPrompt(promptId)
 })
 
-ipcMain.handle('rovai:window-application-menu-popup', (event, input: unknown) => {
+ipcMain.handle('coaxi:window-application-menu-popup', (event, input: unknown) => {
   if (process.platform !== 'win32') return false
   const request = parseWindowsApplicationMenuPopupRequest(input)
   if (!request) throw new Error('Unsupported Windows application menu request')
@@ -1666,19 +1666,19 @@ ipcMain.handle('rovai:window-application-menu-popup', (event, input: unknown) =>
   return true
 })
 
-ipcMain.handle('rovai:desktop-session-get-startup', async (event) => {
+ipcMain.handle('coaxi:desktop-session-get-startup', async (event) => {
   const snapshot = await desktopSessions.getWhenReady(event.sender.id)
   if (!snapshot) throw new Error('Main Window Session is unavailable')
   return structuredClone(snapshot)
 })
 
-ipcMain.handle('rovai:desktop-session-get-interface-language', async (event) => {
+ipcMain.handle('coaxi:desktop-session-get-interface-language', async (event) => {
   requireMainWindow(event.sender)
   await localStoresLoaded
   return requireGeneralPreferences().get().interfaceLanguage
 })
 
-ipcMain.handle('rovai:desktop-session-commit-location', async (_event, location: unknown) => {
+ipcMain.handle('coaxi:desktop-session-commit-location', async (_event, location: unknown) => {
   const validated = parseRestorableLocation(location)
   if (!validated) throw new Error('Unsupported restorable location')
   if (!restorableLocations) throw new Error('Restorable Location store is unavailable')
@@ -1689,14 +1689,14 @@ ipcMain.handle(WINDOW_CLOSE_CHANNEL, createWindowCloseRequestHandler(
   process.platform, () => windowsWindowClose, () => mainWindow
 ))
 
-ipcMain.handle('rovai:general-preferences-get', () => hostGeneralPreferences().get())
+ipcMain.handle('coaxi:general-preferences-get', () => hostGeneralPreferences().get())
 
-ipcMain.handle('rovai:general-preferences-set-language', (_event, language: unknown) => {
+ipcMain.handle('coaxi:general-preferences-set-language', (_event, language: unknown) => {
   if (!isInterfaceLanguage(language)) throw new Error('Unsupported interface language')
   return hostGeneralPreferences().setInterfaceLanguage(language)
 })
 
-ipcMain.handle('rovai:general-preferences-set-language-mode', async (event, mode: unknown) => {
+ipcMain.handle('coaxi:general-preferences-set-language-mode', async (event, mode: unknown) => {
   requireMainWindow(event.sender)
   if (mode !== 'manual' && mode !== 'system') throw new Error('Unsupported interface language mode')
   const api = hostGeneralPreferences()
@@ -1704,55 +1704,55 @@ ipcMain.handle('rovai:general-preferences-set-language-mode', async (event, mode
   return api.setInterfaceLanguageMode(mode)
 })
 
-ipcMain.handle('rovai:general-preferences-set-startup', (_event, mode: unknown) => {
+ipcMain.handle('coaxi:general-preferences-set-startup', (_event, mode: unknown) => {
   if (!isStartupLocationMode(mode)) throw new Error('Unsupported startup location mode')
   return hostGeneralPreferences().setStartupLocationMode(mode as StartupLocationMode)
 })
 
-ipcMain.handle('rovai:general-preferences-set-section', (_event, section: unknown) => {
+ipcMain.handle('coaxi:general-preferences-set-section', (_event, section: unknown) => {
   if (!isSettingsSection(section)) throw new Error('Unsupported settings section')
   return hostGeneralPreferences().setLastSettingsSection(section as SettingsSection)
 })
 
-ipcMain.handle('rovai:general-preferences-set-execution-placement', (_event, placement: unknown) => {
+ipcMain.handle('coaxi:general-preferences-set-execution-placement', (_event, placement: unknown) => {
   if (!isExecutionConsolePlacement(placement)) throw new Error('Unsupported execution console placement')
   return hostGeneralPreferences().setExecutionConsolePlacement(
     placement as ExecutionConsolePlacement
   )
 })
 
-ipcMain.handle('rovai:general-preferences-set-new-conversation-defaults', (_event, defaults: unknown, enableOneClick: unknown = false) => {
+ipcMain.handle('coaxi:general-preferences-set-new-conversation-defaults', (_event, defaults: unknown, enableOneClick: unknown = false) => {
   if (!isNewConversationDefaults(defaults)) throw new Error('Invalid default new conversation configuration')
   if (typeof enableOneClick !== 'boolean') throw new Error('Invalid one-click new conversation preference')
   return hostGeneralPreferences().setNewConversationDefaults(defaults, enableOneClick)
 })
 
-ipcMain.handle('rovai:general-preferences-set-one-click-new-conversation', (_event, enabled: unknown) => {
+ipcMain.handle('coaxi:general-preferences-set-one-click-new-conversation', (_event, enabled: unknown) => {
   if (typeof enabled !== 'boolean') throw new Error('Invalid one-click new conversation preference')
   return hostGeneralPreferences().setOneClickNewConversationEnabled(enabled)
 })
 
-ipcMain.handle('rovai:general-preferences-set-world-map', (_event, enabled: unknown) => {
+ipcMain.handle('coaxi:general-preferences-set-world-map', (_event, enabled: unknown) => {
   if (typeof enabled !== 'boolean') throw new Error('Invalid world map preference')
   return hostGeneralPreferences().setWorldMapEnabled(enabled)
 })
 
-ipcMain.handle('rovai:general-preferences-invalidate-new-conversation-defaults', (_event, expectedDefaults: unknown) => {
+ipcMain.handle('coaxi:general-preferences-invalidate-new-conversation-defaults', (_event, expectedDefaults: unknown) => {
   if (expectedDefaults !== undefined && expectedDefaults !== null && !isNewConversationDefaults(expectedDefaults)) throw new Error('Invalid expected default team')
   return hostGeneralPreferences().invalidateNewConversationDefaults(expectedDefaults)
 })
 
-ipcMain.handle('rovai:channels-get', (event) => {
+ipcMain.handle('coaxi:channels-get', (event) => {
   requireMainWindow(event.sender)
   return channelSettings.get()
 })
 
-ipcMain.handle('rovai:execution-web-settings-get', (event) => {
+ipcMain.handle('coaxi:execution-web-settings-get', (event) => {
   requireMainWindow(event.sender)
   return executionView.getSettings()
 })
 
-ipcMain.handle('rovai:execution-web-settings-set', (event, value: unknown) => {
+ipcMain.handle('coaxi:execution-web-settings-set', (event, value: unknown) => {
   requireMainWindow(event.sender)
   const settings = requireObject(value)
   if (typeof settings.enabled !== 'boolean' || typeof settings.port !== 'number'
@@ -1765,17 +1765,17 @@ ipcMain.handle('rovai:execution-web-settings-set', (event, value: unknown) => {
   } as Pick<ExecutionWebSettingsSnapshot, 'enabled' | 'port'>)
 })
 
-ipcMain.handle('rovai:channels-connect', (event, kind: unknown) => {
+ipcMain.handle('coaxi:channels-connect', (event, kind: unknown) => {
   requireMainWindow(event.sender)
   return channelSettings.connect(optionalChannelKind(kind))
 })
 
-ipcMain.handle('rovai:channels-disconnect', (event, kind: unknown) => {
+ipcMain.handle('coaxi:channels-disconnect', (event, kind: unknown) => {
   requireMainWindow(event.sender)
   return channelSettings.disconnect(optionalChannelKind(kind))
 })
 
-ipcMain.handle('rovai:channels-publish-member-bot', (
+ipcMain.handle('coaxi:channels-publish-member-bot', (
   event,
   agentId: unknown,
   kind: unknown
@@ -1785,13 +1785,13 @@ ipcMain.handle('rovai:channels-publish-member-bot', (
   return channelSettings.publishMemberBot(agentId, optionalChannelKind(kind))
 })
 
-ipcMain.handle('rovai:channels-retry-member-bot', (event, agentId: unknown, kind: unknown) => {
+ipcMain.handle('coaxi:channels-retry-member-bot', (event, agentId: unknown, kind: unknown) => {
   requireMainWindow(event.sender)
   if (typeof agentId !== 'string' || !agentId) throw new Error('Invalid Agent ID')
   return channelSettings.retryMemberBot(agentId, optionalChannelKind(kind))
 })
 
-ipcMain.handle('rovai:channels-select-publication-approver', (
+ipcMain.handle('coaxi:channels-select-publication-approver', (
   event,
   agentId: unknown,
   userId: unknown,
@@ -1807,54 +1807,54 @@ ipcMain.handle('rovai:channels-select-publication-approver', (
   )
 })
 
-ipcMain.handle('rovai:channels-cancel-qr', (event, attemptId: unknown) => {
+ipcMain.handle('coaxi:channels-cancel-qr', (event, attemptId: unknown) => {
   requireMainWindow(event.sender)
   if (typeof attemptId !== 'string' || !attemptId) throw new Error('Invalid QR attempt ID')
   return channelSettings.cancelQrAttempt(attemptId)
 })
 
-ipcMain.handle('rovai:channels-login-view-bounds', (event, attemptId: unknown, bounds: unknown) => {
+ipcMain.handle('coaxi:channels-login-view-bounds', (event, attemptId: unknown, bounds: unknown) => {
   requireMainWindow(event.sender)
   if (typeof attemptId !== 'string' || !attemptId) throw new Error('Invalid QR attempt ID')
   channelSettings.setLoginViewBounds(attemptId, parseChannelLoginViewBounds(bounds))
 })
 
-ipcMain.handle('rovai:channels-refresh-login-qr', (event, attemptId: unknown) => {
+ipcMain.handle('coaxi:channels-refresh-login-qr', (event, attemptId: unknown) => {
   requireMainWindow(event.sender)
   if (typeof attemptId !== 'string' || !attemptId) throw new Error('Invalid QR attempt ID')
   return channelSettings.refreshLoginQr(attemptId)
 })
 
-ipcMain.handle('rovai:onboarding-get', async () => {
+ipcMain.handle('coaxi:onboarding-get', async () => {
   await localStoresLoaded
   return requireOnboarding().getAfterPendingWrites()
 })
 
-ipcMain.handle('rovai:onboarding-show-welcome', () => requireOnboarding().showWelcome())
+ipcMain.handle('coaxi:onboarding-show-welcome', () => requireOnboarding().showWelcome())
 
-ipcMain.handle('rovai:onboarding-complete-welcome', () => requireOnboarding().completeWelcome())
+ipcMain.handle('coaxi:onboarding-complete-welcome', () => requireOnboarding().completeWelcome())
 
-ipcMain.handle('rovai:onboarding-select-member', (_event, role: unknown) => {
+ipcMain.handle('coaxi:onboarding-select-member', (_event, role: unknown) => {
   return requireOnboarding().selectMember(role)
 })
 
-ipcMain.handle('rovai:onboarding-show-member-selection', () => {
+ipcMain.handle('coaxi:onboarding-show-member-selection', () => {
   return requireOnboarding().showMemberSelection()
 })
 
-ipcMain.handle('rovai:onboarding-complete-member-selection', () => {
+ipcMain.handle('coaxi:onboarding-complete-member-selection', () => {
   return requireOnboarding().completeMemberSelection()
 })
 
-ipcMain.handle('rovai:onboarding-set-runtime-selection', (_event, selection: unknown) => {
+ipcMain.handle('coaxi:onboarding-set-runtime-selection', (_event, selection: unknown) => {
   return requireOnboarding().setRuntimeSelection(selection)
 })
 
-ipcMain.handle('rovai:onboarding-defer-runtime', () => {
+ipcMain.handle('coaxi:onboarding-defer-runtime', () => {
   return requireOnboarding().deferRuntimeSetup()
 })
 
-ipcMain.handle('rovai:onboarding-begin-provisioning', (
+ipcMain.handle('coaxi:onboarding-begin-provisioning', (
   _event,
   selection: unknown,
   runtimePermissions: unknown
@@ -1862,34 +1862,34 @@ ipcMain.handle('rovai:onboarding-begin-provisioning', (
   return requireOnboarding().beginProvisioning(selection, runtimePermissions)
 })
 
-ipcMain.handle('rovai:onboarding-record-member', (_event, agentId: unknown, version: unknown) => {
+ipcMain.handle('coaxi:onboarding-record-member', (_event, agentId: unknown, version: unknown) => {
   return requireOnboarding().recordProvisionedMember(agentId, version)
 })
 
-ipcMain.handle('rovai:onboarding-record-runtime', (_event, version: unknown) => {
+ipcMain.handle('coaxi:onboarding-record-runtime', (_event, version: unknown) => {
   return requireOnboarding().recordProvisionedRuntime(version)
 })
 
-ipcMain.handle('rovai:onboarding-prepare-runtime-copies', (_event, targets: unknown) => {
+ipcMain.handle('coaxi:onboarding-prepare-runtime-copies', (_event, targets: unknown) => {
   return requireOnboarding().prepareRuntimeCopies(targets)
 })
 
-ipcMain.handle('rovai:onboarding-record-runtime-copy', (_event, agentId: unknown, commandId: unknown, outcome: unknown) => {
+ipcMain.handle('coaxi:onboarding-record-runtime-copy', (_event, agentId: unknown, commandId: unknown, outcome: unknown) => {
   return requireOnboarding().recordRuntimeCopy(agentId, commandId, outcome)
 })
 
-ipcMain.handle('rovai:onboarding-record-camp', (_event, threadId: unknown) => {
+ipcMain.handle('coaxi:onboarding-record-camp', (_event, threadId: unknown) => {
   return requireOnboarding().recordProvisionedThread(threadId)
 })
 
-ipcMain.handle('rovai:onboarding-complete', () => requireOnboarding().complete())
+ipcMain.handle('coaxi:onboarding-complete', () => requireOnboarding().complete())
 
-ipcMain.handle('rovai:window-reset-capability', (event) => {
+ipcMain.handle('coaxi:window-reset-capability', (event) => {
   const window = requireMainWindow(event.sender)
   return windowResetCapability(window.isFullScreen())
 })
 
-ipcMain.handle('rovai:window-reset-bounds', (event) => {
+ipcMain.handle('coaxi:window-reset-bounds', (event) => {
   const window = requireMainWindow(event.sender)
   const display = screen.getDisplayMatching(window.getBounds()).workArea
   return resetWindowBounds(
@@ -1906,45 +1906,45 @@ ipcMain.handle('rovai:window-reset-bounds', (event) => {
 
 function publishNavigationPreferences(snapshot: NavigationPreferencesSnapshot): NavigationPreferencesSnapshot {
   for (const window of BrowserWindow.getAllWindows()) {
-    if (!window.isDestroyed()) window.webContents.send('rovai:navigation-preferences-changed', snapshot)
+    if (!window.isDestroyed()) window.webContents.send('coaxi:navigation-preferences-changed', snapshot)
   }
   return snapshot
 }
 
-ipcMain.handle('rovai:navigation-preferences-register-projects', (_event, paths: string[], completeLegacy: boolean) => {
+ipcMain.handle('coaxi:navigation-preferences-register-projects', (_event, paths: string[], completeLegacy: boolean) => {
   if (typeof completeLegacy !== 'boolean') throw new Error('Invalid project registration request')
   return projectAccessTransactions.run(async () => publishNavigationPreferences(
     await requireNavigationPreferences().registerProjects(paths, completeLegacy)
   ))
 })
 
-ipcMain.handle('rovai:navigation-preferences-set-thread-read-state', (_event, threadId: unknown, state: unknown) => {
+ipcMain.handle('coaxi:navigation-preferences-set-thread-read-state', (_event, threadId: unknown, state: unknown) => {
   if (typeof threadId !== 'string' || (state !== null && !isNavigationThreadReadState(state))) {
     throw new Error('Invalid Thread read state request')
   }
   return projectAccessTransactions.run(async () => {
     const snapshot = await requireNavigationPreferences().setThreadReadState(threadId, state)
     for (const window of BrowserWindow.getAllWindows()) {
-      if (!window.isDestroyed()) window.webContents.send('rovai:navigation-preferences-changed', snapshot)
+      if (!window.isDestroyed()) window.webContents.send('coaxi:navigation-preferences-changed', snapshot)
     }
     return snapshot
   })
 })
 
-ipcMain.handle('rovai:navigation-preferences-get', () =>
+ipcMain.handle('coaxi:navigation-preferences-get', () =>
   projectAccessTransactions.run(() => requireNavigationPreferences().reload())
 )
 
-ipcMain.handle('rovai:navigation-preferences-apply-project-layout', (_event, expectedRevision: number, mutation: unknown) =>
+ipcMain.handle('coaxi:navigation-preferences-apply-project-layout', (_event, expectedRevision: number, mutation: unknown) =>
   projectAccessTransactions.run(() => requireNavigationPreferences().applyProjectLayout(expectedRevision, mutation).then(publishNavigationPreferences))
 )
 
-ipcMain.handle('rovai:navigation-preferences-replace-pins', (_event, pins: NavigationPin[]) =>
+ipcMain.handle('coaxi:navigation-preferences-replace-pins', (_event, pins: NavigationPin[]) =>
   projectAccessTransactions.run(() => requireNavigationPreferences().replacePins(pins).then(publishNavigationPreferences))
 )
 
 ipcMain.handle(
-  'rovai:navigation-preferences-set-project-name',
+  'coaxi:navigation-preferences-set-project-name',
   (_event, targetKey: unknown, name: unknown) => {
     if (typeof targetKey !== 'string' || (name !== null && typeof name !== 'string')) {
       throw new Error('Invalid Project display name request')
@@ -1956,7 +1956,7 @@ ipcMain.handle(
 )
 
 ipcMain.handle(
-  'rovai:navigation-preferences-remove-project',
+  'coaxi:navigation-preferences-remove-project',
   async (_event, targetKey: unknown, relatedThreadIds: unknown) => {
     if (typeof targetKey !== 'string' || !Array.isArray(relatedThreadIds)) {
       throw new Error('Invalid Project removal request')
@@ -1979,7 +1979,7 @@ ipcMain.handle(
   }
 )
 
-ipcMain.handle('rovai:navigation-preferences-restore-project', async (_event, targetKey: unknown) => {
+ipcMain.handle('coaxi:navigation-preferences-restore-project', async (_event, targetKey: unknown) => {
   if (typeof targetKey !== 'string') throw new Error('Invalid Project restore request')
   if (!targetKey.startsWith('directory:')) throw new Error('Invalid Project restore target')
   return projectAccessTransactions.run(async () => {
@@ -2012,7 +2012,7 @@ ipcMain.handle('rovai:navigation-preferences-restore-project', async (_event, ta
   })
 })
 
-ipcMain.handle('rovai:member-avatar-select-source', async () => {
+ipcMain.handle('coaxi:member-avatar-select-source', async () => {
   const options = {
     title: '选择角色图片',
     buttonLabel: '选择图片',
@@ -2029,7 +2029,7 @@ ipcMain.handle('rovai:member-avatar-select-source', async () => {
 })
 
 ipcMain.handle(
-  'rovai:member-avatar-save',
+  'coaxi:member-avatar-save',
   async (_event, input: SaveMemberAvatarAssetInput) => core.request('memberAvatars.save', {
     sourceBase64: Buffer.from(input.sourcePng).toString('base64'),
     iconBase64: Buffer.from(input.iconPng).toString('base64'),
@@ -2038,7 +2038,7 @@ ipcMain.handle(
 )
 
 ipcMain.handle(
-  'rovai:member-avatar-read',
+  'coaxi:member-avatar-read',
   async (
     _event,
     avatarRef: unknown,
@@ -2076,7 +2076,7 @@ async function resolveDesktopAttachmentTarget(
 }
 
 function attachmentAvailabilityFromError(error: unknown): LocalAttachmentAvailability {
-  if (error instanceof RovaiRequestError) {
+  if (error instanceof CoaxiRequestError) {
     if (error.code === 'attachment_missing') return 'missing'
     if (error.code === 'attachment_unreadable') return 'unreadable'
     if (error.code === 'attachment_kind_changed') return 'kind_changed'
@@ -2220,7 +2220,7 @@ function temporarySourceAttachmentPath(displayName: string): string {
   const safeExtension = /^\.[a-z0-9]{1,16}$/.test(requestedExtension)
     ? requestedExtension
     : ''
-  return join(app.getPath('temp'), `rovai-${randomUUID()}${safeExtension}`)
+  return join(app.getPath('temp'), `coaxi-${randomUUID()}${safeExtension}`)
 }
 
 async function stageLocalComposerAttachment(
@@ -2264,7 +2264,7 @@ async function missionAttachmentPathInputs(value: unknown): Promise<{
     }
     const requestedExtension = extname(displayName).toLocaleLowerCase()
     const safeExtension = /^\.[a-z0-9]{1,16}$/.test(requestedExtension) ? requestedExtension : ''
-    const temporaryPath = join(app.getPath('temp'), `rovai-mission-${candidate.id}${safeExtension}`)
+    const temporaryPath = join(app.getPath('temp'), `coaxi-mission-${candidate.id}${safeExtension}`)
     try {
       await writeFile(temporaryPath, candidate.bytes, { flag: 'wx', mode: 0o600 })
     } catch (error) {
@@ -2278,7 +2278,7 @@ async function missionAttachmentPathInputs(value: unknown): Promise<{
 }
 
 ipcMain.handle(
-  'rovai:mission-create-with-attachments',
+  'coaxi:mission-create-with-attachments',
   async (_event, commandId: unknown, command: unknown, attachments: unknown) => {
     const prepared = await missionAttachmentPathInputs(attachments)
     let rejected = false
@@ -2297,7 +2297,7 @@ ipcMain.handle(
 )
 
 ipcMain.handle(
-  'rovai:mission-update-with-attachments',
+  'coaxi:mission-update-with-attachments',
   async (_event, commandId: unknown, command: unknown, keepAttachmentIds: unknown, attachments: unknown) => {
     if (!Array.isArray(keepAttachmentIds) || keepAttachmentIds.some(id => !isAttachmentId(id))) {
       throw new Error('使命附件列表无效。')
@@ -2320,7 +2320,7 @@ ipcMain.handle(
 )
 
 ipcMain.handle(
-  'rovai:composer-attachment-prepare-path',
+  'coaxi:composer-attachment-prepare-path',
   async (
     _event,
     threadId: unknown,
@@ -2341,7 +2341,7 @@ ipcMain.handle(
 )
 
 ipcMain.handle(
-  'rovai:composer-attachment-prepare-bytes',
+  'coaxi:composer-attachment-prepare-bytes',
   async (
     _event,
     threadId: unknown,
@@ -2375,7 +2375,7 @@ ipcMain.handle(
 )
 
 ipcMain.handle(
-  'rovai:composer-attachment-restore',
+  'coaxi:composer-attachment-restore',
   async (_event, threadId: unknown, attachments: unknown) => {
     const resolvedThreadId = requireIpcString(threadId, 'Thread ID')
     if (!Array.isArray(attachments) || attachments.length > 10) {
@@ -2418,7 +2418,7 @@ ipcMain.handle(
 )
 
 ipcMain.handle(
-  'rovai:composer-attachment-discard',
+  'coaxi:composer-attachment-discard',
   async (_event, threadId: unknown, attachmentRefIds: unknown) => {
     const resolvedThreadId = requireIpcString(threadId, 'Thread ID')
     if (attachmentRefIds !== undefined && (
@@ -2434,7 +2434,7 @@ ipcMain.handle(
 )
 
 ipcMain.handle(
-  'rovai:composer-attachment-preview',
+  'coaxi:composer-attachment-preview',
   async (_event, value: unknown) => {
     const locator = requireAttachmentOwnerLocator(value)
     const local = await localComposerAttachments.preview(locator)
@@ -2467,7 +2467,7 @@ ipcMain.handle(
 )
 
 ipcMain.handle(
-  'rovai:composer-attachment-location',
+  'coaxi:composer-attachment-location',
   async (_event, value: unknown) => {
     const locator = requireAttachmentOwnerLocator(value)
     return localComposerAttachments.location(locator)
@@ -2480,19 +2480,19 @@ function privateUploadService(event: Electron.IpcMainInvokeEvent): PrivateAttach
   }
   return privateAttachmentPreparations
 }
-ipcMain.handle('rovai:private-attachment-prepare', (event, request: unknown, input: unknown) =>
+ipcMain.handle('coaxi:private-attachment-prepare', (event, request: unknown, input: unknown) =>
   privateUploadService(event).prepare(request, input))
-ipcMain.handle('rovai:private-attachment-reconcile', (event, request: unknown) =>
+ipcMain.handle('coaxi:private-attachment-reconcile', (event, request: unknown) =>
   privateUploadService(event).reconcile(request))
-ipcMain.handle('rovai:private-attachment-retry', (event, request: unknown) =>
+ipcMain.handle('coaxi:private-attachment-retry', (event, request: unknown) =>
   privateUploadService(event).retry(request))
-ipcMain.handle('rovai:private-attachment-finish', (event, request: unknown) =>
+ipcMain.handle('coaxi:private-attachment-finish', (event, request: unknown) =>
   privateUploadService(event).finish(request))
-ipcMain.handle('rovai:private-attachment-list', (event, owner: unknown) =>
+ipcMain.handle('coaxi:private-attachment-list', (event, owner: unknown) =>
   privateUploadService(event).list(owner))
 
 ipcMain.handle(
-  'rovai:single-chat-attachment-prepare-path',
+  'coaxi:single-chat-attachment-prepare-path',
   async (
     _event,
     conversationId: unknown,
@@ -2512,7 +2512,7 @@ ipcMain.handle(
 )
 
 ipcMain.handle(
-  'rovai:single-chat-attachment-prepare-bytes',
+  'coaxi:single-chat-attachment-prepare-bytes',
   async (
     _event,
     conversationId: unknown,
@@ -2548,7 +2548,7 @@ ipcMain.handle(
 )
 
 ipcMain.handle(
-  'rovai:single-chat-pending-attachment-prepare-path',
+  'coaxi:single-chat-pending-attachment-prepare-path',
   async (
     _event,
     owner: unknown,
@@ -2567,7 +2567,7 @@ ipcMain.handle(
 )
 
 ipcMain.handle(
-  'rovai:single-chat-pending-attachment-prepare-bytes',
+  'coaxi:single-chat-pending-attachment-prepare-bytes',
   async (
     _event,
     owner: unknown,
@@ -2600,7 +2600,7 @@ ipcMain.handle(
 )
 
 ipcMain.handle(
-  'rovai:single-chat-attachment-remove',
+  'coaxi:single-chat-attachment-remove',
   async (
     _event,
     conversationId: unknown,
@@ -2616,7 +2616,7 @@ ipcMain.handle(
 )
 
 ipcMain.handle(
-  'rovai:attachment-open',
+  'coaxi:attachment-open',
   async (_event, value: unknown) => {
     const locator = requireAttachmentOwnerLocator(value)
     const resolved = await resolveDesktopAttachmentTarget(locator)
@@ -2652,7 +2652,7 @@ ipcMain.handle(
 )
 
 ipcMain.handle(
-  'rovai:attachment-reveal',
+  'coaxi:attachment-reveal',
   async (_event, value: unknown) => {
     const locator = requireAttachmentOwnerLocator(value)
     const resolved = await resolveDesktopAttachmentTarget(locator)
@@ -2677,11 +2677,11 @@ ipcMain.handle(
   }
 )
 
-ipcMain.handle('rovai:reveal-project-directory', (_event, projectPath: unknown) =>
+ipcMain.handle('coaxi:reveal-project-directory', (_event, projectPath: unknown) =>
   revealProjectDirectory(projectPath, path => shell.showItemInFolder(path))
 )
 
-ipcMain.handle('rovai:select-workspace-directory', async () => {
+ipcMain.handle('coaxi:select-workspace-directory', async () => {
   const options = {
     title: '选择工作目录',
     buttonLabel: '选择目录',
@@ -2694,7 +2694,7 @@ ipcMain.handle('rovai:select-workspace-directory', async () => {
   return core.request('workspaces.validate', { path: result.filePaths[0] })
 })
 
-ipcMain.handle('rovai:select-runtime-executable', async () => {
+ipcMain.handle('coaxi:select-runtime-executable', async () => {
   const options = {
     title: '选择本机智能体可执行文件',
     buttonLabel: '选择 Runtime',
@@ -2707,7 +2707,7 @@ ipcMain.handle('rovai:select-runtime-executable', async () => {
   return result.filePaths[0]
 })
 
-ipcMain.handle('rovai:select-skill-import-directory', async () => {
+ipcMain.handle('coaxi:select-skill-import-directory', async () => {
   const options = {
     title: '导入 Skill',
     buttonLabel: '检查目录',
@@ -2720,7 +2720,7 @@ ipcMain.handle('rovai:select-skill-import-directory', async () => {
   return result.filePaths[0]
 })
 
-ipcMain.handle('rovai:reveal-skill', async (_event, skillId: unknown) => {
+ipcMain.handle('coaxi:reveal-skill', async (_event, skillId: unknown) => {
   if (typeof skillId !== 'string' || !skillId.trim()) {
     throw new Error('Skill ID 无效。')
   }
@@ -2731,7 +2731,7 @@ ipcMain.handle('rovai:reveal-skill', async (_event, skillId: unknown) => {
   shell.showItemInFolder(location.path)
 })
 
-ipcMain.handle('rovai:reveal-mcp-config', async () => {
+ipcMain.handle('coaxi:reveal-mcp-config', async () => {
   const config = await core.request<{ path: string; exists: boolean }>('mcp.config.get')
   if (config.exists) {
     shell.showItemInFolder(config.path)
@@ -2744,16 +2744,16 @@ ipcMain.handle('rovai:reveal-mcp-config', async () => {
   }
 })
 
-ipcMain.handle('rovai:export-diagnostics', async () => {
+ipcMain.handle('coaxi:export-diagnostics', async () => {
   const result = mainWindow
     ? await dialog.showSaveDialog(mainWindow, {
         title: '导出 Coaxi 诊断数据',
-        defaultPath: `rovai-diagnostics-${new Date().toISOString().slice(0, 10)}.json`,
+        defaultPath: `coaxi-diagnostics-${new Date().toISOString().slice(0, 10)}.json`,
         filters: [{ name: 'JSON', extensions: ['json'] }]
       })
     : await dialog.showSaveDialog({
         title: '导出 Coaxi 诊断数据',
-        defaultPath: `rovai-diagnostics-${new Date().toISOString().slice(0, 10)}.json`,
+        defaultPath: `coaxi-diagnostics-${new Date().toISOString().slice(0, 10)}.json`,
         filters: [{ name: 'JSON', extensions: ['json'] }]
   })
   if (result.canceled || !result.filePath) return null
@@ -2769,7 +2769,7 @@ ipcMain.handle('rovai:export-diagnostics', async () => {
         arch: process.arch,
         supervisor
       }
-  const temporary = `${result.filePath}.rovai-${randomUUID()}.tmp`
+  const temporary = `${result.filePath}.coaxi-${randomUUID()}.tmp`
   try {
     await writeFile(temporary, `${JSON.stringify(diagnostics, null, 2)}\n`, {
       mode: 0o600,
@@ -2786,51 +2786,51 @@ ipcMain.handle('rovai:export-diagnostics', async () => {
   return result.filePath
 })
 
-ipcMain.handle('rovai:reveal-diagnostics-export', (_event, path: unknown) => {
+ipcMain.handle('coaxi:reveal-diagnostics-export', (_event, path: unknown) => {
   if (typeof path !== 'string' || path !== lastDiagnosticsExportPath) {
     throw new Error('只能显示本次会话刚刚导出的诊断文件。')
   }
   shell.showItemInFolder(path)
 })
 
-ipcMain.handle('rovai:export-native-history-usage', async (event, query: unknown) => {
+ipcMain.handle('coaxi:export-native-history-usage', async (event, query: unknown) => {
   requireMainWindow(event.sender)
   if(event.senderFrame!==event.sender.mainFrame)throw new Error('usage.local_owner_required')
   const owner=mainWindow
   if(!owner||owner.isDestroyed())throw new Error('导出窗口已关闭。')
   const report=await core.request<import('@contracts').NativeHistoryUsageReport>('history.usage',query)
-  const result=await dialog.showSaveDialog(owner,{title:'导出原生历史用量',defaultPath:`codeg-rovai-native-usage-${new Date().toISOString().slice(0,10)}.json`,filters:[{name:'JSON',extensions:['json']}]})
+  const result=await dialog.showSaveDialog(owner,{title:'导出原生历史用量',defaultPath:`coaxi-native-usage-${new Date().toISOString().slice(0,10)}.json`,filters:[{name:'JSON',extensions:['json']}]})
   if(result.canceled||!result.filePath||owner.isDestroyed())return null
-  const temporary=`${result.filePath}.rovai-${randomUUID()}.tmp`
+  const temporary=`${result.filePath}.coaxi-${randomUUID()}.tmp`
   try{await writeFile(temporary,JSON.stringify(report,null,2)+'\n',{mode:0o600,flag:'wx'});await chmod(temporary,0o600);await rename(temporary,result.filePath);await chmod(result.filePath,0o600)}catch(error){await unlink(temporary).catch(()=>undefined);throw error}
   lastMonitoringExportPath=result.filePath
   return result.filePath
 })
 
-ipcMain.handle('rovai:export-usage-activity', async (event, query: unknown) => {
+ipcMain.handle('coaxi:export-usage-activity', async (event, query: unknown) => {
   requireMainWindow(event.sender)
   if(event.senderFrame!==event.sender.mainFrame)throw new Error('usage.local_owner_required')
   const owner=mainWindow
   if(!owner||owner.isDestroyed())throw new Error('导出窗口已关闭。')
   const report=await core.request<import('@contracts').UsageActivityReport>('monitoring.report',query)
-  const result=await dialog.showSaveDialog(owner,{title:'导出用量看板数据',defaultPath:`codeg-rovai-usage-${new Date().toISOString().slice(0,10)}.json`,filters:[{name:'JSON',extensions:['json']}]})
+  const result=await dialog.showSaveDialog(owner,{title:'导出用量看板数据',defaultPath:`coaxi-usage-${new Date().toISOString().slice(0,10)}.json`,filters:[{name:'JSON',extensions:['json']}]})
   if(result.canceled||!result.filePath||owner.isDestroyed())return null
-  const temporary=`${result.filePath}.rovai-${randomUUID()}.tmp`
+  const temporary=`${result.filePath}.coaxi-${randomUUID()}.tmp`
   try{await writeFile(temporary,JSON.stringify(report,null,2)+'\n',{mode:0o600,flag:'wx'});await chmod(temporary,0o600);await rename(temporary,result.filePath);await chmod(result.filePath,0o600)}catch(error){await unlink(temporary).catch(()=>undefined);throw error}
   lastMonitoringExportPath=result.filePath
   return result.filePath
 })
 
-ipcMain.handle('rovai:export-monitoring', async (_event, filter: MonitoringFilter) => {
+ipcMain.handle('coaxi:export-monitoring', async (_event, filter: MonitoringFilter) => {
   const result = mainWindow
     ? await dialog.showSaveDialog(mainWindow, {
         title: '导出 Coaxi 运行监控数据',
-        defaultPath: `rovai-runtime-monitoring-${new Date().toISOString().slice(0, 10)}.json`,
+        defaultPath: `coaxi-runtime-monitoring-${new Date().toISOString().slice(0, 10)}.json`,
         filters: [{ name: 'JSON', extensions: ['json'] }]
       })
     : await dialog.showSaveDialog({
         title: '导出 Coaxi 运行监控数据',
-        defaultPath: `rovai-runtime-monitoring-${new Date().toISOString().slice(0, 10)}.json`,
+        defaultPath: `coaxi-runtime-monitoring-${new Date().toISOString().slice(0, 10)}.json`,
         filters: [{ name: 'JSON', extensions: ['json'] }]
       })
   if (result.canceled || !result.filePath) return null
@@ -2839,7 +2839,7 @@ ipcMain.handle('rovai:export-monitoring', async (_event, filter: MonitoringFilte
     exportedAt: new Date().toISOString(),
     ...snapshot
   }
-  const temporary = `${result.filePath}.rovai-${randomUUID()}.tmp`
+  const temporary = `${result.filePath}.coaxi-${randomUUID()}.tmp`
   try {
     await writeFile(temporary, `${JSON.stringify(payload, null, 2)}\n`, {
       mode: 0o600,
@@ -2856,17 +2856,17 @@ ipcMain.handle('rovai:export-monitoring', async (_event, filter: MonitoringFilte
   return result.filePath
 })
 
-ipcMain.handle('rovai:reveal-monitoring-export', (_event, path: unknown) => {
+ipcMain.handle('coaxi:reveal-monitoring-export', (_event, path: unknown) => {
   if (typeof path !== 'string' || path !== lastMonitoringExportPath) {
     throw new Error('只能显示本次会话刚刚导出的运行监控文件。')
   }
   shell.showItemInFolder(path)
 })
 
-ipcMain.handle('rovai:export-memory', async () => {
+ipcMain.handle('coaxi:export-memory', async () => {
   const options = {
     title: '导出 Coaxi 记忆',
-    defaultPath: `rovai-memory-${new Date().toISOString().slice(0, 10)}.json`,
+    defaultPath: `coaxi-memory-${new Date().toISOString().slice(0, 10)}.json`,
     filters: [{ name: 'JSON', extensions: ['json'] }]
   }
   const result = mainWindow
@@ -2874,7 +2874,7 @@ ipcMain.handle('rovai:export-memory', async () => {
     : await dialog.showSaveDialog(options)
   if (result.canceled || !result.filePath) return null
   const exported = await core.request('memory.export')
-  const temporary = `${result.filePath}.rovai-${randomUUID()}.tmp`
+  const temporary = `${result.filePath}.coaxi-${randomUUID()}.tmp`
   try {
     await writeFile(temporary, `${JSON.stringify(exported, null, 2)}\n`, {
       mode: 0o600,
@@ -2921,7 +2921,7 @@ const appQuitCoordinator = new AppQuitCoordinator({
       console.error('Coaxi application services shutdown failed', error)
     }
     const result = await core.shutdown()
-    console.error(`[rovai-core] controlled shutdown result ${JSON.stringify(result)}`)
+    console.error(`[coaxi-core] controlled shutdown result ${JSON.stringify(result)}`)
   },
   reportFailure: (error) => {
     console.error('Coaxi Core controlled shutdown failed', error)

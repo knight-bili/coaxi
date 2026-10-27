@@ -14,7 +14,7 @@ assert([previousBinary,binary,ui,evidenceRoot].every(value=>value && path.isAbso
 await mkdir(evidenceRoot,{recursive:true});const fixture=await realpath(await mkdtemp(path.join(evidenceRoot,'install-')));
 const home=path.join(fixture,'fake-home'),temp=path.join(fixture,'tmp');await mkdir(home);await mkdir(temp);
 const env={};for(const [key,value] of Object.entries(process.env))if(['PATH','SYSTEMROOT','WINDIR','COMSPEC','PATHEXT'].includes(key.toUpperCase()))env[key]=value;
-Object.assign(env,{HOME:home,USERPROFILE:home,APPDATA:path.join(home,'AppData/Roaming'),LOCALAPPDATA:path.join(home,'AppData/Local'),XDG_CONFIG_HOME:path.join(home,'.config'),XDG_DATA_HOME:path.join(home,'.local/share'),XDG_STATE_HOME:path.join(home,'.local/state'),TEMP:temp,TMP:temp,ROVAI_BUNDLED_SKILLS_ROOT:path.join(root,'skills')});
+Object.assign(env,{HOME:home,USERPROFILE:home,APPDATA:path.join(home,'AppData/Roaming'),LOCALAPPDATA:path.join(home,'AppData/Local'),XDG_CONFIG_HOME:path.join(home,'.config'),XDG_DATA_HOME:path.join(home,'.local/share'),XDG_STATE_HOME:path.join(home,'.local/state'),TEMP:temp,TMP:temp,COAXI_BUNDLED_SKILLS_ROOT:path.join(root,'skills')});
 const formal=path.join(fixture,'formal');const dataDir=process.platform==='win32'?JSON.parse(execFileSync(previousBinary,['--prepare-windows-data-root',formal],{env,encoding:'utf8',windowsHide:true})).core:formal;
 const skillRoot=path.join(dataDir,'skills'),mcp=path.join(dataDir,'mcp.json');
 const checks=[];let host,call;let stage='old_Core';
@@ -29,12 +29,12 @@ const start=async executable=>{
 };
 const close=async()=>{await host.close();host=undefined;};
 const applied=(result,code)=>{assert.equal(result.status,'applied');if(code)assert.equal(result.code,code);};
-const database=fn=>{const db=new DatabaseSync(path.join(dataDir,'rovai.sqlite'),{readOnly:true});try{return fn(db);}finally{db.close();}};
+const database=fn=>{const db=new DatabaseSync(path.join(dataDir,'coaxi.sqlite'),{readOnly:true});try{return fn(db);}finally{db.close();}};
 try {
   await start(previousBinary);
   const oldCommand={commandId:randomUUID(),command:{skillName:'member-studio',memberIds:[],expectedVersion:'stale-proof'}};
   const oldReceipt=await call('toolbox.setMembers',oldCommand);assert.equal(oldReceipt.code,'toolbox.members.conflict');
-  await close();database(db=>{assert.equal(db.prepare('SELECT projection_schema_version AS n FROM rovai_data_contract WHERE singleton=1').get().n,149);});record('real_schema149_command_receipt_seeded');
+  await close();database(db=>{assert.equal(db.prepare('SELECT projection_schema_version AS n FROM coaxi_data_contract WHERE singleton=1').get().n,149);});record('real_schema149_command_receipt_seeded');
   stage='upgrade';await start(binary);assert.deepEqual(await call('toolbox.setMembers',oldCommand),oldReceipt);record('real_149_to_150_upgrade_keeps_command_receipt');
   const catalog=await call('skillPacks.list');const entries=catalog.entries.filter(entry=>entry.contentSource==='embedded');assert.equal(entries.length,28);
   assert.deepEqual(await call('skillPacks.installations.list'),[]);record('upgrade_does_not_auto_install');
@@ -62,8 +62,8 @@ try {
   stage='all_bundled_sources';
   for(const entry of entries.filter(entry=>entry.id!=='brainstorming')){const result=await install(entry.id,'absent');applied(result,'skill_pack.installed');}
   const installed=await call('skillPacks.installations.list');assert.equal(installed.length,28);assert(installed.every(entry=>entry.availability==='available' && !entry.memberDeliveryEnabled));record('all_28_embedded_sources_install_and_validate',{entries:28});
-  await close();database(db=>{assert.equal(db.prepare('SELECT projection_schema_version AS n FROM rovai_data_contract WHERE singleton=1').get().n,150);assert.equal(db.prepare('SELECT count(*) AS n FROM schema_migration WHERE version=200').get().n,1);assert.equal(db.prepare("SELECT count(*) AS n FROM skill_pack_installation WHERE status='installed'").get().n,28);assert.equal(db.prepare('SELECT count(*) AS n FROM agent_run').get().n,0);assert.equal(Object.values(db.prepare('PRAGMA integrity_check').get())[0],'ok');});record('schema150_receipt_200_integrity_and_zero_AgentRun');
-  if(process.platform==='win32')assert.deepEqual(await readdir(home),[]);for(const name of ['.codeg','.claude','.codex']){const names=await readdir(home);assert(!names.includes(name));}record('native_user_skill_configurations_untouched');
+  await close();database(db=>{assert.equal(db.prepare('SELECT projection_schema_version AS n FROM coaxi_data_contract WHERE singleton=1').get().n,150);assert.equal(db.prepare('SELECT count(*) AS n FROM schema_migration WHERE version=200').get().n,1);assert.equal(db.prepare("SELECT count(*) AS n FROM skill_pack_installation WHERE status='installed'").get().n,28);assert.equal(db.prepare('SELECT count(*) AS n FROM agent_run').get().n,0);assert.equal(Object.values(db.prepare('PRAGMA integrity_check').get())[0],'ok');});record('schema150_receipt_200_integrity_and_zero_AgentRun');
+  if(process.platform==='win32')assert.deepEqual(await readdir(home),[]);for(const name of ['.coaxi','.claude','.codex']){const names=await readdir(home);assert(!names.includes(name));}record('native_user_skill_configurations_untouched');
   const result={status:'passed',task:'I02-T03',scope:'real_old_and_new_Core_HTTP_installation_lifecycle_no_runtime_execution',checks,fixture,dataDir,sourceCommit:catalog.commit,previousHostSha256:sha(await readFile(previousBinary)),currentHostSha256:sha(await readFile(binary)),schema:150,migration:200,installed:28,retainedUserEdits:true,retainedForeignDirectory:true,memberDelivery:false,modelInference:false,UI:false,OfficeCLI:false,generativeUiRenderer:false};
   await writeFile(path.join(fixture,'result.json'),JSON.stringify(result,null,2)+'\n');console.log(JSON.stringify({status:'passed',checks:checks.length,evidence:path.join(fixture,'result.json')}));
 } catch(error) {await writeFile(path.join(fixture,'failure.json'),JSON.stringify({status:'failed',stage,checks,error:String(error),fixture},null,2)+'\n');throw error;}

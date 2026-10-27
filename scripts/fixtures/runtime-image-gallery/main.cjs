@@ -191,7 +191,7 @@ app.whenReady().then(async () => {
         assertFramesFitImages(await run('window.imageGalleryTest.state()'))
       }
     }
-    const acceptanceFiles = JSON.parse(process.env.ROVAI_IMAGE_ACCEPTANCE_FILES ?? '[]')
+    const acceptanceFiles = JSON.parse(process.env.COAXI_IMAGE_ACCEPTANCE_FILES ?? '[]')
     for (const [index, file] of acceptanceFiles.entries()) {
       assert.ok(isAbsolute(file.path))
       const result = { displayName: file.displayName, mediaType: file.mediaType, data: readFileSync(file.path).toString('base64') }

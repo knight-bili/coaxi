@@ -7,7 +7,7 @@ import { runCaptured } from './lib/qualification-common.mjs'
 import { defaultResourceMeasurementProfile } from './benchmark/measurement/resources/index.mjs'
 
 test('paired CLI writes deterministic plan and refuses to compare arms without plan evidence', async () => {
-  const root = await mkdtemp(join(tmpdir(), 'rovai-paired-cli-'))
+  const root = await mkdtemp(join(tmpdir(), 'coaxi-paired-cli-'))
   try {
     const definitionPath = join(root, 'definition.json')
     const planPath = join(root, 'plan.json')

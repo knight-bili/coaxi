@@ -5,7 +5,7 @@ import {
   Domain,
   LoggerLevel
 } from '@larksuiteoapi/node-sdk'
-import rovaiMemberBotIconPath from '../../../../build/icon.png?asset'
+import coaxiMemberBotIconPath from '../../../../build/icon.png?asset'
 import type {
   FeishuDeveloperPortalSession,
   FeishuDeveloperSessionService,
@@ -768,7 +768,7 @@ function requireAvatarSource(source: MemberBotAvatarSource): AvatarPng {
 }
 
 async function readDefaultAvatar(): Promise<AvatarPng> {
-  const bytes = await readFile(rovaiMemberBotIconPath)
+  const bytes = await readFile(coaxiMemberBotIconPath)
   if (
     bytes.byteLength < 24
     || bytes[0] !== 0x89

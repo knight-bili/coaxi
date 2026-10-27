@@ -58,7 +58,7 @@ fixture、采集 Run Git observation 或验证 Git 相关 UI。
 已安装、可发现并完成上游认证。
 
 Core 的正式 Runtime 产品目录以
-[`AdapterKind::ALL`](../../crates/rovai-core/src/agent_profile.rs)为准。当前目录包含
+[`AdapterKind::ALL`](../../crates/coaxi-core/src/agent_profile.rs)为准。当前目录包含
 Codex CLI、OpenCode、GitHub Copilot、Claude Code、Antigravity、Kiro、Qoder、
 CodeBuddy、Qwen Code、TRAE CLI CN、Cursor Agent 和 Kimi Code。各测试只覆盖其中明确列出的子集；例如
 `smoke:acp-runtime` 覆盖 OpenCode、Copilot、TRAE 和 Kimi。

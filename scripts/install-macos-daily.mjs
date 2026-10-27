@@ -9,8 +9,8 @@ const root = resolve(fileURLToPath(new URL('..', import.meta.url)))
 
 try {
   const options = parseArguments(process.argv.slice(2))
-  const sourcePath = resolve(options.source ?? `${root}/dist/mac-arm64/Codeg Rovai Workbench.app`)
-  const targetPath = resolve(options.target ?? '/Applications/Codeg Rovai Workbench.app')
+  const sourcePath = resolve(options.source ?? `${root}/dist/mac-arm64/Coaxi.app`)
+  const targetPath = resolve(options.target ?? '/Applications/Coaxi.app')
   const backupPath = resolve(options.backup ?? defaultDailyBackupPath(targetPath))
   const arch = options.arch ?? 'arm64'
   const result = installMacosDaily({

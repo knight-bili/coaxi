@@ -1,4 +1,4 @@
-// Read-only transport for Codeg's subagent-session-dialog. Core alone resolves
+// Read-only transport for Coaxi's subagent-session-dialog. Core alone resolves
 // native addresses. A browser never sends a Session ID or a source path.
 import { sha256 } from '@noble/hashes/sha2.js'
 import type { NativeAgentReadReference, NativeChildReadPage, NativeChildReadReference, NativeChildReadView } from '@contracts'
@@ -11,7 +11,7 @@ export interface NativeTranscriptTurn {
   usage?: Record<string, number> | null; duration_ms?: number | null; model?: string | null; completed_at?: string | null
   agent_message_id?: string | null
 }
-/** Exact eight persisted variants from Codeg/Rust. Opaque metadata is retained. */
+/** Exact eight persisted variants from Coaxi/Rust. Opaque metadata is retained. */
 export type NativeTranscriptBlock =
   | { type: 'text' | 'thinking'; text: string }
   | { type: 'turn_error'; message: string }

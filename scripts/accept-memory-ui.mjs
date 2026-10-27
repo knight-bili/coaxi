@@ -6,11 +6,11 @@ import { seedCompletedOnboardingForAcceptance } from './lib/dev-desktop.mjs'
 
 const root = resolve(import.meta.dirname, '..')
 const appPath = resolve(process.argv[2] ?? join(root, 'dist', 'mac-arm64', 'Coaxi.app'))
-const dataDir = process.env.ROVAI_MEMORY_ACCEPT_DATA_DIR
-  ?? await mkdtemp(join(tmpdir(), 'rovai-memory-ui-accept-'))
-const outputDir = process.env.ROVAI_MEMORY_ACCEPT_OUTPUT_DIR
-  ?? await mkdtemp(join(tmpdir(), 'rovai-memory-ui-captures-'))
-const firstPort = Number(process.env.ROVAI_MEMORY_ACCEPT_DEBUG_PORT ?? 9441)
+const dataDir = process.env.COAXI_MEMORY_ACCEPT_DATA_DIR
+  ?? await mkdtemp(join(tmpdir(), 'coaxi-memory-ui-accept-'))
+const outputDir = process.env.COAXI_MEMORY_ACCEPT_OUTPUT_DIR
+  ?? await mkdtemp(join(tmpdir(), 'coaxi-memory-ui-captures-'))
+const firstPort = Number(process.env.COAXI_MEMORY_ACCEPT_DEBUG_PORT ?? 9441)
 const initialBody = '实际验收：重要改动应提供明确验证结果。'
 const revisedBody = '实际验收：重要改动应提供明确、可复现的验证结果。'
 const forgottenBody = '实际验收临时项：完成后应被永久遗忘。'
@@ -606,11 +606,11 @@ async function clickButton(cdp, selector, label) {
 }
 
 async function request(cdp, method, params = {}) {
-  return evaluate(cdp, `window.rovai.request(${JSON.stringify(method)}, ${JSON.stringify(params)})`, true)
+  return evaluate(cdp, `window.coaxi.request(${JSON.stringify(method)}, ${JSON.stringify(params)})`, true)
 }
 
 async function setTheme(cdp, preference) {
-  await evaluate(cdp, `window.rovai.appearance.setPreference(${JSON.stringify(preference)})`, true)
+  await evaluate(cdp, `window.coaxi.appearance.setPreference(${JSON.stringify(preference)})`, true)
   const expectedTheme = preference === 'night' ? 'night' : 'day'
   await waitForExpression(cdp,
     `document.documentElement.dataset.theme === ${JSON.stringify(expectedTheme)}`)
@@ -654,7 +654,7 @@ async function launchApp(port, width, height) {
     `--user-data-dir=${dataDir}`
   ], {
     cwd: root,
-    env: { ...process.env, ROVAI_ALLOW_ISOLATED_INSTANCE: '1' },
+    env: { ...process.env, COAXI_ALLOW_ISOLATED_INSTANCE: '1' },
     stdio: ['ignore', 'ignore', 'pipe']
   })
   child.stderr.on('data', (chunk) => stderr.push(String(chunk)))
@@ -670,12 +670,12 @@ async function launchApp(port, width, height) {
       deviceScaleFactor: 1,
       mobile: false
     })
-    await waitForExpression(cdp, `Boolean(window.rovai && document.querySelector('.app-shell'))`, 45_000)
+    await waitForExpression(cdp, `Boolean(window.coaxi && document.querySelector('.app-shell'))`, 45_000)
     await waitForExpression(cdp, `Boolean(
       document.querySelector('.unified-sidebar button[aria-label="新对话"]:not(:disabled)')
     )`, 45_000)
     const health = await request(cdp, 'health.check')
-    const expectedDatabasePath = await realpath(join(dataDir, 'rovai.sqlite'))
+    const expectedDatabasePath = await realpath(join(dataDir, 'coaxi.sqlite'))
     const actualDatabasePath = await realpath(health.database.path)
     assert(actualDatabasePath === expectedDatabasePath,
       `Isolated App opened the wrong database: ${JSON.stringify({ expectedDatabasePath, actualDatabasePath })}`)

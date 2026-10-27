@@ -16,11 +16,11 @@
   "isolation": "Fresh Windows native-private Core data root, explicit owned Skill Library/MCP, fake Home/Temp and restricted PATH; no daily credentials or provider CLI",
   "artifacts": {
     "host": {
-      "path": "work/i02/native-artifacts/core153-process-recovery-9640d9f48c94-91c547b4b77b/rovai-host.exe",
+      "path": "work/i02/native-artifacts/core153-process-recovery-9640d9f48c94-91c547b4b77b/coaxi-host.exe",
       "sha256": "9640d9f48c940a4417f57cb70a753f66f3c38c56f09a9da10407b16718dd35ae"
     },
     "cli": {
-      "path": "work/i02/native-artifacts/core153-process-recovery-9640d9f48c94-91c547b4b77b/rovai.exe",
+      "path": "work/i02/native-artifacts/core153-process-recovery-9640d9f48c94-91c547b4b77b/coaxi.exe",
       "sha256": "91c547b4b77bb4dd9cbd9f3b8f474cfab9031167099d2ef7efe044805b2522b3"
     },
     "launcher": {

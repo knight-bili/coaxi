@@ -37,7 +37,7 @@ export async function policyAcceptance(window: BrowserWindow, userData: string, 
       && limited.diagnostics === 'unavailable' && limited.issues.length === 0 && limited.summary === '诊断详情'
       && limited.expanded === 'false' && !limited.warning && !limited.alert
       && retained.events.length === 1 && retained.events[0].trusted && retained.events[0].directive === 'connect-src'
-      && retained.events[0].sourceFile.includes('/__rovai-preview/bridge/')
+      && retained.events[0].sourceFile.includes('/__coaxi-preview/bridge/')
       && retained.csp === "connect-src 'none'" && retained.csp === before.csp
       && retained.timeOrigin === before.timeOrigin && retained.input === '诊断受限后保留的输入' && retained.count === '1' && retained.top === 150,
     evidence: { limited, before, retained } })
@@ -57,7 +57,7 @@ export async function policyAcceptance(window: BrowserWindow, userData: string, 
       && mixed.issues.some((text: string) => text.includes('author csp fixture'))
       && mixed.issues.some((text: string) => text.includes('missing-policy.png'))
       && mixed.issues.some((text: string) => text.includes('business.json'))
-      && mixed.issues.some((text: string) => text.includes('/__rovai-preview/events?documentId=')),
+      && mixed.issues.some((text: string) => text.includes('/__coaxi-preview/events?documentId=')),
     evidence: mixed })
   await frame().executeJavaScript(`location.href='./history.html'`)
   await wait(`${stage}?.dataset.documentState==='loaded' && ${stage}?.dataset.serverDiagnosticsState==='connected'`)

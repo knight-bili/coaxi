@@ -9,7 +9,7 @@ const [fixture] = process.argv.slice(2)
 assert.ok(isAbsolute(fixture), 'The fixture requires an explicit isolated absolute root')
 app.setPath('userData', join(fixture, 'user-data'))
 app.setPath('sessionData', join(fixture, 'session-data'))
-app.setName('Rovai DingTalk Login Acceptance')
+app.setName('Coaxi DingTalk Login Acceptance')
 
 // Production Renderer, preload and interaction view; controlled local
 // account/network responses. No Core, Runtime, daily data or real credentials.
@@ -31,7 +31,7 @@ const server = createServer((request, response) => {
     '<p>钉钉官方交互的本地验收夹具</p><button>测试企业</button><img src="/slow-image"></body></html>')
 })
 server.on('connection', socket => { sockets.add(socket); socket.on('close', () => sockets.delete(socket)) })
-const notify = () => parent.webContents.send('rovai:channels-changed', snapshot)
+const notify = () => parent.webContents.send('coaxi:channels-changed', snapshot)
 function cancel() {
   snapshot.activeQrAttempt = null
   login?.destroy()
@@ -77,7 +77,7 @@ app.whenReady().then(async () => {
   server.listen(0, '127.0.0.1')
   await once(server, 'listening')
   parent = new BrowserWindow({ show: process.platform === 'linux', width: 1040, height: 800, useContentSize: true,
-    title: 'Rovai 钉钉登录 · 自动验收（无需扫码）',
+    title: 'Coaxi 钉钉登录 · 自动验收（无需扫码）',
     webPreferences: { preload: join(fixture, 'preload.cjs'), sandbox: true, contextIsolation: true,
       nodeIntegration: false, backgroundThrottling: false } })
   const createLogin = async () => {
@@ -94,16 +94,16 @@ app.whenReady().then(async () => {
     void login.loadURL('http://127.0.0.1:' + server.address().port + '/interaction').catch(() => undefined)
     await ready
   }
-  handle('rovai:channels-get', () => snapshot)
-  handle('rovai:execution-web-settings-get', () => executionWebSettings)
-  handle('rovai:execution-web-settings-set', value => {
+  handle('coaxi:channels-get', () => snapshot)
+  handle('coaxi:execution-web-settings-get', () => executionWebSettings)
+  handle('coaxi:execution-web-settings-set', value => {
     executionWebSettings = { ...executionWebSettings, enabled: value.enabled, port: value.port,
       server: { state: value.enabled ? 'ready' : 'disabled',
         address: value.enabled ? '192.168.1.23' : null, errorCode: null } }
-    parent.webContents.send('rovai:execution-web-settings-changed', executionWebSettings)
+    parent.webContents.send('coaxi:execution-web-settings-changed', executionWebSettings)
     return executionWebSettings
   })
-  handle('rovai:channels-connect', async kind => {
+  handle('coaxi:channels-connect', async kind => {
     assert.equal(kind, 'dingtalk')
     await createLogin()
     snapshot.activeQrAttempt = { kind: 'dingtalk', attemptId: 'attempt-' + attempt, purpose: 'account_login', agentId: null,
@@ -112,13 +112,13 @@ app.whenReady().then(async () => {
     notify()
     return pending
   })
-  handle('rovai:channels-cancel-qr', id => { if (id === snapshot.activeQrAttempt?.attemptId) cancel(); return snapshot })
-  handle('rovai:channels-refresh-login-qr', id => {
+  handle('coaxi:channels-cancel-qr', id => { if (id === snapshot.activeQrAttempt?.attemptId) cancel(); return snapshot })
+  handle('coaxi:channels-refresh-login-qr', id => {
     assert.equal(id, snapshot.activeQrAttempt?.attemptId)
     refreshes++
     return setStage('preparing')
   })
-  handle('rovai:channels-login-view-bounds', (id, value) => {
+  handle('coaxi:channels-login-view-bounds', (id, value) => {
     const bounds = parseChannelLoginViewBounds(value)
     if (id === snapshot.activeQrAttempt?.attemptId) login?.setBounds(bounds)
   })
@@ -151,13 +151,13 @@ app.whenReady().then(async () => {
       }
     }
   }
-  assert.deepEqual(await login.webContents.mainFrame.executeJavaScript('({ bridge:typeof window.rovai, node:typeof require, fixture:typeof window.loginFixture })'),
+  assert.deepEqual(await login.webContents.mainFrame.executeJavaScript('({ bridge:typeof window.coaxi, node:typeof require, fixture:typeof window.loginFixture })'),
     { bridge: 'undefined', node: 'undefined', fixture: 'undefined' })
   const prefs = login.webContents.getLastWebPreferences()
   assert.equal(prefs.sandbox, true)
   assert.equal(prefs.contextIsolation, true)
   assert.equal(prefs.nodeIntegration, false)
-  cases.push('native page has no Rovai bridge or Node')
+  cases.push('native page has no Coaxi bridge or Node')
   parent.webContents.setZoomFactor(2)
   await parent.webContents.executeJavaScript('new Promise(resolve => setTimeout(resolve, 250))')
   await parent.webContents.executeJavaScript('window.dingtalkLoginTest.checkNativeClip(2)', true)

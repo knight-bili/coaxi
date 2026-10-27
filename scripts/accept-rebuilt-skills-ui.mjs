@@ -7,18 +7,18 @@ import { assertUserDataIsIsolated, seedCompletedOnboardingForAcceptance } from '
 const appPath = process.argv[2]
 const outputDirectory = process.argv[3] && resolve(process.argv[3])
 if (!appPath || !outputDirectory) {
-  throw new Error('Usage: ROVAI_CAPTURE_USER_DATA_DIR=<isolated path> node scripts/accept-rebuilt-skills-ui.mjs <Coaxi.app> <output-directory>')
+  throw new Error('Usage: COAXI_CAPTURE_USER_DATA_DIR=<isolated path> node scripts/accept-rebuilt-skills-ui.mjs <Coaxi.app> <output-directory>')
 }
-const userDataDirectory = assertUserDataIsIsolated(process.env.ROVAI_CAPTURE_USER_DATA_DIR)
-const theme = process.env.ROVAI_CAPTURE_THEME ?? 'day'
-const zoom = Number(process.env.ROVAI_CAPTURE_ZOOM_FACTOR ?? 1)
+const userDataDirectory = assertUserDataIsIsolated(process.env.COAXI_CAPTURE_USER_DATA_DIR)
+const theme = process.env.COAXI_CAPTURE_THEME ?? 'day'
+const zoom = Number(process.env.COAXI_CAPTURE_ZOOM_FACTOR ?? 1)
 if (!['day', 'night'].includes(theme) || ![1, 2].includes(zoom)) {
-  throw new Error('ROVAI_CAPTURE_THEME must be day or night and ROVAI_CAPTURE_ZOOM_FACTOR must be 1 or 2')
+  throw new Error('COAXI_CAPTURE_THEME must be day or night and COAXI_CAPTURE_ZOOM_FACTOR must be 1 or 2')
 }
-const width = Number(process.env.ROVAI_CAPTURE_WIDTH ?? 1440)
-const height = Number(process.env.ROVAI_CAPTURE_HEIGHT ?? 920)
+const width = Number(process.env.COAXI_CAPTURE_WIDTH ?? 1440)
+const height = Number(process.env.COAXI_CAPTURE_HEIGHT ?? 920)
 if (!Number.isInteger(width) || !Number.isInteger(height) || width < 1040 || height < 700) {
-  throw new Error('ROVAI_CAPTURE_WIDTH/HEIGHT must be valid desktop viewport dimensions')
+  throw new Error('COAXI_CAPTURE_WIDTH/HEIGHT must be valid desktop viewport dimensions')
 }
 const fixtureHome = join(dirname(userDataDirectory), 'native-home')
 const nativeSkill = join(fixtureHome, '.codex', 'skills', 'acceptance-demo')
@@ -47,7 +47,7 @@ const app = spawn(join(appPath, 'Contents', 'MacOS', 'Coaxi'), [
     HOME: fixtureHome,
     CODEX_HOME: join(fixtureHome, '.codex'),
     QODER_CONFIG_DIR: join(fixtureHome, '.qoder'),
-    ROVAI_ALLOW_ISOLATED_INSTANCE: '1'
+    COAXI_ALLOW_ISOLATED_INSTANCE: '1'
   }
 })
 const stderr = []
@@ -66,7 +66,7 @@ try {
   })
   await waitFor(cdp, `window.innerWidth === ${width / zoom} && window.innerHeight === ${height / zoom}`, 5_000)
   await waitFor(cdp, `Boolean(document.querySelector('.unified-primary-nav button[aria-label="新对话"]:not(:disabled)')) && !document.querySelector('.startup-gate')`, 45_000)
-  await evaluate(cdp, `window.rovai.appearance.setPreference(${JSON.stringify(theme)})`)
+  await evaluate(cdp, `window.coaxi.appearance.setPreference(${JSON.stringify(theme)})`)
   await waitFor(cdp, `document.documentElement.dataset.theme === ${JSON.stringify(theme)}`, 5_000)
   await evaluate(cdp, `(() => {
     const button = document.querySelector('.unified-sidebar-footer .sidebar-settings-main')
@@ -92,7 +92,7 @@ try {
       skills.narrow !== (skills.available < 620)) {
     throw new Error(`Native Skills view did not match its isolated source: ${JSON.stringify(skills)}`)
   }
-  const skillsSplitter = await exerciseSplitter(cdp, nativePage, 'rovai.native-skills-list-width.v1')
+  const skillsSplitter = await exerciseSplitter(cdp, nativePage, 'coaxi.native-skills-list-width.v1')
   const refreshAction = await checkAction(cdp, nativePage, '刷新')
   if (skills.narrow) await selectFirstRow(cdp, nativePage)
   await waitFor(cdp, `!document.querySelector('.page-zoom-indicator')`, 5_000)
@@ -151,7 +151,7 @@ try {
   await openSection(cdp, '工具箱')
   await waitFor(cdp, `((${toolboxPage})?.querySelectorAll('.rebuilt-skill-row').length ?? 0) === 5`, 30_000)
   const toolbox = await evaluate(cdp, `(async () => {
-    const views = await window.rovai.request('toolbox.list')
+    const views = await window.coaxi.request('toolbox.list')
     const panel = ${toolboxPage}
     return { names: views.map((entry) => entry.name).sort(),
       defaults: views.map((entry) => [entry.name, entry.memberIds.length]),
@@ -192,7 +192,7 @@ try {
   })()`)
   if (!visibleOnFocus) throw new Error('Toolbox help copy is not visible on keyboard focus')
   await evaluate(cdp, `(${toolboxPage}).querySelector('.rebuilt-toolbox-help button').blur()`)
-  const toolboxSplitter = await exerciseSplitter(cdp, toolboxPage, 'rovai.toolbox-list-width.v1')
+  const toolboxSplitter = await exerciseSplitter(cdp, toolboxPage, 'coaxi.toolbox-list-width.v1')
   if (Math.abs(toolbox.available - skills.available) > 1) throw new Error('Toolbox has extra outer padding compared with Skills')
   const descriptionAction = await checkAction(cdp, toolboxPage, '查看说明')
   if (toolbox.narrow) await selectFirstRow(cdp, toolboxPage)
@@ -221,10 +221,10 @@ try {
   })()`)
   await waitFor(cdp, `Boolean((${toolboxPage}).querySelector('.rebuilt-toolbox-member input'))`, 5_000)
   await evaluate(cdp, `(${toolboxPage}).querySelector('.rebuilt-toolbox-member input').click()`)
-  await waitFor(cdp, `(async () => (await window.rovai.request('toolbox.list')).find((item) => item.name === 'campfire')?.memberIds.length === 1)()`, 8_000)
+  await waitFor(cdp, `(async () => (await window.coaxi.request('toolbox.list')).find((item) => item.name === 'campfire')?.memberIds.length === 1)()`, 8_000)
   await waitFor(cdp, `!(${toolboxPage}).querySelector('.rebuilt-skills-status')`, 5_000)
   await evaluate(cdp, `(${toolboxPage}).querySelector('.rebuilt-toolbox-member input').click()`)
-  await waitFor(cdp, `(async () => (await window.rovai.request('toolbox.list')).find((item) => item.name === 'campfire')?.memberIds.length === 0)()`, 8_000)
+  await waitFor(cdp, `(async () => (await window.coaxi.request('toolbox.list')).find((item) => item.name === 'campfire')?.memberIds.length === 0)()`, 8_000)
   await openSection(cdp, 'Skills')
   await waitFor(cdp, `Boolean((${nativePage})?.querySelector('.rebuilt-skills-columns'))`, 5_000)
   if (!skillsSplitter.compact) {

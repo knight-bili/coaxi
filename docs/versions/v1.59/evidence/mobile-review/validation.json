@@ -152,7 +152,7 @@
   ],
   "errors": [],
   "artifact": {
-    "name": "rovai-mobile.html",
+    "name": "coaxi-mobile.html",
     "sha256": "25bf85a794e012f2e432e88ee113015979464466c996fbf21bca4fe9e6b5d623"
   },
   "result": "pass",
@@ -170,7 +170,7 @@
     "skills": "SkillSettings consumes delivery groups; MemberManagement has no Skills/MCP assignment surface.",
     "latest": "Production return-to-latest has a 36 px circular face, 44 px hit area, centered over reading content.",
     "automation": "AutomationEditor/AutomationWorkspace persist a single memberId, not a team. The prototype uses a portrait single select and preserves that member through edits, save and refresh.",
-    "projectPagination": "CampNavigation and navigation-window-reader use five initial conversations and five more per step. The sample Rovai project contains eleven unpinned conversations; folder expansion and per-group limits are independent.",
+    "projectPagination": "CampNavigation and navigation-window-reader use five initial conversations and five more per step. The sample Coaxi project contains eleven unpinned conversations; folder expansion and per-group limits are independent.",
     "execution": "CampWorkspace continuous process timeline, ExecutionAvatarRail avatar/status semantics, ExecutionStatusGlyph and ExecutionToolGroup command icons. Mobile wraps portraits, keeps each Run independent and compresses terminal headers.",
     "taskCreation": "TaskFields showStatus only in edit mode; create contains title, description, acceptanceCriteria and required current-Camp assignee. Prototype defaults a new Task to pending.",
     "messageRuntime": "The member message header includes Runtime display name (Codex CLI) beside the member; production Runtime configuration ownership remains unchanged.",

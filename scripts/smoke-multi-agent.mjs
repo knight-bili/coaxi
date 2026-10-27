@@ -11,7 +11,7 @@ import {
 } from './lib/runtime-camp-files-root.mjs'
 
 const root = resolve(import.meta.dirname, '..')
-const fixtureRoot = await mkdtemp(join(tmpdir(), 'rovai-multi-agent-smoke-'))
+const fixtureRoot = await mkdtemp(join(tmpdir(), 'coaxi-multi-agent-smoke-'))
 const projectRoot = join(fixtureRoot, 'project')
 const dataDir = join(fixtureRoot, 'data')
 let core
@@ -21,12 +21,12 @@ try {
   await mkdir(projectRoot)
   await writeFile(join(projectRoot, 'README.md'), '# Multi-Agent fixture\n')
   await runCommand('git', ['init', '-b', 'main'], projectRoot)
-  await runCommand('git', ['config', 'user.name', 'Rovai-ai Multi-Agent Smoke'], projectRoot)
-  await runCommand('git', ['config', 'user.email', 'multi-agent@rovai.local'], projectRoot)
+  await runCommand('git', ['config', 'user.name', 'Coaxi Multi-Agent Smoke'], projectRoot)
+  await runCommand('git', ['config', 'user.email', 'multi-agent@coaxi.local'], projectRoot)
   await runCommand('git', ['add', 'README.md'], projectRoot)
   await runCommand('git', ['commit', '-m', 'fixture'], projectRoot)
 
-  core = spawn(join(root, 'target', 'debug', 'rovai-core'), [
+  core = spawn(join(root, 'target', 'debug', 'coaxi-core'), [
     ...coreDataDirectoryArguments(dataDir),
     '--skill-library-root', join(dataDir, 'managed-skill-library')
   ], {
@@ -46,11 +46,11 @@ try {
   }
   core.once('error', rejectPending)
   core.once('close', (code, signal) => {
-    if (!shuttingDown) rejectPending(new Error(`rovai-core exited early (code=${code}, signal=${signal})`))
+    if (!shuttingDown) rejectPending(new Error(`coaxi-core exited early (code=${code}, signal=${signal})`))
   })
   const lines = createInterface({ input: core.stdout })
   lines.once('close', () => {
-    if (!shuttingDown) rejectPending(new Error('rovai-core stdout closed early'))
+    if (!shuttingDown) rejectPending(new Error('coaxi-core stdout closed early'))
   })
   lines.on('line', (line) => {
     const message = JSON.parse(line)

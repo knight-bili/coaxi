@@ -66,11 +66,11 @@
     "clean_install_and_public_ci_qualified": false
   },
   "seams": [
-    "ReasoningContent outer original classes/props; body uses existing Rovai SafeMarkdown, without source Streamdown plugins or full Markdown/HTML qualification",
+    "ReasoningContent outer original classes/props; body uses existing Coaxi SafeMarkdown, without source Streamdown plugins or full Markdown/HTML qualification",
     "Original Radix monolith imports mapped to equivalent pinned leaf namespaces; original bodies unchanged",
-    "Rovai locale and native Button; full original Badge and OverlayScrollbars ScrollArea now replace early minimal seams",
+    "Coaxi locale and native Button; full original Badge and OverlayScrollbars ScrollArea now replace early minimal seams",
     "Source session host and standalone dialog fallback join shared Core viewer; no donor DB, store, filesystem reader or execution authority",
-    "Visible scroll/control CSS scoped to codeg-native-rich; only library unique invisible body measurement probe selectors global"
+    "Visible scroll/control CSS scoped to coaxi-native-rich; only library unique invisible body measurement probe selectors global"
   ],
   "verification": {
     "targeted_files": 6,
@@ -169,27 +169,27 @@
       "git_blob_with_filters": "1e1b1b34375c550a943ab3bf2a6e53a188b8ec13"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/types.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/lib/types.ts",
       "sha256": "74593f9c9e7a33a570f596f0ec67d5722551d4097ab1e395d3022e2a7bb9e97f",
       "git_blob_with_filters": "a6dc5c54bee4515367c2c78dab2fbe6a41060b6b"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/source-rich.css",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/source-rich.css",
       "sha256": "570337eeb6a3e5eb651f757bbe8a267f2bad2d31068dc382d0ac143158ed76db",
       "git_blob_with_filters": "a102527688aea15ca6d2d56009737cdefb7eb26b"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/readonly-tool-card.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/ui/readonly-tool-card.tsx",
       "sha256": "ca20084c82f8bd17567debd7f9807958a3e2cd95b6bcb0caadb234202ab8c734",
       "git_blob_with_filters": "ae1fcefadd846874670b039e239dc9f4439d906a"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/source-copy.json",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/ui/source-copy.json",
       "sha256": "7b6e0c2c4a0b0ad56032fbf929c3bf258ec483a042277c8fc1db9bf825f32352",
       "git_blob_with_filters": "3f59176d4391094a0d2898bd150ef395d1bb1400"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/source-primitives.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/ui/source-primitives.tsx",
       "sha256": "2bcb22f5801099bc4798ce5989e3df1badf3d2e8c1492ba9cb188a0ee039e527",
       "git_blob_with_filters": "3d3fb84819e2623be586a0af9080f0778bee9c11"
     },
@@ -219,102 +219,102 @@
       "git_blob_with_filters": "1c0c7db769ad625e6a390c0f4873beb7fcdf55bc"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/reasoning.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/reasoning.tsx",
       "sha256": "bb532f8f121ec57db62a220252be667f0cecca8c1aa41a8dc3542a756bede5bf",
       "git_blob_with_filters": "a7f192c8c29695e195997cc03098d8f39f09c843"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/chat/ask-question-card.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/chat/ask-question-card.tsx",
       "sha256": "19aead54fb54b9f08a9e44fc5e4da803cfa95f0f2f5b3834ac0fb862114bffa6",
       "git_blob_with_filters": "e49534e8a947baaf30719cd0aec082da3c7a73d9"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/agent-capsule.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/message/agent-capsule.tsx",
       "sha256": "e07c285d1ba31eff20ce49fa1173408d2f5db96103b1df548fbc7e90cf99835d",
       "git_blob_with_filters": "88bab06dce337c527466ff09e0b77f84206e6c9a"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/agent-tool-call.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/message/agent-tool-call.tsx",
       "sha256": "2130baaa8c492a47e6ec5c4b609b29748135b2220c83f26714377df1b5549aed",
       "git_blob_with_filters": "c099d60e82ab05a02d412e4a17dbae58950ae587"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/ask-question-result-card.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/message/ask-question-result-card.tsx",
       "sha256": "954155d21360e2d2c6d95b0a67e80fdfb8ce18d6505407315377dbf117ee85c3",
       "git_blob_with_filters": "a396c20cc629e77aed5cd64a8e005f3f3148d826"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/collab-agent-card.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/message/collab-agent-card.tsx",
       "sha256": "b9055956da71a94c70aeb188bc2f6ed5e9432b3c467095868aacfd0d9fe2ee1f",
       "git_blob_with_filters": "b4ae71ff236906f31c772ad4a8750963a73a41fa"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/subagent-session-button.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/message/subagent-session-button.tsx",
       "sha256": "b595c293fca1a83a09def63728bcbe67e7f2c470e9b0915799bc7f1c269ccd17",
       "git_blob_with_filters": "3c292f0c4c4ac903bc76063693ae7f0d929d060f"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/tool-group-part.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/message/tool-group-part.tsx",
       "sha256": "b2db2b1404de08007504cc755930420f7c32c6a9153c453ee37d019f35839d61",
       "git_blob_with_filters": "7f139d4f9e66c93e4dbb467ffcbd3cedf2a3a17a"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/ui/badge.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/ui/badge.tsx",
       "sha256": "6b35aa9c8cfc8eba80f5459e6513cd7e4b657b48936b53646d4491e3b406a338",
       "git_blob_with_filters": "df7e459b8ed6f1883edc78f14818559b19b47be6"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/ui/checkbox.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/ui/checkbox.tsx",
       "sha256": "e980e1b08d1f015db11d3268965c13fb476bccd71ae24c53fbb0d9ebf45c16dd",
       "git_blob_with_filters": "7233d0c2a97802e51a01f6e468d53c7a45bda6ae"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/ui/label.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/ui/label.tsx",
       "sha256": "b1bac3e9351577d28123f5ef6aa113e56040288e733b252b791b694a04c69161",
       "git_blob_with_filters": "716b27db21e91aca770eefa99c0dbdc0d9829f2d"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/ui/progress.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/ui/progress.tsx",
       "sha256": "b072a17abbaf0dff593dee0a185e411b5cbd7ac0bdf293e3c10e3ac8b74c1726",
       "git_blob_with_filters": "0ae876f12b59a4492fcc5f57c845c7b674b4aff2"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/ui/radio-group.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/ui/radio-group.tsx",
       "sha256": "1d4027750ae71bd00bffe11414de825625dd6391647094383955a78a19727974",
       "git_blob_with_filters": "4b1a1103214f6d108166cb14cf51d8f67e03ef05"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/ui/scroll-area.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/ui/scroll-area.tsx",
       "sha256": "41c218dbc7429ae1353efc66764646157897cf47e8373c5425fe8e5e1c11ef13",
       "git_blob_with_filters": "ca1abe8440212b35e715cf6cd24b855bd111d0a0"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/ui/tabs.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/ui/tabs.tsx",
       "sha256": "e5c09410d087c97aa800167c0df3ed2198b1376bb3da317d4cffda1baeca2798",
       "git_blob_with_filters": "4932060ae66003936c8be04987b6ebed8cec0573"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/ask-question.test.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/lib/ask-question.test.ts",
       "sha256": "5d5360b231baea8276ac498fc68b3e01964f2dd0c07171ed51906caff86bb70f",
       "git_blob_with_filters": "c2711ed6726826355aed399d0c6d931af578046f"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/ask-question.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/lib/ask-question.ts",
       "sha256": "03891004793b75e4f7441d63d49a01bfb61a88caacb4ffff390b8101b5924c62",
       "git_blob_with_filters": "8bfcb8a0ef9c993952912a7a0bd053e5375a0e42"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/background-agent.test.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/lib/background-agent.test.ts",
       "sha256": "1e8bd6759ffcbce23c3c806d1ef70f3f7a918566d097cea1af19adc8369fe207",
       "git_blob_with_filters": "ec1dc30e74c1c70b5890391ea736a44d654cf850"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/background-agent.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/lib/background-agent.ts",
       "sha256": "088986ee09b6aad4a7515f73718b28c82cdd9ee7922cb04588896b74e3cf4682",
       "git_blob_with_filters": "45a1b0e72a87e07d5a232b588b1ec28f0c6fe08e"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/native-session-actions.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/ui/native-session-actions.tsx",
       "sha256": "3356d55f2f9f4dfdcb23850561d263947601a2a5edb74be323a80348e1d04d93",
       "git_blob_with_filters": "328838efe763867b5140c54fec49417181e0abdc"
     },

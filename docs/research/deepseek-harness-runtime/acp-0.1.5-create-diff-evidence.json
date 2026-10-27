@@ -118,9 +118,9 @@
   },
   "commands": [
     "node --test scripts/lib/dsh-host.test.mjs",
-    "cargo test -p rovai-core --lib dsh -- --nocapture",
-    "cargo test -p rovai-core --lib successful_terminal_acp_diff_content_is_kept_for_evidence_projection_only",
-    "ROVAI_ACP_SMOKE_ADAPTER=deepseek-harness ROVAI_ACP_FILE_OPERATION_MATRIX=1 node scripts/smoke-acp-runtime.mjs"
+    "cargo test -p coaxi-core --lib dsh -- --nocapture",
+    "cargo test -p coaxi-core --lib successful_terminal_acp_diff_content_is_kept_for_evidence_projection_only",
+    "COAXI_ACP_SMOKE_ADAPTER=deepseek-harness COAXI_ACP_FILE_OPERATION_MATRIX=1 node scripts/smoke-acp-runtime.mjs"
   ],
   "limitations": [
     "This evidence corrects one DSH ingress case and does not replace or mutate the digest-bound v2 qualification artifact.",

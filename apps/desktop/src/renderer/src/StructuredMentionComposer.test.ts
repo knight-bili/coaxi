@@ -12,7 +12,7 @@ import {
   structuredSkillOptions
 } from './StructuredMentionComposer'
 import { composerTypeaheadEnterAction } from './ComposerTypeaheadPlugin'
-import { RovaiComposerExtension } from './RovaiComposerExtension'
+import { CoaxiComposerExtension } from './CoaxiComposerExtension'
 import type { ComposerSkillOption } from './composer-skill-picker'
 import type { GeneralPreferencesApi, InterfaceLanguage } from '@contracts'
 import { changeInterfaceLanguage } from './interface-language'
@@ -22,7 +22,7 @@ const members = [{
   agentId: 'agent_1',
   displayName: '新洛可',
   teamRole: '默认队长',
-  avatarRef: 'rovai://member-avatar/builtin/luoke/v1',
+  avatarRef: 'coaxi://member-avatar/builtin/luoke/v1',
   mentionable: true
 }, {
   agentId: 'agent_2',
@@ -73,7 +73,7 @@ describe('StructuredMentionComposer V2', () => {
   })
 
   it('keeps the module-level Extension configuration stable', () => {
-    expect(RovaiComposerExtension).toBe(RovaiComposerExtension)
+    expect(CoaxiComposerExtension).toBe(CoaxiComposerExtension)
   })
 
   it('offers one all-members choice and filters only mentionable members', () => {

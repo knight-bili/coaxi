@@ -252,7 +252,7 @@ async function verifyFreshStateAttestation(root, result) {
   )
   if (canonicalJson(current) !== canonicalJson(immutable)
       || current.artifactId !== reference.artifactId
-      || current.schemaId !== 'rovai.benchmark.fresh-state-attestation'
+      || current.schemaId !== 'coaxi.benchmark.fresh-state-attestation'
       || current.schemaVersion !== '1.0.0'
       || current.payloadDigest !== `sha256:${digestJson(current.payload)}`
       || current.payloadDigest !== reference.payloadDigest

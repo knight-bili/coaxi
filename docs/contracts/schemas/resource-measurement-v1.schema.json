@@ -1,12 +1,12 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schemas.rovai.invalid/contracts/resource-measurement-v1.schema.json",
-  "title": "Rovai Resource Measurement v1",
+  "$id": "https://schemas.coaxi.invalid/contracts/resource-measurement-v1.schema.json",
+  "title": "Coaxi Resource Measurement v1",
   "type": "object",
   "additionalProperties": false,
   "required": ["schemaId", "schemaVersion", "profile", "measurements", "integrity"],
   "properties": {
-    "schemaId": { "const": "rovai.benchmark.resource-measurement" },
+    "schemaId": { "const": "coaxi.benchmark.resource-measurement" },
     "schemaVersion": { "const": "1.0.0" },
     "profile": { "$ref": "#/$defs/profileReference" },
     "measurements": {

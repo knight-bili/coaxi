@@ -34,19 +34,19 @@
       "sha256": "b7065d6effa1f70302039b89bf4471396d2b7bd3b43e981d2d7a1580c2ab058d"
     },
     {
-      "path": "crates/rovai-core/src/application.rs",
+      "path": "crates/coaxi-core/src/application.rs",
       "sha256": "5619885abccd705ea6826377df859894fddc5dac81e287e581d69ddff6d70ac7"
     },
     {
-      "path": "crates/rovai-core/src/git.rs",
+      "path": "crates/coaxi-core/src/git.rs",
       "sha256": "e7c03507257fe0d8facadfd293b8264c9549de14fdc0ac64d53c65348187dd9d"
     },
     {
-      "path": "crates/rovai-core/src/git/worktrees.rs",
+      "path": "crates/coaxi-core/src/git/worktrees.rs",
       "sha256": "7b5b993770ed5e3ef2204b44396c8b84647436ed8c91981d6b9d91015562c821"
     },
     {
-      "path": "crates/rovai-web/src/operations.rs",
+      "path": "crates/coaxi-web/src/operations.rs",
       "sha256": "d7c332e503b4307da6a899449f0897d86fe01e0c39b1bfb6ad707e097af6bcb1"
     },
     {
@@ -152,7 +152,7 @@
     },
     "checker_invocation_error_preserved": "canvas-folders-foundation.log called a nonexistent check-foundation.mjs; corrected to the existing verify-foundation.mjs. This was an invocation error, not a passing run.",
     "diff_and_smoke_syntax": "passed",
-    "rust_test_owners": "coded_not_run: git::worktrees NUL parser and extensions of existing git::tests ordinary/empty/observation/malformed owners; minimum cargo test -p rovai-core --lib git::",
+    "rust_test_owners": "coded_not_run: git::worktrees NUL parser and extensions of existing git::tests ordinary/empty/observation/malformed owners; minimum cargo test -p coaxi-core --lib git::",
     "current_core_host_smoke": "extended_existing_smoke_not_run",
     "mounted_ui_platform_and_full_regression": "pending_stage_candidate"
   },

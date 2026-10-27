@@ -112,7 +112,7 @@ const candidate = {
 const text =
   '---\nname: ui-ux-pro-max\ndescription: UI design guidance\n---\n\n# 界面设计与实现\n\n从已有界面出发，让每个操作清晰、直接。\n\n## 使用方式\n\n1. 理解当前页面的主要任务。\n2. 保留熟悉的视觉风格和交互。\n3. 检查键盘操作、窄窗口和深色模式。\n\n## 设计原则\n\n- 主要内容优先，低频信息按需展开。\n- 选择整行即可切换投递范围。\n- 配置、导入与预览在当前页面完成。'
 Object.assign(window, {
-  rovai: {
+  coaxi: {
     onEvent: () => () => {},
     selectSkillImportDirectory: async () => {
       folderSelections++

@@ -6,9 +6,9 @@ import { useThreadClient } from './camp-client'
 import { useUiText } from './interface-language'
 import { readErrorMessage } from './error-message'
 import { conversationOriginal, conversationToolRequest, type ConversationOriginal } from './conversation-tools-client'
-import { AskQuestionCard } from './codeg-native-content/components/chat/ask-question-card'
-import type { QuestionAnswer } from './codeg-native-content/lib/types'
-import './codeg-native-content/source-rich.css'
+import { AskQuestionCard } from './coaxi-native-content/components/chat/ask-question-card'
+import type { QuestionAnswer } from './coaxi-native-content/lib/types'
+import './coaxi-native-content/source-rich.css'
 
 const stateText: Record<ConversationQuestionSet['state'], string> = { awaiting_answer: '等待你回答', answered: '答案已保存，等待原连接确认', delivered: '已写回原队员连接', cancelled: '原问题已停止，记录保留', outcome_unknown: '原连接结果待核对，不会自动重发' }
 function Question({ value, name, onChanged }: { value: ConversationQuestionSet; name: string; onChanged(): void }): React.JSX.Element {
@@ -69,12 +69,12 @@ function Question({ value, name, onChanged }: { value: ConversationQuestionSet; 
   }))
   return <section className="feedback-history-item">
     <div><strong>{name}</strong><span> · {t(stateText[value.state])}</span></div>
-    <div className="codeg-native-rich"><AskQuestionCard key={`${value.requestId}:${value.revision}:${status?.state ?? ''}`} question={{ question_id: value.requestId, created_at: value.createdAt, questions: value.questions.map(question => ({ id: question.id, question: question.spec.question, header: question.spec.header, multi_select: question.spec.multiSelect, options: question.spec.options })) }} onAnswer={answer} readOnly={!ready || !!pending || busy || value.state !== 'awaiting_answer'} initialSelections={seed} title={t(value.state === 'awaiting_answer' ? '队员需要你的选择' : '原问题记录')} subtitle={t(stateText[value.state])} /></div>
+    <div className="coaxi-native-rich"><AskQuestionCard key={`${value.requestId}:${value.revision}:${status?.state ?? ''}`} question={{ question_id: value.requestId, created_at: value.createdAt, questions: value.questions.map(question => ({ id: question.id, question: question.spec.question, header: question.spec.header, multi_select: question.spec.multiSelect, options: question.spec.options })) }} onAnswer={answer} readOnly={!ready || !!pending || busy || value.state !== 'awaiting_answer'} initialSelections={seed} title={t(value.state === 'awaiting_answer' ? '队员需要你的选择' : '原问题记录')} subtitle={t(stateText[value.state])} /></div>
     {outcome?.declined && <p>{t('你已明确选择不回答。')}</p>}{error && <p role="alert" className="feedback-error">{error}</p>}
     <div className="feedback-dock-actions"><button type="button" className="quiet-button" disabled={busy} onClick={() => void reconcile()}>{t(pending ? '核对原回答' : '查看原回执')}</button>{['awaiting_answer', 'outcome_unknown'].includes(value.state) && <button type="button" className="quiet-button" disabled={busy} onClick={() => void cancel()}>{t('取消这组问题的剩余投递')}</button>}</div>
   </section>
 }
-/** 问题与普通消息输入分别保存；卡片直接复用固定Codeg原组件。 */
+/** 问题与普通消息输入分别保存；卡片直接复用固定Coaxi原组件。 */
 export function ConversationQuestionsDock({ scope, members }: { scope: ConversationToolScope; members: Array<{ agentId: string; displayName: string }> }): React.JSX.Element | null {
   const client = useThreadClient(), t = useUiText(), generation = useRef(0), sequence = useRef(0)
   const [page, setPage] = useState<{ items: ConversationQuestionSet[]; next: string | null }>({ items: [], next: null }), [error, setError] = useState('')

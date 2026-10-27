@@ -33,11 +33,11 @@ function run(command, args) {
 }
 // A Desktop build may empty out/web while native Rust compilation runs.
 // Own this UI build directory until the matching package has been copied.
-const webBuildDirectory = mkdtempSync(join(tmpdir(), 'rovai-server-web-'))
+const webBuildDirectory = mkdtempSync(join(tmpdir(), 'coaxi-server-web-'))
 try {
   run('pnpm', ['build:web', '--outDir', webBuildDirectory])
   run('pnpm', ['build:server-channels'])
-  run('cargo', ['build', '--locked', '-p', 'rovai-host', '-p', 'rovai-core', '--bin', 'rovai-host', '--bin', 'rovai-server', '--bin', 'rovai', ...(debug ? [] : ['--release'])])
+  run('cargo', ['build', '--locked', '-p', 'coaxi-host', '-p', 'coaxi-core', '--bin', 'coaxi-host', '--bin', 'coaxi-server', '--bin', 'coaxi', ...(debug ? [] : ['--release'])])
   if (customOutput) {
     mkdirSync(dirname(destination), { recursive: true })
     mkdirSync(destination) // Refuse a concurrently created installation, too.
@@ -45,7 +45,7 @@ try {
     rmSync(destination, { recursive: true, force: true })
     mkdirSync(destination, { recursive: true })
   }
-  for (const name of ['rovai-host', 'rovai-server', 'rovai']) {
+  for (const name of ['coaxi-host', 'coaxi-server', 'coaxi']) {
     const executable = `${name}${target.executableSuffix}`
     copyFileSync(join(repository, 'target', profile, executable), join(destination, executable))
     if (target.platform !== 'win32') chmodSync(join(destination, executable), 0o755)
@@ -64,7 +64,7 @@ try {
   const channelPackage = packageServerChannels(repository, destination, target)
   cpSync(join(repository, 'helpers/native-history/LICENSE'), join(destination, 'licenses/native-history-LICENSE'))
   const version = JSON.parse(readFileSync(join(repository, 'package.json'), 'utf8')).version
-  writeFileSync(join(destination, 'package-info'), `schema=1\nproduct=codeg-rovai-workbench\nversion=${version}\ntarget=${target.key}\n`)
+  writeFileSync(join(destination, 'package-info'), `schema=1\nproduct=coaxi\nversion=${version}\ntarget=${target.key}\n`)
   copyFileSync(join(repository, 'scripts', target.platform === 'win32' ? 'install-server.ps1' : 'install-server.sh'), join(destination, target.platform === 'win32' ? 'install-server.ps1' : 'install-server.sh'))
   const commit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: repository, encoding: 'utf8' }).trim()
   const dirty = execFileSync('git', ['status', '--porcelain'], { cwd: repository, encoding: 'utf8' }).trim().length > 0
@@ -88,11 +88,11 @@ try {
   }
   hashTree(destination)
   writeFileSync(join(destination, 'manifest.json'), JSON.stringify({
-    schemaVersion: 1, productId: 'codeg-rovai-workbench', version, commit, dirty, target: target.key, rustTarget: target.rustTarget,
+    schemaVersion: 1, productId: 'coaxi', version, commit, dirty, target: target.key, rustTarget: target.rustTarget,
     profile, qualification: 'development-preview', channelPackage, files
   }, null, 2) + '\n')
-  execFileSync(join(destination, `rovai-host${target.executableSuffix}`), ['--version'], { stdio: 'inherit' })
-  execFileSync(join(destination, `rovai-server${target.executableSuffix}`), ['--version'], { stdio: 'inherit' })
+  execFileSync(join(destination, `coaxi-host${target.executableSuffix}`), ['--version'], { stdio: 'inherit' })
+  execFileSync(join(destination, `coaxi-server${target.executableSuffix}`), ['--version'], { stdio: 'inherit' })
   console.log(`Server preview staged at ${destination}`)
   const archive = archiveServerPackage(destination, customOutput ? `${destination}-release` : join(repository, 'out/server/releases', key), { version, target: key })
   console.log(`Unpublished Server archive: ${archive.archive}`)

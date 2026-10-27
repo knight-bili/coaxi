@@ -16,7 +16,7 @@ const fixture=await realpath(await mkdtemp(path.join(evidenceRoot,'catalog-')));
 const home=path.join(fixture,'fake-home'),temp=path.join(fixture,'tmp');
 await mkdir(home);await mkdir(temp);
 const env={};for(const [key,value] of Object.entries(process.env))if(['PATH','SYSTEMROOT','WINDIR','COMSPEC','PATHEXT'].includes(key.toUpperCase()))env[key]=value;
-Object.assign(env,{HOME:home,USERPROFILE:home,APPDATA:path.join(home,'AppData/Roaming'),LOCALAPPDATA:path.join(home,'AppData/Local'),XDG_CONFIG_HOME:path.join(home,'.config'),XDG_DATA_HOME:path.join(home,'.local/share'),XDG_STATE_HOME:path.join(home,'.local/state'),TEMP:temp,TMP:temp,ROVAI_BUNDLED_SKILLS_ROOT:path.join(root,'skills')});
+Object.assign(env,{HOME:home,USERPROFILE:home,APPDATA:path.join(home,'AppData/Roaming'),LOCALAPPDATA:path.join(home,'AppData/Local'),XDG_CONFIG_HOME:path.join(home,'.config'),XDG_DATA_HOME:path.join(home,'.local/share'),XDG_STATE_HOME:path.join(home,'.local/state'),TEMP:temp,TMP:temp,COAXI_BUNDLED_SKILLS_ROOT:path.join(root,'skills')});
 const formal=path.join(fixture,'formal');
 const dataDir=process.platform==='win32'?JSON.parse(execFileSync(binary,['--prepare-windows-data-root',formal],{encoding:'utf8',env,windowsHide:true})).core:formal;
 const skillRoot=path.join(dataDir,'skills'),mcp=path.join(dataDir,'mcp.json');
@@ -42,15 +42,15 @@ try {
   const anonymous=await request('skillPacks.list',{},false);assert.equal(anonymous.http,401);record('HTTP_anonymous_catalog_rejected');
   const catalog=await request('skillPacks.list');assert.equal(catalog.http,200);assert.equal(catalog.body.error,null);assert.deepEqual(catalog.body.result,direct);record('HTTP_and_Core_share_one_catalog');
   const preview=await request('skillPacks.read',{skillId:'brainstorming'});assert.equal(preview.http,200);assert.equal(preview.body.error,null);assert.equal(preview.body.result.status,'text');assert(preview.body.result.content.startsWith('---'));
-  const expected=await readFile(path.join(root,'crates/rovai-core/resources/codeg-skill-packs/experts/skills/brainstorming/SKILL.md'),'utf8');
+  const expected=await readFile(path.join(root,'crates/coaxi-core/resources/coaxi-skill-packs/experts/skills/brainstorming/SKILL.md'),'utf8');
   assert.equal(preview.body.result.content,expected);record('HTTP_preview_exact_fixed_source',{sha256:sha(expected)});
   const office=await request('skillPacks.read',{skillId:'officecli-pptx'});assert.equal(office.http,200);assert(office.body.error);record('HTTP_Office_dependency_is_explicit');
   const traversal=await request('skillPacks.read',{skillId:'brainstorming',path:'../SKILL.md'});assert.equal(traversal.http,200);assert(traversal.body.error);record('HTTP_cross_package_read_rejected');
   stage='restart';await host.close();host=undefined;
   host=start();await within(host.ready);const reopened=await host.request('skillPacks.list',{});assert.deepEqual(reopened,direct);record('Core_restart_keeps_catalog_bytes');
   await host.close();host=undefined;
-  const db=new DatabaseSync(path.join(dataDir,'rovai.sqlite'),{readOnly:true});
-  try {const marker=db.prepare('SELECT contract_version,projection_schema_version FROM rovai_data_contract WHERE singleton=1').get();assert.equal(marker.projection_schema_version,149);assert.equal(db.prepare('SELECT count(*) AS n FROM agent_run').get().n,0);assert.equal(Object.values(db.prepare('PRAGMA integrity_check').get())[0],'ok');record('fresh_schema149_integrity_and_no_AgentRun',{schema:149});}finally{db.close();}
+  const db=new DatabaseSync(path.join(dataDir,'coaxi.sqlite'),{readOnly:true});
+  try {const marker=db.prepare('SELECT contract_version,projection_schema_version FROM coaxi_data_contract WHERE singleton=1').get();assert.equal(marker.projection_schema_version,149);assert.equal(db.prepare('SELECT count(*) AS n FROM agent_run').get().n,0);assert.equal(Object.values(db.prepare('PRAGMA integrity_check').get())[0],'ok');record('fresh_schema149_integrity_and_no_AgentRun',{schema:149});}finally{db.close();}
   assert.deepEqual(await readdir(home),[]);record('fake_Home_has_no_installed_packages');
   const result={status:'passed',task:'I02-T03',scope:'real_Core_and_HTTP_fixed_catalog_and_preview',checks,fixture,dataDir,fakeHome:home,CoreBinarySha256:sha(await readFile(binary)),schema:149,sourceCommit:direct.commit,modelInference:false,runtimeExecutionRequested:false,installation:false,memberDelivery:false,OfficeCLI:false,generativeUiRenderer:false};
   await writeFile(path.join(fixture,'result.json'),JSON.stringify(result,null,2)+'\n');

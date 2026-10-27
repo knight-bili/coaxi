@@ -17,7 +17,7 @@ import {
 import { buildAndRetainQualificationArtifacts } from './qualification-artifacts.mjs'
 import { validateQualificationArtifactSchema } from './qualification-schema-validation.mjs'
 
-export const EVIDENCE_BUNDLE_MANIFEST_SCHEMA_ID = 'rovai.qualification.evidence-bundle-manifest'
+export const EVIDENCE_BUNDLE_MANIFEST_SCHEMA_ID = 'coaxi.qualification.evidence-bundle-manifest'
 export const EVIDENCE_BUNDLE_MANIFEST_SCHEMA_VERSION = '1.0.0'
 
 const ARTIFACT_ROLES = Object.freeze([
@@ -58,7 +58,7 @@ export function buildEvidenceBundleManifest({
       : caseRecord || result.case
       ? present({
           artifactId: `qualification-case:${stableIdentity(result.case?.id ?? caseRecord.contract.manifest.id)}`,
-          schemaId: 'rovai.qualification.qualification-case',
+          schemaId: 'coaxi.qualification.qualification-case',
           schemaVersion: '1.0.0',
           payloadDigest: withSha256Prefix(caseDigest)
         })
@@ -68,7 +68,7 @@ export function buildEvidenceBundleManifest({
       : catalogDigest
       ? present({
           artifactId: `verification-catalog:${identity}`,
-          schemaId: 'rovai.qualification.verification-catalog',
+          schemaId: 'coaxi.qualification.verification-catalog',
           schemaVersion: '1.1.0',
           payloadDigest: withSha256Prefix(catalogDigest)
         })
@@ -77,7 +77,7 @@ export function buildEvidenceBundleManifest({
       ? normalizedArtifactState(normalizedArtifacts, 'qualification_trial', 'evidence_bundle.qualification_trial_unavailable')
       : present({
       artifactId: `qualification-trial:${stableIdentity(result.resultRevision?.revisionId ?? identity)}`,
-      schemaId: 'rovai.qualification.qualification-trial',
+      schemaId: 'coaxi.qualification.qualification-trial',
       schemaVersion: `${Number.isInteger(result.schemaVersion) ? result.schemaVersion : 1}.0.0`,
       payloadDigest: withSha256Prefix(resultDigest)
     })),
@@ -86,7 +86,7 @@ export function buildEvidenceBundleManifest({
       : result.deliveredWorkspaceSnapshot
       ? present({
           artifactId: `delivered-workspace-snapshot:${result.deliveredWorkspaceSnapshot.digest.slice(0, 32)}`,
-          schemaId: 'rovai.qualification.delivered-workspace-snapshot',
+          schemaId: 'coaxi.qualification.delivered-workspace-snapshot',
           schemaVersion: '1.0.0',
           payloadDigest: withSha256Prefix(result.deliveredWorkspaceSnapshot.digest)
         })
@@ -96,7 +96,7 @@ export function buildEvidenceBundleManifest({
       : result.verifier
       ? present({
           artifactId: `verifier-observation:${identity}`,
-          schemaId: 'rovai.qualification.verifier-observation',
+          schemaId: 'coaxi.qualification.verifier-observation',
           schemaVersion: '1.0.0',
           payloadDigest: digest(result.verifier)
         })
@@ -127,7 +127,7 @@ export function buildEvidenceBundleManifest({
       : result.environmentManifestDigest
       ? present({
           artifactId: `qualification-environment:${identity}`,
-          schemaId: 'rovai.qualification.qualification-environment-manifest',
+          schemaId: 'coaxi.qualification.qualification-environment-manifest',
           schemaVersion: '1.0.0',
           payloadDigest: withSha256Prefix(result.environmentManifestDigest)
         })
@@ -173,7 +173,7 @@ export function buildEvidenceBundleManifest({
     schemaId: EVIDENCE_BUNDLE_MANIFEST_SCHEMA_ID,
     schemaVersion: EVIDENCE_BUNDLE_MANIFEST_SCHEMA_VERSION,
     producer: {
-      id: 'rovai-qualification-runner',
+      id: 'coaxi-qualification-runner',
       version: QUALIFICATION_RUNNER_VERSION,
       digest: withSha256Prefix(producerDigest)
     },
@@ -380,7 +380,7 @@ export async function loadRetainedQualificationArtifacts(evidenceDirectory, resu
 export function evaluationAttemptReference(attempt) {
   return {
     artifactId: `evaluation-attempt:${stableIdentity(attempt.attemptId)}`,
-    schemaId: 'rovai.qualification.evaluation-attempt',
+    schemaId: 'coaxi.qualification.evaluation-attempt',
     schemaVersion: `${Number.isInteger(attempt.schemaVersion) ? attempt.schemaVersion : 1}.0.0`,
     payloadDigest: digest(attempt)
   }
@@ -462,7 +462,7 @@ function isolationProfileState(profile) {
   if (profile?.status === 'admitted' && profile.artifactId && profile.payloadDigest) {
     return present({
       artifactId: profile.artifactId,
-      schemaId: 'rovai.qualification.intervention-isolation-profile',
+      schemaId: 'coaxi.qualification.intervention-isolation-profile',
       schemaVersion: profile.schemaVersion,
       payloadDigest: profile.payloadDigest
     })

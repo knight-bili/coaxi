@@ -10,17 +10,17 @@ describe('桌面导航深链', () => {
     ['thread', thread], ['mission', mission], ['mission', uuid], ['canvas', uuid],
     ['settings', 'appearance'], ['tab', 'canvas']
   ])('按真实标识接收 %s', (kind, value) => {
-    expect(parseDesktopDeepLink(`rovai://${kind}/${value}`)).toEqual({kind, value})
+    expect(parseDesktopDeepLink(`coaxi://${kind}/${value}`)).toEqual({kind, value})
   })
 
   it.each([
-    `rovai://thread/${uuid}`, `rovai://mission/${thread}`, `rovai://canvas/${mission}`,
-    `rovai://user:secret@thread/${thread}`, `rovai://thread:80/${thread}`,
-    `rovai://thread/${thread}?host=remote`, `rovai://thread/${thread}#run`,
-    `rovai://thread/${thread}/extra`, `rovai://thread/${thread}%2fextra`,
-    'rovai://settings/%0a', 'rovai://settings/%zz', 'rovai://settings/unknown',
-    `https://thread/${thread}`, ` rovai://thread/${thread}`,
-    `rovai://thread/${'a'.repeat(2048)}`
+    `coaxi://thread/${uuid}`, `coaxi://mission/${thread}`, `coaxi://canvas/${mission}`,
+    `coaxi://user:secret@thread/${thread}`, `coaxi://thread:80/${thread}`,
+    `coaxi://thread/${thread}?host=remote`, `coaxi://thread/${thread}#run`,
+    `coaxi://thread/${thread}/extra`, `coaxi://thread/${thread}%2fextra`,
+    'coaxi://settings/%0a', 'coaxi://settings/%zz', 'coaxi://settings/unknown',
+    `https://thread/${thread}`, ` coaxi://thread/${thread}`,
+    `coaxi://thread/${'a'.repeat(2048)}`
   ])('拒绝无效标识或夹带输入 %s', raw => {
     expect(parseDesktopDeepLink(raw)).toBeNull()
   })

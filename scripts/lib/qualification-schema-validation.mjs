@@ -80,7 +80,7 @@ export function qualificationSchemaReference(schemaFile) {
   if (!entry) throw new Error(`Qualification schema is not cataloged: ${schemaFile}`)
   return {
     artifactId: `json-schema:${schemaFile.replace(/\.schema\.json$/, '')}:${entry.schemaVersion}`,
-    schemaId: 'rovai.qualification.json-schema',
+    schemaId: 'coaxi.qualification.json-schema',
     schemaVersion: entry.schemaVersion,
     payloadDigest: entry.digest
   }

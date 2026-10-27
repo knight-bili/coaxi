@@ -167,31 +167,31 @@
       "sha256": "225038444fed4de05bdfbe6d31233e034a62eddfab44952f21feb29d5f01bf48"
     },
     {
-      "path": "crates/rovai-core/src/application.rs",
+      "path": "crates/coaxi-core/src/application.rs",
       "sha256": "853249db4b3aae8a9e2e16a5abd1958ff820fc80109f49ebd1631da0953137ac"
     },
     {
-      "path": "crates/rovai-core/src/application/private_composer.rs",
+      "path": "crates/coaxi-core/src/application/private_composer.rs",
       "sha256": "e05ba85ce6c90c107364f5bf24800140cf483b25afe35b127030cb868903569d"
     },
     {
-      "path": "crates/rovai-core/src/application/web_commands.rs",
+      "path": "crates/coaxi-core/src/application/web_commands.rs",
       "sha256": "55318880e3f3f5fb9a4e7b9f348a3451e59ff0bdfec33bbdc788234b6267ec88"
     },
     {
-      "path": "crates/rovai-core/src/single_chat.rs",
+      "path": "crates/coaxi-core/src/single_chat.rs",
       "sha256": "9e2ed4b1ca54df9be5eda06c43c917883dc113bd7b6ba4935174e5e9ac3290fc"
     },
     {
-      "path": "crates/rovai-core/src/single_chat_composer.rs",
+      "path": "crates/coaxi-core/src/single_chat_composer.rs",
       "sha256": "4333ca8e17f92908a3a5c7e371847ecfd954b5f60a74bbf6fa7501d8ae293021"
     },
     {
-      "path": "crates/rovai-core/src/single_chat_composer_tests.rs",
+      "path": "crates/coaxi-core/src/single_chat_composer_tests.rs",
       "sha256": "2be82153eeba32efc9479fd12830a515442ee8c8bbad7a8c70c3bbc4353f7d1a"
     },
     {
-      "path": "crates/rovai-web/src/operations.rs",
+      "path": "crates/coaxi-web/src/operations.rs",
       "sha256": "e264b1e8f890c5c5723750bf1841594c94096058aa07e2533dc7806c904ead47"
     },
     {
@@ -225,32 +225,32 @@
   ],
   "preserved_authorities": [
     {
-      "path": "crates/rovai-core/src/draft_client.rs",
+      "path": "crates/coaxi-core/src/draft_client.rs",
       "git_blob": "8745a0ed10f868be9f728e63f951f7142124bdce",
       "sha256": "651d61c4788d6205f11abbe5979dd21f9a08c4e3378d2cb889ee2598dac2ed1e"
     },
     {
-      "path": "crates/rovai-core/src/command.rs",
+      "path": "crates/coaxi-core/src/command.rs",
       "git_blob": "7529d3242563423d1901001b75693c31f5f889ca",
       "sha256": "22258f81dc5b76040cd0fdba20074321b5be7104e648a8278412c0736ef0d85a"
     },
     {
-      "path": "crates/rovai-core/src/context.rs",
+      "path": "crates/coaxi-core/src/context.rs",
       "git_blob": "6c336da3c1a68d0f76d2b3d7bcd072cb89c20730",
       "sha256": "329144f38675ebedeaf5652858d457d42369455eb26c6159af61d19c02218784"
     },
     {
-      "path": "crates/rovai-core/src/context_contract.rs",
+      "path": "crates/coaxi-core/src/context_contract.rs",
       "git_blob": "97498ae4617bf94fbce2d5a68e6c459fe0c2df90",
       "sha256": "d69fc337182fdab43feb84435c852ca92bf9a4ae57b9e532cb73ad350ccd736c"
     },
     {
-      "path": "crates/rovai-core/src/message_quote.rs",
+      "path": "crates/coaxi-core/src/message_quote.rs",
       "git_blob": "cae8847c28e3f605eb6a8b3b31918d723a9ea4e1",
       "sha256": "efb6e962946b85c089483bb1120fe92f32458bb3b3b5e5eb668e26f8aa96481e"
     },
     {
-      "path": "crates/rovai-core/src/db_private_composer_scope.rs",
+      "path": "crates/coaxi-core/src/db_private_composer_scope.rs",
       "git_blob": "62db5aca02597157baddfa59e4ba37f43cb0470f",
       "sha256": "acc376d5fd4df8f6c141d755ea0e515398235d4545503b5827a1297d3b7b32bc"
     },
@@ -266,7 +266,7 @@
     }
   ],
   "test_binary": {
-    "path": "work\\integration\\target\\debug\\deps\\rovai_core-8a00e4a485931fa6.exe",
+    "path": "work\\integration\\target\\debug\\deps\\coaxi_core-8a00e4a485931fa6.exe",
     "sha256": "4ab924431c06adf36a9c8c389384bca53c98464fc859e41ad69b0942b59d518d",
     "bytes": 87691264
   },

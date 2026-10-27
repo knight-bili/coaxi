@@ -1,0 +1,120 @@
+package app.coaxi.android.core.model
+
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
+
+/**
+ * One choice the user can pick to resolve a `permission_request` (Rust
+ * `PermissionOptionInfo`). `kind` is the SACP option kind (`allow_once` /
+ * `allow_always` / `reject_once` / `reject_always`); a `reject*` option is the
+ * deny / "keep planning" choice.
+ */
+@Serializable
+data class PermissionOption(
+    val optionId: String,
+    val name: String,
+    val kind: String,
+) {
+    /** Deny / keep-planning style choice — rendered as a bordered (non-filled) button. */
+    val isReject: Boolean get() = kind.lowercase().startsWith("reject")
+}
+
+/** One option of an `ask_user_question` question (Rust `QuestionOption`). */
+@Serializable
+data class QuestionOption(
+    val label: String,
+    val description: String = "",
+)
+
+/**
+ * One question in an `ask_user_question` set (Rust `QuestionSpec`). [id] is the
+ * per-question UUID the answer must echo back as [QuestionAnswerItem.questionId].
+ */
+@Serializable
+data class QuestionSpec(
+    val id: String,
+    val question: String,
+    val header: String = "",
+    val multiSelect: Boolean = false,
+    val options: List<QuestionOption> = emptyList(),
+)
+
+/**
+ * One question's answer: the per-question id plus the chosen option labels (a
+ * free-text "Other" entry is appended verbatim). Encode-only; sent with the
+ * request `Json` so keys stay camelCase (`questionId`), matching the server.
+ */
+@Serializable
+data class QuestionAnswerItem(
+    val questionId: String,
+    val labels: List<String>,
+)
+
+/**
+ * The full reply to a `question_request`. `declined == true` (with empty
+ * [answers]) dismisses the prompt and lets the agent use its own judgment.
+ */
+@Serializable
+data class QuestionAnswer(
+    val answers: List<QuestionAnswerItem> = emptyList(),
+    val declined: Boolean = false,
+) {
+    companion object {
+        val dismissed = QuestionAnswer(answers = emptyList(), declined = true)
+    }
+}
+
+/**
+ * The user's decision on a pending Grok plan approval. snake_case on the wire; the
+ * request `Json` has no naming strategy, so the value is spelled out here.
+ */
+@Serializable(with = PlanApprovalDecision.Serializer::class)
+enum class PlanApprovalDecision(val wire: String) {
+    /** Grok leaves plan mode and starts implementing. */
+    APPROVE("approve"),
+    /** Grok revises the plan; plan mode stays active. */
+    REQUEST_CHANGES("request_changes"),
+    /** Plan mode is turned off. */
+    ABANDON("abandon");
+
+    object Serializer : KSerializer<PlanApprovalDecision> {
+        override val descriptor =
+            PrimitiveSerialDescriptor("com.coaxi.PlanApprovalDecision", PrimitiveKind.STRING)
+
+        override fun serialize(encoder: Encoder, value: PlanApprovalDecision) =
+            encoder.encodeString(value.wire)
+
+        override fun deserialize(decoder: Decoder): PlanApprovalDecision =
+            entries.firstOrNull { it.wire == decoder.decodeString() } ?: APPROVE
+    }
+}
+
+/** One row of the agent's live plan (`plan_update` event / snapshot `plan` block). */
+@Serializable
+data class PlanEntry(
+    val content: String,
+    val priority: String = "medium",
+    val status: String = "pending",
+) {
+    enum class Status { COMPLETED, IN_PROGRESS, PENDING }
+
+    val normalizedStatus: Status
+        get() = when (status.lowercase()) {
+            "completed", "done" -> Status.COMPLETED
+            "in_progress", "in-progress", "running", "active" -> Status.IN_PROGRESS
+            else -> Status.PENDING
+        }
+
+    enum class Priority { HIGH, MEDIUM, LOW }
+
+    val normalizedPriority: Priority
+        get() = when (priority.lowercase()) {
+            "high", "urgent" -> Priority.HIGH
+            "low" -> Priority.LOW
+            else -> Priority.MEDIUM
+        }
+}

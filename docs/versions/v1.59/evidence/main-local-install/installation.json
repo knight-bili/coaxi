@@ -6,9 +6,9 @@
   "version": "0.2.6",
   "platform": "darwin",
   "arch": "arm64",
-  "source": "/Users/murray.xue/VSCodeProjects/opensource/rovai-ai-web-recovery/dist/mac-arm64/Rovai AI.app",
-  "installed": "/Applications/Rovai AI.app",
-  "backup": "/Applications/Rovai AI.backup-before-main-4ffb6892-20260914T084702Z.app",
+  "source": "/Users/murray.xue/VSCodeProjects/opensource/coaxi-web-recovery/dist/mac-arm64/Coaxi AI.app",
+  "installed": "/Applications/Coaxi AI.app",
+  "backup": "/Applications/Coaxi AI.backup-before-main-4ffb6892-20260914T084702Z.app",
   "signatureVerification": "App/Host/Core/CLI ad-hoc signature, architecture and Bundle ID at source, same-volume staging, canonical target",
   "installer": "pnpm install:mac:daily",
   "hashes": {
@@ -17,17 +17,17 @@
       "installed": "57cb12df2e22ba7e7af44b48ad6ae56c32ee62d0353d1987c4a4f81d2e7d10ea",
       "backup": "34f02fc9fbbe04441bccb3bcd8ff7a66c64deae9b48b528e0ad1922daf3c6ad7"
     },
-    "Contents/Resources/bin/rovai-host": {
+    "Contents/Resources/bin/coaxi-host": {
       "source": "288180ad096f64212fa30f9827b0a34cfd1517621e4d3da66c12148b233885e8",
       "installed": "288180ad096f64212fa30f9827b0a34cfd1517621e4d3da66c12148b233885e8",
       "backup": "af80e6ed711795e4b4108f0981c1f3bfe797bce6bc75d1c28f46889281378fc0"
     },
-    "Contents/Resources/bin/rovai-core": {
+    "Contents/Resources/bin/coaxi-core": {
       "source": "27f313b5bb93026dc9e89467100805cd6b20de6f4de1485e07f9cb9c95ea6549",
       "installed": "27f313b5bb93026dc9e89467100805cd6b20de6f4de1485e07f9cb9c95ea6549",
       "backup": "27f313b5bb93026dc9e89467100805cd6b20de6f4de1485e07f9cb9c95ea6549"
     },
-    "Contents/Resources/bin/rovai": {
+    "Contents/Resources/bin/coaxi": {
       "source": "acabda226432e733dae4e7ac6ddcc05112230d961daea67382aaa411e9d7462b",
       "installed": "acabda226432e733dae4e7ac6ddcc05112230d961daea67382aaa411e9d7462b",
       "backup": "acabda226432e733dae4e7ac6ddcc05112230d961daea67382aaa411e9d7462b"
@@ -39,55 +39,55 @@
       "pid": 15496,
       "parentPid": 1,
       "startedAt": "Sun Sep 13 22:41:09 2026",
-      "path": "/Applications/Rovai AI.app/Contents/MacOS/Rovai AI",
+      "path": "/Applications/Coaxi AI.app/Contents/MacOS/Coaxi AI",
       "aliveWithSameStartTime": true,
-      "observedPath": "/Applications/Rovai AI.app/Contents/MacOS/Rovai AI"
+      "observedPath": "/Applications/Coaxi AI.app/Contents/MacOS/Coaxi AI"
     },
     {
       "pid": 15504,
       "parentPid": 15496,
       "startedAt": "Sun Sep 13 22:41:10 2026",
-      "path": "/Applications/Rovai AI.app/Contents/Frameworks/Rovai AI Helper.app/Contents/MacOS/Rovai AI Helper",
+      "path": "/Applications/Coaxi AI.app/Contents/Frameworks/Coaxi AI Helper.app/Contents/MacOS/Coaxi AI Helper",
       "aliveWithSameStartTime": true,
-      "observedPath": "/Applications/Rovai AI.app/Contents/Frameworks/Rovai AI Helper.app/Contents/MacOS/Rovai AI Helper"
+      "observedPath": "/Applications/Coaxi AI.app/Contents/Frameworks/Coaxi AI Helper.app/Contents/MacOS/Coaxi AI Helper"
     },
     {
       "pid": 15505,
       "parentPid": 15496,
       "startedAt": "Sun Sep 13 22:41:10 2026",
-      "path": "/Applications/Rovai AI.app/Contents/Frameworks/Rovai AI Helper.app/Contents/MacOS/Rovai AI Helper",
+      "path": "/Applications/Coaxi AI.app/Contents/Frameworks/Coaxi AI Helper.app/Contents/MacOS/Coaxi AI Helper",
       "aliveWithSameStartTime": true,
-      "observedPath": "/Applications/Rovai AI.app/Contents/Frameworks/Rovai AI Helper.app/Contents/MacOS/Rovai AI Helper"
+      "observedPath": "/Applications/Coaxi AI.app/Contents/Frameworks/Coaxi AI Helper.app/Contents/MacOS/Coaxi AI Helper"
     },
     {
       "pid": 15506,
       "parentPid": 15496,
       "startedAt": "Sun Sep 13 22:41:10 2026",
-      "path": "/Applications/Rovai AI.app/Contents/Frameworks/Rovai AI Helper (Renderer).app/Contents/MacOS/Rovai AI Helper (Renderer)",
+      "path": "/Applications/Coaxi AI.app/Contents/Frameworks/Coaxi AI Helper (Renderer).app/Contents/MacOS/Coaxi AI Helper (Renderer)",
       "aliveWithSameStartTime": true,
-      "observedPath": "/Applications/Rovai AI.app/Contents/Frameworks/Rovai AI Helper (Renderer).app/Contents/MacOS/Rovai AI Helper (Renderer)"
+      "observedPath": "/Applications/Coaxi AI.app/Contents/Frameworks/Coaxi AI Helper (Renderer).app/Contents/MacOS/Coaxi AI Helper (Renderer)"
     },
     {
       "pid": 15509,
       "parentPid": 15496,
       "startedAt": "Sun Sep 13 22:41:11 2026",
-      "path": "/Applications/Rovai AI.app/Contents/Resources/bin/rovai-host",
+      "path": "/Applications/Coaxi AI.app/Contents/Resources/bin/coaxi-host",
       "aliveWithSameStartTime": true,
-      "observedPath": "/Applications/Rovai AI.app/Contents/Resources/bin/rovai-host"
+      "observedPath": "/Applications/Coaxi AI.app/Contents/Resources/bin/coaxi-host"
     },
     {
       "pid": 93577,
       "parentPid": 15496,
       "startedAt": "Mon Sep 14 16:56:38 2026",
-      "path": "/Applications/Rovai AI.app/Contents/Frameworks/Rovai AI Helper (Renderer).app/Contents/MacOS/Rovai AI Helper (Renderer)",
+      "path": "/Applications/Coaxi AI.app/Contents/Frameworks/Coaxi AI Helper (Renderer).app/Contents/MacOS/Coaxi AI Helper (Renderer)",
       "aliveWithSameStartTime": true,
-      "observedPath": "/Applications/Rovai AI.app/Contents/Frameworks/Rovai AI Helper (Renderer).app/Contents/MacOS/Rovai AI Helper (Renderer)"
+      "observedPath": "/Applications/Coaxi AI.app/Contents/Frameworks/Coaxi AI Helper (Renderer).app/Contents/MacOS/Coaxi AI Helper (Renderer)"
     }
   ],
   "allRecordedProcessesStillAlive": true,
   "dailyUserDataModifiedByInstaller": false,
   "dailyProcessRestartedByInstaller": false,
   "activeProcessIsPreviousVersion": true,
-  "activation": "Exit the current App when ready and open /Applications/Rovai AI.app explicitly.",
+  "activation": "Exit the current App when ready and open /Applications/Coaxi AI.app explicitly.",
   "firstUpgradeRequiresWebRelogin": true
 }

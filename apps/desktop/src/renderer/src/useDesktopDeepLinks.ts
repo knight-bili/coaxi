@@ -1,7 +1,7 @@
 import {useEffect,useRef} from 'react'
 import type {DesktopDeepLink,DesktopDeepLinksApi} from '@contracts'
 
-/** Same FIFO startup drain as Codeg DeepLinkBootstrap; uses the original guarded navigation. */
+/** Same FIFO startup drain as Coaxi DeepLinkBootstrap; uses the original guarded navigation. */
 export function useDesktopDeepLinks(api:DesktopDeepLinksApi|undefined,ready:boolean,onOpen:(link:DesktopDeepLink)=>Promise<void>,onError:(message:string)=>void):void{
   const latest=useRef({ready,onOpen,onError});latest.current={ready,onOpen,onError}
   const wake=useRef<()=>void>(()=>undefined)

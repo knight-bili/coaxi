@@ -1,4 +1,4 @@
-/* 字段分组沿 Codeg SettingCard/SettingRow；表面及控件使用 Rovai 当前主题。 */
+/* 字段分组沿 Coaxi SettingCard/SettingRow；表面及控件使用 Coaxi 当前主题。 */
 .custom-runtime-settings .section-heading {align-items:center;flex-wrap:wrap;gap:12px}
 .custom-runtime-settings .section-heading p {margin:4px 0 0;color:var(--muted);font-size:12px}
 .custom-runtime-toolbar,.custom-runtime-actions {display:flex;align-items:center;gap:8px;flex-wrap:wrap}

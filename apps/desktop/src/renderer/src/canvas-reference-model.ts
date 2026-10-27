@@ -1,5 +1,5 @@
-// Codeg aff1e6c278453ed8d0b96a5f664edcdca621aa3f region membership, adapted to Core Thread/private identities.
-// Apache-2.0: integration/licenses/codeg/LICENSE. Business relationships remain Core-owned.
+// Coaxi aff1e6c278453ed8d0b96a5f664edcdca621aa3f region membership, adapted to Core Thread/private identities.
+// Apache-2.0: integration/licenses/component-a/LICENSE. Business relationships remain Core-owned.
 import type { AgentProfile, CanvasConversationRef, CanvasNode, CanvasThreadReference, WorkspaceWorktree } from '@contracts'
 import type { CanvasFolderGroupOption, CanvasReferenceOption } from './CanvasNodeEditor'
 import type { CanvasReferenceState } from './canvas-reference-controller'

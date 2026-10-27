@@ -14,11 +14,12 @@ import { BrowserSharePopover } from './BrowserSharePopover'
 import { NativeBrowserStage } from './NativeBrowserStage'
 import { BrowserMarkupDialog,type BrowserCapture } from './BrowserMarkupDialog'
 import { browserHandoffFiles } from './browser-page-handoff'
+import { resolveBrowserAddress } from '../../shared/browser-address'
 
-/** Codeg browser-toolbar and page handoff, inside the single retained workspace. */
+/** Coaxi browser-toolbar and page handoff, inside the single retained workspace. */
 export function BrowserWorkbench({threadId,resource,active=true,onWorkspaceFiles}:{threadId:string;resource?:string;active?:boolean;onQuickMessage?(text:string):boolean;onWorkspaceFiles?(files:File[]):Promise<boolean>}):React.JSX.Element{
   const api=useThreadClient().browserWorkspace,t=useUiText(),preview=useOptionalFilePreview(),epoch=useRef(0),lock=useRef(false)
-  const [tabs,setTabs]=useState<BrowserWorkspaceView[]>([]),[url,setUrl]=useState('http://localhost:3000'),[editing,setEditing]=useState(false)
+  const [tabs,setTabs]=useState<BrowserWorkspaceView[]>([]),[url,setUrl]=useState(''),[editing,setEditing]=useState(false)
   const [busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState(''),[profileId,setProfileId]=useState('temporary'),[devtools,setDevtools]=useState(false)
   const [markup,setMarkup]=useState<BrowserCapture|null>(null),[picker,setPicker]=useState<{id:string;documentId:string}|null>(null)
   const current=tabs.find(row=>row.id===resource)
@@ -28,7 +29,7 @@ export function BrowserWorkbench({threadId,resource,active=true,onWorkspaceFiles
   const refresh=useCallback(async():Promise<void>=>{if(!api)return;const generation=epoch.current,value=await api.list(threadId);if(epoch.current!==generation)return;setTabs(value);for(const row of value){const id=preview?.openWorkspace('browser',row.id,row.title||row.url,true);if(id)preview?.updateWorkspaceTab(id,{label:row.title||row.url})}},[api,threadId,preview?.openWorkspace,preview?.updateWorkspaceTab])
   useEffect(()=>{let live=true;const read=():void=>{void refresh().catch(failure=>{if(live)setError(readErrorMessage(failure))})};read();const timer=setInterval(read,2000);return()=>{live=false;clearInterval(timer)}},[refresh])
   useEffect(()=>{if(current&&!editing)setUrl(current.url)},[resource,current?.url,editing])
-  useEffect(()=>{setEditing(false);if(current)setUrl(current.url);setNotice('');setError('');setMarkup(null)},[resource])
+  useEffect(()=>{setEditing(false);setUrl(current?.url??'');setNotice('');setError('');setMarkup(null)},[resource])
   const run=async(action:()=>Promise<void>):Promise<void>=>{if(lock.current)return;lock.current=true;setBusy(true);setError('');setNotice('');const generation=epoch.current;try{await action()}catch(failure){if(epoch.current===generation)setError(readErrorMessage(failure))}finally{lock.current=false;if(epoch.current===generation)setBusy(false)}}
   const control=async(action:'back'|'forward'|'reload'|'system'|'devtools'):Promise<void>=>{if(api&&current){await api.control({id:current.id,action});await refresh()}}
   const deliver=async(files:File[]):Promise<boolean>=>{
@@ -46,11 +47,11 @@ export function BrowserWorkbench({threadId,resource,active=true,onWorkspaceFiles
   if(!api)return <div className="workbench-empty"><Globe size={32}/><strong>{t('浏览器需要桌面端')}</strong><p>{t('请在桌面端打开要使用的页面。')}</p></div>
   let origin:string|null=null;try{if(current&&/^https?:/.test(current.url))origin=new URL(current.url).origin}catch{}
   return <div className="workbench-browser unified-browser" onPointerDown={()=>{if(notice)setNotice('')}} onWheel={()=>{if(notice)setNotice('')}}>
-    <form className="browser-navigation-row" onSubmit={event=>{event.preventDefault();setEditing(false);void run(async()=>{if(current)await api.control({id:current.id,action:'navigate',url});else{const opened=await api.open(threadId,url,profileId);if(delivery.current===deliveryToken&&active){preview?.openWorkspace('browser',opened.id,opened.title||opened.url);preview?.close('workspace:browser:')}}await refresh()})}}>
+    <form className="browser-navigation-row" onSubmit={event=>{event.preventDefault();void run(async()=>{const address=resolveBrowserAddress(url);if(!address)return;setEditing(false);setUrl(address);if(current)await api.control({id:current.id,action:'navigate',url:address});else{const opened=await api.open(threadId,address,profileId);if(delivery.current===deliveryToken&&active){preview?.openWorkspace('browser',opened.id,opened.title||opened.url);preview?.close('workspace:browser:')}}await refresh()})}}>
       <button type="button" className="quiet-button workbench-icon" title={t('后退')} aria-label={t('后退')} disabled={busy||!current} onClick={()=>void run(()=>control('back'))}><ArrowLeft size={16}/></button>
       <button type="button" className="quiet-button workbench-icon" title={t('前进')} aria-label={t('前进')} disabled={busy||!current} onClick={()=>void run(()=>control('forward'))}><ArrowRight size={16}/></button>
       <button type="button" className="quiet-button workbench-icon" title={t('刷新页面')} aria-label={t('刷新页面')} disabled={busy||!current} onClick={()=>void run(()=>control('reload'))}><RefreshCw size={16}/></button>
-      <div className="browser-address-field">{current&&<BrowserSharePopover key={current.id} threadId={threadId} targetId={current.id} origin={origin}/>}<input aria-label={t('网页地址')} spellCheck={false} value={url} onFocus={()=>setEditing(true)} onChange={event=>setUrl(event.target.value)}/><button type="submit" className="quiet-button workbench-icon" title={t(current?'前往网页':'打开网页')} aria-label={t(current?'前往网页':'打开网页')} disabled={busy}><ArrowRight size={15}/></button></div>
+      <div className="browser-address-field">{current&&<BrowserSharePopover key={current.id} threadId={threadId} targetId={current.id} origin={origin}/>}<input aria-label={t('网页地址')} placeholder={t('搜索或输入网址')} spellCheck={false} value={url} onFocus={()=>setEditing(true)} onChange={event=>setUrl(event.target.value)}/><button type="submit" className="quiet-button workbench-icon" title={t(current?'前往网页':'打开网页')} aria-label={t(current?'前往网页':'打开网页')} disabled={busy}><ArrowRight size={15}/></button></div>
       <DropdownMenu.Root><DropdownMenu.Trigger asChild><button type="button" className="quiet-button workbench-icon" title={t('把页面加入对话')} aria-label={t('把页面加入对话')} disabled={busy||!current}><Send size={16}/></button></DropdownMenu.Trigger><DropdownMenu.Portal><DropdownMenu.Content className="workspace-menu" align="end" sideOffset={6}>
         <DropdownMenu.Label>{t('把页面发给对话')}</DropdownMenu.Label>
         <DropdownMenu.Item onSelect={()=>void run(async()=>{if(!api.inspect||!current)return;const result=await api.inspect({id:current.id,action:'page'});await deliver(browserHandoffFiles('page',result))})}><Globe size={16}/>{t('页面文字与链接')}</DropdownMenu.Item>

@@ -3,10 +3,10 @@ import { Keyboard,RotateCcw } from 'lucide-react'
 import { useThreadClient } from './camp-client'
 import { useUiText } from './interface-language'
 import { useKeyboardShortcuts } from './useKeyboardShortcuts'
-import { DEFAULT_SHORTCUTS,INPUT_SHORTCUT_IDS,SHORTCUT_DEFINITIONS,canShareShortcut,formatShortcutLabel,setShortcutRecorderArmed,shortcutFromKeyboardEvent,shortcutsConflict,type ShortcutActionId } from '../../shared/codeg-keyboard-shortcuts'
+import { DEFAULT_SHORTCUTS,INPUT_SHORTCUT_IDS,SHORTCUT_DEFINITIONS,canShareShortcut,formatShortcutLabel,setShortcutRecorderArmed,shortcutFromKeyboardEvent,shortcutsConflict,type ShortcutActionId } from '../../shared/coaxi-keyboard-shortcuts'
 
 const labels:Record<ShortcutActionId,string>={toggle_search:'搜索会话',toggle_sidebar:'显示或隐藏侧栏',toggle_terminal:'显示或隐藏终端',new_terminal_tab:'新建终端标签',close_current_terminal_tab:'关闭当前终端',toggle_aux_panel:'显示或隐藏辅助面板',new_conversation:'新建会话',open_folder:'打开文件夹',open_settings:'打开设置',close_current_tab:'关闭当前文件标签',reopen_last_closed_tab:'重新打开关闭的标签',close_all_file_tabs:'关闭全部文件标签',next_tab:'下一个标签',prev_tab:'上一个标签',switch_tab_1:'切换到标签1',switch_tab_2:'切换到标签2',switch_tab_3:'切换到标签3',switch_tab_4:'切换到标签4',switch_tab_5:'切换到标签5',switch_tab_6:'切换到标签6',switch_tab_7:'切换到标签7',switch_tab_8:'切换到标签8',switch_tab_9:'切换到标签9',send_message:'发送消息',newline_in_message:'消息换行',toggle_custom_style:'启用或停用自定义样式',zoom_in:'放大界面',zoom_out:'缩小界面',zoom_reset:'恢复默认缩放'}
-/** 原 Codeg shortcut-settings 的录制、冲突拒绝和逐项重置；容器沿用 Rovai。 */
+/** 原 Coaxi shortcut-settings 的录制、冲突拒绝和逐项重置；容器沿用 Coaxi。 */
 export function KeyboardShortcutSettings():React.JSX.Element{
   const state=useKeyboardShortcuts(),client=useThreadClient(),t=useUiText()
   const [recording,setRecording]=useState<ShortcutActionId|null>(null),[busy,setBusy]=useState(false),[error,setError]=useState('')

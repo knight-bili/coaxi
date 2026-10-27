@@ -8,7 +8,7 @@ import {
   writePrivateJsonExclusive
 } from './qualification-common.mjs'
 
-export const TOOL_MEASUREMENT_SPEC_SCHEMA_ID = 'rovai.qualification.tool-measurement-spec'
+export const TOOL_MEASUREMENT_SPEC_SCHEMA_ID = 'coaxi.qualification.tool-measurement-spec'
 export const TOOL_MEASUREMENT_SPEC_SCHEMA_VERSION = '2.0.0'
 export const TOOL_MEASUREMENT_PROJECTION_POLICY = 'qualification-tool-measurement-v2'
 
@@ -40,7 +40,7 @@ const SEMANTIC_ITEMS = new Set([
 export async function admitToolMeasurementPack(packDirectory, caseRecord) {
   const pack = await loadToolMeasurementPack(packDirectory, caseRecord)
   const admissionWithoutDigest = {
-    schemaId: 'rovai.qualification.tool-measurement-pack-admission',
+    schemaId: 'coaxi.qualification.tool-measurement-pack-admission',
     schemaVersion: '2.0.0',
     specificationId: pack.spec.specificationId,
     caseId: caseRecord.contract.manifest.id,
@@ -64,7 +64,7 @@ export async function admitToolMeasurementPack(packDirectory, caseRecord) {
 
 export async function retainPreparedToolFixtureManifest(evidenceDirectory, manifest) {
   const expected = manifestWithoutPayloadDigest(manifest)
-  if (manifest?.schemaId !== 'rovai.qualification.prepared-tool-fixture-manifest'
+  if (manifest?.schemaId !== 'coaxi.qualification.prepared-tool-fixture-manifest'
       || manifest.schemaVersion !== '2.0.0'
       || manifest.payloadDigest !== withDigest(digestJson(expected))) {
     throw new Error('Prepared Tool Fixture Manifest identity is invalid')
@@ -81,7 +81,7 @@ export async function verifyToolMeasurementPack(packDirectory, caseRecord) {
   const pack = await loadToolMeasurementPack(packDirectory, caseRecord)
   const admission = JSON.parse(await readFile(join(pack.root, 'measurement-admission.json'), 'utf8'))
   const expectedWithoutDigest = {
-    schemaId: 'rovai.qualification.tool-measurement-pack-admission',
+    schemaId: 'coaxi.qualification.tool-measurement-pack-admission',
     schemaVersion: '2.0.0',
     specificationId: pack.spec.specificationId,
     caseId: caseRecord.contract.manifest.id,
@@ -211,7 +211,7 @@ export async function materializeToolMeasurementFixtures({
     })
   }
   const manifestWithoutDigest = {
-    schemaId: 'rovai.qualification.prepared-tool-fixture-manifest',
+    schemaId: 'coaxi.qualification.prepared-tool-fixture-manifest',
     schemaVersion: '2.0.0',
     specificationId: pack.spec.specificationId,
     caseId: pack.admission.caseId,

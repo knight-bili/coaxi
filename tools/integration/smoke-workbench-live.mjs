@@ -9,8 +9,8 @@ import { launchAcceptanceBrowser } from '../../scripts/lib/host-web-browser.mjs'
 import { coreDataDirectoryArguments } from '../../scripts/lib/runtime-camp-files-root.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
-const binary = process.env.ROVAI_HOST_BIN
-const ui = process.env.ROVAI_WEB_UI
+const binary = process.env.COAXI_HOST_BIN
+const ui = process.env.COAXI_WEB_UI
 const evidenceRoot = process.env.WORKBENCH_EVIDENCE_ROOT
 const browserBinary = process.env.WORKBENCH_BROWSER_BIN
 assert(binary && ui && evidenceRoot && browserBinary && [binary, ui, evidenceRoot, browserBinary].every(path.isAbsolute))
@@ -95,7 +95,7 @@ try {
   await browser.send('Input.insertText', { text: started.administratorToken })
   await browser.click(`document.querySelector('.web-login button[type=submit]')`)
   await browser.wait(`document.querySelector('.web-login-overlay') === null && document.querySelector('.unified-sidebar') !== null`)
-  assert.equal(await browser.evaluate('typeof window.rovai'), 'undefined')
+  assert.equal(await browser.evaluate('typeof window.coaxi'), 'undefined')
   record('production_web_authenticated_no_desktop_mock')
   const menuItem = text => `[...document.querySelectorAll('[role="menuitem"]')].find(e=>e.getClientRects().length>0 && e.textContent.trim()===${JSON.stringify(text)})`
   const enter = async name => {
@@ -163,7 +163,7 @@ try {
     await within(aCompleted)
     await browser.evaluate('new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve(true))))')
     assert.equal(await browser.evaluate(home('I02-工程-B')), true, '迟到的真实A响应不能覆盖较新的B意图')
-    assert.equal(await browser.evaluate('history.state.rovai.target.projectPath'), projects['I02-工程-B'].path)
+    assert.equal(await browser.evaluate('history.state.coaxi.target.projectPath'), projects['I02-工程-B'].path)
     assert.equal(eventErrors.length, 0)
     record('late_real_A_response_does_not_replace_B')
   } finally { await browser.send('Fetch.disable'); stopEvents() }
@@ -174,11 +174,11 @@ try {
   await writeFile(path.join(output, 'project-A-before-removal.txt'), savedReadme)
   await unlink(path.join(missing, 'README.md'))
   await rmdir(missing)
-  const beforeHistory = await browser.evaluate('JSON.stringify(history.state.rovai.target)')
+  const beforeHistory = await browser.evaluate('JSON.stringify(history.state.coaxi.target)')
   await enter('I02-工程-A')
   await browser.wait(`document.querySelector('.error-banner[role="alert"]') !== null`)
   assert.equal(await browser.evaluate(home('I02-工程-B')), true)
-  assert.equal(await browser.evaluate('JSON.stringify(history.state.rovai.target)'), beforeHistory)
+  assert.equal(await browser.evaluate('JSON.stringify(history.state.coaxi.target)'), beforeHistory)
   record('missing_directory_keeps_previous_home_and_history')
   stage = 'directory_retry'
   await mkdir(missing)
@@ -191,7 +191,7 @@ try {
   await browser.wait(home('I02-工程-B'))
   assert.equal(browser.errors.length, 0)
   stage = 'browser_restart'
-  assert.equal(await browser.evaluate(`JSON.parse(localStorage.getItem('rovai.current-project.v1')).projectPath`), projects['I02-工程-B'].path)
+  assert.equal(await browser.evaluate(`JSON.parse(localStorage.getItem('coaxi.current-project.v1')).projectPath`), projects['I02-工程-B'].path)
   await browser.close()
   browser = await launchBrowser()
   await browser.send('Page.navigate', { url: origin })
@@ -202,12 +202,12 @@ try {
     await browser.send('Input.insertText', { text: started.administratorToken })
     await browser.click(`document.querySelector('.web-login button[type=submit]')`)
   }
-  assert.equal(await browser.evaluate(`JSON.parse(localStorage.getItem('rovai.current-project.v1')).projectPath`), projects['I02-工程-B'].path)
+  assert.equal(await browser.evaluate(`JSON.parse(localStorage.getItem('coaxi.current-project.v1')).projectPath`), projects['I02-工程-B'].path)
   await browser.wait(home('I02-工程-B'))
   await browser.wait(`document.querySelectorAll('.quick-chat-continue-row').length === 1 && document.querySelector('.quick-chat-workspace')?.textContent.includes('I02-工程-B-对话')`)
   assert(!(await browser.evaluate(`document.querySelector('.quick-chat-workspace').textContent`)).includes('I02-工程-A-对话'))
-  assert.equal(await browser.evaluate('typeof window.rovai'), 'undefined')
-  assert.equal(await browser.evaluate('history.state.rovai.target.projectPath'), projects['I02-工程-B'].path)
+  assert.equal(await browser.evaluate('typeof window.coaxi'), 'undefined')
+  assert.equal(await browser.evaluate('history.state.coaxi.target.projectPath'), projects['I02-工程-B'].path)
   assert.equal(browser.errors.length, 0)
   record('production_browser_restart_restores_current_project', { login: needsLogin ? 'reauthenticated' : 'restored' })
   stage = 'capture'
@@ -228,7 +228,7 @@ try {
   await browser.wait(`Boolean(${editor}) && ${editor}.getAttribute('contenteditable') === 'true'`)
   await browser.click(editor)
   await browser.send('Input.insertText', { text: 'I02_TAB_A_UNSENT' })
-  const storedDrafts = `Object.keys(localStorage).filter(key=>key.startsWith('rovai.web.thread-drafts.v1:')).map(key=>JSON.parse(localStorage.getItem(key)).entries['rovai.camp-composer-draft.v1:${projects['I02-工程-B'].threadId}']?.value).filter(Boolean)`
+  const storedDrafts = `Object.keys(localStorage).filter(key=>key.startsWith('coaxi.web.thread-drafts.v1:')).map(key=>JSON.parse(localStorage.getItem(key)).entries['coaxi.camp-composer-draft.v1:${projects['I02-工程-B'].threadId}']?.value).filter(Boolean)`
   await browser.wait(`(${storedDrafts}).some(value=>value.includes('I02_TAB_A_UNSENT'))`)
   const secondPage = await browser.newPage(origin)
   await browser.wait(home('I02-工程-B'))
@@ -270,17 +270,17 @@ try {
   record('explicit_previous_editor_restore_copies_one_snapshot_without_merging')
   await browser.capture(path.join(output, 'saved-draft-restored.png'))
   stage = 'real_storage_quota'
-  const snapshots = `Object.fromEntries(Object.keys(localStorage).filter(key=>key.startsWith('rovai.web.thread-drafts.v1:')).sort().map(key=>[key,localStorage.getItem(key)]))`
+  const snapshots = `Object.fromEntries(Object.keys(localStorage).filter(key=>key.startsWith('coaxi.web.thread-drafts.v1:')).sort().map(key=>[key,localStorage.getItem(key)]))`
   const beforeQuota = await browser.evaluate(`JSON.stringify(${snapshots})`)
   await writeFile(path.join(output, 'archives-before-quota.json'), beforeQuota)
-  const quota = await browser.evaluate(`(()=>{let low=0,high=8388608;while(low+1<high){const mid=Math.floor((low+high)/2);try{localStorage.setItem('rovai.acceptance.quota','x'.repeat(mid));low=mid}catch(error){if(error.name!=='QuotaExceededError')throw error;high=mid}}localStorage.setItem('rovai.acceptance.quota','x'.repeat(low));try{localStorage.setItem('rovai.acceptance.quota','x'.repeat(low+1));return 'no quota'}catch(error){return error.name}})()`)
+  const quota = await browser.evaluate(`(()=>{let low=0,high=8388608;while(low+1<high){const mid=Math.floor((low+high)/2);try{localStorage.setItem('coaxi.acceptance.quota','x'.repeat(mid));low=mid}catch(error){if(error.name!=='QuotaExceededError')throw error;high=mid}}localStorage.setItem('coaxi.acceptance.quota','x'.repeat(low));try{localStorage.setItem('coaxi.acceptance.quota','x'.repeat(low+1));return 'no quota'}catch(error){return error.name}})()`)
   assert.equal(quota, 'QuotaExceededError')
   await browser.click(editor)
   await browser.send('Input.insertText', { text: '_UNSAVED_AFTER_QUOTA' })
   await browser.wait(`document.querySelector('.conversation-controls')?.textContent.includes('草稿保存失败') === true`)
   assert((await browser.evaluate(`${editor}.textContent`)).includes('_UNSAVED_AFTER_QUOTA'))
   assert.deepEqual(await browser.evaluate(snapshots), JSON.parse(beforeQuota))
-  await browser.evaluate(`localStorage.removeItem('rovai.acceptance.quota')`)
+  await browser.evaluate(`localStorage.removeItem('coaxi.acceptance.quota')`)
   await browser.send('Input.insertText', { text: '!' })
   await browser.wait(`(${storedDrafts}).some(value=>value.includes('_UNSAVED_AFTER_QUOTA'))`)
   const savedInput = await browser.evaluate(`${editor}.textContent`)
@@ -290,7 +290,7 @@ try {
   stage = 'record_only_withdrawal_guard'
   const messageId = recordedMessages.at(-1)
   const readPublication = () => {
-    const db = new DatabaseSync(path.join(dataDir, 'rovai.sqlite'), { readOnly: true })
+    const db = new DatabaseSync(path.join(dataDir, 'coaxi.sqlite'), { readOnly: true })
     try { return { message: db.prepare('select id,body,version,recall_state from camp_message where id=?').get(messageId), deliveries: db.prepare('select status from camp_message_delivery where message_id=?').all(messageId) } }
     finally { db.close() }
   }
@@ -324,7 +324,7 @@ try {
 } finally {
   if (browser) await browser.close()
   if (host) await host.close()
-  const db = new DatabaseSync(path.join(dataDir, 'rovai.sqlite'), { readOnly: true })
+  const db = new DatabaseSync(path.join(dataDir, 'coaxi.sqlite'), { readOnly: true })
   try { assert.equal(db.prepare('SELECT count(*) AS n FROM agent_run').get().n, 0, '禁止启动真实Runtime'); assert.equal(Object.values(db.prepare('PRAGMA integrity_check').get())[0], 'ok') }
   finally { db.close() }
   if (finalResult) {

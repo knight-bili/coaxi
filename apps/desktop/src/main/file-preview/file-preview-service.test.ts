@@ -48,11 +48,11 @@ async function fixture(): Promise<{
   registry: RootWatchRegistry
   service: FilePreviewService
 }> {
-  const root = await mkdtemp(join(tmpdir(), 'rovai-file-preview-'))
+  const root = await mkdtemp(join(tmpdir(), 'coaxi-file-preview-'))
   directories.push(root)
   // Keep the host user's home out of synthetic path-presentation assertions.
   // Home-relative behavior is covered by tests that explicitly override this.
-  const home = await mkdtemp(join(tmpdir(), 'rovai-preview-home-'))
+  const home = await mkdtemp(join(tmpdir(), 'coaxi-preview-home-'))
   directories.push(home)
   vi.mocked(homedir).mockReturnValue(home)
   const authority: FilePreviewSourceAuthority = {
@@ -101,7 +101,7 @@ describe('FilePreviewService', () => {
     await writeFile(join(root, 'page.html'), '<!doctype html><h1>完整预览</h1>')
     await writeFile(join(root, 'unknown.bin'), Buffer.from([0, 1, 2, 3, 255]))
     await mkdir(join(root, 'directory'))
-    const outside = await mkdtemp(join(tmpdir(), 'rovai-native-media-outside-'))
+    const outside = await mkdtemp(join(tmpdir(), 'coaxi-native-media-outside-'))
     directories.push(outside)
     await writeFile(join(outside, 'private.txt'), '不可访问')
     authority.resolve = async request => request.kind !== 'native_child_file' ? null : {
@@ -126,7 +126,7 @@ describe('FilePreviewService', () => {
   })
   it('confines native files and nested links to the captured root and revalidates every read after lease changes', async () => {
     const { root, authority, service, native } = await fixture()
-    const outside = await mkdtemp(join(tmpdir(), 'rovai-native-outside-'))
+    const outside = await mkdtemp(join(tmpdir(), 'coaxi-native-outside-'))
     directories.push(outside)
     await mkdir(join(root, 'docs'))
     await writeFile(join(root, 'docs', 'index.md'), '[next](child.txt)')
@@ -212,7 +212,7 @@ describe('FilePreviewService', () => {
     const file = opened.value.file
     const prepared = await service.prepareHtml(1, { handleId: file.handleId, expectedGeneration: file.contentGeneration })
     if (!prepared.ok) throw new Error('expected markdown')
-    const url = `rovai-preview://asset/${prepared.value.tabToken}/image.svg`
+    const url = `coaxi-preview://asset/${prepared.value.tabToken}/image.svg`
     await service.bindThread(1, 'camp-2')
     expect(service.authorizeHtmlAsset(1, 'GET', url)).toBe(true)
     const now = Date.now()
@@ -388,8 +388,8 @@ describe('FilePreviewService', () => {
   it.each([
     ['README.md', 'project_relative', 'README.md', true],
     ['docs/guide.md', 'project_relative', 'docs/guide.md', true],
-    ['../Downloads/rovai-preview-plan-simple.md', 'external', '~/Downloads/rovai-preview-plan-simple.md', true],
-    ['../Downloads/rovai-preview-simple.html', 'external', '~/Downloads/rovai-preview-simple.html', false]
+    ['../Downloads/coaxi-preview-plan-simple.md', 'external', '~/Downloads/coaxi-preview-plan-simple.md', true],
+    ['../Downloads/coaxi-preview-simple.html', 'external', '~/Downloads/coaxi-preview-simple.html', false]
   ] as const)('shows the actual source attachment path for %s', async (path, presentation, displayPath, hasWorkspace) => {
     const { root, native, registry } = await fixture()
     const project = join(root, 'project')
@@ -516,7 +516,7 @@ describe('FilePreviewService', () => {
 
   it('opens repaired references when they resolve to one concrete external file', async () => {
     const { root, service, native, registry } = await fixture()
-    const outside = await mkdtemp(join(tmpdir(), 'rovai-preview-colon-outside-'))
+    const outside = await mkdtemp(join(tmpdir(), 'coaxi-preview-colon-outside-'))
     directories.push(outside)
     const path = join(outside, 'notes.txt')
     await writeFile(path, 'outside')
@@ -541,7 +541,7 @@ describe('FilePreviewService', () => {
 
   it('reveals explicit outside directories without granting read access or launching app bundles', async () => {
     const { service, authority, registry, native } = await fixture()
-    const outside = await mkdtemp(join(tmpdir(), 'rovai-preview-directory-home-'))
+    const outside = await mkdtemp(join(tmpdir(), 'coaxi-preview-directory-home-'))
     directories.push(outside)
     const downloads = join(outside, 'Downloads')
     const bundle = join(outside, 'Untrusted.app')
@@ -587,7 +587,7 @@ describe('FilePreviewService', () => {
 
   it('does not reveal missing, escaped, or inactive-Thread directories', async () => {
     const { root, service, native } = await fixture()
-    const outside = await mkdtemp(join(tmpdir(), 'rovai-preview-directory-outside-'))
+    const outside = await mkdtemp(join(tmpdir(), 'coaxi-preview-directory-outside-'))
     directories.push(outside)
     await symlink(outside, join(root, 'outside'))
     expect(await service.open(1, request('missing'))).toMatchObject({ ok: false, error: { code: 'file_not_found' } })
@@ -789,7 +789,7 @@ describe('FilePreviewService', () => {
 
   it('routes an unsupported external file to the system without creating a preview handle or root grant', async () => {
     const { service, native, openPath, registry } = await fixture()
-    const outside = await mkdtemp(join(tmpdir(), 'rovai-file-preview-system-'))
+    const outside = await mkdtemp(join(tmpdir(), 'coaxi-file-preview-system-'))
     directories.push(outside)
     const report = join(outside, 'report.pdf')
     await writeFile(report, '%PDF-1.7')
@@ -806,7 +806,7 @@ describe('FilePreviewService', () => {
 
   it('restores only previewable files without native actions or authorization prompts', async () => {
     const { root, service, native, openPath } = await fixture()
-    const outside = await mkdtemp(join(tmpdir(), 'rovai-file-preview-restore-outside-'))
+    const outside = await mkdtemp(join(tmpdir(), 'coaxi-file-preview-restore-outside-'))
     directories.push(outside)
     await writeFile(join(root, 'README.md'), '# Restored')
     await writeFile(join(root, 'installer.exe'), new Uint8Array([0, 1, 2]))
@@ -891,7 +891,7 @@ describe('FilePreviewService', () => {
 
   it('opens absolute, Home-relative, and file-URI references to one external file without choosing a root', async () => {
     const { service, native, registry } = await fixture()
-    const outside = await mkdtemp(join(tmpdir(), 'rovai-file-preview-outside-'))
+    const outside = await mkdtemp(join(tmpdir(), 'coaxi-file-preview-outside-'))
     directories.push(outside)
     const outsideFile = join(outside, 'notes.txt')
     await writeFile(outsideFile, 'notes')
@@ -926,7 +926,7 @@ describe('FilePreviewService', () => {
 
   it.each(['attachment', 'run_evidence', 'run_activity_file'] as const)('opens an exact external file resolved by %s authority', async (kind) => {
     const { root, service, authority, native } = await fixture()
-    const outside = await mkdtemp(join(tmpdir(), `rovai-file-preview-${kind}-`))
+    const outside = await mkdtemp(join(tmpdir(), `coaxi-file-preview-${kind}-`))
     directories.push(outside)
     const outsideFile = join(outside, 'notes.txt')
     await writeFile(join(root, 'notes.txt'), 'wrong root')
@@ -969,7 +969,7 @@ describe('FilePreviewService', () => {
 
   it('opens new and same-named Mission files from the Run execution root', async () => {
     const { root: projectRoot, service, authority, native } = await fixture()
-    const executionRoot = await mkdtemp(join(tmpdir(), 'rovai-mission-worktree-preview-'))
+    const executionRoot = await mkdtemp(join(tmpdir(), 'coaxi-mission-worktree-preview-'))
     directories.push(executionRoot)
     await mkdir(join(projectRoot, 'src'), { recursive: true })
     await mkdir(join(executionRoot, 'src'), { recursive: true })
@@ -1006,7 +1006,7 @@ describe('FilePreviewService', () => {
 
   it('opens and restores an exact Run activity file from its execution root', async () => {
     const { root: projectRoot, service, authority, native } = await fixture()
-    const executionRoot = await mkdtemp(join(tmpdir(), 'rovai-run-activity-preview-'))
+    const executionRoot = await mkdtemp(join(tmpdir(), 'coaxi-run-activity-preview-'))
     directories.push(executionRoot)
     await mkdir(join(projectRoot, 'src'), { recursive: true })
     await mkdir(join(executionRoot, 'src'), { recursive: true })
@@ -1044,7 +1044,7 @@ describe('FilePreviewService', () => {
 
   it('keeps root grants for an explicit external directory operation', async () => {
     const { root, service, native } = await fixture()
-    const outside = await mkdtemp(join(tmpdir(), 'rovai-file-preview-grant-'))
+    const outside = await mkdtemp(join(tmpdir(), 'coaxi-file-preview-grant-'))
     directories.push(outside)
     await symlink(outside, join(root, 'external-directory'))
     vi.mocked(native.selectRoot).mockResolvedValue(outside)
@@ -1084,7 +1084,7 @@ describe('FilePreviewService', () => {
     vi.useFakeTimers()
     try {
       const { service, native, openPath } = await fixture()
-      const outside = await mkdtemp(join(tmpdir(), 'rovai-file-preview-reopen-outside-'))
+      const outside = await mkdtemp(join(tmpdir(), 'coaxi-file-preview-reopen-outside-'))
       directories.push(outside)
       const path = join(outside, 'notes.txt')
       await writeFile(path, 'first')
@@ -1322,7 +1322,7 @@ describe('FilePreviewService', () => {
 
   it('opens a Markdown relative link next to an external parent without a root grant', async () => {
     const { service, native } = await fixture()
-    const outside = await mkdtemp(join(tmpdir(), 'rovai-file-preview-markdown-outside-'))
+    const outside = await mkdtemp(join(tmpdir(), 'coaxi-file-preview-markdown-outside-'))
     directories.push(outside)
     await mkdir(join(outside, 'guides'))
     await writeFile(join(outside, 'README.md'), '[设计说明](guides/design.md)')
@@ -1352,7 +1352,7 @@ describe('FilePreviewService', () => {
 
   it('derives an external Markdown tab resource scope from its own directory and releases it with the tab', async () => {
     const { root, service, native } = await fixture()
-    const outside = await mkdtemp(join(tmpdir(), 'rovai-file-preview-html-outside-'))
+    const outside = await mkdtemp(join(tmpdir(), 'coaxi-file-preview-html-outside-'))
     directories.push(outside)
     const pages = join(outside, 'pages')
     await mkdir(join(pages, 'assets'), { recursive: true })
@@ -1376,7 +1376,7 @@ describe('FilePreviewService', () => {
       html: '<link rel="stylesheet" href="./assets/site.css"><a href="details.html">Details</a>',
       assetBasePath: ''
     })
-    const assetUrl = `rovai-preview://asset/${prepared.value.tabToken}/assets/site.css`
+    const assetUrl = `coaxi-preview://asset/${prepared.value.tabToken}/assets/site.css`
     expect(service.authorizeHtmlAsset(2, 'GET', assetUrl)).toBe(false)
     expect(service.authorizeHtmlAsset(1, 'POST', assetUrl)).toBe(false)
     expect(service.authorizeHtmlAsset(1, 'GET', assetUrl)).toBe(true)
@@ -1384,10 +1384,10 @@ describe('FilePreviewService', () => {
     expect(response.status).toBe(200)
     expect(response.headers.get('cache-control')).toBe('no-store')
     expect(await response.text()).toContain(
-      `rovai-preview://asset/${prepared.value.tabToken}/images/bg.png`
+      `coaxi-preview://asset/${prepared.value.tabToken}/images/bg.png`
     )
     expect((await service.serveHtmlAsset(new Request(
-      `rovai-preview://asset/${prepared.value.tabToken}/not-in-html-scope.css`
+      `coaxi-preview://asset/${prepared.value.tabToken}/not-in-html-scope.css`
     ))).status).toBe(404)
 
     const child = await service.open(1, {

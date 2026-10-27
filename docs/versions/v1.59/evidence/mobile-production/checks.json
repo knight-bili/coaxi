@@ -1,7 +1,7 @@
 {
   "recordedAt": "2026-09-14T07:47:28.903644+00:00",
   "baseCommit": "c89872046b71c88b4120a96e4a067fa40cbd3710",
-  "branch": "rovai/unified-rust-host",
+  "branch": "coaxi/unified-rust-host",
   "sourceSha256": {
     "apps/desktop/src/renderer/src/AppHeader.tsx": "7c5cbd0055332caa7f86bd506e323370f10c7e084adf8187934687fa360f2428",
     "apps/desktop/src/renderer/src/AppearanceSettings.tsx": "e972a8d968656e6700032bfffa877dc5b493f1525ac3081ce33376c91e5f0fc1",
@@ -17,7 +17,7 @@
     "apps/desktop/src/renderer/src/NavigationIcon.tsx": "47f123ac1b96dac1d6ad0b1496ba88ac8de1be59c7f21f90904bf9058ad17af5",
     "apps/desktop/src/renderer/src/NavigationShell.tsx": "32d2e8f8a838addc0c11b0fa4f5282645a12d501d29742a96a7f671b2a532a06",
     "apps/desktop/src/renderer/src/RemoteAboutSettings.tsx": "d2fb74e9f3e44dc31d5b170503ed04952d9c9a68a8c336e5934604274847f588",
-    "apps/desktop/src/renderer/src/RovaiComposerExtension.ts": "c400616278ab48c36d81d70e4b5ca0ccee07f8e8a8d060430155e526521f7c56",
+    "apps/desktop/src/renderer/src/CoaxiComposerExtension.ts": "c400616278ab48c36d81d70e4b5ca0ccee07f8e8a8d060430155e526521f7c56",
     "apps/desktop/src/renderer/src/SingleChatPanel.tsx": "d2b2ba99d1e3e4ff3280c767c42dcb121b669fcbf369c17d40d775a9db3a2d5b",
     "apps/desktop/src/renderer/src/StructuredMentionComposer.tsx": "d7c440484ddea8bb0b8699f9593b15edef3246e87db2b30d2e8d8eaa9b55a987",
     "apps/desktop/src/renderer/src/useExecutionDisclosureAnchor.ts": "a24deda54fb26484940356a8a42564ced027f74e8243f6623c04cc446d28b62d",
@@ -113,7 +113,7 @@
   ],
   "provenance": {
     "host": "Real Rust Host through parent-pipe protocol, isolated Core/Skills/MCP; Desktop-capability mode without starting Electron Main.",
-    "server": "Real standalone debug rovai-server with isolated --data-dir and production out/web; native update installation not exercised.",
+    "server": "Real standalone debug coaxi-server with isolated --data-dir and production out/web; native update installation not exercised.",
     "execution": "Shared production components with fixture Run/command/approval evidence; no real Runtime or platform approval.",
     "browser": "macOS Chrome device emulation 360/390/430px and 844px touch landscape; no physical iOS/Android device.",
     "nativeRegression": "Existing isolated Electron fixtures; no daily userData, Core or model."

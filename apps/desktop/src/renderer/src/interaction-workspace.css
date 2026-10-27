@@ -1,4 +1,4 @@
-/* Codeg SettingCard/SettingRow 的分隔行与开关比例，沿用 Rovai 主题和容器。 */
+/* Coaxi SettingCard/SettingRow 的分隔行与开关比例，沿用 Coaxi 主题和容器。 */
 .interaction-help{font-size:12px;line-height:1.6;color:var(--muted);margin:8px 0 12px}
 .interaction-setting-rows{min-width:0;border-block:1px solid var(--line);background:transparent}
 .interaction-setting-row{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:14px 0}

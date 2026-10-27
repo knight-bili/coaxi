@@ -1,7 +1,7 @@
 import type { ThreadClient } from './camp-client'
 import { dispatchShortcutAction } from './shortcut-action-driver'
 
-const desktopBridge = () => typeof window === 'undefined' ? undefined : window.rovai
+const desktopBridge = () => typeof window === 'undefined' ? undefined : window.coaxi
 
 /** Lazy Desktop-only compatibility adapter; importing it never accesses Electron. */
 export const desktopThreadClient: ThreadClient = {
@@ -21,45 +21,45 @@ export const desktopThreadClient: ThreadClient = {
   get interactionWorkspace() { return desktopBridge()?.interactionWorkspace },
   get browserWorkspace() { return desktopBridge()?.browserWorkspace },
   get privateInputRecovery() { return desktopBridge()?.privateInputRecovery },
-  exportMonitoring: async filter => { const path = await window.rovai.exportMonitoring(filter); return { exported: Boolean(path), ...(path ? { path } : {}) } },
-  exportUsageActivityReport: async query => { const path = await window.rovai.exportUsageActivityReport?.(query); return {exported:Boolean(path),...(path?{path}:{})} },
+  exportMonitoring: async filter => { const path = await window.coaxi.exportMonitoring(filter); return { exported: Boolean(path), ...(path ? { path } : {}) } },
+  exportUsageActivityReport: async query => { const path = await window.coaxi.exportUsageActivityReport?.(query); return {exported:Boolean(path),...(path?{path}:{})} },
   get usageCard() { return desktopBridge()?.usageCard },
-  syncNativeHistoryUsage: input => window.rovai.request('history.usage.local',input),
-  exportNativeHistoryUsage: async query => {const path=await window.rovai.exportNativeHistoryUsage?.(query);return {exported:Boolean(path),...(path?{path}:{})}},
-  revealMonitoringExport: path => window.rovai.revealMonitoringExport(path),
-  exportDiagnostics: async () => { const path = await window.rovai.exportDiagnostics(); return { exported: Boolean(path), ...(path ? { path } : {}) } },
-  revealDiagnosticsExport: path => window.rovai.revealDiagnosticsExport(path),
-  get memberAvatars() { return window.rovai.memberAvatars },
-  selectSkillImportDirectory: () => window.rovai.selectSkillImportDirectory(),
-  selectRuntimeExecutable: () => window.rovai.selectRuntimeExecutable(),
-  revealMcpConfig: () => window.rovai.revealMcpConfig(),
+  syncNativeHistoryUsage: input => window.coaxi.request('history.usage.local',input),
+  exportNativeHistoryUsage: async query => {const path=await window.coaxi.exportNativeHistoryUsage?.(query);return {exported:Boolean(path),...(path?{path}:{})}},
+  revealMonitoringExport: path => window.coaxi.revealMonitoringExport(path),
+  exportDiagnostics: async () => { const path = await window.coaxi.exportDiagnostics(); return { exported: Boolean(path), ...(path ? { path } : {}) } },
+  revealDiagnosticsExport: path => window.coaxi.revealDiagnosticsExport(path),
+  get memberAvatars() { return window.coaxi.memberAvatars },
+  selectSkillImportDirectory: () => window.coaxi.selectSkillImportDirectory(),
+  selectRuntimeExecutable: () => window.coaxi.selectRuntimeExecutable(),
+  revealMcpConfig: () => window.coaxi.revealMcpConfig(),
   channels: {
-    get: () => window.rovai.channels.get(), onChanged: listener => window.rovai.channels.onChanged(listener),
-    publishMemberBot: (agentId, kind) => window.rovai.channels.publishMemberBot(agentId, kind),
-    retryMemberBot: (agentId, kind) => window.rovai.channels.retryMemberBot(agentId, kind),
-    selectPublicationApprover: (agentId, userId, kind) => window.rovai.channels.selectPublicationApprover(agentId, userId, kind),
+    get: () => window.coaxi.channels.get(), onChanged: listener => window.coaxi.channels.onChanged(listener),
+    publishMemberBot: (agentId, kind) => window.coaxi.channels.publishMemberBot(agentId, kind),
+    retryMemberBot: (agentId, kind) => window.coaxi.channels.retryMemberBot(agentId, kind),
+    selectPublicationApprover: (agentId, userId, kind) => window.coaxi.channels.selectPublicationApprover(agentId, userId, kind),
     native: {
-      connect: kind => window.rovai.channels.connect(kind), disconnect: kind => window.rovai.channels.disconnect(kind),
-      cancelQrAttempt: id => window.rovai.channels.cancelQrAttempt(id), refreshLoginQr: id => window.rovai.channels.refreshLoginQr(id)
+      connect: kind => window.coaxi.channels.connect(kind), disconnect: kind => window.coaxi.channels.disconnect(kind),
+      cancelQrAttempt: id => window.coaxi.channels.cancelQrAttempt(id), refreshLoginQr: id => window.coaxi.channels.refreshLoginQr(id)
     }
   },
-  request: (method, params) => window.rovai.request(method, params),
-  onEvent: (listener) => window.rovai.onEvent(listener),
-  onClosePreviewRequested: listener => window.rovai.windowControls.onCloseTabRequested(()=>dispatchShortcutAction('close_current_tab')||listener()),
-  get singleChatAttachments() { return window.rovai.singleChatAttachments },
+  request: (method, params) => window.coaxi.request(method, params),
+  onEvent: (listener) => window.coaxi.onEvent(listener),
+  onClosePreviewRequested: listener => window.coaxi.windowControls.onCloseTabRequested(()=>dispatchShortcutAction('close_current_tab')||listener()),
+  get singleChatAttachments() { return window.coaxi.singleChatAttachments },
   get missionAttachments() { return desktopBridge()?.missionAttachments ?? null },
-  get composerAttachments() { return window.rovai.composerAttachments },
+  get composerAttachments() { return window.coaxi.composerAttachments },
   attachmentLocation: async locator => {
     if (locator.owner === 'composer') {
-      const path = await window.rovai.composerAttachments.location?.(locator)
+      const path = await window.coaxi.composerAttachments.location?.(locator)
       return path ? { path, location: 'local' } : null
     }
-    const path = await window.rovai.request<string | null>('thread.attachments.location', locator)
+    const path = await window.coaxi.request<string | null>('thread.attachments.location', locator)
     return path ? { path, location: 'local' } : null
   },
   attachments: { kind: 'native',
-    open: locator => window.rovai.attachments.open(locator),
-    reveal: locator => window.rovai.attachments.reveal(locator)
+    open: locator => window.coaxi.attachments.open(locator),
+    reveal: locator => window.coaxi.attachments.reveal(locator)
   },
-  get platform() { return window.rovai.platform }
+  get platform() { return window.coaxi.platform }
 }

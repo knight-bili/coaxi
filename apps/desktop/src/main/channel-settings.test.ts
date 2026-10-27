@@ -744,7 +744,7 @@ describe('channel settings service', () => {
       event: {
         context: { open_message_id: 'om_card_ack', open_chat_id: 'oc_card_ack' },
         operator: { open_id: 'ou_card_ack' },
-        action: { tag: 'button', value: { rovaiAction: 'bind_project' } }
+        action: { tag: 'button', value: { coaxiAction: 'bind_project' } }
       }
     }, { needCheck: false })).resolves.toEqual({
       toast: { type: 'warning', content: '仅 Coaxi Owner 可以选择项目' }
@@ -1030,7 +1030,7 @@ describe('channel settings service', () => {
           return coreSnapshot({ account: connectedAccount(owner) })
         }
         if (method === 'members.get') return presentAgent('agent-a', {
-          avatarRef: 'rovai://member-avatar/builtin/luoke/v1'
+          avatarRef: 'coaxi://member-avatar/builtin/luoke/v1'
         })
         if (method === 'channels.feishu.publicationIntent.create') {
           publicationIntentId = String(
@@ -1058,7 +1058,7 @@ describe('channel settings service', () => {
       expectedDeveloperIdentity: { userId: owner.userId, tenantId: owner.tenantId },
       avatarSource
     }))
-    expect(resolveAvatar).toHaveBeenCalledWith('rovai://member-avatar/builtin/luoke/v1')
+    expect(resolveAvatar).toHaveBeenCalledWith('coaxi://member-avatar/builtin/luoke/v1')
     expect(normal.activeQrAttempt).toBeNull()
     expect(normal.activeProvisioning).toMatchObject({
       agentId: 'agent-a',
@@ -1151,7 +1151,7 @@ describe('channel settings service', () => {
       expect(advancedStates.at(-1)).toBe('completed')
       expect(channels.createMessage).toHaveBeenCalledOnce()
       expect(warn).toHaveBeenCalledWith(
-        '[rovai] Feishu member Bot welcome failed: feishu_open_api_http_503'
+        '[coaxi] Feishu member Bot welcome failed: feishu_open_api_http_503'
       )
     } finally {
       warn.mockRestore()
@@ -1334,7 +1334,7 @@ describe('channel settings service', () => {
           return coreSnapshot({ account: connectedAccount(owner) })
         }
         if (method === 'members.get') return presentAgent('agent-a', {
-          avatarRef: 'rovai://member-avatar/builtin/luoke/v1'
+          avatarRef: 'coaxi://member-avatar/builtin/luoke/v1'
         })
         return { status: 'applied' }
       })
@@ -2178,7 +2178,7 @@ describe('channel settings service', () => {
           })
         }
         if (method === 'members.get') return presentAgent('agent-a', {
-          avatarRef: 'rovai://member-avatar/builtin/luoke/v1'
+          avatarRef: 'coaxi://member-avatar/builtin/luoke/v1'
         })
         const params = rawParams as { command?: Record<string, unknown> }
         if (method === 'channels.feishu.publicationIntent.create') intentCreates += 1
@@ -2439,7 +2439,7 @@ describe('channel settings service', () => {
             status: 'accepted',
             code: 'channel.binding.resolved',
             payload: {
-              projectDisplayName: command.action === 'quick_chat' ? null : 'Rovai 项目',
+              projectDisplayName: command.action === 'quick_chat' ? null : 'Coaxi 项目',
               executionScopeKind: command.action === 'quick_chat' ? 'quick_chat' : 'project'
             }
           }
@@ -2526,7 +2526,7 @@ describe('channel settings service', () => {
         tag: 'select_static',
         option: 'rvproj_1',
         value: {
-          rovaiAction: 'bind_project',
+          coaxiAction: 'bind_project',
           pendingBindingId: 'rvpcb_1',
           expectedVersion: 1,
           nonce: 'nonce-1',
@@ -2568,7 +2568,7 @@ describe('channel settings service', () => {
       action: {
         tag: 'button',
         value: {
-          rovaiAction: 'bind_project',
+          coaxiAction: 'bind_project',
           pendingBindingId: 'rvpcb_1',
           projectId: 'rvproj_1',
           expectedVersion: 1,
@@ -2599,7 +2599,7 @@ describe('channel settings service', () => {
         action: {
           tag: 'button',
           value: {
-            rovaiAction: 'start_quick_chat',
+            coaxiAction: 'start_quick_chat',
             pendingBindingId: 'rvpcb_1',
             expectedVersion: 1,
             nonce: 'nonce-1',
@@ -2640,7 +2640,7 @@ describe('channel settings service', () => {
       action: {
         tag: 'button',
         value: {
-          rovaiAction: 'bind_project',
+          coaxiAction: 'bind_project',
           pendingBindingId: 'rvpcb_fail',
           projectId: 'rvproj_1',
           expectedVersion: 1,
@@ -3348,7 +3348,7 @@ describe('channel settings service', () => {
       behaviors: [{
         type: 'callback',
         value: {
-          rovaiAction: 'bind_project',
+          coaxiAction: 'bind_project',
           pendingBindingId: 'rvpcb_group',
           expectedVersion: 1,
           nonce: 'nonce-group'
@@ -3384,7 +3384,7 @@ describe('channel settings service', () => {
             type: button.type,
             width: 'fill',
             behaviors: [{ type: 'callback', value: {
-              rovaiAction: button.action,
+              coaxiAction: button.action,
               pendingBindingId: `rvpcb_${kind}`,
               expectedVersion: 1,
               nonce: `nonce-${kind}`
@@ -3395,7 +3395,7 @@ describe('channel settings service', () => {
     }
     expect(harness.send.mock.calls.map(([target]) => target)).not.toContain('ou_owner')
     expect(JSON.stringify(harness.send.mock.calls)).not.toContain('选择后会立即处理刚才的消息。')
-    expect(JSON.stringify(harness.send.mock.calls)).not.toContain('项目路径只保留在 Rovai 本机，不会发送到飞书。')
+    expect(JSON.stringify(harness.send.mock.calls)).not.toContain('项目路径只保留在 Coaxi 本机，不会发送到飞书。')
     expect(JSON.stringify(harness.send.mock.calls)).not.toContain('canonicalPath')
     expect(harness.updateCard).toHaveBeenCalledWith('om_picker_group', expect.any(Object))
     expect(harness.recallMessage).toHaveBeenCalledWith('om_picker_group')
@@ -3973,7 +3973,7 @@ describe('channel settings service', () => {
         { tag: 'markdown', text_size: 'notation', content: '发送给 <at id="ou_bot_b"></at> <at id="ou_owner"></at>' }
       ] }
     })
-    expect(JSON.stringify(harness.send.mock.calls)).not.toContain('Rovai 队员回复')
+    expect(JSON.stringify(harness.send.mock.calls)).not.toContain('Coaxi 队员回复')
     expect(settlements.every((command) => command.outcome === 'sent')).toBe(true)
     expect(settlements).toContainEqual(expect.objectContaining({
       deliveryId: 'delivery-console',
@@ -4162,7 +4162,7 @@ describe('channel settings service', () => {
   })
 
   it.each(['legacy', 'source_ref'])('settles a %s attachment upload independently using its current content rules', async (storage) => {
-    const directory = await mkdtemp(join(tmpdir(), 'rovai-channel-attachment-'))
+    const directory = await mkdtemp(join(tmpdir(), 'coaxi-channel-attachment-'))
     const path = join(directory, 'result.png')
     const bytes = Buffer.from('verified image bytes')
     await writeFile(path, bytes)

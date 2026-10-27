@@ -16,7 +16,7 @@ test(
   { timeout: 180_000 },
   async (t) => {
     if (!admitElectronIntegrationTest(t)) return
-    const fixture = await mkdtemp(join(tmpdir(), 'rovai-member-runtime-apply-test-'))
+    const fixture = await mkdtemp(join(tmpdir(), 'coaxi-member-runtime-apply-test-'))
     let child,
       closed,
       passed = false
@@ -73,7 +73,7 @@ test(
         child.kill('SIGKILL')
         await closed
       }
-      if (!passed || process.env.ROVAI_KEEP_MEMBER_RUNTIME_APPLY_FIXTURE === '1')
+      if (!passed || process.env.COAXI_KEEP_MEMBER_RUNTIME_APPLY_FIXTURE === '1')
         console.log(`Runtime apply fixture: ${fixture}`)
       else await rm(fixture, { recursive: true, force: true })
     }

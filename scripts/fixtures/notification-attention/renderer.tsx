@@ -20,7 +20,7 @@ let setSources: (source: VisibleNotificationSources | null) => void
 let sequence = 0
 const read = () => ({ threadId: 'camp-other', surfaceVisible: true, snapshotSequence: 0,
   messageIds: [], campTurnIds: [], agentRunIds: [], approvalIds: [] })
-Object.assign(window, { rovai: {
+Object.assign(window, { coaxi: {
   request: async (method: string, request: any) => {
     if (method === 'notifications.preference.get') return preference
     if (method === 'notifications.preference.update') {

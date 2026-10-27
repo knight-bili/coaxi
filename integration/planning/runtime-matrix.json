@@ -5,8 +5,8 @@
     {
       "id": "antigravity",
       "sources": [
-        "codeg",
-        "rovai-ai"
+        "coaxi",
+        "coaxi"
       ],
       "platforms": {
         "windows": {
@@ -29,8 +29,8 @@
     {
       "id": "claude_code",
       "sources": [
-        "codeg",
-        "rovai-ai"
+        "coaxi",
+        "coaxi"
       ],
       "platforms": {
         "windows": {
@@ -53,8 +53,8 @@
     {
       "id": "cline",
       "sources": [
-        "codeg",
-        "rovai-ai"
+        "coaxi",
+        "coaxi"
       ],
       "platforms": {
         "windows": {
@@ -77,8 +77,8 @@
     {
       "id": "code_buddy",
       "sources": [
-        "codeg",
-        "rovai-ai"
+        "coaxi",
+        "coaxi"
       ],
       "platforms": {
         "windows": {
@@ -101,8 +101,8 @@
     {
       "id": "codex",
       "sources": [
-        "codeg",
-        "rovai-ai"
+        "coaxi",
+        "coaxi"
       ],
       "platforms": {
         "windows": {
@@ -125,7 +125,7 @@
     {
       "id": "command_code",
       "sources": [
-        "rovai-ai"
+        "coaxi"
       ],
       "platforms": {
         "windows": {
@@ -148,7 +148,7 @@
     {
       "id": "copilot",
       "sources": [
-        "rovai-ai"
+        "coaxi"
       ],
       "platforms": {
         "windows": {
@@ -171,8 +171,8 @@
     {
       "id": "cursor",
       "sources": [
-        "codeg",
-        "rovai-ai"
+        "coaxi",
+        "coaxi"
       ],
       "platforms": {
         "windows": {
@@ -195,8 +195,8 @@
     {
       "id": "deepseek",
       "sources": [
-        "codeg",
-        "rovai-ai"
+        "coaxi",
+        "coaxi"
       ],
       "platforms": {
         "windows": {
@@ -219,7 +219,7 @@
     {
       "id": "gemini",
       "sources": [
-        "codeg"
+        "coaxi"
       ],
       "platforms": {
         "windows": {
@@ -242,8 +242,8 @@
     {
       "id": "grok",
       "sources": [
-        "codeg",
-        "rovai-ai"
+        "coaxi",
+        "coaxi"
       ],
       "platforms": {
         "windows": {
@@ -266,7 +266,7 @@
     {
       "id": "hermes",
       "sources": [
-        "codeg"
+        "coaxi"
       ],
       "platforms": {
         "windows": {
@@ -289,8 +289,8 @@
     {
       "id": "kimi_code",
       "sources": [
-        "codeg",
-        "rovai-ai"
+        "coaxi",
+        "coaxi"
       ],
       "platforms": {
         "windows": {
@@ -313,7 +313,7 @@
     {
       "id": "kiro",
       "sources": [
-        "rovai-ai"
+        "coaxi"
       ],
       "platforms": {
         "windows": {
@@ -336,7 +336,7 @@
     {
       "id": "open_claw",
       "sources": [
-        "codeg"
+        "coaxi"
       ],
       "platforms": {
         "windows": {
@@ -359,8 +359,8 @@
     {
       "id": "open_code",
       "sources": [
-        "codeg",
-        "rovai-ai"
+        "coaxi",
+        "coaxi"
       ],
       "platforms": {
         "windows": {
@@ -383,8 +383,8 @@
     {
       "id": "pi",
       "sources": [
-        "codeg",
-        "rovai-ai"
+        "coaxi",
+        "coaxi"
       ],
       "platforms": {
         "windows": {
@@ -407,8 +407,8 @@
     {
       "id": "qoder",
       "sources": [
-        "codeg",
-        "rovai-ai"
+        "coaxi",
+        "coaxi"
       ],
       "platforms": {
         "windows": {
@@ -431,7 +431,7 @@
     {
       "id": "qwen_code",
       "sources": [
-        "rovai-ai"
+        "coaxi"
       ],
       "platforms": {
         "windows": {
@@ -454,7 +454,7 @@
     {
       "id": "trae_cn",
       "sources": [
-        "rovai-ai"
+        "coaxi"
       ],
       "platforms": {
         "windows": {
@@ -477,7 +477,7 @@
     {
       "id": "zcode",
       "sources": [
-        "rovai-ai"
+        "coaxi"
       ],
       "platforms": {
         "windows": {

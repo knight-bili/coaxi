@@ -14,7 +14,7 @@ const rows:Array<{key:keyof InteractionFeatures;title:string;description:string;
   {key:'computerClipboard',title:'剪贴板',description:'单独配备读取、写入剪贴板的工具；共享与本地确认仍分别生效。',parent:'computer'},
 ]
 
-/** 以 Codeg AgentToolsSettings/SettingRow 的五组开关和 Rovai 队员详情节布局呈现。 */
+/** 以 Coaxi AgentToolsSettings/SettingRow 的五组开关和 Coaxi 队员详情节布局呈现。 */
 export function MemberInteractionSettings({agentId,adapterKind,disabled=false}:{agentId:string;adapterKind?:string|null;disabled?:boolean}):React.JSX.Element|null{
   const api=useThreadClient().interactionWorkspace,t=useUiText()
   const [base,setBase]=useState<Policy|null>(null),[features,setFeatures]=useState(empty),[busy,setBusy]=useState(false),[error,setError]=useState(''),[pending,setPending]=useState<{expectedRevision:number;value:Policy}|null>(null)

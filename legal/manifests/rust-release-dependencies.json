@@ -3,7 +3,7 @@
   "ecosystem": "rust",
   "distribution_scope": "release",
   "target": "aarch64-apple-darwin",
-  "root_package": "rovai-core@0.0.1",
+  "root_package": "coaxi-core@0.0.1",
   "release_package_count": 120,
   "third_party_crate_count": 119,
   "coverage": {

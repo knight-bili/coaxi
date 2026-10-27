@@ -44,9 +44,9 @@ last_updated: 2026-09-09
 
 | 当前事实 | 设计影响 | 依据 |
 | --- | --- | --- |
-| `CurrentInput` 从触发消息生成 `source / message / mentionsCurrentUser`；`as_payload` 再附加 Skills 与附件。 | 在 Core 的同一投影过程增加 `quotes`。不能由 Renderer 拼 Prompt 或增加 Adapter 特例。 | [context.rs](../../../crates/rovai-core/src/context.rs)，`CurrentInput::as_payload`、`load_current_input` |
-| `reply_to_camp_message_id` 驱动最多三层 public reference closure。 | 不为选文设置该字段，否则会额外拉入原消息或回复链。已经存在的显式 Reply 不因引用动作被删除。 | [context.rs](../../../crates/rovai-core/src/context.rs)，`load_public_reference_closure`；[Profile v4](../../contracts/context-delivery-profile-v4.md) |
-| `ExternalQuote` 是渠道专用的结构化 segment，目前投影成 `CURRENT_INPUT.message` 中的引用段。 | 不开放该 segment 给 Composer，不改变飞书现有 quote 合同。新增本地 MessageQuote 快照承载本功能。 | [ContextManifest v22](../../contracts/context-manifest-evidence-v22.md)、[camp_content.rs](../../../crates/rovai-core/src/camp_content.rs) |
+| `CurrentInput` 从触发消息生成 `source / message / mentionsCurrentUser`；`as_payload` 再附加 Skills 与附件。 | 在 Core 的同一投影过程增加 `quotes`。不能由 Renderer 拼 Prompt 或增加 Adapter 特例。 | [context.rs](../../../crates/coaxi-core/src/context.rs)，`CurrentInput::as_payload`、`load_current_input` |
+| `reply_to_camp_message_id` 驱动最多三层 public reference closure。 | 不为选文设置该字段，否则会额外拉入原消息或回复链。已经存在的显式 Reply 不因引用动作被删除。 | [context.rs](../../../crates/coaxi-core/src/context.rs)，`load_public_reference_closure`；[Profile v4](../../contracts/context-delivery-profile-v4.md) |
+| `ExternalQuote` 是渠道专用的结构化 segment，目前投影成 `CURRENT_INPUT.message` 中的引用段。 | 不开放该 segment 给 Composer，不改变飞书现有 quote 合同。新增本地 MessageQuote 快照承载本功能。 | [ContextManifest v22](../../contracts/context-manifest-evidence-v22.md)、[camp_content.rs](../../../crates/coaxi-core/src/camp_content.rs) |
 | ComposerDocument V2 只有 Text + Atom；一个 Draft Mutation Coordinator 拥有完整 Draft View。 | 引用属于 Draft 元数据，不塞进 Lexical Text、Atom 或正文；增删引用进入同一 mutation 队列。 | [Composer 架构](../../architecture/camp-composer-draft.md)、[contracts](../../../packages/contracts/src/index.ts) |
 | 公共 Draft 已有 body、content、replyIntent、continuationIntent、revision；Pending 有私有编辑与 working refs。 | Draft、Pending、Pending edit、发布后的 Message 都要携带同一引用快照。只接入即时发送会遗漏排队路径。 | [Draft v12](../../contracts/camp-composer-draft-v12.md)、[Pending v3](../../contracts/pending-camp-input-v3.md) |
 | SingleChatComposerDraftView 目前只有 revision、attachments、updatedAt；Single Chat history 不自动重放。 | 不能声称单聊已复用公共正文 Draft。应在自己的存储与发送边界新增 quote 元数据，随 conversationMessage 冻结；私有读取仍走认证的当前 Conversation。 | [Single Chat 架构](../../architecture/single-chat.md)、[Single Chat DTO](../../../packages/contracts/src/index.ts) |

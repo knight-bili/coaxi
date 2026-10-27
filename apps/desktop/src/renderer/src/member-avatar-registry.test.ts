@@ -17,10 +17,10 @@ describe('member avatar registry', () => {
 
   it('does not treat managed, malformed, or legacy values as builtin assets', () => {
     expect(builtinMemberAvatarAssets(null)).toBeNull()
-    expect(builtinMemberAvatarAssets('rovai://member-avatar/builtin/luoke/v2')).toBeNull()
+    expect(builtinMemberAvatarAssets('coaxi://member-avatar/builtin/luoke/v2')).toBeNull()
     expect(
       builtinMemberAvatarAssets(
-        'rovai://member-avatar/managed/123e4567-e89b-12d3-a456-426614174000'
+        'coaxi://member-avatar/managed/123e4567-e89b-12d3-a456-426614174000'
       )
     ).toBeNull()
     expect(builtinMemberAvatarAssets('https://example.com/avatar.png')).toBeNull()

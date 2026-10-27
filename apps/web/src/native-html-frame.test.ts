@@ -10,15 +10,15 @@ it.each([false, true])('accepts only the current parent initialization and prese
   const id = '12345678-1234-1234-1234-123456789abc'
   const parentDescriptor = Object.getOwnPropertyDescriptor(window, 'parent')!
   const listen = vi.spyOn(window, 'addEventListener'), previous = location.href
-  history.replaceState(null, '', '/preview.html#codeg.'+id)
+  history.replaceState(null, '', '/preview.html#coaxi.'+id)
   document.documentElement.innerHTML = html
   try {
     const parent = { postMessage: vi.fn() }, foreign = {}
     Object.defineProperty(window, 'parent', { configurable: true, value: parent })
     window.eval(document.querySelector('script')!.textContent!)
-    expect(parent.postMessage).toHaveBeenCalledWith({ protocol: 'rovai-codeg-preview-v1', id, type: 'ready' }, location.origin)
+    expect(parent.postMessage).toHaveBeenCalledWith({ protocol: 'coaxi-preview-v1', id, type: 'ready' }, location.origin)
     const send = (data: unknown, source: unknown = parent, origin = location.origin) => window.dispatchEvent(new MessageEvent('message', { data, source: source as Window, origin }))
-    const init = { protocol: 'rovai-codeg-preview-v1', id, type: 'initialize', html: '<p>完整末尾😀</p>', scripts }
+    const init = { protocol: 'coaxi-preview-v1', id, type: 'initialize', html: '<p>完整末尾😀</p>', scripts }
     send(init, foreign); send(init, parent, 'http://invalid.example'); send({ ...init, id: 'stale' }); send({ ...init, scripts: 'true' })
     expect(document.querySelector('iframe')).toBeNull()
     send(init)
@@ -29,12 +29,12 @@ it.each([false, true])('accepts only the current parent initialization and prese
     send({ ...init, html: '<p>第二份</p>' })
     expect(frame.srcdoc).toBe(init.html)
     parent.postMessage.mockClear()
-    send({ type: 'codeg-visualize:size', height: 1800 }, foreign)
-    send({ type: 'codeg-visualize:size', height: Number.POSITIVE_INFINITY }, frame.contentWindow)
+    send({ type: 'coaxi-visualize:size', height: 1800 }, foreign)
+    send({ type: 'coaxi-visualize:size', height: Number.POSITIVE_INFINITY }, frame.contentWindow)
     expect(parent.postMessage).not.toHaveBeenCalled()
-    send({ type: 'codeg-visualize:size', height: 1800 }, frame.contentWindow)
+    send({ type: 'coaxi-visualize:size', height: 1800 }, frame.contentWindow)
     expect(parent.postMessage).toHaveBeenCalledOnce()
-    expect(parent.postMessage).toHaveBeenCalledWith({ type: 'codeg-visualize:size', height: 1800 }, location.origin)
+    expect(parent.postMessage).toHaveBeenCalledWith({ type: 'coaxi-visualize:size', height: 1800 }, location.origin)
   } finally {
     for (const [type, listener] of listen.mock.calls) if (type === 'message') window.removeEventListener(type, listener)
     listen.mockRestore(); Object.defineProperty(window, 'parent', parentDescriptor)

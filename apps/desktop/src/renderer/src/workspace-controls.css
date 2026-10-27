@@ -1,6 +1,6 @@
-/* Shared host presentation for the migrated Codeg controls. Reference:
-   Codeg ui/button.tsx, ui/input.tsx, shortcut-settings.tsx and config-sync-settings.tsx;
-   Rovai GeneralSettings/SettingsPageHeader retain the page and dialog structure. */
+/* Shared host presentation for the migrated Coaxi controls. Reference:
+   Coaxi ui/button.tsx, ui/input.tsx, shortcut-settings.tsx and config-sync-settings.tsx;
+   Coaxi GeneralSettings/SettingsPageHeader retain the page and dialog structure. */
 .workspace-field {
   min-width: 0;
   max-width: 100%;
@@ -87,7 +87,7 @@ textarea.workspace-field { min-height: 84px; resize: vertical; }
 .portable-migration-settings .portable-provider-toolbar>.workspace-field { flex: 1 1 200px; }
 .portable-migration-settings .portable-migration-file { flex: 1 1 200px; font-size: 12px; color: var(--muted); }
 
-/* Codeg's shortcut list: one compact row per action, keys aligned on the right. */
+/* Coaxi's shortcut list: one compact row per action, keys aligned on the right. */
 .keyboard-shortcut-rows { display: grid; min-width: 0; gap: 6px; }
 .keyboard-shortcut-rows>.setting-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; min-width: 0; min-height: 46px; gap: 8px 16px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 8px; }
 .keyboard-shortcut-rows .setting-copy { min-width: 0; flex: 1 1 180px; font-size: 12px; }

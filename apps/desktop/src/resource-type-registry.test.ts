@@ -18,6 +18,6 @@ describe('resource type registry', () => {
   })
 
   it('keeps unknown extensions on the generic file visual', () => {
-    expect(getResourceVisualKind('artifact.rovai-unknown')).toBe('file')
+    expect(getResourceVisualKind('artifact.coaxi-unknown')).toBe('file')
   })
 })

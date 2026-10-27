@@ -18,8 +18,8 @@ export * from './BusinessApp'
 
 export function App(): React.JSX.Element {
   useInterfaceLanguage()
-  useEffect(() => window.rovai.generalPreferences.onChanged?.(acceptPersistedInterfaceLanguage), [])
-  useEffect(()=>window.rovai.keyboardShortcuts?.onNativeInput?.(input=>{if(!input.isComposing)dispatchShortcutInput(input)}),[])
+  useEffect(() => window.coaxi.generalPreferences.onChanged?.(acceptPersistedInterfaceLanguage), [])
+  useEffect(()=>window.coaxi.keyboardShortcuts?.onNativeInput?.(input=>{if(!input.isComposing)dispatchShortcutInput(input)}),[])
   const [supervisorState, setSupervisorState] = useState<{
     latest: SupervisorSnapshot | null
     lastNonShutdown: SupervisorSnapshot | null
@@ -37,7 +37,7 @@ export function App(): React.JSX.Element {
     setStartupError(null)
     // This snapshot belongs to the local Main Window Session, not to Core. Read it
     // alongside the Supervisor so the target frame never waits for DB admission.
-    void window.rovai.desktopSession.getStartupSnapshot().then((snapshot) => {
+    void window.coaxi.desktopSession.getStartupSnapshot().then((snapshot) => {
       if (!disposed) setStartupSnapshot(snapshot)
     }).catch((error) => {
       if (!disposed) setStartupError(errorMessage(error))
@@ -49,7 +49,7 @@ export function App(): React.JSX.Element {
     let disposed = false
     // Main owns this local preference, so the language is available even when
     // Core is blocked and BusinessApp never mounts.
-    void window.rovai.desktopSession.getInterfaceLanguage().then((language) => {
+    void window.coaxi.desktopSession.getInterfaceLanguage().then((language) => {
       if (!disposed) initializeInterfaceLanguage({ interfaceLanguage: language })
     }).catch(() => undefined)
     return () => { disposed = true }
@@ -61,11 +61,11 @@ export function App(): React.JSX.Element {
     const apply = (snapshot: AppearanceSnapshot): void => {
       if (!disposed) applyAppearanceSnapshot(document.documentElement, snapshot)
     }
-    const unsubscribe = window.rovai.appearance.onChanged((snapshot) => {
+    const unsubscribe = window.coaxi.appearance.onChanged((snapshot) => {
       receivedChange = true
       apply(snapshot)
     })
-    void window.rovai.appearance.get().then((snapshot) => {
+    void window.coaxi.appearance.get().then((snapshot) => {
       if (!receivedChange) apply(snapshot)
     }).catch(() => undefined)
     return () => {
@@ -88,15 +88,15 @@ export function App(): React.JSX.Element {
         }
       })
     }
-    const unsubscribe = window.rovai.supervisor.onChanged(apply)
-    void window.rovai.supervisor.getSnapshot().then(apply).catch(() => undefined)
+    const unsubscribe = window.coaxi.supervisor.onChanged(apply)
+    void window.coaxi.supervisor.getSnapshot().then(apply).catch(() => undefined)
     return () => {
       disposed = true
       unsubscribe()
     }
   }, [])
 
-  useEffect(() => window.rovai.onEvent((event: CoreEvent) => {
+  useEffect(() => window.coaxi.onEvent((event: CoreEvent) => {
     if (event.method !== 'runtime.state') return
     if (stringField(asRecord(event.params), 'status') === 'shutting_down') {
       setRuntimeShuttingDown(true)
@@ -105,7 +105,7 @@ export function App(): React.JSX.Element {
 
   useEffect(() => {
     const wakeNetworkRecovery = (): void => {
-      void window.rovai.request('runtime.networkRecovery.wake').catch(() => undefined)
+      void window.coaxi.request('runtime.networkRecovery.wake').catch(() => undefined)
     }
     window.addEventListener('online', wakeNetworkRecovery)
     return () => window.removeEventListener('online', wakeNetworkRecovery)
@@ -142,7 +142,7 @@ export function App(): React.JSX.Element {
   } else {
     workspace = (
       <div className="authoritative-workspace">
-        <ThreadClientProvider client={desktopThreadClient}><CurrentUserProfileProvider api={window.rovai.currentUserProfile}>
+        <ThreadClientProvider client={desktopThreadClient}><CurrentUserProfileProvider api={window.coaxi.currentUserProfile}>
           <BusinessApp environment={desktopBusinessEnvironment}
             initialStartupSnapshot={startupSnapshot}
             startupStartedAtMs={startupStartedAt.current}
@@ -156,7 +156,7 @@ export function App(): React.JSX.Element {
   return (
     <>
       {workspace}
-      {window.rovai.windowClose && <WindowCloseDialog api={window.rovai.windowClose} />}
+      {window.coaxi.windowClose && <WindowCloseDialog api={window.coaxi.windowClose} />}
       {shuttingDown && <ControlledShutdownOverlay visible={shutdownFeedbackVisible} />}
     </>
   )

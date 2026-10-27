@@ -51,7 +51,7 @@ export function PortableConfigurationExport({sourceArchive}:{sourceArchive?:Port
       if(client.portableConfiguration.saveExport){const saved=await client.portableConfiguration.saveExport(receipt.operationId);if(observed===generation.current&&saved.saved)setMessage(t('加密配置副本已保存。'))}
       else if(client.portableConfiguration.downloadExport){
         const blob=await client.portableConfiguration.downloadExport(receipt);if(observed!==generation.current)return
-        const url=URL.createObjectURL(blob);const anchor=document.createElement('a');anchor.href=url;anchor.download='configuration.rovai-config';anchor.click();window.setTimeout(()=>URL.revokeObjectURL(url),60000);setMessage(t('加密配置副本已交给浏览器下载。'))
+        const url=URL.createObjectURL(blob);const anchor=document.createElement('a');anchor.href=url;anchor.download='configuration.coaxi-config';anchor.click();window.setTimeout(()=>URL.revokeObjectURL(url),60000);setMessage(t('加密配置副本已交给浏览器下载。'))
       }else throw new Error(t('当前客户端没有配置文件保存入口。'))
     }catch(reason){if(observed===generation.current)setError(readErrorMessage(reason))}finally{if(observed===generation.current)setBusy(false)}
   }

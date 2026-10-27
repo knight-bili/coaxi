@@ -9,17 +9,17 @@ import { setTimeout as delay } from 'node:timers/promises'
 import { launchHost } from './host-test-client.mjs'
 
 const root = resolve(import.meta.dirname, '../..')
-const executable = process.platform === 'win32' ? 'rovai-server.exe' : 'rovai-server'
-const binary = process.env.ROVAI_SERVER_BIN ?? join(root, 'target/debug', executable)
+const executable = process.platform === 'win32' ? 'coaxi-server.exe' : 'coaxi-server'
+const binary = process.env.COAXI_SERVER_BIN ?? join(root, 'target/debug', executable)
 const version = JSON.parse(await readFile(join(root, 'package.json'), 'utf8')).version
 
 test('Server default root is account scoped and independent of working directory', async () => {
-  const fixture = await realpath(await mkdtemp(join(tmpdir(), 'rovai-server-paths-')))
+  const fixture = await realpath(await mkdtemp(join(tmpdir(), 'coaxi-server-paths-')))
   try {
     assert.match(execFileSync(binary, ['--help'], { cwd: fixture, encoding: 'utf8' }), /\[default: 127\.0\.0\.1:8767\]/)
     const paths = JSON.parse(execFileSync(binary, ['paths'], { cwd: fixture, encoding: 'utf8' }))
-    assert.equal(paths.dataDir, join(process.platform === 'win32' ? process.env.USERPROFILE : process.env.HOME, '.rovai-server'))
-    assert.equal(paths.database, join(paths.dataDir, 'rovai.sqlite'))
+    assert.equal(paths.dataDir, join(process.platform === 'win32' ? process.env.USERPROFILE : process.env.HOME, '.coaxi-server'))
+    assert.equal(paths.database, join(paths.dataDir, 'coaxi.sqlite'))
     // `paths` retains the frozen bootstrap field across the public Thread rename.
     assert.equal(typeof paths.runtimeCampFilesRoot, 'string')
     assert.ok(paths.runtimeCampFilesRoot.startsWith(join(paths.dataDir, 'instances') + sep))
@@ -35,20 +35,20 @@ test('Native Server default and custom roots retain data and token, reject anoth
   timeout: 120_000,
   skip: process.platform === 'win32' ? 'Windows console shutdown requires its native console acceptance; path and installer checks run independently' : false
 }, async () => {
-  const fixture = await realpath(await mkdtemp(join(tmpdir(), 'rovai-server-entry-')))
-  const home = join(fixture, 'account'), install = join(fixture, 'program'), desktop = join(home, '.rovai')
+  const fixture = await realpath(await mkdtemp(join(tmpdir(), 'coaxi-server-entry-')))
+  const home = join(fixture, 'account'), install = join(fixture, 'program'), desktop = join(home, '.coaxi')
   await mkdir(join(desktop, 'skills'), { recursive: true })
   let installedBinary = join(install, executable)
-  if (process.env.ROVAI_SERVER_RELEASE_DIR) {
+  if (process.env.COAXI_SERVER_RELEASE_DIR) {
     const version = JSON.parse(await readFile(join(root, 'package.json'), 'utf8')).version
-    execFileSync('/bin/sh', [join(root, 'scripts/install-server.sh'), '--version', version, '--from-dir', process.env.ROVAI_SERVER_RELEASE_DIR, '--prefix', install, '--bin-dir', join(fixture, 'bin'), '--no-modify-path'], { env: { ...process.env, HOME: home, PATH: '/usr/bin:/bin:/usr/sbin:/sbin' }, stdio: 'pipe' })
+    execFileSync('/bin/sh', [join(root, 'scripts/install-server.sh'), '--version', version, '--from-dir', process.env.COAXI_SERVER_RELEASE_DIR, '--prefix', install, '--bin-dir', join(fixture, 'bin'), '--no-modify-path'], { env: { ...process.env, HOME: home, PATH: '/usr/bin:/bin:/usr/sbin:/sbin' }, stdio: 'pipe' })
     // Exercise the user-facing PATH symlink, not just the revision binary.
     installedBinary = join(fixture, 'bin', executable)
   } else {
     await mkdir(join(install, 'web-ui'), { recursive: true }); await cp(binary, installedBinary)
     await writeFile(join(install, 'web-ui/index.html'), '<!doctype html><title>Matched package UI</title><h1>Shared Host</h1>')
   }
-  const hostBinary = process.env.ROVAI_HOST_BIN ?? join(root, 'target/debug/rovai-host')
+  const hostBinary = process.env.COAXI_HOST_BIN ?? join(root, 'target/debug/coaxi-host')
   const isolatedEnvironment = { ...process.env, HOME: home, PATH: '/usr/bin:/bin:/usr/sbin:/sbin' }
   const desktopPaths = JSON.parse(execFileSync(hostBinary, ['prepare', '--data-dir', join(fixture, 'desktop-data')], { env: isolatedEnvironment, encoding: 'utf8' }))
   console.log(JSON.stringify({ channel: 'automatic_acceptance', name: 'parallel-desktop-host', dataDir: desktopPaths.dataDir, skillLibraryRoot: join(desktop, 'skills'), mcpConfigPath: join(desktop, 'mcp.json'), runtime: false }))
@@ -97,16 +97,16 @@ test('Native Server default and custom roots retain data and token, reject anoth
     assert.equal(desktopImport.candidates.length, 1, JSON.stringify(desktopImport.rejectedCandidates))
     assert.equal((await desktopCall('skills.import.commit', { commandId: randomUUID(), command: { stagingToken: desktopImport.stagingToken, candidateName: desktopImport.candidates[0].name, expectedDigest: desktopImport.candidates[0].contentDigest, expectedSkillVersion: null, confirmUpdate: false } })).status, 'applied')
     const desktopBaseline = { mcp: await readFile(join(desktop, 'mcp.json'), 'utf8'), skills: await desktopCall('skills.list'), instances: await readdir(join(desktop, 'instances')) }
-    const desktopWeb = await desktopHost.request('host.web.start', { listen: '127.0.0.1:0', uiDirectory: join(install, process.env.ROVAI_SERVER_RELEASE_DIR ? 'current/web-ui' : 'web-ui') })
+    const desktopWeb = await desktopHost.request('host.web.start', { listen: '127.0.0.1:0', uiDirectory: join(install, process.env.COAXI_SERVER_RELEASE_DIR ? 'current/web-ui' : 'web-ui') })
     assert.equal((await call({ origin: () => desktopWeb.origin }, desktopWeb.administratorToken, 'mcp.config.get')).configDigest, (await desktopCall('mcp.config.get')).configDigest)
-    await assert.rejects(access(join(home, '.rovai-server')), { code: 'ENOENT' })
-    for (const [name, args, data] of [['default', [], join(home, '.rovai-server')], ['custom', ['--data-dir', join(fixture, 'custom')], join(fixture, 'custom')]]) {
+    await assert.rejects(access(join(home, '.coaxi-server')), { code: 'ENOENT' })
+    for (const [name, args, data] of [['default', [], join(home, '.coaxi-server')], ['custom', ['--data-dir', join(fixture, 'custom')], join(fixture, 'custom')]]) {
       console.log(JSON.stringify({ channel: 'automatic_acceptance', name, dataDir: data, skillLibraryRoot: join(data, 'skills'), mcpConfigPath: join(data, 'mcp.json'), runtime: false }))
       const first = start(args); await wait(first.ready)
       assert.ok(first.origin(), first.output())
       const token = await readFile(join(data, 'server-token'), 'utf8')
       assert.equal(first.output().includes(token), false)
-      assert.ok(first.output().includes(`Rovai Server ${version} · Ready`))
+      assert.ok(first.output().includes(`Coaxi Server ${version} · Ready`))
       assert.match(first.output(), /Foreground/)
       assert.equal(first.output().includes('Host Core is ready'), false)
       assert.equal(first.output().includes('\x1b['), false)
@@ -122,7 +122,7 @@ test('Native Server default and custom roots retain data and token, reject anoth
       const imported = await call(first, token, 'skills.import.commit', { commandId: randomUUID(), command: { stagingToken: inspected.stagingToken, candidateName: inspected.candidates[0].name, expectedDigest: inspected.candidates[0].contentDigest, expectedSkillVersion: null, confirmUpdate: false } })
       assert.equal(imported.status, 'applied', JSON.stringify(imported))
       const skills = await call(first, token, 'skills.list'); assert.ok(skills.some(skill => skill.name === `${name}-skill`))
-      if (process.env.ROVAI_SERVER_RELEASE_DIR) {
+      if (process.env.COAXI_SERVER_RELEASE_DIR) {
         const toolbox = await call(first, token, 'toolbox.list')
         assert.equal(toolbox.length, 5)
         assert.ok(toolbox.every(skill => skill.sourceError === null), JSON.stringify(toolbox))
@@ -131,7 +131,7 @@ test('Native Server default and custom roots retain data and token, reject anoth
       assert.equal(desktopHost.child.exitCode, null, 'Desktop Host remains live beside Server')
       assert.equal(await readFile(join(desktop, 'mcp.json'), 'utf8'), desktopBaseline.mcp)
       assert.deepEqual(await desktopCall('skills.list'), desktopBaseline.skills)
-      await access(join(data, 'rovai.sqlite')); await access(join(data, 'mcp.json')); await access(join(data, 'skills')); await access(join(data, 'logs/server.log'))
+      await access(join(data, 'coaxi.sqlite')); await access(join(data, 'mcp.json')); await access(join(data, 'skills')); await access(join(data, 'logs/server.log'))
       const instances = await readdir(join(data, 'instances')); assert.equal(instances.length, 1)
       await access(join(data, 'instances', instances[0], 'runtime-files/.runtime-camp-files-root.json'))
       const loginBeforeExit = await fetch(`${first.origin()}/api/v1/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ protocolVersion: 4, administratorToken: token }) })
@@ -153,9 +153,9 @@ test('Native Server default and custom roots retain data and token, reject anoth
       assert.match(await readFile(join(data, 'logs/server.log'), 'utf8'), /Host Core stopped after durable settlement/)
       assert.equal((await readFile(join(data, 'logs/server.log'), 'utf8')).includes(token), false)
       // A previously admitted instance with a lost DB must not become a fresh empty instance.
-      await rm(join(data, 'rovai.sqlite'))
+      await rm(join(data, 'coaxi.sqlite'))
       const lostDatabase = start(args); assert.equal((await wait(lostDatabase.closed)).code, 1)
-      await assert.rejects(access(join(data, 'rovai.sqlite')), { code: 'ENOENT' })
+      await assert.rejects(access(join(data, 'coaxi.sqlite')), { code: 'ENOENT' })
     }
     assert.equal(await readFile(join(desktop, 'mcp.json'), 'utf8'), desktopBaseline.mcp)
     assert.deepEqual(await desktopCall('skills.list'), desktopBaseline.skills)
@@ -163,18 +163,18 @@ test('Native Server default and custom roots retain data and token, reject anoth
     const desktopRoot = start(['--data-dir', desktop]); assert.equal((await wait(desktopRoot.closed)).code, 1); assert.match(desktopRoot.output(), /server_legacy_layout/)
     assert.equal(await readFile(join(desktop, 'mcp.json'), 'utf8'), desktopBaseline.mcp)
     await assert.rejects(access(join(desktop, 'server-layout.json')), { code: 'ENOENT' })
-    const legacy = join(fixture, 'legacy'); await mkdir(legacy); await writeFile(join(legacy, 'rovai.sqlite'), 'legacy sentinel')
+    const legacy = join(fixture, 'legacy'); await mkdir(legacy); await writeFile(join(legacy, 'coaxi.sqlite'), 'legacy sentinel')
     const refused = start(['--data-dir', legacy]); assert.equal((await wait(refused.closed)).code, 1); assert.match(refused.output(), /server_legacy_layout/)
-    assert.equal(await readFile(join(legacy, 'rovai.sqlite'), 'utf8'), 'legacy sentinel')
-    assert.deepEqual(await readdir(legacy), ['rovai.sqlite'])
+    assert.equal(await readFile(join(legacy, 'coaxi.sqlite'), 'utf8'), 'legacy sentinel')
+    assert.deepEqual(await readdir(legacy), ['coaxi.sqlite'])
     const outside = join(fixture, 'outside'); await mkdir(outside)
     const alias = join(fixture, 'alias'); await symlink(outside, alias)
     const throughAlias = start(['--data-dir', join(alias, 'new-root')])
     assert.equal((await wait(throughAlias.closed)).code, 1); assert.match(throughAlias.output(), /symlink component/)
     assert.deepEqual(await readdir(outside), [], 'path checks must precede preparation through a symlink ancestor')
-    const oldDefault = join(desktop, 'server'); await mkdir(oldDefault); await writeFile(join(oldDefault, 'rovai.sqlite'), 'old preview')
+    const oldDefault = join(desktop, 'server'); await mkdir(oldDefault); await writeFile(join(oldDefault, 'coaxi.sqlite'), 'old preview')
     const oldDefaultHint = start([]); assert.equal((await wait(oldDefaultHint.closed)).code, 1); assert.match(oldDefaultHint.output(), /previous preview data exists/)
-    assert.equal(await readFile(join(oldDefault, 'rovai.sqlite'), 'utf8'), 'old preview')
+    assert.equal(await readFile(join(oldDefault, 'coaxi.sqlite'), 'utf8'), 'old preview')
   } finally {
     await desktopHost.close()
     for (const host of processes) { if (host.child.exitCode === null && host.child.signalCode === null) host.child.kill('SIGKILL'); await wait(host.closed).catch(() => {}) }
@@ -188,7 +188,7 @@ test('interactive Server shows the retained token outside diagnostics and settle
   timeout: 90_000,
   skip: process.platform === 'win32' ? 'POSIX PTY evidence; Windows console closure is qualified separately' : false
 }, async () => {
-  const fixture = await realpath(await mkdtemp(join(tmpdir(), 'rovai-server-terminal-')))
+  const fixture = await realpath(await mkdtemp(join(tmpdir(), 'coaxi-server-terminal-')))
   const ui = join(fixture, 'web-ui'); await mkdir(ui); await writeFile(join(ui, 'index.html'), '<!doctype html><title>Server terminal fixture</title>')
   try {
     for (const mode of ['quiet-hangup', 'verbose', 'redirected-output']) {
@@ -247,7 +247,7 @@ try:
         'mirrored': b'Host Core is ready' in output,
         'durableStop': b'Host Core stopped after durable settlement' in logs,
         'normalExit': os.waitstatus_to_exitcode(status) == 0,
-        'realVersion': ('Rovai Server ' + version).encode() in output,
+        'realVersion': ('Coaxi Server ' + version).encode() in output,
     }))
 finally:
     try: os.kill(pid, signal.SIGKILL)
@@ -267,12 +267,12 @@ finally:
 test('Windows native console close completes the existing durable shutdown', {
   timeout: 90_000, skip: process.platform !== 'win32' ? 'Requires native Windows console' : false
 }, async () => {
-  const fixture = await realpath(await mkdtemp(join(tmpdir(), 'rovai-server-console-')))
+  const fixture = await realpath(await mkdtemp(join(tmpdir(), 'coaxi-server-console-')))
   const data = join(fixture, 'data'), metadata = join(fixture, 'console.json')
   const launch = join(fixture, 'launch.ps1'), close = join(fixture, 'close.ps1'), config = join(fixture, 'launch.json')
   let launcher, serverPid, closed = false
   try {
-    await writeFile(config, JSON.stringify({ binary, args: ['--data-dir', data, '--web-ui', process.env.ROVAI_WEB_UI ?? join(root, 'out/web'), '--listen', '127.0.0.1:0'], metadata }))
+    await writeFile(config, JSON.stringify({ binary, args: ['--data-dir', data, '--web-ui', process.env.COAXI_WEB_UI ?? join(root, 'out/web'), '--listen', '127.0.0.1:0'], metadata }))
     await writeFile(launch, String.raw`
 param([string]$Config)
 $ErrorActionPreference = 'Stop'

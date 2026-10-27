@@ -8,13 +8,13 @@ const DEFAULT_REPOSITORY_ROOT = resolve(import.meta.dirname, '../../..')
 const SOURCES = Object.freeze({
   package: 'package.json',
   cargo: 'Cargo.toml',
-  dataContract: 'crates/rovai-core/src/db.rs',
-  readModel: 'crates/rovai-core/src/read_model.rs',
-  contextContract: 'crates/rovai-core/src/context_contract.rs',
-  contextDelivery: 'crates/rovai-core/src/context_delivery.rs',
-  builtinTransport: 'crates/rovai-core/src/builtin_tool_transport.rs',
-  taskContract: 'crates/rovai-core/src/collaboration.rs',
-  acceptedAck: 'crates/rovai-core/src/context.rs'
+  dataContract: 'crates/coaxi-core/src/db.rs',
+  readModel: 'crates/coaxi-core/src/read_model.rs',
+  contextContract: 'crates/coaxi-core/src/context_contract.rs',
+  contextDelivery: 'crates/coaxi-core/src/context_delivery.rs',
+  builtinTransport: 'crates/coaxi-core/src/builtin_tool_transport.rs',
+  taskContract: 'crates/coaxi-core/src/collaboration.rs',
+  acceptedAck: 'crates/coaxi-core/src/context.rs'
 })
 
 export async function collectProductContractFingerprint({

@@ -5,7 +5,7 @@ export function installCanvasFileIpc(ipcMain) {
   const register=ipcMain.handle, requests=[]
   let registered=0
   ipcMain.handle=function(channel,handler){
-    if(!channel.startsWith('rovai:file-preview-'))return register.call(this,channel,handler)
+    if(!channel.startsWith('coaxi:file-preview-'))return register.call(this,channel,handler)
     registered++
     return register.call(this,channel,async(event,...args)=>{
       const row={channel,args:structuredClone(args),at:Date.now()};requests.push(row)

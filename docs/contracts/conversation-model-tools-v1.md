@@ -10,7 +10,7 @@ last_updated: 2026-10-23
 # Conversation Model Tools v1
 
 客户已明确确认“会话模型工具补齐 r1”。本合同拥有该可选服务的权限、作用域、输入输出、幂等、回答投递与自动化所有权语义。
-完整字段和闭集 Schema 见[实现合同](../../crates/rovai-core/src/conversation_tools/contract.json)；批准时的原始快照见[冻结方案](../versions/v1.73/model-context-change-conversation-model-tools.md)及[确认记录](../../integration/proposals/conversation-model-tools-r1-confirmation.json)。合同接受不表示软件已编译、测试或可供模型调用。
+完整字段和闭集 Schema 见[实现合同](../../crates/coaxi-core/src/conversation_tools/contract.json)；批准时的原始快照见[冻结方案](../versions/v1.73/model-context-change-conversation-model-tools.md)及[确认记录](../../integration/proposals/conversation-model-tools-r1-confirmation.json)。合同接受不表示软件已编译、测试或可供模型调用。
 
 ## 服务和原权限
 

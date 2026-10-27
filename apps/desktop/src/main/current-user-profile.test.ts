@@ -7,7 +7,7 @@ import { CurrentUserProfileStore, parseCurrentUserProfile } from './current-user
 
 const roots: string[] = []
 async function fixture(): Promise<string> {
-  const root = await mkdtemp(join(tmpdir(), 'rovai-current-user-profile-'))
+  const root = await mkdtemp(join(tmpdir(), 'coaxi-current-user-profile-'))
   roots.push(root)
   return join(root, 'profile.json')
 }

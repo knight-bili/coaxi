@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schemas.rovai.invalid/contracts/semantic-judge-configuration-v1.1.schema.json",
-  "title": "Rovai Semantic Judge Configuration 1.1",
+  "$id": "https://schemas.coaxi.invalid/contracts/semantic-judge-configuration-v1.1.schema.json",
+  "title": "Coaxi Semantic Judge Configuration 1.1",
   "$defs": {
     "checklistItemId": {
       "enum": [
@@ -98,29 +98,29 @@
   ],
   "properties": {
     "artifactId": {
-      "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/stableId"
+      "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/stableId"
     },
     "schemaId": {
-      "const": "rovai.qualification.semantic-judge-configuration"
+      "const": "coaxi.qualification.semantic-judge-configuration"
     },
     "schemaVersion": {
       "const": "1.1.0"
     },
     "producer": {
-      "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/producer"
+      "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/producer"
     },
     "binding": {
-      "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/binding"
+      "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/binding"
     },
     "sourceBoundaries": {
       "type": "array",
       "minItems": 1,
       "items": {
-        "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/sourceBoundary"
+        "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/sourceBoundary"
       }
     },
     "payloadDigest": {
-      "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/digest"
+      "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/digest"
     },
     "payload": {
       "type": "object",
@@ -143,7 +143,7 @@
       ],
       "properties": {
         "configurationId": {
-          "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/stableId"
+          "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/stableId"
         },
         "model": {
           "type": "object",
@@ -165,7 +165,7 @@
               "maxLength": 240
             },
             "snapshotDigest": {
-              "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/digest"
+              "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/digest"
             }
           }
         },
@@ -179,18 +179,18 @@
           ],
           "properties": {
             "replicaA": {
-              "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/digest"
+              "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/digest"
             },
             "replicaB": {
-              "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/digest"
+              "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/digest"
             },
             "counterbalanceRuleDigest": {
-              "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/digest"
+              "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/digest"
             }
           }
         },
         "rubricDigest": {
-          "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/digest"
+          "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/digest"
         },
         "checklist": {
           "$ref": "#/$defs/exactChecklist"
@@ -208,16 +208,16 @@
           }
         },
         "packSchema": {
-          "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/artifactRef"
+          "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/artifactRef"
         },
         "replicaOutputSchema": {
-          "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/artifactRef"
+          "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/artifactRef"
         },
         "reviewSchema": {
-          "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/artifactRef"
+          "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/artifactRef"
         },
         "redactionPolicyDigest": {
-          "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/digest"
+          "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/digest"
         },
         "retrySchedule": {
           "type": "object",

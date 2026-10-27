@@ -8,7 +8,7 @@ import {
   projectMessageInlineCodes
 } from './safe-markdown-model'
 
-export const FILE_REFERENCE_FRAGMENT = '#rovai-file-reference='
+export const FILE_REFERENCE_FRAGMENT = '#coaxi-file-reference='
 export type FileReferenceActivation = (rawReference: string, source: HTMLElement, target?: FileLocationTarget) => void
 
 export function FileReferenceLink({

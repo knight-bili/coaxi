@@ -27,7 +27,7 @@ import { loadQualificationResultHistory } from './qualification-recovery.mjs'
 import { validateV036Schema } from './qualification-v036-schema-validation.mjs'
 
 export const DIAGNOSTIC_PORTFOLIO_PRODUCER = Object.freeze({
-  name: 'rovai-diagnostic-portfolio',
+  name: 'coaxi-diagnostic-portfolio',
   version: '0.36.0'
 })
 

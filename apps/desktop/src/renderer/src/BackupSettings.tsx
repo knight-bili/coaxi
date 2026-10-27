@@ -7,7 +7,7 @@ import type { BackupSummary, NativeBackupsApi } from '@contracts'
 import { AppDialogContent, AppDialogHeader, AppDialogBody, AppDialogFooter } from './AppDialog'
 import { useThreadClient } from './camp-client'
 import { useUiText } from './interface-language'
-// Codeg backup-settings: encrypted export, inspect, then explicit restart to
+// Coaxi backup-settings: encrypted export, inspect, then explicit restart to
 // restore. Passwords stay local to the current input and native helper pipe.
 export function BackupSettings():React.JSX.Element{
   const api=useThreadClient().nativeBackups,t=useUiText()

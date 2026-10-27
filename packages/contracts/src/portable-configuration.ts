@@ -13,7 +13,7 @@ export interface PortableMemberConnectionView {agentId:string;agentVersion:numbe
 export interface PortableProviderPage {items:PortableProviderViewV1[];next:string|null}
 /** 原文由加密存储和显式导出拥有；普通视图的原文字段为占位提示。 */
 export type PortableProviderDefinitionV1 = Omit<PortableProviderViewV1,'revision'|'digest'|'createdAt'|'updatedAt'>
-export interface PortableArchiveReference {archiveId:string;sourceDigest:string;sourceKind:'codeg_v1'|'fusion_v1'|'fusion_v2';counts:Record<string,number>}
+export interface PortableArchiveReference {archiveId:string;sourceDigest:string;sourceKind:'coaxi_v1'|'fusion_v1'|'fusion_v2';counts:Record<string,number>}
 export interface PortableArchiveSelection {selectionId:string;displayName:string;sourceDigest:string;byteSize:number}
 export interface PortableExportSourceArchive {archiveId:string;sourceDigest:string}
 export interface PortableExportReceipt {operationId:string;state:'unknown'|'prepared'|'ready';archiveId?:string;createdAt?:string;includeSecrets?:boolean;encryptedDigest?:string|null;byteSize?:number|null;sourceArchive?:PortableExportSourceArchive}

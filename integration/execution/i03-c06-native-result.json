@@ -31,8 +31,8 @@
         "passed": true
       }
     ],
-    "result": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\c06\\fusion-i03-rc.5\\native-758da4e2\\native-electron-final\\result.json",
-    "screenshot": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\c06\\fusion-i03-rc.5\\native-758da4e2\\native-electron-final\\native-output.png",
+    "result": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\c06\\fusion-i03-rc.5\\native-758da4e2\\native-electron-final\\result.json",
+    "screenshot": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\c06\\fusion-i03-rc.5\\native-758da4e2\\native-electron-final\\native-output.png",
     "visual_review": "actual PNG inspected; 2+3 and 5 visible, no overlap or unintended scrollbar",
     "input_method": "Electron sendInputEvent through actual production handlers; DOM button activation; not OS pointer/IME/clipboard qualification",
     "shutdown": "completed deadlineExpired=false forcedSignal=null"
@@ -86,7 +86,7 @@
         "code": "read_failed"
       }
     ],
-    "result": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\c06\\fusion-i03-rc.5\\native-190cf86d\\file-authority-final\\result.json",
+    "result": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\c06\\fusion-i03-rc.5\\native-190cf86d\\file-authority-final\\result.json",
     "policy": "Preserve exact explicit-file access including external files; directory grants and private source authority remain separate"
   },
   "cold_reopen": {
@@ -122,48 +122,48 @@
   "staged_apps": [
     {
       "run_id": "190cf86d",
-      "app": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\local\\i03-c06-190cf86d\\app",
+      "app": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\integration\\local\\i03-c06-190cf86d\\app",
       "desktop_files": 149,
       "native_binaries": [
         {
-          "name": "rovai-core.exe",
+          "name": "coaxi-core.exe",
           "sha256": "2345fdd7ad001ce45420e2285acdfe371bf2b809cadba3b7d24cd93d6fb6d0ac"
         },
         {
-          "name": "rovai-host.exe",
+          "name": "coaxi-host.exe",
           "sha256": "f54e9bba856e8310fe0088baeba6590b23994d6f6a39851738d043fba208e37d"
         },
         {
-          "name": "rovai.exe",
+          "name": "coaxi.exe",
           "sha256": "d6f5bb6e8847b8bf4490b295ddafe0a45a5ae794a7d1ea57209a47c099231327"
         }
       ]
     },
     {
       "run_id": "758da4e2",
-      "app": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\local\\i03-c06-758da4e2\\app",
+      "app": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\integration\\local\\i03-c06-758da4e2\\app",
       "desktop_files": 149,
       "native_binaries": [
         {
-          "name": "rovai-core.exe",
+          "name": "coaxi-core.exe",
           "sha256": "2345fdd7ad001ce45420e2285acdfe371bf2b809cadba3b7d24cd93d6fb6d0ac"
         },
         {
-          "name": "rovai-host.exe",
+          "name": "coaxi-host.exe",
           "sha256": "f54e9bba856e8310fe0088baeba6590b23994d6f6a39851738d043fba208e37d"
         },
         {
-          "name": "rovai.exe",
+          "name": "coaxi.exe",
           "sha256": "d6f5bb6e8847b8bf4490b295ddafe0a45a5ae794a7d1ea57209a47c099231327"
         }
       ]
     }
   ],
   "frozen_authority_files": {
-    "crates/rovai-core/src/local_attachment_source.rs": "8830581e72fc103b2f359be17a0072c5ee0cedc6eb5fe58b179ae3d255dbc1ca",
-    "crates/rovai-core/src/context.rs": "329144f38675ebedeaf5652858d457d42369455eb26c6159af61d19c02218784",
-    "crates/rovai-core/src/message_quote.rs": "efb6e962946b85c089483bb1120fe92f32458bb3b3b5e5eb668e26f8aa96481e",
-    "crates/rovai-core/src/command.rs": "22258f81dc5b76040cd0fdba20074321b5be7104e648a8278412c0736ef0d85a"
+    "crates/coaxi-core/src/local_attachment_source.rs": "8830581e72fc103b2f359be17a0072c5ee0cedc6eb5fe58b179ae3d255dbc1ca",
+    "crates/coaxi-core/src/context.rs": "329144f38675ebedeaf5652858d457d42369455eb26c6159af61d19c02218784",
+    "crates/coaxi-core/src/message_quote.rs": "efb6e962946b85c089483bb1120fe92f32458bb3b3b5e5eb668e26f8aa96481e",
+    "crates/coaxi-core/src/command.rs": "22258f81dc5b76040cd0fdba20074321b5be7104e648a8278412c0736ef0d85a"
   },
   "source_binding": {
     "base_commit": "db1e335598fbaf807b6bb00013a524b24db70013",

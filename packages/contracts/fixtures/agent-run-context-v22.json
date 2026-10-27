@@ -57,7 +57,7 @@
   },
   "directUserCurrentInputOptionalFields": {
     "skills": [{"name": "review-pr", "path": "/project/.codex/skills/review-pr/SKILL.md"}],
-    "attachments": ["/Users/test/.rovai/instances/v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef/runtime-files/camps/rvcamp_01h47kvsy5fk1shh6w1g60eecf/attachments/00000000-0000-4000-8000-000000000001/payload/spec.pdf"]
+    "attachments": ["/Users/test/.coaxi/instances/v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef/runtime-files/camps/rvcamp_01h47kvsy5fk1shh6w1g60eecf/attachments/00000000-0000-4000-8000-000000000001/payload/spec.pdf"]
   },
   "skillSelectionSnapshot": {
     "schemaVersion": 1,
@@ -94,7 +94,7 @@
     "optionalFields": ["taskContext", "sessionContinuity", "externalEffect", "gather", "delegation"],
     "campResources": {
       "campId": "rvcamp_01h47kvsy5fk1shh6w1g60eecf",
-      "publishedAttachmentRoot": "/Users/test/.rovai/instances/v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef/runtime-files/camps/rvcamp_01h47kvsy5fk1shh6w1g60eecf/attachments",
+      "publishedAttachmentRoot": "/Users/test/.coaxi/instances/v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef/runtime-files/camps/rvcamp_01h47kvsy5fk1shh6w1g60eecf/attachments",
       "access": "enumerate_and_read",
       "scope": "current_camp",
       "mutability": "read_only"

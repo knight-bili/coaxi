@@ -150,7 +150,7 @@
       "task": "I04-T01/I12",
       "owner": "研发",
       "status": "media_stats_and_scoped_materials_local_verified_full_engine_and_candidate_pending",
-      "problem": "原用户图/生成图/完整图预览与统计复用固定Codeg；Core精确readId读取与原Rovai图片菜单、HTML服务已接。修复父窗Esc、模块循环和临时来源不能restore的问题；原生自动预览禁止系统启动/新根授权。",
+      "problem": "原用户图/生成图/完整图预览与统计复用固定Coaxi；Core精确readId读取与原Coaxi图片菜单、HTML服务已接。修复父窗Esc、模块循环和临时来源不能restore的问题；原生自动预览禁止系统启动/新根授权。",
       "evidence": "i04-native-media-stats-result.json",
       "remaining": "完整内容引擎、普通文件/目录/系统引用已本地验证；完整HTML、I07网页/目标、完整App及真实两端生命周期/规模/恢复继续。"
     },
@@ -193,7 +193,7 @@
       "remaining": [
         "I04阶段编码集齐后集中核实真实Core/Native/Web、完整App/供体App同场景、授权/长历史/规模/内存与恢复；本批为生产卡片配声明运输替身的Chromium分项。",
         "插件增强CSS/kit/calendar保留原构造接口与缺资产fallback；实际安装包Core授权发现归I08，无任意home/Tauri读取。",
-        "完整DocGuest、网页/邮件/电话与内置/系统浏览器目标归I07；普通文件工作区继续Rovai原HTML服务。",
+        "完整DocGuest、网页/邮件/电话与内置/系统浏览器目标归I07；普通文件工作区继续Coaxi原HTML服务。",
         "I04原剩余Claude旧agent/parser/home关联、Qoder独立来源/明确导入、Grok修改意见与三Context模式、Runtime并集、恢复、记忆及自动化不减；ANSI完整许可继续发布资格。"
       ],
       "qualification": "127定向/48隔离Chromium检查及4原组件图；真实Core/Native/Web/完整App仍待，I04正式84新增0。"
@@ -208,7 +208,7 @@
       "qualification": "两个精确Rust owner通过；132组官方纯函数合成参考，本机Windows66组；同库正向绑定仍为Codex，Claude/Qoder仅补错Runtime拒绝。未运行实际CLI/模型/完整App，不增加84正式场景通过数。",
       "remaining": [
         "先核对Claude/Qoder实际ACP工具/原生Session身份和摘要映射的固定来源；真实Host绑定/提供方运行/断线恢复与平台候选继续，不能假定同名即同值",
-        "代理专用资源文件来源与原Codeg Viewer/Agent卡片接现有真实Core reader；两端Controller/按readId资源/原组件视觉及完整App联调",
+        "代理专用资源文件来源与原Coaxi Viewer/Agent卡片接现有真实Core reader；两端Controller/按readId资源/原组件视觉及完整App联调",
         "原生嵌套Agent来源/父链和原统计回调按独立Agent资格补齐，不发行Session后代令牌；完整语料和原parser差分",
         "旧无记录来源明确导入；不猜当前home、不静默扫全部原生日志",
         "I04其余Runtime并集、r1恢复/接管、记忆和自动化；I07完整浏览器/I08增强资产与全81簇48包324保持"
@@ -226,7 +226,7 @@
       "qualification": "原source文件owner已随完整Claude批次执行通过，覆盖上轮真实文件夹具；不等于Core生产关联/真实Runtime/App，不增加84正式场景通过数。",
       "remaining": [
         "先核对Claude/Qoder实际ACP工具/原生Session身份和摘要映射的固定来源；真实Host绑定/提供方运行/断线恢复与平台候选继续，不能假定同名即同值",
-        "代理专用资源文件来源与原Codeg Viewer/Agent卡片接现有真实Core reader；两端Controller/按readId资源/原组件视觉及完整App联调",
+        "代理专用资源文件来源与原Coaxi Viewer/Agent卡片接现有真实Core reader；两端Controller/按readId资源/原组件视觉及完整App联调",
         "原生嵌套Agent来源/父链和原统计回调按独立Agent资格补齐，不发行Session后代令牌；完整语料和原parser差分",
         "旧无记录来源明确导入；不猜当前home、不静默扫全部原生日志",
         "I04其余Runtime并集、r1恢复/接管、记忆和自动化；I07完整浏览器/I08增强资产与全81簇48包324保持"
@@ -240,12 +240,12 @@
       "task": "I04-T01/T02/I12",
       "owner": "研发",
       "status": "full_original_parser_local_verified_core_producer_and_candidate_pending",
-      "problem": "固定Codeg完整Claude helper/RecordAccumulator/分组、图片/别名/补丁、后台/goal/compaction及去重用量移植；Core核验字节、子源/工程行回调与稳定时间替代原路径猜选。独立summary扫描和父窗口先于子花费的原顺序保留。",
+      "problem": "固定Coaxi完整Claude helper/RecordAccumulator/分组、图片/别名/补丁、后台/goal/compaction及去重用量移植；Core核验字节、子源/工程行回调与稳定时间替代原路径猜选。独立summary扫描和父窗口先于子花费的原顺序保留。",
       "evidence": "i04-native-claude-content-result.json",
       "qualification": "66原函数主体在声明的模块路径/格式化归一后相同；54原断言和真实文件→完整UTF8/稳定快照/取消在原source owner通过，12条警告留证。来源/Core生产者、公开目标及真实Runtime/App未获资格，正式84新增0。",
       "remaining": [
         "先核对Claude/Qoder实际ACP工具/原生Session身份和摘要映射的固定来源；真实Host绑定/提供方运行/断线恢复与平台候选继续，不能假定同名即同值",
-        "代理专用资源文件来源与原Codeg Viewer/Agent卡片接现有真实Core reader；两端Controller/按readId资源/原组件视觉及完整App联调",
+        "代理专用资源文件来源与原Coaxi Viewer/Agent卡片接现有真实Core reader；两端Controller/按readId资源/原组件视觉及完整App联调",
         "原生嵌套Agent来源/父链和原统计回调按独立Agent资格补齐，不发行Session后代令牌；完整语料和原parser差分",
         "旧无记录来源明确导入；不猜当前home、不静默扫全部原生日志",
         "I04其余Runtime并集、r1恢复/接管、记忆和自动化；I07完整浏览器/I08增强资产与全81簇48包324保持"
@@ -263,7 +263,7 @@
       "qualification": "43原case与原source文件owner通过；13原函数和3用量事实函数主体核对。文件driver仅提供合成记录/子源，不证明Core生产证据/User查找/真实Runtime。三项原身份/发现/旧环境case在对应Core来源/最终launch资格，未删能力或假通过；正式84新增0。",
       "remaining": [
         "先核对Claude/Qoder实际ACP工具/原生Session身份和摘要映射的固定来源；真实Host绑定/提供方运行/断线恢复与平台候选继续，不能假定同名即同值",
-        "代理专用资源文件来源与原Codeg Viewer/Agent卡片接现有真实Core reader；两端Controller/按readId资源/原组件视觉及完整App联调",
+        "代理专用资源文件来源与原Coaxi Viewer/Agent卡片接现有真实Core reader；两端Controller/按readId资源/原组件视觉及完整App联调",
         "原生嵌套Agent来源/父链和原统计回调按独立Agent资格补齐，不发行Session后代令牌；完整语料和原parser差分",
         "旧无记录来源明确导入；不猜当前home、不静默扫全部原生日志",
         "I04其余Runtime并集、r1恢复/接管、记忆和自动化；I07完整浏览器/I08增强资产与全81簇48包324保持"
@@ -281,7 +281,7 @@
       "qualification": "原source与Context owner精确列册各1项并执行通过；复用同DB/Blob/根目录，C/Q适配器/evidence/来源是明确SQL夹具，真实文件完成关联/历史/取消/重授权和零写。没有RPC/UI/实际Host与提供方资格，正式84新增0。",
       "remaining": [
         "先核对Claude/Qoder实际ACP工具/原生Session身份和摘要映射的固定来源；真实Host绑定/提供方运行/断线恢复与平台候选继续，不能假定同名即同值",
-        "代理专用资源文件来源与原Codeg Viewer/Agent卡片接现有真实Core reader；两端Controller/按readId资源/原组件视觉及完整App联调",
+        "代理专用资源文件来源与原Coaxi Viewer/Agent卡片接现有真实Core reader；两端Controller/按readId资源/原组件视觉及完整App联调",
         "原生嵌套Agent来源/父链和原统计回调按独立Agent资格补齐，不发行Session后代令牌；完整语料和原parser差分",
         "旧无记录来源明确导入；不猜当前home、不静默扫全部原生日志",
         "I04其余Runtime并集、r1恢复/接管、记忆和自动化；I07完整浏览器/I08增强资产与全81簇48包324保持"
@@ -298,7 +298,7 @@
       "qualification": "三个原Rust owner精确列册/执行，Core生产bins check、类型与71客户端检查通过。真实文件/worker/完整UTF8分页、历史/重授权和原Session生命周期已验；adapter/evidence/来源是SQL夹具，Web为fetch替身，不证明实际Core.handle/IPC/HTTP/provider/原UI。正式84新增0。",
       "remaining": [
         "先核对Claude/Qoder实际ACP工具/原生Session身份和摘要映射的固定来源；真实Host绑定/提供方运行/断线恢复与平台候选继续，不能假定同名即同值",
-        "代理专用资源文件来源与原Codeg Viewer/Agent卡片接现有真实Core reader；两端Controller/按readId资源/原组件视觉及完整App联调",
+        "代理专用资源文件来源与原Coaxi Viewer/Agent卡片接现有真实Core reader；两端Controller/按readId资源/原组件视觉及完整App联调",
         "原生嵌套Agent来源/父链和原统计回调按独立Agent资格补齐，不发行Session后代令牌；完整语料和原parser差分",
         "旧无记录来源明确导入；不猜当前home、不静默扫全部原生日志",
         "I04其余Runtime并集、r1恢复/接管、记忆和自动化；I07完整浏览器/I08增强资产与全81簇48包324保持"

@@ -53,7 +53,7 @@ export class ProjectLauncherWindow {
       const inspected=await this.request<{projectPath:string}>('workspaces.inspect',{path:result.path})
       this.pending={id:randomUUID(),path:inspected.projectPath}
       const main=this.owner();if(!main||main.isDestroyed())throw new Error('主窗口暂不可用，请重新进入项目。')
-      if(main.isMinimized())main.restore();main.show();main.focus();main.webContents.send('rovai:project-launcher-available');this.window?.hide();return
+      if(main.isMinimized())main.restore();main.show();main.focus();main.webContents.send('coaxi:project-launcher-available');this.window?.hide();return
     }
     throw new Error('launcher.operation_not_admitted')
   }

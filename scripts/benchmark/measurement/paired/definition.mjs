@@ -1,8 +1,8 @@
 import { canonicalJson, digestJson } from '../../protocol/canonical.mjs'
 
-export const PAIRED_DEFINITION_SCHEMA_ID = 'rovai.benchmark.paired-trial-definition'
+export const PAIRED_DEFINITION_SCHEMA_ID = 'coaxi.benchmark.paired-trial-definition'
 export const PAIRED_DEFINITION_SCHEMA_VERSION = '1.0.0'
-export const PAIRED_PLAN_SCHEMA_ID = 'rovai.benchmark.paired-trial-plan'
+export const PAIRED_PLAN_SCHEMA_ID = 'coaxi.benchmark.paired-trial-plan'
 export const PAIRED_PLAN_SCHEMA_VERSION = '1.0.0'
 
 const DEFAULT_FRESH_STATE_KEYS = Object.freeze([

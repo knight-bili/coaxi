@@ -9,7 +9,7 @@ import {
 } from './lib/runtime-camp-files-root.mjs'
 
 const root = resolve(import.meta.dirname, '..')
-const fixtureRoot = await mkdtemp(join(tmpdir(), 'rovai-core-smoke-'))
+const fixtureRoot = await mkdtemp(join(tmpdir(), 'coaxi-core-smoke-'))
 const projectRoot = join(fixtureRoot, 'project')
 const ordinaryRoot = join(fixtureRoot, 'ordinary')
 const emptyGitRoot = join(fixtureRoot, 'empty-git')
@@ -22,10 +22,10 @@ try {
   await mkdir(emptyGitRoot)
   await mkdir(dataDir)
   dataDir = await realpath(dataDir)
-  await writeFile(join(projectRoot, 'README.md'), '# Rovai-ai Core Smoke\n')
+  await writeFile(join(projectRoot, 'README.md'), '# Coaxi Core Smoke\n')
   await run('git', ['init', '-b', 'main'], projectRoot)
-  await run('git', ['config', 'user.name', 'Rovai-ai Smoke'], projectRoot)
-  await run('git', ['config', 'user.email', 'smoke@rovai.local'], projectRoot)
+  await run('git', ['config', 'user.name', 'Coaxi Smoke'], projectRoot)
+  await run('git', ['config', 'user.email', 'smoke@coaxi.local'], projectRoot)
   await run('git', ['add', 'README.md'], projectRoot)
   await run('git', ['commit', '-m', 'fixture'], projectRoot)
   await run('git', ['init', '-b', 'main'], emptyGitRoot)
@@ -159,7 +159,7 @@ function assertEmptyNavigation(navigation, phase) {
 }
 
 function startCore(dataDirectory) {
-  const child = spawn(join(root, 'target', 'debug', 'rovai-core'), [
+  const child = spawn(join(root, 'target', 'debug', 'coaxi-core'), [
     ...coreDataDirectoryArguments(dataDirectory),
     '--skill-library-root', join(dataDirectory, 'managed-skill-library')
   ], {

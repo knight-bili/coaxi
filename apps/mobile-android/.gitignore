@@ -27,5 +27,5 @@ service-account*.json
 /.claude/
 
 # Release signing — local only, never commit
-/codeg-release.jks
+/coaxi-release.jks
 /keystore.properties

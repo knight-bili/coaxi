@@ -21,11 +21,11 @@
       "apps/web/src/client.ts": "550c1df5c7cd5c23706cd9087117922b7834ec083f610f78610ef3e02559f181",
       "apps/web/src/private-upload-preparations.test.ts": "164186de06346b596fab7f0ff894f669ab795f0fa725f701860755369476d060",
       "apps/web/src/private-upload-preparations.ts": "b89dcc5e82fe35e6741add48e502cc809a5d2ff356d0b23a7c977e8d5aaf92bd",
-      "crates/rovai-core/src/application.rs": "4a76928769420a1110d5d3a05e4833c46baaad6d5de219945b11cf3aa7bd349a",
-      "crates/rovai-core/src/single_chat_composer_tests.rs": "d9d68fc87de42cc65e9667b8c4b1115dca7299985c5a5bdf0619a25bcaa00023",
-      "crates/rovai-core/src/web_upload.rs": "7266c11c9a4cf610649c46676320f1629a548a8567e3c5bdba4b8ad0d17b239f",
-      "crates/rovai-web/src/lib.rs": "d449d107ab72fb38ec638d5151629f606ddb3dc8e1083c01dc7b68afd07adb38",
-      "crates/rovai-web/src/uploads.rs": "38d233cd20997b30b8f2783241a19d7de5220779124d56f64f80049aee0b93bd",
+      "crates/coaxi-core/src/application.rs": "4a76928769420a1110d5d3a05e4833c46baaad6d5de219945b11cf3aa7bd349a",
+      "crates/coaxi-core/src/single_chat_composer_tests.rs": "d9d68fc87de42cc65e9667b8c4b1115dca7299985c5a5bdf0619a25bcaa00023",
+      "crates/coaxi-core/src/web_upload.rs": "7266c11c9a4cf610649c46676320f1629a548a8567e3c5bdba4b8ad0d17b239f",
+      "crates/coaxi-web/src/lib.rs": "d449d107ab72fb38ec638d5151629f606ddb3dc8e1083c01dc7b68afd07adb38",
+      "crates/coaxi-web/src/uploads.rs": "38d233cd20997b30b8f2783241a19d7de5220779124d56f64f80049aee0b93bd",
       "docs/contracts/host-web-v5.md": "90bfbffd7b889013fcba2e14a06d73d8df34ffbb7288e1d362e32dd6253cd871",
       "docs/contracts/single-chat-composer-scope-v1.md": "10c1e3fe88270ae82d403f4473a7e782065f315182cacc758815c7862c740861",
       "docs/development/testing.md": "516ad2a3566dfcd6355584899be17dcc23bce92d91755502015877177ce9b557",
@@ -75,8 +75,8 @@
       "artifact": "upload-lifecycle-rust-format.log",
       "status": "failed_existing_untouched_sources",
       "files": [
-        "crates/rovai-core/src/lib.rs",
-        "crates/rovai-core/src/single_chat.rs"
+        "crates/coaxi-core/src/lib.rs",
+        "crates/coaxi-core/src/single_chat.rs"
       ],
       "resolution": "changed five files pass; baseline full-workspace format debt remains for stage candidate"
     }
@@ -89,10 +89,10 @@
     "model/runtime/cross-platform/physical-device qualification"
   ],
   "preserved_authorities": {
-    "crates/rovai-core/src/local_attachment_source.rs": "8830581e72fc103b2f359be17a0072c5ee0cedc6eb5fe58b179ae3d255dbc1ca",
-    "crates/rovai-core/src/context.rs": "329144f38675ebedeaf5652858d457d42369455eb26c6159af61d19c02218784",
-    "crates/rovai-core/src/message_quote.rs": "efb6e962946b85c089483bb1120fe92f32458bb3b3b5e5eb668e26f8aa96481e",
-    "crates/rovai-core/src/command.rs": "22258f81dc5b76040cd0fdba20074321b5be7104e648a8278412c0736ef0d85a"
+    "crates/coaxi-core/src/local_attachment_source.rs": "8830581e72fc103b2f359be17a0072c5ee0cedc6eb5fe58b179ae3d255dbc1ca",
+    "crates/coaxi-core/src/context.rs": "329144f38675ebedeaf5652858d457d42369455eb26c6159af61d19c02218784",
+    "crates/coaxi-core/src/message_quote.rs": "efb6e962946b85c089483bb1120fe92f32458bb3b3b5e5eb668e26f8aa96481e",
+    "crates/coaxi-core/src/command.rs": "22258f81dc5b76040cd0fdba20074321b5be7104e648a8278412c0736ef0d85a"
   },
   "artifacts": {
     "i03/upload-lifecycle-tests-01.log": "382fbba5fa1bf39535ce702afa1fcfbccb2b28a62c7d75630f4acad565176e34",

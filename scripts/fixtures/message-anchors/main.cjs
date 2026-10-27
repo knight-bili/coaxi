@@ -10,7 +10,7 @@ app.setPath('userData', userData)
 app.setPath('sessionData', join(userData, 'session'))
 app.whenReady().then(async () => {
   const window = new BrowserWindow({ show: true, width: 1440, height: 920, useContentSize: true,
-    title: 'Rovai message anchor acceptance', webPreferences: {
+    title: 'Coaxi message anchor acceptance', webPreferences: {
       contextIsolation: true, sandbox: true, nodeIntegration: false, backgroundThrottling: false
     } })
   const errors = []

@@ -46,10 +46,10 @@ const productName = packageMetadata.build.productName
 const executableName = packageMetadata.build.mac.executableName ?? productName
 const appName = `${productName}.app`
 const expectedArchitecture = EXPECTED_ARCHITECTURES[arch]
-const mountPoint = mkdtempSync(join(tmpdir(), `rovai-release-${arch}-`))
+const mountPoint = mkdtempSync(join(tmpdir(), `coaxi-release-${arch}-`))
 let zipExtractDirectory = null
 const report = [
-  'Rovai macOS signing verification',
+  'Coaxi macOS signing verification',
   `Architecture: ${arch}`,
   `Expected Mach-O architecture: ${expectedArchitecture}`
 ]
@@ -189,7 +189,7 @@ function signatureDetails(label, targetPath, expectedIdentifier = null) {
   if (!/^[A-F0-9]{64}$/.test(EXPECTED_CERT_SHA256 ?? '')) {
     throw new Error('MAC_RELEASE_CERT_SHA256 must be the pinned certificate SHA-256')
   }
-  const certificateDirectory = mkdtempSync(join(tmpdir(), 'rovai-signing-cert-'))
+  const certificateDirectory = mkdtempSync(join(tmpdir(), 'coaxi-signing-cert-'))
   try {
     const certificatePrefix = join(certificateDirectory, 'certificate')
     run('/usr/bin/codesign', [
@@ -283,9 +283,9 @@ try {
   if (!existsSync(appPath)) throw new Error(`${appName} is missing from the mounted DMG`)
 
   const appExecutable = join(appPath, 'Contents', 'MacOS', executableName)
-  const corePath = join(appPath, 'Contents', 'Resources', 'bin', 'rovai-core')
-  const hostPath = join(appPath, 'Contents', 'Resources', 'bin', 'rovai-host')
-  const cliPath = join(appPath, 'Contents', 'Resources', 'bin', 'rovai')
+  const corePath = join(appPath, 'Contents', 'Resources', 'bin', 'coaxi-core')
+  const hostPath = join(appPath, 'Contents', 'Resources', 'bin', 'coaxi-host')
+  const cliPath = join(appPath, 'Contents', 'Resources', 'bin', 'coaxi')
   for (const requiredPath of [appExecutable, corePath, hostPath, cliPath]) {
     if (!existsSync(requiredPath)) throw new Error(`required binary is missing: ${requiredPath}`)
   }
@@ -295,28 +295,28 @@ try {
   run('/usr/bin/codesign', ['--verify', '--strict', '--verbose=2', hostPath])
   run('/usr/bin/codesign', ['--verify', '--strict', '--verbose=2', cliPath])
   report.push('App codesign verification: passed')
-  report.push('rovai-core codesign verification: passed')
-  report.push('rovai-host codesign verification: passed')
-  report.push('rovai codesign verification: passed')
+  report.push('coaxi-core codesign verification: passed')
+  report.push('coaxi-host codesign verification: passed')
+  report.push('coaxi codesign verification: passed')
 
   assertArchitecture('App', appExecutable)
-  assertArchitecture('rovai-core', corePath)
-  assertArchitecture('rovai-host', hostPath)
-  assertArchitecture('rovai', cliPath)
+  assertArchitecture('coaxi-core', corePath)
+  assertArchitecture('coaxi-host', hostPath)
+  assertArchitecture('coaxi', cliPath)
 
   assertAppMetadata('DMG App', appPath)
 
   signatureDetails('App', appPath, EXPECTED_APP_ID)
-  signatureDetails('rovai-core', corePath)
-  signatureDetails('rovai-host', hostPath)
-  signatureDetails('rovai', cliPath)
+  signatureDetails('coaxi-core', corePath)
+  signatureDetails('coaxi-host', hostPath)
+  signatureDetails('coaxi', cliPath)
   run('/usr/bin/xcrun', ['stapler', 'validate', appPath])
   run('/usr/bin/xcrun', ['stapler', 'validate', dmgPath])
   run('/usr/sbin/spctl', ['--assess', '--type', 'execute', '--verbose=2', appPath])
   report.push('App and DMG notarization tickets: valid')
   report.push('Gatekeeper app assessment: passed')
 
-  zipExtractDirectory = mkdtempSync(join(tmpdir(), `rovai-update-${arch}-`))
+  zipExtractDirectory = mkdtempSync(join(tmpdir(), `coaxi-update-${arch}-`))
   run('/usr/bin/ditto', ['-x', '-k', zipPath, zipExtractDirectory])
   const zipAppPath = join(zipExtractDirectory, appName)
   if (!existsSync(zipAppPath)) throw new Error(`${appName} is missing from the update ZIP`)
@@ -324,7 +324,7 @@ try {
   signatureDetails('Update ZIP App', zipAppPath, EXPECTED_APP_ID)
   assertArchitecture('Update ZIP App', join(zipAppPath, 'Contents', 'MacOS', executableName))
   assertAppMetadata('Update ZIP App', zipAppPath)
-  for (const binaryName of ['rovai-core', 'rovai-host', 'rovai']) {
+  for (const binaryName of ['coaxi-core', 'coaxi-host', 'coaxi']) {
     const binaryPath = join(zipAppPath, 'Contents', 'Resources', 'bin', binaryName)
     run('/usr/bin/codesign', ['--verify', '--strict', '--verbose=2', binaryPath])
     signatureDetails(`Update ZIP ${binaryName}`, binaryPath)

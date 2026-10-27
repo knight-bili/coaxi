@@ -7,7 +7,7 @@ import {join,resolve,toNamespacedPath} from 'node:path'
 import {tmpdir} from 'node:os'
 import test from 'node:test'
 const repository=resolve(import.meta.dirname,'../..')
-const binary=process.env.ROVAI_CORE_BIN??join(repository,'resources/bin/windows-x64/rovai-core.exe')
+const binary=process.env.COAXI_CORE_BIN??join(repository,'resources/bin/windows-x64/coaxi-core.exe')
 
 test('独立启动器经真实 Core 创建中文文件、幂等恢复、目录边界和原 Thread 文件读写', {timeout:90_000,skip:process.platform!=='win32'},async()=>{
   const fixture=await realpath(await mkdtemp(join(tmpdir(),'coaxi-launcher-core-'))),authority=join(fixture,'authority'),data=join(authority,'Core'),parent=join(fixture,'projects'),tools=join(fixture,'tools'),count=join(fixture,'invocations.json')

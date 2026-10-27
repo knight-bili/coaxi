@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.rovai.invalid/v0.53/benchmark-comparison-v1.schema.json",
-  "title": "Rovai Benchmark Comparison Eligibility v1",
+  "title": "Coaxi Benchmark Comparison Eligibility v1",
   "type": "object",
   "additionalProperties": false,
   "required": ["schemaVersion", "baseline", "candidate", "axes", "deltas", "integrityDigest"],

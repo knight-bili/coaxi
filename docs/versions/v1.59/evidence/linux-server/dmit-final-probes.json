@@ -24,7 +24,7 @@
         "system",
         "user"
       ],
-      "rovaiIntegration": false
+      "coaxiIntegration": false
     },
     "install-opencode.json": {
       "name": "install-opencode",
@@ -128,8 +128,8 @@
         "tool.execution_start",
         "user.message"
       ],
-      "rovaiIntegration": false,
-      "diagnostic": "ccess\",\"editClassifierVersion\":1,\"interactionId\":\"477f1035-8936-42a6-8876-e1c0636ce423\",\"containsBuiltInFileEditRequest\":false},\"ephemeral\":true,\"id\":\"b75e5f71-044a-4165-9974-44f5e371890c\",\"timestamp\":\"2026-09-14T11:49:21.820Z\",\"parentId\":\"649dc3de-a973-4ea5-a3b2-042aa94a8d82\"}\n{\"type\":\"assistant.message\",\"data\":{\"messageId\":\"c28daa4a-e2ef-45b2-b720-af68c6a30128\",\"model\":\"MiniMax-M3\",\"content\":\"<think>File created and verified. Now reply with the exact marker.</think>\\n\\nROVAI_LINUX_COPILOT_TOOL_OK\",\"toolRequests\":[],\"interactionId\":\"477f1035-8936-42a6-8876-e1c0636ce423\",\"turnId\":\"2\",\"rte\":false,\"apiCallId\":\"06f712404592b5c99c70380166114663\"},\"id\":\"b6c1fd80-90c1-461a-8cc4-d4c5cb75404c\",\"timestamp\":\"2026-09-14T11:49:21.821Z\",\"parentId\":\"649dc3de-a973-4ea5-a3b2-042aa94a8d82\"}\n{\"type\":\"assistant.turn_end\",\"data\":{\"turnId\":\"2\"},\"id\":\"3dfbc2b6-044b-4cd6-805e-a6794c20b2fb\",\"timestamp\":\"2026-09-14T11:49:21.823Z\",\"parentId\":\"b6c1fd80-90c1-461a-8cc4-d4c5cb75404c\"}\n{\"type\":\"assistant.idle\",\"data\":{},\"ephemeral\":true,\"id\":\"7e427db3-0338-47fb-9b9f-cff86d044f41\",\"timestamp\":\"2026-09-14T11:49:21.826Z\",\"parentId\":\"3dfbc2b6-044b-4cd6-805e-a6794c20b2fb\"}\n{\"type\":\"result\",\"timestamp\":\"2026-09-14T11:49:21.835Z\",\"sessionId\":\"ebc002f9-8cd9-425c-83f9-71b77a07c83d\",\"exitCode\":0,\"usage\":{\"premiumRequests\":0,\"totalApiDurationMs\":6129,\"sessionDurationMs\":6459,\"codeChanges\":{\"linesAdded\":1,\"linesRemoved\":0,\"filesModified\":[\"/home/rovai-test/qualification/workspace-copilot/linux-runtime-marker.txt\"]}}}\n"
+      "coaxiIntegration": false,
+      "diagnostic": "ccess\",\"editClassifierVersion\":1,\"interactionId\":\"477f1035-8936-42a6-8876-e1c0636ce423\",\"containsBuiltInFileEditRequest\":false},\"ephemeral\":true,\"id\":\"b75e5f71-044a-4165-9974-44f5e371890c\",\"timestamp\":\"2026-09-14T11:49:21.820Z\",\"parentId\":\"649dc3de-a973-4ea5-a3b2-042aa94a8d82\"}\n{\"type\":\"assistant.message\",\"data\":{\"messageId\":\"c28daa4a-e2ef-45b2-b720-af68c6a30128\",\"model\":\"MiniMax-M3\",\"content\":\"<think>File created and verified. Now reply with the exact marker.</think>\\n\\nCOAXI_LINUX_COPILOT_TOOL_OK\",\"toolRequests\":[],\"interactionId\":\"477f1035-8936-42a6-8876-e1c0636ce423\",\"turnId\":\"2\",\"rte\":false,\"apiCallId\":\"06f712404592b5c99c70380166114663\"},\"id\":\"b6c1fd80-90c1-461a-8cc4-d4c5cb75404c\",\"timestamp\":\"2026-09-14T11:49:21.821Z\",\"parentId\":\"649dc3de-a973-4ea5-a3b2-042aa94a8d82\"}\n{\"type\":\"assistant.turn_end\",\"data\":{\"turnId\":\"2\"},\"id\":\"3dfbc2b6-044b-4cd6-805e-a6794c20b2fb\",\"timestamp\":\"2026-09-14T11:49:21.823Z\",\"parentId\":\"b6c1fd80-90c1-461a-8cc4-d4c5cb75404c\"}\n{\"type\":\"assistant.idle\",\"data\":{},\"ephemeral\":true,\"id\":\"7e427db3-0338-47fb-9b9f-cff86d044f41\",\"timestamp\":\"2026-09-14T11:49:21.826Z\",\"parentId\":\"3dfbc2b6-044b-4cd6-805e-a6794c20b2fb\"}\n{\"type\":\"result\",\"timestamp\":\"2026-09-14T11:49:21.835Z\",\"sessionId\":\"ebc002f9-8cd9-425c-83f9-71b77a07c83d\",\"exitCode\":0,\"usage\":{\"premiumRequests\":0,\"totalApiDurationMs\":6129,\"sessionDurationMs\":6459,\"codeChanges\":{\"linesAdded\":1,\"linesRemoved\":0,\"filesModified\":[\"/home/coaxi-test/qualification/workspace-copilot/linux-runtime-marker.txt\"]}}}\n"
     },
     "claude-native.json": {
       "name": "claude-native",
@@ -293,7 +293,7 @@
         "result",
         "system"
       ],
-      "rovaiIntegration": false,
+      "coaxiIntegration": false,
       "diagnostic": "message\",\"usage\":{\"input_tokens\":0,\"output_tokens\":0,\"cache_creation_input_tokens\":0,\"cache_read_input_tokens\":0,\"cache_creation\":null,\"server_tool_use\":null,\"service_tier\":null}},\"parent_tool_use_id\":null,\"_requestId\":\"01a09fca22c47710b2e1bbd3314ebe05\",\"_meta\":{\"codebuddy.ai/conversationRequestId\":\"01a09fca22c47710b2e1bbd3314ebe05\",\"codebuddy.ai/messageId\":\"01a09fca-2381-7ce7-966d-90edf150d2eb\",\"baggage\":\"codebuddy.session_id=01a09fca-20ec-7051-a91c-8c90bac7b486,codebuddy.conversation_request_id=01a09fca22c47710b2e1bbd3314ebe05\"},\"__timestamp\":\"2026-09-14T12:00:19.891Z\"}\n{\"type\":\"result\",\"subtype\":\"error_during_execution\",\"is_error\":true,\"uuid\":\"01a09fca-23b5-70a1-91ad-2418dd452222\",\"session_id\":\"01a09fca-20ec-7051-a91c-8c90bac7b486\",\"duration_ms\":96,\"duration_api_ms\":55,\"num_turns\":2,\"total_cost_usd\":0,\"usage\":{\"input_tokens\":0,\"output_tokens\":0,\"cache_creation_input_tokens\":0,\"cache_read_input_tokens\":0,\"cache_creation\":null,\"server_tool_use\":null,\"service_tier\":null},\"permission_denials\":[],\"errors\":[\"Authentication required. Please use /login command to sign in to your account\"],\"modelUsage\":{\"custom:MiniMax-M3\":{\"inputTokens\":0,\"outputTokens\":0,\"cacheReadInputTokens\":0,\"cacheCreationInputTokens\":0,\"contextWindow\":0,\"maxOutputTokens\":0}},\"_meta\":{\"baggage\":\"codebuddy.session_id=01a09fca-20ec-7051-a91c-8c90bac7b486,codebuddy.conversation_request_id=01a09fca22c47710b2e1bbd3314ebe05\"},\"__timestamp\":\"2026-09-14T12:00:19.895Z\",\"_requestId\":\"01a09fca22c47710b2e1bbd3314ebe05\"}\n"
     },
     "opencode-native-result.json": {
@@ -313,8 +313,8 @@
         "text",
         "tool_use"
       ],
-      "rovaiIntegration": false,
-      "diagnostic": "\",\"timestamp\":1789386547416,\"sessionID\":\"ses_f60408053ffeIMqADvVmVmBNfr\",\"part\":{\"id\":\"prt_09fbfe082001U2oSubCtMPzmaN\",\"reason\":\"tool-calls\",\"messageID\":\"msg_09fbfbcdc001DZFzlqW8CMRtwh\",\"sessionID\":\"ses_f60408053ffeIMqADvVmVmBNfr\",\"type\":\"step-finish\",\"tokens\":{\"total\":7594,\"input\":190,\"output\":45,\"reasoning\":0,\"cache\":{\"write\":0,\"read\":7359}},\"cost\":0}}\n{\"type\":\"step_start\",\"timestamp\":1789386549595,\"sessionID\":\"ses_f60408053ffeIMqADvVmVmBNfr\",\"part\":{\"id\":\"prt_09fbfe94f001i7trYN7ULOKB8n\",\"messageID\":\"msg_09fbfe0a2001OjTh8KyxdlouBR\",\"sessionID\":\"ses_f60408053ffeIMqADvVmVmBNfr\",\"type\":\"step-start\"}}\n{\"type\":\"text\",\"timestamp\":1789386550041,\"sessionID\":\"ses_f60408053ffeIMqADvVmVmBNfr\",\"part\":{\"id\":\"prt_09fbfe955001CMuPIPkdX8Jug2\",\"messageID\":\"msg_09fbfe0a2001OjTh8KyxdlouBR\",\"sessionID\":\"ses_f60408053ffeIMqADvVmVmBNfr\",\"type\":\"text\",\"text\":\"<think>The file has been created and read back successfully. The content is exactly \\\"ROVAI_LINUX_OPENCODE_TOOL_OK\\\" followed by a newline. Now I need to reply with thatexact marker.</think>\\n\\nROVAI_LINUX_OPENCODE_TOOL_OK\",\"time\":{\"start\":1789386549589,\"end\":1789386549997}}}\n{\"type\":\"step_finish\",\"timestamp\":1789386550042,\"sessionID\":\"ses_f60408053ffeIMqADvVmVmBNfr\",\"part\":{\"id\":\"prt_09fbfeaf4001PmLPS7MbliDQHb\",\"reason\":\"stop\",\"messageID\":\"msg_09fbfe0a2001OjTh8KyxdlouBR\",\"sessionID\":\"ses_f60408053ffeIMqADvVmVmBNfr\",\"type\":\"step-finish\",\"tokens\":{\"total\":7720,\"input\":117,\"output\":13,\"reasoning\":41,\"cache\":{\"write\":0,\"read\":7549}},\"cost\":0}}\n"
+      "coaxiIntegration": false,
+      "diagnostic": "\",\"timestamp\":1789386547416,\"sessionID\":\"ses_f60408053ffeIMqADvVmVmBNfr\",\"part\":{\"id\":\"prt_09fbfe082001U2oSubCtMPzmaN\",\"reason\":\"tool-calls\",\"messageID\":\"msg_09fbfbcdc001DZFzlqW8CMRtwh\",\"sessionID\":\"ses_f60408053ffeIMqADvVmVmBNfr\",\"type\":\"step-finish\",\"tokens\":{\"total\":7594,\"input\":190,\"output\":45,\"reasoning\":0,\"cache\":{\"write\":0,\"read\":7359}},\"cost\":0}}\n{\"type\":\"step_start\",\"timestamp\":1789386549595,\"sessionID\":\"ses_f60408053ffeIMqADvVmVmBNfr\",\"part\":{\"id\":\"prt_09fbfe94f001i7trYN7ULOKB8n\",\"messageID\":\"msg_09fbfe0a2001OjTh8KyxdlouBR\",\"sessionID\":\"ses_f60408053ffeIMqADvVmVmBNfr\",\"type\":\"step-start\"}}\n{\"type\":\"text\",\"timestamp\":1789386550041,\"sessionID\":\"ses_f60408053ffeIMqADvVmVmBNfr\",\"part\":{\"id\":\"prt_09fbfe955001CMuPIPkdX8Jug2\",\"messageID\":\"msg_09fbfe0a2001OjTh8KyxdlouBR\",\"sessionID\":\"ses_f60408053ffeIMqADvVmVmBNfr\",\"type\":\"text\",\"text\":\"<think>The file has been created and read back successfully. The content is exactly \\\"COAXI_LINUX_OPENCODE_TOOL_OK\\\" followed by a newline. Now I need to reply with thatexact marker.</think>\\n\\nCOAXI_LINUX_OPENCODE_TOOL_OK\",\"time\":{\"start\":1789386549589,\"end\":1789386549997}}}\n{\"type\":\"step_finish\",\"timestamp\":1789386550042,\"sessionID\":\"ses_f60408053ffeIMqADvVmVmBNfr\",\"part\":{\"id\":\"prt_09fbfeaf4001PmLPS7MbliDQHb\",\"reason\":\"stop\",\"messageID\":\"msg_09fbfe0a2001OjTh8KyxdlouBR\",\"sessionID\":\"ses_f60408053ffeIMqADvVmVmBNfr\",\"type\":\"step-finish\",\"tokens\":{\"total\":7720,\"input\":117,\"output\":13,\"reasoning\":41,\"cache\":{\"write\":0,\"read\":7549}},\"cost\":0}}\n"
     },
     "install-codex.json": {
       "name": "install-codex",
@@ -370,7 +370,7 @@
         "result",
         "system"
       ],
-      "rovaiIntegration": false,
+      "coaxiIntegration": false,
       "diagnostic": "71dc94b14e\",\"traceparent\":\"00-b177ade1065b0ed8d96714dcca9ad22b-9ae3bd07db47546b-01\",\"baggage\":\"codebuddy.session_id=01a09fc6-f718-752d-b719-115140b8ee45,codebuddy.conversation_request_id=01a09fc6f8c370319e743ff74b5a59f1\"},\"__timestamp\":\"2026-09-14T11:56:54.350Z\"}\n{\"type\":\"result\",\"subtype\":\"error_during_execution\",\"is_error\":true,\"uuid\":\"01a09fc7-00cf-7d72-a668-c115a1d6bcae\",\"session_id\":\"01a09fc6-f718-752d-b719-115140b8ee45\",\"duration_ms\":1887,\"duration_api_ms\":1657,\"num_turns\":2,\"total_cost_usd\":0,\"usage\":{\"input_tokens\":0,\"output_tokens\":0,\"cache_creation_input_tokens\":0,\"cache_read_input_tokens\":0,\"cache_creation\":null,\"server_tool_use\":null,\"service_tier\":null},\"permission_denials\":[],\"errors\":[\"404 404 page not found (target: https://api.minimaxi.com) (01a09fc6f992714b9876c4440b632406/01a09fc6-f718-752d-b719-115140b8ee45)\"],\"errors_info\":[{\"status\":404,\"code\":404,\"details\":\"404 404 page not found (target: https://api.minimaxi.com) (01a09fc6f992714b9876c4440b632406/01a09fc6-f718-752d-b719-115140b8ee45)\"}],\"modelUsage\":{\"minimax-m3\":{\"inputTokens\":0,\"outputTokens\":0,\"cacheReadInputTokens\":0,\"cacheCreationInputTokens\":0,\"contextWindow\":512000,\"maxOutputTokens\":128000}},\"_meta\":{\"traceparent\":\"00-b177ade1065b0ed8d96714dcca9ad22b-9ae3bd07db47546b-01\",\"baggage\":\"codebuddy.session_id=01a09fc6-f718-752d-b719-115140b8ee45,codebuddy.conversation_request_id=01a09fc6f8c370319e743ff74b5a59f1\"},\"__timestamp\":\"2026-09-14T11:56:54.352Z\",\"_requestId\":\"01a09fc6f8c370319e743ff74b5a59f1\"}\n"
     },
     "install-kimi.json": {
@@ -445,7 +445,7 @@
         "system",
         "user"
       ],
-      "rovaiIntegration": false
+      "coaxiIntegration": false
     },
     "server-claude-3.json": {
       "name": "server-claude-3",
@@ -519,7 +519,7 @@
         "turn.completed",
         "turn.started"
       ],
-      "rovaiIntegration": false
+      "coaxiIntegration": false
     },
     "install-claude.json": {
       "name": "install-claude",
@@ -613,7 +613,7 @@
         "turn_end",
         "turn_start"
       ],
-      "rovaiIntegration": false
+      "coaxiIntegration": false
     },
     "byok-v2-qwen.json": {
       "name": "byok-v2-qwen",
@@ -689,7 +689,7 @@
         "tool_call_update",
         "usage"
       ],
-      "rovaiIntegration": false
+      "coaxiIntegration": false
     },
     "byok-pi.json": {
       "name": "byok-pi",
@@ -762,7 +762,7 @@
         "stream_event",
         "system"
       ],
-      "rovaiIntegration": false,
+      "coaxiIntegration": false,
       "diagnostic": "Warning: running headless with --yolo / approval-mode=yolo and no sandbox. All tool calls (shell, write, edit) auto-execute at this process's privilege level. Enable a sandbox via --sandbox / QWEN_SANDBOX, or set QWEN_CODE_SUPPRESS_YOLO_WARNING=1 to silence this notice.\n"
     },
     "install-copilot.json": {
@@ -943,9 +943,9 @@
       "runtime": "claude-code-cli",
       "sourceCommit": "bda1ab832d48229a4b91c2530a599b32029827cc",
       "fullQualification": false,
-      "dataDir": "/home/rovai-test/qualification/server-integration-claude-code-cli-1/data",
-      "skillLibraryRoot": "/home/rovai-test/qualification/server-integration-claude-code-cli-1/data/skills",
-      "mcpConfigPath": "/home/rovai-test/qualification/server-integration-claude-code-cli-1/data/mcp.json",
+      "dataDir": "/home/coaxi-test/qualification/server-integration-claude-code-cli-1/data",
+      "skillLibraryRoot": "/home/coaxi-test/qualification/server-integration-claude-code-cli-1/data/skills",
+      "mcpConfigPath": "/home/coaxi-test/qualification/server-integration-claude-code-cli-1/data/mcp.json",
       "checks": [
         "native_discovery_auth_model_and_permissions"
       ],
@@ -961,9 +961,9 @@
       "runtime": "codex-cli",
       "sourceCommit": "bda1ab832d48229a4b91c2530a599b32029827cc",
       "fullQualification": false,
-      "dataDir": "/home/rovai-test/qualification/server-integration-codex-cli-1/data",
-      "skillLibraryRoot": "/home/rovai-test/qualification/server-integration-codex-cli-1/data/skills",
-      "mcpConfigPath": "/home/rovai-test/qualification/server-integration-codex-cli-1/data/mcp.json",
+      "dataDir": "/home/coaxi-test/qualification/server-integration-codex-cli-1/data",
+      "skillLibraryRoot": "/home/coaxi-test/qualification/server-integration-codex-cli-1/data/skills",
+      "mcpConfigPath": "/home/coaxi-test/qualification/server-integration-codex-cli-1/data/mcp.json",
       "checks": [],
       "runs": [],
       "status": "failed",
@@ -975,9 +975,9 @@
       "runtime": "claude-code-cli",
       "sourceCommit": "bda1ab832d48229a4b91c2530a599b32029827cc",
       "fullQualification": false,
-      "dataDir": "/home/rovai-test/qualification/server-integration-claude-code-cli-2/data",
-      "skillLibraryRoot": "/home/rovai-test/qualification/server-integration-claude-code-cli-2/data/skills",
-      "mcpConfigPath": "/home/rovai-test/qualification/server-integration-claude-code-cli-2/data/mcp.json",
+      "dataDir": "/home/coaxi-test/qualification/server-integration-claude-code-cli-2/data",
+      "skillLibraryRoot": "/home/coaxi-test/qualification/server-integration-claude-code-cli-2/data/skills",
+      "mcpConfigPath": "/home/coaxi-test/qualification/server-integration-claude-code-cli-2/data/mcp.json",
       "checks": [
         "native_discovery_auth_model_and_permissions"
       ],
@@ -999,9 +999,9 @@
       "runtime": "claude-code-cli",
       "sourceCommit": "bda1ab832d48229a4b91c2530a599b32029827cc",
       "fullQualification": false,
-      "dataDir": "/home/rovai-test/qualification/server-integration-claude-code-cli-3/data",
-      "skillLibraryRoot": "/home/rovai-test/qualification/server-integration-claude-code-cli-3/data/skills",
-      "mcpConfigPath": "/home/rovai-test/qualification/server-integration-claude-code-cli-3/data/mcp.json",
+      "dataDir": "/home/coaxi-test/qualification/server-integration-claude-code-cli-3/data",
+      "skillLibraryRoot": "/home/coaxi-test/qualification/server-integration-claude-code-cli-3/data/skills",
+      "mcpConfigPath": "/home/coaxi-test/qualification/server-integration-claude-code-cli-3/data/mcp.json",
       "checks": [
         "native_discovery_auth_model_and_permissions",
         "http_send_native_tool_write_read_and_final_projection",

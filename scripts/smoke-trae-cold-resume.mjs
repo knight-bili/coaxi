@@ -12,7 +12,7 @@ import {
 } from './lib/runtime-camp-files-root.mjs'
 
 const root = resolve(import.meta.dirname, '..')
-const adapterKind = process.env.ROVAI_COLD_RESUME_ADAPTER?.trim() || 'trae-cn-cli'
+const adapterKind = process.env.COAXI_COLD_RESUME_ADAPTER?.trim() || 'trae-cn-cli'
 const runtime = {
   'trae-cn-cli': {
     label: 'TRAE',
@@ -36,7 +36,7 @@ const runtime = {
 }[adapterKind]
 if (!runtime) throw new Error(`Unsupported cold-continuation adapter: ${adapterKind}`)
 const fixtureRoot = await realpath(
-  await mkdtemp(join(tmpdir(), `rovai-${adapterKind}-cold-resume-`))
+  await mkdtemp(join(tmpdir(), `coaxi-${adapterKind}-cold-resume-`))
 )
 const projectRoot = join(fixtureRoot, 'project')
 const dataDir = join(fixtureRoot, 'data')
@@ -74,8 +74,8 @@ try {
   await writeFile(join(projectRoot, 'README.md'), `# ${runtime.label} cold resume fixture\n`)
   await writeFile(markerPath, `${sessionMarker}\n`)
   await run('git', ['init', '-b', 'main'], projectRoot)
-  await run('git', ['config', 'user.name', `Rovai-ai ${runtime.label} Cold Resume Smoke`], projectRoot)
-  await run('git', ['config', 'user.email', `${adapterKind}-cold-resume@rovai.local`], projectRoot)
+  await run('git', ['config', 'user.name', `Coaxi ${runtime.label} Cold Resume Smoke`], projectRoot)
+  await run('git', ['config', 'user.email', `${adapterKind}-cold-resume@coaxi.local`], projectRoot)
   await run('git', ['add', 'README.md', 'native-session-marker.txt'], projectRoot)
   await run('git', ['commit', '-m', 'fixture'], projectRoot)
 
@@ -200,12 +200,12 @@ try {
           || event.params?.sourceAgentRunId === restoredRunId
       ),
       runtimeSnapshots: querySqliteRows(
-        join(dataDir, 'rovai.sqlite'),
+        join(dataDir, 'coaxi.sqlite'),
         `SELECT installation_id, probe_status, authentication_status, stale_at, last_error
          FROM adapter_capability_snapshot`
       ),
       probeAttempts: querySqliteRows(
-        join(dataDir, 'rovai.sqlite'),
+        join(dataDir, 'coaxi.sqlite'),
         `SELECT installation_id, status, failure_class, diagnostic_code,
                 attempted_at, public_runtime_failure_json
          FROM adapter_probe_attempt ORDER BY attempted_at DESC LIMIT 3`
@@ -262,7 +262,7 @@ try {
   const invalidSessionId = `invalid-${crypto.randomUUID()}`
   await client.stop()
   executeSqlite(
-    join(dataDir, 'rovai.sqlite'),
+    join(dataDir, 'coaxi.sqlite'),
     `UPDATE conversation SET native_session_id = '${invalidSessionId}' WHERE id = '${restoredResult.run.conversationId}'`
   )
   client = startCore(dataDir)
@@ -280,7 +280,7 @@ try {
   const fallbackStart = startForRun(client.events, fallbackRunId)
   await client.stop()
   const continuityLostCount = Number(querySqliteScalar(
-    join(dataDir, 'rovai.sqlite'),
+    join(dataDir, 'coaxi.sqlite'),
     `SELECT COUNT(*) FROM event_log WHERE event_type = 'agent_run.native_session_continuity_lost' AND entity_id = '${fallbackRunId}'`
   ))
   if (fallbackResult.run.status !== 'succeeded'
@@ -304,12 +304,12 @@ try {
           || event.params?.sourceAgentRunId === fallbackRunId
       ),
       runtimeSnapshots: querySqliteRows(
-        join(dataDir, 'rovai.sqlite'),
+        join(dataDir, 'coaxi.sqlite'),
         `SELECT installation_id, probe_status, authentication_status, stale_at, last_error
          FROM adapter_capability_snapshot`
       ),
       probeAttempts: querySqliteRows(
-        join(dataDir, 'rovai.sqlite'),
+        join(dataDir, 'coaxi.sqlite'),
         `SELECT installation_id, status, failure_class, diagnostic_code,
                 attempted_at, public_runtime_failure_json
          FROM adapter_probe_attempt ORDER BY attempted_at DESC LIMIT 3`
@@ -337,7 +337,7 @@ try {
 } finally {
   await client?.stop()
   await removeEphemeralRuntimeCampFilesRoot(dataDir)
-  if (process.env.ROVAI_KEEP_ACP_RUNTIME_FIXTURE !== '1') {
+  if (process.env.COAXI_KEEP_ACP_RUNTIME_FIXTURE !== '1') {
     await rm(fixtureRoot, { recursive: true, force: true })
   }
 }
@@ -347,7 +347,7 @@ function startCore(dataDirectory) {
   const pending = new Map()
   let nextId = 1
   let stopping = false
-  const child = spawn(join(root, 'target', 'debug', 'rovai-core'), [
+  const child = spawn(join(root, 'target', 'debug', 'coaxi-core'), [
     ...coreDataDirectoryArguments(dataDirectory),
     '--skill-library-root', join(dataDirectory, 'managed-skill-library'),
     '--mcp-config-path', join(dataDirectory, 'managed-mcp.json')
@@ -369,7 +369,7 @@ function startCore(dataDirectory) {
   }
   child.once('error', rejectPending)
   child.once('close', (code, signal) => {
-    if (!stopping) rejectPending(new Error(`rovai-core exited early (code=${code}, signal=${signal})`))
+    if (!stopping) rejectPending(new Error(`coaxi-core exited early (code=${code}, signal=${signal})`))
   })
   const lines = createInterface({ input: child.stdout })
   lines.on('line', (line) => {

@@ -7,27 +7,27 @@
     "parent": "87d686443179b3175e44b5e964f7a1d83d3209e5",
     "implementationFiles": [
       {
-        "file": "crates/rovai-core/src/application.rs",
+        "file": "crates/coaxi-core/src/application.rs",
         "sha256": "8bcfc2a78a3e20be9422482fccc1d3d9261d42254d7fc1b77176990dd6c5ded2",
         "gitBlob": "c0eae1cdf94e4d32aa043a5964d4fae3ddc82a3d"
       },
       {
-        "file": "crates/rovai-core/src/db.rs",
+        "file": "crates/coaxi-core/src/db.rs",
         "sha256": "12fc720c7128e6e87f0565e323fcf6febb51e0caded521358fc9f59b3a466973",
         "gitBlob": "b28250a3062d4c2c8cc8b496225573acb45605f4"
       },
       {
-        "file": "crates/rovai-core/src/lib.rs",
+        "file": "crates/coaxi-core/src/lib.rs",
         "sha256": "733c483f949848688bda01b62443c37e35323a761a5733a3371763797f2e0135",
         "gitBlob": "ae38fb1090cb4e93c1cbedab5590e03e7a1957db"
       },
       {
-        "file": "crates/rovai-core/src/skill_pack_members.rs",
+        "file": "crates/coaxi-core/src/skill_pack_members.rs",
         "sha256": "395a5f1092719786f9a3e457228d5e21212c78392a469e897335c895c98519ef",
         "gitBlob": "6dd437371b30a42a5435b1e509c363a27ed38504"
       },
       {
-        "file": "crates/rovai-web/src/operations.rs",
+        "file": "crates/coaxi-web/src/operations.rs",
         "sha256": "ccd715be278861eb000ff44a67b58f51bb9f8df3b58f1f676ccc1a75b230b445",
         "gitBlob": "82414dc5360ca186978f15da785a2d8f5be39c03"
       },
@@ -77,7 +77,7 @@
         "gitBlob": "136e58f3c0ac0733c30e3f262fbbfffc1125bb47"
       },
       {
-        "file": "crates/rovai-core/src/canvas_board.rs",
+        "file": "crates/coaxi-core/src/canvas_board.rs",
         "sha256": "fb6c76a9bbc2845a31bd71335cd1a53100cc4fc36d9e41589b2a483b2b7ce852",
         "gitBlob": "0c0b685aab881932cdbdbb6ab80c67601c966144"
       },
@@ -101,19 +101,19 @@
     "donorFileCount": 16,
     "protectedModelSources": [
       {
-        "file": "crates/rovai-core/src/context.rs",
+        "file": "crates/coaxi-core/src/context.rs",
         "sha256": "2adc3d625fe2e0027e37e02b284c1a8a22e0d5559544d83b7b82ea12c03df184"
       },
       {
-        "file": "crates/rovai-core/src/current_input_skill.rs",
+        "file": "crates/coaxi-core/src/current_input_skill.rs",
         "sha256": "a9f462bde50cdb62cb76822c5d0ffbe58f188d4823ca340b589a50dfef403c17"
       },
       {
-        "file": "crates/rovai-core/src/context_contract.rs",
+        "file": "crates/coaxi-core/src/context_contract.rs",
         "sha256": "0bd5b2539bc06080452a7bb651945fcb0816d3f2b9312e6ebf737a15aac8570c"
       },
       {
-        "file": "crates/rovai-core/src/managed_skills.rs",
+        "file": "crates/coaxi-core/src/managed_skills.rs",
         "sha256": "49e76bb99eaaf3723ebe7c56fb361b4c20e68c1c5be0cc18983a901a4f86954b"
       }
     ]
@@ -128,7 +128,7 @@
       "canvas.boards.update",
       "canvas.boards.delete"
     ],
-    "authority": "Rovai Core SQLite",
+    "authority": "Coaxi Core SQLite",
     "boardRevisionCAS": true,
     "firstResultReplay": true,
     "atomicInvalidationAndResult": true,
@@ -221,7 +221,7 @@
   },
   "artifact": {
     "schema": 152,
-    "binary": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\native-artifacts\\core152-canvas-boards-489bf95eb64d\\rovai-host.exe",
+    "binary": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\native-artifacts\\core152-canvas-boards-489bf95eb64d\\coaxi-host.exe",
     "sha256": "489bf95eb64d17da265da4889743c35d283ed301a4fb41540d8dcd1a0324af69",
     "previousSha256": "cb1348b9761608ae04503dce20a59537566c837d662a71d53805ca39ffe306dd",
     "binaryUnchangedAfterExtendedTestAdditions": false
@@ -230,7 +230,7 @@
     "多画板接口与存储基础已验；完整画布UI和八类节点尚未实现",
     "业务对象绑定、拖动分组布局、文件权限及真实PTY仍在I03后续，不缩范围",
     "完整324场景not_run；没有模型或跨平台资格",
-    "RuntimeTerminalAdmission是AgentRun终态结算，不能当PTY启动准入；需实际移植Codeg portable-pty管理器",
+    "RuntimeTerminalAdmission是AgentRun终态结算，不能当PTY启动准入；需实际移植Coaxi portable-pty管理器",
     "客户未确认r1，已要求改成故事化客户说明；工程模型方案语义保持，模型源码不动"
   ],
   "next": [

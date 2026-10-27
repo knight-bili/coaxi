@@ -89,7 +89,7 @@ type Presentation = CanvasSurfaceProps & {
 const EMPTY_CONVERSATIONS: CanvasConversationBridge['instances'] = []
 const PresentationContext = createContext<Presentation | null>(null)
 
-// Codeg conversation-card-node: 224×132 summary, four-line title and compact metadata.
+// Coaxi conversation-card-node: 224×132 summary, four-line title and compact metadata.
 function CanvasConversationSummary({ actions, row, reference, selected, derived, title, color }: {
   actions: Presentation; row: CanvasNode; reference: CanvasConversationRef; selected?: boolean; derived?: boolean; title: string; color?: string | null
 }): React.JSX.Element {
@@ -265,7 +265,7 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
   const conversationInstances = props.conversation?.instances ?? EMPTY_CONVERSATIONS
   const [groupedConversations,setGroupedConversations]=useState(false),[groupedSelected,setGroupedSelected]=useState<string|null>(null),[groupedPlacements,setGroupedPlacements]=useState<SplitDeckPlacement[]>([])
   const groupedRestoredLayout=useRef<unknown>(null),[groupedRestoreToken,setGroupedRestoreToken]=useState(0)
-  const groupedStorageKey=props.scope?`rovai.canvas.conversation-groups.v1:${JSON.stringify([props.scope.host,props.scope.core,props.boardId])}`:null
+  const groupedStorageKey=props.scope?`coaxi.canvas.conversation-groups.v1:${JSON.stringify([props.scope.host,props.scope.core,props.boardId])}`:null
   useEffect(()=>{
     groupedRestoredLayout.current=null;setGroupedConversations(false);setGroupedSelected(null);setGroupedPlacements([])
     if(!groupedStorageKey||!storage)return
@@ -489,7 +489,7 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
     const moves = packLayout(rows.map(row => ({ id: row.id, ...row.data })), sizes)
     if (moves.length) mutate({ type: 'move', moves })
   }
-  // Codeg's board actions stay in a bottom-centred dock; viewport controls own their corner.
+  // Coaxi's board actions stay in a bottom-centred dock; viewport controls own their corner.
   const toolbar = <div className="canvas-toolbar" role="toolbar" aria-label={uiAttribute('画布工具')}>
     <CanvasIconButton label={uiAttribute(groupedConversations?'回到自由画布':'会话标签与分屏')} disabled={!conversationInstances.some(instance=>instance.target.boardId===props.boardId)||Boolean(props.conversation?.opening||props.conversation?.leaving||props.conversation?.restoring)} onClick={()=>{if(!groupedConversations)setGroupedRestoreToken(value=>value+1);setGroupedConversations(value=>!value)}}><Columns2 size={16}/></CanvasIconButton>
     <DropdownMenu.Root>

@@ -11,7 +11,7 @@ import { pause } from './lib/host-web-browser.mjs'
 // records are created; no model, daily App or installed service is started.
 const args = process.argv.slice(2)
 if (process.platform !== 'darwin' || args.length !== 2) throw Error('Usage on macOS: node scripts/smoke-server-package.mjs <package> <baseline-package>')
-const fixture = await realpath(await mkdtemp(join(tmpdir(), 'rovai-server-package-')))
+const fixture = await realpath(await mkdtemp(join(tmpdir(), 'coaxi-server-package-')))
 const product = join(fixture, 'product'), baseline = join(fixture, 'baseline')
 await cp(resolve(args[0]), product, { recursive: true }); await cp(resolve(args[1]), baseline, { recursive: true })
 async function verify(directory) {
@@ -27,11 +27,11 @@ async function verify(directory) {
 }
 const current = await verify(product), previous = await verify(baseline)
 const env = { ...process.env, PATH: '/usr/bin:/bin:/usr/sbin:/sbin' }
-const binary = directory => join(directory, 'rovai-host')
+const binary = directory => join(directory, 'coaxi-host')
 const prepared = JSON.parse(execFileSync(binary(product), ['prepare', '--data-dir', join(fixture, 'data')], { cwd: product, env, encoding: 'utf8' }))
 console.log(JSON.stringify({ channel: 'automatic_acceptance', fixture, ...prepared, product, baseline, runtime: false, hostPathExcludesNode: true }))
-assert.match(execFileSync(binary(product), ['--version'], { env, encoding: 'utf8' }), /rovai-host/)
-execFileSync(join(product, 'rovai'), ['--help'], { env, encoding: 'utf8' })
+assert.match(execFileSync(binary(product), ['--version'], { env, encoding: 'utf8' }), /coaxi-host/)
+execFileSync(join(product, 'coaxi'), ['--help'], { env, encoding: 'utf8' })
 const workspace = join(fixture, 'workspace'); await mkdir(workspace)
 const report = { current, previous, fixture, realRuntime: false, checks: {} }
 let active
@@ -53,7 +53,7 @@ try {
   await cp(prepared.dataDir, join(fixture, 'backup-data'), { recursive: true })
   const hasRuntimeFiles = await lstat(prepared.runtimeCampFilesRoot).then(()=>true, ()=>false)
   if (hasRuntimeFiles) await copyStoppedFixtureTree(prepared.runtimeCampFilesRoot, join(fixture, 'backup-runtime-files'))
-  const beforeDatabase = createHash('sha256').update(await readFile(join(prepared.dataDir, 'rovai.sqlite'))).digest('hex')
+  const beforeDatabase = createHash('sha256').update(await readFile(join(prepared.dataDir, 'coaxi.sqlite'))).digest('hex')
   console.log(JSON.stringify({ stage: 'closed-baseline-backed-up', threadId }))
 
   const administrator = randomBytes(32).toString('hex')
@@ -79,7 +79,7 @@ try {
     await copyStoppedFixtureTree(prepared.runtimeCampFilesRoot, join(fixture, 'upgraded-runtime-files'))
     await copyStoppedFixtureTree(join(fixture, 'backup-runtime-files'), prepared.runtimeCampFilesRoot)
   }
-  assert.equal(createHash('sha256').update(await readFile(join(prepared.dataDir, 'rovai.sqlite'))).digest('hex'), beforeDatabase)
+  assert.equal(createHash('sha256').update(await readFile(join(prepared.dataDir, 'coaxi.sqlite'))).digest('hex'), beforeDatabase)
   active = launchPipe(baseline)
   const restored = await active.request('camps.snapshot', baselineScope)
   assert.equal(restored.messages.filter(message=>message.body==='PRESERVED_PACKAGE_MESSAGE').length, 1)

@@ -12,7 +12,7 @@ type Settings={revision:string|null;endpoint:string;username:string;passwordSet:
 type Snapshot={id:string;createdAt:string;sha256:string;bytes:number;kind?:'backup'|'configuration'}
 type Transfer={commandId:string;operation?:'push'|'pull';state:string;message?:string;result?:{path:string;snapshot:Snapshot}}
 const empty:Settings={revision:null,endpoint:'',username:'',passwordSet:false,allowInsecure:false}
-// Codeg config-sync-settings: account, saved-password state and explicit remote
+// Coaxi config-sync-settings: account, saved-password state and explicit remote
 // operations. Encrypted backup archives are published as immutable snapshots.
 export function WebdavSettings():React.JSX.Element{
   const client=useThreadClient(),native=client.webdavWorkspace,t=useUiText()

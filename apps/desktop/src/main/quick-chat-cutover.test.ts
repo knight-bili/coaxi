@@ -14,7 +14,7 @@ afterEach(async () => {
 
 describe('Quick Chat incompatible cutover', () => {
   it('deletes only the exact retired managed directory', async () => {
-    const userDataPath = await mkdtemp(join(tmpdir(), 'rovai-quick-chat-cutover-'))
+    const userDataPath = await mkdtemp(join(tmpdir(), 'coaxi-quick-chat-cutover-'))
     cleanup.push(userDataPath)
     await mkdir(join(userDataPath, 'lobby', 'nested'), { recursive: true })
     await writeFile(join(userDataPath, 'lobby', 'nested', 'discard.txt'), 'obsolete')
@@ -29,7 +29,7 @@ describe('Quick Chat incompatible cutover', () => {
   })
 
   it('unlinks a retired symlink without following it', async () => {
-    const root = await mkdtemp(join(tmpdir(), 'rovai-quick-chat-cutover-'))
+    const root = await mkdtemp(join(tmpdir(), 'coaxi-quick-chat-cutover-'))
     cleanup.push(root)
     const userDataPath = join(root, 'user-data')
     const outsidePath = join(root, 'outside')

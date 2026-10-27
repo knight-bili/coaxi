@@ -5,9 +5,9 @@ use std::{env, path::PathBuf, process::Command};
 
 fn main() {
     let node =
-        PathBuf::from(env::var_os("ROVAI_ACCEPTANCE_NODE").expect("fixture Node is required"));
+        PathBuf::from(env::var_os("COAXI_ACCEPTANCE_NODE").expect("fixture Node is required"));
     let script =
-        PathBuf::from(env::var_os("ROVAI_ACCEPTANCE_SCRIPT").expect("fixture script is required"));
+        PathBuf::from(env::var_os("COAXI_ACCEPTANCE_SCRIPT").expect("fixture script is required"));
     assert!(node.is_absolute() && node.is_file());
     assert!(script.is_absolute() && script.is_file());
     let mut child = Command::new(node);

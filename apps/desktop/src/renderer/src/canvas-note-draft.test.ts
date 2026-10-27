@@ -34,13 +34,13 @@ describe('画布便笺本机草稿的恢复和归属', () => {
   })
   it('确认保存后只移除本便笺副本，其他便笺和原视口偏好保持', () => {
     const { storage, values } = memory()
-    storage.setItem('rovai.canvas.view.v1:old', 'viewport')
+    storage.setItem('coaxi.canvas.view.v1:old', 'viewport')
     saveCanvasNoteDraft(storage, scope, '板', '甲', draft)
     saveCanvasNoteDraft(storage, scope, '板', '乙', draft)
     expect(saveCanvasNoteDraft(storage, scope, '板', '甲', null)).toBe(true)
     expect(loadCanvasNoteDraft(storage, scope, '板', '甲')).toBeNull()
     expect(loadCanvasNoteDraft(storage, scope, '板', '乙')).toEqual(draft)
-    expect(values.get('rovai.canvas.view.v1:old')).toBe('viewport')
+    expect(values.get('coaxi.canvas.view.v1:old')).toBe('viewport')
   })
   it('禁用或满额的本机存储明确返回失败，不能声称已保存副本', () => {
     const unavailable = () => { throw new Error('denied') }

@@ -1,5 +1,5 @@
 import type { DelegationDetail } from '@contracts'
-import type { CoreDelegationCardModel } from './codeg-native-content/ui/source-delegation-host'
+import type { CoreDelegationCardModel } from './coaxi-native-content/ui/source-delegation-host'
 
 /** Metadata from the already-authorized, exact-parent Core list only. No child
  * body prefetch or report/task-id search across conversations. */

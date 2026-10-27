@@ -8,7 +8,7 @@ import { digest, runDaily } from './daily'
 import { dailyAnalysisSchema, recordDailyAnalysis, validateAnalysis } from './daily-analysis'
 const roots:string[]=[]
 afterEach(async()=>{await Promise.all(roots.splice(0).map(root=>rm(root,{recursive:true,force:true})))})
-const temp=async():Promise<string>=>{const path=await mkdtemp(join(tmpdir(),'rovai-report-test-'));roots.push(path);return path}
+const temp=async():Promise<string>=>{const path=await mkdtemp(join(tmpdir(),'coaxi-report-test-'));roots.push(path);return path}
 
 describe('offline report contract — synthetic fixtures only',()=>{
   it('separates the new handoff cohort from the complete retained open backlog',()=>{

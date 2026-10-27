@@ -9,7 +9,7 @@ import {RuntimeParameterSelect} from './RuntimeParameterSelect'
 import './portable-configuration.css'
 
 const reference=(value:PortableConnectionRefV1|null):string=>value?JSON.stringify({id:value.id,revision:value.revision,digest:value.digest}):''
-/** Codeg 智能体配置的服务商选择，沿用 Coaxi 队员运行设置的单行布局。 */
+/** Coaxi 智能体配置的服务商选择，沿用 Coaxi 队员运行设置的单行布局。 */
 export function PortableMemberConnection({agentId,disabled,onSaved}:{agentId:string;disabled:boolean;onSaved():void|Promise<void>}):React.JSX.Element{
   const client=useThreadClient(),t=useUiText(),generation=useRef(0)
   const [saved,setSaved]=useState<PortableMemberConnectionView|null>(null),[page,setPage]=useState<PortableProviderPage>({items:[],next:null}),[selected,setSelected]=useState(''),[pending,setPending]=useState<PortableConfigurationPending|null>(null),[busy,setBusy]=useState(false),[ready,setReady]=useState(false),[error,setError]=useState('')

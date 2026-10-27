@@ -17,7 +17,7 @@
     "new_formal_cases_passed": 0
   },
   "facts": [
-    "Original Codeg card and collapsed-row UI, original pure builders/inliner and unchanged original tests retained; explicit Core host seams only.",
+    "Original Coaxi card and collapsed-row UI, original pure builders/inliner and unchanged original tests retained; explicit Core host seams only.",
     "Exact native read identity, transient parent/child resources, canonical document directory checks, raw byte size/generation checks, bounded concurrency and window HTML quota.",
     "Complete documents default scripts off; fragments use original local-only widget stub. Optional preserveAuthorCsp adds author restrictions to sandbox policy, no model send.",
     "Web original srcDoc conflicts with App CSP: existing preview entry supplies an opaque bootstrap and original inner sandbox; App/API CSP unchanged.",
@@ -56,7 +56,7 @@
       "files": [
         {
           "source": "src/lib/html-preview-inline.ts",
-          "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/html-preview-inline.ts",
+          "destination": "apps/desktop/src/renderer/src/coaxi-native-content/lib/html-preview-inline.ts",
           "sourceSha256": "189a3c995307aeb258e16c32dcbed96a9adbc642d512cdd1d6e41907a604ee3f",
           "portedSha256": "113dae96195e1b715443f54f801b47c2779f55af183b16cafb62e0747b492f01",
           "sourceGitBlob": "6372954d78e446d92c38caafc14a31474adda9a0",
@@ -66,7 +66,7 @@
         },
         {
           "source": "src/lib/html-preview-inline.test.ts",
-          "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/html-preview-inline.test.ts",
+          "destination": "apps/desktop/src/renderer/src/coaxi-native-content/lib/html-preview-inline.test.ts",
           "sourceSha256": "b1636d50053497e7920cd86a29096fec3a2b3f00b97c2bfa5e41fc2d4f35aa1e",
           "portedSha256": "43a7e203da353c623e0a4e48f1a605381aa8595507c795a9bd9636037c9b1d0d",
           "sourceGitBlob": "b173d07f287aa7b7954846ae5dc09158a33e4f6b",
@@ -76,19 +76,19 @@
         },
         {
           "source": "src/components/message/codex-visualize-card.tsx",
-          "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/message/codex-visualize-card.tsx",
+          "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/message/codex-visualize-card.tsx",
           "sourceSha256": "dead83ff7abb5f80190b0c611099a80a864822448d04e1bfab255e0dcba155fc",
           "portedSha256": "c5e8b98966fb460b12559180e7a6f4d3f0233715297ff633f8eb515803896a49",
           "sourceGitBlob": "a7fe683c17e98c57b6476669bd6c3ed66d6f2ebd",
           "bodyChanges": [
             "complete original pure document/fragment/CSP/size/theme/local-state builders and card JSX retained",
-            "Core scoped load and resource reader replace frontend home/root/Tauri IO; Core-owned reader identity and visibility in load key; current scope guards and original window HTML pool; resource concurrency 4 for shared host quotas; source theme values bind Rovai tokens without shadowing host variables",
+            "Core scoped load and resource reader replace frontend home/root/Tauri IO; Core-owned reader identity and visibility in load key; current scope guards and original window HTML pool; resource concurrency 4 for shared host quotas; source theme values bind Coaxi tokens without shadowing host variables",
             "original runtime plugin asset discovery excluded from this slice; original FALLBACK_ASSETS branch retained, authorized enhanced asset integration remains I08; not a full DocGuest/browser port"
           ]
         },
         {
           "source": "src/components/message/codex-visualize-card.test.tsx",
-          "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/message/codex-visualize-build.test.ts",
+          "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/message/codex-visualize-build.test.ts",
           "sourceSha256": "50e58a3be59915a53c7c666aa0651e62a40de99f96db91b83a82376e5b92bcc8",
           "portedSha256": "c09f1645a734e4c6ec6c5805e6edc4309989e65449b93a0cfc6b16f6e5df2de5",
           "sourceGitBlob": "0337d52afe11603ee040736f9ba469efa4b7bcd0",
@@ -98,7 +98,7 @@
         },
         {
           "source": "src/components/message/html-file-previews.tsx",
-          "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/message/html-file-previews.tsx",
+          "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/message/html-file-previews.tsx",
           "sourceSha256": "4b25695300fd3d7fe0baa08e33f7f9363e67e9c3d9dfdde59dc1df710395f3d0",
           "portedSha256": "ed0e58297cc0cfc2370e944d68e6dec0ae6dd776e76c36bc963d599b5413b4a6",
           "sourceGitBlob": "35ca841d108d4da11513b3f1cca39833ce80ba07",
@@ -111,7 +111,7 @@
       "runtimeAssetsI08Pending": true,
       "docGuestI07Pending": true
     },
-    "browser_transport_scope": "Actual Chromium renders production Codeg port and fixed original components. FilePreviewApi/Thread owner is simulated. Web headers are copied verbatim from production Rust CSP and sent by a local HTTP fixture; not actual Core/IPC/Rust HTTP/full App qualification.",
+    "browser_transport_scope": "Actual Chromium renders production Coaxi port and fixed original components. FilePreviewApi/Thread owner is simulated. Web headers are copied verbatim from production Rust CSP and sent by a local HTTP fixture; not actual Core/IPC/Rust HTTP/full App qualification.",
     "actual_chromium": true,
     "actual_core_native_web_e2e": false,
     "actual_ipc": false,
@@ -132,7 +132,7 @@
   "remaining": [
     "I04阶段编码集齐后集中核实真实Core/Native/Web、完整App/供体App同场景、授权/长历史/规模/内存与恢复；本批为生产卡片配声明运输替身的Chromium分项。",
     "插件增强CSS/kit/calendar保留原构造接口与缺资产fallback；实际安装包Core授权发现归I08，无任意home/Tauri读取。",
-    "完整DocGuest、网页/邮件/电话与内置/系统浏览器目标归I07；普通文件工作区继续Rovai原HTML服务。",
+    "完整DocGuest、网页/邮件/电话与内置/系统浏览器目标归I07；普通文件工作区继续Coaxi原HTML服务。",
     "I04原剩余Claude旧agent/parser/home关联、Qoder独立来源/明确导入、Grok修改意见与三Context模式、Runtime并集、恢复、记忆及自动化不减；ANSI完整许可继续发布资格。"
   ],
   "approved_r1_artifacts": [
@@ -175,12 +175,12 @@
       "git_blob_with_filters": "141ec1d46348d2ddbb657b68d4c2ca2bfdb2e788"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/native-markdown.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/ui/native-markdown.tsx",
       "sha256": "e2f00351a039aa4a832e13c77d9523cadfb1d6a136a8eca10d4c5f674833ca19",
       "git_blob_with_filters": "ff97672b92fcc291a3eba99d6f4b0507a60af2e6"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/source-copy.json",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/ui/source-copy.json",
       "sha256": "16ef158049c7bdf9701bfb9bdeec983c420bf5b911fdaec01fa76c52c199ff71",
       "git_blob_with_filters": "0381e23a216f7e75de37b9ddc0d43c565423bdb8"
     },
@@ -205,7 +205,7 @@
       "git_blob_with_filters": "ea3c3b2b56ae0c5749a5940019a661fdd7bfebdf"
     },
     {
-      "path": "crates/rovai-web/src/lib.rs",
+      "path": "crates/coaxi-web/src/lib.rs",
       "sha256": "fada9dbda222b6b2a742461f938fc3794060884a404b987efd534ef6b47f55e7",
       "git_blob_with_filters": "a549eb6f361918006157b5e1aa49834f665058c8"
     },
@@ -240,57 +240,57 @@
       "git_blob_with_filters": "c1d19d6d3a3267b763007f76ba018ba9c1831a7b"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/codex-visualize-build.test.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/message/codex-visualize-build.test.ts",
       "sha256": "c09f1645a734e4c6ec6c5805e6edc4309989e65449b93a0cfc6b16f6e5df2de5",
       "git_blob_with_filters": "1a54eb30937468a7ad108a256ffc1d6b96bf3148"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/codex-visualize-card.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/message/codex-visualize-card.tsx",
       "sha256": "c5e8b98966fb460b12559180e7a6f4d3f0233715297ff633f8eb515803896a49",
       "git_blob_with_filters": "cc01d131a6db0ebbbb18016ddb4a7b37b723d185"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/html-file-previews.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/message/html-file-previews.tsx",
       "sha256": "ed0e58297cc0cfc2370e944d68e6dec0ae6dd776e76c36bc963d599b5413b4a6",
       "git_blob_with_filters": "7c91ed0f35858f4d780404654b5a14c240ecc82d"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/html-preview-inline.test.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/lib/html-preview-inline.test.ts",
       "sha256": "43a7e203da353c623e0a4e48f1a605381aa8595507c795a9bd9636037c9b1d0d",
       "git_blob_with_filters": "c342f85acbe6407899b0489477cc026f03b6eb53"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/html-preview-inline.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/lib/html-preview-inline.ts",
       "sha256": "113dae96195e1b715443f54f801b47c2779f55af183b16cafb62e0747b492f01",
       "git_blob_with_filters": "8f4f2120cb3376019608e7d78c3fa92a1238bd43"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/source-html.css",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/source-html.css",
       "sha256": "8b464518a700a69f51858631b3c1f209b98ca7d0f466e77af16c39a09f327a1e",
       "git_blob_with_filters": "08ff30dfe76e7e54b22be1e2b39174d797af4051"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/native-html-frame.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/ui/native-html-frame.tsx",
       "sha256": "9cc71044c2ed3aa46ad96fc3020261bec858d6a2b859e47e72f04b0348d9c861",
       "git_blob_with_filters": "03704d4f95f5bdcb385dcd601dd541c549c4065a"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/native-html-host.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/ui/native-html-host.tsx",
       "sha256": "c6a293d918ebe535e8f2092ae2d59b1516e1a1256ed2727ec30e39d222a25abc",
       "git_blob_with_filters": "126b5c11cdbe02276c7810e308b41681b73d623c"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/native-html-policy.test.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/ui/native-html-policy.test.ts",
       "sha256": "4fd769a51b209537025e00c1c2d91f70f78adcc01a8b11dd0ecc94707d4e6e38",
       "git_blob_with_filters": "0297830b32cd591d78030c05790fcfbb45e3e472"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/native-html-source.test.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/ui/native-html-source.test.ts",
       "sha256": "8a5ebef5e844476fcbcfdb89c5b89220abe298f9c724702abaa39de19ed66166",
       "git_blob_with_filters": "5c7147df20a28e6afc774f098914b295bf8a8c32"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/native-html-source.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/ui/native-html-source.ts",
       "sha256": "f7779be9239dd96bfc2910beb257e9157098d6bb25e6fd0fd06df05f5e50b191",
       "git_blob_with_filters": "67e700c16a0952c5374f3651fc37c64100cb82a8"
     },

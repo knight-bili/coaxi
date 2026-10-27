@@ -121,7 +121,7 @@ describe('Skill settings', () => {
     expect(markup).not.toContain('type="checkbox"')
   })
 
-  it('shows only Rovai badges while preserving upstream and imported provenance', () => {
+  it('shows only Coaxi badges while preserving upstream and imported provenance', () => {
     const bundled = skillFixture(true)
     const grillDuo = {
       ...skillFixture(true),

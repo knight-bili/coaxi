@@ -9,7 +9,7 @@ import { setTimeout as pause } from 'node:timers/promises'
 // 不伪造旧Host二进制、不改Core命令结果或数据库，不授予真实旧服务整体验证资格。
 const register = ipcMain.handle, requests = [], omitted = []
 ipcMain.handle = function (channel, handler) {
-  return register.call(this, channel, channel !== 'rovai:request' ? handler : async (event, method, params) => {
+  return register.call(this, channel, channel !== 'coaxi:request' ? handler : async (event, method, params) => {
     requests.push({ method, commandId: params?.commandId ?? null })
     const result = await handler(event, method, params)
     if (result.kind !== 'value') return result
@@ -72,16 +72,16 @@ export async function qualifyCanvasSourceUi(window, { evaluate, wait, rpc, openC
   const copy = await evaluate('document.querySelector(".canvas-board-copy").innerText'); assert.ok(copy.includes('统计暂不可用')); assert.ok(!copy.includes('0 个节点')); report.compatibility.unknownStats = copy
   record('missing_board_summary_is_explicitly_unknown_in_original_list_instead_of_a_fabricated_zero')
   await openCanvasBoard(evaluate, wait, boardId)
-  const appearance = await evaluate('window.rovai.appearance.get()')
+  const appearance = await evaluate('window.coaxi.appearance.get()')
   try {
     for (const [theme, size] of [['day', [1440, 920]], ['night', [1040, 702]], ['day', [1040, 702]]]) {
-      await evaluate(`window.rovai.appearance.setPreference(${JSON.stringify(theme)})`); await wait(`document.documentElement.dataset.theme===${JSON.stringify(theme)}`); window.setContentSize(...size)
+      await evaluate(`window.coaxi.appearance.setPreference(${JSON.stringify(theme)})`); await wait(`document.documentElement.dataset.theme===${JSON.stringify(theme)}`); window.setContentSize(...size)
       await click('.canvas-dock-panel button[aria-label="查看全部"]'); await pause(500)
       const metrics = await evaluate(`(()=>{const root=document.querySelector('.canvas-workspace'),stage=document.querySelector('.canvas-flow-stage').getBoundingClientRect();return{theme:${JSON.stringify(theme)},viewport:[innerWidth,innerHeight],outerX:root.scrollWidth-root.clientWidth,outerY:root.scrollHeight-root.clientHeight,zoom:document.querySelector('.canvas-zoom-readout').textContent,cards:${JSON.stringify(nodes)}.map(n=>{const host=document.querySelector('.react-flow__node[data-id="'+n.id+'"]'),card=host.querySelector('article'),r=card.getBoundingClientRect();return{kind:n.kind,width:r.width,height:r.height,insideStage:r.left>=stage.left-1&&r.top>=stage.top-1&&r.right<=stage.right+1&&r.bottom<=stage.bottom+1,extraX:card.scrollWidth-card.clientWidth,extraY:card.scrollHeight-card.clientHeight}})}})()`)
       report.compatibility.layouts.push(metrics); await checkpoint(); assert.equal(metrics.outerX, 0); assert.equal(metrics.outerY, 0); assert.ok(metrics.cards.every(c => c.insideStage && c.extraX <= 1 && c.extraY <= 1), JSON.stringify(metrics))
       const image = join(config.evidence, `eight-${theme}-${size[0]}.png`); await writeFile(image, (await window.webContents.capturePage()).toPNG()); (report.screenshots ??= []).push(image)
     }
-  } finally { await evaluate(`window.rovai.appearance.setPreference(${JSON.stringify(appearance.preference)})`) }
+  } finally { await evaluate(`window.coaxi.appearance.setPreference(${JSON.stringify(appearance.preference)})`) }
   record('actual_eight_original_card_types_fit_after_original_fit_action_in_day_night_and_small_window_without_outer_scroll')
   const forbidden = requests.slice(before).filter(r => r.method.startsWith('canvas.terminals.') || r.method === 'canvas.nodes.apply' || /\.send$/.test(r.method))
   assert.deepEqual(forbidden, []); report.compatibility.forbiddenRequests = forbidden; await checkpoint()

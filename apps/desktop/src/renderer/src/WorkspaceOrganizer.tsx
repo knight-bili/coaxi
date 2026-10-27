@@ -8,8 +8,8 @@ import { WorkspaceTagChoices } from './WorkspaceTagChoices'
 type Organizer = { tags:string[]; directoryAliases:Array<{path:string;name:string;group:string}>; quickMessages:Array<{id:string;title:string;text:string}> }
 const empty = ():Organizer=>({tags:[],directoryAliases:[],quickMessages:[]})
 
-// Codeg conversation-tag-list-editor / folder aliases and quick-message rows;
-// shared Rovai settings controls, with Core digest-CAS persistence.
+// Coaxi conversation-tag-list-editor / folder aliases and quick-message rows;
+// shared Coaxi settings controls, with Core digest-CAS persistence.
 export function WorkspaceOrganizer({threadId,onDirtyChange,onUseMessage,onDirectoryAliasesApplied}:{threadId:string;onDirtyChange(dirty:boolean):void;onUseMessage?(text:string):boolean;onDirectoryAliasesApplied?():void}):React.JSX.Element{
   const client=useThreadClient(),t=useUiText(),scope=useMemo(()=>({threadId}),[threadId])
   const [value,setValue]=useState<Organizer>(empty),[saved,setSaved]=useState<Organizer>(empty),[digest,setDigest]=useState<string|null>(null)

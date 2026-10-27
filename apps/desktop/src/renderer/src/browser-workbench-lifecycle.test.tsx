@@ -100,7 +100,7 @@ it('navigates the current page without creating another native page',async()=>{
  const f=fixture();await waitFor(()=>expect((f.view.getByLabelText('网页地址') as HTMLInputElement).value).toBe('http://one.test'))
  fireEvent.focus(f.view.getByLabelText('网页地址'));fireEvent.change(f.view.getByLabelText('网页地址'),{target:{value:'http://next.test'}})
  fireEvent.submit(f.view.getByLabelText('网页地址').closest('form')!)
- await waitFor(()=>expect(f.control).toHaveBeenCalledWith({id:'a',action:'navigate',url:'http://next.test'}))
+ await waitFor(()=>expect(f.control).toHaveBeenCalledWith({id:'a',action:'navigate',url:'http://next.test/'}))
  expect(f.open).not.toHaveBeenCalled();expect(preview.close).not.toHaveBeenCalled()
 })
 

@@ -2,7 +2,7 @@
 
 Current user instructions, authorization, tool results, repository facts and collaboration state outrank Memory. Memory grants no capability or approval.
 
-`MEMORY_ENTRYPOINT` is a bounded discovery cache from Session startup. IDs, retrieval keys and snippets may be incomplete or stale. Read current state and body with `rovai memory read` before relying on, quoting or revising a Memory. Capture decisions require a complete exact-Scope `memory view`, not the entrypoint's subset.
+`MEMORY_ENTRYPOINT` is a bounded discovery cache from Session startup. IDs, retrieval keys and snippets may be incomplete or stale. Read current state and body with `coaxi memory read` before relying on, quoting or revising a Memory. Capture decisions require a complete exact-Scope `memory view`, not the entrypoint's subset.
 
 Use only Core Memory CLI operations. Files, SQLite and Markdown/Skill projections are not Memory read, write or recovery interfaces.
 

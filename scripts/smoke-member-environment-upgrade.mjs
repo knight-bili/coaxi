@@ -1,6 +1,6 @@
 // Cross-version acceptance owner: the previous Core must create the native binding
 // itself. A stored-ID-only unit fixture cannot prove that the next CLI resumes it.
-// Usage: node scripts/smoke-member-environment-upgrade.mjs /absolute/old/rovai-core [candidate-core]
+// Usage: node scripts/smoke-member-environment-upgrade.mjs /absolute/old/coaxi-core [candidate-core]
 // Adapter-only regressions: replace the old Core path with --adapter-regressions.
 import assert from 'node:assert/strict'
 import { spawn } from 'node:child_process'
@@ -15,10 +15,10 @@ import { coreDataDirectoryArguments, removeEphemeralRuntimeCampFilesRoot } from 
 
 const previousCore = process.argv[2]
 const adapterRegressionsOnly = previousCore === '--adapter-regressions'
-assert.ok(adapterRegressionsOnly || (previousCore && isAbsolute(previousCore)), 'Supply the absolute pre-upgrade Core path (with its adjacent rovai CLI) or --adapter-regressions')
+assert.ok(adapterRegressionsOnly || (previousCore && isAbsolute(previousCore)), 'Supply the absolute pre-upgrade Core path (with its adjacent coaxi CLI) or --adapter-regressions')
 assert.notEqual(process.platform, 'win32', 'This synthetic Python CLI fixture requires macOS or Linux')
-const candidateCore = resolve(process.argv[3] ?? join(import.meta.dirname, '../target/debug/rovai-core'))
-const fixture = await realpath(await mkdtemp(join(tmpdir(), 'rovai-env-upgrade-')))
+const candidateCore = resolve(process.argv[3] ?? join(import.meta.dirname, '../target/debug/coaxi-core'))
+const fixture = await realpath(await mkdtemp(join(tmpdir(), 'coaxi-env-upgrade-')))
 const results = []
 const failures = []
 try {
@@ -36,7 +36,7 @@ try {
     await writeFile(executable, syntheticCli(kind))
     await chmod(executable, 0o700)
     console.error(`Isolated upgrade acceptance: data=${data}; skills=${join(data, 'managed-skill-library')}; MCP=${join(data, 'mcp.json')}`)
-    const databasePath = join(data, 'rovai.sqlite')
+    const databasePath = join(data, 'coaxi.sqlite')
     const query = (sql, ...params) => {
       const db = new DatabaseSync(databasePath, { readOnly: true })
       try { return db.prepare(sql).get(...params) } finally { db.close() }
@@ -46,7 +46,7 @@ try {
     try {
       core = startCore(previousCore, 'before')
       await core.request('health.check')
-      assert.equal(query('SELECT projection_schema_version AS version FROM rovai_data_contract').version, 142,
+      assert.equal(query('SELECT projection_schema_version AS version FROM coaxi_data_contract').version, 142,
         'The initial Core must be the supported version before environment snapshot retirement')
       await core.request('runtime.discovery.rescan', { interactiveShell: false })
       const profile = await core.request('members.get', { agentId: 'agent_1' })
@@ -110,7 +110,7 @@ try {
       // Changing this inherited value proves the old environment was not restored.
       core = startCore(candidateCore, 'after')
       await core.request('health.check')
-      assert.equal(query('SELECT projection_schema_version AS version FROM rovai_data_contract').version, 145)
+      assert.equal(query('SELECT projection_schema_version AS version FROM coaxi_data_contract').version, 145)
       assert.equal(query("SELECT COUNT(*) AS total FROM sqlite_master WHERE name IN ('conversation_runtime_environment','runtime_environment_plan')").total, 0)
       await send('UPGRADE_SECOND_INPUT')
       await settled(2)
@@ -133,7 +133,7 @@ try {
         const serverId = crypto.randomUUID()
         await writeFile(join(data, 'mcp.json'), JSON.stringify({
           mcpServers: { fixture: { command: '/usr/bin/false' } },
-          _rovai: { schemaVersion: 2,
+          _coaxi: { schemaVersion: 2,
             servers: { fixture: { serverId, enabled: true, source: 'user', riskLevel: 'standard' } },
             assignments: [{ serverId, agentId: 'agent_1' }] }
         }), { mode: 0o600 })
@@ -168,8 +168,8 @@ try {
         ...coreDataDirectoryArguments(data, { homeDirectory: home }),
         '--skill-library-root', join(data, 'managed-skill-library'), '--mcp-config-path', join(data, 'mcp.json')
       ], directory, { HOME: home, PATH: '/usr/bin:/bin', SHELL: '/bin/sh', TMPDIR: directory,
-        ROVAI_CLAUDE_CODE_BIN: kind === 'claude-code-cli' ? executable : '/nonexistent/claude',
-        ROVAI_CODEX_BIN: kind === 'codex-cli' ? executable : '/nonexistent/codex',
+        COAXI_CLAUDE_CODE_BIN: kind === 'claude-code-cli' ? executable : '/nonexistent/claude',
+        COAXI_CODEX_BIN: kind === 'codex-cli' ? executable : '/nonexistent/codex',
         CLAUDE_CONFIG_DIR: join(home, '.claude'), CODEX_HOME: join(home, '.codex'),
         ANTHROPIC_API_KEY: 'fixture-host-claude', OPENAI_API_KEY: 'fixture-host-codex',
         UPGRADE_MEMBER_VALUE: 'host-default', UPGRADE_MEMBER_SECRET: 'fixture-host-value', UPGRADE_HOST_VALUE: stage })
@@ -281,10 +281,10 @@ for line in sys.stdin:
 // validate its additional directories. Do not let later lease binding repair it.
 function processContextProbe(log) {
   return `
-if os.environ.get('ROVAI_CLI_CONTEXT'):
-    context_path = os.environ['ROVAI_CLI_CONTEXT']
+if os.environ.get('COAXI_CLI_CONTEXT'):
+    context_path = os.environ['COAXI_CLI_CONTEXT']
     with open(context_path) as source: context = json.load(source)
-    run_tmp = os.environ['ROVAI_RUN_TMP']
+    run_tmp = os.environ['COAXI_RUN_TMP']
     launch = dict(method='process/start', stage=os.getenv('RESUME_CASE'), pid=os.getpid(), cwd=os.getcwd(),
         contextPath=context_path, processId=context['processId'], runTmp=run_tmp,
         runTmpExists=os.path.isdir(run_tmp), unbound=context.get('lease') is None)
@@ -356,7 +356,7 @@ for line in sys.stdin:
 `)
   await chmod(executable, 0o700)
   const query = (sql, ...params) => {
-    const db = new DatabaseSync(join(data, 'rovai.sqlite'), { readOnly: true })
+    const db = new DatabaseSync(join(data, 'coaxi.sqlite'), { readOnly: true })
     try { return db.prepare(sql).get(...params) } finally { db.close() }
   }
   const records = async () => {
@@ -365,8 +365,8 @@ for line in sys.stdin:
   }
   const start = stage => connectCore(binary, [...coreDataDirectoryArguments(data, { homeDirectory: home }),
     '--skill-library-root', join(data, 'skills'), '--mcp-config-path', join(data, 'mcp.json')], directory,
-    { HOME: home, PATH: '/usr/bin:/bin', SHELL: '/bin/sh', TMPDIR: directory, ROVAI_TRAE_CN_BIN: executable,
-      ROVAI_CODEX_BIN: '/nonexistent/codex', ROVAI_CLAUDE_CODE_BIN: '/nonexistent/claude', RESUME_CASE: stage })
+    { HOME: home, PATH: '/usr/bin:/bin', SHELL: '/bin/sh', TMPDIR: directory, COAXI_TRAE_CN_BIN: executable,
+      COAXI_CODEX_BIN: '/nonexistent/codex', COAXI_CLAUDE_CODE_BIN: '/nonexistent/claude', RESUME_CASE: stage })
   let core, campId, total = 0
   const send = async body => {
     const result = await core.request('thread.messages.send', { commandId: crypto.randomUUID(), threadId: campId,
@@ -454,9 +454,9 @@ def new_session():
     session_file = os.path.join(native_root, sid + '.jsonl')
     with open(session_file, 'w') as output: output.write(json.dumps({'type':'session','id':sid,'cwd':os.getcwd()}) + '\\n')
 def managed_state():
-    with open(os.environ['ROVAI_PI_HOST_BINDING_FILE']) as source: binding = json.load(source)
-    state = {'schemaVersion':3,'extensionVersion':'rovai-pi-host-v8','hostInstanceId':binding['hostInstanceId'],'hostBindingGeneration':binding['hostBindingGeneration'],'sessionId':sid,'sessionFile':session_file,'cwd':os.getcwd()}
-    emit({'type':'extension_ui_request','method':'setStatus','statusKey':'rovai-managed-session-state','statusText':json.dumps(state)})
+    with open(os.environ['COAXI_PI_HOST_BINDING_FILE']) as source: binding = json.load(source)
+    state = {'schemaVersion':3,'extensionVersion':'coaxi-pi-host-v8','hostInstanceId':binding['hostInstanceId'],'hostBindingGeneration':binding['hostBindingGeneration'],'sessionId':sid,'sessionFile':session_file,'cwd':os.getcwd()}
+    emit({'type':'extension_ui_request','method':'setStatus','statusKey':'coaxi-managed-session-state','statusText':json.dumps(state)})
 new_session()
 for line in sys.stdin:
     request = json.loads(line)
@@ -481,7 +481,7 @@ for line in sys.stdin:
 `)
   await chmod(executable, 0o700)
   const query = (sql, ...params) => {
-    const db = new DatabaseSync(join(data, 'rovai.sqlite'), { readOnly: true })
+    const db = new DatabaseSync(join(data, 'coaxi.sqlite'), { readOnly: true })
     try { return db.prepare(sql).get(...params) } finally { db.close() }
   }
   const records = async () => {
@@ -490,8 +490,8 @@ for line in sys.stdin:
   }
   const start = () => connectCore(binary, [...coreDataDirectoryArguments(data, { homeDirectory: home }),
     '--skill-library-root', join(data, 'skills'), '--mcp-config-path', join(data, 'mcp.json')], directory,
-    { HOME: home, PATH: '/usr/bin:/bin', SHELL: '/bin/sh', TMPDIR: directory, ROVAI_PI_BIN: executable,
-      PI_CODING_AGENT_DIR: join(home, 'pi'), ROVAI_CODEX_BIN: '/nonexistent/codex', ROVAI_CLAUDE_CODE_BIN: '/nonexistent/claude' })
+    { HOME: home, PATH: '/usr/bin:/bin', SHELL: '/bin/sh', TMPDIR: directory, COAXI_PI_BIN: executable,
+      PI_CODING_AGENT_DIR: join(home, 'pi'), COAXI_CODEX_BIN: '/nonexistent/codex', COAXI_CLAUDE_CODE_BIN: '/nonexistent/claude' })
   let core, campId, privateConversationId, total = 0
   const latestRun = () => query('SELECT id,status,wait_reason,last_error_code,conversation_id FROM agent_run WHERE conversation_id IN (SELECT id FROM conversation WHERE camp_id=?) ORDER BY rowid DESC LIMIT 1', campId)
   const sessions = new Map(), hosts = new Map()

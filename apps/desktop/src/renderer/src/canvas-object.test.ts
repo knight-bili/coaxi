@@ -1,12 +1,12 @@
 import { expect, it, vi } from 'vitest'
-import type { CanvasNode, MissionChangedFile, MissionRecord, RovaiApi, TaskView } from '@contracts'
+import type { CanvasNode, MissionChangedFile, MissionRecord, CoaxiApi, TaskView } from '@contracts'
 import { canvasDiffFile, canvasObjectInvalidated, canvasObjectTarget, canvasPlainConversation, readCanvasDiffFiles, readCanvasObject, readCanvasTaskPage, type CanvasObjectTarget } from './canvas-object'
 import { retainMissionDiffSession } from './mission-diff-session'
 import { canvasConversationMatches } from './canvas-conversation'
 
 const mission = { missionId: 'mission-original', threadId: 'thread', title: 'Original mission' } as MissionRecord
 const task = { taskId: 'task-original', threadId: 'thread', title: 'Original task' } as TaskView
-const api = (read: (...args: unknown[]) => Promise<unknown>) => ({ request: vi.fn(read) }) as unknown as Pick<RovaiApi, 'request'>
+const api = (read: (...args: unknown[]) => Promise<unknown>) => ({ request: vi.fn(read) }) as unknown as Pick<CoaxiApi, 'request'>
 const target: CanvasObjectTarget = { threadId: 'thread', object: { kind: 'mission', missionId: mission.missionId } }
 
 it('reads the exact Mission, Diff or Task ID without entering a Thread or starting a Runtime', async () => {

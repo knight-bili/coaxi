@@ -1,7 +1,7 @@
 // Evidence only: never persist headers, endpoints, message text or tool arguments.
 import { createHash } from 'node:crypto';
 
-export const targetName = 'mcp__rovai_delivery64__issue_receipt';
+export const targetName = 'mcp__coaxi_delivery64__issue_receipt';
 export const digest = value => createHash('sha256').update(
   typeof value === 'string' || Buffer.isBuffer(value) ? value : JSON.stringify(value),
 ).digest('hex');

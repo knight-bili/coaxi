@@ -516,7 +516,7 @@ test('dual-view artifacts retain immutable private provenance and Suite pointer'
     outcome,
     producerDigest: 'a'.repeat(64)
   })
-  const root = await mkdtemp(join(tmpdir(), 'rovai-judge-views-'))
+  const root = await mkdtemp(join(tmpdir(), 'coaxi-judge-views-'))
   try {
     const retained = await retainSemanticJudgeViewArtifacts(root, { process, outcome, suite })
     assert.equal(retained.resultReference.status, 'complete')
@@ -681,10 +681,10 @@ function sourcePackFixture() {
   }
   return {
     artifactId: 'judge-evidence-pack:fixture',
-    schemaId: 'rovai.qualification.judge-evidence-pack',
+    schemaId: 'coaxi.qualification.judge-evidence-pack',
     schemaVersion: '1.0.0',
     producer: {
-      id: 'rovai-qualification-runner',
+      id: 'coaxi-qualification-runner',
       version: 'fixture',
       digest: `sha256:${'a'.repeat(64)}`
     },
@@ -988,7 +988,7 @@ test('exhausted replica transport attempts remain separate from the retained val
   }})
   const process={...fixture.process,...processExecution},outcome={...fixture.outcome,...outcomeExecution}
   const suite=buildSemanticJudgeViewSuite({process,outcome,producerDigest:'a'.repeat(64)})
-  const root=await mkdtemp(join(tmpdir(),'rovai-judge-exhausted-'))
+  const root=await mkdtemp(join(tmpdir(),'coaxi-judge-exhausted-'))
   try {
     await retainSemanticJudgeViewArtifacts(root,{process,outcome,suite})
     const failures=await readJudgeExecutionFailures(root,suite)

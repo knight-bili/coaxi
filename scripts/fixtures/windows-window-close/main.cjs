@@ -33,7 +33,7 @@ app.whenReady().then(async () => {
       return { destroy: () => { destroyed = true }, isDestroyed: () => destroyed }
     },
     quit: () => app.quit(),
-    publish: value => window.webContents.send('rovai:window-close-changed', value)
+    publish: value => window.webContents.send('coaxi:window-close-changed', value)
   })
   coordinator = new AppQuitCoordinator({ updateInstallPending: () => updatePending, beforeDrain: () => {},
     prepareRenderer: async () => { await owner.settlePending(); prepares++; if (failQuit) throw Error('fixture draft write failed') },
@@ -51,7 +51,7 @@ app.whenReady().then(async () => {
       } catch (error) { console.error(error); app.exit(1) }
     }
   })
-  ipcMain.handle('rovai:window-close', createWindowCloseRequestHandler('win32', () => owner, () => window))
+  ipcMain.handle('coaxi:window-close', createWindowCloseRequestHandler('win32', () => owner, () => window))
   window.on('close', event => owner.handleClose(event))
   const run = expression => window.webContents.executeJavaScript(expression, true)
   const wait = async expression => {

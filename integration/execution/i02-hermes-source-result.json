@@ -4,7 +4,7 @@
   "task": "I02-T02",
   "status": "source_audited_implementation_pending",
   "source": {
-    "codegCommit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
+    "coaxiCommit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
     "entry": "src-tauri/src/acp/registry.rs: AgentType::Hermes",
     "bridge": {
       "package": "hermes-agent",

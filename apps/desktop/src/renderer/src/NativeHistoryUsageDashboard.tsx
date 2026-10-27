@@ -3,13 +3,13 @@ import type { NativeHistoryUsageReport,TokenUsageBreakdownItem,TokenUsageBucket,
 import { useThreadClient } from './camp-client'
 import { useInterfaceLanguage,useUiText } from './interface-language'
 import { readErrorMessage } from './error-message'
-import { ActivityHeatmap,RankedBars,RingMeter,TrendChart } from './codeg-native-content/components/token-usage/charts'
-import { buildHeatMatrix,cacheHitRate,computeDelta,foldBreakdown,formatTokensPrecise,resolveRange,suggestBucket,type TokenUsageRangePreset } from './codeg-native-content/lib/token-usage'
-import { useTranslations } from './codeg-native-content/ui/source-primitives'
+import { ActivityHeatmap,RankedBars,RingMeter,TrendChart } from './coaxi-native-content/components/token-usage/charts'
+import { buildHeatMatrix,cacheHitRate,computeDelta,foldBreakdown,formatTokensPrecise,resolveRange,suggestBucket,type TokenUsageRangePreset } from './coaxi-native-content/lib/token-usage'
+import { useTranslations } from './coaxi-native-content/ui/source-primitives'
 import { UsageShareDialog } from './UsageShareDialog'
 import { NativeUsagePriceEstimate } from './NativeUsagePriceEstimate'
 
-/** 冻结导入材料的原 Codeg 用量口径，和本应用运行数据分开。 */
+/** 冻结导入材料的原 Coaxi 用量口径，和本应用运行数据分开。 */
 export function NativeHistoryUsageDashboard():React.JSX.Element {
   const client=useThreadClient(),language=useInterfaceLanguage(),t=useUiText(),original=useTranslations('TokenUsage')
   const [now]=useState(()=>new Date()),[preset,setPreset]=useState<TokenUsageRangePreset>('30d'),[dates,setDates]=useState({from:'',to:''}),[bucket,setBucket]=useState<TokenUsageBucket>('day')
@@ -30,8 +30,8 @@ export function NativeHistoryUsageDashboard():React.JSX.Element {
   const cache=totals?cacheHitRate(totals):null,delta=totals&&report?.previous_totals?computeDelta(totals.total_tokens,report.previous_totals.total_tokens):null
   const trend=report?.series.map(point=>({key:point.bucket_key,label:point.bucket_key,cache:point.cache_read_tokens,fresh:Math.max(0,point.total_tokens-point.cache_read_tokens),detail:[{label:t('输入'),value:formatTokensPrecise(point.input_tokens)},{label:t('输出'),value:formatTokensPrecise(point.output_tokens)}]}))??[]
   const ranking=(items:TokenUsageBreakdownItem[])=>{const {shown,other}=foldBreakdown(items,7);return [...shown,...(other?[other]:[])].map(row=>({key:row.key,label:row.key==='__other__'?t('其他'):row.key==='__unknown__'?t('未知模型'):row.label,value:row.total_tokens,share:totals&&totals.total_tokens>0?row.total_tokens/totals.total_tokens:null}))}
-  const downloadJson=async():Promise<void>=>{if(!data)return;try{if(client.exportNativeHistoryUsage){await client.exportNativeHistoryUsage(query);return}const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));const link=document.createElement('a');link.href=url;link.download='codeg-rovai-native-history-usage.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),30000)}catch(reason){setError(readErrorMessage(reason))}}
-  return <div className="usage-activity-dashboard codeg-native-rich tu-viz">
+  const downloadJson=async():Promise<void>=>{if(!data)return;try{if(client.exportNativeHistoryUsage){await client.exportNativeHistoryUsage(query);return}const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));const link=document.createElement('a');link.href=url;link.download='coaxi-native-history-usage.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),30000)}catch(reason){setError(readErrorMessage(reason))}}
+  return <div className="usage-activity-dashboard coaxi-native-rich tu-viz">
     <header className="usage-dashboard-heading"><div><h1>{t('原生历史用量')}</h1><p>{t('来自已导入的冻结快照，按原始记录统计。')}</p></div><div className="flex flex-wrap gap-2"><button type="button" className="quiet-button" disabled={loading} onClick={()=>setRefresh(value=>value+1)}>{t('刷新')}</button><button type="button" className="quiet-button" disabled={!report} onClick={()=>void downloadJson()}>{t('导出 JSON')}</button><button type="button" className="primary-button" disabled={!report} onClick={()=>report&&setShare({...structuredClone(report),truncated:report.truncated||Boolean(data?.missingIndex.length)})}>{t('分享')}</button></div></header>
     <div className="usage-dashboard-toolbar"><div className="usage-dashboard-ranges" role="group" aria-label={t('统计范围')}>{(['7d','30d','90d','thisMonth','thisYear','all','custom'] as const).map((value,index)=><button className="quiet-button" key={value} type="button" aria-pressed={preset===value} onClick={()=>{setPreset(value);setBucket(suggestBucket(value,resolveRange(value,now)))}}>{t(['近 7 天','近 30 天','近 90 天','本月','今年','全部记录','自选日期'][index])}</button>)}</div>
       <div className="usage-dashboard-filters"><label>{t('工程')}<select className="workspace-field" value={project} onChange={event=>setProject(event.target.value)}><option value="">{t('全部')}</option>{data?.folderKeys.filter(row=>row.path).map(row=><option value={row.path} key={row.path}>{row.path}</option>)}</select></label><label>{t('智能体')}<input className="workspace-field" value={provider} placeholder={t('全部')} onChange={event=>setProvider(event.target.value)}/></label><label>{t('模型')}<input className="workspace-field" value={model} placeholder={t('全部')} onChange={event=>setModel(event.target.value)}/></label><label>{t('粒度')}<select className="workspace-field" value={bucket} onChange={event=>setBucket(event.target.value as TokenUsageBucket)}><option value="day">{t('按天')}</option><option value="week">{t('按周')}</option><option value="month">{t('按月')}</option></select></label></div>

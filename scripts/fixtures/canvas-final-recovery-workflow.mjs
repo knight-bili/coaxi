@@ -40,7 +40,7 @@ export async function qualifyCanvasSourceUi(window,{evaluate,wait,rpc,openCanvas
   await openCanvasBoard(evaluate,wait,context.boardId)
   await click('document.querySelector(".canvas-board-title")');await click(menu('管理项目分组'));await click(button('新建项目分组'))
   await type('document.querySelector(".app-dialog input[data-dialog-autofocus]")','R10 恢复项目分组');await click(button('保存分组'));await wait('!document.querySelector(".project-groups-members")');await click(button('完成'))
-  const preferences=await evaluate('window.rovai.navigationPreferences.get()'),group=preferences.projectGroups.find(g=>g.name==='R10 恢复项目分组');assert.ok(group);context.groupId=group.id
+  const preferences=await evaluate('window.coaxi.navigationPreferences.get()'),group=preferences.projectGroups.find(g=>g.name==='R10 恢复项目分组');assert.ok(group);context.groupId=group.id
   const kinds=['folder','group','agent','conversation','custom','note','file','terminal']
   for(const [i,kind] of kinds.entries()){
    const snapshot=await core(),data={kind,title:`R10 ${kind}`,x:i%4*540,y:Math.floor(i/4)*390,width:kind==='conversation'?224:480,height:kind==='conversation'?132:310,
@@ -73,7 +73,7 @@ export async function qualifyCanvasSourceUi(window,{evaluate,wait,rpc,openCanvas
   const snapshot=await core(),other=await rpc('canvas.nodes.snapshot',{boardId:context.otherBoardId}),boards=(await rpc('canvas.boards.list')).boards
   assert.deepEqual(snapshot.board,context.primary.board);assert.deepEqual(snapshot.nodes,context.primary.nodes);assert.deepEqual(other.board,context.secondary.board);assert.deepEqual(other.nodes,context.secondary.nodes);assert.deepEqual(boards,context.boards)
   assert.equal(createHash('sha256').update(await readFile(context.sourceFile)).digest('hex'),context.sourceSha256)
-  const preferences=await evaluate('window.rovai.navigationPreferences.get()');assert.ok(preferences.projectGroups.some(g=>g.id===context.groupId&&g.name==='R10 恢复项目分组'))
+  const preferences=await evaluate('window.coaxi.navigationPreferences.get()');assert.ok(preferences.projectGroups.some(g=>g.id===context.groupId&&g.name==='R10 恢复项目分组'))
   record('fresh_app_core_preserve_both_board_metadata_all_eight_exact_nodes_original_file_bytes_and_device_project_group')
   await click('document.querySelector(\'button[aria-label="无限画布"]\')');await rendered()
   const restored=await camera();assert.ok(restored.every((n,i)=>Math.abs(n-context.camera[i])<(i<2?.001:2)),JSON.stringify({expected:context.camera,actual:restored}))

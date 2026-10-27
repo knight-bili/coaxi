@@ -23,8 +23,8 @@ import {
 } from './lib/runtime-camp-files-root.mjs'
 
 const root = resolve(import.meta.dirname, '..')
-const fixtureRoot = await realpath(process.env.ROVAI_MCP_PROJECTION_FIXTURE_ROOT
-  ?? await mkdtemp(join(tmpdir(), 'rovai-mcp-projection-smoke-')))
+const fixtureRoot = await realpath(process.env.COAXI_MCP_PROJECTION_FIXTURE_ROOT
+  ?? await mkdtemp(join(tmpdir(), 'coaxi-mcp-projection-smoke-')))
 const projectRoot = join(fixtureRoot, 'project')
 const dataDir = join(fixtureRoot, 'data')
 const grokHome = join(fixtureRoot, 'grok-home')
@@ -33,21 +33,21 @@ const grokSourceHome = process.env.GROK_HOME?.trim() || join(homedir(), '.grok')
 const grokNativeStdioMarker = join(fixtureRoot, 'grok-native-stdio-started')
 const grokNativeHttpNameMarker = join(fixtureRoot, 'grok-native-http-name-started')
 const mcpConfigPath = join(fixtureRoot, 'config', 'mcp.json')
-const fixture = join(root, 'crates/rovai-core/tests/fixtures/mcp-smoke-server.mjs')
+const fixture = join(root, 'crates/coaxi-core/tests/fixtures/mcp-smoke-server.mjs')
 const opencodeCallMarker = join(fixtureRoot, 'opencode-mcp-calls')
-const opencodeCallEnvironment = { ROVAI_MCP_SMOKE_CALL_MARKER: opencodeCallMarker }
+const opencodeCallEnvironment = { COAXI_MCP_SMOKE_CALL_MARKER: opencodeCallMarker }
 const nativeMcpEntryHint = 'If MCP tools are exposed through execute, use that entry point to call the named tool. A missing standalone function does not by itself mean the MCP tool is unavailable.'
 const serverId = '6f589c15-bba8-42e5-a20a-cd6749824207'
-const serverName = 'rovai_smoke'
+const serverName = 'coaxi_smoke'
 const projectedHttpServerId = '1bb55b1c-39fc-40cc-b9d5-e6ba2dfcd577'
-const projectedHttpServerName = 'rovai_smoke_http'
+const projectedHttpServerName = 'coaxi_smoke_http'
 const projectedStdioServerId = '9de5a1c5-d645-425e-8fbd-eb12b7443103'
-const projectedStdioServerName = 'rovai_smoke_stdio'
-const selected = (process.env.ROVAI_MCP_PROJECTION_SMOKE_ADAPTERS ?? 'all')
+const projectedStdioServerName = 'coaxi_smoke_stdio'
+const selected = (process.env.COAXI_MCP_PROJECTION_SMOKE_ADAPTERS ?? 'all')
   .split(',')
   .map((value) => value.trim())
   .filter(Boolean)
-const debugGrokProjection = process.env.ROVAI_MCP_PROJECTION_DEBUG_GROK === '1'
+const debugGrokProjection = process.env.COAXI_MCP_PROJECTION_DEBUG_GROK === '1'
 const allAdapters = [
   'codex-cli',
   'claude-code-cli',
@@ -74,7 +74,7 @@ try {
   for (const adapter of adapters) {
     if (!allAdapters.includes(adapter)) throw new Error(`Unsupported MCP Projection smoke Adapter: ${adapter}`)
   }
-  projectedHttp = await startMcpHttpServer('rovai-projection-http')
+  projectedHttp = await startMcpHttpServer('coaxi-projection-http')
   nativeHttp = await startMcpHttpServer('runtime-native-http')
   await prepareProject(nativeHttp.url)
   if (grokSelected) await prepareGrokHome()
@@ -82,12 +82,12 @@ try {
     const nativeRows = [serverName, projectedHttpServerName, projectedStdioServerName].map((serverName, index) => ({
         id: `native-mcp-${index}`, name: '@deepseek-ai/dsh-mcp-client',
         config: { serverName, transport: 'stdio', command: process.execPath, args: [fixture],
-          env: { ROVAI_MCP_SMOKE_SOURCE: 'runtime-native' }, failOnStartupError: true }
+          env: { COAXI_MCP_SMOKE_SOURCE: 'runtime-native' }, failOnStartupError: true }
       }))
-    if (process.env.ROVAI_DSH_SCRIPTED_MCP === '1') nativeRows.push({ id: 'acceptance-scripted-model', name: join(root, 'scripts/lib/dsh-scripted-mcp-provider.mjs') })
+    if (process.env.COAXI_DSH_SCRIPTED_MCP === '1') nativeRows.push({ id: 'acceptance-scripted-model', name: join(root, 'scripts/lib/dsh-scripted-mcp-provider.mjs') })
     await prepareDshSmokeHome(dshHome, [{ insert: nativeRows }])
   }
-  await prepareRovaiConfig(projectedHttp.url)
+  await prepareCoaxiConfig(projectedHttp.url)
   core = startCore()
   await core.request('health.check')
   const workspace = await core.request('workspaces.inspect', { path: projectRoot })
@@ -104,24 +104,24 @@ try {
           `runtime-native-http:${adapterMarker}-stdio`
         ]
       : adapterKind === 'grok-build'
-        ? [`rovai-projection-stdio:${adapterMarker}-stdio`]
+        ? [`coaxi-projection-stdio:${adapterMarker}-stdio`]
       : ['kimi-code-cli', 'zcode-app', 'deepseek-harness', 'opencode-cli'].includes(adapterKind)
         ? [
-            `rovai-projection:${adapterMarker}`,
-            `rovai-projection-http:${adapterMarker}-http`,
-            `rovai-projection-stdio:${adapterMarker}-stdio`
+            `coaxi-projection:${adapterMarker}`,
+            `coaxi-projection-http:${adapterMarker}-http`,
+            `coaxi-projection-stdio:${adapterMarker}-stdio`
           ]
-      : [`rovai-projection:${adapterMarker}`]
+      : [`coaxi-projection:${adapterMarker}`]
     const forbidden = nativeWins
       ? [
-          `rovai-projection:${adapterMarker}`,
-          `rovai-projection-http:${adapterMarker}-http`,
-          `rovai-projection-stdio:${adapterMarker}-stdio`
+          `coaxi-projection:${adapterMarker}`,
+          `coaxi-projection-http:${adapterMarker}-http`,
+          `coaxi-projection-stdio:${adapterMarker}-stdio`
         ]
       : adapterKind === 'grok-build'
         ? [
-            `rovai-projection:${adapterMarker}`,
-            `rovai-projection-http:${adapterMarker}-http`,
+            `coaxi-projection:${adapterMarker}`,
+            `coaxi-projection-http:${adapterMarker}-http`,
             `runtime-native-http:${adapterMarker}-stdio`
           ]
       : ['kimi-code-cli', 'zcode-app', 'deepseek-harness', 'opencode-cli'].includes(adapterKind)
@@ -172,7 +172,7 @@ try {
     let safety = null
     if (['zcode-app', 'deepseek-harness', 'opencode-cli'].includes(adapterKind)) {
       // Use the same Camp so a missing compatibility fence would actually reuse
-      // the resident Host. A neighbouring member has no Rovai assignments.
+      // the resident Host. A neighbouring member has no Coaxi assignments.
       const mutate = async (method, params) => {
         const config = await core.request('mcp.config.get')
         const mutation = await core.request(method, { expectedConfigDigest: config.configDigest, ...params })
@@ -192,25 +192,25 @@ try {
         assert(observed.includes(expected) && (!forbidden || !observed.includes(forbidden)), `${adapterKind} ${label}: ${JSON.stringify({ output:run.output, toolOutput:run.toolOutput })}`)
       }
       await mutate('mcp.servers.update', { serverId, definitionJson: JSON.stringify({ mcpServers: {
-        [serverName]: { command: process.execPath, args: [fixture], env: { ROVAI_MCP_SMOKE_SOURCE: 'rovai-updated', ...opencodeCallEnvironment } }
+        [serverName]: { command: process.execPath, args: [fixture], env: { COAXI_MCP_SMOKE_SOURCE: 'coaxi-updated', ...opencodeCallEnvironment } }
       } }) })
       const updated = await probe(call)
-      assertSource(updated, 'rovai-updated:lifecycle', null, 'MCP update did not take effect')
+      assertSource(updated, 'coaxi-updated:lifecycle', null, 'MCP update did not take effect')
       assert(updated.hostInstanceId !== result.hostInstanceId, `${adapterKind} reused stale MCP Host`)
       if (['deepseek-harness', 'opencode-cli'].includes(adapterKind)) assert(updated.nativeThreadId === result.nativeThreadId, `${adapterKind} lost exact Session on MCP update`)
       await configureProductRuntime(core.request, adapterKind, ['agent_2'])
       const adjacent = await probe(call, 'agent_2')
-      assertSource(adjacent, 'runtime-native:lifecycle', 'rovai-updated:', 'adjacent member did not call its native MCP')
+      assertSource(adjacent, 'runtime-native:lifecycle', 'coaxi-updated:', 'adjacent member did not call its native MCP')
       await mutate('mcp.assignments.set', { serverId, agentId: 'agent_1', assigned: false })
       const unassigned = await probe(call)
-      assertSource(unassigned, 'runtime-native:lifecycle', 'rovai-updated:', 'removed assignment remained visible')
+      assertSource(unassigned, 'runtime-native:lifecycle', 'coaxi-updated:', 'removed assignment remained visible')
       await mutate('mcp.assignments.set', { serverId, agentId: 'agent_1', assigned: true })
       const reassigned = await probe(call)
-      assertSource(reassigned, 'rovai-updated:lifecycle', null, 'reassignment did not take effect')
+      assertSource(reassigned, 'coaxi-updated:lifecycle', null, 'reassignment did not take effect')
       if (adapterKind === 'deepseek-harness') {
         const callMarker = join(fixtureRoot, 'dsh-mcp-calls')
         await mutate('mcp.servers.update', { serverId, definitionJson: JSON.stringify({ mcpServers: {
-          [serverName]: { command: process.execPath, args: [fixture], env: { ROVAI_MCP_SMOKE_SOURCE: 'rovai-updated', ROVAI_MCP_SMOKE_CALL_MARKER: callMarker } }
+          [serverName]: { command: process.execPath, args: [fixture], env: { COAXI_MCP_SMOKE_SOURCE: 'coaxi-updated', COAXI_MCP_SMOKE_CALL_MARKER: callMarker } }
         } }) })
         const permissions = async (sandbox_mode, approval_policy) => {
           const member = await core.request('members.get', { agentId: 'agent_1' })
@@ -225,15 +225,15 @@ try {
         await permissions('danger-full-access', 'ask')
         const ask = await probe(call, 'agent_1')
         assert(ask.approvalCount === 0 && await count() === 1,
-          'Rovai synthesized an Approval that DSH did not request for MCP')
+          'Coaxi synthesized an Approval that DSH did not request for MCP')
         await permissions('read-only', 'ask')
         const readOnlyAsk = await probe(call, 'agent_1')
         assert(readOnlyAsk.approvalCount === 0 && await count() === 2,
-          'Rovai overrode DSH native MCP behavior under read-only/ask')
+          'Coaxi overrode DSH native MCP behavior under read-only/ask')
         await permissions('read-only', 'never')
         const readOnlyNever = await probe(call, 'agent_1')
         assert(readOnlyNever.approvalCount === 0 && await count() === 3,
-          'Rovai overrode DSH native MCP behavior under read-only/never')
+          'Coaxi overrode DSH native MCP behavior under read-only/never')
         await permissions('danger-full-access', 'never')
         safety = {
           authority: 'runtime-native',
@@ -243,7 +243,7 @@ try {
       }
       await mutate('mcp.servers.delete', { serverId })
       const deleted = await probe(call)
-      assertSource(deleted, 'runtime-native:lifecycle', 'rovai-updated:', 'deleted MCP remained visible')
+      assertSource(deleted, 'runtime-native:lifecycle', 'coaxi-updated:', 'deleted MCP remained visible')
       lifecycle = { updateObserved: true, oldHostFenced: true, adjacentAssignmentIsolated: true,
         unassignedNativeRestored: true, reassignedObserved: true, deletedNativeRestored: true,
         agentRunIds: [updated, adjacent, unassigned, reassigned, deleted].map((run) => run.agentRunId),
@@ -264,8 +264,8 @@ try {
 
   console.log(JSON.stringify({
     ok: true,
-    modelSource: process.env.ROVAI_DSH_SCRIPTED_MCP === '1' ? 'scripted MCP-only acceptance fixture; no provider generation' : 'native provider',
-    semantics: 'Runtime-native config is preserved; Codex skips collisions, Grok skips active native collisions and adds distinct per-Run servers, while other additive adapters give Rovai the whole-definition precedence',
+    modelSource: process.env.COAXI_DSH_SCRIPTED_MCP === '1' ? 'scripted MCP-only acceptance fixture; no provider generation' : 'native provider',
+    semantics: 'Runtime-native config is preserved; Codex skips collisions, Grok skips active native collisions and adds distinct per-Run servers, while other additive adapters give Coaxi the whole-definition precedence',
     results
   }, null, 2))
 } finally {
@@ -273,7 +273,7 @@ try {
   if (projectedHttp) await projectedHttp.stop()
   if (nativeHttp) await nativeHttp.stop()
   await removeEphemeralRuntimeCampFilesRoot(dataDir)
-  if (process.env.ROVAI_KEEP_MCP_FIXTURE === '1') process.stderr.write(`MCP fixture retained: ${fixtureRoot}\n`)
+  if (process.env.COAXI_KEEP_MCP_FIXTURE === '1') process.stderr.write(`MCP fixture retained: ${fixtureRoot}\n`)
   else await rm(fixtureRoot, { recursive: true, force: true })
 }
 
@@ -285,7 +285,7 @@ async function prepareProject(nativeHttpUrl) {
     type: 'stdio',
     command: process.execPath,
     args: [fixture],
-    env: { ROVAI_MCP_SMOKE_SOURCE: 'runtime-native' }
+    env: { COAXI_MCP_SMOKE_SOURCE: 'runtime-native' }
   }
   const nativeServers = {
     [serverName]: nativeServer,
@@ -294,7 +294,7 @@ async function prepareProject(nativeHttpUrl) {
   }
   await mkdir(join(projectRoot, '.zcode'), { recursive: true })
   await writeFile(join(projectRoot, '.zcode', 'config.json'), `${JSON.stringify({mcp: { enabled: true, servers: nativeServers }}, null, 2)}\n`)
-  await writeFile(join(projectRoot, 'README.md'), '# Rovai-ai same-name MCP Projection smoke\n')
+  await writeFile(join(projectRoot, 'README.md'), '# Coaxi same-name MCP Projection smoke\n')
   if (!grokOnly) {
     await writeFile(join(projectRoot, '.mcp.json'), `${JSON.stringify({
       mcpServers: nativeServers
@@ -309,13 +309,13 @@ async function prepareProject(nativeHttpUrl) {
         type: 'local',
         command: [process.execPath, fixture],
         enabled: true,
-        environment: { ROVAI_MCP_SMOKE_SOURCE: 'runtime-native', ...opencodeCallEnvironment }
+        environment: { COAXI_MCP_SMOKE_SOURCE: 'runtime-native', ...opencodeCallEnvironment }
       },
       [projectedHttpServerName]: {
         type: 'local',
         command: [process.execPath, fixture],
         enabled: true,
-        environment: { ROVAI_MCP_SMOKE_SOURCE: 'runtime-native', ...opencodeCallEnvironment }
+        environment: { COAXI_MCP_SMOKE_SOURCE: 'runtime-native', ...opencodeCallEnvironment }
       },
       [projectedStdioServerName]: {
         type: 'remote',
@@ -329,19 +329,19 @@ async function prepareProject(nativeHttpUrl) {
     `command = ${JSON.stringify(process.execPath)}`,
     `args = [${JSON.stringify(fixture)}]`,
     `[mcp_servers.${serverName}.env]`,
-    'ROVAI_MCP_SMOKE_SOURCE = "runtime-native"',
+    'COAXI_MCP_SMOKE_SOURCE = "runtime-native"',
     `[mcp_servers.${projectedHttpServerName}]`,
     `command = ${JSON.stringify(process.execPath)}`,
     `args = [${JSON.stringify(fixture)}]`,
     `[mcp_servers.${projectedHttpServerName}.env]`,
-    'ROVAI_MCP_SMOKE_SOURCE = "runtime-native"',
+    'COAXI_MCP_SMOKE_SOURCE = "runtime-native"',
     `[mcp_servers.${projectedStdioServerName}]`,
     `url = ${JSON.stringify(nativeHttpUrl)}`,
     ''
   ].join('\n'))
   await run('git', ['init', '-b', 'main'], projectRoot)
-  await run('git', ['config', 'user.name', 'Rovai-ai MCP Projection Smoke'], projectRoot)
-  await run('git', ['config', 'user.email', 'mcp-projection-smoke@rovai.local'], projectRoot)
+  await run('git', ['config', 'user.name', 'Coaxi MCP Projection Smoke'], projectRoot)
+  await run('git', ['config', 'user.email', 'mcp-projection-smoke@coaxi.local'], projectRoot)
   await run('git', ['add', '.'], projectRoot)
   await run('git', ['commit', '-m', 'same-name Runtime-native MCP fixture'], projectRoot)
 }
@@ -356,12 +356,12 @@ async function prepareGrokHome() {
     `[mcp_servers.${serverName}]`,
     `command = ${JSON.stringify(process.execPath)}`,
     `args = [${JSON.stringify(fixture)}]`,
-    `env = { ROVAI_MCP_SMOKE_SOURCE = "runtime-native", ROVAI_MCP_SMOKE_STARTUP_MARKER = ${JSON.stringify(grokNativeStdioMarker)} }`,
+    `env = { COAXI_MCP_SMOKE_SOURCE = "runtime-native", COAXI_MCP_SMOKE_STARTUP_MARKER = ${JSON.stringify(grokNativeStdioMarker)} }`,
     '',
     `[mcp_servers.${projectedHttpServerName}]`,
     `command = ${JSON.stringify(process.execPath)}`,
     `args = [${JSON.stringify(fixture)}]`,
-    `env = { ROVAI_MCP_SMOKE_SOURCE = "runtime-native", ROVAI_MCP_SMOKE_STARTUP_MARKER = ${JSON.stringify(grokNativeHttpNameMarker)} }`,
+    `env = { COAXI_MCP_SMOKE_SOURCE = "runtime-native", COAXI_MCP_SMOKE_STARTUP_MARKER = ${JSON.stringify(grokNativeHttpNameMarker)} }`,
     ''
   ].join('\n'), { mode: 0o600 })
   await chmod(join(grokHome, 'config.toml'), 0o600)
@@ -373,7 +373,7 @@ async function prepareGrokHome() {
   }
 }
 
-async function prepareRovaiConfig(projectedHttpUrl) {
+async function prepareCoaxiConfig(projectedHttpUrl) {
   await mkdir(resolve(mcpConfigPath, '..'), { recursive: true, mode: 0o700 })
   await chmod(resolve(mcpConfigPath, '..'), 0o700)
   await writeFile(mcpConfigPath, `${JSON.stringify({
@@ -381,7 +381,7 @@ async function prepareRovaiConfig(projectedHttpUrl) {
       [serverName]: {
         command: process.execPath,
         args: [fixture],
-        env: { ROVAI_MCP_SMOKE_SOURCE: 'rovai-projection', ...opencodeCallEnvironment }
+        env: { COAXI_MCP_SMOKE_SOURCE: 'coaxi-projection', ...opencodeCallEnvironment }
       },
       [projectedHttpServerName]: {
         url: projectedHttpUrl
@@ -389,10 +389,10 @@ async function prepareRovaiConfig(projectedHttpUrl) {
       [projectedStdioServerName]: {
         command: process.execPath,
         args: [fixture],
-        env: { ROVAI_MCP_SMOKE_SOURCE: 'rovai-projection-stdio', ...opencodeCallEnvironment }
+        env: { COAXI_MCP_SMOKE_SOURCE: 'coaxi-projection-stdio', ...opencodeCallEnvironment }
       }
     },
-    _rovai: {
+    _coaxi: {
       schemaVersion: 2,
       servers: {
         [serverName]: {
@@ -454,7 +454,7 @@ async function runProjectedTool(request, workspace, adapterKind, adapterMarker, 
         `Call the Runtime-native MCP server named \`${serverName}\` and its \`echo\` tool exactly once with text \`${adapterMarker}\`.`,
         `Call the Runtime-native MCP server named \`${projectedHttpServerName}\` and its \`echo\` tool exactly once with text \`${adapterMarker}-http\`.`,
         `Call the Runtime-native MCP server named \`${projectedStdioServerName}\` and its \`echo\` tool exactly once with text \`${adapterMarker}-stdio\`.`,
-        'Return all three tool results. The assigned Rovai definitions have the same names and must be skipped.'
+        'Return all three tool results. The assigned Coaxi definitions have the same names and must be skipped.'
       ]
     : adapterKind === 'grok-build'
       ? [
@@ -602,13 +602,13 @@ function startMcpHttpServer(source) {
           result = {
             protocolVersion: message.params?.protocolVersion ?? '2025-06-18',
             capabilities: { tools: {} },
-            serverInfo: { name: 'rovai-mcp-http-smoke', version: '1.0.0' }
+            serverInfo: { name: 'coaxi-mcp-http-smoke', version: '1.0.0' }
           }
         } else if (message.method === 'tools/list') {
           result = {
             tools: [{
               name: 'echo',
-              description: 'Return a deterministic Rovai-ai HTTP MCP smoke marker.',
+              description: 'Return a deterministic Coaxi HTTP MCP smoke marker.',
               inputSchema: {
                 type: 'object',
                 properties: { text: { type: 'string' } },
@@ -665,11 +665,11 @@ async function opencodeCallCount() {
 
 function selectedModel(adapterKind) {
   return ({
-    'opencode-cli': process.env.ROVAI_MCP_OPENCODE_MODEL ?? 'opencode/mimo-v2.5-free',
-    'qoder-cli': process.env.ROVAI_MCP_QODER_MODEL ?? 'deepseek/deepseek-v4-flash-pg',
-    'codebuddy-cli': process.env.ROVAI_MCP_CODEBUDDY_MODEL ?? 'custom-local:deepseek-v4-flash',
-    'qwen-code': process.env.ROVAI_MCP_QWEN_MODEL ?? 'deepseek-v4-flash(openai)',
-    'trae-cn-cli': process.env.ROVAI_MCP_TRAE_MODEL
+    'opencode-cli': process.env.COAXI_MCP_OPENCODE_MODEL ?? 'opencode/mimo-v2.5-free',
+    'qoder-cli': process.env.COAXI_MCP_QODER_MODEL ?? 'deepseek/deepseek-v4-flash-pg',
+    'codebuddy-cli': process.env.COAXI_MCP_CODEBUDDY_MODEL ?? 'custom-local:deepseek-v4-flash',
+    'qwen-code': process.env.COAXI_MCP_QWEN_MODEL ?? 'deepseek-v4-flash(openai)',
+    'trae-cn-cli': process.env.COAXI_MCP_TRAE_MODEL
   })[adapterKind] ?? null
 }
 
@@ -678,9 +678,9 @@ function adapterName(adapterKind) {
 }
 
 function startCore() {
-  const coreExecutable = process.env.ROVAI_CORE_EXECUTABLE
-    ? resolve(process.env.ROVAI_CORE_EXECUTABLE)
-    : join(root, 'target', 'debug', 'rovai-core')
+  const coreExecutable = process.env.COAXI_CORE_EXECUTABLE
+    ? resolve(process.env.COAXI_CORE_EXECUTABLE)
+    : join(root, 'target', 'debug', 'coaxi-core')
   const coreEnvironment = { ...process.env, GROK_HOME: grokHome,
     ...(adapters.includes('deepseek-harness') ? { DSH_HOME: dshHome } : {}) }
   const child = spawn(coreExecutable, [
@@ -703,7 +703,7 @@ function startCore() {
       if (debugGrokProjection
           && message.method === 'runtime.host.log'
           && message.params?.adapterKind === 'grok-build'
-          && /plugin|rovai_smoke/i.test(message.params?.text ?? '')) {
+          && /plugin|coaxi_smoke/i.test(message.params?.text ?? '')) {
         process.stderr.write(`[grok-mcp-debug] ${String(message.params.text).slice(0, 2_048)}\n`)
       }
       return

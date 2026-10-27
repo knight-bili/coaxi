@@ -18,8 +18,8 @@ export async function collectContractTestEvidence({ repositoryRoot, references, 
   const records = []
   const unique = [...new Map(references.map(ref => [`${ref.locator}:${ref.testName}`, ref])).values()]
   for (const [index, reference] of unique.entries()) {
-    const target = reference.locator.endsWith('/main.rs') ? ['--bin', 'rovai-core'] : ['--lib']
-    const args = ['test', '-p', 'rovai-core', ...target, '--features', 'slow-tests', reference.testName, '--', '--test-threads=1']
+    const target = reference.locator.endsWith('/main.rs') ? ['--bin', 'coaxi-core'] : ['--lib']
+    const args = ['test', '-p', 'coaxi-core', ...target, '--features', 'slow-tests', reference.testName, '--', '--test-threads=1']
     const remaining = deadline - Date.now()
     const execution = remaining <= 0 ? { code: null, stdout: '', stderr: '', timedOut: true, spawnError: null } : await execute('cargo', args, repositoryRoot, timeoutMs === null ? null : remaining)
     const classification = classifyTestExecution(reference, execution)

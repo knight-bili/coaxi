@@ -4,9 +4,9 @@ An avatar identifies a member; it does not establish responsibilities, permissio
 
 ## Timing and file handling
 
-Present the visual plan before card confirmation. After confirmation, generate, download, or prepare the file in the current AgentRun and pass it promptly to `rovai member create`.
+Present the visual plan before card confirmation. After confirmation, generate, download, or prepare the file in the current AgentRun and pass it promptly to `coaxi member create`.
 
-Prefer a separate file under `ROVAI_RUN_TMP` when available, or another controlled temporary directory readable by Core in this Run. Do not assume temporary files survive between Runs.
+Prefer a separate file under `COAXI_RUN_TMP` when available, or another controlled temporary directory readable by Core in this Run. Do not assume temporary files survive between Runs.
 
 Pass the local path through `--avatar-file`. Do not write directly to `userData/member-avatars/` or use a remote URL as `avatarRef`. The product decodes, strips metadata, resizes, crops, and stores the managed asset.
 
@@ -23,7 +23,7 @@ Follow the confirmed visual preference, name, role, and traits. Default to illus
 
 For public or historical figures, use public professional references without claiming to reproduce the real person. For fictional characters, preserve requested qualities without copying a particular film, game, or illustration design.
 
-Include the reference or name, role, 2-3 work traits, dimensions, framing, crop space, simple background, and exclusions above in the generation prompt. Optional Rovai details, such as warm lamps, travel gear, or badge motifs, should support distinct identities rather than make everyone share one costume or profession.
+Include the reference or name, role, 2-3 work traits, dimensions, framing, crop space, simple background, and exclusions above in the generation prompt. Optional Coaxi details, such as warm lamps, travel gear, or badge motifs, should support distinct identities rather than make everyone share one costume or profession.
 
 ## Source online
 
@@ -43,4 +43,4 @@ The default order is original generation, sourced image, then default avatar. Us
 
 Visually check a square crop using the image's shorter side, horizontally centered. For a 4:5 portrait, start about 3%-8% below the top. Keep the head, chin, and identifying features visible. The product creates the 192 x 192 icon; a finished icon file is unnecessary.
 
-Before creation, verify the readable static PNG/JPEG, dimensions and bytes against `rovai member create --help`, crop, and current-Run path. Match the confirmed identity without inferring identity facts from the image.
+Before creation, verify the readable static PNG/JPEG, dimensions and bytes against `coaxi member create --help`, crop, and current-Run path. Match the confirmed identity without inferring identity facts from the image.

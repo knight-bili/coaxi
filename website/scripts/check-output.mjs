@@ -59,7 +59,7 @@ for (const lang of ['', '/zh']) {
     if (!download.includes(`/releases/download/v0.4.8/${asset}`)) problems.push(`${lang}/download: missing ${asset}`)
   }
   for (const target of ['linux-x64.tar.gz','macos-arm64.tar.gz','macos-x64.tar.gz','windows-x64.zip']) {
-    if (!download.includes(`/releases/download/v0.4.8/rovai-server-0.4.8-${target}`)) problems.push(`${lang}/download: missing Server asset ${target}`)
+    if (!download.includes(`/releases/download/v0.4.8/coaxi-server-0.4.8-${target}`)) problems.push(`${lang}/download: missing Server asset ${target}`)
   }
   for (const topic of ['agents','agent-setup','remote','desktop-web','server-install','lan-access','tailscale','public-https','server-maintenance']) {
     const article = new JSDOM(readFileSync(join(dist, lang, 'docs', topic + '.html'), 'utf8')).window.document

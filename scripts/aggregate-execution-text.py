@@ -242,7 +242,7 @@ def offline_core_lock(source_db):
     if os.name != "posix":
         raise ValueError("in-place mode currently requires a POSIX Core instance lock")
     import fcntl
-    lock = source_db.parent / ".rovai-core-instance.lock"
+    lock = source_db.parent / ".coaxi-core-instance.lock"
     fd = os.open(lock, os.O_RDWR | os.O_CREAT | os.O_NOFOLLOW, 0o600)
     try:
         if not stat.S_ISREG(os.fstat(fd).st_mode):
@@ -263,7 +263,7 @@ def copy_blobs(source, target):
 
 def run(args):
     args.output_dir.mkdir(mode=0o700)
-    output_db = args.output_dir / "rovai.sqlite"
+    output_db = args.output_dir / "coaxi.sqlite"
     source = sqlite3.connect(args.source_db.as_uri() + ("?mode=rw" if args.apply_in_place else "?mode=ro"), timeout=0)
     target = sqlite3.connect(output_db)
     try:

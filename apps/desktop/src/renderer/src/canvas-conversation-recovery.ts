@@ -1,5 +1,5 @@
-// Codeg aff1e6c278453ed8d0b96a5f664edcdca621aa3f remembers expanded cards,
-// while drawer/ACP liveness stay session-only. See integration/licenses/codeg/LICENSE.
+// Coaxi aff1e6c278453ed8d0b96a5f664edcdca621aa3f remembers expanded cards,
+// while drawer/ACP liveness stay session-only. See integration/licenses/coaxi/LICENSE.
 import type { CanvasNode } from '@contracts'
 import { canvasComposerContext, canvasComposerContextKey, parseCanvasComposerContext } from './canvas-composer-drafts'
 import type { CanvasConversationTarget } from './canvas-conversation'
@@ -7,7 +7,7 @@ import { loadCanvasViewState, type CanvasViewScope } from './canvas-view-state'
 import { uiAttribute } from './interface-language'
 
 type Storage = Pick<globalThis.Storage, 'getItem' | 'setItem'>
-export const CANVAS_CONVERSATION_RECOVERY_PREFIX = 'rovai.canvas-conversations.v1:'
+export const CANVAS_CONVERSATION_RECOVERY_PREFIX = 'coaxi.canvas-conversations.v1:'
 const key = (scope: CanvasViewScope, boardId: string) => `${CANVAS_CONVERSATION_RECOVERY_PREFIX}${JSON.stringify([scope.host, scope.core, boardId])}`
 const valid = (value: string) => typeof value === 'string' && Boolean(value.trim()) && !value.includes('\0')
 const sameScope = (context: NonNullable<ReturnType<typeof parseCanvasComposerContext>>, scope: CanvasViewScope, boardId: string) =>

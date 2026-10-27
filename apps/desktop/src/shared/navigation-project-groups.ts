@@ -3,7 +3,7 @@ import { normalizeProjectDisplayName, projectDisplayNameError } from './project-
 import { isProjectPath as path } from './navigation-project-path'
 
 // Adapts Codeg folder_group_service at aff1e6c278453ed8d0b96a5f664edcdca621aa3f (Apache-2.0).
-// Persistence and revision checks use Rovai presentation preferences, not the donor database.
+// Persistence and revision checks use Coaxi presentation preferences, not the donor database.
 
 const groupId = (value: unknown): value is string => typeof value === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value)
 export const navigationProjectGroupKey = (id: string): string => `folder-group:${id}`

@@ -84,7 +84,7 @@ export function dingtalkOutTrackId(
   deliveryId: string
 ): string {
   const digest = createHash('sha256')
-    .update('rovai-dingtalk-card')
+    .update('coaxi-dingtalk-card')
     .update('\0')
     .update(deliveryId)
     .digest('hex')
@@ -358,7 +358,7 @@ export class DingTalkChannelSettingsService {
     this.#hostPump = new AdaptiveChannelHostPump({
       run: () => this.#pumpOnce(),
       onError: (error) => {
-        console.warn(`[rovai] DingTalk outbox pump failed: ${failureCode(error)}`)
+        console.warn(`[coaxi] DingTalk outbox pump failed: ${failureCode(error)}`)
       },
       setTimeout: dependencies.setTimeout,
       clearTimeout: dependencies.clearTimeout
@@ -367,7 +367,7 @@ export class DingTalkChannelSettingsService {
       onMessage: (message) => this.#queueInbound(message),
       onCard: (callback) => this.#handleCard(callback),
       onFailure: (appKey, error) => {
-        console.warn(`[rovai] DingTalk Stream ${digest(appKey)}: ${failureCode(error)}`)
+        console.warn(`[coaxi] DingTalk Stream ${digest(appKey)}: ${failureCode(error)}`)
       }
     })
   }
@@ -894,7 +894,7 @@ export class DingTalkChannelSettingsService {
         ownerUserId: identity.userId,
         displayName: agent.displayName
       }).catch((error) => {
-        console.warn(`[rovai] DingTalk member Bot welcome failed: ${failureCode(error)}`)
+        console.warn(`[coaxi] DingTalk member Bot welcome failed: ${failureCode(error)}`)
       })
     } catch (error) {
       if (error instanceof DingTalkApproverSelectionRequired) {
@@ -1166,7 +1166,7 @@ export class DingTalkChannelSettingsService {
       [message.appId],
       false
     ).catch((error) => {
-      console.warn(`[rovai] DingTalk inbound observation failed: ${failureCode(error)}`)
+      console.warn(`[coaxi] DingTalk inbound observation failed: ${failureCode(error)}`)
       return false
     })
     pending.set(message.appId, { message, agentId: bot.agentId, observation })
@@ -1192,7 +1192,7 @@ export class DingTalkChannelSettingsService {
       observed.map((candidate) => candidate.message.appId),
       true
     ).catch((error) => {
-        console.warn(`[rovai] DingTalk inbound failed: ${failureCode(error)}`)
+        console.warn(`[coaxi] DingTalk inbound failed: ${failureCode(error)}`)
     })
     this.#hostPump.wake()
   }

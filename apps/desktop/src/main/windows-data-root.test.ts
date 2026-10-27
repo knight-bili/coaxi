@@ -11,17 +11,17 @@ import { PRODUCT_DATA_DIRECTORY } from '../shared/product-identity'
 
 describe('Windows data-root startup', () => {
   it('uses LOCALAPPDATA for daily state and the exact explicit acceptance root', () => {
-    expect(PRODUCT_DATA_DIRECTORY).toBe('Codeg Rovai Workbench')
+    expect(PRODUCT_DATA_DIRECTORY).toBe('Coaxi')
     expect(resolveWindowsDataRoot(null, 'C:\\Users\\慕雪\\AppData\\Local')).toBe(
-      'C:\\Users\\慕雪\\AppData\\Local\\Codeg Rovai Workbench'
+      'C:\\Users\\慕雪\\AppData\\Local\\Coaxi'
     )
-    expect(resolveWindowsDataRoot('D:/Rovai fixtures/case 01', undefined)).toBe(
-      'D:\\Rovai fixtures\\case 01'
+    expect(resolveWindowsDataRoot('D:/Coaxi fixtures/case 01', undefined)).toBe(
+      'D:\\Coaxi fixtures\\case 01'
     )
   })
 
   it('rejects UNC, traversal, relative, and volume-root storage', () => {
-    expect(() => resolveWindowsDataRoot('\\\\server\\share\\rovai', undefined)).toThrow(
+    expect(() => resolveWindowsDataRoot('\\\\server\\share\\coaxi', undefined)).toThrow(
       'windows_storage.not_local'
     )
     expect(() => resolveWindowsDataRoot('C:\\fixtures\\..\\daily', undefined)).toThrow(
@@ -36,7 +36,7 @@ describe('Windows data-root startup', () => {
   })
 
   it('accepts only the exact closed layout returned by the native preparer', () => {
-    const root = 'C:\\Users\\test-user\\AppData\\Local\\Codeg Rovai Workbench'
+    const root = 'C:\\Users\\test-user\\AppData\\Local\\Coaxi'
     const layout = expectedWindowsDataRootLayout(root)
     expect(parseWindowsDataRootLayout(root, `${JSON.stringify(layout)}\r\n`)).toEqual(layout)
 
@@ -51,7 +51,7 @@ describe('Windows data-root startup', () => {
   })
 
   it('invokes the native sidecar once before returning paths', () => {
-    const root = 'C:\\Users\\test-user\\AppData\\Local\\Codeg Rovai Workbench'
+    const root = 'C:\\Users\\test-user\\AppData\\Local\\Coaxi'
     const layout = expectedWindowsDataRootLayout(root)
     const prepare = vi.fn(() => ({
       status: 0,
@@ -60,17 +60,17 @@ describe('Windows data-root startup', () => {
       stderr: ''
     }))
 
-    expect(prepareWindowsDataRoot('C:\\Program Files\\Codeg Rovai Workbench\\rovai-core.exe', root, prepare))
+    expect(prepareWindowsDataRoot('C:\\Program Files\\Coaxi\\coaxi-core.exe', root, prepare))
       .toEqual(layout)
     expect(prepare).toHaveBeenCalledOnce()
     expect(prepare).toHaveBeenCalledWith(
-      'C:\\Program Files\\Codeg Rovai Workbench\\rovai-core.exe',
+      'C:\\Program Files\\Coaxi\\coaxi-core.exe',
       ['--prepare-windows-data-root', root]
     )
   })
 
   it('binds every Electron-owned path without reusing Core storage', () => {
-    const layout = expectedWindowsDataRootLayout('C:\\Codeg Rovai Workbench')
+    const layout = expectedWindowsDataRootLayout('C:\\Coaxi')
     const electronApp = {
       setPath: vi.fn(),
       setAppLogsPath: vi.fn()
@@ -87,7 +87,7 @@ describe('Windows data-root startup', () => {
   })
 
   it('fails closed when native preparation fails', () => {
-    expect(() => prepareWindowsDataRoot('C:\\rovai-core.exe', 'C:\\Rovai', () => ({
+    expect(() => prepareWindowsDataRoot('C:\\coaxi-core.exe', 'C:\\Coaxi', () => ({
       status: 1,
       signal: null,
       stdout: '',

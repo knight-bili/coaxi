@@ -18,9 +18,9 @@ export const COMPOSER_DRAFT_DEBOUNCE_MS = 350
 export const COMPOSER_DRAFT_MAX_WAIT_MS = 1_500
 export const COMPOSER_DRAFT_RETRY_DELAYS_MS = [500, 1_500] as const
 
-export const ROVAI_ATOM_PRESENTATION_TAG = 'rovai:atom-presentation'
-export const ROVAI_COMPOSER_INITIALIZE_TAG = 'rovai:composer-initialize'
-export const ROVAI_COMPOSER_REPLACE_TAG = 'rovai:composer-replace'
+export const COAXI_ATOM_PRESENTATION_TAG = 'coaxi:atom-presentation'
+export const COAXI_COMPOSER_INITIALIZE_TAG = 'coaxi:composer-initialize'
+export const COAXI_COMPOSER_REPLACE_TAG = 'coaxi:composer-replace'
 
 export interface ComposerPersistContext {
   localVersion: number
@@ -128,9 +128,9 @@ export class ComposerDraftSync<Draft = unknown> {
   handleEditorUpdate(payload: UpdateListenerPayload): void {
     this.latestEditorState = payload.editorState
     if (
-      payload.tags.has(ROVAI_ATOM_PRESENTATION_TAG)
-      || payload.tags.has(ROVAI_COMPOSER_INITIALIZE_TAG)
-      || payload.tags.has(ROVAI_COMPOSER_REPLACE_TAG)
+      payload.tags.has(COAXI_ATOM_PRESENTATION_TAG)
+      || payload.tags.has(COAXI_COMPOSER_INITIALIZE_TAG)
+      || payload.tags.has(COAXI_COMPOSER_REPLACE_TAG)
     ) return
     if (payload.dirtyLeaves.size === 0 && payload.dirtyElements.size === 0) return
 

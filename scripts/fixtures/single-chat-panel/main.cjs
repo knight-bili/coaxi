@@ -14,7 +14,7 @@ const wait = (milliseconds) => new Promise((resolve) => setTimeout(resolve, mill
 
 app.whenReady().then(async () => {
   const window = new BrowserWindow({
-    show: process.env.ROVAI_SHOW_SINGLE_CHAT_FIXTURE === '1',
+    show: process.env.COAXI_SHOW_SINGLE_CHAT_FIXTURE === '1',
     width: 1180,
     height: 800,
     useContentSize: true,

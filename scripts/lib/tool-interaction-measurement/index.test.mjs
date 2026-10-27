@@ -815,7 +815,7 @@ test('private replay source reproduces deterministic oracle assessment without e
     measurementSpec,
     toolEvidence,
     preparedFixtureArtifact: {
-      schemaId: 'rovai.qualification.prepared-tool-fixture-manifest',
+      schemaId: 'coaxi.qualification.prepared-tool-fixture-manifest',
       schemaVersion: '2.0.0',
       payloadDigest: digestIdentity('9'),
       locator: 'prepared/fixture.json'

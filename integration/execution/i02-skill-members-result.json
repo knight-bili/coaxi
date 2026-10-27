@@ -32,37 +32,37 @@
         "gitBlob": "05e208d69e65e6d7dcaae83650206b5fd7348d1e"
       },
       {
-        "file": "crates/rovai-core/src/application.rs",
+        "file": "crates/coaxi-core/src/application.rs",
         "sha256": "0f5c0756bae0cdef9fd9f5b8f4fa4efff691475e530aa76962b6eb7cc7530522",
         "gitBlob": "7cb52702f7e420109bc33669635d46a116d26afe"
       },
       {
-        "file": "crates/rovai-core/src/db.rs",
+        "file": "crates/coaxi-core/src/db.rs",
         "sha256": "55775cb0e8d2eeadf2b8280b6f7613022c65962692184de17cc506bb2b75208a",
         "gitBlob": "d3d6f894454df6d8e6d2a5d54a572bfbfe0bd594"
       },
       {
-        "file": "crates/rovai-core/src/lib.rs",
+        "file": "crates/coaxi-core/src/lib.rs",
         "sha256": "73b1b2bf57d05107c69a913dd46ccbbdb92e34ff0c9166ef5bb634b430ce061c",
         "gitBlob": "54476f3cb75ae74e1e7302cf835e5ff84df630ea"
       },
       {
-        "file": "crates/rovai-core/src/skill_pack_installation.rs",
+        "file": "crates/coaxi-core/src/skill_pack_installation.rs",
         "sha256": "d10ab40aeefd80d426c8426b02102e8c15942bcf225011e53ed191a703a5e4a6",
         "gitBlob": "66e61f595df65a800343a3fd42851bf43f1989f2"
       },
       {
-        "file": "crates/rovai-host/Cargo.toml",
+        "file": "crates/coaxi-host/Cargo.toml",
         "sha256": "1c5c67569a1c98ca1f8d79cc791a0dc1064e81104ccf7f98d04262176203ef55",
         "gitBlob": "5c6fa604ecd5b5cc27c67114040a9e0b3ae110c3"
       },
       {
-        "file": "crates/rovai-host/src/server_updates/install.rs",
+        "file": "crates/coaxi-host/src/server_updates/install.rs",
         "sha256": "fde0ae6cfe3d86ceb9f17c3caafdf8ee4a63e647e87278dee52cef12cadf6f92",
         "gitBlob": "ad7df40a1c072d889c7ff769a5d43558ce26b859"
       },
       {
-        "file": "crates/rovai-web/src/operations.rs",
+        "file": "crates/coaxi-web/src/operations.rs",
         "sha256": "e9c128bf0c74a69993211287d4db01a5af3bb49aa9bfc4966b31efd32b1f795a",
         "gitBlob": "d3bcb7faa063b5377fbf739f2953cea98141a307"
       },
@@ -107,7 +107,7 @@
         "gitBlob": "c0ec17930c54f72f4aff3ef4be4e019d45c2d721"
       },
       {
-        "file": "crates/rovai-core/src/skill_pack_members.rs",
+        "file": "crates/coaxi-core/src/skill_pack_members.rs",
         "sha256": "5debcbf5c0e8ccb3e288bf24519afb4283af2ce9cdf68c039691d2912d5eed15",
         "gitBlob": "dfc825bbad1fb90a3c51a3e2acfad42eb9289086"
       },
@@ -129,19 +129,19 @@
     ],
     "unchangedModelSources": [
       {
-        "file": "crates/rovai-core/src/context.rs",
+        "file": "crates/coaxi-core/src/context.rs",
         "sha256": "2adc3d625fe2e0027e37e02b284c1a8a22e0d5559544d83b7b82ea12c03df184"
       },
       {
-        "file": "crates/rovai-core/src/current_input_skill.rs",
+        "file": "crates/coaxi-core/src/current_input_skill.rs",
         "sha256": "a9f462bde50cdb62cb76822c5d0ffbe58f188d4823ca340b589a50dfef403c17"
       },
       {
-        "file": "crates/rovai-core/src/context_contract.rs",
+        "file": "crates/coaxi-core/src/context_contract.rs",
         "sha256": "0bd5b2539bc06080452a7bb651945fcb0816d3f2b9312e6ebf737a15aac8570c"
       },
       {
-        "file": "crates/rovai-core/src/managed_skills.rs",
+        "file": "crates/coaxi-core/src/managed_skills.rs",
         "sha256": "49e76bb99eaaf3723ebe7c56fb361b4c20e68c1c5be0cc18983a901a4f86954b"
       }
     ]
@@ -149,7 +149,7 @@
   "implementation": {
     "schema": 151,
     "migration": 201,
-    "authority": "Rovai Core SQLite",
+    "authority": "Coaxi Core SQLite",
     "newAPIs": [
       "skillPacks.members.list",
       "skillPacks.members.set"
@@ -249,7 +249,7 @@
   },
   "artifact": {
     "schema": 151,
-    "binary": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i02\\native-artifacts\\core151-skill-members-ba9b4b5524eb\\rovai-host.exe",
+    "binary": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i02\\native-artifacts\\core151-skill-members-ba9b4b5524eb\\coaxi-host.exe",
     "sha256": "ba9b4b5524eb4d538b78bf537fff556f98fd63741e7be935f285c6962628ae96"
   },
   "modelProposal": {
@@ -281,11 +281,11 @@
       },
       "outputs": [
         {
-          "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I02_技能包模型投递变更方案_r1_待确认.docx",
+          "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\outputs\\I02_技能包模型投递变更方案_r1_待确认.docx",
           "sha256": "8f447045d56bb6fe27a7a88740a60c34f586d5fd4776c48841a42f9a01a3ef0f"
         },
         {
-          "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I02_技能包模型投递变更方案_r1_待确认.pdf",
+          "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\outputs\\I02_技能包模型投递变更方案_r1_待确认.pdf",
           "sha256": "dad69529c035a6d9540da52c80cbfa22f227ae717310edc862cad297cc39e938"
         }
       ]

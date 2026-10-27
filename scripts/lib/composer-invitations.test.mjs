@@ -13,8 +13,8 @@ import { admitElectronIntegrationTest } from './electron-sandbox-capability.mjs'
 const root = resolve(import.meta.dirname, '../..')
 test('production Composer invites outsiders in Pending drafts and preserves failed input', { timeout: 120_000 }, async t => {
   if (!admitElectronIntegrationTest(t)) return
-  const fixture = await mkdtemp(join(tmpdir(), 'rovai-pending-invitations-ui-'))
-  const evidence = process.env.ROVAI_INVITE_EVIDENCE_DIR
+  const fixture = await mkdtemp(join(tmpdir(), 'coaxi-pending-invitations-ui-'))
+  const evidence = process.env.COAXI_INVITE_EVIDENCE_DIR
   if (evidence) assert.ok(isAbsolute(evidence), 'Evidence directory must be absolute')
   let child, closed
   try {

@@ -24,7 +24,7 @@ const initial: NavigationThreadItem[] = sources.map((channelSource, index) => ({
   lastActivityAt: '2026-08-31T00:00:00Z', lastActivityGlobalSequence: 1, latestCompletionGlobalSequence: 0, version: 1
 }))
 const saved: Array<{ id: string; title: string }> = []
-Object.assign(window, { rovai: { platform: 'darwin' } })
+Object.assign(window, { coaxi: { platform: 'darwin' } })
 function Fixture(): React.JSX.Element {
   const [camps, setCamps] = useState(initial)
   const [active, setActive] = useState('fixture-camp-4')

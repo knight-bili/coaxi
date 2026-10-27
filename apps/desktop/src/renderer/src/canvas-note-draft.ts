@@ -5,7 +5,7 @@ export type CanvasNoteStorage = Pick<Storage, 'getItem' | 'setItem' | 'removeIte
 const validId = (value: string) => Boolean(value.trim()) && !value.includes('\0')
 function key(scope: CanvasViewScope | null, boardId: string, nodeId: string): string | null {
   return scope && [scope.host, scope.core, boardId, nodeId].every(validId)
-    ? `rovai.canvas.note-draft.v1:${JSON.stringify([scope.host, scope.core, boardId, nodeId])}` : null
+    ? `coaxi.canvas.note-draft.v1:${JSON.stringify([scope.host, scope.core, boardId, nodeId])}` : null
 }
 /** Unsaved local text only; the Core snapshot remains the saved note authority. */
 export function loadCanvasNoteDraft(storage: CanvasNoteStorage | undefined, scope: CanvasViewScope | null, boardId: string, nodeId: string): CanvasNoteDraft | null {

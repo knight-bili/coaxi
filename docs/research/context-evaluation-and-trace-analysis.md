@@ -22,17 +22,17 @@ last_updated: 2026-09-10
 
 | 结论 | 状态 | 源码依据 | 限制或缺口 |
 | --- | --- | --- | --- |
-| 已有每日、每周和手动计划，领取后建立普通 Camp/AgentRun | 已确认 | [AutomationSchedule 与 AutomationService](../../crates/rovai-core/src/automation.rs) | 不是任意 shell job；应用退出或休眠时不会常驻执行，恢复按 missed 处理 |
+| 已有每日、每周和手动计划，领取后建立普通 Camp/AgentRun | 已确认 | [AutomationSchedule 与 AutomationService](../../crates/coaxi-core/src/automation.rs) | 不是任意 shell job；应用退出或休眠时不会常驻执行，恢复按 missed 处理 |
 | 计划按设备本地时区求值 | 已确认 | 同文件 `next_run_at` 相关求值使用 `Local`；[当前合同](../contracts/scheduled-automation-v1.md) | Schedule 本身没有独立 IANA 时区字段，日报统计时区需另行冻结 |
-| 普通用户 CLI 能查看、观察和导出指定 Run | 已确认 | [User Automation](../contracts/user-automation-v1.md)与[CLI](../../crates/rovai-core/src/bin/rovai.rs) | 没有按日期批量枚举所有 Run 的现成入口；受管 Runtime 明确禁止 `rovai app` |
-| Run 有权威状态、时间、等待原因和结构化失败 | 已确认 | [AgentRunDiagnosticView](../../crates/rovai-core/src/read_model.rs)、[RuntimeFailureView](../../crates/rovai-core/src/runtime_failure.rs) | 状态成功只代表 Run 结算，不代表用户任务验收；最新行不等于任意历史时点的状态 |
-| A2A 有 Delivery、派发阶段、等待原因、重试代次和终态事件 | 已确认 | [MessageDeliveryService](../../crates/rovai-core/src/message_delivery.rs) | 显式 retry 会复用 Delivery 并清空旧终态，不能只读当前行统计历史失败 |
-| 工具有去重 Evidence 和版本化 Canonical Activity | 已确认 | [ExecutionEvidenceService](../../crates/rovai-core/src/execution_evidence.rs)、[CanonicalRuntimeActivity](../../crates/rovai-core/src/canonical_activity.rs) | start/progress/terminal 不是三次调用；同操作可有多个 classifier 投影；未知工作不被自动补全 |
-| 记忆读取与正式修订有基础证据 | 已确认 | [读取证据](../../crates/rovai-core/src/memory_retrieval.rs)、[正式 Revision](../../crates/rovai-core/src/memory.rs) | 准确读取去重与统计仍待第一／四项；日报先标不可用，不提前使用粗略计数 |
-| ContextManifest 保留选择、遗漏、投递、Skill/MCP digest 与版本 | 已确认 | [ContextManifestView](../../crates/rovai-core/src/read_model.rs)、[ContextService](../../crates/rovai-core/src/context.rs) | 这些是 Core 可见证据，不自动赋予分析 Agent 读取所有正文的权限 |
-| Usage 已有稀疏汇总、覆盖率和趋势呈现 | 已确认 | [MonitoringService](../../crates/rovai-core/src/monitoring.rs)、[RuntimeUsageChart](../../apps/desktop/src/renderer/src/RuntimeUsageChart.tsx) | 只覆盖 Usage；现有 Snapshot 是滚动 24h/7d/30d，不能直接当作配置时区的昨日统计；派生数据保留 45 天 |
+| 普通用户 CLI 能查看、观察和导出指定 Run | 已确认 | [User Automation](../contracts/user-automation-v1.md)与[CLI](../../crates/coaxi-core/src/bin/coaxi.rs) | 没有按日期批量枚举所有 Run 的现成入口；受管 Runtime 明确禁止 `rovai app` |
+| Run 有权威状态、时间、等待原因和结构化失败 | 已确认 | [AgentRunDiagnosticView](../../crates/coaxi-core/src/read_model.rs)、[RuntimeFailureView](../../crates/coaxi-core/src/runtime_failure.rs) | 状态成功只代表 Run 结算，不代表用户任务验收；最新行不等于任意历史时点的状态 |
+| A2A 有 Delivery、派发阶段、等待原因、重试代次和终态事件 | 已确认 | [MessageDeliveryService](../../crates/coaxi-core/src/message_delivery.rs) | 显式 retry 会复用 Delivery 并清空旧终态，不能只读当前行统计历史失败 |
+| 工具有去重 Evidence 和版本化 Canonical Activity | 已确认 | [ExecutionEvidenceService](../../crates/coaxi-core/src/execution_evidence.rs)、[CanonicalRuntimeActivity](../../crates/coaxi-core/src/canonical_activity.rs) | start/progress/terminal 不是三次调用；同操作可有多个 classifier 投影；未知工作不被自动补全 |
+| 记忆读取与正式修订有基础证据 | 已确认 | [读取证据](../../crates/coaxi-core/src/memory_retrieval.rs)、[正式 Revision](../../crates/coaxi-core/src/memory.rs) | 准确读取去重与统计仍待第一／四项；日报先标不可用，不提前使用粗略计数 |
+| ContextManifest 保留选择、遗漏、投递、Skill/MCP digest 与版本 | 已确认 | [ContextManifestView](../../crates/coaxi-core/src/read_model.rs)、[ContextService](../../crates/coaxi-core/src/context.rs) | 这些是 Core 可见证据，不自动赋予分析 Agent 读取所有正文的权限 |
+| Usage 已有稀疏汇总、覆盖率和趋势呈现 | 已确认 | [MonitoringService](../../crates/coaxi-core/src/monitoring.rs)、[RuntimeUsageChart](../../apps/desktop/src/renderer/src/RuntimeUsageChart.tsx) | 只覆盖 Usage；现有 Snapshot 是滚动 24h/7d/30d，不能直接当作配置时区的昨日统计；派生数据保留 45 天 |
 | 真实 Runner、分离 Judge、版本比较与配对基础已经存在 | 已确认 | [Qualification Runner](../../scripts/qualification-runner.mjs)、[Judge Views](../../scripts/lib/qualification-judge-views.mjs)、[Tool-use Judge](../../scripts/lib/qualification-tool-use-judge.mjs)、[Benchmark Compare](../../scripts/benchmark/evaluation/comparison.mjs) | Runner 的 Team 配置仍在源码中冻结；Team/Solo 配对只允许 coordinationMode 变化，需最小配置与实验定义扩展 |
-| 合同评测配置与实际代码存在漂移 | 已确认 | [Current Contract Profile](../../scripts/benchmark/profiles/current-contract-conformance.mjs)、[当前 DB 常量](../../crates/rovai-core/src/db.rs) | Profile 为 v1.28/schema 69，基线 Core 为 v1.56/schema 98；Formatter/Manifest 为 23，部分条目仍写 22 |
+| 合同评测配置与实际代码存在漂移 | 已确认 | [Current Contract Profile](../../scripts/benchmark/profiles/current-contract-conformance.mjs)、[当前 DB 常量](../../crates/coaxi-core/src/db.rs) | Profile 为 v1.28/schema 69，基线 Core 为 v1.56/schema 98；Formatter/Manifest 为 23，部分条目仍写 22 |
 | 合同条目结果没有逐项绑定执行证据 | 已确认 | [runCurrentContractConformance](../../scripts/benchmark/execution/current-contract-runner.mjs) | 全组 `cargo test --lib` 退出码映射到全部条目，且条目包含 Main target 测试；源码中存在测试不等于本次实际执行 |
 | 所有历史 Run 的精确 Rovai build 和实验来源都可直接取得 | 未知 | 已核对 Run/Diagnostic/Manifest/Automation 的公开形状 | `AgentRun.version` 是实体版本，workspace Git HEAD 是用户项目版本，二者都不是 Rovai build；缺失时不能用当前安装版本回填 |
 

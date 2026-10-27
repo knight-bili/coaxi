@@ -56,7 +56,7 @@ export async function qualifyCanvasSourceUi(window,{evaluate,wait,rpc,openCanvas
  const graph=()=>rpc('canvas.nodes.snapshot',{boardId})
  await click('document.querySelector(".canvas-board-title")');await click(menu('管理项目分组'));await wait('Boolean('+button('新建项目分组')+')');await click(button('新建项目分组'))
  await text('document.querySelector(".app-dialog input[data-dialog-autofocus]")','R09 原项目分组');await click(button('保存分组'));await wait('!document.querySelector(".project-groups-members")');await click(button('完成'))
- const prefs=await evaluate('window.rovai.navigationPreferences.get()'),group=prefs.projectGroups.find(group=>group.name==='R09 原项目分组');assert.ok(group);report.ui_context.groupId=group.id
+ const prefs=await evaluate('window.coaxi.navigationPreferences.get()'),group=prefs.projectGroups.find(group=>group.name==='R09 原项目分组');assert.ok(group);report.ui_context.groupId=group.id
  record('original_board_creation_and_project_group_management_persist_real_board_and_device_group_without_model')
  for(const [kind,label] of Object.entries(kinds)){
   report.ui_step=kind+':create';await checkpoint()

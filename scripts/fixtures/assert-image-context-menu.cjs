@@ -82,13 +82,13 @@ module.exports = async (window, run, capture, output) => {
     window.show()
     window.focus()
     await run(`(() => {
-      const request = window.rovai.request;
+      const request = window.coaxi.request;
       window.imageLocationCalls = []; window.imageRevealCalls = [];
-      window.rovai.request = async (method, params) => {
+      window.coaxi.request = async (method, params) => {
         if (method === 'thread.attachments.location') { window.imageLocationCalls.push(params); return '/fixture/message-image.svg'; }
         return request(method, params);
       };
-      window.rovai.attachments = { reveal: async locator => { window.imageRevealCalls.push(locator); return {availability:'available', error:null}; } };
+      window.coaxi.attachments = { reveal: async locator => { window.imageRevealCalls.push(locator); return {availability:'available', error:null}; } };
       window.campOpenTest.showAttachmentSurfaces(${JSON.stringify(image)});
     })()`)
     await settle()
@@ -165,8 +165,8 @@ module.exports = async (window, run, capture, output) => {
     const draftBefore = await run('window.campOpenTest.localDraftState().body')
     await run(`(() => {
       window.composerImageReads = 0;
-      window.originalComposerImagePreview = window.rovai.composerAttachments.preview;
-      window.rovai.composerAttachments.preview = async () => { window.composerImageReads++; throw new Error('Source no longer available'); };
+      window.originalComposerImagePreview = window.coaxi.composerAttachments.preview;
+      window.coaxi.composerAttachments.preview = async () => { window.composerImageReads++; throw new Error('Source no longer available'); };
     })()`)
     await openMenu(composerTile, true)
     assert.deepEqual(await labels(), ['复制图片', '保存图片…'], 'composer images only expose the confirmed shared actions')
@@ -200,7 +200,7 @@ module.exports = async (window, run, capture, output) => {
     assert.equal(readFileSync(join(output, 'saved-composer-image.svg'), 'utf8'), svg)
     assert.equal(await run('window.composerImageReads'), 0, 'loaded image actions do not re-read a missing source')
     assert.equal(await run('window.campOpenTest.localDraftState().body'), draftBefore, 'image actions leave the draft intact')
-    await run('window.rovai.composerAttachments.preview = window.originalComposerImagePreview; void 0')
+    await run('window.coaxi.composerAttachments.preview = window.originalComposerImagePreview; void 0')
 
     await run(`document.documentElement.dataset.theme = 'night'; document.querySelector(${JSON.stringify(composerTile)}).click()`)
     await waitFor('document.querySelector(".composer-image-lightbox") !== null')
@@ -270,8 +270,8 @@ module.exports = async (window, run, capture, output) => {
     window.setContentSize(1200, 800)
     await run(`(() => {
       window.pendingComposerPreviews = []; window.composerSystemOpens = 0;
-      window.rovai.composerAttachments.preview = () => new Promise(resolve => window.pendingComposerPreviews.push(resolve));
-      window.rovai.attachments.open = async () => { window.composerSystemOpens++; return {availability:'available',error:null}; };
+      window.coaxi.composerAttachments.preview = () => new Promise(resolve => window.pendingComposerPreviews.push(resolve));
+      window.coaxi.attachments.open = async () => { window.composerSystemOpens++; return {availability:'available',error:null}; };
       window.campOpenTest.remount();
     })()`)
     await waitFor('window.pendingComposerPreviews.length > 0')
@@ -288,7 +288,7 @@ module.exports = async (window, run, capture, output) => {
     assert.equal(await run('Array.from(document.querySelectorAll(".image-context-menu [role=menuitem]")).every(item => item.getAttribute("aria-disabled") === "true")'), true)
     await capture('composer-image-menu-unavailable')
     await key('Escape')
-    await run(`window.rovai.composerAttachments.preview = window.originalComposerImagePreview; window.campOpenTest.showAttachmentSurfaces(${JSON.stringify(image)});`)
+    await run(`window.coaxi.composerAttachments.preview = window.originalComposerImagePreview; window.campOpenTest.showAttachmentSurfaces(${JSON.stringify(image)});`)
     await waitFor(`document.querySelector(${JSON.stringify(composerTile + ' img')})?.naturalWidth === 640`)
     return { checks: ['full-size-native-image-copy', 'transparent-pixels', 'native-paste', 'original-byte-download', 'exact-owner-reveal', 'keyboard-loop-and-escape', 'lightbox-menu', 'runtime-menu-without-refresh', 'composer-two-actions', 'composer-full-size-native-copy', 'composer-original-byte-save', 'composer-no-source-reread', 'composer-draft-preserved', 'composer-lightbox-menu', 'composer-copy-pending-and-denied', 'composer-loading-and-decode-failure', 'copy-denied', 'broken-attachment-auto-recovery', 'day-night', '200-percent-collision', 'reduced-motion'], clipboardRestored: true }
   } finally {

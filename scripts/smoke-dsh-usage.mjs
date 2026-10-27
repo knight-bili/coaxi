@@ -13,7 +13,7 @@ import { querySqliteRows } from './lib/sqlite.mjs'
 import { removeEphemeralRuntimeCampFilesRoot } from './lib/runtime-camp-files-root.mjs'
 
 const repository = resolve(import.meta.dirname, '..')
-const root = await realpath(await mkdtemp(join(tmpdir(), 'rovai-dsh-usage-')))
+const root = await realpath(await mkdtemp(join(tmpdir(), 'coaxi-dsh-usage-')))
 const project = join(root, 'project'), data = join(root, 'data')
 const audit = join(root, 'native-usage.jsonl'), plugin = join(root, 'usage-audit.mjs')
 await mkdir(project)
@@ -53,7 +53,7 @@ let core, workspace, events = [], threadId
 const runs = []
 async function start() {
   events = []
-  core = startQualificationCore({ coreExecutable: join(repository, 'target/debug/rovai-core'),
+  core = startQualificationCore({ coreExecutable: join(repository, 'target/debug/coaxi-core'),
     dataDirectory: data, workingDirectory: repository, runtimeCacheDirectory: join(root, 'cache'),
     mcpConfigPath: join(root, 'mcp.json'), onNotification: event => events.push(event) })
   await core.request('health.check')
@@ -93,7 +93,7 @@ async function send(body) {
 async function reconcile() {
   const records = (await readFile(audit, 'utf8')).trim().split('\n').map(line => JSON.parse(line))
   assert.equal(new Set(records.map(record => JSON.stringify([record.sessionId, record.seq]))).size, records.length, 'native events replayed')
-  const rows = await querySqliteRows(join(data, 'rovai.sqlite'), 'SELECT * FROM runtime_usage_run_summary')
+  const rows = await querySqliteRows(join(data, 'coaxi.sqlite'), 'SELECT * FROM runtime_usage_run_summary')
   assert.equal(rows.length, runs.length)
   const mapping = { inputTokens: 'uncached_input_tokens', outputTokens: 'output_tokens',
     cacheReadTokens: 'cache_read_tokens', cacheWriteTokens: 'cache_write_tokens', reasoningTokens: 'reasoning_output_tokens' }

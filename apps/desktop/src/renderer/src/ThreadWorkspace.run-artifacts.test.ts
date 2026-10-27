@@ -31,7 +31,7 @@ function snapshot(runs: AgentRunView[] = [run()], images = true, files = true): 
       membershipGeneration: 1, version: 1, createdAt, updatedAt: endedAt },
     members: [...new Set(runs.map(item => item.agentId))].map((agentId, index) => ({
       agentId, displayName: index === 0 ? '奥黛丽' : '爱丽丝', teamRole: '',
-      avatarRef: 'rovai://member-avatar/builtin/luoke/v1', accent: 'var(--identity-1)',
+      avatarRef: 'coaxi://member-avatar/builtin/luoke/v1', accent: 'var(--identity-1)',
       membershipStatus: 'active', leaveRequestedAt: null, profilePresence: 'present',
       memberOrder: index, isDefaultLead: index === 0, version: 1
     })),

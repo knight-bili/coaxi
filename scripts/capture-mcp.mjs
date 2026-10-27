@@ -12,18 +12,18 @@ import { spawn } from 'node:child_process'
 import { seedCompletedOnboardingForAcceptance } from './lib/dev-desktop.mjs'
 
 const appPath = process.argv[2]
-const outputPrefix = process.argv[3] ?? '/tmp/rovai-mcp'
-const port = Number(process.env.ROVAI_DEBUG_PORT ?? 9451)
+const outputPrefix = process.argv[3] ?? '/tmp/coaxi-mcp'
+const port = Number(process.env.COAXI_DEBUG_PORT ?? 9451)
 
 if (!appPath) {
   throw new Error('Usage: node scripts/capture-mcp.mjs <Coaxi.app> [output-prefix]')
 }
 
-const fixtureRoot = await mkdtemp(join(tmpdir(), 'rovai-mcp-app-'))
+const fixtureRoot = await mkdtemp(join(tmpdir(), 'coaxi-mcp-app-'))
 const home = join(fixtureRoot, 'home')
 const userDataDir = join(fixtureRoot, 'electron')
 const codexHome = join(home, '.codex')
-const configPath = join(home, '.rovai', 'mcp.json')
+const configPath = join(home, '.coaxi', 'mcp.json')
 await mkdir(codexHome, { recursive: true })
 await mkdir(userDataDir, { recursive: true })
 seedCompletedOnboardingForAcceptance(userDataDir)
@@ -31,7 +31,7 @@ await writeFile(join(codexHome, 'config.toml'), [
   '[mcp_servers.imported_docs]',
   'command = "/usr/bin/env"',
   'args = ["node"]',
-  'env = { API_TOKEN = "rovai-secret-must-not-render" }',
+  'env = { API_TOKEN = "coaxi-secret-must-not-render" }',
   ''
 ].join('\n'))
 
@@ -44,14 +44,14 @@ const app = spawn(executable, [
     ...process.env,
     HOME: home,
     CODEX_HOME: codexHome,
-    ROVAI_ALLOW_ISOLATED_INSTANCE: '1'
+    COAXI_ALLOW_ISOLATED_INSTANCE: '1'
   },
   stdio: ['ignore', 'ignore', 'pipe']
 })
 const stderr = []
 app.stderr.on('data', (chunk) => {
   stderr.push(String(chunk))
-  if (process.env.ROVAI_CAPTURE_DEBUG === '1') process.stderr.write(chunk)
+  if (process.env.COAXI_CAPTURE_DEBUG === '1') process.stderr.write(chunk)
 })
 
 try {
@@ -61,7 +61,7 @@ try {
   await cdp.send('Page.bringToFront')
   await resize(cdp, 1440, 920)
   await waitForExpression(cdp, `Boolean(document.querySelector('.unified-sidebar-footer button[aria-label="设置"]'))`, 45_000)
-  await evaluate(cdp, `window.rovai.appearance.setPreference('day')`)
+  await evaluate(cdp, `window.coaxi.appearance.setPreference('day')`)
   await waitForExpression(cdp, `document.documentElement.dataset.theme === 'day'`, 5_000)
   const existingMembers = await request(cdp, 'members.list')
   for (let index = existingMembers.length; index < 12; index += 1) {
@@ -97,8 +97,8 @@ try {
     rosterScrollable: document.querySelector('.mcp-member-roster').scrollHeight > document.querySelector('.mcp-member-roster').clientHeight,
     importDialog: Boolean(document.querySelector('.mcp-import-dialog')),
     publicPreview: document.querySelector('.mcp-source-panel pre')?.textContent ?? '',
-    hiddenMetadataVisible: document.body.innerText.includes('_rovai'),
-    sourceSecretVisible: document.body.innerText.includes('rovai-secret-must-not-render'),
+    hiddenMetadataVisible: document.body.innerText.includes('_coaxi'),
+    sourceSecretVisible: document.body.innerText.includes('coaxi-secret-must-not-render'),
     persistentRiskText: document.querySelector('.mcp-settings')?.innerText.includes('高权限') ?? false,
     riskTagCount: document.querySelectorAll('.mcp-risk-badge, .mcp-risk-dialog').length,
     assignmentScopeCount: document.querySelectorAll('.mcp-assignment-scope').length,
@@ -128,7 +128,7 @@ try {
   assert(initial.rosterOverflowY === 'auto', `Member roster is not independently scrollable: ${JSON.stringify(initial)}`)
   if (initial.memberRows >= 8) assert(initial.rosterScrollable, `Tall member roster did not overflow inside the workbench: ${JSON.stringify(initial)}`)
   assert(!initial.importDialog, 'MCP import scanned automatically on first load')
-  assert(!initial.hiddenMetadataVisible, 'Hidden _rovai metadata reached the Renderer')
+  assert(!initial.hiddenMetadataVisible, 'Hidden _coaxi metadata reached the Renderer')
   assert(!initial.sourceSecretVisible, 'Source literal secret reached the Renderer before import')
   assert(!initial.persistentRiskText && initial.riskTagCount === 0, `Persistent MCP risk UI is still visible: ${JSON.stringify(initial)}`)
   assert(initial.assignmentScopeCount === 0, `Legacy assignment scope badge is still visible: ${JSON.stringify(initial)}`)
@@ -182,7 +182,7 @@ try {
       disabled: node.querySelector('input[type="checkbox"]')?.disabled,
       checked: node.querySelector('input[type="checkbox"]')?.checked
     })),
-    secretVisible: document.body.innerText.includes('rovai-secret-must-not-render'),
+    secretVisible: document.body.innerText.includes('coaxi-secret-must-not-render'),
     sourceStatus: [...document.querySelectorAll('.mcp-source-status')].map((node) => node.textContent?.trim())
   }))()`)
   assert(importPreview.candidateCount === 1, `Expected one isolated Codex candidate: ${JSON.stringify(importPreview)}`)
@@ -213,7 +213,7 @@ try {
     return {
       text: row?.innerText,
       enabled: row?.querySelector('[role="switch"]')?.getAttribute('aria-checked'),
-      secretVisible: document.body.innerText.includes('rovai-secret-must-not-render')
+      secretVisible: document.body.innerText.includes('coaxi-secret-must-not-render')
     }
   })()`)
   assert(imported.text.includes('imported_docs'), `Imported Server is missing: ${JSON.stringify(imported)}`)
@@ -286,7 +286,7 @@ try {
   assertLayout(libraryDay, 1440, 920, 'day')
   await evaluate(cdp, `document.querySelector('.settings-panel')?.scrollTo({ top: 0 })`)
 
-  await evaluate(cdp, `window.rovai.appearance.setPreference('night')`)
+  await evaluate(cdp, `window.coaxi.appearance.setPreference('night')`)
   await waitForExpression(cdp, `document.documentElement.dataset.theme === 'night'`, 5_000)
   await resize(cdp, 1040, 700)
   await capture(cdp, `${outputPrefix}-night-compact.png`)
@@ -401,7 +401,7 @@ async function layoutState(cdp) {
     const roster = document.querySelector('.mcp-member-roster')
     const workbench = document.querySelector('.mcp-assignment-workbench')
     const panelRect = panel?.getBoundingClientRect()
-    const config = await window.rovai.request('mcp.config.get')
+    const config = await window.coaxi.request('mcp.config.get')
     const serverByName = new Map(config.servers.map((server) => [server.name, server]))
     const identityColorIndex = (identityId) => {
       let hash = 0x811c9dc5
@@ -601,7 +601,7 @@ async function evaluate(cdp, expression) {
 }
 
 async function request(cdp, method, params = {}) {
-  return evaluate(cdp, `window.rovai.request(${JSON.stringify(method)}, ${JSON.stringify(params)})`)
+  return evaluate(cdp, `window.coaxi.request(${JSON.stringify(method)}, ${JSON.stringify(params)})`)
 }
 
 async function waitForExpression(cdp, expression, timeoutMs) {
@@ -639,7 +639,7 @@ async function connectCdp(url) {
   socket.addEventListener('message', (event) => {
     const message = JSON.parse(String(event.data))
     if (!message.id) {
-      if (process.env.ROVAI_CAPTURE_DEBUG === '1' && message.method === 'Runtime.exceptionThrown') {
+      if (process.env.COAXI_CAPTURE_DEBUG === '1' && message.method === 'Runtime.exceptionThrown') {
         process.stderr.write(`${JSON.stringify(message.params)}\n`)
       }
       return

@@ -2,11 +2,11 @@
 # Native package installer. No Node, Rust compiler, Desktop, or service manager.
 set -eu
 umask 077
-fail() { printf 'Rovai Server: %s\n' "$*" >&2; exit 1; }
+fail() { printf 'Coaxi Server: %s\n' "$*" >&2; exit 1; }
 version=latest
 release_tag=
 from_dir=
-prefix="${HOME:?Current account HOME is required}/.local/share/codeg-rovai-workbench-server"
+prefix="${HOME:?Current account HOME is required}/.local/share/coaxi-server"
 bin_dir="$HOME/.local/bin"
 modify_path=yes
 while [ "$#" -gt 0 ]; do
@@ -32,7 +32,7 @@ for path in "$prefix" "$bin_dir"; do
 done
 command -v curl >/dev/null 2>&1 || [ -n "$from_dir" ] || fail 'curl is required for GitHub downloads'
 download() { curl --proto '=https' --tlsv1.2 --fail --silent --show-error --location --retry 2 --connect-timeout 15 --max-time 600 "$1" -o "$2"; }
-staging=$(mktemp -d "${TMPDIR:-/tmp}/rovai-server-install.XXXXXX")
+staging=$(mktemp -d "${TMPDIR:-/tmp}/coaxi-server-install.XXXXXX")
 locked=no
 cleanup() { rm -rf "$staging"; if [ "$locked" = yes ]; then rm -rf "$prefix/.install-lock"; fi; }
 trap cleanup EXIT
@@ -56,7 +56,7 @@ else
 fi
 printf '%s\n' "$version" | LC_ALL=C grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+(-[A-Za-z0-9.-]+)?$' || fail 'Invalid Server version'
 case "$release_tag" in "v$version"|"server-v$version") ;; *) fail 'Invalid Server release tag';; esac
-asset="rovai-server-$version-$target.tar.gz"
+asset="coaxi-server-$version-$target.tar.gz"
 if [ -n "$from_dir" ]; then
   cp "$from_dir/$asset" "$staging/$asset"
   cp "$from_dir/SHA256SUMS" "$staging/SHA256SUMS"
@@ -74,25 +74,25 @@ else fail 'sha256sum or shasum is required'; fi
 # Release archives have one root and only regular files/directories. Check every
 # member before extracting, including links and traversal components.
 tar -tzf "$staging/$asset" > "$staging/members"
-LC_ALL=C awk 'BEGIN { ok=1 } !/^rovai-server\/[A-Za-z0-9_.\/-]*$/ || /(^|\/)\.\.?($|\/)/ { ok=0 } END { exit !ok }' "$staging/members" || fail 'Unsafe archive path'
+LC_ALL=C awk 'BEGIN { ok=1 } !/^coaxi-server\/[A-Za-z0-9_.\/-]*$/ || /(^|\/)\.\.?($|\/)/ { ok=0 } END { exit !ok }' "$staging/members" || fail 'Unsafe archive path'
 tar -tvzf "$staging/$asset" > "$staging/types"
 LC_ALL=C awk 'substr($0,1,1)!="-" && substr($0,1,1)!="d" { bad=1 } END { exit bad }' "$staging/types" || fail 'Archive links or special files are not allowed'
 tar -xzf "$staging/$asset" -C "$staging"
-payload="$staging/rovai-server"
-grep -qx "product=codeg-rovai-workbench" "$payload/package-info" && grep -qx "version=$version" "$payload/package-info" && grep -qx "target=$target" "$payload/package-info" || fail 'Package version or target mismatch'
-[ -f "$payload/web-ui/index.html" ] && [ -f "$payload/skills/cli-operations/SKILL.md" ] && [ -x "$payload/rovai-server" ] || fail 'Incomplete package'
-[ "$("$payload/rovai-server" --version)" = "rovai-server $version" ] || fail 'Host/package version mismatch'
+payload="$staging/coaxi-server"
+grep -qx "product=coaxi" "$payload/package-info" && grep -qx "version=$version" "$payload/package-info" && grep -qx "target=$target" "$payload/package-info" || fail 'Package version or target mismatch'
+[ -f "$payload/web-ui/index.html" ] && [ -f "$payload/skills/cli-operations/SKILL.md" ] && [ -x "$payload/coaxi-server" ] || fail 'Incomplete package'
+[ "$("$payload/coaxi-server" --version)" = "coaxi-server $version" ] || fail 'Host/package version mismatch'
 # Claim only a new directory or an installation already owned by this installer.
 if [ -e "$prefix" ] || [ -L "$prefix" ]; then
   [ -d "$prefix" ] && [ ! -L "$prefix" ] && [ -f "$prefix/INSTALLER-V1" ] && [ ! -L "$prefix/INSTALLER-V1" ] || fail 'Program directory is not an installer-owned installation'
-  [ "$(cat "$prefix/INSTALLER-V1")" = codeg-rovai-workbench-server ] || fail 'Unknown installation owner'
-else mkdir -p "$prefix"; printf '%s\n' codeg-rovai-workbench-server > "$prefix/INSTALLER-V1"; fi
+  [ "$(cat "$prefix/INSTALLER-V1")" = coaxi-server ] || fail 'Unknown installation owner'
+else mkdir -p "$prefix"; printf '%s\n' coaxi-server > "$prefix/INSTALLER-V1"; fi
 mkdir "$prefix/.install-lock" 2>/dev/null || fail 'Another installation is in progress'
 locked=yes
 mkdir -p "$bin_dir"
-command_path="$bin_dir/codeg-rovai-server"
+command_path="$bin_dir/coaxi-server"
 if [ -e "$command_path" ] || [ -L "$command_path" ]; then
-  [ -L "$command_path" ] && [ "$(readlink "$command_path")" = "$prefix/current/rovai-server" ] || fail 'Existing rovai-server command belongs to another installation'
+  [ -L "$command_path" ] && [ "$(readlink "$command_path")" = "$prefix/current/coaxi-server" ] || fail 'Existing coaxi-server command belongs to another installation'
 fi
 [ ! -L "$prefix/revisions" ] || fail 'Invalid revisions directory'
 mkdir -p "$prefix/revisions"
@@ -111,13 +111,13 @@ replace_link() {
 if [ -e "$prefix/current" ] && [ ! -L "$prefix/current" ]; then fail 'Current program entry is not a managed link'; fi
 ln -s "revisions/$expected" "$prefix/.install-lock/current"
 replace_link "$prefix/.install-lock/current" "$prefix/current"
-if [ ! -L "$command_path" ]; then ln -s "$prefix/current/rovai-server" "$command_path"; fi
+if [ ! -L "$command_path" ]; then ln -s "$prefix/current/coaxi-server" "$command_path"; fi
 if [ "$modify_path" = yes ]; then
   # Add a guarded entry once per common shell; do not execute user profiles.
-  path_line="case :\$PATH: in *:'$bin_dir':*) ;; *) export PATH='$bin_dir':\$PATH ;; esac # rovai-server PATH"
+  path_line="case :\$PATH: in *:'$bin_dir':*) ;; *) export PATH='$bin_dir':\$PATH ;; esac # coaxi-server PATH"
   for profile in "$HOME/.profile" "$HOME/.bashrc" "$HOME/.bash_profile" "${ZDOTDIR:-$HOME}/.zshrc"; do
     if ! grep -Fqx "$path_line" "$profile" 2>/dev/null; then printf '\n%s\n' "$path_line" >> "$profile"; fi
   done
   printf 'Open a new terminal, or run: export PATH=%s:$PATH\n' "'$bin_dir'"
 fi
-printf 'Installed Rovai Server %s (%s). Run codeg-rovai-server. Data is selected at launch with --data-dir; installation does not open it.\n' "$version" "$target"
+printf 'Installed Coaxi Server %s (%s). Run coaxi-server. Data is selected at launch with --data-dir; installation does not open it.\n' "$version" "$target"

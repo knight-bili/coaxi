@@ -15,7 +15,7 @@ interface Entry {
 }
 interface ComputerLine {scopeKey:string;scope?:{threadId:string;scopeKind:string};agentId?:string;targetId:string;action:string;outcome:string;at:number;count:number;app:string|null}
 const actionNames:Record<string,string>={capture:'截取画面',snapshot:'读取窗口内容',verify:'核对窗口',click:'点击',drag:'拖动',scroll:'滚动',type:'输入',key:'按键','hold-key':'按住按键','set-value':'设置值',restore:'还原窗口',menu:'选择菜单','set-frame':'调整窗口',launch:'启动应用','clipboard-read':'读取剪贴板','clipboard-write':'写入剪贴板'}
-/** 依据 Codeg BrowserAgentActivity 的操作记录与 Coaxi 审批弹窗；原代码始终完整展示。 */
+/** 依据 Coaxi BrowserAgentActivity 的操作记录与 Coaxi 审批弹窗；原代码始终完整展示。 */
 export function InteractionActivity({threadId}:{threadId:string}):React.JSX.Element|null{
   const client=useThreadClient(),api=client.interactionWorkspace,computer=client.interactionComputer,t=useUiText()
   const [open,setOpen]=useState(false),[items,setItems]=useState<Entry[]>([]),[busy,setBusy]=useState<string|null>(null),[error,setError]=useState('')

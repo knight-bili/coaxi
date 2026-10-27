@@ -14,7 +14,7 @@ import { coreDataDirectoryArguments, removeEphemeralRuntimeCampFilesRoot } from 
 
 if (process.platform === 'win32') throw new Error('This shell fixture requires macOS or Linux')
 const root = resolve(import.meta.dirname, '..')
-const fixture = await realpath(process.env.ROVAI_STOP_CONTINUE_FIXTURE_ROOT ?? await mkdtemp(join(tmpdir(), 'rovai-stop-continue-')))
+const fixture = await realpath(process.env.COAXI_STOP_CONTINUE_FIXTURE_ROOT ?? await mkdtemp(join(tmpdir(), 'coaxi-stop-continue-')))
 const data = join(fixture, 'core'), home = join(fixture, 'home'), workspace = join(fixture, 'workspace')
 const journal = join(fixture, 'prompts.jsonl'), executable = join(fixture, 'copilot-fixture')
 const shutdownText = process.argv.includes('--shutdown-text')
@@ -46,7 +46,7 @@ try {
     body: 'Perform the fixture work.', purpose: 'Verify stop and explicit continuation'
   })
   const threadId = created.payload.threadId
-  database = new DatabaseSync(join(data, 'rovai.sqlite'), { readOnly: true })
+  database = new DatabaseSync(join(data, 'coaxi.sqlite'), { readOnly: true })
   const prompts = async () => readFile(journal, 'utf8').then(text => text.trim().split('\n').filter(Boolean).map(JSON.parse)).catch(error => {
     if (error.code === 'ENOENT') return []
     throw error
@@ -136,11 +136,11 @@ async function until(read, description) {
 }
 
 function startCore() {
-  const child = spawn(join(root, 'target/debug/rovai-core'), [
+  const child = spawn(join(root, 'target/debug/coaxi-core'), [
     ...coreDataDirectoryArguments(data, { homeDirectory: home }),
     '--skill-library-root', join(data, 'managed-skill-library'), '--mcp-config-path', join(data, 'mcp.json')
   ], { cwd: fixture, stdio: ['pipe', 'pipe', 'pipe'], env: {
-    HOME: home, PATH: '/usr/bin:/bin', SHELL: '/bin/sh', TMPDIR: fixture, ROVAI_COPILOT_BIN: executable
+    HOME: home, PATH: '/usr/bin:/bin', SHELL: '/bin/sh', TMPDIR: fixture, COAXI_COPILOT_BIN: executable
   } })
   const closed = once(child, 'close'), pending = new Map()
   let nextId = 0, stderr = ''

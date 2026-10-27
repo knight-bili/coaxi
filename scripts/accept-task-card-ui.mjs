@@ -8,15 +8,15 @@ import { coreDataDirectoryArguments } from './lib/runtime-camp-files-root.mjs'
 
 const root = resolve(import.meta.dirname, '..')
 const appPath = resolve(process.argv[2] ?? join(root, 'dist', 'mac-arm64', 'Coaxi.app'))
-const fixtureRoot = process.env.ROVAI_TASK_CARD_ACCEPT_FIXTURE_ROOT
-  ?? await mkdtemp(join(tmpdir(), 'rovai-task-card-ui-accept-'))
+const fixtureRoot = process.env.COAXI_TASK_CARD_ACCEPT_FIXTURE_ROOT
+  ?? await mkdtemp(join(tmpdir(), 'coaxi-task-card-ui-accept-'))
 const dataDir = join(fixtureRoot, 'user-data')
-const runtimeTempDir = process.env.ROVAI_TASK_CARD_ACCEPT_RUNTIME_TMP
+const runtimeTempDir = process.env.COAXI_TASK_CARD_ACCEPT_RUNTIME_TMP
   ?? await mkdtemp('/tmp/rv-task-')
-const outputDir = process.env.ROVAI_TASK_CARD_ACCEPT_OUTPUT_DIR
-  ?? await mkdtemp(join(tmpdir(), 'rovai-task-card-ui-captures-'))
-const databasePath = join(dataDir, 'rovai.sqlite')
-const firstPort = Number(process.env.ROVAI_TASK_CARD_ACCEPT_DEBUG_PORT ?? 9501)
+const outputDir = process.env.COAXI_TASK_CARD_ACCEPT_OUTPUT_DIR
+  ?? await mkdtemp(join(tmpdir(), 'coaxi-task-card-ui-captures-'))
+const databasePath = join(dataDir, 'coaxi.sqlite')
+const firstPort = Number(process.env.COAXI_TASK_CARD_ACCEPT_DEBUG_PORT ?? 9501)
 
 await mkdir(dataDir, { recursive: true })
 seedCompletedOnboardingForAcceptance(dataDir)
@@ -717,12 +717,12 @@ async function openCamp(cdp, threadId) {
 
 async function request(cdp, method, params = {}) {
   return evaluate(cdp,
-    `window.rovai.request(${JSON.stringify(method)}, ${JSON.stringify(params)})`, true)
+    `window.coaxi.request(${JSON.stringify(method)}, ${JSON.stringify(params)})`, true)
 }
 
 async function setTheme(cdp, preference) {
   await evaluate(cdp,
-    `window.rovai.appearance.setPreference(${JSON.stringify(preference)})`, true)
+    `window.coaxi.appearance.setPreference(${JSON.stringify(preference)})`, true)
   const expectedTheme = preference === 'night' ? 'night' : 'day'
   await waitForExpression(cdp,
     `document.documentElement.dataset.theme === ${JSON.stringify(expectedTheme)}`)
@@ -737,7 +737,7 @@ async function launchApp(port, width, height, reducedMotion) {
   ], {
     cwd: root,
     stdio: ['ignore', 'ignore', 'pipe'],
-    env: { ...process.env, ROVAI_ALLOW_ISOLATED_INSTANCE: '1' }
+    env: { ...process.env, COAXI_ALLOW_ISOLATED_INSTANCE: '1' }
   })
   child.stderr.on('data', (chunk) => stderr.push(String(chunk)))
   let cdp = null
@@ -759,7 +759,7 @@ async function launchApp(port, width, height, reducedMotion) {
       }]
     })
     await waitForExpression(cdp,
-      `Boolean(window.rovai && document.querySelector('.app-shell'))`, 45_000)
+      `Boolean(window.coaxi && document.querySelector('.app-shell'))`, 45_000)
     const health = await request(cdp, 'health.check')
     assert(await realpath(health.database.path) === await realpath(databasePath),
       `Isolated App opened the wrong database: ${JSON.stringify(health.database.path)}`)
@@ -890,7 +890,7 @@ async function connectCdp(url) {
 }
 
 function startCore(dataDirectory) {
-  const child = spawn(join(appPath, 'Contents', 'Resources', 'bin', 'rovai-core'), [
+  const child = spawn(join(appPath, 'Contents', 'Resources', 'bin', 'coaxi-core'), [
     ...coreDataDirectoryArguments(dataDirectory),
     '--skill-library-root', join(dataDirectory, 'managed-skill-library'),
     '--mcp-config-path', join(dataDirectory, 'mcp.json')

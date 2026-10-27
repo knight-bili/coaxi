@@ -337,19 +337,19 @@ Provider 对账不应阻塞 v0.96 的本地可信监控。
 - AgentRun、Evidence、Delivery、ContextManifest、Approval、Runtime Health contracts：
   [`packages/contracts/src/index.ts`](../../../packages/contracts/src/index.ts)
 - Claude stream-json 启动与当前最小 result parser：
-  [`crates/rovai-core/src/claude.rs`](../../../crates/rovai-core/src/claude.rs)
+  [`crates/rovai-core/src/claude.rs`](../../../crates/coaxi-core/src/claude.rs)
 - Codex notification normalization：
-  [`crates/rovai-core/src/codex.rs`](../../../crates/rovai-core/src/codex.rs)
+  [`crates/rovai-core/src/codex.rs`](../../../crates/coaxi-core/src/codex.rs)
 - ACP prompt response、`usage_update` normalization：
-  [`crates/rovai-core/src/acp.rs`](../../../crates/rovai-core/src/acp.rs)、
-  [`crates/rovai-core/src/main.rs`](../../../crates/rovai-core/src/main.rs)
+  [`crates/rovai-core/src/acp.rs`](../../../crates/coaxi-core/src/acp.rs)、
+  [`crates/rovai-core/src/main.rs`](../../../crates/coaxi-core/src/main.rs)
 - Usage 尚未进入 Execution Evidence 持久化白名单：
-  [`crates/rovai-core/src/execution_evidence.rs`](../../../crates/rovai-core/src/execution_evidence.rs)
+  [`crates/rovai-core/src/execution_evidence.rs`](../../../crates/coaxi-core/src/execution_evidence.rs)
 - Native Session disposition 与 attempt 持久化：
-  [`crates/rovai-core/src/runtime.rs`](../../../crates/rovai-core/src/runtime.rs)、
-  [`crates/rovai-core/src/db.rs`](../../../crates/rovai-core/src/db.rs)
+  [`crates/rovai-core/src/runtime.rs`](../../../crates/coaxi-core/src/runtime.rs)、
+  [`crates/rovai-core/src/db.rs`](../../../crates/coaxi-core/src/db.rs)
 - Compaction observation：
-  [`crates/rovai-core/src/compaction.rs`](../../../crates/rovai-core/src/compaction.rs)
+  [`crates/rovai-core/src/compaction.rs`](../../../crates/coaxi-core/src/compaction.rs)
 - Copilot 真实 ACP Usage ledger：
   [`docs/versions/v0.64/evidence/copilot-native-turn-reconciliation-2026-08-12/`](../../versions/v0.64/evidence/copilot-native-turn-reconciliation-2026-08-12/)
 - 当前 Runtime 兼容性证据：

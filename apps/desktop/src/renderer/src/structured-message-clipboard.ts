@@ -1,6 +1,6 @@
 import type { StructuredThreadMessageContent } from '@contracts'
 
-const CLIPBOARD_ATTRIBUTE = 'data-rovai-structured-camp-message-v1'
+const CLIPBOARD_ATTRIBUTE = 'data-coaxi-structured-camp-message-v1'
 const CLIPBOARD_VERSION = 1
 const MAX_PRIVATE_PAYLOAD_LENGTH = 2_000_000
 const MAX_SEGMENT_COUNT = 10_000

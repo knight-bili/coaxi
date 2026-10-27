@@ -3,7 +3,7 @@
   "date": "2026-10-16",
   "status": "implemented_pending_batched_native_verification",
   "source_reference": {
-    "codeg": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
+    "coaxi": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
     "note": "src/components/canvas/nodes/note-node.tsx:30-155",
     "terminal": "src/components/canvas/nodes/terminal-node.tsx:56-129"
   },

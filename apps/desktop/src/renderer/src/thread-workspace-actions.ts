@@ -37,7 +37,7 @@ interface ActionContext {
   notify(message: string): void
 }
 
-// Existing Rovai handlers are shared by the main workspace and independent canvas cards.
+// Existing Coaxi handlers are shared by the main workspace and independent canvas cards.
 // Function bodies and model-facing request construction are retained from BusinessApp.
 export function threadWorkspaceActions({ client, activeThreadId, activeThreadCommands, campSnapshot, campSnapshotRef, activeThreadIdRef, campSelectionGeneration, threadClientOwner, campEventSequenceMarker, setThreadSnapshot, setBusy, setError, setToast, setRuntimeRecovery, setOptimisticThreadMessages, setCancellingRunIds, setConfirmingRunIds, refreshActiveThreadSnapshot, requestThreadProjection, navigationRefreshCoordinator, forgetMemberCreationDraft, notify }: ActionContext) {
 

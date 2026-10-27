@@ -10,10 +10,10 @@ import { digest } from '../../../../packages/evaluation/src/daily'
 // Use the same 20s budget for setup, terminal observation and process cleanup.
 // Synthetic worker result: proves Host ownership/lifecycle only, never Agent quality.
 async function fixture() {
-  const root = await mkdtemp(join(tmpdir(), 'rovai-evaluation-host-test-')), source = join(root, 'source'), workspace = join(root, 'workspace')
+  const root = await mkdtemp(join(tmpdir(), 'coaxi-evaluation-host-test-')), source = join(root, 'source'), workspace = join(root, 'workspace')
   for (const path of ['scripts/lib', 'packages/evaluation', 'docs/contracts/schemas', 'docs/versions/v0.34/schemas', 'docs/versions/v0.36/schemas']) await mkdir(join(source, path), { recursive: true })
   await mkdir(workspace)
-  await writeFile(join(source, 'package.json'), JSON.stringify({ name: 'rovai-ai', type: 'module' }))
+  await writeFile(join(source, 'package.json'), JSON.stringify({ name: 'coaxi', type: 'module' }))
   await writeFile(join(source, 'pnpm-lock.yaml'), 'fixture: true')
   await copyFile(resolve('scripts/eval-host.mjs'), join(source, 'scripts/eval-host.mjs'))
   await copyFile(resolve('scripts/eval-wait.mjs'), join(source, 'scripts/eval-wait.mjs'))

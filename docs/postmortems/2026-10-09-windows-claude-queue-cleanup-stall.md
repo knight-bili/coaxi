@@ -85,8 +85,8 @@ Claude 的可信原生终态已经到达，清理失败仍可能使执行路径�
 
 | 改动 | 修复后的行为 | 实现证据 |
 | --- | --- | --- |
-| 收敛当前 Job 清理判据 | 本次有效 Job 查询成功且 `ActiveProcesses == 0` 才确认；移除累计计数、普通通知和逐进程句柄的额外完成门槛 | [Windows Managed Process](../../crates/rovai-core/src/managed_process/windows.rs) |
-| 分开业务终态与清理 | 原生成功／失败按可信终态结算；未确认清理另保留精确 Run/epoch 的门禁和 owner | [Claude 执行收尾](../../crates/rovai-core/src/claude.rs)、[Core 结算与清理](../../crates/rovai-core/src/application.rs) |
+| 收敛当前 Job 清理判据 | 本次有效 Job 查询成功且 `ActiveProcesses == 0` 才确认；移除累计计数、普通通知和逐进程句柄的额外完成门槛 | [Windows Managed Process](../../crates/coaxi-core/src/managed_process/windows.rs) |
+| 分开业务终态与清理 | 原生成功／失败按可信终态结算；未确认清理另保留精确 Run/epoch 的门禁和 owner | [Claude 执行收尾](../../crates/coaxi-core/src/claude.rs)、[Core 结算与清理](../../crates/coaxi-core/src/application.rs) |
 | 有界清理与局部重试 | 正常结束、Stop 共用清理机制；Windows 单次总预算五秒，未确认时由既有 worker 重试，ACK 后唤醒后继调度 | [修复提交](https://github.com/murray17/rovai-ai/commit/7429216d6134f65785542df8d1f33038ae3c4c18) |
 | 保留排队请求 | 等待清理期间不丢弃后继请求；临时启动文件删除失败只记诊断，不推翻可信结果 | 同上 |
 | 明确等待原因 | 执行台区分普通排队、等待清理和清理未确认重试 | [ThreadWorkspace](../../apps/desktop/src/renderer/src/ThreadWorkspace.tsx) |

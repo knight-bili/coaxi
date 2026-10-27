@@ -123,7 +123,7 @@ test('Collaboration message evidence projects only delivered Public A2A bodies w
 })
 
 test('Semantic untrusted evidence includes participant messages and final response but never ContextManifest or private logs', async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'rovai-semantic-evidence-'))
+  const directory = await mkdtemp(join(tmpdir(), 'coaxi-semantic-evidence-'))
   try {
     await mkdir(join(directory, 'delivered', 'src'), { recursive: true })
     const finalBody = 'Implemented the fix and verified the public checks.'
@@ -271,7 +271,7 @@ test('Semantic untrusted evidence includes participant messages and final respon
 })
 
 test('Semantic evidence reads exact delivered code only through its content-bound Evidence Reference', async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'rovai-semantic-code-evidence-'))
+  const directory = await mkdtemp(join(tmpdir(), 'coaxi-semantic-code-evidence-'))
   try {
     await mkdir(join(directory, 'delivered', 'src'), { recursive: true })
     const code = 'export function answer() { return 42 }\n'
@@ -376,7 +376,7 @@ function ref(evidenceId) {
 
 test('task v3 includes unchanged captured files and Gather public returns with exact source digests', async () => {
   const { buildTaskJudgeSegments } = await import('./qualification-semantic-evidence.mjs')
-  const directory = await mkdtemp(join(tmpdir(), 'rovai-task-evidence-'))
+  const directory = await mkdtemp(join(tmpdir(), 'coaxi-task-evidence-'))
   try {
     await mkdir(join(directory, 'delivered', 'src'), { recursive: true })
     const code = 'export const value = 0\n', body = 'Member return: retain the original tree on failure.'
@@ -408,7 +408,7 @@ test('task v3 includes unchanged captured files and Gather public returns with e
 
 test('v4 receipt and Task bodies require matching frozen observation and Evidence Index', async () => {
   const { buildTaskJudgeSegments } = await import('./qualification-semantic-evidence.mjs')
-  const directory=await mkdtemp(join(tmpdir(),'rovai-receipt-evidence-'))
+  const directory=await mkdtemp(join(tmpdir(),'coaxi-receipt-evidence-'))
   try {
     await mkdir(join(directory,'delivered'))
     const receiptBody=JSON.stringify({command:'npm test',exitCode:0,output:'pass 5'}), taskBody=JSON.stringify({title:'Repair',description:'Respect rollback',status:'completed'})
@@ -445,7 +445,7 @@ test('empty collaboration reevaluation preserves old evidence and gets a new bou
 
 test('task source material reaches the evidence pack separately from participant prose', async () => {
   const { buildTaskJudgeSegments } = await import('./qualification-semantic-evidence.mjs')
-  const directory=await mkdtemp(join(tmpdir(),'rovai-source-material-'))
+  const directory=await mkdtemp(join(tmpdir(),'coaxi-source-material-'))
   try {
     await mkdir(join(directory,'delivered'))
     const body='Independent source: acceptanceCode=ORBIT-74; minimumReplicas=3'
@@ -463,7 +463,7 @@ test('task source material reaches the evidence pack separately from participant
 
 test('v11 validates all Lead deliveries, encodes sequence order and fails closed on omissions', async () => {
   const { buildTaskJudgeSegments } = await import('./qualification-semantic-evidence.mjs')
-  const directory=await mkdtemp(join(tmpdir(),'rovai-delivery-closure-'))
+  const directory=await mkdtemp(join(tmpdir(),'coaxi-delivery-closure-'))
   try {
     await mkdir(join(directory,'delivered'))
     const message=(id,sequence,body)=>({id,sequence,body,authorType:'agent',authorId:'lead',sourceAgentRunId:'run',campTurnId:'turn',addressedAgentIds:[]})

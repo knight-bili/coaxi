@@ -444,7 +444,7 @@ app.whenReady().then(async () => {
       assert.deepEqual((await state(true)).atomTypes, ['skill'])
     })
 
-    await run('copy writes text/plain and Rovai Composer JSON', async () => {
+    await run('copy writes text/plain and Coaxi Composer JSON', async () => {
       const document = {
         version: 2,
         segments: [

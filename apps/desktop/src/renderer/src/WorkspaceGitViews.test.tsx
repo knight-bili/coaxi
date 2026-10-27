@@ -8,7 +8,7 @@ import { WorkspaceGitViews } from './WorkspaceGitViews'
 
 const diffPreview = vi.hoisted(() => vi.fn())
 
-vi.mock('./codeg-native-content/components/diff/unified-diff-preview', () => ({
+vi.mock('./coaxi-native-content/components/diff/unified-diff-preview', () => ({
   UnifiedDiffPreview: (props: { diffText: string }) => diffPreview(props)
 }))
 

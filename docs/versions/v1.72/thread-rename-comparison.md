@@ -17,7 +17,7 @@ last_updated: 2026-10-01
 
 ## P1 公开批次 Charter
 
-来源：[crates/rovai-core/src/context.rs](../../../crates/rovai-core/src/context.rs)。
+来源：[crates/rovai-core/src/context.rs](../../../crates/coaxi-core/src/context.rs)。
 
 以下含共享 CLI Contract 的完整拼接结果；资源 `charter-rovai-cli.md` 同步替换。可选片段另列 P3。
 
@@ -77,7 +77,7 @@ Rovai Built-in CLI Contract
 
 ## P2 非批次公开 Charter
 
-来源：[crates/rovai-core/src/context.rs](../../../crates/rovai-core/src/context.rs)。
+来源：[crates/rovai-core/src/context.rs](../../../crates/coaxi-core/src/context.rs)。
 
 以下含共享 CLI Contract 的完整拼接结果；资源 `charter-rovai-cli.md` 同步替换。可选片段另列 P3。
 
@@ -147,7 +147,7 @@ Rovai Built-in CLI Contract
 
 ## P3 FEISHU_FILE_DELIVERY_GUIDANCE
 
-来源：[crates/rovai-core/src/context.rs](../../../crates/rovai-core/src/context.rs)。
+来源：[crates/rovai-core/src/context.rs](../../../crates/coaxi-core/src/context.rs)。
 
 保留原来的 Adapter／渠道触发条件；本次不扩大到其他渠道。
 
@@ -167,7 +167,7 @@ This Thread is connected to an external channel. Local file paths and Runtime im
 
 ## P3 CODEX_FINAL_CAMP_ANSWER_GUIDANCE
 
-来源：[crates/rovai-core/src/context.rs](../../../crates/rovai-core/src/context.rs)。
+来源：[crates/rovai-core/src/context.rs](../../../crates/coaxi-core/src/context.rs)。
 
 保留原来的 Adapter／渠道触发条件；本次不扩大到其他渠道。
 
@@ -187,7 +187,7 @@ When publishing the Thread-visible final answer with `rovai send`, use the compl
 
 ## P3 Mission 附加合同
 
-来源：[crates/rovai-core/src/context.rs](../../../crates/rovai-core/src/context.rs)。
+来源：[crates/rovai-core/src/context.rs](../../../crates/coaxi-core/src/context.rs)。
 
 
 变更前：
@@ -215,7 +215,7 @@ Rovai Mission Contract
 
 ## P4 Single Chat Charter
 
-来源：[crates/rovai-core/resources/charter-rovai-single-chat.md](../../../crates/rovai-core/resources/charter-rovai-single-chat.md)。
+来源：[crates/rovai-core/resources/charter-rovai-single-chat.md](../../../crates/coaxi-core/resources/charter-coaxi-single-chat.md)。
 
 
 变更前：
@@ -289,7 +289,7 @@ Rovai operations
 
 ## P5 historyHint 分支 1
 
-来源：[crates/rovai-core/src/context.rs](../../../crates/rovai-core/src/context.rs)。
+来源：[crates/rovai-core/src/context.rs](../../../crates/coaxi-core/src/context.rs)。
 
 只改称谓；序号、可见性、额外消息判断和触发条件不变。旧冻结文本不改写。
 
@@ -309,7 +309,7 @@ The latest public message before your last recorded run in this Thread had seque
 
 ## P5 historyHint 分支 2
 
-来源：[crates/rovai-core/src/context.rs](../../../crates/rovai-core/src/context.rs)。
+来源：[crates/rovai-core/src/context.rs](../../../crates/coaxi-core/src/context.rs)。
 
 只改称谓；序号、可见性、额外消息判断和触发条件不变。旧冻结文本不改写。
 
@@ -329,7 +329,7 @@ The latest public message before your last recorded run in this Thread had seque
 
 ## P5 historyHint 分支 3
 
-来源：[crates/rovai-core/src/context.rs](../../../crates/rovai-core/src/context.rs)。
+来源：[crates/rovai-core/src/context.rs](../../../crates/coaxi-core/src/context.rs)。
 
 只改称谓；序号、可见性、额外消息判断和触发条件不变。旧冻结文本不改写。
 
@@ -349,7 +349,7 @@ As of this run's start, there are additional visible messages in this Thread bey
 
 ## P5 historyHint 分支 4
 
-来源：[crates/rovai-core/src/context.rs](../../../crates/rovai-core/src/context.rs)。
+来源：[crates/rovai-core/src/context.rs](../../../crates/coaxi-core/src/context.rs)。
 
 只改称谓；序号、可见性、额外消息判断和触发条件不变。旧冻结文本不改写。
 
@@ -369,7 +369,7 @@ As of this run's start, all visible messages in this Thread are already in RUN_I
 
 ## P5 historyHint 分支 5
 
-来源：[crates/rovai-core/src/context.rs](../../../crates/rovai-core/src/context.rs)。
+来源：[crates/rovai-core/src/context.rs](../../../crates/coaxi-core/src/context.rs)。
 
 只改称谓；序号、可见性、额外消息判断和触发条件不变。旧冻结文本不改写。
 
@@ -389,7 +389,7 @@ The latest public message before your last recorded run in this Thread had seque
 
 ## P5 historyHint 分支 6
 
-来源：[crates/rovai-core/src/context.rs](../../../crates/rovai-core/src/context.rs)。
+来源：[crates/rovai-core/src/context.rs](../../../crates/coaxi-core/src/context.rs)。
 
 只改称谓；序号、可见性、额外消息判断和触发条件不变。旧冻结文本不改写。
 
@@ -409,7 +409,7 @@ No public-message boundary from a previous run is recorded for you in this Threa
 
 ## P6 Single Chat 动态指引
 
-来源：[crates/rovai-core/resources/single-chat-guidance-v2.json](../../../crates/rovai-core/resources/single-chat-guidance-v2.json)。
+来源：[crates/rovai-core/resources/single-chat-guidance-v2.json](../../../crates/coaxi-core/resources/single-chat-guidance-v2.json)。
 
 新增 `single-chat-guidance-v3.json` 承载下文；v2 保留给原有冻结输入校验。四条指令和 section 条件不变。
 
@@ -443,7 +443,7 @@ No public-message boundary from a previous run is recorded for you in this Threa
 
 ## P7 A2A return 动态指引
 
-来源：[crates/rovai-core/src/context.rs](../../../crates/rovai-core/src/context.rs)。
+来源：[crates/rovai-core/src/context.rs](../../../crates/coaxi-core/src/context.rs)。
 
 `forward` 的四条指令保持原文；无 A2A 仍不输出该 section。Evidence 以主文档的版本规则区分新旧全文。
 
@@ -486,7 +486,7 @@ No public-message boundary from a previous run is recorded for you in this Threa
 
 ## T1 工具说明（原文件第 946 行）
 
-来源：[crates/rovai-core/src/team_tool_catalog.rs](../../../crates/rovai-core/src/team_tool_catalog.rs)。
+来源：[crates/rovai-core/src/team_tool_catalog.rs](../../../crates/coaxi-core/src/team_tool_catalog.rs)。
 
 
 变更前：
@@ -508,7 +508,7 @@ Attachments include saved metadata and source paths, not live file checks.
 
 ## T2 工具说明（原文件第 967 行）
 
-来源：[crates/rovai-core/src/team_tool_catalog.rs](../../../crates/rovai-core/src/team_tool_catalog.rs)。
+来源：[crates/rovai-core/src/team_tool_catalog.rs](../../../crates/coaxi-core/src/team_tool_catalog.rs)。
 
 
 变更前：
@@ -526,7 +526,7 @@ Optional reference to an existing public message in this Thread.
 
 ## T3 工具说明（原文件第 1005 行）
 
-来源：[crates/rovai-core/src/team_tool_catalog.rs](../../../crates/rovai-core/src/team_tool_catalog.rs)。
+来源：[crates/rovai-core/src/team_tool_catalog.rs](../../../crates/coaxi-core/src/team_tool_catalog.rs)。
 
 
 变更前：
@@ -544,7 +544,7 @@ Create and enable one durable Automation only when the user explicitly asks. mem
 
 ## T4 工具说明（原文件第 1062 行）
 
-来源：[crates/rovai-core/src/team_tool_catalog.rs](../../../crates/rovai-core/src/team_tool_catalog.rs)。
+来源：[crates/rovai-core/src/team_tool_catalog.rs](../../../crates/coaxi-core/src/team_tool_catalog.rs)。
 
 
 变更前：
@@ -562,7 +562,7 @@ Send a public Thread message
 
 ## T5 工具说明（原文件第 1124 行）
 
-来源：[crates/rovai-core/src/team_tool_catalog.rs](../../../crates/rovai-core/src/team_tool_catalog.rs)。
+来源：[crates/rovai-core/src/team_tool_catalog.rs](../../../crates/coaxi-core/src/team_tool_catalog.rs)。
 
 
 变更前：
@@ -580,7 +580,7 @@ Read a task's current content, status and owner in this Thread.
 
 ## T6 工具说明（原文件第 1137 行）
 
-来源：[crates/rovai-core/src/team_tool_catalog.rs](../../../crates/rovai-core/src/team_tool_catalog.rs)。
+来源：[crates/rovai-core/src/team_tool_catalog.rs](../../../crates/coaxi-core/src/team_tool_catalog.rs)。
 
 
 变更前：
@@ -598,7 +598,7 @@ List Thread Tasks
 
 ## T7 工具说明（原文件第 1138 行）
 
-来源：[crates/rovai-core/src/team_tool_catalog.rs](../../../crates/rovai-core/src/team_tool_catalog.rs)。
+来源：[crates/rovai-core/src/team_tool_catalog.rs](../../../crates/coaxi-core/src/team_tool_catalog.rs)。
 
 
 变更前：
@@ -616,7 +616,7 @@ List task summaries in this Thread. Use task get for details. Do not poll.
 
 ## T8 工具说明（原文件第 1144 行）
 
-来源：[crates/rovai-core/src/team_tool_catalog.rs](../../../crates/rovai-core/src/team_tool_catalog.rs)。
+来源：[crates/rovai-core/src/team_tool_catalog.rs](../../../crates/coaxi-core/src/team_tool_catalog.rs)。
 
 
 变更前：
@@ -634,7 +634,7 @@ Discover other Threads
 
 ## T9 工具说明（原文件第 1145 行）
 
-来源：[crates/rovai-core/src/team_tool_catalog.rs](../../../crates/rovai-core/src/team_tool_catalog.rs)。
+来源：[crates/rovai-core/src/team_tool_catalog.rs](../../../crates/coaxi-core/src/team_tool_catalog.rs)。
 
 
 变更前：
@@ -652,7 +652,7 @@ Return a bounded Top-K of other public Threads frozen into this AgentRun. Target
 
 ## T10 工具说明（原文件第 1151 行）
 
-来源：[crates/rovai-core/src/team_tool_catalog.rs](../../../crates/rovai-core/src/team_tool_catalog.rs)。
+来源：[crates/rovai-core/src/team_tool_catalog.rs](../../../crates/coaxi-core/src/team_tool_catalog.rs)。
 
 
 变更前：
@@ -670,7 +670,7 @@ Search one public Thread timeline
 
 ## T11 工具说明（原文件第 1152 行）
 
-来源：[crates/rovai-core/src/team_tool_catalog.rs](../../../crates/rovai-core/src/team_tool_catalog.rs)。
+来源：[crates/rovai-core/src/team_tool_catalog.rs](../../../crates/coaxi-core/src/team_tool_catalog.rs)。
 
 
 变更前：
@@ -688,7 +688,7 @@ Search one public Thread timeline. Omit threadId to search the current Thread, o
 
 ## T12 工具说明（原文件第 1158 行）
 
-来源：[crates/rovai-core/src/team_tool_catalog.rs](../../../crates/rovai-core/src/team_tool_catalog.rs)。
+来源：[crates/rovai-core/src/team_tool_catalog.rs](../../../crates/coaxi-core/src/team_tool_catalog.rs)。
 
 
 变更前：
@@ -706,7 +706,7 @@ Search public Thread history
 
 ## T13 工具说明（原文件第 1159 行）
 
-来源：[crates/rovai-core/src/team_tool_catalog.rs](../../../crates/rovai-core/src/team_tool_catalog.rs)。
+来源：[crates/rovai-core/src/team_tool_catalog.rs](../../../crates/coaxi-core/src/team_tool_catalog.rs)。
 
 
 变更前：
@@ -724,7 +724,7 @@ Discover messages across public historical Threads when the target Thread is unk
 
 ## T14 工具说明（原文件第 1165 行）
 
-来源：[crates/rovai-core/src/team_tool_catalog.rs](../../../crates/rovai-core/src/team_tool_catalog.rs)。
+来源：[crates/rovai-core/src/team_tool_catalog.rs](../../../crates/coaxi-core/src/team_tool_catalog.rs)。
 
 
 变更前：
@@ -742,7 +742,7 @@ Read public Thread messages
 
 ## T15 工具说明（原文件第 1166 行）
 
-来源：[crates/rovai-core/src/team_tool_catalog.rs](../../../crates/rovai-core/src/team_tool_catalog.rs)。
+来源：[crates/rovai-core/src/team_tool_catalog.rs](../../../crates/coaxi-core/src/team_tool_catalog.rs)。
 
 
 变更前：
@@ -760,7 +760,7 @@ Read messages from exactly one public Thread. Target-Thread membership is not a 
 
 ## T16 工具说明（原文件第 1173 行）
 
-来源：[crates/rovai-core/src/team_tool_catalog.rs](../../../crates/rovai-core/src/team_tool_catalog.rs)。
+来源：[crates/rovai-core/src/team_tool_catalog.rs](../../../crates/coaxi-core/src/team_tool_catalog.rs)。
 
 
 变更前：
@@ -778,7 +778,7 @@ Read a bounded page of user and assistant messages before CURRENT_INPUT in the a
 
 ## T17 工具说明（原文件第 1194 行）
 
-来源：[crates/rovai-core/src/team_tool_catalog.rs](../../../crates/rovai-core/src/team_tool_catalog.rs)。
+来源：[crates/rovai-core/src/team_tool_catalog.rs](../../../crates/coaxi-core/src/team_tool_catalog.rs)。
 
 
 变更前：
@@ -796,7 +796,7 @@ Resolve stable Memory IDs against current Revision, lifecycle, Thread access, an
 
 ## T18 工具说明（原文件第 1 行）
 
-来源：[crates/rovai-core/src/camp_message_send_teaching.rs](../../../crates/rovai-core/src/camp_message_send_teaching.rs)。
+来源：[crates/rovai-core/src/camp_message_send_teaching.rs](../../../crates/coaxi-core/src/camp_message_send_teaching.rs)。
 
 
 变更前：
@@ -814,7 +814,7 @@ Publish one public Thread message. Use --public-only when the message must not a
 
 ## T19 工具说明（原文件第 8 行）
 
-来源：[crates/rovai-core/src/camp_message_send_teaching.rs](../../../crates/rovai-core/src/camp_message_send_teaching.rs)。
+来源：[crates/rovai-core/src/camp_message_send_teaching.rs](../../../crates/coaxi-core/src/camp_message_send_teaching.rs)。
 
 
 变更前：
@@ -832,7 +832,7 @@ Guarantee that this public Thread message addresses no Agent. When true, explici
 
 ## T20 工具说明（原文件第 10 行）
 
-来源：[crates/rovai-core/src/camp_message_send_teaching.rs](../../../crates/rovai-core/src/camp_message_send_teaching.rs)。
+来源：[crates/rovai-core/src/camp_message_send_teaching.rs](../../../crates/coaxi-core/src/camp_message_send_teaching.rs)。
 
 
 变更前：
@@ -850,7 +850,7 @@ Mention the Principal and create an Inbox notification. Ordinary public Thread m
 
 ## T21 工具说明（原文件第 24 行）
 
-来源：[crates/rovai-core/src/camp_message_send_teaching.rs](../../../crates/rovai-core/src/camp_message_send_teaching.rs)。
+来源：[crates/rovai-core/src/camp_message_send_teaching.rs](../../../crates/coaxi-core/src/camp_message_send_teaching.rs)。
 
 
 变更前：
@@ -876,7 +876,7 @@ It creates no Agent Delivery, does not represent approval, and may be combined w
 
 ## T22 工具说明（原文件第 586 行）
 
-来源：[crates/rovai-core/src/team_tool.rs](../../../crates/rovai-core/src/team_tool.rs)。
+来源：[crates/rovai-core/src/team_tool.rs](../../../crates/coaxi-core/src/team_tool.rs)。
 
 
 变更前：
@@ -894,7 +894,7 @@ Required Current ThreadMember who owns the responsibility. Creation does not not
 
 ## T23 工具说明（原文件第 624 行）
 
-来源：[crates/rovai-core/src/team_tool.rs](../../../crates/rovai-core/src/team_tool.rs)。
+来源：[crates/rovai-core/src/team_tool.rs](../../../crates/coaxi-core/src/team_tool.rs)。
 
 
 变更前：
@@ -912,7 +912,7 @@ Set an active Thread member, or omit to leave unchanged.
 
 ## T24 工具说明（原文件第 84 行）
 
-来源：[crates/rovai-core/src/memory_tool.rs](../../../crates/rovai-core/src/memory_tool.rs)。
+来源：[crates/rovai-core/src/memory_tool.rs](../../../crates/coaxi-core/src/memory_tool.rs)。
 
 
 变更前：
@@ -930,7 +930,7 @@ Another present member of the current Thread.
 
 ## T25 工具说明（原文件第 227 行）
 
-来源：[crates/rovai-core/src/memory_retrieval.rs](../../../crates/rovai-core/src/memory_retrieval.rs)。
+来源：[crates/rovai-core/src/memory_retrieval.rs](../../../crates/coaxi-core/src/memory_retrieval.rs)。
 
 
 变更前：
@@ -948,7 +948,7 @@ Another present member of the current Thread.
 
 ## T26 工具说明（原文件第 1370 行）
 
-来源：[crates/rovai-core/src/bin/rovai.rs](../../../crates/rovai-core/src/bin/rovai.rs)。
+来源：[crates/rovai-core/src/bin/rovai.rs](../../../crates/coaxi-core/src/bin/coaxi.rs)。
 
 
 变更前：
@@ -992,7 +992,7 @@ Run an Agent operation's exact `--help` for its closed inputs. Each Agent operat
 
 ## T27 工具说明（原文件第 1604 行）
 
-来源：[crates/rovai-core/src/bin/rovai.rs](../../../crates/rovai-core/src/bin/rovai.rs)。
+来源：[crates/rovai-core/src/bin/rovai.rs](../../../crates/coaxi-core/src/bin/coaxi.rs)。
 
 
 变更前：
@@ -1010,7 +1010,7 @@ Run an Agent operation's exact `--help` for its closed inputs. Each Agent operat
 
 ## T28 工具说明（原文件第 1788 行）
 
-来源：[crates/rovai-core/src/bin/rovai.rs](../../../crates/rovai-core/src/bin/rovai.rs)。
+来源：[crates/rovai-core/src/bin/rovai.rs](../../../crates/coaxi-core/src/bin/coaxi.rs)。
 
 
 变更前：
@@ -1028,7 +1028,7 @@ Run an Agent operation's exact `--help` for its closed inputs. Each Agent operat
 
 ## T29 工具说明（原文件第 1869 行）
 
-来源：[crates/rovai-core/src/bin/rovai.rs](../../../crates/rovai-core/src/bin/rovai.rs)。
+来源：[crates/rovai-core/src/bin/rovai.rs](../../../crates/coaxi-core/src/bin/coaxi.rs)。
 
 
 变更前：
@@ -1046,7 +1046,7 @@ rovai thread list --limit 10
 
 ## T30 工具说明（原文件第 1871 行）
 
-来源：[crates/rovai-core/src/bin/rovai.rs](../../../crates/rovai-core/src/bin/rovai.rs)。
+来源：[crates/rovai-core/src/bin/rovai.rs](../../../crates/coaxi-core/src/bin/coaxi.rs)。
 
 
 变更前：
@@ -1064,7 +1064,7 @@ rovai thread search --query 'amount'
 
 ## T31 工具说明（原文件第 1872 行）
 
-来源：[crates/rovai-core/src/bin/rovai.rs](../../../crates/rovai-core/src/bin/rovai.rs)。
+来源：[crates/rovai-core/src/bin/rovai.rs](../../../crates/coaxi-core/src/bin/coaxi.rs)。
 
 
 变更前：
@@ -1082,7 +1082,7 @@ rovai thread search --thread-id '<thread-id>' --query 'amount'
 
 ## T32 工具说明（原文件第 1875 行）
 
-来源：[crates/rovai-core/src/bin/rovai.rs](../../../crates/rovai-core/src/bin/rovai.rs)。
+来源：[crates/rovai-core/src/bin/rovai.rs](../../../crates/coaxi-core/src/bin/coaxi.rs)。
 
 
 变更前：
@@ -1100,7 +1100,7 @@ rovai thread read
 
 ## T33 工具说明（原文件第 1876 行）
 
-来源：[crates/rovai-core/src/bin/rovai.rs](../../../crates/rovai-core/src/bin/rovai.rs)。
+来源：[crates/rovai-core/src/bin/rovai.rs](../../../crates/coaxi-core/src/bin/coaxi.rs)。
 
 
 变更前：
@@ -1118,7 +1118,7 @@ rovai thread read --limit 20
 
 ## T34 工具说明（原文件第 1877 行）
 
-来源：[crates/rovai-core/src/bin/rovai.rs](../../../crates/rovai-core/src/bin/rovai.rs)。
+来源：[crates/rovai-core/src/bin/rovai.rs](../../../crates/coaxi-core/src/bin/coaxi.rs)。
 
 
 变更前：
@@ -1136,7 +1136,7 @@ rovai thread read --before 123
 
 ## T35 工具说明（原文件第 1878 行）
 
-来源：[crates/rovai-core/src/bin/rovai.rs](../../../crates/rovai-core/src/bin/rovai.rs)。
+来源：[crates/rovai-core/src/bin/rovai.rs](../../../crates/coaxi-core/src/bin/coaxi.rs)。
 
 
 变更前：
@@ -1154,7 +1154,7 @@ rovai thread read --message-id '<message-id>'
 
 ## T36 工具说明（原文件第 1879 行）
 
-来源：[crates/rovai-core/src/bin/rovai.rs](../../../crates/rovai-core/src/bin/rovai.rs)。
+来源：[crates/rovai-core/src/bin/rovai.rs](../../../crates/coaxi-core/src/bin/coaxi.rs)。
 
 
 变更前：
@@ -1172,7 +1172,7 @@ rovai thread read --reply-chain '<message-id>' --limit 20
 
 ## T37 工具说明（原文件第 436 行）
 
-来源：[crates/rovai-core/src/bin/rovai/app_cli.rs](../../../crates/rovai-core/src/bin/rovai/app_cli.rs)。
+来源：[crates/rovai-core/src/bin/rovai/app_cli.rs](../../../crates/coaxi-core/src/bin/coaxi/app_cli.rs)。
 
 
 变更前：
@@ -1219,7 +1219,7 @@ The Desktop App must already be running. V1 never launches it automatically.
 
 ## T38 工具说明（原文件第 458 行）
 
-来源：[crates/rovai-core/src/bin/rovai/app_cli.rs](../../../crates/rovai-core/src/bin/rovai/app_cli.rs)。
+来源：[crates/rovai-core/src/bin/rovai/app_cli.rs](../../../crates/coaxi-core/src/bin/coaxi/app_cli.rs)。
 
 
 变更前：
@@ -1237,7 +1237,7 @@ rovai app thread create [--name <name>] (--workspace <path> | --quick-chat) --me
 
 ## T39 工具说明（原文件第 461 行）
 
-来源：[crates/rovai-core/src/bin/rovai/app_cli.rs](../../../crates/rovai-core/src/bin/rovai/app_cli.rs)。
+来源：[crates/rovai-core/src/bin/rovai/app_cli.rs](../../../crates/coaxi-core/src/bin/coaxi/app_cli.rs)。
 
 
 变更前：
@@ -1255,7 +1255,7 @@ rovai app thread send --thread-id <id> --agent-id <id> (--body <text> | --body-f
 
 ## T40 工具说明（原文件第 463 行）
 
-来源：[crates/rovai-core/src/bin/rovai/app_cli.rs](../../../crates/rovai-core/src/bin/rovai/app_cli.rs)。
+来源：[crates/rovai-core/src/bin/rovai/app_cli.rs](../../../crates/coaxi-core/src/bin/coaxi/app_cli.rs)。
 
 
 变更前：
@@ -1273,7 +1273,7 @@ rovai app thread open --thread-id <id> [--json]
 
 ## T41 工具说明（原文件第 474 行）
 
-来源：[crates/rovai-core/src/bin/rovai/app_cli.rs](../../../crates/rovai-core/src/bin/rovai/app_cli.rs)。
+来源：[crates/rovai-core/src/bin/rovai/app_cli.rs](../../../crates/coaxi-core/src/bin/coaxi/app_cli.rs)。
 
 
 变更前：
@@ -1291,7 +1291,7 @@ rovai app trace export --since <RFC3339> --until <RFC3339> --output <new-directo
 
 ## T42 工具说明（原文件第 477 行）
 
-来源：[crates/rovai-core/src/bin/rovai/app_cli.rs](../../../crates/rovai-core/src/bin/rovai/app_cli.rs)。
+来源：[crates/rovai-core/src/bin/rovai/app_cli.rs](../../../crates/coaxi-core/src/bin/coaxi/app_cli.rs)。
 
 
 变更前：
@@ -1309,7 +1309,7 @@ rovai app trace schedule --automation-id <existing-id> --timezone <IANA-zone> --
 
 ## T43 automation.run 说明
 
-来源：[crates/rovai-core/src/team_tool_catalog.rs](../../../crates/rovai-core/src/team_tool_catalog.rs)。
+来源：[crates/rovai-core/src/team_tool_catalog.rs](../../../crates/coaxi-core/src/team_tool_catalog.rs)。
 
 变更前：
 
@@ -1332,7 +1332,7 @@ Run one enabled Automation immediately only when the user explicitly asks. A suc
 
 ## J1 camp_search_input_schema
 
-来源：[crates/rovai-core/src/camp_history.rs](../../../crates/rovai-core/src/camp_history.rs)。
+来源：[crates/rovai-core/src/camp_history.rs](../../../crates/coaxi-core/src/camp_history.rs)。
 
 
 变更前：
@@ -1372,7 +1372,7 @@ pub fn thread_search_input_schema() -> Value {
 
 ## J2 history_search_input_schema
 
-来源：[crates/rovai-core/src/camp_history.rs](../../../crates/rovai-core/src/camp_history.rs)。
+来源：[crates/rovai-core/src/camp_history.rs](../../../crates/coaxi-core/src/camp_history.rs)。
 
 
 变更前：
@@ -1424,7 +1424,7 @@ pub fn history_search_input_schema() -> Value {
 
 ## J3 camp_read_input_schema
 
-来源：[crates/rovai-core/src/camp_history.rs](../../../crates/rovai-core/src/camp_history.rs)。
+来源：[crates/rovai-core/src/camp_history.rs](../../../crates/coaxi-core/src/camp_history.rs)。
 
 
 变更前：
@@ -1506,7 +1506,7 @@ pub fn thread_read_input_schema() -> Value {
 
 ## J4 camp_list_success_schema
 
-来源：[crates/rovai-core/src/team_tool_catalog.rs](../../../crates/rovai-core/src/team_tool_catalog.rs)。
+来源：[crates/rovai-core/src/team_tool_catalog.rs](../../../crates/coaxi-core/src/team_tool_catalog.rs)。
 
 
 变更前：
@@ -1568,7 +1568,7 @@ fn thread_list_success_schema() -> Value {
 
 ## J5 camp_search_success_schema
 
-来源：[crates/rovai-core/src/team_tool_catalog.rs](../../../crates/rovai-core/src/team_tool_catalog.rs)。
+来源：[crates/rovai-core/src/team_tool_catalog.rs](../../../crates/coaxi-core/src/team_tool_catalog.rs)。
 
 
 变更前：
@@ -1676,7 +1676,7 @@ fn thread_search_success_schema(include_thread_title: bool) -> Value {
 
 ## J6 camp_read_item_schema
 
-来源：[crates/rovai-core/src/team_tool_catalog.rs](../../../crates/rovai-core/src/team_tool_catalog.rs)。
+来源：[crates/rovai-core/src/team_tool_catalog.rs](../../../crates/coaxi-core/src/team_tool_catalog.rs)。
 
 
 变更前：
@@ -1720,7 +1720,7 @@ fn thread_read_item_schema() -> Value {
 
 ## J7 camp_read_thread_schema
 
-来源：[crates/rovai-core/src/team_tool_catalog.rs](../../../crates/rovai-core/src/team_tool_catalog.rs)。
+来源：[crates/rovai-core/src/team_tool_catalog.rs](../../../crates/coaxi-core/src/team_tool_catalog.rs)。
 
 
 变更前：
@@ -1778,7 +1778,7 @@ fn thread_read_reply_chain_schema() -> Value {
 
 ## J8 camp_read_timeline_schema
 
-来源：[crates/rovai-core/src/team_tool_catalog.rs](../../../crates/rovai-core/src/team_tool_catalog.rs)。
+来源：[crates/rovai-core/src/team_tool_catalog.rs](../../../crates/coaxi-core/src/team_tool_catalog.rs)。
 
 
 变更前：
@@ -1830,7 +1830,7 @@ fn thread_read_timeline_schema() -> Value {
 
 ## J9 task_detail_success_schema
 
-来源：[crates/rovai-core/src/team_tool_catalog.rs](../../../crates/rovai-core/src/team_tool_catalog.rs)。
+来源：[crates/rovai-core/src/team_tool_catalog.rs](../../../crates/coaxi-core/src/team_tool_catalog.rs)。
 
 
 变更前：
@@ -1954,7 +1954,7 @@ fn task_detail_success_schema(include_changed: bool) -> Value {
 
 ## J10 mission_list_success_schema
 
-来源：[crates/rovai-core/src/team_tool_catalog.rs](../../../crates/rovai-core/src/team_tool_catalog.rs)。
+来源：[crates/rovai-core/src/team_tool_catalog.rs](../../../crates/coaxi-core/src/team_tool_catalog.rs)。
 
 
 变更前：
@@ -2024,7 +2024,7 @@ fn mission_list_success_schema() -> Value {
 
 ## J11 collection_message_schema
 
-来源：[crates/rovai-core/src/team_tool_catalog.rs](../../../crates/rovai-core/src/team_tool_catalog.rs)。
+来源：[crates/rovai-core/src/team_tool_catalog.rs](../../../crates/coaxi-core/src/team_tool_catalog.rs)。
 
 
 变更前：
@@ -2082,7 +2082,7 @@ fn collection_message_schema() -> Value {
 
 ## J12 item_message_schema
 
-来源：[crates/rovai-core/src/team_tool_catalog.rs](../../../crates/rovai-core/src/team_tool_catalog.rs)。
+来源：[crates/rovai-core/src/team_tool_catalog.rs](../../../crates/coaxi-core/src/team_tool_catalog.rs)。
 
 
 变更前：
@@ -2181,7 +2181,7 @@ fn item_message_schema() -> Value {
 实际构造器是 `automation.rs::ClaimedOccurrence::payload`：旧 `campId` 与 `conversationId` 都取 `self.camp_id`，
 不是两个实体 ID。新版收敛成一个 `threadId`；这也修正 r1 将第二个字段解释成私有 ID 的错误。
 
-来源：[crates/rovai-core/src/team_tool_catalog.rs](../../../crates/rovai-core/src/team_tool_catalog.rs)。
+来源：[crates/rovai-core/src/team_tool_catalog.rs](../../../crates/coaxi-core/src/team_tool_catalog.rs)。
 
 
 变更前：
@@ -2274,7 +2274,7 @@ fn item_message_schema() -> Value {
 
 ## J14 automation_run_summary_schema
 
-来源：[crates/rovai-core/src/team_tool_catalog.rs](../../../crates/rovai-core/src/team_tool_catalog.rs)。Automation 列表／详情中的 Run 摘要同样只改公开范围字段。
+来源：[crates/rovai-core/src/team_tool_catalog.rs](../../../crates/coaxi-core/src/team_tool_catalog.rs)。Automation 列表／详情中的 Run 摘要同样只改公开范围字段。
 
 变更前：
 

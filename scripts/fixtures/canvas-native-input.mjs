@@ -7,7 +7,7 @@ import { setTimeout as pause } from 'node:timers/promises'
 import { stripVTControlCharacters } from 'node:util'
 import { execFileSync } from 'node:child_process'
 
-const config=JSON.parse(await readFile(process.env.ROVAI_C06_NATIVE_CONFIG,'utf8'))
+const config=JSON.parse(await readFile(process.env.COAXI_C06_NATIVE_CONFIG,'utf8'))
 const report={source_commit:config.source_commit,scope:'production Main/preload/Core; direct Electron native input events',checks:[],status:'running',started_at:new Date().toISOString()}
 await mkdir(config.evidence,{recursive:false})
 let started=false
@@ -45,15 +45,15 @@ async function qualify(window){
   return result.value
  }
  const wait=async(expression,timeout=20_000)=>{const until=Date.now()+timeout;while(Date.now()<until){if(await evaluate(expression))return;await pause(100)}throw Error('Native condition timed out: '+expression)}
- const rpc=(method,params={})=>evaluate(`window.rovai.request(${JSON.stringify(method)},${JSON.stringify(params)})`)
+ const rpc=(method,params={})=>evaluate(`window.coaxi.request(${JSON.stringify(method)},${JSON.stringify(params)})`)
  try{
   if(privateModes.includes(config.mode)||config.mode==='object-cold'||config.mode==='file-resources'||config.mode==='terminal-input'||config.mode==='native-load'||config.mode==='native-notifications'||config.mode==='source-ui'){
-   await wait(`window.rovai?.onboarding&&window.rovai.onboarding.get().then(value=>value.status!=='uninitialized')`,60_000)
-   const initial=await evaluate('window.rovai.onboarding.get()')
+   await wait(`window.coaxi?.onboarding&&window.coaxi.onboarding.get().then(value=>value.status!=='uninitialized')`,60_000)
+   const initial=await evaluate('window.coaxi.onboarding.get()')
    if(initial.status!=='completed'){
-    if(initial.step==='welcome')await evaluate('window.rovai.onboarding.completeWelcome()')
-    if(['welcome','member'].includes(initial.step))await evaluate('window.rovai.onboarding.completeMemberSelection()')
-    const deferred=await evaluate('window.rovai.onboarding.deferRuntimeSetup()')
+    if(initial.step==='welcome')await evaluate('window.coaxi.onboarding.completeWelcome()')
+    if(['welcome','member'].includes(initial.step))await evaluate('window.coaxi.onboarding.completeMemberSelection()')
+    const deferred=await evaluate('window.coaxi.onboarding.deferRuntimeSetup()')
     assert.equal(deferred.status,'completed');assert.equal(deferred.origin,'runtime_deferred')
     report.onboarding_preparation={before:initial.status,after:deferred.status,origin:deferred.origin,qualification:'fixture setup only; not first-use flow qualification'}
     const loaded=new Promise(resolve=>window.webContents.once('did-finish-load',resolve));window.webContents.reload();await loaded
@@ -73,7 +73,7 @@ async function qualify(window){
    })()`)
   }
   window.show();window.focus();window.webContents.focus()
-  await wait(`window.rovai&&document.querySelector('button[aria-label="无限画布"]')?.disabled===false`,60_000)
+  await wait(`window.coaxi&&document.querySelector('button[aria-label="无限画布"]')?.disabled===false`,60_000)
   if(config.mode==='source-ui'){
    await sourceUiWorkflow.qualifyCanvasSourceUi(window,{evaluate,wait,rpc,openCanvasBoard,config,report,record})
    report.runtime_errors=await evaluate('window.nativeRuntimeErrors')
@@ -122,7 +122,7 @@ async function qualify(window){
    return
   }
   if(config.mode==='visual'){
-   report.scope='production Main/preload/Core; Codeg canvas creation and rendered visual states; no model'
+   report.scope='production Main/preload/Core; Coaxi canvas creation and rendered visual states; no model'
    await qualifyCanvasVisual(window,{evaluate,wait,rpc})
    report.status='passed'
    return
@@ -230,7 +230,7 @@ async function qualify(window){
   record('real_pty_result_is_painted_in_production_terminal_reader')
   const shot=join(config.evidence,'native-output.png');await writeFile(shot,(await window.webContents.capturePage()).toPNG());report.screenshot=shot
   await evaluate(`(()=>{[...document.querySelectorAll('.canvas-terminal button')].find(button=>(button.getAttribute('aria-label')||button.textContent.trim())==='停止终端').click();return true})()`)
-  await wait(`window.rovai.request('canvas.terminals.snapshot',{target:${JSON.stringify(target)}}).then(value=>value.cleanupComplete===true)`)
+  await wait(`window.coaxi.request('canvas.terminals.snapshot',{target:${JSON.stringify(target)}}).then(value=>value.cleanupComplete===true)`)
   record('native_terminal_stop_completes_process_cleanup')
   const finalGraph=await rpc('canvas.nodes.snapshot',{boardId:board.id})
   const restored=await rpc('canvas.nodes.apply',{commandId:randomUUID(),command:{boardId:board.id,expectedRevision:finalGraph.board.revision,mutation:{type:'update',nodeId:terminal.id,patch:{width:terminal.data.width}}}})
@@ -366,7 +366,7 @@ async function qualifyCanvasVisual(window,{evaluate,wait,rpc}){
  const graph=await rpc('canvas.nodes.snapshot',{boardId:created[0].id});assert.equal(graph.nodes.length,0)
  report.visual_board_id=created[0].id
  await capture('02-empty-board')
- record('real_creation_persists_one_empty_board_and_displays_codeg_canvas_chrome',{board_id:created[0].id})
+ record('real_creation_persists_one_empty_board_and_displays_coaxi_canvas_chrome',{board_id:created[0].id})
 }
 async function qualifyFiles(window,{evaluate,wait,rpc}){
  const requests=new Set(),network=[]
@@ -412,7 +412,7 @@ async function qualifyFiles(window,{evaluate,wait,rpc}){
   await evaluate(`(()=>{${htmlCard}.querySelector('iframe.file-preview-html').contentWindow.postMessage({c06FrameProbe:${JSON.stringify(probe)}},${JSON.stringify(origin)});return true})()`)
   await pause(100)
   for(const item of candidates)if(await item.executeJavaScript(`window.__c06FrameProbe===${JSON.stringify(probe)}`).catch(()=>false))frame=item
-  if(frame){initial=await frame.executeJavaScript(`({title:document.title,ready:document.readyState,counter:document.querySelector('#counter')?.textContent,color:document.querySelector('#counter')?getComputedStyle(document.querySelector('#counter')).color:null,bridge:typeof window.rovai,node:typeof window.require,csp:document.querySelector('meta[http-equiv="Content-Security-Policy"]')?.content})`).catch(()=>null);if(initial?.ready==='complete'&&(initial?.color==='rgb(23, 101, 155)'||initial?.title==='无法加载页面'))break}
+  if(frame){initial=await frame.executeJavaScript(`({title:document.title,ready:document.readyState,counter:document.querySelector('#counter')?.textContent,color:document.querySelector('#counter')?getComputedStyle(document.querySelector('#counter')).color:null,bridge:typeof window.coaxi,node:typeof window.require,csp:document.querySelector('meta[http-equiv="Content-Security-Policy"]')?.content})`).catch(()=>null);if(initial?.ready==='complete'&&(initial?.color==='rgb(23, 101, 155)'||initial?.title==='无法加载页面'))break}
   await pause(100)
  }
  for(const item of window.webContents.mainFrame.framesInSubtree.filter(item=>{try{return new URL(item.url).origin===origin}catch{return false}}))await item.executeJavaScript(`(()=>{removeEventListener('message',window.__c06ProbeHandler);delete window.__c06ProbeHandler;delete window.__c06FrameProbe;return true})()`).catch(()=>{})
@@ -516,9 +516,9 @@ async function qualifyMaterials({evaluate,rpc}){
  record('forged_node_scope_cannot_register_private_materials')
  const prepare=async(scope,name,text)=>{
   const current=await get(scope),request={commandId:randomUUID(),threadId,expectedRevision:current.draft.revision,target:{kind:'single_chat',conversationId,composerScope:scope}}
-  const prepared=await evaluate(`window.rovai.singleChatAttachments.prepareInput(${JSON.stringify(request)},new File([${JSON.stringify(text)}],${JSON.stringify(name)},{type:'text/plain'}))`)
+  const prepared=await evaluate(`window.coaxi.singleChatAttachments.prepareInput(${JSON.stringify(request)},new File([${JSON.stringify(text)}],${JSON.stringify(name)},{type:'text/plain'}))`)
   assert.equal(prepared.state,'recorded',JSON.stringify(prepared));assert.equal(prepared.receipt.status,'applied',JSON.stringify(prepared))
-  const reconciled=await evaluate(`window.rovai.singleChatAttachments.reconcileInput(${JSON.stringify(request)})`)
+  const reconciled=await evaluate(`window.coaxi.singleChatAttachments.reconcileInput(${JSON.stringify(request)})`)
   assert.deepEqual(reconciled,prepared)
   report.preparations??=[];report.preparations.push({request,result:prepared})
   return get(scope)
@@ -583,18 +583,18 @@ async function qualifyMaterialReopen({evaluate,rpc}){
  assert.deepEqual(beta.draft.attachments.map(x=>x.displayName),['乙材料.txt'])
  assert.deepEqual(alpha.agentRuns,[]);assert.deepEqual(alpha.messages,[])
  for(const prepared of previous.preparations){
-  const receipt=await evaluate(`window.rovai.singleChatAttachments.reconcileInput(${JSON.stringify(prepared.request)})`)
+  const receipt=await evaluate(`window.coaxi.singleChatAttachments.reconcileInput(${JSON.stringify(prepared.request)})`)
   assert.deepEqual(receipt,prepared.result)
  }
  record('native_preparation_receipts_survive_process_restart_without_rebinding_or_execution')
- await evaluate(`window.rovai.filePreview.bindThread(${JSON.stringify(threadId)})`)
+ await evaluate(`window.coaxi.filePreview.bindThread(${JSON.stringify(threadId)})`)
  const preview=async(locator,expected)=>{
-  const opened=await evaluate(`window.rovai.filePreview.restore(${JSON.stringify({kind:'attachment',threadId,locator})})`)
+  const opened=await evaluate(`window.coaxi.filePreview.restore(${JSON.stringify({kind:'attachment',threadId,locator})})`)
   assert.equal(opened.ok,true,JSON.stringify(opened));assert.equal(opened.value.kind,'file_preview')
   const file=opened.value.file
-  const read=await evaluate(`window.rovai.filePreview.readText(${JSON.stringify({handleId:file.handleId,expectedGeneration:file.contentGeneration})})`)
+  const read=await evaluate(`window.coaxi.filePreview.readText(${JSON.stringify({handleId:file.handleId,expectedGeneration:file.contentGeneration})})`)
   assert.equal(read.ok,true,JSON.stringify(read));assert.equal(read.value.text,expected)
-  await evaluate(`window.rovai.filePreview.release(${JSON.stringify({handleId:file.handleId})})`)
+  await evaluate(`window.coaxi.filePreview.release(${JSON.stringify({handleId:file.handleId})})`)
   return {kind:file.kind,fileName:file.fileName}
  }
  report.orphan_file=await preview({owner:'single_chat_scoped_composer',threadId,conversationId,composerScope:scopes[0],attachmentRefId:alpha.draft.attachments[0].id},'原默认位置待迁入材料')
@@ -606,7 +606,7 @@ async function qualifyMaterialReopen({evaluate,rpc}){
  for(const attachment of retained.input.attachments)await preview({owner:'single_chat_retained',threadId,conversationId,composerScope:scopes[0],retainedInputId:retained.input.id,attachmentRefId:attachment.id},expected[attachment.displayName])
  assert.equal(retained.input.attachments.length,2)
  record('retained_input_keeps_original_body_and_each_authorized_attachment_content')
- const crossed=await evaluate(`window.rovai.filePreview.restore(${JSON.stringify({kind:'attachment',threadId,locator:{owner:'single_chat_scoped_composer',threadId,conversationId,composerScope:scopes[0],attachmentRefId:beta.draft.attachments[0].id}})})`)
+ const crossed=await evaluate(`window.coaxi.filePreview.restore(${JSON.stringify({kind:'attachment',threadId,locator:{owner:'single_chat_scoped_composer',threadId,conversationId,composerScope:scopes[0],attachmentRefId:beta.draft.attachments[0].id}})})`)
  assert.equal(crossed.ok,false,JSON.stringify(crossed));report.crossed_file=crossed
  record('production_file_reader_rejects_attachment_from_a_different_card')
  assert.deepEqual((await rpc('singleChat.composerDraft.recovery',{threadId,conversationId})).items,recovery.items)
@@ -666,8 +666,8 @@ async function qualifyObjects(window,{evaluate,wait,rpc}){
    await evaluate(`(()=>{document.querySelector('button[aria-label="恢复到 100%"]').click();return true})()`)
    await wait(`document.querySelector('.canvas-zoom-readout')?.textContent==='100%'`)
    await evaluate(`(()=>{document.querySelector('.canvas-dock-panel button[aria-label="查看全部"]').click();return true})()`)
-   toolbarChecked=true;record('codeg_canvas_dock_viewport_keyboard_menus_and_minimap_toggle')
-   await writeFile(join(config.evidence,'00-codeg-canvas-dock.png'),(await window.webContents.capturePage()).toPNG())
+   toolbarChecked=true;record('coaxi_canvas_dock_viewport_keyboard_menus_and_minimap_toggle')
+   await writeFile(join(config.evidence,'00-coaxi-canvas-dock.png'),(await window.webContents.capturePage()).toPNG())
   }
  }
  const inspect=async kind=>{
@@ -820,7 +820,7 @@ async function qualifyNotes(window,{evaluate,wait,rpc}){
  await pause(200)
  report.note_drag_events=await evaluate('window.noteDragEvents')
  report.note_graph_after_drag=await rpc('canvas.nodes.snapshot',{boardId})
- await wait(`window.rovai.request('canvas.nodes.snapshot',{boardId:${JSON.stringify(boardId)}}).then(graph=>graph.nodes.find(node=>node.id===${JSON.stringify(ids[0])})?.data.x===${expectedGeometry.x})`)
+ await wait(`window.coaxi.request('canvas.nodes.snapshot',{boardId:${JSON.stringify(boardId)}}).then(graph=>graph.nodes.find(node=>node.id===${JSON.stringify(ids[0])})?.data.x===${expectedGeometry.x})`)
  const moved=(await rpc('canvas.nodes.snapshot',{boardId})).nodes.find(node=>node.id===ids[0])
  assert.equal(moved.data.x+moved.data.width,400);assert.equal(moved.data.y,expectedGeometry.y)
  record('whole_note_body_native_drag_updates_exact_core_geometry_and_retains_edge_alignment')
@@ -839,14 +839,14 @@ async function qualifyNotes(window,{evaluate,wait,rpc}){
  let saved='真实行内输入\n最后字符乙'
  await type(saved)
  await click(`document.querySelector('button[aria-label="恢复到 100%"]')`)
- await wait(`window.rovai.request('canvas.nodes.snapshot',{boardId:${JSON.stringify(boardId)}}).then(graph=>graph.nodes.find(node=>node.id===${JSON.stringify(ids[0])})?.data.content===${JSON.stringify(saved)})`)
+ await wait(`window.coaxi.request('canvas.nodes.snapshot',{boardId:${JSON.stringify(boardId)}}).then(graph=>graph.nodes.find(node=>node.id===${JSON.stringify(ids[0])})?.data.content===${JSON.stringify(saved)})`)
  const after=(await rpc('canvas.nodes.snapshot',{boardId})).nodes.find(node=>node.id===ids[0])
  assert.equal(after.data.x,moved.data.x);assert.equal(after.data.y,moved.data.y)
  record('native_double_click_and_trusted_last_character_blur_save_only_note_content')
  saved='键盘进入后按Escape保存的便笺丙'
  await type(saved,true)
  window.webContents.sendInputEvent({type:'keyDown',keyCode:'Escape'});window.webContents.sendInputEvent({type:'keyUp',keyCode:'Escape'})
- await wait(`!${card}.querySelector('textarea')&&window.rovai.request('canvas.nodes.snapshot',{boardId:${JSON.stringify(boardId)}}).then(graph=>graph.nodes.find(node=>node.id===${JSON.stringify(ids[0])})?.data.content===${JSON.stringify(saved)})`)
+ await wait(`!${card}.querySelector('textarea')&&window.coaxi.request('canvas.nodes.snapshot',{boardId:${JSON.stringify(boardId)}}).then(graph=>graph.nodes.find(node=>node.id===${JSON.stringify(ids[0])})?.data.content===${JSON.stringify(saved)})`)
  record('native_f2_edit_and_escape_save_preserve_original_note_exit_semantics')
  const local='本机冲突草稿乙',remote='远端已经保存的原文甲'
  await type(local)
@@ -857,7 +857,7 @@ async function qualifyNotes(window,{evaluate,wait,rpc}){
  await click(`document.querySelector('button[aria-label="恢复到 100%"]')`)
  const conflict=(await rpc('canvas.nodes.snapshot',{boardId})).nodes.find(node=>node.id===ids[0])
  assert.equal(conflict.data.content,remote)
- report.note_drafts=await evaluate(`Object.entries(localStorage).filter(([key])=>key.startsWith('rovai.canvas.note-draft.v1:')).map(([key,value])=>({key,value:JSON.parse(value)}))`)
+ report.note_drafts=await evaluate(`Object.entries(localStorage).filter(([key])=>key.startsWith('coaxi.canvas.note-draft.v1:')).map(([key,value])=>({key,value:JSON.parse(value)}))`)
  assert.ok(report.note_drafts.some(item=>item.value.text===local&&item.value.baseline===saved))
  record('remote_note_revision_keeps_saved_text_and_local_draft_without_silent_overwrite')
  await click(`document.querySelector('button[aria-label="队员"]')`)
@@ -866,7 +866,7 @@ async function qualifyNotes(window,{evaluate,wait,rpc}){
  await click(`${card}.querySelector('.canvas-note-status summary')`)
  assert.ok(await evaluate(`${card}.querySelector('.canvas-note-status details').open`))
  await click(`${card}.querySelector('.canvas-note-status button')`)
- await wait(`window.rovai.request('canvas.nodes.snapshot',{boardId:${JSON.stringify(boardId)}}).then(graph=>graph.nodes.find(node=>node.id===${JSON.stringify(ids[0])})?.data.content===${JSON.stringify(local)})`)
+ await wait(`window.coaxi.request('canvas.nodes.snapshot',{boardId:${JSON.stringify(boardId)}}).then(graph=>graph.nodes.find(node=>node.id===${JSON.stringify(ids[0])})?.data.content===${JSON.stringify(local)})`)
  await wait(`!${card}.querySelector('.canvas-note-status')`)
  const final=await rpc('canvas.nodes.snapshot',{boardId})
  assert.equal(final.nodes.find(node=>node.id===ids[1]).data.content,'乙卡独立原文')
@@ -1022,7 +1022,7 @@ async function qualifyRendererCrash(window,{evaluate,wait,rpc}){
    timer=setTimeout(()=>{window.webContents.removeListener('did-finish-load',loaded);reject(Error('Owned renderer reload timed out'))},60_000)
    window.webContents.once('did-finish-load',loaded);window.webContents.reload()
   })
-  await wait(`window.rovai&&document.querySelector('button[aria-label="无限画布"]')?.disabled===false`,60_000)
+  await wait(`window.coaxi&&document.querySelector('button[aria-label="无限画布"]')?.disabled===false`,60_000)
   const after=window.webContents.getOSProcessId()
   assert.ok(before>0&&after>0&&before!==after);assert.equal(process.pid,mainPid)
   report.crashes.at(-1).after_renderer_pid=after
@@ -1044,7 +1044,7 @@ async function qualifyRendererCrash(window,{evaluate,wait,rpc}){
  await wait(`${note}?.querySelector('.canvas-note-prose')?.textContent.includes(${JSON.stringify(noteText)})&&Boolean(${note}?.querySelector('.canvas-note-status button'))`)
  const after=(await rpc('canvas.nodes.snapshot',{boardId})).nodes.find(node=>node.id===nodeIds[2])
  assert.equal(after.data.content,baseline)
- report.recovered_note=await evaluate(`Object.entries(localStorage).filter(([key])=>key.startsWith('rovai.canvas.note-draft.v1:')&&key.includes(${JSON.stringify(nodeIds[2])})).map(([key,value])=>({key,value:JSON.parse(value)}))`)
+ report.recovered_note=await evaluate(`Object.entries(localStorage).filter(([key])=>key.startsWith('coaxi.canvas.note-draft.v1:')&&key.includes(${JSON.stringify(nodeIds[2])})).map(([key,value])=>({key,value:JSON.parse(value)}))`)
  assert.equal(report.recovered_note.length,1);assert.equal(report.recovered_note[0].value.text,noteText);assert.equal(report.recovered_note[0].value.baseline,baseline)
  record('unblurred_note_survives_forced_renderer_termination_as_a_visible_scoped_draft_without_overwriting_saved_text')
  for(const id of nodeIds.slice(0,2)){
@@ -1059,7 +1059,7 @@ async function qualifyRendererCrash(window,{evaluate,wait,rpc}){
  await writeFile(join(config.evidence,'01-recovered-private-cards-and-note.png'),(await window.webContents.capturePage()).toPNG())
  // Resolve this fixture's own dirty note through the existing UI so normal controlled shutdown can finish.
  await evaluate(`(()=>{${note}.querySelector('.canvas-note-status button').click();return true})()`)
- await wait(`!${note}.querySelector('.canvas-note-status')&&window.rovai.request('canvas.nodes.snapshot',{boardId:${JSON.stringify(boardId)}}).then(graph=>graph.nodes.find(node=>node.id===${JSON.stringify(nodeIds[2])})?.data.content===${JSON.stringify(noteText)})`)
+ await wait(`!${note}.querySelector('.canvas-note-status')&&window.coaxi.request('canvas.nodes.snapshot',{boardId:${JSON.stringify(boardId)}}).then(graph=>graph.nodes.find(node=>node.id===${JSON.stringify(nodeIds[2])})?.data.content===${JSON.stringify(noteText)})`)
 }
 async function qualifyPublicMulti(window,{evaluate,wait,rpc}){
  window.unmaximize();window.setContentSize(1680,1000);window.webContents.setZoomFactor(1)
@@ -1117,7 +1117,7 @@ async function qualifyPublicMulti(window,{evaluate,wait,rpc}){
    await window.webContents.insertText(texts[index])
    await wait(`${inputs[index]}.textContent===${JSON.stringify(texts[index])}`)
   }
-  const readDrafts=`Object.entries(localStorage).filter(([key])=>key.startsWith('rovai.canvas-composer-drafts.v1:')).flatMap(([key,value])=>Object.entries(JSON.parse(value).drafts).map(([context,body])=>({key,context:JSON.parse(context.slice(7)),draft:JSON.parse(body)}))).filter(item=>item.context[2]===${JSON.stringify(boardId)})`
+  const readDrafts=`Object.entries(localStorage).filter(([key])=>key.startsWith('coaxi.canvas-composer-drafts.v1:')).flatMap(([key,value])=>Object.entries(JSON.parse(value).drafts).map(([context,body])=>({key,context:JSON.parse(context.slice(7)),draft:JSON.parse(body)}))).filter(item=>item.context[2]===${JSON.stringify(boardId)})`
   // The original public Lexical composer saves through its debounce owner; DOM text is not a persistence receipt.
   await wait(`(()=>{const drafts=${readDrafts};return ${JSON.stringify(nodeIds)}.every((id,index)=>drafts.some(item=>item.context[3]===id&&item.draft.body===${JSON.stringify(texts)}[index]))})()`)
   report.public_drafts=await evaluate(readDrafts)
@@ -1180,7 +1180,7 @@ async function qualifyPublicMulti(window,{evaluate,wait,rpc}){
  report.summary_viewport_before=await evaluate(`(()=>{window.summaryWheel=[];window.addEventListener('wheel',event=>window.summaryWheel.push({trusted:event.isTrusted,deltaX:event.deltaX,deltaY:event.deltaY}),true);return {transform:document.querySelector('.react-flow__viewport').style.transform,zoom:document.querySelector('.canvas-zoom-readout').textContent}})()`)
  const point=await evaluate(`(()=>{const rect=document.querySelector('.canvas-flow-stage').getBoundingClientRect();return {x:Math.round(rect.left+12),y:Math.round(rect.top+12)}})()`)
  window.webContents.sendInputEvent({type:'mouseWheel',...point,deltaY:100,deltaX:0,canScroll:true})
- // Both original Codeg and this surface use panOnScroll: a plain wheel pans, it does not change the zoom percentage.
+ // Both original Coaxi and this surface use panOnScroll: a plain wheel pans, it does not change the zoom percentage.
  await wait(`document.querySelector('.react-flow__viewport').style.transform!==${JSON.stringify(report.summary_viewport_before.transform)}`)
  report.summary_viewport_after=await evaluate(`({transform:document.querySelector('.react-flow__viewport').style.transform,zoom:document.querySelector('.canvas-zoom-readout').textContent,wheel:window.summaryWheel})`)
  assert.equal(report.summary_viewport_after.zoom,report.summary_viewport_before.zoom);assert.ok(report.summary_viewport_after.wheel.some(event=>event.trusted))
@@ -1209,12 +1209,12 @@ async function qualifyReadyDiff(window,{evaluate,wait,rpc}){
  report.ready_diff_context={missionId,threadId,agentId,project,relativePath,otherPath,newPath,base}
  const started=await rpc('missions.start',{commandId:randomUUID(),command:{missionId}})
  assert.equal(started.status,'accepted',JSON.stringify(started))
- await wait(`window.rovai.request('missions.delivery',{missionId:${JSON.stringify(missionId)}}).then(value=>value.git&&value.workspace?.state==='ready')`,60_000)
+ await wait(`window.coaxi.request('missions.delivery',{missionId:${JSON.stringify(missionId)}}).then(value=>value.git&&value.workspace?.state==='ready')`,60_000)
  const delivery=await rpc('missions.delivery',{missionId}),workspace=delivery.workspace
  assert.equal(workspace.missionId,missionId);assert.equal(workspace.threadId,threadId);assert.equal(workspace.baseSha,base)
  assert.equal(git(workspace.worktreePath,'rev-parse','HEAD'),base);assert.notEqual(workspace.worktreePath,project)
  report.ready_diff_context.workspace=workspace
- await wait(`window.rovai.request('threads.open',{threadId:${JSON.stringify(threadId)},traceId:${JSON.stringify(randomUUID())}}).then(value=>value.agentRuns.length>0&&value.agentRuns.every(run=>['succeeded','failed','cancelled'].includes(run.status)))`,60_000)
+ await wait(`window.coaxi.request('threads.open',{threadId:${JSON.stringify(threadId)},traceId:${JSON.stringify(randomUUID())}}).then(value=>value.agentRuns.length>0&&value.agentRuns.every(run=>['succeeded','failed','cancelled'].includes(run.status)))`,60_000)
  report.controlled_run=await rpc('threads.open',{threadId,traceId:randomUUID()})
  assert.ok(report.controlled_run.agentRuns.every(run=>run.status==='succeeded'),JSON.stringify(report.controlled_run.agentRuns))
  record('real_core_prepares_managed_git_worktree_at_recorded_base_and_settles_controlled_protocol_run')
@@ -1300,10 +1300,10 @@ if(config.mode==='source-ui'){
 }
 if(config.mode==='native-notifications'){
  assert.equal(createHash('sha256').update(await readFile(new URL(config.notification_module))).digest('hex'),config.notification_sha256)
- for(const [key,specification] of [['ROVAI_QWEN_BIN',config.controlled_launcher],['ROVAI_ACCEPTANCE_SCRIPT',config.controlled_script]]){
+ for(const [key,specification] of [['COAXI_QWEN_BIN',config.controlled_launcher],['COAXI_ACCEPTANCE_SCRIPT',config.controlled_script]]){
   assert.equal(process.env[key],specification.path);assert.equal(createHash('sha256').update(await readFile(specification.path)).digest('hex'),specification.sha256)
  }
- assert.equal(process.env.ROVAI_SKILL_RECOVERY_CAPTURE,config.runtime_capture)
+ assert.equal(process.env.COAXI_SKILL_RECOVERY_CAPTURE,config.runtime_capture)
  notificationWorkflow=await import(config.notification_module)
  privateIpc=notificationWorkflow.installNotificationIpc(ipcMain)
 }
@@ -1325,10 +1325,10 @@ if(config.mode==='file-resources'){
 }
 if(config.mode==='object-cold'){
  for(const key of ['object_workflow','object_ipc'])assert.equal(createHash('sha256').update(await readFile(new URL(config[key+'_module']))).digest('hex'),config[key+'_sha256'])
- for(const [key,specification] of [['ROVAI_QWEN_BIN',config.controlled_launcher],['ROVAI_ACCEPTANCE_SCRIPT',config.controlled_script]]){
+ for(const [key,specification] of [['COAXI_QWEN_BIN',config.controlled_launcher],['COAXI_ACCEPTANCE_SCRIPT',config.controlled_script]]){
   assert.equal(process.env[key],specification.path);assert.equal(createHash('sha256').update(await readFile(specification.path)).digest('hex'),specification.sha256)
  }
- assert.equal(process.env.ROVAI_SKILL_RECOVERY_CAPTURE,config.runtime_capture)
+ assert.equal(process.env.COAXI_SKILL_RECOVERY_CAPTURE,config.runtime_capture)
  objectWorkflow=await import(config.object_workflow_module)
  privateIpc=(await import(config.object_ipc_module)).installCanvasMissionIpc(ipcMain)
 }
@@ -1337,11 +1337,11 @@ if(privateModes.includes(config.mode)){
   const file=new URL(url);assert.equal(file.protocol,'file:')
   assert.equal(createHash('sha256').update(await readFile(file)).digest('hex'),hash)
  }
- for(const [key,specification] of [['ROVAI_QWEN_BIN',config.controlled_launcher],['ROVAI_ACCEPTANCE_SCRIPT',config.controlled_script]]){
+ for(const [key,specification] of [['COAXI_QWEN_BIN',config.controlled_launcher],['COAXI_ACCEPTANCE_SCRIPT',config.controlled_script]]){
   assert.ok(specification?.path&&specification.sha256);assert.equal(process.env[key],specification.path)
   assert.equal(createHash('sha256').update(await readFile(specification.path)).digest('hex'),specification.sha256)
  }
- assert.equal(process.env.ROVAI_SKILL_RECOVERY_CAPTURE,config.runtime_capture)
+ assert.equal(process.env.COAXI_SKILL_RECOVERY_CAPTURE,config.runtime_capture)
  privateWorkflow=await import(config.private_workflow_module)
  const {installCanvasPrivateIpc}=await import(config.private_ipc_module)
  privateIpc=installCanvasPrivateIpc(ipcMain)

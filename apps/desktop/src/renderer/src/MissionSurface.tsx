@@ -4,7 +4,7 @@ import { useOptionalFilePreviewLayout } from './FilePreviewLayout'
 import { filePreviewSplitMinWidth } from './file-preview-layout'
 import { UiText, uiAttribute } from './interface-language'
 
-const WIDTH_KEY = 'rovai.mission-drawer-width'
+const WIDTH_KEY = 'coaxi.mission-drawer-width'
 const minimum = 640
 const clamp = (width: number, maximum: number) => Math.max(Math.min(minimum, maximum), Math.min(width, maximum))
 

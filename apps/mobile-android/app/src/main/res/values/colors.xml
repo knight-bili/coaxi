@@ -4,6 +4,6 @@
          values-night variant is the dark #0A0B0D. Following the system day/night
          setting here keeps the launch frame from flashing dark before Compose paints
          a light UI (and vice versa). -->
-    <color name="codeg_bg">#F2F4F6</color>
+    <color name="coaxi_bg">#F2F4F6</color>
     <color name="ic_launcher_background">#0F0F1E</color>
 </resources>

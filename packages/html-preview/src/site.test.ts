@@ -74,7 +74,7 @@ async function collectDiagnostics(site: HtmlPreviewSite, cookie: string, documen
   return new Promise((resolve, reject) => {
     const items: Record<string, unknown>[] = []
     const request = httpRequest({ hostname: '127.0.0.1', port: origin.port,
-      path: `/__rovai-preview/events?documentId=${document}`, headers: { host: origin.host, cookie } }, response => {
+      path: `/__coaxi-preview/events?documentId=${document}`, headers: { host: origin.host, cookie } }, response => {
       if (response.statusCode !== 200) { reject(new Error(`Diagnostic HTTP ${response.statusCode}`)); response.destroy(); return }
       let pending = ''
       response.on('data', chunk => {
@@ -114,8 +114,8 @@ it('retains root and child errors and renews the collection budget after a full 
   // A child HTML response cannot clear errors already collected for its parent.
   expect(replay[0].resourceUrl).toBe(`${site.descriptor.origin}/root-error.css`)
   expect(new Set(replay.map(item => new URL(String(item.resourceUrl)).pathname))).toEqual(new Set(['/root-error.css', '/child-error.css', '/barrier.css']))
-  expect((await read(site, '/__rovai-preview/events', { cookie })).status).toBe(403)
-  expect((await read(site, '/__rovai-preview/events?documentId=unknown', { cookie })).status).toBe(403)
+  expect((await read(site, '/__coaxi-preview/events', { cookie })).status).toBe(403)
+  expect((await read(site, '/__coaxi-preview/events?documentId=unknown', { cookie })).status).toBe(403)
 })
 
 it('does not attribute a delayed old-page request failure to the next document', async () => {
@@ -240,7 +240,7 @@ it('excludes private host stores even inside a broad root while retaining the ex
 it('injects before author execution without modifying source bytes or original line mapping', () => {
   for (const source of ['<!doctype html><html><head><script>throw new Error("test")</script></head></html>', '<!doctype html>\n<script>throw new Error("test")</script>', '<h1>fragment</h1>', '<!doctype html>\r<html>\r<head><script>throw 1</script>']) {
     const result = injectPreviewScript(source, '/bridge.js')
-    expect(result.html.replace('<script src="/bridge.js" data-rovai-preview-diagnostic></script>', '')).toBe(source)
+    expect(result.html.replace('<script src="/bridge.js" data-coaxi-preview-diagnostic></script>', '')).toBe(source)
     expect(result.html.indexOf('/bridge.js')).toBeLessThan(result.html.indexOf('throw') === -1 ? Infinity : result.html.indexOf('throw'))
     expect(result.html.split('\n')).toHaveLength(source.split('\n').length)
     expect(originalPreviewPosition(result.map, result.map.line, result.map.column + result.map.length + 5)).toEqual({ line: result.map.line, column: result.map.column + 5 })

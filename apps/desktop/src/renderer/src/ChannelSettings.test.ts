@@ -68,7 +68,7 @@ describe('Channel settings', () => {
   it.each(['Error', 'DingTalkConsoleError', 'DingTalkDeveloperApiError'])(
     'unwraps Electron %s failures without alerting on an exact cancellation', (name) => {
       const wrapped = (message: string): Error => new Error(
-        `Error invoking remote method 'rovai:channels-connect': ${name}: ${message}`
+        `Error invoking remote method 'coaxi:channels-connect': ${name}: ${message}`
       )
       expect(channelErrorMessage(wrapped('dingtalk_operation_cancelled'))).toBeNull()
       expect(channelErrorMessage(wrapped('dingtalk_open_platform_unavailable')))
@@ -77,7 +77,7 @@ describe('Channel settings', () => {
     }
   )
 
-  it('renders the Rovai Settings header and an honest loading state before Main responds', () => {
+  it('renders the Coaxi Settings header and an honest loading state before Main responds', () => {
     const markup = renderToStaticMarkup(createElement(ChannelSettings, {
       agents: [agent('agent-a', 0)]
     }))
@@ -314,25 +314,25 @@ describe('Channel settings', () => {
     expect(markup).not.toContain('添加项目')
     expect(markup).not.toContain('绑定会话')
     expect(channelErrorMessage(new Error(
-      "Error invoking remote method 'rovai:channels-retry-member-bot': Error: feishu_console_remote_app_unavailable"
+      "Error invoking remote method 'coaxi:channels-retry-member-bot': Error: feishu_console_remote_app_unavailable"
     ))).toBe('原飞书应用已删除或当前账号无权访问，无法按原 App ID 重试。')
     expect(channelErrorMessage(new Error(
-      "Error invoking remote method 'rovai:channels-retry-member-bot': Error: feishu_connection_error"
+      "Error invoking remote method 'coaxi:channels-retry-member-bot': Error: feishu_connection_error"
     ))).toBe('飞书连接异常，请稍后重试。')
     expect(channelErrorMessage(new Error(
-      "Error invoking remote method 'rovai:channels-retry-member-bot': Error: feishu_console_event_verification_failed"
+      "Error invoking remote method 'coaxi:channels-retry-member-bot': Error: feishu_console_event_verification_failed"
     ))).toBe('飞书事件与长连接配置尚未确认生效；原应用已保留，可以稍后继续核对。')
     expect(channelErrorMessage(new Error(
-      "Error invoking remote method 'rovai:channels-publish-member-bot': Error: feishu_console_create_app_from_template_http_500"
+      "Error invoking remote method 'coaxi:channels-publish-member-bot': Error: feishu_console_create_app_from_template_http_500"
     ))).toBe('飞书开放平台操作尚未完成；请查看下方状态，排除问题后重试。')
     expect(channelErrorMessage(new Error(
-      "Error invoking remote method 'rovai:channels-connect': Error: feishu_login_cancelled"
+      "Error invoking remote method 'coaxi:channels-connect': Error: feishu_login_cancelled"
     ))).toBeNull()
     expect(channelErrorMessage(new Error(
-      "Error invoking remote method 'rovai:channels-connect': Error: dingtalk_legacy_session_requires_reconnect"
+      "Error invoking remote method 'coaxi:channels-connect': Error: dingtalk_legacy_session_requires_reconnect"
     ))).toBe('钉钉已改用网页登录，请重新连接一次；已有 Bot 和应用绑定会保留。')
     expect(channelErrorMessage(new Error(
-      "Error invoking remote method 'rovai:channels-publish-member-bot': Error: dingtalk_approval_mode_invalid"
+      "Error invoking remote method 'coaxi:channels-publish-member-bot': Error: dingtalk_approval_mode_invalid"
     ))).toBe('钉钉开放平台操作尚未完成；请查看下方状态，排除问题后重试。')
     expect(channelErrorMessage(new Error('dingtalk_login_identity_timeout')))
       .toBe('读取钉钉账号与企业身份超时，请稍后重试。')

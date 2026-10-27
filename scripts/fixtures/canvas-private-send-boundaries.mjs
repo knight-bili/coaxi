@@ -12,10 +12,10 @@ export async function qualifyPrivateSendBoundaries(window, tools) {
   const { threadId, conversationId, boardId, scopes, agentId, quoteMessage } = context
   const core = await realpath(join(config.data_root, 'Core'))
   const query = (sql, params) => {
-    assert.ok(process.env.ROVAI_ACCEPTANCE_NODE)
+    assert.ok(process.env.COAXI_ACCEPTANCE_NODE)
     const code = "import {DatabaseSync} from 'node:sqlite'; const db=new DatabaseSync(process.argv[1],{readOnly:true}); try{console.log(JSON.stringify(db.prepare(process.argv[2]).all(...JSON.parse(process.argv[3]))))}finally{db.close()}"
-    return JSON.parse(execFileSync(process.env.ROVAI_ACCEPTANCE_NODE, ['--no-warnings', '--input-type=module', '-e', code,
-      join(core, 'rovai.sqlite'), sql, JSON.stringify(params)], { encoding: 'utf8', windowsHide: true }))
+    return JSON.parse(execFileSync(process.env.COAXI_ACCEPTANCE_NODE, ['--no-warnings', '--input-type=module', '-e', code,
+      join(core, 'coaxi.sqlite'), sql, JSON.stringify(params)], { encoding: 'utf8', windowsHide: true }))
   }
   const captures = async () => (await readFile(config.runtime_capture, 'utf8')).trim().split('\n').map(JSON.parse).flatMap(entry => {
     const text = (entry.params?.prompt ?? []).filter(part => part.type === 'text').map(part => part.text).join('\n')
@@ -76,7 +76,7 @@ export async function qualifyPrivateSendBoundaries(window, tools) {
   assert.equal(received[0].input.attachments.length, 1); assert.equal(await readFile(received[0].input.attachments[0], 'utf8'), alphaFile)
   assert.deepEqual(received[0].input.quotes.map(quote => quote.text), alpha.quotes.map(quote => quote.text))
   assert.deepEqual(received[0].input.quotes.map(quote => quote.text), ['甲材料对应的问题', earlierExcerpt])
-  const sections = text.match(/\[[A-Z_]+\]/g), required = ['[SELF_ACTIVE_TASKS]', '[RUN_FACTS]', '[ROVAI_ADDITIONAL_SKILLS]', '[ROVAI_SKILL_PACKS]', '[SINGLE_CHAT_GUIDANCE]', '[CURRENT_INPUT]']
+  const sections = text.match(/\[[A-Z_]+\]/g), required = ['[SELF_ACTIVE_TASKS]', '[RUN_FACTS]', '[COAXI_ADDITIONAL_SKILLS]', '[COAXI_SKILL_PACKS]', '[SINGLE_CHAT_GUIDANCE]', '[CURRENT_INPUT]']
   assert.deepEqual(sections.filter(section => required.includes(section)), required)
   assert.ok(sections.every(section => required.includes(section) || section === '[COLLABORATION_STATE]'))
   for (const id of [boardId, ...scopes.map(scope => scope.nodeId)]) assert.ok(!text.includes(id))

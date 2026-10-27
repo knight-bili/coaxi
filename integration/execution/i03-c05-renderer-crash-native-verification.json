@@ -12,7 +12,7 @@
       "revision": "r1",
       "status": "failed",
       "checks": [],
-      "error": "Error: Native condition timed out: Boolean(document.querySelector('.canvas-conversation-frame[data-canvas-conversation-key*=\"28a827bb-d8c3-402c-8731-85a4cbb79be1\"]')?.querySelector('.single-chat-composer textarea')&&document.querySelector('.canvas-conversation-frame[data-canvas-conversation-key*=\"b44af91f-cc66-4418-9b4c-4dfc2da79ffd\"]')?.querySelector('.single-chat-composer textarea')&&document.querySelector('.canvas-conversation-frame[data-canvas-conversation-key*=\"28a827bb-d8c3-402c-8731-85a4cbb79be1\"]')?.querySelector('.single-chat-composer textarea').value===\"甲卡未发送，硬中断前最后一个字：甲\"&&document.querySelector('.canvas-conversation-frame[data-canvas-conversation-key*=\"b44af91f-cc66-4418-9b4c-4dfc2da79ffd\"]')?.querySelector('.single-chat-composer textarea').value===\"乙卡独立输入保持不变\")\n    at wait (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/codeg-rovai-ai-rovai-core-codeg/work/integration/integration/local/i03-c06-rc14/app/c06-native-renderer-crash-r1.mjs:38:163)\n    at async crashAndReload (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/codeg-rovai-ai-rovai-core-codeg/work/integration/integration/local/i03-c06-rc14/app/c06-native-renderer-crash-r1.mjs:849:3)\n    at async qualifyRendererCrash (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/codeg-rovai-ai-rovai-core-codeg/work/integration/integration/local/i03-c06-rc14/app/c06-native-renderer-crash-r1.mjs:852:2)\n    at async qualify (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/codeg-rovai-ai-rovai-core-codeg/work/integration/integration/local/i03-c06-rc14/app/c06-native-renderer-crash-r1.mjs:94:4)",
+      "error": "Error: Native condition timed out: Boolean(document.querySelector('.canvas-conversation-frame[data-canvas-conversation-key*=\"28a827bb-d8c3-402c-8731-85a4cbb79be1\"]')?.querySelector('.single-chat-composer textarea')&&document.querySelector('.canvas-conversation-frame[data-canvas-conversation-key*=\"b44af91f-cc66-4418-9b4c-4dfc2da79ffd\"]')?.querySelector('.single-chat-composer textarea')&&document.querySelector('.canvas-conversation-frame[data-canvas-conversation-key*=\"28a827bb-d8c3-402c-8731-85a4cbb79be1\"]')?.querySelector('.single-chat-composer textarea').value===\"甲卡未发送，硬中断前最后一个字：甲\"&&document.querySelector('.canvas-conversation-frame[data-canvas-conversation-key*=\"b44af91f-cc66-4418-9b4c-4dfc2da79ffd\"]')?.querySelector('.single-chat-composer textarea').value===\"乙卡独立输入保持不变\")\n    at wait (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/coaxi-coaxi-coaxi-core-coaxi/work/integration/integration/local/i03-c06-rc14/app/c06-native-renderer-crash-r1.mjs:38:163)\n    at async crashAndReload (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/coaxi-coaxi-coaxi-core-coaxi/work/integration/integration/local/i03-c06-rc14/app/c06-native-renderer-crash-r1.mjs:849:3)\n    at async qualifyRendererCrash (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/coaxi-coaxi-coaxi-core-coaxi/work/integration/integration/local/i03-c06-rc14/app/c06-native-renderer-crash-r1.mjs:852:2)\n    at async qualify (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/coaxi-coaxi-coaxi-core-coaxi/work/integration/integration/local/i03-c06-rc14/app/c06-native-renderer-crash-r1.mjs:94:4)",
       "crashes": [
         {
           "kind": "last_private_character",
@@ -56,7 +56,7 @@
           "passed": true
         }
       ],
-      "error": "Error: Native condition timed out: Boolean(document.querySelector('.canvas-board-tile[data-board-id=\"de1876a9-055a-4ff7-a49f-6ac236c96411\"]:not(:disabled)'))\n    at wait (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/codeg-rovai-ai-rovai-core-codeg/work/integration/integration/local/i03-c06-rc14/app/c06-native-renderer-crash-r2.mjs:38:163)\n    at async openCanvasBoard (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/codeg-rovai-ai-rovai-core-codeg/work/integration/integration/local/i03-c06-rc14/app/c06-native-renderer-crash-r2.mjs:18:2)\n    at async crashAndReload (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/codeg-rovai-ai-rovai-core-codeg/work/integration/integration/local/i03-c06-rc14/app/c06-native-renderer-crash-r2.mjs:851:3)\n    at async qualifyRendererCrash (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/codeg-rovai-ai-rovai-core-codeg/work/integration/integration/local/i03-c06-rc14/app/c06-native-renderer-crash-r2.mjs:863:2)\n    at async qualify (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/codeg-rovai-ai-rovai-core-codeg/work/integration/integration/local/i03-c06-rc14/app/c06-native-renderer-crash-r2.mjs:94:4)",
+      "error": "Error: Native condition timed out: Boolean(document.querySelector('.canvas-board-tile[data-board-id=\"de1876a9-055a-4ff7-a49f-6ac236c96411\"]:not(:disabled)'))\n    at wait (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/coaxi-coaxi-coaxi-core-coaxi/work/integration/integration/local/i03-c06-rc14/app/c06-native-renderer-crash-r2.mjs:38:163)\n    at async openCanvasBoard (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/coaxi-coaxi-coaxi-core-coaxi/work/integration/integration/local/i03-c06-rc14/app/c06-native-renderer-crash-r2.mjs:18:2)\n    at async crashAndReload (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/coaxi-coaxi-coaxi-core-coaxi/work/integration/integration/local/i03-c06-rc14/app/c06-native-renderer-crash-r2.mjs:851:3)\n    at async qualifyRendererCrash (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/coaxi-coaxi-coaxi-core-coaxi/work/integration/integration/local/i03-c06-rc14/app/c06-native-renderer-crash-r2.mjs:863:2)\n    at async qualify (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/coaxi-coaxi-coaxi-core-coaxi/work/integration/integration/local/i03-c06-rc14/app/c06-native-renderer-crash-r2.mjs:94:4)",
       "crashes": [
         {
           "kind": "last_private_character",
@@ -173,7 +173,7 @@
     "note": "可信输入后未经失焦直接硬中断；原Core content仍是baseline，本机独立noteId草稿及画面保持最后乙；经明确UI保存后正常退出",
     "identity": "原Thread/conversation/node引用不变，消息和AgentRun均为空",
     "preflight": {
-      "source_result": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\c06\\fusion-i03-rc.14\\native-renderer-crash-r2\\result.json",
+      "source_result": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\c06\\fusion-i03-rc.14\\native-renderer-crash-r2\\result.json",
       "boardId": "de1876a9-055a-4ff7-a49f-6ac236c96411",
       "noteId": "c742cd19-aedf-459d-b84c-423a76e30de2",
       "own_recovered_note_saved": true
@@ -191,7 +191,7 @@
     "actually_viewed": true,
     "visual_findings": [
       "画布和卡片无额外外围滚动，标题单层，两份私聊输入与未保存便笺均可见",
-      "便笺SafeMarkdown document规则实际为15px，覆盖纸张13px；与原Codeg note-node.tsx:139/146不一致，下一组集中整改，不宣告完整UI通过"
+      "便笺SafeMarkdown document规则实际为15px，覆盖纸张13px；与原Coaxi note-node.tsx:139/146不一致，下一组集中整改，不宣告完整UI通过"
     ]
   },
   "boundaries": [

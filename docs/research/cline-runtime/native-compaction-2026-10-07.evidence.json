@@ -5,7 +5,7 @@
   "timezone": "Asia/Shanghai",
   "scope": "Cline 3.0.65 current production ACP, zero intervention, real model; research evidence only",
   "fixedEnvironment": {
-    "rovaiCommit": "9faf819d5e130295c37de70374568a740504d2f0",
+    "coaxiCommit": "9faf819d5e130295c37de70374568a740504d2f0",
     "runtimeImplementationCommit": "be9bdd3c",
     "clineVersion": "3.0.65",
     "clineUpstreamCommit": "9131e36429314ea614491bf749678adbacb3d3cb",

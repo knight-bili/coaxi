@@ -11,7 +11,7 @@ import { coreDataDirectoryArguments, removeEphemeralRuntimeCampFilesRoot } from 
 
 if (process.platform === 'win32') throw new Error('This shell fixture requires macOS or Linux')
 const root = resolve(import.meta.dirname, '..')
-const fixture = await realpath(await mkdtemp(join(tmpdir(), 'rovai-member-environment-smoke-')))
+const fixture = await realpath(await mkdtemp(join(tmpdir(), 'coaxi-member-environment-smoke-')))
 const data = join(fixture, 'core'), home = join(fixture, 'home')
 const executable = join(fixture, 'claude-fixture')
 const kind = 'claude-code-cli', memberId = 'agent_1'
@@ -73,7 +73,7 @@ try {
   // Seed only the lazy Conversation boundary while the disposable Core is stopped.
   // Environment capture/reset and native generation are exercised by the Rust owners.
   await core.stop()
-  const sessionFixture = new DatabaseSync(join(data, 'rovai.sqlite'))
+  const sessionFixture = new DatabaseSync(join(data, 'coaxi.sqlite'))
   sessionFixture.prepare(`INSERT INTO conversation(id,camp_id,agent_id,kind,version,created_at,updated_at)
     VALUES(?,?,?,'camp_member',1,datetime('now'),datetime('now'))`).run('fixture-member-session', campId, memberId)
   sessionFixture.close()
@@ -97,14 +97,14 @@ try {
   assert.deepEqual((await get()).environment, {})
   assert.ok(!core.events.some(event => JSON.stringify(event).includes(secret)))
   await core.stop()
-  const database = await readFile(join(data, 'rovai.sqlite'))
+  const database = await readFile(join(data, 'coaxi.sqlite'))
   assert.ok(!database.includes(Buffer.from(secret)), 'Credentials are encrypted in persisted SQLite')
   // The Core is stopped. Convert only this disposable fixture to the exact prior schema.
-  const legacy = new DatabaseSync(join(data, 'rovai.sqlite'))
+  const legacy = new DatabaseSync(join(data, 'coaxi.sqlite'))
   legacy.exec(`BEGIN;
     DROP TABLE IF EXISTS conversation_runtime_environment; DROP TABLE member_runtime_environment; DROP TABLE IF EXISTS runtime_environment_plan; DROP TABLE runtime_environment_legacy;
     DELETE FROM schema_migration WHERE version IN (191,192,193,194);
-    UPDATE rovai_data_contract SET projection_schema_version=140 WHERE singleton=1;`)
+    UPDATE coaxi_data_contract SET projection_schema_version=140 WHERE singleton=1;`)
   legacy.prepare('INSERT INTO runtime_startup_setting(runtime_kind,revision,configuration_json,updated_at) VALUES(?,1,?,datetime(\'now\'))').run(kind,
     JSON.stringify({ programPath: null, environment: [{ name: 'ANTHROPIC_API_KEY', value: secret }] }))
   legacy.exec('COMMIT'); legacy.close()
@@ -133,13 +133,13 @@ try {
 }
 
 function startCore() {
-  const child = spawn(join(root, 'target/debug/rovai-core'), [
+  const child = spawn(join(root, 'target/debug/coaxi-core'), [
     ...coreDataDirectoryArguments(data, { homeDirectory: home }),
     '--skill-library-root', join(data, 'managed-skill-library'),
     '--mcp-config-path', join(data, 'mcp.json')
   ], { cwd: fixture, stdio: ['pipe', 'pipe', 'pipe'], env: {
     HOME: home, PATH: '/usr/bin:/bin', SHELL: '/bin/sh', TMPDIR: fixture,
-    ROVAI_CLAUDE_CODE_BIN: executable, CLAUDE_CONFIG_DIR: join(home, '.claude')
+    COAXI_CLAUDE_CODE_BIN: executable, CLAUDE_CONFIG_DIR: join(home, '.claude')
   } })
   const closed = once(child, 'close')
   const events = [], pending = new Map()

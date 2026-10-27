@@ -10,7 +10,7 @@ import {useCanvasGraph} from './useCanvasGraph'
 import {readCanvasViewScope} from './canvas-view-state'
 import {CanvasTerminal} from './CanvasTerminal'
 import {useShortcutActions} from './useShortcutActions'
-import {NUMBERED_TAB_ACTION_IDS} from '../../shared/codeg-keyboard-shortcuts'
+import {NUMBERED_TAB_ACTION_IDS} from '../../shared/coaxi-keyboard-shortcuts'
 import type {ShortcutActions} from './shortcut-action-driver'
 export function WorkspaceTerminals({projectPath,onUnsettledChange}:{projectPath:string;onUnsettledChange(value:boolean):void}):React.JSX.Element{
   const client=useThreadClient(),t=useUiText(),boards=useCanvasBoards(),[boardId,setBoardId]=useState(''),[scope,setScope]=useState<string|null>(null),[error,setError]=useState<string|null>(null)

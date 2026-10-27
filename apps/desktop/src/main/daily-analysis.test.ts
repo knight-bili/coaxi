@@ -7,7 +7,7 @@ import { DailyAnalysisService } from './daily-analysis'
 import { digest } from '../../../../packages/evaluation/src/daily'
 
 it('prepares only owner-configured workspace files, excludes analysis descendants and reports broken scope', async () => {
-  const root = await mkdtemp(join(tmpdir(), 'rovai-analysis-host-test-'))
+  const root = await mkdtemp(join(tmpdir(), 'coaxi-analysis-host-test-'))
   try {
     const workspace = join(root, 'workspace'); await mkdir(workspace)
     let project = workspace

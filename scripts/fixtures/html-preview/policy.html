@@ -20,9 +20,9 @@ if (new URLSearchParams(location.search).has('errors')) {
   image.src = './missing-policy.png'; document.body.append(image);
   fetch('./business.json').catch(() => {});
   // The author's own request to the same endpoint must remain a page issue.
-  const bridge = document.querySelector('script[data-rovai-preview-diagnostic]');
+  const bridge = document.querySelector('script[data-coaxi-preview-diagnostic]');
   const documentId = new URL(bridge.src).pathname.split('/').pop().replace(/\.js$/, '');
-  fetch('/__rovai-preview/events?documentId=' + documentId).catch(() => {});
+  fetch('/__coaxi-preview/events?documentId=' + documentId).catch(() => {});
   setTimeout(() => { throw new Error('author csp fixture'); }, 0);
 }
 </script></body></html>

@@ -6,11 +6,11 @@ import { seedCompletedOnboardingForAcceptance } from './lib/dev-desktop.mjs'
 
 const root = resolve(import.meta.dirname, '..')
 const appPath = resolve(process.argv[2] ?? join(root, 'dist', 'mac-arm64', 'Coaxi.app'))
-const fixtureRoot = process.env.ROVAI_DIAGNOSTICS_ACCEPT_FIXTURE_ROOT
-  ?? await mkdtemp(join(tmpdir(), 'rovai-diagnostics-ui-accept-'))
-const outputDir = process.env.ROVAI_DIAGNOSTICS_ACCEPT_OUTPUT_DIR
-  ?? await mkdtemp(join(tmpdir(), 'rovai-diagnostics-ui-captures-'))
-const firstPort = Number(process.env.ROVAI_DIAGNOSTICS_ACCEPT_DEBUG_PORT ?? 9491)
+const fixtureRoot = process.env.COAXI_DIAGNOSTICS_ACCEPT_FIXTURE_ROOT
+  ?? await mkdtemp(join(tmpdir(), 'coaxi-diagnostics-ui-accept-'))
+const outputDir = process.env.COAXI_DIAGNOSTICS_ACCEPT_OUTPUT_DIR
+  ?? await mkdtemp(join(tmpdir(), 'coaxi-diagnostics-ui-captures-'))
+const firstPort = Number(process.env.COAXI_DIAGNOSTICS_ACCEPT_DEBUG_PORT ?? 9491)
 // Keep the current qualified runtime catalog visible in complete results.
 const expectedRuntimeCount = 15
 const expectedCheckCount = 6 + expectedRuntimeCount
@@ -154,7 +154,7 @@ async function createFixture(name, withPermissionIssue) {
     await mkdir(mcpDirectory, { recursive: true, mode: 0o700 })
     await writeFile(mcpPath, `${JSON.stringify({
       mcpServers: {},
-      _rovai: { schemaVersion: 2, servers: {}, assignments: [] }
+      _coaxi: { schemaVersion: 2, servers: {}, assignments: [] }
     }, null, 2)}\n`, { mode: 0o644 })
     await chmod(mcpPath, 0o644)
   }
@@ -198,7 +198,7 @@ async function assertDiagnosticsReport(cdp, expected) {
 }
 
 function assertV5Export(exported, fixture) {
-  assert(exported?.format === 'rovai-diagnostics-v5',
+  assert(exported?.format === 'coaxi-diagnostics-v5',
     `Diagnostics export format was ${JSON.stringify(exported?.format)}`)
   assert(exported?.diagnostics?.schemaVersion === 1,
     'Diagnostics export omitted the typed report')
@@ -206,7 +206,7 @@ function assertV5Export(exported, fixture) {
       && exported.diagnostics.checks.length === expectedCheckCount,
   'Diagnostics export did not contain all checks')
   const serialized = JSON.stringify(exported)
-  assert(!serialized.includes('rovai-diagnostics-v4'), 'Diagnostics export retained v4')
+  assert(!serialized.includes('coaxi-diagnostics-v4'), 'Diagnostics export retained v4')
   for (const path of [fixture.fixture, fixture.dataDir, fixture.homeDir, fixture.mcpPath]) {
     assert(!serialized.includes(path), `Diagnostics export leaked ${path}`)
   }
@@ -292,11 +292,11 @@ async function clickButton(cdp, selector, label) {
 
 async function request(cdp, method, params = {}) {
   return evaluate(cdp,
-    `window.rovai.request(${JSON.stringify(method)}, ${JSON.stringify(params)})`, true)
+    `window.coaxi.request(${JSON.stringify(method)}, ${JSON.stringify(params)})`, true)
 }
 
 async function setTheme(cdp, preference) {
-  await evaluate(cdp, `window.rovai.appearance.setPreference(${JSON.stringify(preference)})`, true)
+  await evaluate(cdp, `window.coaxi.appearance.setPreference(${JSON.stringify(preference)})`, true)
   const expectedTheme = preference === 'night' ? 'night' : 'day'
   await waitForExpression(cdp,
     `document.documentElement.dataset.theme === ${JSON.stringify(expectedTheme)}`)
@@ -314,7 +314,7 @@ async function launchApp(port, width, height, reducedMotion, fixture) {
     env: {
       ...process.env,
       HOME: fixture.homeDir,
-      ROVAI_ALLOW_ISOLATED_INSTANCE: '1'
+      COAXI_ALLOW_ISOLATED_INSTANCE: '1'
     }
   })
   child.stderr.on('data', (chunk) => stderr.push(String(chunk)))
@@ -337,12 +337,12 @@ async function launchApp(port, width, height, reducedMotion, fixture) {
       }]
     })
     await waitForExpression(cdp,
-      `Boolean(window.rovai && document.querySelector('.app-shell'))`, 45_000)
+      `Boolean(window.coaxi && document.querySelector('.app-shell'))`, 45_000)
     // The bootstrap shell is visible before authoritative Core requests are admitted.
-    await waitForExpression(cdp, `window.rovai.supervisor.getSnapshot().then(snapshot =>
+    await waitForExpression(cdp, `window.coaxi.supervisor.getSnapshot().then(snapshot =>
       snapshot.fullCoreState === 'ready' && snapshot.capabilities.coreRequests)`, 45_000)
     const health = await request(cdp, 'health.check')
-    assert(await realpath(health.database.path) === await realpath(join(fixture.dataDir, 'rovai.sqlite')),
+    assert(await realpath(health.database.path) === await realpath(join(fixture.dataDir, 'coaxi.sqlite')),
       `Isolated App opened the wrong database: ${JSON.stringify(health.database.path)}`)
     return { cdp, port, child }
   } catch (error) {

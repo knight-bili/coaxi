@@ -13,13 +13,13 @@ const root = resolve(import.meta.dirname, '../..')
 // Production ThreadWorkspace owns the state replacement and bottom-follow behavior.
 // A standalone status row cannot detect the resulting card/viewport displacement.
 test('execution cards update phase-only feedback and keep their live line anchored across layouts', { timeout: 120_000 }, async t => {
-  const chrome = process.env.ROVAI_TEST_CHROME ?? (process.platform === 'darwin'
+  const chrome = process.env.COAXI_TEST_CHROME ?? (process.platform === 'darwin'
     ? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' : '/usr/bin/google-chrome')
   if (!await access(chrome).then(() => true, () => false)) {
     t.skip('Chrome is not installed; execution geometry acceptance did not run')
     return
   }
-  const fixture = await mkdtemp(join(tmpdir(), 'rovai-execution-transition-'))
+  const fixture = await mkdtemp(join(tmpdir(), 'coaxi-execution-transition-'))
   const renderer = join(fixture, 'renderer')
   let browser, server
   let passed = false
@@ -237,7 +237,7 @@ test('execution cards update phase-only feedback and keep their live line anchor
     await writeFile(join(fixture, 'measurements.json'), JSON.stringify(report, null, 2))
     await browser?.close()
     if (server?.listening) await new Promise(resolve => server.close(resolve))
-    if (!passed || process.env.ROVAI_KEEP_EXECUTION_TRANSITION_FIXTURE === '1') {
+    if (!passed || process.env.COAXI_KEEP_EXECUTION_TRANSITION_FIXTURE === '1') {
       console.log(`Preserved execution transition evidence: ${fixture}`)
     } else {
       await rm(fixture, { recursive: true, force: true })

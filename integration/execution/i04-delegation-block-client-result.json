@@ -36,7 +36,7 @@
     "docs_diff_gate_base": "efb6f0bbc7b8d03bcda6f9c085a48efcb45f1680",
     "codegraph_synced": true,
     "transport": "explicit synthetic read responses, actual production RunExecutionDisclosure/hook/window/virtual list/group/ToolCallRow/viewer host; ConsoleClient uses fetch replacement",
-    "source_reference": "Fixed original Codeg delegated/resumed/card-row bodies and actual donor reference imports with declared host seams; original Rovai Run disclosure/layout retained",
+    "source_reference": "Fixed original Coaxi delegated/resumed/card-row bodies and actual donor reference imports with declared host seams; original Coaxi Run disclosure/layout retained",
     "source_audit_unchanged": {
       "ok": true,
       "donorCommit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
@@ -80,7 +80,7 @@
       "night390",
       "day390"
     ],
-    "findings": "Original card geometry/style/affordances retained in both themes, complete task and resume reason accessible, narrow actions visible and no horizontal overflow. Production has ordinary tool groups and original-record disclosure. Original Rovai Drawer padding makes card host width different from isolated donor reference; no pixel-equality or full original App claim."
+    "findings": "Original card geometry/style/affordances retained in both themes, complete task and resume reason accessible, narrow actions visible and no horizontal overflow. Production has ordinary tool groups and original-record disclosure. Original Coaxi Drawer padding makes card host width different from isolated donor reference; no pixel-equality or full original App claim."
   },
   "self_review_fixes": [
     "Actual Renderer exposed wrong Shell id used for delegation source; added separate Core metadata identity while preserving Shell output path",

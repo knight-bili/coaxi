@@ -9,7 +9,7 @@ app.setPath('userData', userData)
 app.setPath('sessionData', join(userData, 'session'))
 // Production ThreadWorkspace, closed metadata/draft API. No Core, Runtime or daily data is opened.
 app.whenReady().then(async () => {
-  const window = new BrowserWindow({ show: process.platform === 'linux' || process.env.ROVAI_SHOW_FAST_FIXTURE === '1', width: 1280, height: 720, useContentSize: true,
+  const window = new BrowserWindow({ show: process.platform === 'linux' || process.env.COAXI_SHOW_FAST_FIXTURE === '1', width: 1280, height: 720, useContentSize: true,
     webPreferences: { contextIsolation: true, sandbox: true, nodeIntegration: false, backgroundThrottling: false } })
   window.webContents.on('console-message', event => console.error(event.message))
   await window.loadFile(renderer)
@@ -165,7 +165,7 @@ app.whenReady().then(async () => {
       assert.ok(await run(`document.querySelector('[data-agent-run-id="run-agent-0"]').textContent.includes(${JSON.stringify(text)})`))
       assert.equal(await run(`document.querySelector('.execution-drawer .camp-fast-toggle').getAttribute('aria-pressed')`), 'false')
     }
-    if (process.env.ROVAI_FAST_CHECK_ONLY === '1') {
+    if (process.env.COAXI_FAST_CHECK_ONLY === '1') {
       // Focused launch/metadata acceptance. The full legacy layout/Stop suite
       // remains the default path below and is not silently skipped by CI.
       const checksBeforeExecution = (await snapshot()).checks.length

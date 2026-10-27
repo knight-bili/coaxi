@@ -9,7 +9,7 @@ export function FeedbackRequestProvider({request,children}:{request:FeedbackRequ
 export function useFeedbackRequest():FeedbackRequest{
   const supplied=useContext(FeedbackRequestContext),client=useOptionalThreadClient()
   return useMemo(()=>supplied??(<T,>(action:string,payload:unknown):Promise<T>=>{
-    const owner=client??(typeof window!=='undefined'&&window.rovai?desktopThreadClient:null)
+    const owner=client??(typeof window!=='undefined'&&window.coaxi?desktopThreadClient:null)
     if(!owner)return Promise.reject(new Error('反馈运输不可用'))
     return owner.request<T>('feedback.operation',{action,payload})
   }),[supplied,client])

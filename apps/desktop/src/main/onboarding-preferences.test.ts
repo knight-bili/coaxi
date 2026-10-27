@@ -18,7 +18,7 @@ afterEach(async () => {
 })
 
 async function temporaryFile(): Promise<string> {
-  const directory = await mkdtemp(join(tmpdir(), 'rovai-onboarding-'))
+  const directory = await mkdtemp(join(tmpdir(), 'coaxi-onboarding-'))
   cleanup.push(directory)
   return join(directory, 'onboarding.json')
 }

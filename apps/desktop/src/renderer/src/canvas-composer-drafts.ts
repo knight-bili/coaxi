@@ -1,5 +1,5 @@
-// Codeg aff1e6c278453ed8d0b96a5f664edcdca621aa3f keeps canvas-draft:<contextKey>
-// per card in canvas-conversation-surface.tsx (Apache-2.0, integration/licenses/codeg/LICENSE).
+// Coaxi aff1e6c278453ed8d0b96a5f664edcdca621aa3f keeps canvas-draft:<contextKey>
+// per card in canvas-conversation-surface.tsx (Apache-2.0, integration/licenses/component-a/LICENSE).
 import type { CanvasConversationRef, ThreadComposerDraftView } from '@contracts'
 import type { SavedDraftCopy, ThreadClient } from './camp-client'
 import { readCanvasViewScope, type CanvasViewScope } from './canvas-view-state'
@@ -15,7 +15,7 @@ export interface CanvasComposerContext extends CanvasViewScope {
   conversationId: string | null
 }
 interface Bundle { version: 1; drafts: Record<string, string> }
-export const CANVAS_COMPOSER_STORAGE_PREFIX = 'rovai.canvas-composer-drafts.v1:'
+export const CANVAS_COMPOSER_STORAGE_PREFIX = 'coaxi.canvas-composer-drafts.v1:'
 const valid = (value: unknown): value is string => typeof value === 'string' && Boolean(value.trim()) && !value.includes('\0')
 const object = (value: unknown): value is Record<string, unknown> => Boolean(value && typeof value === 'object' && !Array.isArray(value))
 export function canvasComposerContext(scope: CanvasViewScope, boardId: string, nodeId: string, reference: CanvasConversationRef): CanvasComposerContext {

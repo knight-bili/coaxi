@@ -840,7 +840,7 @@ fn tool_is_error(value: &Value) -> bool {
 /// `_meta["codebuddy.ai"].isMeta` (advertised as
 /// `agentCapabilities.metaPromptSupport`; per the 2.159.0 changelog it reaches
 /// the model but is not shown, broadcast or replayed as a user message):
-/// `markAcpMetaPromptItems` stamps the same flag on its user items. codeg never
+/// `markAcpMetaPromptItems` stamps the same flag on its user items. coaxi never
 /// sends one, but another client's would land here. Since 2.162.0 it also
 /// covers the task-list reminders CodeBuddy persists for the model: a
 /// `<system-reminder>` text flagged `{isMeta, skipRun, startsNewUserRequest:
@@ -851,7 +851,7 @@ fn tool_is_error(value: &Value) -> bool {
 /// CodeBuddy's OWN renderer skips exactly these records when it replays a
 /// session (`"message" === type && "user" === role && (isMeta ||
 /// !InputItemUtils.isRealUserMessageItem(item))` → `continue`), so rendering
-/// them as user turns was a codeg-only artifact: it split one exchange into two
+/// them as user turns was a coaxi-only artifact: it split one exchange into two
 /// prompts and dropped the raw notification XML — plus the model-facing guidance
 /// prose that follows the closing tag — into a chat bubble. The payload is not
 /// lost: `capture_task_notification` folds it onto the launching Agent card.

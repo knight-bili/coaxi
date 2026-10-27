@@ -1,8 +1,8 @@
 import { useMemo } from 'react'
 import type { UsageActivityReport } from '@contracts'
 import { useUiText } from './interface-language'
-import { formatTokenCount } from './codeg-native-content/lib/token-format'
-import { CARD_HEIGHT,CARD_WIDTH,RankRow,StripCell,TrendBars,type ShareCardTheme } from './codeg-native-content/components/token-usage/share-card'
+import { formatTokenCount } from './coaxi-native-content/lib/token-format'
+import { CARD_HEIGHT,CARD_WIDTH,RankRow,StripCell,TrendBars,type ShareCardTheme } from './coaxi-native-content/components/token-usage/share-card'
 
 /** 沿用原分享卡的尺寸、色板、趋势、连带指标与排行；Core 未采集的会话时长/画像不编造。 */
 export function UsageActivityShareCard({report,locale,theme,showProjectNames}:{report:UsageActivityReport;locale:string;theme:ShareCardTheme;showProjectNames:boolean}):React.JSX.Element {

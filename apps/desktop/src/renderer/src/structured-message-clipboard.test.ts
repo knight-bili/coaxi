@@ -37,7 +37,7 @@ describe('structured message clipboard', () => {
     ], members)
 
     expect(data?.text).toBe('请 @爱丽丝 和 @所有队员')
-    expect(data?.html).toContain('data-rovai-structured-camp-message-v1=')
+    expect(data?.html).toContain('data-coaxi-structured-camp-message-v1=')
     expect(data?.html).toContain('请 @爱丽丝 和 @所有队员')
     expect(data?.html).not.toContain('agent-alice')
   })

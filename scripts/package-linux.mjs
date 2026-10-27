@@ -11,8 +11,8 @@ const kind = process.argv[2] ?? 'portable'
 const targets = { dir: ['dir'], portable: ['AppImage', 'tar.gz'], appimage: ['AppImage'], tar: ['tar.gz'], deb: ['deb'], all: ['AppImage', 'tar.gz', 'deb'] }[kind]
 if (!targets) throw new Error('Expected dir, portable, appimage, tar, deb or all')
 const metadata = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'))
-if (metadata.build.appId !== 'app.codegrovai.workbench.desktop' || metadata.name !== 'codeg-rovai-workbench') throw new Error('Linux package must use the fusion installation identity')
-for (const name of ['rovai-core', 'rovai-host', 'rovai', 'rovai-native-history']) {
+if (metadata.build.appId !== 'app.coaxi.desktop' || metadata.name !== 'coaxi') throw new Error('Linux package must use the fusion installation identity')
+for (const name of ['coaxi-core', 'coaxi-host', 'coaxi', 'coaxi-native-history']) {
   const binary = join(root, 'resources/bin/linux-x64', name)
   const info = lstatSync(binary)
   if (!info.isFile() || info.isSymbolicLink() || !(info.mode & 0o111)) throw new Error(`Missing executable Linux sidecar: ${name}`)

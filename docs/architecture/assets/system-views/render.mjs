@@ -6,9 +6,9 @@ import { renderLayout } from './source/layouts.mjs';
 
 // Rendering dependencies stay outside the application workspace.
 const assetDir = path.dirname(fileURLToPath(import.meta.url));
-const toolRoot = process.env.ROVAI_DIAGRAM_TOOLS;
+const toolRoot = process.env.COAXI_DIAGRAM_TOOLS;
 if (!toolRoot) {
-  throw new Error('Set ROVAI_DIAGRAM_TOOLS to the isolated Puppeteer and Rough.js installation directory. See README.md.');
+  throw new Error('Set COAXI_DIAGRAM_TOOLS to the isolated Puppeteer and Rough.js installation directory. See README.md.');
 }
 const requireTool = createRequire(path.join(path.resolve(toolRoot), 'package.json'));
 const { default: puppeteer } = await import(pathToFileURL(requireTool.resolve('puppeteer')).href);
@@ -43,7 +43,7 @@ function frame(raw, figure) {
 <desc id="figure-description">${xml([figure.description || subtitle, footer].filter(Boolean).join(' '))}</desc>
 <rect width="${width}" height="${height}" fill="#fcfdfc"/>
 <g font-family="${font}" fill="#253c31">
-<text x="48" y="40" fill="#708078" font-size="12" font-weight="600" letter-spacing="2">ROVAI AI / ARCHITECTURE</text>
+<text x="48" y="40" fill="#708078" font-size="12" font-weight="600" letter-spacing="2">COAXI AI / ARCHITECTURE</text>
 <text x="${width - 48}" y="40" fill="#708078" font-size="13" text-anchor="end">图 ${figure.id.slice(0, 2)}</text>
 <text x="48" y="94" font-size="34" font-weight="600">${xml(figure.title)}</text>
 ${subtitle ? `<text x="49" y="130" fill="#708078" font-size="17">${xml(subtitle)}</text>` : ''}

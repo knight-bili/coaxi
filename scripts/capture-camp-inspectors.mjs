@@ -3,42 +3,42 @@ import { join } from 'node:path'
 import { spawn } from 'node:child_process'
 
 const appPath = process.argv[2]
-const outputPrefix = process.argv[3] ?? '/tmp/rovai-camp-inspectors'
-const userDataDir = process.env.ROVAI_CAPTURE_USER_DATA_DIR
-const port = Number(process.env.ROVAI_DEBUG_PORT ?? 9433)
-const width = Number(process.env.ROVAI_CAPTURE_WIDTH ?? 1440)
-const height = Number(process.env.ROVAI_CAPTURE_HEIGHT ?? 920)
-const zoomFactor = Number(process.env.ROVAI_CAPTURE_ZOOM_FACTOR ?? 1)
-const theme = process.env.ROVAI_CAPTURE_THEME ?? null
+const outputPrefix = process.argv[3] ?? '/tmp/coaxi-camp-inspectors'
+const userDataDir = process.env.COAXI_CAPTURE_USER_DATA_DIR
+const port = Number(process.env.COAXI_DEBUG_PORT ?? 9433)
+const width = Number(process.env.COAXI_CAPTURE_WIDTH ?? 1440)
+const height = Number(process.env.COAXI_CAPTURE_HEIGHT ?? 920)
+const zoomFactor = Number(process.env.COAXI_CAPTURE_ZOOM_FACTOR ?? 1)
+const theme = process.env.COAXI_CAPTURE_THEME ?? null
 const expectedTheme = theme === 'day' || theme === 'night' ? theme : null
-const relaxed = process.env.ROVAI_CAPTURE_RELAXED === '1'
+const relaxed = process.env.COAXI_CAPTURE_RELAXED === '1'
 const expectsComposerAttachments =
-  process.env.ROVAI_CAPTURE_EXPECT_COMPOSER_ATTACHMENTS !== undefined
+  process.env.COAXI_CAPTURE_EXPECT_COMPOSER_ATTACHMENTS !== undefined
 const expectsTimelineAttachments =
-  process.env.ROVAI_CAPTURE_EXPECT_TIMELINE_ATTACHMENTS !== undefined
+  process.env.COAXI_CAPTURE_EXPECT_TIMELINE_ATTACHMENTS !== undefined
 const expectedComposerAttachments = Number(
-  process.env.ROVAI_CAPTURE_EXPECT_COMPOSER_ATTACHMENTS ?? 0
+  process.env.COAXI_CAPTURE_EXPECT_COMPOSER_ATTACHMENTS ?? 0
 )
 const expectedTimelineAttachments = Number(
-  process.env.ROVAI_CAPTURE_EXPECT_TIMELINE_ATTACHMENTS ?? 0
+  process.env.COAXI_CAPTURE_EXPECT_TIMELINE_ATTACHMENTS ?? 0
 )
 const captureAttachmentLightbox =
-  process.env.ROVAI_CAPTURE_ATTACHMENT_LIGHTBOX === '1'
+  process.env.COAXI_CAPTURE_ATTACHMENT_LIGHTBOX === '1'
 const previewAttachmentId =
-  process.env.ROVAI_CAPTURE_PREVIEW_ATTACHMENT_ID ?? null
+  process.env.COAXI_CAPTURE_PREVIEW_ATTACHMENT_ID ?? null
 const exerciseAttachmentInputs =
-  process.env.ROVAI_CAPTURE_EXERCISE_ATTACHMENT_INPUTS === '1'
+  process.env.COAXI_CAPTURE_EXERCISE_ATTACHMENT_INPUTS === '1'
 const attachmentCampId =
-  process.env.ROVAI_CAPTURE_CAMP_ID ?? null
+  process.env.COAXI_CAPTURE_CAMP_ID ?? null
 
 if (!appPath || !userDataDir) {
-  throw new Error('Usage: ROVAI_CAPTURE_USER_DATA_DIR=<data> node scripts/capture-camp-inspectors.mjs <Coaxi.app> [output-prefix]')
+  throw new Error('Usage: COAXI_CAPTURE_USER_DATA_DIR=<data> node scripts/capture-camp-inspectors.mjs <Coaxi.app> [output-prefix]')
 }
 if (theme && !['system', 'day', 'night'].includes(theme)) {
-  throw new Error(`Unknown ROVAI_CAPTURE_THEME: ${theme}`)
+  throw new Error(`Unknown COAXI_CAPTURE_THEME: ${theme}`)
 }
 if (!Number.isFinite(zoomFactor) || zoomFactor <= 0) {
-  throw new Error(`Invalid ROVAI_CAPTURE_ZOOM_FACTOR: ${zoomFactor}`)
+  throw new Error(`Invalid COAXI_CAPTURE_ZOOM_FACTOR: ${zoomFactor}`)
 }
 
 const executable = join(appPath, 'Contents', 'MacOS', 'Coaxi')
@@ -47,7 +47,7 @@ const app = spawn(executable, [
   `--user-data-dir=${userDataDir}`
 ], {
   stdio: ['ignore', 'ignore', 'pipe'],
-  env: { ...process.env, ROVAI_ALLOW_ISOLATED_INSTANCE: '1' }
+  env: { ...process.env, COAXI_ALLOW_ISOLATED_INSTANCE: '1' }
 })
 const stderr = []
 app.stderr.on('data', (chunk) => stderr.push(String(chunk)))
@@ -75,7 +75,7 @@ try {
   )
   if (theme) {
     await cdp.send('Runtime.evaluate', {
-      expression: `window.rovai.appearance.setPreference(${JSON.stringify(theme)})`,
+      expression: `window.coaxi.appearance.setPreference(${JSON.stringify(theme)})`,
       awaitPromise: true,
       returnByValue: true
     })
@@ -195,7 +195,7 @@ try {
     cdp,
     `!document.querySelector('.activity-pane')
       && document.querySelector('.workspace-grid')?.classList.contains('inspector-collapsed')
-      && localStorage.getItem('rovai.thread.inspector.visibility') === 'hidden'`,
+      && localStorage.getItem('coaxi.thread.inspector.visibility') === 'hidden'`,
     5_000
   )
   const hiddenInspectorInspection = await cdp.send('Runtime.evaluate', {
@@ -228,14 +228,14 @@ try {
   await waitForExpression(
     cdp,
     `Boolean(document.querySelector('.activity-pane'))
-      && localStorage.getItem('rovai.thread.inspector.visibility') === 'visible'`,
+      && localStorage.getItem('coaxi.thread.inspector.visibility') === 'visible'`,
     5_000
   )
   if (previewAttachmentId) {
     const previewProbe = await cdp.send('Runtime.evaluate', {
       expression: `(async () => {
         try {
-          const preview = await window.rovai.composerAttachments.preview(
+          const preview = await window.coaxi.composerAttachments.preview(
             ${JSON.stringify(previewAttachmentId)}
           )
           return {
@@ -397,10 +397,10 @@ try {
       const rejectionProbe = await cdp.send('Runtime.evaluate', {
         expression: `(async () => {
           const threadId = ${JSON.stringify(attachmentCampId)}
-          const before = await window.rovai.request('camp.composerDraft.get', { threadId })
+          const before = await window.coaxi.request('camp.composerDraft.get', { threadId })
           let rejected = false
           try {
-            await window.rovai.request('camp.messages.send', {
+            await window.coaxi.request('camp.messages.send', {
               commandId: crypto.randomUUID(),
               threadId,
               draftRevision: before.revision + 1,
@@ -409,7 +409,7 @@ try {
           } catch {
             rejected = true
           }
-          const after = await window.rovai.request('camp.composerDraft.get', { threadId })
+          const after = await window.coaxi.request('camp.composerDraft.get', { threadId })
           return {
             rejected,
             retained: before.body === after.body

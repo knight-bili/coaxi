@@ -28,7 +28,7 @@ process.env.NODE_OPTIONS = `${process.env.NODE_OPTIONS ?? ''} --require=${hook}`
 let core, passed = false
 const methods = async () => (await readFile(trace, 'utf8')).trim().split('\n').filter(Boolean).map(JSON.parse)
 try {
-  core = startQualificationCore({ coreExecutable: join(repo, 'target/debug/rovai-core'),
+  core = startQualificationCore({ coreExecutable: join(repo, 'target/debug/coaxi-core'),
     dataDirectory: data, workingDirectory: project, runtimeCacheDirectory: join(root, 'cache'),
     mcpConfigPath: join(data, 'mcp.json') })
   const workspace = await core.request('workspaces.inspect', { path: project })

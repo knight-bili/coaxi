@@ -1,0 +1,444 @@
+// Apache-2.0; spacering-net/codeg aff1e6c278453ed8d0b96a5f664edcdca621aa3f backup/crypto.rs
+//! Optional passphrase encryption for backup archives.
+//!
+//! When a passphrase is supplied, the plaintext ZIP payload is wrapped in a
+//! `.coaxibak` envelope: an unencrypted header (magic + KDF params + salt +
+//! nonce prefix) followed by the ZIP encrypted with AES-256-GCM in a chunked
+//! STREAM construction. The header is plaintext because the salt/nonce must be
+//! readable before the key can be derived; the GCM tag on the first chunk is
+//! what authenticates the passphrase (a wrong passphrase fails to decrypt).
+//!
+//! Streaming (64 KiB chunks) keeps memory bounded — backups can be large.
+
+use std::fs::File;
+use std::io::{self, BufReader, BufWriter, Read, Write};
+use std::path::Path;
+
+use aes_gcm::aead::generic_array::GenericArray;
+use aes_gcm::aead::stream::{DecryptorBE32, EncryptorBE32};
+use aes_gcm::{Aes256Gcm, KeyInit};
+use argon2::{Algorithm, Argon2, Params, Version};
+use base64::Engine;
+use base64::engine::general_purpose::STANDARD as B64;
+use rand::RngCore;
+use serde::{Deserialize, Serialize};
+use tokio_util::sync::CancellationToken;
+
+use super::{BACKUP_I18N_KEY_BAD_PASSPHRASE, BackupError as AppCommandError};
+
+use super::cancelled_error;
+
+/// First 8 bytes of an encrypted backup.
+pub const ENVELOPE_MAGIC: &[u8; 8] = b"COAXIBAK";
+const LEGACY_ENVELOPE_MAGIC: &[u8; 8] = b"CODEGBAK";
+
+/// 只写新格式，同时允许用户导入更新前创建的加密备份。
+pub(crate) fn has_envelope_magic(bytes: &[u8]) -> bool {
+    bytes.starts_with(ENVELOPE_MAGIC) || bytes.starts_with(LEGACY_ENVELOPE_MAGIC)
+}
+/// First 4 bytes of a plaintext ZIP (`PK\x03\x04`), used to disambiguate.
+pub const ZIP_MAGIC: &[u8; 4] = b"PK\x03\x04";
+pub const ENVELOPE_HEADER_VERSION: u8 = 1;
+
+/// Plaintext chunk size fed to the STREAM cipher. Ciphertext chunks are this
+/// plus [`GCM_TAG_LEN`].
+pub const DEFAULT_CHUNK_SIZE: usize = 64 * 1024;
+const GCM_TAG_LEN: usize = 16;
+/// STREAM-BE32 reserves 5 of the 12 GCM nonce bytes (4 counter + 1 last-block
+/// flag), leaving a 7-byte random prefix.
+const NONCE_PREFIX_LEN: usize = 7;
+const SALT_LEN: usize = 16;
+
+// Bounds enforced on a decrypted envelope's attacker-controlled header.
+const MIN_SALT_LEN: usize = 8;
+const MAX_SALT_LEN: usize = 64;
+const MIN_CHUNK_SIZE: usize = 4 * 1024;
+const MAX_CHUNK_SIZE: usize = 1024 * 1024;
+// Bound an attacker-controlled encrypted header to the product-supported KDF
+// envelope (we only ever emit m=64 MiB / t=3 / p=1). A hostile file therefore
+// can't drive >256 MiB / 10-pass Argon2 work during inspect/restore before the
+// GCM tag fails. Widen these only alongside a format_version bump.
+const MAX_M_COST: u32 = 256 * 1024; // 256 MiB (Argon2 m_cost is in KiB)
+const MAX_T_COST: u32 = 10;
+const MAX_P_COST: u32 = 4;
+
+// Argon2id defaults. 64 MiB / 3 passes / 1 lane is a reasonable interactive
+// cost that still meaningfully slows brute force on a leaked archive.
+const DEFAULT_M_COST: u32 = 64 * 1024;
+const DEFAULT_T_COST: u32 = 3;
+const DEFAULT_P_COST: u32 = 1;
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct KdfParams {
+    pub m_cost: u32,
+    pub t_cost: u32,
+    pub p_cost: u32,
+    /// Argon2 version constant: `0x13` (19) for the modern V0x13.
+    pub version: u32,
+}
+
+impl Default for KdfParams {
+    fn default() -> Self {
+        Self {
+            m_cost: DEFAULT_M_COST,
+            t_cost: DEFAULT_T_COST,
+            p_cost: DEFAULT_P_COST,
+            version: 0x13,
+        }
+    }
+}
+
+/// Cleartext header at the front of a `.coaxibak` file. Carries everything
+/// needed to re-derive the key and decrypt — it is the single source of truth
+/// for crypto parameters (the in-archive manifest stays crypto-agnostic).
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct EnvelopeHeader {
+    pub algo: String,
+    pub kdf: String,
+    pub kdf_params: KdfParams,
+    pub salt_b64: String,
+    pub nonce_prefix_b64: String,
+    pub chunk_size: usize,
+}
+
+/// Cheap probe of the first bytes of `path` to tell an encrypted envelope from
+/// a plaintext ZIP.
+pub fn is_encrypted(path: &Path) -> Result<bool, AppCommandError> {
+    let mut f = File::open(path).map_err(AppCommandError::io)?;
+    let mut head = [0u8; 8];
+    let n = read_fill(&mut f, &mut head).map_err(AppCommandError::io)?;
+    Ok(n >= ENVELOPE_MAGIC.len() && has_envelope_magic(&head))
+}
+
+fn derive_key(
+    passphrase: &str,
+    salt: &[u8],
+    params: &KdfParams,
+) -> Result<[u8; 32], AppCommandError> {
+    let p = Params::new(params.m_cost, params.t_cost, params.p_cost, Some(32)).map_err(|e| {
+        AppCommandError::task_execution_failed("Invalid KDF parameters").with_detail(e.to_string())
+    })?;
+    let version = if params.version == 0x10 {
+        Version::V0x10
+    } else {
+        Version::V0x13
+    };
+    let argon2 = Argon2::new(Algorithm::Argon2id, version, p);
+    let mut key = [0u8; 32];
+    argon2
+        .hash_password_into(passphrase.as_bytes(), salt, &mut key)
+        .map_err(|e| {
+            AppCommandError::task_execution_failed("Key derivation failed")
+                .with_detail(e.to_string())
+        })?;
+    Ok(key)
+}
+
+/// Encrypt the plaintext ZIP at `src` into a `.coaxibak` envelope at `dest`.
+/// Synchronous — run under `spawn_blocking`.
+pub fn encrypt_file(
+    src: &Path,
+    dest: &Path,
+    passphrase: &str,
+    cancel: &CancellationToken,
+) -> Result<(), AppCommandError> {
+    let reader = BufReader::new(File::open(src).map_err(AppCommandError::io)?);
+    encrypt_stream(
+        reader,
+        || {
+            File::create(dest)
+                .map(BufWriter::new)
+                .map_err(AppCommandError::io)
+        },
+        passphrase,
+        cancel,
+    )
+}
+
+fn encrypt_stream<R: Read, W: Write>(
+    mut reader: R,
+    writer: impl FnOnce() -> Result<W, AppCommandError>,
+    passphrase: &str,
+    cancel: &CancellationToken,
+) -> Result<(), AppCommandError> {
+    let mut salt = [0u8; SALT_LEN];
+    let mut nonce_prefix = [0u8; NONCE_PREFIX_LEN];
+    rand::rngs::OsRng.fill_bytes(&mut salt);
+    rand::rngs::OsRng.fill_bytes(&mut nonce_prefix);
+
+    let kdf_params = KdfParams::default();
+    let key = derive_key(passphrase, &salt, &kdf_params)?;
+
+    let header = EnvelopeHeader {
+        algo: "AES-256-GCM".to_string(),
+        kdf: "Argon2id".to_string(),
+        kdf_params,
+        salt_b64: B64.encode(salt),
+        nonce_prefix_b64: B64.encode(nonce_prefix),
+        chunk_size: DEFAULT_CHUNK_SIZE,
+    };
+
+    let mut out = writer()?;
+    // Write the cleartext header.
+    out.write_all(ENVELOPE_MAGIC).map_err(AppCommandError::io)?;
+    out.write_all(&[ENVELOPE_HEADER_VERSION])
+        .map_err(AppCommandError::io)?;
+    let header_json = serde_json::to_vec(&header).map_err(|e| {
+        AppCommandError::task_execution_failed("Serialize envelope header")
+            .with_detail(e.to_string())
+    })?;
+    out.write_all(&(header_json.len() as u32).to_le_bytes())
+        .map_err(AppCommandError::io)?;
+    out.write_all(&header_json).map_err(AppCommandError::io)?;
+
+    let cipher = Aes256Gcm::new_from_slice(&key).map_err(|e| {
+        AppCommandError::task_execution_failed("Cipher init failed").with_detail(e.to_string())
+    })?;
+    let nonce = GenericArray::from_slice(&nonce_prefix);
+    let mut enc = EncryptorBE32::from_aead(cipher, nonce);
+
+    let chunk = DEFAULT_CHUNK_SIZE;
+    let mut cur = read_block(&mut reader, chunk).map_err(AppCommandError::io)?;
+    loop {
+        if cancel.is_cancelled() {
+            return Err(cancelled_error());
+        }
+        let nxt = read_block(&mut reader, chunk).map_err(AppCommandError::io)?;
+        if nxt.is_empty() {
+            let ct = enc
+                .encrypt_last(cur.as_slice())
+                .map_err(|_| AppCommandError::task_execution_failed("Encryption failed"))?;
+            out.write_all(&ct).map_err(AppCommandError::io)?;
+            break;
+        }
+        let ct = enc
+            .encrypt_next(cur.as_slice())
+            .map_err(|_| AppCommandError::task_execution_failed("Encryption failed"))?;
+        out.write_all(&ct).map_err(AppCommandError::io)?;
+        cur = nxt;
+    }
+    out.flush().map_err(AppCommandError::io)?;
+    Ok(())
+}
+
+/// Decrypt a `.coaxibak` envelope at `src` into a plaintext ZIP at `dest`.
+/// A wrong passphrase (or tampering) surfaces as an authentication error.
+pub fn decrypt_file(
+    src: &Path,
+    dest: &Path,
+    passphrase: &str,
+    cancel: &CancellationToken,
+) -> Result<(), AppCommandError> {
+    let reader = BufReader::new(File::open(src).map_err(AppCommandError::io)?);
+    decrypt_stream(
+        reader,
+        || {
+            File::create(dest)
+                .map(BufWriter::new)
+                .map_err(AppCommandError::io)
+        },
+        passphrase,
+        cancel,
+    )
+}
+
+fn decrypt_stream<R: Read, W: Write>(
+    mut reader: R,
+    writer: impl FnOnce() -> Result<W, AppCommandError>,
+    passphrase: &str,
+    cancel: &CancellationToken,
+) -> Result<(), AppCommandError> {
+    let header = read_header(&mut reader)?;
+    // The envelope header is attacker-controlled; validate every field that
+    // drives an allocation (chunk_size) or CPU/memory work (Argon2 params)
+    // BEFORE deriving the key or allocating buffers, to deny a malformed file a
+    // memory/CPU DoS during inspect/restore.
+    validate_header(&header)?;
+    let salt = B64
+        .decode(header.salt_b64.as_bytes())
+        .map_err(|_| corrupt_header_error())?;
+    let nonce_prefix = B64
+        .decode(header.nonce_prefix_b64.as_bytes())
+        .map_err(|_| corrupt_header_error())?;
+    if nonce_prefix.len() != NONCE_PREFIX_LEN {
+        return Err(corrupt_header_error());
+    }
+    if !(MIN_SALT_LEN..=MAX_SALT_LEN).contains(&salt.len()) {
+        return Err(corrupt_header_error());
+    }
+
+    let key = derive_key(passphrase, &salt, &header.kdf_params)?;
+    let cipher = Aes256Gcm::new_from_slice(&key).map_err(|e| {
+        AppCommandError::task_execution_failed("Cipher init failed").with_detail(e.to_string())
+    })?;
+    let nonce = GenericArray::from_slice(&nonce_prefix);
+    let mut dec = DecryptorBE32::from_aead(cipher, nonce);
+
+    let mut out = writer()?;
+    let block = header.chunk_size + GCM_TAG_LEN;
+    let mut cur = read_block(&mut reader, block).map_err(AppCommandError::io)?;
+    loop {
+        if cancel.is_cancelled() {
+            return Err(cancelled_error());
+        }
+        let nxt = read_block(&mut reader, block).map_err(AppCommandError::io)?;
+        if nxt.is_empty() {
+            let pt = dec
+                .decrypt_last(cur.as_slice())
+                .map_err(|_| bad_passphrase_error())?;
+            out.write_all(&pt).map_err(AppCommandError::io)?;
+            break;
+        }
+        let pt = dec
+            .decrypt_next(cur.as_slice())
+            .map_err(|_| bad_passphrase_error())?;
+        out.write_all(&pt).map_err(AppCommandError::io)?;
+        cur = nxt;
+    }
+    out.flush().map_err(AppCommandError::io)?;
+    Ok(())
+}
+
+/// Reject an envelope header whose fields are out of the bounds we ever
+/// produce, before any of them drives an allocation or KDF work.
+fn validate_header(h: &EnvelopeHeader) -> Result<(), AppCommandError> {
+    if h.algo != "AES-256-GCM" || h.kdf != "Argon2id" {
+        return Err(corrupt_header_error());
+    }
+    if !(MIN_CHUNK_SIZE..=MAX_CHUNK_SIZE).contains(&h.chunk_size) {
+        return Err(corrupt_header_error());
+    }
+    let p = &h.kdf_params;
+    if !(8..=MAX_M_COST).contains(&p.m_cost)
+        || !(1..=MAX_T_COST).contains(&p.t_cost)
+        || !(1..=MAX_P_COST).contains(&p.p_cost)
+    {
+        return Err(corrupt_header_error());
+    }
+    Ok(())
+}
+
+fn read_header<R: Read>(reader: &mut R) -> Result<EnvelopeHeader, AppCommandError> {
+    let mut magic = [0u8; 8];
+    read_fill(reader, &mut magic).map_err(AppCommandError::io)?;
+    if !has_envelope_magic(&magic) {
+        return Err(corrupt_header_error());
+    }
+    let mut ver = [0u8; 1];
+    read_fill(reader, &mut ver).map_err(AppCommandError::io)?;
+    if ver[0] != ENVELOPE_HEADER_VERSION {
+        return Err(corrupt_header_error());
+    }
+    let mut len_buf = [0u8; 4];
+    read_fill(reader, &mut len_buf).map_err(AppCommandError::io)?;
+    let len = u32::from_le_bytes(len_buf) as usize;
+    // Guard against an absurd declared header length (corruption / hostile file).
+    if len > 1024 * 1024 {
+        return Err(corrupt_header_error());
+    }
+    let mut json = vec![0u8; len];
+    if read_fill(reader, &mut json).map_err(AppCommandError::io)? != len {
+        return Err(corrupt_header_error());
+    }
+    serde_json::from_slice(&json).map_err(|_| corrupt_header_error())
+}
+
+/// Read exactly `buf.len()` bytes, or fewer at EOF. Returns the count read.
+fn read_fill<R: Read>(reader: &mut R, buf: &mut [u8]) -> io::Result<usize> {
+    let mut filled = 0;
+    while filled < buf.len() {
+        let n = reader.read(&mut buf[filled..])?;
+        if n == 0 {
+            break;
+        }
+        filled += n;
+    }
+    Ok(filled)
+}
+
+/// Read up to `size` bytes into a fresh Vec (shorter only at EOF; empty == EOF).
+fn read_block<R: Read>(reader: &mut R, size: usize) -> io::Result<Vec<u8>> {
+    let mut buf = vec![0u8; size];
+    let n = read_fill(reader, &mut buf)?;
+    buf.truncate(n);
+    Ok(buf)
+}
+
+fn bad_passphrase_error() -> AppCommandError {
+    AppCommandError::authentication_failed("Incorrect passphrase or corrupted backup")
+        .with_i18n(BACKUP_I18N_KEY_BAD_PASSPHRASE, Default::default())
+}
+
+fn corrupt_header_error() -> AppCommandError {
+    AppCommandError::invalid_input("Malformed backup envelope header")
+        .with_i18n(BACKUP_I18N_KEY_BAD_PASSPHRASE, Default::default())
+}
+
+/// 配置迁移沿既有 STREAM 容器读写内存，秘密和导入口令不写明文临时文件。
+pub(crate) fn encrypt_bytes(
+    bytes: &[u8],
+    passphrase: &str,
+    limit: usize,
+) -> Result<Vec<u8>, AppCommandError> {
+    if bytes.len() > limit {
+        return Err(AppCommandError::invalid_input(
+            "Configuration exceeds memory limit",
+        ));
+    }
+    let mut writer = BoundedConfigurationBytes {
+        bytes: Vec::new(),
+        limit,
+    };
+    encrypt_stream(
+        bytes,
+        || Ok(&mut writer),
+        passphrase,
+        &CancellationToken::new(),
+    )?;
+    Ok(writer.bytes)
+}
+
+pub(crate) fn decrypt_bytes(
+    bytes: &[u8],
+    passphrase: &str,
+    limit: usize,
+) -> Result<Vec<u8>, AppCommandError> {
+    if bytes.len() > limit {
+        return Err(AppCommandError::invalid_input(
+            "Configuration exceeds memory limit",
+        ));
+    }
+    let mut writer = BoundedConfigurationBytes {
+        bytes: Vec::new(),
+        limit,
+    };
+    decrypt_stream(
+        bytes,
+        || Ok(&mut writer),
+        passphrase,
+        &CancellationToken::new(),
+    )?;
+    Ok(writer.bytes)
+}
+
+struct BoundedConfigurationBytes {
+    bytes: Vec<u8>,
+    limit: usize,
+}
+impl Write for BoundedConfigurationBytes {
+    fn write(&mut self, value: &[u8]) -> io::Result<usize> {
+        if self
+            .bytes
+            .len()
+            .checked_add(value.len())
+            .is_none_or(|length| length > self.limit)
+        {
+            return Err(io::Error::other("Configuration exceeds memory limit"));
+        }
+        self.bytes.extend_from_slice(value);
+        Ok(value.len())
+    }
+    fn flush(&mut self) -> io::Result<()> {
+        Ok(())
+    }
+}

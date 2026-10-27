@@ -27,7 +27,7 @@ function fixture(fetcher: typeof fetch) {
     }
   })
   const document = Object.assign(new EventTarget(), { readyState: 'complete', body: {}, querySelectorAll: () => [],
-    currentScript: { getAttribute: () => '/__rovai-preview/bridge/root.js' } })
+    currentScript: { getAttribute: () => '/__coaxi-preview/bridge/root.js' } })
   for (const [key, value] of Object.entries({ window: frame, parent: host, document, crypto: webcrypto, fetch: fetcher,
     addEventListener: frame.addEventListener.bind(frame), MutationObserver: class { observe() {} disconnect() {} }, scrollTo: vi.fn() })) vi.stubGlobal(key, value)
   const channel = new HtmlPreviewHostChannel(preview, () => frame as unknown as Window)
@@ -42,8 +42,8 @@ function fixture(fetcher: typeof fetch) {
     const event = new Event('securitypolicyviolation')
     const { isTrusted = true, ...fields } = patch
     Object.assign(event, { effectiveDirective: 'connect-src', disposition: 'enforce',
-      blockedURI: preview.origin + '/__rovai-preview/events?documentId=root',
-      sourceFile: preview.origin + '/__rovai-preview/bridge/root.js', ...fields })
+      blockedURI: preview.origin + '/__coaxi-preview/events?documentId=root',
+      sourceFile: preview.origin + '/__coaxi-preview/bridge/root.js', ...fields })
     Object.defineProperty(event, 'isTrusted', { value: isTrusted })
     document.dispatchEvent(event)
   }
@@ -101,7 +101,7 @@ it('bounds retries across handshakes and rejects stale diagnostic recovery messa
   expect(fetcher).toHaveBeenCalledTimes(4)
   const count = messages.length
   const event = new Event('message')
-  Object.assign(event, { source: frame, origin: preview.origin, data: { protocol: 'rovai-html-preview-v1',
+  Object.assign(event, { source: frame, origin: preview.origin, data: { protocol: 'coaxi-html-preview-v1',
     ...preview, type: 'server-diagnostics', state: 'connected', documentId: 'old', connectionId: 'old' } })
   host.dispatchEvent(event)
   expect(messages).toHaveLength(count)

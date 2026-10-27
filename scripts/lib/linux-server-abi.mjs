@@ -57,7 +57,7 @@ export function inspectLinuxServerAbi(directory) {
     }
   }
   visit(directory)
-  for (const executable of ['rovai-server', 'rovai-host', 'rovai']) {
+  for (const executable of ['coaxi-server', 'coaxi-host', 'coaxi']) {
     if (!files[executable]) throw new Error(`Linux Server package is missing ELF executable ${executable}`)
   }
   return { schemaVersion: 1, target: 'linux-x64', maximumRequiredGlibc: linuxServerGlibcBaseline, files }

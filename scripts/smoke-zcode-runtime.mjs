@@ -12,7 +12,7 @@ import { removeEphemeralRuntimeCampFilesRoot } from './lib/runtime-camp-files-ro
 // Missing-Send owners with the official resident Host's cross-Session boundary.
 // The caller supplies an isolated native HOME containing official BYOK config.
 const root = resolve(import.meta.dirname, '..')
-const fixture = await realpath(await mkdtemp(join(tmpdir(), 'rovai-zcode-fleet-')))
+const fixture = await realpath(await mkdtemp(join(tmpdir(), 'coaxi-zcode-fleet-')))
 const project = join(fixture, 'project')
 const data = join(fixture, 'data')
 const events = []
@@ -23,10 +23,10 @@ const delay = (ms) => new Promise((done) => setTimeout(done, ms))
 try {
   await mkdir(project)
   await writeFile(join(project, 'README.md'), '# Official ZCode isolation fixture\n')
-  for (const args of [['init', '-b', 'main'], ['add', 'README.md'], ['-c', 'user.name=Rovai Smoke', '-c', 'user.email=smoke@rovai.local', 'commit', '-m', 'fixture']]) {
+  for (const args of [['init', '-b', 'main'], ['add', 'README.md'], ['-c', 'user.name=Coaxi Smoke', '-c', 'user.email=smoke@coaxi.local', 'commit', '-m', 'fixture']]) {
     execFileSync('git', args, { cwd: project, stdio: 'ignore' })
   }
-  core = startQualificationCore({ coreExecutable: join(root, 'target/debug/rovai-core'), dataDirectory: data,
+  core = startQualificationCore({ coreExecutable: join(root, 'target/debug/coaxi-core'), dataDirectory: data,
     workingDirectory: root, runtimeCacheDirectory: join(fixture, 'cache'), onNotification: (event) => events.push(event) })
   const workspace = await core.request('workspaces.inspect', { path: project })
   await until(() => events.some((e) => e.method === 'runtime.discovery.completed'), 90_000)
@@ -35,7 +35,7 @@ try {
     commandId: crypto.randomUUID(), workspace, body, address: { mode: 'explicit', agentIds: ['agent_2'] },
     purpose: 'Verify official ZCode Session isolation through the product Runtime.'
   }))
-  if (['1', 'native'].includes(process.env.ROVAI_ZCODE_FLEET_CRASH)) {
+  if (['1', 'native'].includes(process.env.COAXI_ZCODE_FLEET_CRASH)) {
     const effect = join(project, 'CRASH_MUST_NOT_WRITE.txt')
     const active = await send(`In this temporary test project, execute Bash once: sleep 30; printf SHOULD_NOT_EXIST > '${effect}'. Report when done.`)
     await until(() => events.some((e) => e.method === 'runtime.action' && e.params?.agentRunId === active.agentRunId
@@ -43,7 +43,7 @@ try {
     const table = await processTable()
     const owned = descendantsOf(table, core.pid)
     assert(owned.length > 0)
-    const nativeCrash = process.env.ROVAI_ZCODE_FLEET_CRASH === 'native'
+    const nativeCrash = process.env.COAXI_ZCODE_FLEET_CRASH === 'native'
     // The official kernel may replace process.title. Identify its exact owner
     // through our direct cleanup companion instead of the mutable argv title.
     const nativeOwners = table.filter((p) => p.ppid === core.pid

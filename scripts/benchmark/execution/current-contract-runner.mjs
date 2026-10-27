@@ -45,7 +45,7 @@ export async function runCurrentContractConformance({
   }))
   const suiteResult = aggregateBenchmarkSuite(CURRENT_CONTRACT_PROFILE, outcomes)
   const evidenceRecord = {
-    schemaId: 'rovai.benchmark.contract-conformance-evidence',
+    schemaId: 'coaxi.benchmark.contract-conformance-evidence',
     schemaVersion: '1.0.0',
     profile: `${CURRENT_CONTRACT_PROFILE.id}@${CURRENT_CONTRACT_PROFILE.version}`,
     commands: sourceEvidence.map(entry => entry.command),

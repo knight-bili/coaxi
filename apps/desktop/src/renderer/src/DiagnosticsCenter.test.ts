@@ -18,7 +18,7 @@ function check(overrides: Partial<DiagnosticCheck>): DiagnosticCheck {
     group: 'local_dependencies',
     subjectKind: 'core',
     subjectId: null,
-    label: 'Rovai Core',
+    label: 'Coaxi Core',
     status: 'ok',
     code: 'core_ready',
     detail: 'Core is available.',

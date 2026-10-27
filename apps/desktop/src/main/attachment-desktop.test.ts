@@ -44,7 +44,7 @@ describe('Desktop Attachment target boundary', () => {
 
   it('does not expose a native Shell error that contains an Authority path', () => {
     expect(attachmentOpenResultFromNativeError(
-      'Failed to open /Users/example/Library/Application Support/Rovai/camp-attachments/secret.txt'
+      'Failed to open /Users/example/Library/Application Support/Coaxi/camp-attachments/secret.txt'
     )).toEqual({ opened: false, error: 'open_failed' })
     expect(attachmentOpenResultFromNativeError('')).toEqual({ opened: true, error: null })
   })

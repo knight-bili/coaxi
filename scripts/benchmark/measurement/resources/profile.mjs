@@ -1,6 +1,6 @@
 import { digestJson } from '../../protocol/canonical.mjs'
 
-export const RESOURCE_PROFILE_SCHEMA_ID = 'rovai.benchmark.resource-measurement-profile'
+export const RESOURCE_PROFILE_SCHEMA_ID = 'coaxi.benchmark.resource-measurement-profile'
 export const RESOURCE_PROFILE_SCHEMA_VERSION = '1.0.0'
 
 const DIRECTIONS = new Set(['lower_is_better', 'higher_is_better', 'descriptive'])
@@ -23,7 +23,7 @@ const DEFAULT_METRICS = Object.freeze([
 
 export function defaultResourceMeasurementProfile() {
   return createResourceMeasurementProfile({
-    id: 'rovai-default-resource-measurement',
+    id: 'coaxi-default-resource-measurement',
     version: '1.0.0',
     metrics: DEFAULT_METRICS
   })

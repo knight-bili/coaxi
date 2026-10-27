@@ -1,6 +1,6 @@
-import type { RovaiApi } from '@contracts'
+import type { CoaxiApi } from '@contracts'
 
-type Client = Pick<RovaiApi, 'request'>
+type Client = Pick<CoaxiApi, 'request'>
 const readers = new WeakMap<Client, Map<string, { count: number }>>()
 
 /** Mission-wide release must wait for every mounted change reader on the same client. */

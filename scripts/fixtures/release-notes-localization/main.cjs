@@ -47,7 +47,7 @@ app.whenReady().then(async () => {
       await run("window.releaseNotesTest.language('zh-CN')"); await settle()
       await assertNotes('Installed 中文说明', 'English notes')
       assert.equal(await run("document.querySelector('[data-app-update-release-tab=current]').getAttribute('aria-selected')"), 'true')
-      assert.equal(await run("document.querySelectorAll('[data-markdown-heading^=\"Rovai AI v\"]').length"), 0)
+      assert.equal(await run("document.querySelectorAll('[data-markdown-heading^=\"Coaxi AI v\"]').length"), 0)
       await run("window.releaseNotesTest.language('en')"); await settle()
       await capture(`release-notes-${theme}-en`)
       window.setContentSize(1040, 700)
@@ -77,25 +77,25 @@ app.whenReady().then(async () => {
       { language: 'zh-CN', source: '<!-- lang:en -->\n\nEnglish fallback\n\n[img]: https://example.com/image.png\n\n<!-- lang:zh-CN -->\n\n![Hidden image][img]', expected: 'English fallback', excluded: 'Hidden image' }
     ]
     for (const boundary of boundaryCases) {
-      await run(`window.releaseNotesTest.notes(${JSON.stringify('# Rovai AI v0.0.3\n\n' + boundary.source)})`)
+      await run(`window.releaseNotesTest.notes(${JSON.stringify('# Coaxi AI v0.0.3\n\n' + boundary.source)})`)
       await run(`window.releaseNotesTest.language(${JSON.stringify(boundary.language)})`); await settle()
       const result = await visibleNotes()
       assert.ok(result.text.includes(boundary.expected), JSON.stringify(result))
       assert.ok(!result.text.includes(boundary.excluded), JSON.stringify(result))
       if (boundary.href) assert.equal(result.guide, boundary.href)
-      assert.equal(await run("document.querySelectorAll('[data-markdown-heading^=\"Rovai AI v\"]').length"), 0)
+      assert.equal(await run("document.querySelectorAll('[data-markdown-heading^=\"Coaxi AI v\"]').length"), 0)
     }
     assert.deepEqual(await run('window.releaseNotesTest.requests'), [])
-    const mixed = '# Rovai AI v0.0.3\n\n<!-- lang:en -->\n\nEnglish notes\n\n说明文字 <!-- lang:fr -->\nContenu français.\n\n<!-- lang:zh-CN -->\n\n中文说明'
+    const mixed = '# Coaxi AI v0.0.3\n\n<!-- lang:en -->\n\nEnglish notes\n\n说明文字 <!-- lang:fr -->\nContenu français.\n\n<!-- lang:zh-CN -->\n\n中文说明'
     await run(`window.releaseNotesTest.notes(${JSON.stringify(mixed)})`)
     await run("window.releaseNotesTest.language('en')"); await settle()
     const mixedNotes = await visibleNotes()
     for (const text of ['English notes', 'Contenu français.', '中文说明']) assert.ok(mixedNotes.text.includes(text), JSON.stringify(mixedNotes))
-    const titleOnly = '<!-- lang:en -->\n\nEnglish title-cleanup fallback\n\n<!-- lang:zh-CN -->\n\n# Rovai AI v0.0.3\n'
+    const titleOnly = '<!-- lang:en -->\n\nEnglish title-cleanup fallback\n\n<!-- lang:zh-CN -->\n\n# Coaxi AI v0.0.3\n'
     await run(`window.releaseNotesTest.notes(${JSON.stringify(titleOnly)})`)
     await run("window.releaseNotesTest.language('zh-CN')"); await settle()
     assert.ok((await visibleNotes()).text.includes('English title-cleanup fallback'))
-    await run(`window.releaseNotesTest.notes(${JSON.stringify('# Rovai AI v0.0.3\n\n[docs]: https://example.com/guide')})`); await settle()
+    await run(`window.releaseNotesTest.notes(${JSON.stringify('# Coaxi AI v0.0.3\n\n[docs]: https://example.com/guide')})`); await settle()
     assert.equal(await run("document.querySelector('#about-release-panel-available .about-release-notes') === null"), true)
     assert.ok(await run("document.querySelector('#about-release-panel-available .about-release-empty').textContent.includes('此版本没有提供更新日志')"))
     assert.equal(await run("document.querySelector('[data-app-update-release-tab=available]').getAttribute('aria-selected')"), 'true')

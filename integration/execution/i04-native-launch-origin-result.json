@@ -21,7 +21,7 @@
     "Official Qoder 1.1.45 and 1.1.68 archives verified against immutable npm SHA512 SRI; reviewed five pure functions per version, not whole bundle/CLI.",
     "Publisher empty-value masking/name validation/NFC/path rules corrected initial source assumptions; prototype results are superseded and labeled in local research logs.",
     "Only direct Core dependency edge to already locked unicode-normalization 0.1.25 added; no new package or version upgrade.",
-    "Current Rovai Qoder recipe has no --config-dir option, so only its final supported environment chooses captured root.",
+    "Current Coaxi Qoder recipe has no --config-dir option, so only its final supported environment chooses captured root.",
     "No current environment, current home, file guessing, secret persistence, Session identity promotion or public Claude/Qoder reader enablement."
   ],
   "verification": {
@@ -94,12 +94,12 @@
       ],
       "donors": [
         {
-          "name": "codeg",
+          "name": "coaxi",
           "commit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
           "tracked_clean": true
         },
         {
-          "name": "rovai-ai",
+          "name": "coaxi",
           "commit": "cc465dda562536b94f23787759e3206324baa29e",
           "tracked_clean": true
         }
@@ -179,22 +179,22 @@
       "git_blob": "8d2091c761a33dd35d944e6cb16a27b371346b67"
     },
     {
-      "path": "crates/rovai-core/Cargo.toml",
+      "path": "crates/coaxi-core/Cargo.toml",
       "sha256": "1aff2801951f885a7bfd6d10f674e35a73c800f461b529ef11c72c65abe9e790",
       "git_blob": "52ba3d3eac985567a400e1fb8563d9c568b0a5dd"
     },
     {
-      "path": "crates/rovai-core/src/context/native_child_session_tests.rs",
+      "path": "crates/coaxi-core/src/context/native_child_session_tests.rs",
       "sha256": "fd2d17c04938b0f7d1da489a9aa33ddcf1f433f0eda7f97ffcc2f7f622c5aa2a",
       "git_blob": "a2b682850922e8928c894ca49bf88a20f248ce96"
     },
     {
-      "path": "crates/rovai-core/src/runtime_subagent_session/origin.rs",
+      "path": "crates/coaxi-core/src/runtime_subagent_session/origin.rs",
       "sha256": "48a35b9f11a3fe35a14db957e2ce890abd25b0f6b2fc390992b09137200f4fa1",
       "git_blob": "bad266e41f84564000463802960e967cd5bbb4ce"
     },
     {
-      "path": "crates/rovai-core/src/runtime_subagent_session/origin/capture_tests.rs",
+      "path": "crates/coaxi-core/src/runtime_subagent_session/origin/capture_tests.rs",
       "sha256": "77ba4ac5a4bb5448c83743bea954d261ab04a6bc82da66ecb6333e2d0b430f6f",
       "git_blob": "ad21fd4b891361ecdd7ea64107692cbf8726b7a4"
     },

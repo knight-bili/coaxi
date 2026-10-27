@@ -82,7 +82,7 @@ const attachmentNameOnlyReference = 'attachment-preview.ts'
 const externalReference = '/Users/fixture/Desktop/Reports/report.ts'
 const externalDisplayPath = '~/Desktop/Reports/report.ts'
 const pathReferences = [
-  'crates/rovai-core/src/acp.rs',
+  'crates/coaxi-core/src/acp.rs',
   'workspace-crates-directory/core-runtime-source-and-language-adapters/source-implementations/acp.rs'
 ]
 const missingReference = 'src/missing-report.ts'
@@ -249,7 +249,7 @@ const pickerChanges: AgentRunFileChangesView = {
     operationCount: 1, additions: 1, deletions: 1
   }))
 }
-Object.assign(window, { rovai: {
+Object.assign(window, { coaxi: {
   platform: 'darwin',
   onEvent: () => () => {},
   composerAttachments: { discard: async () => {} },
@@ -480,8 +480,8 @@ function Fixture(): React.JSX.Element {
   }
   return <FilePreviewProvider threadId={camp} resolvedTheme={resolvedTheme}>
     <div className="app-shell app-shell-camp">
-      <aside style={{ gridRow: '1 / -1', padding: '48px 24px', background: 'var(--rail)' }}>Rovai AI</aside>
-      <AppHeader threadTitle="文件预览验收" contextLabel="Rovai AI" thread={null} onFocusApprovals={() => {}} />
+      <aside style={{ gridRow: '1 / -1', padding: '48px 24px', background: 'var(--rail)' }}>Coaxi AI</aside>
+      <AppHeader threadTitle="文件预览验收" contextLabel="Coaxi AI" thread={null} onFocusApprovals={() => {}} />
       <main className="content task-content">{initialExecutionCase ? <InitialExecutionWorkspace /> : <Workspace />}</main>
     </div>
     {toolRowsVisible && <ToolRows />}
@@ -513,7 +513,8 @@ async function settle(): Promise<void> {
     await new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())))
     if (performance.now() > deadline) throw new Error('File preview layout did not settle')
   } while (!element('.workspace-grid') || element('.is-file-preview-snapping') || document.getAnimations().some(animation =>
-    animation instanceof CSSTransition && animation.playState === 'running'))
+    animation instanceof CSSTransition && animation.playState === 'running'
+      && /^(width|height|grid-template-columns|transform|display)$/.test(animation.transitionProperty)))
 }
 
 Object.assign(window, { previewTest: {
@@ -827,14 +828,14 @@ Object.assign(window, { previewTest: {
     await settle()
   },
   findSnapshot() {
-    const selected = CSS.highlights.get('rovai-file-find-current')
+    const selected = CSS.highlights.get('coaxi-file-find-current')
     const range = selected ? [...selected][0] as Range | undefined : undefined
     return {
       visible: Boolean(document.querySelector('.file-find-surface')),
       query: document.querySelector<HTMLInputElement>('.file-find-form > input')?.value,
       count: document.querySelector('.file-find-count')?.textContent,
       error: document.querySelector('.file-find-error')?.textContent,
-      marked: CSS.highlights.get('rovai-file-find-match')?.size ?? 0,
+      marked: CSS.highlights.get('coaxi-file-find-match')?.size ?? 0,
       current: range?.toString(),
       selectedFile: previewController.activeTab?.kind === 'file_change' ? previewController.activeTab.selectedEvidenceFileId : null,
       conversationQuery: document.querySelector<HTMLInputElement>('.conversation-find-form input')?.value,

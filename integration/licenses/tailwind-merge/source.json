@@ -4,7 +4,7 @@
   "version": "3.4.0",
   "license": "MIT",
   "integrity": "sha512-uSaO4gnW+b3Y2aWoWfFpX62vn2sR3skfhbjsEnaBI81WD1wBLlHZe5sWf0AqjksNdYTbGBEd0UasQMT3SNV15g==",
-  "sourceComponent": "Fixed Codeg cn class conflict resolution",
+  "sourceComponent": "Fixed Coaxi cn class conflict resolution",
   "sourceLock": "aff1e6c pnpm-lock.yaml",
   "addedPackages": [
     "tailwind-merge@3.4.0"

@@ -66,7 +66,7 @@ def main():
             assert error is None, f'{operation}: {error and error.get("code")}'
             return response['result']
 
-    with tempfile.TemporaryDirectory(prefix='rovai-linux-os-') as temporary:
+    with tempfile.TemporaryDirectory(prefix='coaxi-linux-os-') as temporary:
         root = Path(temporary).resolve()
         data = root / 'data'
         home = root / 'account'
@@ -78,7 +78,7 @@ def main():
             if source:
                 (isolated_path / tool).symlink_to(source)
         environment = {'HOME': str(home), 'PATH': str(isolated_path), 'LANG': 'C.UTF-8'}
-        binary = str(package / 'rovai-server')
+        binary = str(package / 'coaxi-server')
         command = [binary, '--data-dir', str(data), '--listen', '127.0.0.1:0']
         print(json.dumps({'channel': 'automatic_acceptance', 'dataDir': str(data), 'skillLibraryRoot': str(data / 'skills'), 'runtime': False}), flush=True)
 
@@ -148,7 +148,7 @@ def main():
             assert token == restored
             config = call(origin, session['token'], 'mcp.config.get')
             assert any(server['name'] == 'linux-os-fixture' for server in config['servers'])
-            assert (data / 'rovai.sqlite').is_file() and (data / 'skills').is_dir()
+            assert (data / 'coaxi.sqlite').is_file() and (data / 'skills').is_dir()
             assert (data / 'logs/server.log').is_file()
             stop(process)
             checks.extend(['durable_sigterm', 'restart', 'persisted_data', 'persisted_session', 'persisted_token'])

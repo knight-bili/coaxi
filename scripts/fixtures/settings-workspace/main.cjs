@@ -407,7 +407,7 @@ app.whenReady().then(async () => {
             ...savedAccount, accountId: `sample-${kind}`, brand: kind,
             userName: zoom === 2 ? 'Murray / 渠道开发与应用发布负责人' : savedAccount.userName,
             email: zoom === 2 ? 'developer-account-with-a-long-name@example.com' : 'murray@example.com',
-            tenantName: zoom === 2 ? 'Rovai 智能协作与开放平台应用研发工作室' : savedAccount.tenantName
+            tenantName: zoom === 2 ? 'Coaxi 智能协作与开放平台应用研发工作室' : savedAccount.tenantName
           } } })
           await click(`.channel-provider-tab:has(.channel-mark-${kind})`)
           const alignment = await run(`(() => {

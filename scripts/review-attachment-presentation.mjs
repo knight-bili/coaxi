@@ -9,7 +9,7 @@ import { build } from 'vite'
 
 const root = resolve(import.meta.dirname, '..')
 const fixtureSource = join(root, 'scripts/fixtures/camp-open-projection')
-const fixture = await mkdtemp(join(tmpdir(), 'rovai-attachment-review-'))
+const fixture = await mkdtemp(join(tmpdir(), 'coaxi-attachment-review-'))
 
 await build({
   configFile: false,

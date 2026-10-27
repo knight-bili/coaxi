@@ -1,4 +1,4 @@
-/* Codeg side-panel shape: calc(100% - 1rem), sm:max-width 36rem;
+/* Coaxi side-panel shape: calc(100% - 1rem), sm:max-width 36rem;
  * flush 16px transcript/header column, non-modal and stackable. */
 .delegation-children { display: flex; flex: none; flex-direction: column; min-width: 0; gap: 6px; margin: 8px 0; font-size: 12px; }
 .delegation-card { display: flex; align-items: stretch; min-width: 0; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-raised); overflow: hidden; }
@@ -34,7 +34,7 @@
 .delegation-chat-surface.single-chat-popover[hidden] { display: none; }
 .delegation-chat-surface .single-chat-target-trigger { pointer-events: none; }
 .delegation-chat-surface .single-chat-target-chevron { display: none; }
-/* Codeg's right-hand Base UI drawer: same swipe variables, stack and motion. */
+/* Coaxi's right-hand Base UI drawer: same swipe variables, stack and motion. */
 .delegation-drawer { pointer-events: auto; --stack-step: .05; --peek: 1rem; --stack-progress: clamp(0, var(--drawer-swipe-progress, 0), 1); --stack-scale-base: max(0, calc(1 - var(--nested-drawers, 0) * var(--stack-step))); --stack-scale: clamp(0, calc(var(--stack-scale-base) + var(--stack-step) * var(--stack-progress)), 1); --stack-shrink: calc(1 - var(--stack-scale)); --stack-peek-offset: max(0px, calc((var(--nested-drawers, 0) - var(--stack-progress)) * var(--peek))); transform: translate3d(calc(var(--drawer-swipe-movement-x, 0px) - var(--stack-peek-offset) - var(--stack-shrink) * 100%), 0, 0) scale(var(--stack-scale)); transition: transform 450ms cubic-bezier(.22, 1, .36, 1), filter 450ms; outline: none; }
 .delegation-drawer[data-starting-style], .delegation-drawer[data-ending-style] { transform: translate3d(calc(100% + 10px), 0, 0); }
 .delegation-drawer[data-swiping], .delegation-drawer[data-nested-drawer-swiping] { transition-duration: 0ms; }

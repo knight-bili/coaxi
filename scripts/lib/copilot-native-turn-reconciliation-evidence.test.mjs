@@ -182,8 +182,8 @@ async function readJson(fileName) {
 }
 
 function assertRedacted(text) {
-  assert.doesNotMatch(text, /\/var\/folders\/[^\s"']*rovai-copilot-turn-reconciliation/)
-  assert.doesNotMatch(text, /\/private\/tmp\/rovai-p0-recovery-blocked/)
+  assert.doesNotMatch(text, /\/var\/folders\/[^\s"']*coaxi-copilot-turn-reconciliation/)
+  assert.doesNotMatch(text, /\/private\/tmp\/coaxi-p0-recovery-blocked/)
   assert.doesNotMatch(text, /Bearer\s+(?!\[REDACTED\])\S+/i)
   assert.doesNotMatch(text, /\b(?:gh[pousr]|github_pat)_[A-Za-z0-9_]{16,}\b/)
   assert.doesNotMatch(text, /"sessionId":"[0-9a-f]{8}-[0-9a-f-]{27,}"/i)

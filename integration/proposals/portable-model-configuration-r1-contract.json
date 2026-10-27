@@ -707,7 +707,7 @@
           "const": 2
         },
         "product": {
-          "const": "codeg-rovai-config"
+          "const": "coaxi-config"
         },
         "archiveId": {
           "type": "string",

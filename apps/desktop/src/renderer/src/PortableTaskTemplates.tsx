@@ -27,7 +27,7 @@ function value(draft:Draft):{name:string;title:string;config:string}{
   return {name:draft.name,title:draft.title,config:JSON.stringify({...draft.config,display_text:draft.body,prompt_blocks:prompt})}
 }
 
-/** 参考 Codeg task-editor-dialog 的模板列表、保存和删除；配置仍由同一 Host 库拥有。 */
+/** 参考 Coaxi task-editor-dialog 的模板列表、保存和删除；配置仍由同一 Host 库拥有。 */
 export function PortableTaskTemplates():React.JSX.Element|null{
   const client=useThreadClient(),api=client.portableConfiguration?.templates,t=useUiText(),generation=useRef(0)
   const key=client.presentationScope?`portable-task-templates:${client.presentationScope}`:null

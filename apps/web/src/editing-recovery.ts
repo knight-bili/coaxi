@@ -7,7 +7,7 @@ type ArchiveOptions = { ownerScope: string; storage: Pick<Storage, 'getItem' | '
 type Archive = { version: 1; scope: string; ownerScope: string; entries: Record<string, { value: string; savedAt: number }> }
 
 export function browserEditingRecovery(scope: string, storage: RecoveryStorage = sessionStorage, archive?: ArchiveOptions): EditingRecovery {
-  const key = 'rovai.web.edits.v1'
+  const key = 'coaxi.web.edits.v1'
   const read = (): Record<string, unknown> => {
     const raw = storage.getItem(key)
     if (!raw) return {}
@@ -15,8 +15,8 @@ export function browserEditingRecovery(scope: string, storage: RecoveryStorage =
     return saved.scope === scope && saved.entries && typeof saved.entries === 'object' ? saved.entries : {}
   }
   if (archive && !scope.startsWith(`${archive.ownerScope}/`)) throw new Error('草稿归属与当前连接不一致。')
-  const archivePrefix = `rovai.web.thread-drafts.v1:${archive?.ownerScope}/`
-  const archiveKey = `rovai.web.thread-drafts.v1:${scope}`
+  const archivePrefix = `coaxi.web.thread-drafts.v1:${archive?.ownerScope}/`
+  const archiveKey = `coaxi.web.thread-drafts.v1:${scope}`
   const isPublicDraft = (identity: string) => identity.startsWith(THREAD_COMPOSER_STORAGE_PREFIX) || identity.startsWith(CANVAS_COMPOSER_STORAGE_PREFIX)
   const encodeDraft = (identity: string, value: unknown): string => {
     if (identity.startsWith(CANVAS_COMPOSER_STORAGE_PREFIX)) {
@@ -85,7 +85,7 @@ export function browserEditingRecovery(scope: string, storage: RecoveryStorage =
         try {
           const saved = JSON.parse(archive.storage.getItem(key) ?? 'null') as Archive
           const entry = saved?.entries?.[identity]
-          if (saved?.version === 1 && saved.ownerScope === archive.ownerScope && key === `rovai.web.thread-drafts.v1:${saved.scope}` && entry && Number.isFinite(entry.savedAt)) {
+          if (saved?.version === 1 && saved.ownerScope === archive.ownerScope && key === `coaxi.web.thread-drafts.v1:${saved.scope}` && entry && Number.isFinite(entry.savedAt)) {
             copies.push({ id: saved.scope, value: encodeDraft(identity, entry.value), savedAt: entry.savedAt })
           }
         } catch { /* Keep malformed copies untouched; do not import partial content. */ }

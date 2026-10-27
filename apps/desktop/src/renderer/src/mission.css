@@ -491,8 +491,8 @@ button.mission-tag { cursor: pointer; }
 html.mission-drawer-resizing,html.mission-drawer-resizing * { cursor: col-resize !important; user-select: none !important; }
 html.mission-drawer-resizing :is(.file-preview-retained-host,iframe) { pointer-events: none; }
 :is(.mission-description-toggle,.mission-group-heading,.mission-create-options,.mission-session-leading button,.mission-activity-entry):focus-visible { outline: 1px solid var(--ink); outline-offset: 1px; }
-html:not([data-rovai-platform="win32"]) .navigation-collapsed .mission-page-header { padding-left: 128px; }
-html:not([data-rovai-platform="win32"]) .navigation-collapsed .mission-full .topbar-conversation-context { padding-left: 142px; }
+html:not([data-coaxi-platform="win32"]) .navigation-collapsed .mission-page-header { padding-left: 128px; }
+html:not([data-coaxi-platform="win32"]) .navigation-collapsed .mission-full .topbar-conversation-context { padding-left: 142px; }
 @media(max-width:1190px) { .mission-board-page { padding-inline: 20px; }.mission-board-scroll > .mission-board { gap: 9px; }.mission-column { padding-inline: 7px; }.mission-board-card { padding-inline: 10px; }.mission-filter { padding-inline: 6px; }.mission-filter .mission-filter-value { max-width: 70px; }.mission-search { width: 112px; } }
 @media(prefers-reduced-motion:reduce) { .mission-drawer { animation: none; } }
 @container mission-header (max-width: 700px) {

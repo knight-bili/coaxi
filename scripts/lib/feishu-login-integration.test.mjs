@@ -18,7 +18,7 @@ const esbuild = createRequire(require.resolve('vite'))('esbuild')
 
 test('Feishu uses Session HTTP, passive bootstrap and the production login Dialog', { timeout: 90_000 }, async t => {
   if (!admitElectronIntegrationTest(t)) return
-  const fixture = await mkdtemp(join(tmpdir(), 'rovai-feishu-login-'))
+  const fixture = await mkdtemp(join(tmpdir(), 'coaxi-feishu-login-'))
   let child
   let closed
   try {
@@ -48,7 +48,7 @@ test('Feishu uses Session HTTP, passive bootstrap and the production login Dialo
     const report = JSON.parse(stdout.split('\n').find(line => line.startsWith('{')))
     assert.equal(report.ok, true)
     assert.ok(report.cases.length >= 6)
-    if (environment.ROVAI_FEISHU_LIVE_PROBE === '1') {
+    if (environment.COAXI_FEISHU_LIVE_PROBE === '1') {
       assert.deepEqual(report.liveProbe, { init: 'valid', polling: 'waiting', serverExpiry: null })
     }
   } finally {
@@ -56,7 +56,7 @@ test('Feishu uses Session HTTP, passive bootstrap and the production login Dialo
       child.kill('SIGKILL')
       await closed
     }
-    if (process.env.ROVAI_KEEP_FEISHU_LOGIN_FIXTURE === '1') process.stdout.write(`Feishu login fixture: ${fixture}\n`)
+    if (process.env.COAXI_KEEP_FEISHU_LOGIN_FIXTURE === '1') process.stdout.write(`Feishu login fixture: ${fixture}\n`)
     else await rm(fixture, { recursive: true, force: true })
   }
 })

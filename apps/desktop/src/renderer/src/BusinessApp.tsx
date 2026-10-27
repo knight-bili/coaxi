@@ -95,7 +95,7 @@ import type {
   NavigationSnapshot,
   ProjectNavigationGroup,
   RestorableLocation,
-  RovaiApi,
+  CoaxiApi,
   HearthReviewItem,
   StoredCommandResult,
   SupervisorSnapshot,
@@ -567,12 +567,12 @@ export function StartupWorkspace({
       : view === 'memory' ? 'memory-content' : 'task-content compose-content'
   return (
     <>
-    <NavigationShell platform={window.rovai.platform} disabled
+    <NavigationShell platform={window.coaxi.platform} disabled
       className={view === 'camp' ? 'app-shell-camp' : ''}
       data-startup-frame={target?.kind ?? 'location'}
     >
       <ThreadNavigation
-        platform={window.rovai.platform}
+        platform={window.coaxi.platform}
         view={view}
         state="loading"
         disabled
@@ -606,10 +606,10 @@ export function StartupWorkspace({
               waiting
               error={error}
               onRetry={onRetry}
-              onExportDiagnostics={() => window.rovai.exportDiagnostics()}
+              onExportDiagnostics={() => window.coaxi.exportDiagnostics()}
             />
           : <StartupGate waiting error={error} onRetry={onRetry}
-              onExportDiagnostics={() => window.rovai.exportDiagnostics()} />)}
+              onExportDiagnostics={() => window.coaxi.exportDiagnostics()} />)}
       </main>
     </NavigationShell>
     {error === null && <StartupLoadingCanvas
@@ -638,8 +638,8 @@ export function BootstrapShell({
       applyAppearanceSnapshot(document.documentElement, next)
       setAppearance(next)
     }
-    void window.rovai.appearance.get().then(acceptSnapshot).catch(() => undefined)
-    const unsubscribe = window.rovai.appearance.onChanged(acceptSnapshot)
+    void window.coaxi.appearance.get().then(acceptSnapshot).catch(() => undefined)
+    const unsubscribe = window.coaxi.appearance.onChanged(acceptSnapshot)
     return () => {
       disposed = true
       unsubscribe?.()
@@ -651,7 +651,7 @@ export function BootstrapShell({
     setBusy('retry')
     setActionError(null)
     try {
-      await window.rovai.supervisor.retryFullCore()
+      await window.coaxi.supervisor.retryFullCore()
     } catch {
       setActionError(uiAttribute('暂时无法重新打开，请重试。'))
     } finally {
@@ -662,7 +662,7 @@ export function BootstrapShell({
     setBusy('diagnostics')
     setActionError(null)
     try {
-      await window.rovai.exportDiagnostics()
+      await window.coaxi.exportDiagnostics()
     } catch {
       setActionError(uiAttribute('暂时无法导出诊断，请重试。'))
     } finally {
@@ -672,7 +672,7 @@ export function BootstrapShell({
   const changeAppearance = async (preference: ThemePreference): Promise<void> => {
     setActionError(null)
     try {
-      setAppearance(await window.rovai.appearance.setPreference(preference))
+      setAppearance(await window.coaxi.appearance.setPreference(preference))
     } catch {
       setActionError(uiAttribute('暂时无法保存外观设置，请重试。'))
     }
@@ -4669,7 +4669,7 @@ export function notificationMessageIsVisible(messageId: string): boolean {
 }
 
 export async function resolveNotificationAgentRun(
-  client: Pick<RovaiApi, 'request'>,
+  client: Pick<CoaxiApi, 'request'>,
   threadId: string,
   agentRunId: string,
   availableSnapshot: ThreadSnapshot | null
@@ -4721,7 +4721,7 @@ export function notificationFocusMatchesAction(
 async function resolveNavigationPins(
   navigation: NavigationSnapshot,
   pins: NavigationPin[],
-  client: Pick<RovaiApi, 'request'>
+  client: Pick<CoaxiApi, 'request'>
 ): Promise<{ pins: NavigationPin[]; threads: NavigationThreadItem[] }> {
   const pinnedThreadIds = new Set(
     pins.filter((pin) => pin.kind === 'camp').map((pin) => pin.targetKey)

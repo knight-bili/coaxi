@@ -1,4 +1,4 @@
-import type { RovaiApi, ThreadMessagePage, ThreadOpenProjection } from '@contracts'
+import type { CoaxiApi, ThreadMessagePage, ThreadOpenProjection } from '@contracts'
 import { newCommandId } from '../../shared/command-id'
 import { threadCommands } from './thread-commands'
 import { campOpenProjectionAsSnapshot, type ThreadSurfaceSnapshot } from './thread-workspace-data'
@@ -35,7 +35,7 @@ export class ThreadProjectionSupersededError extends Error {
 export class ThreadProjectionStore {
   private readonly entries = new Map<string, Entry>()
   private generation = 0
-  constructor(private readonly client: Pick<RovaiApi, 'request'>) {}
+  constructor(private readonly client: Pick<CoaxiApi, 'request'>) {}
   get epoch(): number { return this.generation }
 
   private entry(threadId: string): Entry {

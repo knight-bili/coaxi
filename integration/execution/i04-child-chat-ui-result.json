@@ -22,7 +22,7 @@
     "原 system/delegation-parent 任务和原 Run 保留，消息/输入/排队/保留附件和引用用 child owner，普通未绑定草稿不迁入",
     "四既有 User 控制入口先存原 UUID/完整命令；规范回执校验，未知先核对，重开可恢复，显式重试原请求",
     "正文交接 guard 串起抽屉/嵌套/Thread 离开，后层失败回滚；隐藏恢复保留同编辑器/草稿/阅读位置并隐藏内层结束弹窗",
-    "原 Codeg 抽屉几何与 Rovai 聊天/执行/材料共用，嵌入去重复 chrome，无额外外层滚动；结束保留历史并禁发"
+    "原 Coaxi 抽屉几何与 Coaxi 聊天/执行/材料共用，嵌入去重复 chrome，无额外外层滚动；结束保留历史并禁发"
   ],
   "checks": {
     "typescript_passed": true,
@@ -98,7 +98,7 @@
     "提交前 Git/CodeGraph 短暂并发锁，未删除锁或终止进程；待原操作释放后重新 stage/sync，通过日志另存04"
   ],
   "pending": [
-    "可信 Runtime 原生子代理只读 Session 与第二类 Codeg 查看器、原设置及其余协作能力",
+    "可信 Runtime 原生子代理只读 Session 与第二类 Coaxi 查看器、原设置及其余协作能力",
     "Grok 修改反馈与原 User 队列/生命周期的完整设计衔接，超出 r1 时先形成具体 revision",
     "实际 Core/Native/Web/Host 与完整产品 GUI 往返，原完整 App 同场景与真实 Runtime/平台矩阵",
     "I04-T02/T03/T04 未完 Runtime 并集/执行恢复/三类记忆/自动化及84正式场景集中候选"
@@ -111,221 +111,221 @@
   "dependencies_changed": false,
   "approved_r1_artifacts": [
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\proposals\\native-delegation-r1.md",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\integration\\proposals\\native-delegation-r1.md",
       "bytes": 44061,
       "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\proposals\\native-delegation-r1-contract.json",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\integration\\proposals\\native-delegation-r1-contract.json",
       "bytes": 117977,
       "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\I04_队员怎样叫来独立帮手_客户确认版_r1.docx",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\outputs\\I04_独立帮手_r1\\final\\I04_队员怎样叫来独立帮手_客户确认版_r1.docx",
       "bytes": 67619,
       "sha256": "b3a318110460df2c95fc7132f4f3a985f0e59c6e506161fa1b8ceee3d70c0192"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\I04_队员怎样叫来独立帮手_客户确认版_r1.pdf",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\outputs\\I04_独立帮手_r1\\final\\I04_队员怎样叫来独立帮手_客户确认版_r1.pdf",
       "bytes": 809962,
       "sha256": "79af957b4e2f3e2a77311b72093188289f193d1c36d49218d99e1d9cb2446340"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\native-delegation-r1-contract.json",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\outputs\\I04_独立帮手_r1\\final\\native-delegation-r1-contract.json",
       "bytes": 117977,
       "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\native-delegation-r1.md",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\outputs\\I04_独立帮手_r1\\final\\native-delegation-r1.md",
       "bytes": 44061,
       "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
     }
   ],
   "source_files": [
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\DelegationViewer.tsx",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\apps\\desktop\\src\\renderer\\src\\DelegationViewer.tsx",
       "bytes": 26001,
       "sha256": "e37b342dac8200a6efbfae8709800cba5ab159f0a33e9bc7a99dd2a0beab9199",
       "repository_path": "apps/desktop/src/renderer/src/DelegationViewer.tsx",
       "git_blob": "bd76f479892fb79426009eff568edc38dc038de6"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\SingleChatPanel.tsx",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\apps\\desktop\\src\\renderer\\src\\SingleChatPanel.tsx",
       "bytes": 98393,
       "sha256": "9e51cf16310865d7472c760a34836d541b28b93ae95726cb0aaa0c687356ef40",
       "repository_path": "apps/desktop/src/renderer/src/SingleChatPanel.tsx",
       "git_blob": "b0b48d3e4b50317dd5fd0f54331ac9d5854d8045"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\ThreadWorkspace.tsx",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\apps\\desktop\\src\\renderer\\src\\ThreadWorkspace.tsx",
       "bytes": 512207,
       "sha256": "27126b1231f8962f34cf9ae4424c922a05bfe78da8caaf46ebd6512c4406de14",
       "repository_path": "apps/desktop/src/renderer/src/ThreadWorkspace.tsx",
       "git_blob": "44acaece347f412e399d30e5219660feba5975ae"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\camp-client.tsx",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\apps\\desktop\\src\\renderer\\src\\camp-client.tsx",
       "bytes": 4471,
       "sha256": "3a05598a1ec49b6536a57a4b9736d9a2ca97810f1f924199a7bd73e65b711f68",
       "repository_path": "apps/desktop/src/renderer/src/camp-client.tsx",
       "git_blob": "4fc0fc5b54aef61dcfd49132e5bb42d7eb244e00"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\delegation-action-controller.test.ts",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\apps\\desktop\\src\\renderer\\src\\delegation-action-controller.test.ts",
       "bytes": 7337,
       "sha256": "9419b429abf870e8542550aa1c75a62d7ffa23a06c34f542d1dc7d8d62a08513",
       "repository_path": "apps/desktop/src/renderer/src/delegation-action-controller.test.ts",
       "git_blob": "6c69eff4ecce68c10d6c10ab0b06601dec84d803"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\delegation-action-controller.ts",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\apps\\desktop\\src\\renderer\\src\\delegation-action-controller.ts",
       "bytes": 8091,
       "sha256": "c42514862090782ef205342c5c665307ec87ecea0312733c6ffd03c7353ceab0",
       "repository_path": "apps/desktop/src/renderer/src/delegation-action-controller.ts",
       "git_blob": "d45bc0ea23b7da5394092bdfe29d98b58b761337"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\delegation-viewer-controller.ts",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\apps\\desktop\\src\\renderer\\src\\delegation-viewer-controller.ts",
       "bytes": 9002,
       "sha256": "21eed0550f33475607ba96da453ecf86245b9a1a36d4110246c583fbae1cd9fa",
       "repository_path": "apps/desktop/src/renderer/src/delegation-viewer-controller.ts",
       "git_blob": "90aa3f0aac5e0cb3284dd4d060f656a811e056b0"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\delegation-viewer-leave.test.ts",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\apps\\desktop\\src\\renderer\\src\\delegation-viewer-leave.test.ts",
       "bytes": 1398,
       "sha256": "943e5a603572118b27282c94986e520eb26979953decfe8084ca56f0464ec9de",
       "repository_path": "apps/desktop/src/renderer/src/delegation-viewer-leave.test.ts",
       "git_blob": "2fc23ae7a7a1c015659cd58adf709853886a5c7c"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\delegation-viewer.css",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\apps\\desktop\\src\\renderer\\src\\delegation-viewer.css",
       "bytes": 8669,
       "sha256": "bf3ff4c13040fb89ed15d3f690b523c51c59572a10b2bb9f335a3013cfb55296",
       "repository_path": "apps/desktop/src/renderer/src/delegation-viewer.css",
       "git_blob": "ea56275b93cba4443af54d7002eeb0230c8f35c8"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\locales\\en.json",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\apps\\desktop\\src\\renderer\\src\\locales\\en.json",
       "bytes": 324911,
       "sha256": "96e432b906ce741c8d5ed8550fd5c8b136d93d121060a9cede8cd042333459fa",
       "repository_path": "apps/desktop/src/renderer/src/locales/en.json",
       "git_blob": "be92cfe7fafb75449381104f6cbca8828b461784"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\shared\\private-conversation-operations.ts",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\apps\\desktop\\src\\shared\\private-conversation-operations.ts",
       "bytes": 1599,
       "sha256": "5ef0fb7bfeff04a286aedaa4488c7206544f5b0b893083bc6b086b3b1d62d9bb",
       "repository_path": "apps/desktop/src/shared/private-conversation-operations.ts",
       "git_blob": "b172169e779c49cfc05da848dc9a1fd543aeff6c"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\docs\\architecture\\delegation.md",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\docs\\architecture\\delegation.md",
       "bytes": 8940,
       "sha256": "881d30674cb944d3d8cf9dd70cee39dc343fcfbcccf0ea8f16bb10630fe25192",
       "repository_path": "docs/architecture/delegation.md",
       "git_blob": "9889900ef332ff4e3f983b4b9f9bc2af7a7a77b6"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\docs\\contracts\\delegation-v1.md",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\docs\\contracts\\delegation-v1.md",
       "bytes": 45206,
       "sha256": "4a83e228cbb82c30ea2c012974397ef4b05ce960bc5f6241fabc4246aa5fc759",
       "repository_path": "docs/contracts/delegation-v1.md",
       "git_blob": "a0614a5037d860a356e8b1e563e967f45d24a881"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\docs\\ui\\components\\conversation-workspace.md",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\docs\\ui\\components\\conversation-workspace.md",
       "bytes": 143464,
       "sha256": "da6d697de0853850d62f2cf1ba5573ae4d134d780d217b748d2cfccbf57e956d",
       "repository_path": "docs/ui/components/conversation-workspace.md",
       "git_blob": "b7583c985e513489fbdbaeb2dcf7596843ad84ed"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\docs\\versions\\v1.73\\README.md",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\docs\\versions\\v1.73\\README.md",
       "bytes": 7489,
       "sha256": "5c7272bfd0fc18563deacdc719398e1acc572e5dcf6e9333a8cb7e9878d6617c",
       "repository_path": "docs/versions/v1.73/README.md",
       "git_blob": "6341fcd9e39eff1c80f988d4a36378bea3dd8af1"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\docs\\versions\\v1.73\\decisions.md",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\docs\\versions\\v1.73\\decisions.md",
       "bytes": 1589,
       "sha256": "3de71953b7cd4dd72ac9d8a099090e28ca441155da1a75e2d6942e02f81703ea",
       "repository_path": "docs/versions/v1.73/decisions.md",
       "git_blob": "07bea0a10f3217c5f49f304153ff901dfca362a6"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\docs\\versions\\v1.73\\implementation-plan.md",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\docs\\versions\\v1.73\\implementation-plan.md",
       "bytes": 17704,
       "sha256": "5de955647db1f86a30e168f742147ea5eb627a698142864c7c19ddcd8e8f140e",
       "repository_path": "docs/versions/v1.73/implementation-plan.md",
       "git_blob": "b38c5ce78c71708fcbde0a227c450e397ee6527f"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\execution\\i04-execution-plan.md",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\integration\\execution\\i04-execution-plan.md",
       "bytes": 20591,
       "sha256": "157f2c86cf87f0b23109e1f3eaf476cd57e7e8c59b831d3cb3f784ac3860ad92",
       "repository_path": "integration/execution/i04-execution-plan.md",
       "git_blob": "fbb3bde7544f873912194d21635ce55df8ed8ec3"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\inventory\\delegation-viewer-ui-reference.md",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\integration\\inventory\\delegation-viewer-ui-reference.md",
       "bytes": 6965,
       "sha256": "3fcd794368df36dd46ac25f0f377607a84246166f81018199226d9864e0369d6",
       "repository_path": "integration/inventory/delegation-viewer-ui-reference.md",
       "git_blob": "849ff71c8004b15134437a574e5f145b4426aae5"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\scripts\\fixtures\\delegation-viewer\\chat-checks.cjs",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\scripts\\fixtures\\delegation-viewer\\chat-checks.cjs",
       "bytes": 8701,
       "sha256": "7239188e9c570a9be9643cd3f15db5a982a3442a0f09c3876dd26562b90e1061",
       "repository_path": "scripts/fixtures/delegation-viewer/chat-checks.cjs",
       "git_blob": "130719f71fcf3dee3b02a718e9fc84f0dcfc2e37"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\scripts\\fixtures\\delegation-viewer\\child-chat.ts",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\scripts\\fixtures\\delegation-viewer\\child-chat.ts",
       "bytes": 10513,
       "sha256": "084b90323d6e593aaeeb375aa0230f2338ee3bae27679b794489354fe29f7bb0",
       "repository_path": "scripts/fixtures/delegation-viewer/child-chat.ts",
       "git_blob": "dee66c5b4de08707cc03c30411f3a71ad27be8c6"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\scripts\\fixtures\\delegation-viewer\\main.cjs",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\scripts\\fixtures\\delegation-viewer\\main.cjs",
       "bytes": 11544,
       "sha256": "be8ba9d69f3eea1d483ebdf565f7882596046ade1000b781198242aeb283b6b9",
       "repository_path": "scripts/fixtures/delegation-viewer/main.cjs",
       "git_blob": "824965a015cf339ac262d34b8e48294ac25bbb6e"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\scripts\\fixtures\\delegation-viewer\\renderer.tsx",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\scripts\\fixtures\\delegation-viewer\\renderer.tsx",
       "bytes": 11128,
       "sha256": "ed6e6c191e09ba2bc71bbd263f0b44943d1a152af157b44db84c228125a9424b",
       "repository_path": "scripts/fixtures/delegation-viewer/renderer.tsx",
       "git_blob": "bee67ff82d2be0272607dedb963e4722ffdad6bb"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\scripts\\fixtures\\single-chat-panel\\main.cjs",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\scripts\\fixtures\\single-chat-panel\\main.cjs",
       "bytes": 25622,
       "sha256": "c7c514f6b6d41224018ecd94e081f0176dd7a74097d5131fb9307b74a31d208e",
       "repository_path": "scripts/fixtures/single-chat-panel/main.cjs",
       "git_blob": "2a29c5d4d1939f917edd120154468e7f79168e56"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\scripts\\fixtures\\single-chat-panel\\renderer.tsx",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\scripts\\fixtures\\single-chat-panel\\renderer.tsx",
       "bytes": 31817,
       "sha256": "3aff967bf49772e2fb768d64c543ff6f7156ca65354d500c7a4c3d63ddea6430",
       "repository_path": "scripts/fixtures/single-chat-panel/renderer.tsx",
       "git_blob": "0f0d164cf4b3f1620bd2fab5049f34a279a64106"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\scripts\\lib\\delegation-viewer.test.mjs",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\scripts\\lib\\delegation-viewer.test.mjs",
       "bytes": 2646,
       "sha256": "59d237016a6364b4402244f7a86cf44a861a2c0358c22734a6bf3f9619d77b24",
       "repository_path": "scripts/lib/delegation-viewer.test.mjs",
       "git_blob": "a06ae7ae54982a7f7d493e12c332021dc26114f0"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\scripts\\lib\\single-chat-panel.test.mjs",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\scripts\\lib\\single-chat-panel.test.mjs",
       "bytes": 4410,
       "sha256": "cfb052186e608d794a6d97350f90af9f1b4737ee8c9f488877ed3f4802e73ce8",
       "repository_path": "scripts/lib/single-chat-panel.test.mjs",
@@ -334,97 +334,97 @@
   ],
   "evidence_files": [
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\child-chat-ui-controller-02.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\logs\\child-chat-ui-controller-02.log",
       "bytes": 286,
       "sha256": "d67e4df82a34aedc9e81fd97298cd4aae3b1641560b8760079b14cc5b0a46b24"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\child-chat-ui-types-05.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\logs\\child-chat-ui-types-05.log",
       "bytes": 16,
       "sha256": "5a3973f79ed9becd5f23c4feff467513814de7ea381d75a4d2e339aa8b8edca9"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\child-chat-ui-original-final-10.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\logs\\child-chat-ui-original-final-10.log",
       "bytes": 679,
       "sha256": "1f7a3f80b9ca700fd55a76bb24296cbe6cced818c002dae116f58342b8e3a997"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\child-chat-ui-viewer-final-05.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\logs\\child-chat-ui-viewer-final-05.log",
       "bytes": 1957,
       "sha256": "f652355e0d1e0682dce10a224c5e885e9e2003f0af0718adf12518deb6d39c38"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\child-chat-ui-docs-tests-01.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\logs\\child-chat-ui-docs-tests-01.log",
       "bytes": 976,
       "sha256": "80344ee61c7510b9f339a780e2032a00316eb2c42a6c9f51b490ed46140ad06f"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\child-chat-ui-docs-gates-01.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\logs\\child-chat-ui-docs-gates-01.log",
       "bytes": 342,
       "sha256": "44f5d6acb4b8547acc2047b37fe8e61b6ccebc65493125d6f9c652bc8561779b"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\child-chat-ui-codegraph-sync-04.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\logs\\child-chat-ui-codegraph-sync-04.log",
       "bytes": 88,
       "sha256": "4b5e6457c82b34383f70240f2de6ba2c4356069cd254d5755442097468fb99ef"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\child-chat-ui-captures\\final\\readonly\\geometry.json",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\child-chat-ui-captures\\final\\readonly\\geometry.json",
       "bytes": 1412,
       "sha256": "a9f84d67d4ba57692543c2537625aac747d0d5ef13c20317900b0c65eb001fd3"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\child-chat-ui-captures\\final\\chat\\geometry.json",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\child-chat-ui-captures\\final\\chat\\geometry.json",
       "bytes": 1428,
       "sha256": "910d432666f0dfcbfb05d6b81b103517687f511983373549996801079e91ef74"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\child-chat-ui-captures\\final\\readonly\\viewer-day-narrow.png",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\child-chat-ui-captures\\final\\readonly\\viewer-day-narrow.png",
       "bytes": 77121,
       "sha256": "bdd3dd7695c5c08922a8cd9434b28ed3dc16fb621a7ada2d93bd971e7f08722e",
-      "original_capture": "C:\\Users\\JiaLe\\AppData\\Local\\Temp\\rovai-delegation-viewer-ZYgEUa\\viewer-day-narrow.png"
+      "original_capture": "C:\\Users\\JiaLe\\AppData\\Local\\Temp\\coaxi-delegation-viewer-ZYgEUa\\viewer-day-narrow.png"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\child-chat-ui-captures\\final\\readonly\\viewer-day-wide.png",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\child-chat-ui-captures\\final\\readonly\\viewer-day-wide.png",
       "bytes": 107003,
       "sha256": "cfe7b3b318bb756cae1bed90bde4fa0d3c48a015e1a02b6b677c6b4fa26b11a7",
-      "original_capture": "C:\\Users\\JiaLe\\AppData\\Local\\Temp\\rovai-delegation-viewer-ZYgEUa\\viewer-day-wide.png"
+      "original_capture": "C:\\Users\\JiaLe\\AppData\\Local\\Temp\\coaxi-delegation-viewer-ZYgEUa\\viewer-day-wide.png"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\child-chat-ui-captures\\final\\readonly\\viewer-night-narrow.png",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\child-chat-ui-captures\\final\\readonly\\viewer-night-narrow.png",
       "bytes": 76378,
       "sha256": "28b7229256c303c4db69dfbd0f4e85ee86db2cb652e2bce4d240581b77e8300e",
-      "original_capture": "C:\\Users\\JiaLe\\AppData\\Local\\Temp\\rovai-delegation-viewer-ZYgEUa\\viewer-night-narrow.png"
+      "original_capture": "C:\\Users\\JiaLe\\AppData\\Local\\Temp\\coaxi-delegation-viewer-ZYgEUa\\viewer-night-narrow.png"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\child-chat-ui-captures\\final\\readonly\\viewer-night-wide.png",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\child-chat-ui-captures\\final\\readonly\\viewer-night-wide.png",
       "bytes": 108515,
       "sha256": "9851987b53d98ae906a3ab557c2aef9e061dcc20a4d8385abf4a753ccec8c0a2",
-      "original_capture": "C:\\Users\\JiaLe\\AppData\\Local\\Temp\\rovai-delegation-viewer-ZYgEUa\\viewer-night-wide.png"
+      "original_capture": "C:\\Users\\JiaLe\\AppData\\Local\\Temp\\coaxi-delegation-viewer-ZYgEUa\\viewer-night-wide.png"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\child-chat-ui-captures\\final\\chat\\child-chat-day-narrow.png",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\child-chat-ui-captures\\final\\chat\\child-chat-day-narrow.png",
       "bytes": 58993,
       "sha256": "9c29aa35d2faad7938b396db39644df8858479576bd3cb07ab502872f7f6a195",
-      "original_capture": "C:\\Users\\JiaLe\\AppData\\Local\\Temp\\rovai-delegation-viewer-pCQTMe\\child-chat-day-narrow.png"
+      "original_capture": "C:\\Users\\JiaLe\\AppData\\Local\\Temp\\coaxi-delegation-viewer-pCQTMe\\child-chat-day-narrow.png"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\child-chat-ui-captures\\final\\chat\\child-chat-day-wide.png",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\child-chat-ui-captures\\final\\chat\\child-chat-day-wide.png",
       "bytes": 125692,
       "sha256": "d935c61813a43d56091507e9549f8f7b2088344584a61d983b28e385399af1a8",
-      "original_capture": "C:\\Users\\JiaLe\\AppData\\Local\\Temp\\rovai-delegation-viewer-pCQTMe\\child-chat-day-wide.png"
+      "original_capture": "C:\\Users\\JiaLe\\AppData\\Local\\Temp\\coaxi-delegation-viewer-pCQTMe\\child-chat-day-wide.png"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\child-chat-ui-captures\\final\\chat\\child-chat-night-narrow.png",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\child-chat-ui-captures\\final\\chat\\child-chat-night-narrow.png",
       "bytes": 59967,
       "sha256": "afed250dd59e7d9ef4e06c20b5e3b433aba38fd124993bba73d24d67cbb0e1cd",
-      "original_capture": "C:\\Users\\JiaLe\\AppData\\Local\\Temp\\rovai-delegation-viewer-pCQTMe\\child-chat-night-narrow.png"
+      "original_capture": "C:\\Users\\JiaLe\\AppData\\Local\\Temp\\coaxi-delegation-viewer-pCQTMe\\child-chat-night-narrow.png"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\child-chat-ui-captures\\final\\chat\\child-chat-night-wide.png",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\child-chat-ui-captures\\final\\chat\\child-chat-night-wide.png",
       "bytes": 125889,
       "sha256": "53bb0a80f2445b1499ac6e4e4c5f9f4ca85f52f730a198d07e769188f3409585",
-      "original_capture": "C:\\Users\\JiaLe\\AppData\\Local\\Temp\\rovai-delegation-viewer-pCQTMe\\child-chat-night-wide.png"
+      "original_capture": "C:\\Users\\JiaLe\\AppData\\Local\\Temp\\coaxi-delegation-viewer-pCQTMe\\child-chat-night-wide.png"
     }
   ]
 }

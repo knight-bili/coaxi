@@ -402,7 +402,7 @@ describe('ExecutionViewService', () => {
 })
 
 async function tempRoot(): Promise<string> {
-  const root = await mkdtemp(join(tmpdir(), 'rovai-execution-web-test-'))
+  const root = await mkdtemp(join(tmpdir(), 'coaxi-execution-web-test-'))
   temporaryDirectories.push(root)
   return root
 }

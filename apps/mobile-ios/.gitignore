@@ -8,7 +8,7 @@ DerivedData/
 .DS_Store
 
 # XcodeGen generates the project from project.yml
-CodegiOS.xcodeproj/
+CoaxiiOS.xcodeproj/
 
 # Local signing configuration
 Config/Signing.local.xcconfig

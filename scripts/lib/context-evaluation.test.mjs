@@ -17,7 +17,7 @@ test('scope selects a general suite, a dedicated suite, or fails closed for unsu
   assert.throws(() => validateRegressionConfiguration({ schemaVersion: 1, team: [] }))
 })
 test('blocked-data Case accepts honest unknown wording while rejecting success claims and missing explanations', async () => {
-  const root = await mkdtemp(join(tmpdir(), 'rovai-blocked-case-'))
+  const root = await mkdtemp(join(tmpdir(), 'coaxi-blocked-case-'))
   try {
     const suite = JSON.parse(await readFile('qualification/context-regression/suite.json', 'utf8'))
     const verifier = resolve('qualification/context-regression', suite.cases.find(item => item.id === 'DEMO-111').directory, 'verifier.mjs')

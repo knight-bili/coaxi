@@ -34,7 +34,7 @@ function builtin(operation = 'thread.message.send', input: unknown = { recipient
   }
 }
 
-function shell(command = "rovai send --to agent-5 --body 'message'", result: unknown = sent): LiveRuntimeEvent {
+function shell(command = "coaxi send --to agent-5 --body 'message'", result: unknown = sent): LiveRuntimeEvent {
   return {
     id: 'shell-event', agentRunId: 'run-1', eventType: 'activity.completed', createdAt: '2026-09-12T00:00:02Z',
     canonical: canonical('shell-1', { activityDomain: 'shell', semanticKind: 'shell.execute',
@@ -50,11 +50,11 @@ function steps(events: LiveRuntimeEvent[]): ExecutionStep[] {
 
 describe('Built-in input presentation', () => {
   it('uses the CLI catalog for all display names without changing internal identities', () => {
-    const source = readFileSync('crates/rovai-core/src/builtin_tool_transport.rs', 'utf8')
+    const source = readFileSync('crates/coaxi-core/src/builtin_tool_transport.rs', 'utf8')
     const identities = [...source.matchAll(/BuiltinToolCliIdentity\s*\{\s*operation: "([^"]+)",\s*group: "([^"]+)",\s*action: "([^"]*)"/gu)]
     expect(identities).toHaveLength(36)
     expect(BUILTIN_CLI_NAMES).toEqual(Object.fromEntries(identities.map(([, operation, group, action]) => [
-      operation, ['rovai', group, action].filter(Boolean).join(' ')
+      operation, ['coaxi', group, action].filter(Boolean).join(' ')
     ])))
     for (const [operation, name] of Object.entries(BUILTIN_CLI_NAMES)) {
       const [step] = steps([builtin(operation)])
@@ -76,7 +76,7 @@ describe('Built-in input presentation', () => {
         threadId: 'camp-1', runId: 'run-1', runStatus: 'running', step,
         completeEvidence: { id: 'blob-result' } as PresentableExecutionEvidence, onFileOpenError: () => {}
       }))
-      expect(markup).toContain('rovai task update')
+      expect(markup).toContain('coaxi task update')
       expect(markup).toContain('<details')
       expect(markup).not.toMatch(/RAW_|PRIVATE_|DO_NOT_SHOW_ERROR|messageId/)
     })
@@ -111,19 +111,19 @@ describe('Built-in input presentation', () => {
   })
 })
 
-describe('Rovai Shell carrier presentation', () => {
+describe('Coaxi Shell carrier presentation', () => {
   it.each([
-    ["rovai send --public-only --body 'message with spaces'", "rovai send --public-only --body 'message with spaces'"],
-    ['rovai send --body="message" --to agent-5', 'rovai send --body="message" --to agent-5'],
-    ["rovai send 'message' --input-file /tmp/request.json", "rovai send 'message' --input-file /tmp/request.json"],
-    ["rovai send --body 'line one\nline two' && git status", "rovai send --body 'line one line two' && git status"],
-    ["rovai send <<'JSON'\n{\"body\":\"message\",\"publicOnly\":true}\nJSON", "rovai send <<'JSON' ; {\"body\":\"message\",\"publicOnly\":true} ; JSON"],
-    ["git status && rovai send <<'JSON'\n{\"body\":\"message\"}\nJSON\npwd", "git status && rovai send <<'JSON' ; {\"body\":\"message\"} ; JSON ; pwd"],
-    ["rovai task get <<JSON && git status\n{\"taskId\":\"task-1\"}\nJSON", "rovai task get <<JSON && git status ; {\"taskId\":\"task-1\"} ; JSON"],
-    ["rovai send <<-'JSON'\n\t{\"body\":\"message\"}\n\tJSON", "rovai send <<-'JSON' ; {\"body\":\"message\"} ; JSON"],
-    ["rovai send <<'JSON'\n{\"body\":\"unfinished\"}", "rovai send <<'JSON' ; {\"body\":\"unfinished\"}"],
-    ["rovai send <<< '{\"body\":\"message\"}' && pwd", "rovai send <<< '{\"body\":\"message\"}' && pwd"],
-    ["printf '%s' 'independent' && rovai send --body 'message'", "printf '%s' 'independent' && rovai send --body 'message'"]
+    ["coaxi send --public-only --body 'message with spaces'", "coaxi send --public-only --body 'message with spaces'"],
+    ['coaxi send --body="message" --to agent-5', 'coaxi send --body="message" --to agent-5'],
+    ["coaxi send 'message' --input-file /tmp/request.json", "coaxi send 'message' --input-file /tmp/request.json"],
+    ["coaxi send --body 'line one\nline two' && git status", "coaxi send --body 'line one line two' && git status"],
+    ["coaxi send <<'JSON'\n{\"body\":\"message\",\"publicOnly\":true}\nJSON", "coaxi send <<'JSON' ; {\"body\":\"message\",\"publicOnly\":true} ; JSON"],
+    ["git status && coaxi send <<'JSON'\n{\"body\":\"message\"}\nJSON\npwd", "git status && coaxi send <<'JSON' ; {\"body\":\"message\"} ; JSON ; pwd"],
+    ["coaxi task get <<JSON && git status\n{\"taskId\":\"task-1\"}\nJSON", "coaxi task get <<JSON && git status ; {\"taskId\":\"task-1\"} ; JSON"],
+    ["coaxi send <<-'JSON'\n\t{\"body\":\"message\"}\n\tJSON", "coaxi send <<-'JSON' ; {\"body\":\"message\"} ; JSON"],
+    ["coaxi send <<'JSON'\n{\"body\":\"unfinished\"}", "coaxi send <<'JSON' ; {\"body\":\"unfinished\"}"],
+    ["coaxi send <<< '{\"body\":\"message\"}' && pwd", "coaxi send <<< '{\"body\":\"message\"}' && pwd"],
+    ["printf '%s' 'independent' && coaxi send --body 'message'", "printf '%s' 'independent' && coaxi send --body 'message'"]
   ])('preserves the complete message/input carrier: %s', (command, expected) => {
     const [step] = steps([shell(command)])
     expect(executionStepPublicTitle(step)).toBe(expected)
@@ -137,27 +137,27 @@ describe('Rovai Shell carrier presentation', () => {
     expect(steps(events).map(step => step.id)).toEqual(['core-1'])
     expect(steps(events)[0]).toMatchObject({
       builtinOperation: 'thread.message.send', detailOperationId: 'shell-1',
-      activityDomain: 'tool', toolName: 'thread.message.send', iconKind: 'rovai',
-      detail: `$ rovai send --to agent-5 --body 'message'\n${JSON.stringify(sent)}`
+      activityDomain: 'tool', toolName: 'thread.message.send', iconKind: 'coaxi',
+      detail: `$ coaxi send --to agent-5 --body 'message'\n${JSON.stringify(sent)}`
     })
-    expect(executionStepPublicTitle(steps(events)[0])).toBe("rovai send --to agent-5 --body 'message'")
+    expect(executionStepPublicTitle(steps(events)[0])).toBe("coaxi send --to agent-5 --body 'message'")
     expect(JSON.stringify(events)).toBe(before)
-    expect(steps([builtin(), shell("rovai send <<'JSON'\n{\"body\":\"message\"}\nJSON")])).toHaveLength(1)
-    expect(steps([builtin(), shell("rovai send --body '正文中的 `code`、$(literal) 与 <tag> 只是文本'")])).toHaveLength(1)
-    expect(steps([builtin(), shell("rovai send <<'JSON'\n{\"body\":\"`code` 与 $(literal)\"}\nJSON")])).toHaveLength(1)
-    expect(steps([builtin(), shell("rovai send <<<'{\"body\":\"`code`\"}'")])).toHaveLength(1)
+    expect(steps([builtin(), shell("coaxi send <<'JSON'\n{\"body\":\"message\"}\nJSON")])).toHaveLength(1)
+    expect(steps([builtin(), shell("coaxi send --body '正文中的 `code`、$(literal) 与 <tag> 只是文本'")])).toHaveLength(1)
+    expect(steps([builtin(), shell("coaxi send <<'JSON'\n{\"body\":\"`code` 与 $(literal)\"}\nJSON")])).toHaveLength(1)
+    expect(steps([builtin(), shell("coaxi send <<<'{\"body\":\"`code`\"}'")])).toHaveLength(1)
     const task = { taskId: 'task-1', title: 'Task', status: 'open', assigneeAgentId: null, internalFact: true }
     const { internalFact: _, ...cliTask } = task
-    expect(steps([builtin('team.create_task', { title: 'Task' }, task), shell("rovai task create --title Task", cliTask)])).toHaveLength(1)
+    expect(steps([builtin('team.create_task', { title: 'Task' }, task), shell("coaxi task create --title Task", cliTask)])).toHaveLength(1)
     const pagedShell = shell()
-    pagedShell.payload = { item: { type: 'commandExecution', command: 'rovai send --body message', status: 'completed' }, executionWindowBuiltinOperation: 'thread.message.send' }
+    pagedShell.payload = { item: { type: 'commandExecution', command: 'coaxi send --body message', status: 'completed' }, executionWindowBuiltinOperation: 'thread.message.send' }
     expect(steps([pagedShell])).toEqual([])
     const pagedCore = builtin()
     delete (pagedCore.payload as Record<string, unknown>).coreEnvelope
     expect(steps([pagedCore, pagedShell])[0]).toMatchObject({
-      id: 'core-1', detailOperationId: 'shell-1', detail: '$ rovai send --body message'
+      id: 'core-1', detailOperationId: 'shell-1', detail: '$ coaxi send --body message'
     })
-    pagedShell.payload = { item: { type: 'commandExecution', command: 'rovai send --body message && git status', status: 'completed' }, executionWindowBuiltinOperation: 'thread.message.send' }
+    pagedShell.payload = { item: { type: 'commandExecution', command: 'coaxi send --body message && git status', status: 'completed' }, executionWindowBuiltinOperation: 'thread.message.send' }
     expect(steps([pagedShell])).toHaveLength(1)
   })
 
@@ -181,7 +181,7 @@ describe('Rovai Shell carrier presentation', () => {
   it('folds a digest-matched CLI with adjacent coalesced Shell and Core rows', () => {
     const core = builtin()
     core.canonical = canonical('core-1', { firstEvidenceSequence: 2, lastEvidenceSequence: 2 })
-    const carrier = shell('/bin/zsh -lc "rovai send --public-only --input-file /tmp/request.json"')
+    const carrier = shell('/bin/zsh -lc "coaxi send --public-only --input-file /tmp/request.json"')
     carrier.canonical = canonical('shell-1', {
       activityDomain: 'shell', semanticKind: 'shell.execute', toolName: 'commandExecution',
       sourceAuthority: 'runtime', credibility: 'runtime_structured',
@@ -192,7 +192,7 @@ describe('Rovai Shell carrier presentation', () => {
 
     expect(steps([core, carrier]).map(step => [step.id, step.detailOperationId]))
       .toEqual([['core-1', 'shell-1']])
-    expect(executionStepPublicTitle(steps([core, carrier])[0])).toContain('rovai send --public-only')
+    expect(executionStepPublicTitle(steps([core, carrier])[0])).toContain('coaxi send --public-only')
 
     carrier.canonical = { ...carrier.canonical!, firstEvidenceSequence: 1, lastEvidenceSequence: 1 }
     expect(steps([carrier, core]).map(step => [step.id, step.detailOperationId]))
@@ -212,22 +212,22 @@ describe('Rovai Shell carrier presentation', () => {
   })
 
   it('folds a Trae runtime.action CLI carrier while retaining a separate help command', () => {
-    const help = shell('rovai send --help')
+    const help = shell('coaxi send --help')
     help.eventType = 'runtime.action'
     help.executionEpoch = 1
     help.canonical = canonical('help-shell', { activityDomain: 'shell', semanticKind: 'shell.execute',
       sourceAuthority: 'runtime', credibility: 'runtime_structured',
       firstEvidenceSequence: 6, lastEvidenceSequence: 6 })
-    help.payload = { kind: 'execute', input: 'rovai send --help', output: 'help text', status: 'completed',
+    help.payload = { kind: 'execute', input: 'coaxi send --help', output: 'help text', status: 'completed',
       resultDigest: 'help-digest' }
 
-    const carrier = shell("rovai send --public-only --body 'hello'")
+    const carrier = shell("coaxi send --public-only --body 'hello'")
     carrier.eventType = 'runtime.action'
     carrier.executionEpoch = 1
     carrier.canonical = canonical('shell-1', { activityDomain: 'shell', semanticKind: 'shell.execute',
       sourceAuthority: 'runtime', credibility: 'runtime_structured',
       firstEvidenceSequence: 7, lastEvidenceSequence: 7 })
-    carrier.payload = { kind: 'execute', input: "rovai send --public-only --body 'hello'",
+    carrier.payload = { kind: 'execute', input: "coaxi send --public-only --body 'hello'",
       output: JSON.stringify(sent), status: 'completed', resultDigest: 'same-agent-output' }
 
     const core = builtin()
@@ -241,7 +241,7 @@ describe('Rovai Shell carrier presentation', () => {
 
   it('preserves multiline input, long values and complete JSON output on the one retained Tool', () => {
     const body = `line one\n  line two ${'long-value-'.repeat(500)} SECRET_TEST_VALUE`
-    const command = `rovai memory write --body '${body}'`
+    const command = `coaxi memory write --body '${body}'`
     const result = { body, nested: { password: 'TEST_PASSWORD', token: 'TEST_TOKEN' }, count: 123 }
     const events = [builtin('memory.write', {}, result), shell(command, result)]
     const [step] = steps(events)
@@ -260,7 +260,7 @@ describe('Rovai Shell carrier presentation', () => {
 
   it('does not borrow a window carrier for an ambiguous or unverified Core identity', () => {
     const pagedShell = shell()
-    pagedShell.payload = { item: { type: 'commandExecution', command: 'rovai send --body message' }, executionWindowBuiltinOperation: 'thread.message.send' }
+    pagedShell.payload = { item: { type: 'commandExecution', command: 'coaxi send --body message' }, executionWindowBuiltinOperation: 'thread.message.send' }
     const second = { ...builtin(), canonical: canonical('core-2') }
     expect(steps([builtin(), second, pagedShell]).every(step => step.detailOperationId === undefined)).toBe(true)
     const unverified = { ...builtin(), canonical: canonical('core-1', { credibility: 'runtime_structured' }) }
@@ -280,9 +280,9 @@ describe('Rovai Shell carrier presentation', () => {
     expect(steps([started, builtin(), firstShell, second, secondShell]).map(step => step.id)).toEqual(['core-1', 'core-2'])
   })
 
-  it.each(['rovai send --help', 'rovai --version', "rovai send --body 'message' && git status",
-    "rovai send --body 'message' > /tmp/output.json", 'rovai send --body "$(pwd)"', "rovai send <<JSON\n{\"body\":\"$(pwd)\"}\nJSON",
-    "rovai send <<JSON\n{\"body\":\"incomplete\"}", "echo 'rovai send'"])(
+  it.each(['coaxi send --help', 'coaxi --version', "coaxi send --body 'message' && git status",
+    "coaxi send --body 'message' > /tmp/output.json", 'coaxi send --body "$(pwd)"', "coaxi send <<JSON\n{\"body\":\"$(pwd)\"}\nJSON",
+    "coaxi send <<JSON\n{\"body\":\"incomplete\"}", "echo 'coaxi send'"])(
     'retains Shell work without a pure proven carrier: %s', command => {
       expect(steps([builtin(), shell(command)])).toHaveLength(2)
     })

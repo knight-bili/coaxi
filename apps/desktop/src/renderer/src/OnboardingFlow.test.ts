@@ -246,8 +246,8 @@ function healthWithRuntime(
   admission: RuntimePlatformAdmission | null
 ): HealthStatus {
   return {
-    core: { ok: true, version: 'test', dataDir: '/tmp/rovai' },
-    database: { ok: true, path: '/tmp/rovai/rovai.sqlite' },
+    core: { ok: true, version: 'test', dataDir: '/tmp/coaxi' },
+    database: { ok: true, path: '/tmp/coaxi/coaxi.sqlite' },
     git: { installed: false, version: null },
     hostPlatform: 'macos-arm64',
     runtimeCatalog: [],

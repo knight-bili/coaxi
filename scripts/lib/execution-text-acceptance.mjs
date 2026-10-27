@@ -15,15 +15,15 @@ export async function acceptExecutionText({ request, workspace, databasePath, wa
     memberAgentIds: ['agent_1'], defaultLeadAgentId: 'agent_1',
     body: [
       'Run this small local acceptance in exactly this order:',
-      'All three commentary markers A, B and C are mandatory. Your first commentary must start with ROVAI_BODY_A; do not skip it or combine it with a tool call.',
-      '1. Emit a commentary paragraph beginning ROVAI_BODY_A about checking the fixture.',
+      'All three commentary markers A, B and C are mandatory. Your first commentary must start with COAXI_BODY_A; do not skip it or combine it with a tool call.',
+      '1. Emit a commentary paragraph beginning COAXI_BODY_A about checking the fixture.',
       '2. Use one local shell/read tool to read README.md.',
-      '3. Emit a separate commentary paragraph beginning ROVAI_BODY_B describing the result.',
+      '3. Emit a separate commentary paragraph beginning COAXI_BODY_B describing the result.',
       '4. Use another local shell/read tool to count the bytes in README.md.',
-      '5. Emit a separate commentary paragraph beginning ROVAI_BODY_C explaining completion.',
+      '5. Emit a separate commentary paragraph beginning COAXI_BODY_C explaining completion.',
       'Each commentary paragraph should be about 150 words, and must be actual narration, not a tool argument.',
       'Do not alter files, use the network, delegate, or contact other Camps/members.',
-      'Then send the short final public answer "Local text-block acceptance finished" to this Camp using the normal Rovai publication route.'
+      'Then send the short final public answer "Local text-block acceptance finished" to this Camp using the normal Coaxi publication route.'
     ].join(' '), purpose: 'Verify every narration block, tool ordering and fresh-run SQLite write volume.'
   })
   const threadId = sent.payload?.threadId
@@ -58,7 +58,7 @@ export async function acceptExecutionText({ request, workspace, databasePath, wa
       : item.payload
     bodies.push({ ...item, payload })
   }
-  const markers = ['ROVAI_BODY_A', 'ROVAI_BODY_B', 'ROVAI_BODY_C'].map((marker) => {
+  const markers = ['COAXI_BODY_A', 'COAXI_BODY_B', 'COAXI_BODY_C'].map((marker) => {
     // A paragraph may refer to another step's marker; its own identity is the prefix.
     const found = bodies.filter((item) => item.payload.text?.trimStart().startsWith(marker))
     if (found.length !== 1) throw new Error(`Expected exactly one full block for ${marker}, found ${found.length}`)

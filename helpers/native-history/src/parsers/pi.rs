@@ -30,13 +30,13 @@ use crate::parsers::{
 /// through pi's tilde rule ([`expand_pi_tilde`]), because pi reads them through
 /// `expandTildePath`.
 ///
-/// That is pi's own documented order minus its `--session-dir` flag, which codeg
+/// That is pi's own documented order minus its `--session-dir` flag, which coaxi
 /// never passes (`docs/settings.md`: "precedence is `--session-dir`,
 /// `PI_CODING_AGENT_SESSION_DIR`, then `sessionDir` in settings.json"). The
 /// settings layer is not optional garnish: pi-acp reads it too
 /// (`getPiSessionsDir` → `readSessionDirFromSettings`), so a user who sets
 /// `sessionDir` and is missing this layer gets a pi that resumes fine while
-/// codeg's history list stays permanently empty.
+/// coaxi's history list stays permanently empty.
 ///
 /// Mirrors the `resolve_*`/`resolve_*_from` split of `parsers::kimi_code` so the
 /// environment lookup is a pure function over its inputs (testable without
@@ -84,7 +84,7 @@ pub(crate) fn resolve_pi_agent_dir() -> PathBuf {
 /// `contextWindow: definition.contextWindow ?? 128000`. The entry REPLACES any
 /// built-in model of the same id (`applyModelsJson` upserts by id and only
 /// borrows `api`/`baseUrl` from the one it replaces), so 128K is what pi runs
-/// with — not the built-in catalog's number, and not codeg's name table's.
+/// with — not the built-in catalog's number, and not coaxi's name table's.
 const PI_DEFAULT_MODEL_CONTEXT_WINDOW: u64 = 128_000;
 
 /// The context window `<agent_dir>/models.json` settles on for a model.
@@ -234,7 +234,7 @@ fn expand_pi_tilde(value: &str, home_dir: Option<&Path>) -> PathBuf {
 /// resolves a single sessions root with no workspace in hand.
 ///
 /// Guessing is worse than declining. Resolving a relative value against the agent
-/// dir (which is what pi-acp's own discovery helper does) would point codeg at a
+/// dir (which is what pi-acp's own discovery helper does) would point coaxi at a
 /// directory nobody writes to AND would shadow the default — costing the user the
 /// history pi wrote to `<agent_dir>/sessions` before they ever set the option.
 /// Falling through keeps that history listed.
@@ -958,7 +958,7 @@ fn parse_branch_summary(sp: &mut SessionParse, value: &Value, ts: DateTime<Utc>,
 
 /// An extension-injected message that DOES participate in the LLM context
 /// (`custom_message`). `display: false` is the extension asking for it to stay
-/// hidden in the TUI, and codeg honors that rather than second-guessing it.
+/// hidden in the TUI, and coaxi honors that rather than second-guessing it.
 fn parse_custom_message(sp: &mut SessionParse, value: &Value, ts: DateTime<Utc>, idx: usize) {
     if !value
         .get("display")

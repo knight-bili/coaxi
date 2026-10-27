@@ -13,20 +13,20 @@ if (process.platform !== 'darwin') {
 
 const root = resolve(import.meta.dirname, '..')
 const appPath = resolve(process.argv[2] ?? join(root, 'dist', 'mac-arm64', 'Coaxi.app'))
-const requestedFixtureRoot = resolve(process.env.ROVAI_BOOTSTRAP_ACCEPT_FIXTURE_ROOT
-  ?? await mkdtemp(join(tmpdir(), 'rovai-bootstrap-shell-ui-accept-')))
+const requestedFixtureRoot = resolve(process.env.COAXI_BOOTSTRAP_ACCEPT_FIXTURE_ROOT
+  ?? await mkdtemp(join(tmpdir(), 'coaxi-bootstrap-shell-ui-accept-')))
 await mkdir(requestedFixtureRoot, { recursive: true })
 // Core rejects symlink components in managed roots; macOS /tmp and /var are aliases.
 const fixtureRoot = await realpath(requestedFixtureRoot)
 const dataDir = assertUserDataIsIsolated(join(fixtureRoot, 'user-data'))
-const outputDir = resolve(process.env.ROVAI_BOOTSTRAP_ACCEPT_OUTPUT_DIR
+const outputDir = resolve(process.env.COAXI_BOOTSTRAP_ACCEPT_OUTPUT_DIR
   ?? join(fixtureRoot, 'captures'))
-const port = Number(process.env.ROVAI_BOOTSTRAP_ACCEPT_DEBUG_PORT ?? 9531)
-const acceptanceScope = process.env.ROVAI_BOOTSTRAP_ACCEPT_SCOPE ?? 'all'
+const port = Number(process.env.COAXI_BOOTSTRAP_ACCEPT_DEBUG_PORT ?? 9531)
+const acceptanceScope = process.env.COAXI_BOOTSTRAP_ACCEPT_SCOPE ?? 'all'
 if (!['all', 'bootstrap'].includes(acceptanceScope)) {
   throw new Error(`Unsupported Bootstrap acceptance scope: ${acceptanceScope}`)
 }
-const databasePath = join(dataDir, 'rovai.sqlite')
+const databasePath = join(dataDir, 'coaxi.sqlite')
 const retainedAuthority = Buffer.from('retained unknown authority\n', 'utf8')
 
 await mkdir(dataDir, { recursive: true })
@@ -37,7 +37,7 @@ let running = null
 try {
   running = await launchApp()
   await waitForSelector(running.cdp, '.bootstrap-shell', 45_000)
-  await waitForExpression(running.cdp, `window.rovai.supervisor.getSnapshot()
+  await waitForExpression(running.cdp, `window.coaxi.supervisor.getSnapshot()
     .then((snapshot) => snapshot.fullCoreState === 'blocked')`, 45_000)
 
   const initial = await inspectBootstrap(running.cdp)
@@ -49,12 +49,12 @@ try {
   const dayCapture = join(outputDir, 'bootstrap-blocked-day-1040x700.png')
   await capture(running.cdp, dayCapture)
 
-  const retried = await evaluate(running.cdp, `window.rovai.supervisor.getSnapshot().then(
+  const retried = await evaluate(running.cdp, `window.coaxi.supervisor.getSnapshot().then(
     async (before) => {
-      await window.rovai.supervisor.retryFullCore()
+      await window.coaxi.supervisor.retryFullCore()
       return before.generation
     })`, true)
-  await waitForExpression(running.cdp, `window.rovai.supervisor.getSnapshot().then(
+  await waitForExpression(running.cdp, `window.coaxi.supervisor.getSnapshot().then(
     (snapshot) => snapshot.generation > ${Number(retried)}
       && snapshot.fullCoreState === 'blocked'
       && snapshot.restartAttempt === 0)`, 45_000)
@@ -88,7 +88,7 @@ try {
 
   const englishDataDir = assertUserDataIsIsolated(join(fixtureRoot, 'english-user-data'))
   await mkdir(join(englishDataDir, 'managed-skill-library'), { recursive: true })
-  await writeFile(join(englishDataDir, 'rovai.sqlite'), retainedAuthority, { flag: 'wx', mode: 0o600 })
+  await writeFile(join(englishDataDir, 'coaxi.sqlite'), retainedAuthority, { flag: 'wx', mode: 0o600 })
   await writeFile(join(englishDataDir, 'general-preferences.json'), `${JSON.stringify({
     schemaVersion: 5,
     interfaceLanguage: 'en',
@@ -105,9 +105,9 @@ try {
   await waitForSelector(running.cdp, '.bootstrap-shell', 45_000)
   await waitForExpression(running.cdp, `document.documentElement.lang === 'en'
     && document.querySelector('.bootstrap-authority-card h1')?.textContent === 'Session temporarily unavailable'
-    && window.rovai.supervisor.getSnapshot().then((snapshot) => snapshot.fullCoreState === 'blocked')`, 45_000)
+    && window.coaxi.supervisor.getSnapshot().then((snapshot) => snapshot.fullCoreState === 'blocked')`, 45_000)
   const locallyReadLanguage = await evaluate(running.cdp,
-    `window.rovai.desktopSession.getInterfaceLanguage()`, true)
+    `window.coaxi.desktopSession.getInterfaceLanguage()`, true)
   assert(locallyReadLanguage === 'en', `Bootstrap language read did not return the saved preference: ${locallyReadLanguage}`)
   await setTheme(running.cdp, 'day')
   await wait(350)
@@ -177,8 +177,8 @@ try {
 async function verifyCoreCrashRecovery() {
   const recoveryDataDir = assertUserDataIsIsolated(join(fixtureRoot, 'crash-recovery-user-data'))
   await mkdir(recoveryDataDir, { recursive: false })
-  const coreExecutable = await realpath(join(appPath, 'Contents', 'Resources', 'bin', 'rovai-core'))
-  const hostExecutable = await realpath(join(appPath, 'Contents', 'Resources', 'bin', 'rovai-host'))
+  const coreExecutable = await realpath(join(appPath, 'Contents', 'Resources', 'bin', 'coaxi-core'))
+  const hostExecutable = await realpath(join(appPath, 'Contents', 'Resources', 'bin', 'coaxi-host'))
   const core = startQualificationCore({
     coreExecutable,
     dataDirectory: recoveryDataDir,
@@ -196,7 +196,7 @@ async function verifyCoreCrashRecovery() {
       const stopped = await core.stop()
       assert(stopped.code === 0, `Fixture Core failed: ${JSON.stringify(stopped)}`)
     }
-    const recoveryDatabase = join(recoveryDataDir, 'rovai.sqlite')
+    const recoveryDatabase = join(recoveryDataDir, 'coaxi.sqlite')
     const fixture = new DatabaseSync(recoveryDatabase)
     try {
       assert(fixture.prepare('PRAGMA journal_mode').get().journal_mode === 'wal',
@@ -223,21 +223,21 @@ async function verifyCoreCrashRecovery() {
     }
 
     application = await launchApp(recoveryDataDir)
-    await waitForExpression(application.cdp, `window.rovai.supervisor.getSnapshot()
+    await waitForExpression(application.cdp, `window.coaxi.supervisor.getSnapshot()
       .then(snapshot => snapshot.fullCoreState === 'ready')`, 45_000)
     await waitForSelector(application.cdp, '.app-shell', 45_000)
     await evaluate(application.cdp,
       "void (window.__workspaceBeforeCrash = document.querySelector('.app-shell'))")
-    const before = await evaluate(application.cdp, 'window.rovai.supervisor.getSnapshot()', true)
+    const before = await evaluate(application.cdp, 'window.coaxi.supervisor.getSnapshot()', true)
     const member = await evaluate(application.cdp,
-      `window.rovai.request('members.get', { agentId: 'agent_1' })`, true)
+      `window.coaxi.request('members.get', { agentId: 'agent_1' })`, true)
     const walPath = `${recoveryDatabase}-wal`
     const walBefore = await stat(walPath).then(metadata => metadata.size)
 
     await evaluate(application.cdp, `(() => {
       const member = ${JSON.stringify(member)}
       window.__crashWriteSettled = false
-      window.__crashWrite = window.rovai.request('members.update', {
+      window.__crashWrite = window.coaxi.request('members.update', {
         commandId: crypto.randomUUID(),
         command: {
           agentId: member.agentId, expectedVersion: member.version,
@@ -279,7 +279,7 @@ async function verifyCoreCrashRecovery() {
       && failure.details?.signal === 'SIGKILL',
     `Renderer lost structured crash failure fields: ${JSON.stringify(interrupted)}`)
 
-    await waitForExpression(application.cdp, `window.rovai.supervisor.getSnapshot().then(
+    await waitForExpression(application.cdp, `window.coaxi.supervisor.getSnapshot().then(
       snapshot => snapshot.generation > ${before.generation}
         && snapshot.fullCoreState === 'ready'
         && snapshot.capabilities.authoritativeWorkspace
@@ -288,9 +288,9 @@ async function verifyCoreCrashRecovery() {
     assert(await evaluate(application.cdp, `!window.__workspaceBeforeCrash.isConnected
       && window.__workspaceBeforeCrash !== document.querySelector('.app-shell')`),
     'The authoritative workspace tree was not unmounted and rebuilt for the new generation')
-    const after = await evaluate(application.cdp, 'window.rovai.supervisor.getSnapshot()', true)
+    const after = await evaluate(application.cdp, 'window.coaxi.supervisor.getSnapshot()', true)
     const recoveredMember = await evaluate(application.cdp,
-      `window.rovai.request('members.get', { agentId: 'agent_1' })`, true)
+      `window.coaxi.request('members.get', { agentId: 'agent_1' })`, true)
     assert(recoveredMember.displayName === member.displayName
       && recoveredMember.version === member.version,
     'The interrupted member update was committed or replayed')
@@ -329,7 +329,7 @@ async function verifyOptionalSubsystemRecovery() {
   const optionalDataDir = assertUserDataIsIsolated(join(fixtureRoot, 'optional-subsystem-user-data'))
   await mkdir(optionalDataDir)
   const seed = startQualificationCore({
-    coreExecutable: await realpath(join(appPath, 'Contents', 'Resources', 'bin', 'rovai-core')),
+    coreExecutable: await realpath(join(appPath, 'Contents', 'Resources', 'bin', 'coaxi-core')),
     dataDirectory: optionalDataDir,
     workingDirectory: root,
     runtimeCacheDirectory: join(fixtureRoot, 'runtime-cache'),
@@ -355,18 +355,18 @@ async function verifyOptionalSubsystemRecovery() {
     await rename(fault, `${fault}.original`)
     await mkdir(fault)
     application = await launchApp(optionalDataDir)
-    await waitForExpression(application.cdp, `window.rovai.supervisor.getSnapshot().then(snapshot =>
+    await waitForExpression(application.cdp, `window.coaxi.supervisor.getSnapshot().then(snapshot =>
       snapshot.fullCoreState === 'ready'
       && snapshot.coreSubsystems.some(subsystem => subsystem.id === 'mcp' && subsystem.state === 'degraded')
       && snapshot.coreSubsystems.every(subsystem => subsystem.state !== 'initializing'))`, 45_000)
     await waitForSelector(application.cdp, '.app-shell:not(.onboarding-app-shell)', 45_000)
     await waitForSelector(application.cdp, '.core-subsystem-notice', 45_000)
-    const before = await evaluate(application.cdp, 'window.rovai.supervisor.getSnapshot()', true)
-    assert((await evaluate(application.cdp, `window.rovai.request('members.list')`, true)).length > 0,
+    const before = await evaluate(application.cdp, 'window.coaxi.supervisor.getSnapshot()', true)
+    assert((await evaluate(application.cdp, `window.coaxi.request('members.list')`, true)).length > 0,
       'Member authority is unavailable while MCP is degraded')
-    await evaluate(application.cdp, 'window.rovai.request("navigation.snapshot")', true)
+    await evaluate(application.cdp, 'window.coaxi.request("navigation.snapshot")', true)
     const blocked = await evaluate(application.cdp,
-      `window.rovai.request('mcp.config.get').then(() => null, failure => failure)`, true)
+      `window.coaxi.request('mcp.config.get').then(() => null, failure => failure)`, true)
     assert(blocked.code === 'subsystem_unavailable' && blocked.details.subsystem === 'mcp'
       && blocked.generation === before.generation && blocked.retryable,
     'Renderer lost the structured feature failure across contextBridge')
@@ -397,17 +397,17 @@ async function verifyOptionalSubsystemRecovery() {
     await rename(fault, `${fault}.obstruction`)
     await rename(`${fault}.original`, fault)
     await evaluate(application.cdp, `document.querySelector('.core-subsystem-notice button').click()`)
-    await waitForExpression(application.cdp, `window.rovai.supervisor.getSnapshot().then(snapshot =>
+    await waitForExpression(application.cdp, `window.coaxi.supervisor.getSnapshot().then(snapshot =>
       snapshot.coreSubsystems.find(subsystem => subsystem.id === 'mcp')?.state === 'ready'
       && !document.querySelector('.core-subsystem-notice'))`, 45_000)
-    const after = await evaluate(application.cdp, 'window.rovai.supervisor.getSnapshot()', true)
+    const after = await evaluate(application.cdp, 'window.coaxi.supervisor.getSnapshot()', true)
     assert(after.generation === before.generation && after.restartAttempt === 0
       && after.capabilities.authoritativeWorkspace && after.capabilities.coreRequests,
     'Feature retry restarted or blocked Full Core')
     assert(await evaluate(application.cdp,
       'window.__authorityBeforeFeatureRetry === document.querySelector(".app-shell")'),
     'Feature retry remounted the authority workspace')
-    const recoveredMcpConfig = await evaluate(application.cdp, 'window.rovai.request("mcp.config.get")', true)
+    const recoveredMcpConfig = await evaluate(application.cdp, 'window.coaxi.request("mcp.config.get")', true)
     assert(recoveredMcpConfig.path === fault && recoveredMcpConfig.exists
       && !recoveredMcpConfig.fileIssue && !recoveredMcpConfig.permissionIssue
       && recoveredMcpConfig.configDigest === retainedMcpConfig.configDigest,
@@ -420,7 +420,7 @@ async function verifyOptionalSubsystemRecovery() {
 }
 
 async function killIsolatedCore(application, recoveryDataDir, coreExecutable) {
-  const owner = JSON.parse(await readFile(join(recoveryDataDir, '.rovai-core-instance.lock'), 'utf8'))
+  const owner = JSON.parse(await readFile(join(recoveryDataDir, '.coaxi-core-instance.lock'), 'utf8'))
   assert(Number.isSafeInteger(owner.processId) && owner.processId > 1,
     'The isolated Core lock has no valid process ID')
   assert(await realpath(owner.executablePath) === coreExecutable,
@@ -439,7 +439,7 @@ async function killIsolatedCore(application, recoveryDataDir, coreExecutable) {
 }
 
 async function inspectBootstrap(cdp) {
-  return evaluate(cdp, `window.rovai.supervisor.getSnapshot().then((snapshot) => {
+  return evaluate(cdp, `window.coaxi.supervisor.getSnapshot().then((snapshot) => {
     const shell = document.querySelector('.bootstrap-shell')
     const retry = document.querySelector('.bootstrap-actions .primary-button')
     const transitionDuration = getComputedStyle(retry ?? document.documentElement)
@@ -492,7 +492,7 @@ function assertBootstrapState(state, context) {
 
 async function setTheme(cdp, preference) {
   await evaluate(cdp,
-    `window.rovai.appearance.setPreference(${JSON.stringify(preference)})`, true)
+    `window.coaxi.appearance.setPreference(${JSON.stringify(preference)})`, true)
   await waitForExpression(cdp,
     `document.documentElement.dataset.theme === ${JSON.stringify(preference)}`)
 }
@@ -509,8 +509,8 @@ async function launchApp(userData = dataDir) {
     stdio: ['ignore', 'ignore', 'pipe'],
     env: {
       ...process.env,
-      ROVAI_ALLOW_ISOLATED_INSTANCE: '1',
-      ROVAI_DISABLE_AUTO_UPDATE_CHECKS: '1'
+      COAXI_ALLOW_ISOLATED_INSTANCE: '1',
+      COAXI_DISABLE_AUTO_UPDATE_CHECKS: '1'
     }
   })
   child.stderr.on('data', (chunk) => stderr.push(String(chunk)))

@@ -346,7 +346,7 @@ export class ChannelSettingsService {
     this.#hostPump = dependencies ? new AdaptiveChannelHostPump({
       run: () => this.#pumpOnce(),
       onError: (error) => {
-        console.warn(`[rovai] ${this.#profile.logLabel} outbox pump failed: ${channelFailureCode(error)}`)
+        console.warn(`[coaxi] ${this.#profile.logLabel} outbox pump failed: ${channelFailureCode(error)}`)
       },
       classifyCoreEvent: (event) => trackedExecutionCoreEventWake(event, (agentRunId) => {
         const state = this.#executionCardStates.get(agentRunId)
@@ -975,7 +975,7 @@ export class ChannelSettingsService {
         provisioned.ownerOpenId,
         agent.displayName
       ).catch((error) => {
-        console.warn(`[rovai] ${this.#profile.logLabel} member Bot welcome failed: ${channelFailureCode(error)}`)
+        console.warn(`[coaxi] ${this.#profile.logLabel} member Bot welcome failed: ${channelFailureCode(error)}`)
       })
       timing.recordTotal('ok')
       this.#finishQr()
@@ -1174,7 +1174,7 @@ export class ChannelSettingsService {
           provisioned.ownerOpenId,
           agent.displayName
         ).catch((error) => {
-          console.warn(`[rovai] ${this.#profile.logLabel} member Bot welcome failed: ${channelFailureCode(error)}`)
+          console.warn(`[coaxi] ${this.#profile.logLabel} member Bot welcome failed: ${channelFailureCode(error)}`)
         })
       }
       timing.recordTotal('ok')
@@ -1486,7 +1486,7 @@ export class ChannelSettingsService {
       appSecret: credential.appSecret,
       domain: this.#profile.sdkDomain,
       transport: 'websocket',
-      source: 'rovai-ai',
+      source: 'coaxi',
       includeRawEvent: true,
       handshakeTimeoutMs: 20_000,
       policy: { dmMode: 'open', requireMention: true, respondToMentionAll: false },
@@ -2320,7 +2320,7 @@ export class ChannelSettingsService {
             this.#hostPump?.wake()
           }
         }, (error) => {
-          console.warn(`[rovai] ${this.#profile.logLabel} aggregate recovery failed: ${channelFailureCode(error)}`)
+          console.warn(`[coaxi] ${this.#profile.logLabel} aggregate recovery failed: ${channelFailureCode(error)}`)
         }).finally(() => {
           if (this.#aggregateRecovery === recovery) this.#aggregateRecovery = null
         })
@@ -2336,7 +2336,7 @@ export class ChannelSettingsService {
             this.#hostPump?.wake()
           }
         }, (error) => {
-          console.warn(`[rovai] ${this.#profile.logLabel} roster sweep failed: ${channelFailureCode(error)}`)
+          console.warn(`[coaxi] ${this.#profile.logLabel} roster sweep failed: ${channelFailureCode(error)}`)
         }).finally(() => {
           if (this.#rosterSweep === sweep) this.#rosterSweep = null
         })
@@ -3226,13 +3226,13 @@ function projectSelectionOperation(payload: Record<string, unknown>): ProjectSel
 
 function projectCardAction(value: unknown, selectedOption?: string): ProjectCardAction | null {
   if (!isRecord(value)) return null
-  const action = value.rovaiAction === 'bind_project'
+  const action = value.coaxiAction === 'bind_project'
     ? 'bind'
-    : value.rovaiAction === 'start_quick_chat'
+    : value.coaxiAction === 'start_quick_chat'
       ? 'quick_chat'
-      : value.rovaiAction === 'cancel_binding'
+      : value.coaxiAction === 'cancel_binding'
         ? 'cancel'
-        : value.rovaiAction === 'refresh_projects'
+        : value.coaxiAction === 'refresh_projects'
           ? 'refresh'
           : null
   if (!action
@@ -3287,8 +3287,8 @@ function projectSelectionCard(input: {
   projectOptions: ProjectCardOption[]
   notice?: 'project_unavailable' | 'moved_to_conversation'
 }): Record<string, unknown> {
-  const actionValue = (rovaiAction: string, projectId?: string): Record<string, unknown> => ({
-    rovaiAction,
+  const actionValue = (coaxiAction: string, projectId?: string): Record<string, unknown> => ({
+    coaxiAction,
     pendingBindingId: input.pendingBindingId,
     expectedVersion: input.expectedVersion,
     nonce: input.nonce,

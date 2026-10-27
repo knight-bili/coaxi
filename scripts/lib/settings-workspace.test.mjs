@@ -14,7 +14,7 @@ const root = resolve(import.meta.dirname, '../..')
 const source = join(root, 'scripts/fixtures/settings-workspace')
 test('settings preserve channel actions, large-roster selection, sparse usage and failure recovery across themes and zoom', { timeout: 240_000 }, async t => {
   if (!admitElectronIntegrationTest(t)) return
-  const fixture = await mkdtemp(join(tmpdir(), 'rovai-settings-workspace-test-'))
+  const fixture = await mkdtemp(join(tmpdir(), 'coaxi-settings-workspace-test-'))
   let child, closed
   try {
     await build({ configFile: false, root: source, base: './', logLevel: 'error', plugins: [react()],
@@ -39,7 +39,7 @@ test('settings preserve channel actions, large-roster selection, sparse usage an
     assert.equal(JSON.parse(output.split('\n').find(line => line.startsWith('{'))).ok, true)
   } finally {
     if (child && child.exitCode === null && child.signalCode === null) { child.kill('SIGKILL'); await closed }
-    if (process.env.ROVAI_KEEP_SETTINGS_FIXTURE === '1') process.stdout.write(`Settings screenshots: ${fixture}\n`)
+    if (process.env.COAXI_KEEP_SETTINGS_FIXTURE === '1') process.stdout.write(`Settings screenshots: ${fixture}\n`)
     else await rm(fixture, { recursive: true, force: true })
   }
 })

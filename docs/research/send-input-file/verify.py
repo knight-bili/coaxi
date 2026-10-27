@@ -58,10 +58,10 @@ class ObservedProvider(p.Provider):
 
 
 p.server.RequestHandlerClass = ObservedProvider
-key = "v1-" + hashlib.sha256(b"rovai-runtime-camp-files-instance-v1\0" + str(data).encode()).hexdigest()
+key = "v1-" + hashlib.sha256(b"coaxi-runtime-camp-files-instance-v1\0" + str(data).encode()).hexdigest()
 core_args = ["--data-dir", str(data), "--skill-library-root", str(skills),
              "--mcp-config-path", str(data / "mcp.json"),
-             "--runtime-camp-files-root", str(host / ".rovai/instances" / key / "runtime-files")]
+             "--runtime-camp-files-root", str(host / ".coaxi/instances" / key / "runtime-files")]
 
 
 def digest(path):
@@ -77,7 +77,7 @@ evidence = {
     "codexVersion": subprocess.check_output([codex, "--version"], env=environment, text=True, timeout=15).strip(),
     "binarySha256": {label: digest(path.resolve(strict=True)) for label, path in {
         "baselineCore": options.baseline_core, "candidateCore": options.candidate_core,
-        "baselineCli": options.baseline_core.parent / "rovai", "candidateCli": options.candidate_core.parent / "rovai",
+        "baselineCli": options.baseline_core.parent / "coaxi", "candidateCli": options.candidate_core.parent / "coaxi",
         "codex": Path(codex)}.items()},
     "phases": [],
 }
@@ -120,7 +120,7 @@ async def main():
             helper = root / (phase + ".py")
             p.put(helper, f'''import json, os, subprocess
 from pathlib import Path
-command = [os.environ["ROVAI_AGENT_CLI"]]
+command = [os.environ["COAXI_AGENT_CLI"]]
 sent = subprocess.run(command + {args!r}, capture_output=True, text=True, timeout=10)
 assert sent.returncode == 0, (sent.returncode, sent.stdout, sent.stderr)
 result = json.loads(sent.stdout)
@@ -154,7 +154,7 @@ if {phase == "restored-json-and-new-help"!r}:
             matches = [message for message in published if message["id"] == receipt["messageId"]]
             assert len(matches) == 1 and matches[0]["body"] == body, matches
             assert len(published) == len(seen), "Unexpected extra publication"
-            with closing(sqlite3.connect(f"file:{data / 'rovai.sqlite'}?mode=ro", uri=True)) as database:
+            with closing(sqlite3.connect(f"file:{data / 'coaxi.sqlite'}?mode=ro", uri=True)) as database:
                 binding = database.execute("SELECT native_session_id,native_binding_id,native_binding_generation FROM conversation WHERE id=?",
                                            (run["conversationId"],)).fetchone()
                 bootstrap = database.execute("SELECT id,session_charter_blob_id,session_charter_digest FROM native_session_bootstrap_evidence WHERE conversation_id=?",

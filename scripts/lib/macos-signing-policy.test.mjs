@@ -17,7 +17,7 @@ const validDetails = [
   `TeamIdentifier=${TEAM_ID}`
 ].join('\n')
 const validRequirement = [
-  'designated => identifier "ai.rovai.desktop"',
+  'designated => identifier "ai.coaxi.desktop"',
   'and anchor apple generic',
   'and certificate 1[field.1.2.840.113635.100.6.2.6] /* exists */',
   'and certificate leaf[field.1.2.840.113635.100.6.1.13] /* exists */',

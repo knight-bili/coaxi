@@ -24,7 +24,7 @@ function argumentsFor(configuration, directory, extra = {}) {
 // Never inherit the calling Agent's thread/bridge identity or credential-bearing
 // application context. Authentication remains owned by the installed Codex CLI.
 function environment() {
-  return Object.fromEntries(Object.entries(process.env).filter(([key]) => (!key.startsWith('CODEX_') || key === 'CODEX_HOME') && !key.startsWith('ROVAI_')))
+  return Object.fromEntries(Object.entries(process.env).filter(([key]) => (!key.startsWith('CODEX_') || key === 'CODEX_HOME') && !key.startsWith('COAXI_')))
 }
 
 export function invokeCli(executable, args, input, timeoutMs) {

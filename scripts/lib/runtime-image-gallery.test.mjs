@@ -14,7 +14,7 @@ const root = resolve(import.meta.dirname, '../..')
 const source = join(root, 'scripts/fixtures/runtime-image-gallery')
 test('Runtime and attachment galleries use real decoding and a shared accessible lightbox', { timeout: 60_000 }, async (t) => {
   if (!admitElectronIntegrationTest(t)) return
-  const fixture = await mkdtemp(join(tmpdir(), 'rovai-image-gallery-test-'))
+  const fixture = await mkdtemp(join(tmpdir(), 'coaxi-image-gallery-test-'))
   let child
   let closed
   try {
@@ -37,7 +37,7 @@ test('Runtime and attachment galleries use real decoding and a shared accessible
     assert.equal(JSON.parse(output.split('\n').find(line => line.startsWith('{'))).ok, true)
   } finally {
     if (child && child.exitCode === null && child.signalCode === null) { child.kill('SIGKILL'); await closed }
-    if (process.env.ROVAI_KEEP_IMAGE_GALLERY_FIXTURE === '1') process.stdout.write(`Image gallery captures: ${fixture}\n`)
+    if (process.env.COAXI_KEEP_IMAGE_GALLERY_FIXTURE === '1') process.stdout.write(`Image gallery captures: ${fixture}\n`)
     else await rm(fixture, { recursive: true, force: true })
   }
 })

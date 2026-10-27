@@ -267,7 +267,7 @@ export async function createQualificationExecutionEnvironment(workspacePath, ove
     TEMP: temporaryDirectory,
     CI: '1',
     NO_COLOR: '1',
-    ROVAI_QUALIFICATION_VERIFIER_OFFLINE: '1',
+    COAXI_QUALIFICATION_VERIFIER_OFFLINE: '1',
     GIT_CONFIG_GLOBAL: join(environmentRoot, '.gitconfig'),
     NPM_CONFIG_USERCONFIG: join(environmentRoot, '.npmrc')
   }
@@ -323,7 +323,7 @@ export async function runHermeticNode(logicalCommand, {
     TZ: 'UTC',
     LANG: 'C',
     LC_ALL: 'C',
-    ROVAI_QUALIFICATION_VERIFIER_OFFLINE: '1'
+    COAXI_QUALIFICATION_VERIFIER_OFFLINE: '1'
   }
   const before = await treeManifest(absoluteWorkspace)
   try {

@@ -1,4 +1,4 @@
-// Adapted from Codeg aff1e6c canvas-board-preview.tsx; Apache-2.0: integration/licenses/codeg/LICENSE.
+// Adapted from Codeg aff1e6c canvas-board-preview.tsx; Apache-2.0: integration/licenses/component-a/LICENSE.
 import { memo } from 'react'
 import { Map as MapIcon } from 'lucide-react'
 import type { CanvasBoardPreviewRect } from '@contracts'

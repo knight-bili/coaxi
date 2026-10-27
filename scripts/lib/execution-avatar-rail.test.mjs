@@ -16,7 +16,7 @@ const source = join(root, 'scripts/fixtures/execution-avatar-rail')
 
 test('production execution popover preserves dismissal, selection, scrolling and navigation through native input', { timeout: 180_000 }, async (t) => {
   if (!admitElectronIntegrationTest(t)) return
-  const fixture = await mkdtemp(join(tmpdir(), 'rovai-execution-avatar-rail-'))
+  const fixture = await mkdtemp(join(tmpdir(), 'coaxi-execution-avatar-rail-'))
   let child
   let closed
   let passed = false
@@ -31,7 +31,7 @@ test('production execution popover preserves dismissal, selection, scrolling and
     const userData = assertUserDataIsIsolated(join(fixture, 'user-data'))
     await mkdir(join(userData, 'managed-skill-library'), { recursive: true })
     process.stdout.write(`Isolated execution rail fixture: ${fixture}\n`)
-    const dismissalOnly = process.env.ROVAI_EXECUTION_POPOVER_DISMISSAL_ONLY === '1'
+    const dismissalOnly = process.env.COAXI_EXECUTION_POPOVER_DISMISSAL_ONLY === '1'
     child = spawn(electron, [join(source, 'main.cjs'), join(fixture, 'renderer/index.html'), userData,
       ...(dismissalOnly ? ['--dismissal-only'] : []),
       ...(process.platform === 'linux' ? ['--no-sandbox'] : [])], {
@@ -54,7 +54,7 @@ test('production execution popover preserves dismissal, selection, scrolling and
       child.kill('SIGKILL')
       await closed
     }
-    if (!passed || process.env.ROVAI_KEEP_EXECUTION_AVATAR_FIXTURE === '1') {
+    if (!passed || process.env.COAXI_KEEP_EXECUTION_AVATAR_FIXTURE === '1') {
       process.stdout.write(`Preserved execution rail fixture: ${fixture}\n`)
     } else {
       await rm(fixture, { recursive: true, force: true })

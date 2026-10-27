@@ -9,7 +9,7 @@ import {
 } from './qualification-common.mjs'
 import { validateQualificationArtifactSchema } from './qualification-schema-validation.mjs'
 
-export const TOOL_CALL_LEDGER_SCHEMA_ID = 'rovai.qualification.tool-call-ledger'
+export const TOOL_CALL_LEDGER_SCHEMA_ID = 'coaxi.qualification.tool-call-ledger'
 export const TOOL_CALL_LEDGER_SCHEMA_VERSION = '1.1.0'
 
 export function buildToolCallLedger({
@@ -122,7 +122,7 @@ export function buildToolCallLedger({
     schemaId: TOOL_CALL_LEDGER_SCHEMA_ID,
     schemaVersion: TOOL_CALL_LEDGER_SCHEMA_VERSION,
     producer: {
-      id: 'rovai-qualification-runner',
+      id: 'coaxi-qualification-runner',
       version: QUALIFICATION_RUNNER_VERSION,
       digest: withSha256Prefix(producerDigest)
     },

@@ -20,12 +20,12 @@ export class HtmlPreviewHostChannel {
   connect(): void {
     this.#connectionId = Array.from(crypto.getRandomValues(new Uint8Array(16)), byte => byte.toString(16).padStart(2, '0')).join(''); this.#documentId = null; this.#connected = false
     this.#emit({ type: 'connecting' })
-    this.frame()?.postMessage({ protocol: 'rovai-html-preview-v1', previewId: this.preview.previewId,
+    this.frame()?.postMessage({ protocol: 'coaxi-html-preview-v1', previewId: this.preview.previewId,
       generation: this.preview.generation, type: 'connect', connectionId: this.#connectionId }, this.preview.origin)
   }
   send(type: string, data: Record<string, unknown> = {}): void {
     if (!this.#connected) return
-    this.frame()?.postMessage({ ...data, protocol: 'rovai-html-preview-v1', previewId: this.preview.previewId,
+    this.frame()?.postMessage({ ...data, protocol: 'coaxi-html-preview-v1', previewId: this.preview.previewId,
       generation: this.preview.generation, documentId: this.#documentId, connectionId: this.#connectionId, type }, this.preview.origin)
   }
   attach(host: Window): () => void {
@@ -33,13 +33,13 @@ export class HtmlPreviewHostChannel {
     const receive = (event: MessageEvent<unknown>): void => {
       if (event.source !== this.frame() || event.origin !== this.preview.origin) return
       const data = event.data as Record<string, unknown> | null
-      if (!data || typeof data !== 'object' || Array.isArray(data) || data.protocol !== 'rovai-html-preview-v1'
+      if (!data || typeof data !== 'object' || Array.isArray(data) || data.protocol !== 'coaxi-html-preview-v1'
         || data.previewId !== this.preview.previewId || data.generation !== this.preview.generation
         || typeof data.type !== 'string' || typeof data.documentId !== 'string' || !data.documentId || data.documentId.length > 128) return
       if (data.type === 'bootstrap-ready' && this.preview.sandboxedDocument !== undefined) {
         if (this.#initialized) return
         this.#initialized = true
-        this.frame()?.postMessage({ protocol: 'rovai-html-preview-v1', type: 'initialize',
+        this.frame()?.postMessage({ protocol: 'coaxi-html-preview-v1', type: 'initialize',
           previewId: this.preview.previewId, generation: this.preview.generation, html: this.preview.sandboxedDocument }, this.preview.origin)
         return
       }

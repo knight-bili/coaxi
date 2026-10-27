@@ -6,10 +6,10 @@
     "apps/web/src/auth-storage.ts": "b8f4f0d80b97351cd64287e8d74b5350ea6cf4b27edda12d56ebf7c4670f2567",
     "apps/web/src/client.ts": "6ef15f7fbc94091e38c4bacaf46e27f6819bdd9a5143d9e5030cda7799190623",
     "apps/web/src/main.tsx": "25dc8a37b0f862ad4f1b7cf613486d2c0e81f522c193677edb2230feccd2b167",
-    "crates/rovai-web/src/auth.rs": "cc386c28fedd06773b9c107732bf0e2910483d02d0d54bb98502375794653515",
-    "crates/rovai-web/src/lib.rs": "f3d0d31a1d1f94f315b8447de215373f15727db3e55824869f34cb43f82d81a1",
-    "crates/rovai-host/src/web_control.rs": "246b8d37db3f9324885ef717fba122886b8534f5fefeb9c551d4afb3ef0d2baa",
-    "crates/rovai-host/src/lib.rs": "c5a8684874342ed43622f0a27a3bef102a8cd9f0a30348f8ebf87ebafd9810a8",
+    "crates/coaxi-web/src/auth.rs": "cc386c28fedd06773b9c107732bf0e2910483d02d0d54bb98502375794653515",
+    "crates/coaxi-web/src/lib.rs": "f3d0d31a1d1f94f315b8447de215373f15727db3e55824869f34cb43f82d81a1",
+    "crates/coaxi-host/src/web_control.rs": "246b8d37db3f9324885ef717fba122886b8534f5fefeb9c551d4afb3ef0d2baa",
+    "crates/coaxi-host/src/lib.rs": "c5a8684874342ed43622f0a27a3bef102a8cd9f0a30348f8ebf87ebafd9810a8",
     "scripts/lib/host-web.test.mjs": "834a1cddaa7d5a2aba0dcaaa8cac287c6451d2c5e7be2aa3a8e471f835b72d63",
     "scripts/lib/server-entry.test.mjs": "9e7cc24245cab6cb0111d4aaa0f0096be711ee3fb98ab340edaffd18bc5d674b",
     "scripts/smoke-web-recovery.mjs": "41c899c12c132d7246d74c047bbac0d6256f0a542b914a1c757e2f5e3d8638ce"
@@ -29,7 +29,7 @@
     "format": "passed",
     "docs": "docs:test/docs:check and diff-aware docs:check:ci passed with base 42f144dcd6777e226e7734061b84a06d71b5da29",
     "rustWorkspace": "pnpm test:rust:staged routed to cargo test --workspace: Core 805 passed / 6 existing manual ignores, CLI 35 passed, Web 6 passed; total 846 passed",
-    "rustFinalTargets": "Final rovai-host/rovai-web targets and doc-tests passed after lazy explicit-disable fix"
+    "rustFinalTargets": "Final coaxi-host/coaxi-web targets and doc-tests passed after lazy explicit-disable fix"
   },
   "limitations": [
     "No iOS/Android or Windows/Linux native qualification in this increment.",

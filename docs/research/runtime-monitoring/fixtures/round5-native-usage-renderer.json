@@ -689,9 +689,9 @@
     }
   ],
   "finalPackagedBinaries": {
-    "rovai-core": "5f50b291bbd79ff9b60624fdcbff1d156fd38815c6c3cef37821bf9a7ed4416b",
-    "rovai-host": "3e6ea75cea18afab658412b9df9fa9cf10d9557e6054c8a4e5f1e70db53f94b6",
-    "rovai": "9df0efaa8f8e07b07d4171faf0e8f67bee26eb30d6bc537962e90fad8784d21d"
+    "coaxi-core": "5f50b291bbd79ff9b60624fdcbff1d156fd38815c6c3cef37821bf9a7ed4416b",
+    "coaxi-host": "3e6ea75cea18afab658412b9df9fa9cf10d9557e6054c8a4e5f1e70db53f94b6",
+    "coaxi": "9df0efaa8f8e07b07d4171faf0e8f67bee26eb30d6bc537962e90fad8784d21d"
   },
   "partialAttempts": [
     {

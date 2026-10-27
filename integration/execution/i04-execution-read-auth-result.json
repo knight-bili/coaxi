@@ -79,7 +79,7 @@
       "night1000",
       "day1000"
     ],
-    "findings": "Original Codeg card modules and Rovai layout retained without style/DOM redesign. Recovered cards and complete narration use the latest scope, both themes fit. Fixture intentionally constrains the scroll host to 480px for nonzero reading-position verification; this is not the full original App or a new product scroll layout."
+    "findings": "Original Coaxi card modules and Coaxi layout retained without style/DOM redesign. Recovered cards and complete narration use the latest scope, both themes fit. Fixture intentionally constrains the scroll host to 480px for nonzero reading-position verification; this is not the full original App or a new product scroll layout."
   },
   "self_review_fixes": [
     "Cache listener identity is per lease, so two mirrors sharing the same callback do not dispose each other; release idempotent and final unsubscribe verified",

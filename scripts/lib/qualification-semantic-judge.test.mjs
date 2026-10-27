@@ -397,7 +397,7 @@ test('Semantic Judge artifacts are retained immutably with current-user-only per
     producerDigest: 'a'.repeat(64),
     invokeReplica: async () => ({ items: replicaItems(fixture.pack) })
   })
-  const root = await mkdtemp(join(tmpdir(), 'rovai-semantic-judge-'))
+  const root = await mkdtemp(join(tmpdir(), 'coaxi-semantic-judge-'))
   try {
     const pointer = await retainSemanticEngineeringReviewArtifacts(root, {
       configuration: fixture.configuration,
@@ -483,7 +483,7 @@ function evidenceIndexFixture() {
   ]
   return {
     artifactId,
-    schemaId: 'rovai.qualification.evidence-index',
+    schemaId: 'coaxi.qualification.evidence-index',
     schemaVersion: '1.0.0',
     payloadDigest: `sha256:${'c'.repeat(64)}`,
     payload: {

@@ -1,4 +1,4 @@
-//! Per-turn wall-clock observations recorded by codeg's own ACP connection
+//! Per-turn wall-clock observations recorded by coaxi's own ACP connection
 //! layer, for agents whose native session store carries **no per-turn
 //! timestamps**.
 //!
@@ -11,17 +11,17 @@
 //! thinking+text-only turn is natively clockless, and its message footer
 //! rendered nothing.
 //!
-//! Every ACP session of such an agent runs THROUGH codeg, so the connection
+//! Every ACP session of such an agent runs THROUGH coaxi, so the connection
 //! layer is a first-party witness of each turn's real span: it stamps the
 //! prompt send and observes the turn's completion. This module persists that
 //! observation as one JSONL line per completed turn, keyed by the agent's own
 //! session id, and the history parser merges it back for turns whose native
-//! store yields no clock. The data is honest — codeg's own measurement, not a
+//! store yields no clock. The data is honest — coaxi's own measurement, not a
 //! fabrication from unrelated fields.
 //!
 //! ## File layout
 //!
-//! `<paths::codeg_turn_timings_root()>/<agent>/<session-id>.jsonl`, one JSON
+//! `<paths::coaxi_turn_timings_root()>/<agent>/<session-id>.jsonl`, one JSON
 //! object per line:
 //!
 //! ```jsonc
@@ -74,7 +74,7 @@
 //!   Pinned by `parsers::cursor` test
 //!   `accepted_residual_missing_tail_lines_can_misattribute_span`.
 //!
-//! Sessions never run through this codeg install (copied from another
+//! Sessions never run through this coaxi install (copied from another
 //! machine) simply have no journal file.
 //!
 //! ## Growth
@@ -284,7 +284,12 @@ pub fn append_turn_timing_in(
 /// Strict `<` keeps legitimately tied starts; the in-process append lock
 /// (see [`append_turn_timing_in`]) makes disorder rare to begin with.
 pub fn read_turn_timings(agent: &str, session_id: &str) -> Vec<TurnTiming> {
-    read_turn_timings_in(&crate::paths::codeg_turn_timings_root(), agent, session_id)
+    let root = crate::paths::coaxi_turn_timings_root();
+    if journal_path_in(&root, agent, session_id).is_some_and(|path| path.exists()) {
+        return read_turn_timings_in(&root, agent, session_id);
+    }
+    // 已保存的计时仅作为旧历史读取；新记录始终写入 Coaxi 目录。
+    read_turn_timings_in(&crate::scoped_fs::root().join(".codeg-turn-timings"), agent, session_id)
 }
 
 /// Root-injectable core of [`read_turn_timings`].

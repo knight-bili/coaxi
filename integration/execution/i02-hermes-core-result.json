@@ -5,7 +5,7 @@
   "status": "Windows_source_and_safe_native_bootstrap_verified_session_qualification_pending",
   "scope": "Hermes_Core_catalog_native_modes_strict_load_Migration198_and_shared_clients",
   "source": {
-    "codegCommit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
+    "coaxiCommit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
     "officialCommit": "818c13be1dc4fd28987e1e881a9408224afd4535",
     "bridgeVersion": "0.21.6",
     "python": "3.14",
@@ -37,71 +37,71 @@
         "sha256": "dd830ceafe9a0cdd161b7474cb51badbed09364ace57b4c2c7773edb30e277a0"
       },
       {
-        "file": "crates/rovai-core/src/acp.rs",
+        "file": "crates/coaxi-core/src/acp.rs",
         "sha256": "44b582c35c9c858244bcb7f14f45357969be55874208cbeb182bced9b05d237c"
       },
       {
-        "file": "crates/rovai-core/src/agent_profile.rs",
+        "file": "crates/coaxi-core/src/agent_profile.rs",
         "sha256": "882f495cb3528c87a1d255217f9b6f2249b543c4726ed9bed836161e3cb9f719"
       },
       {
-        "file": "crates/rovai-core/src/agent_runtime_adapter.rs",
+        "file": "crates/coaxi-core/src/agent_runtime_adapter.rs",
         "sha256": "4790ba7c18c71778b61fd91c92c207407cd2dbb54dce192fa4d75544586fd63e"
       },
       {
-        "file": "crates/rovai-core/src/application.rs",
+        "file": "crates/coaxi-core/src/application.rs",
         "sha256": "78a6dbf5a4788a858b17d5ed97b769048dc81142d03223fcc6e952b9b582a0ad"
       },
       {
-        "file": "crates/rovai-core/src/compaction.rs",
+        "file": "crates/coaxi-core/src/compaction.rs",
         "sha256": "001c63d7eacefd8a17e4bf56bacdc000ca217705fb96ce726a97c4377fb6445b"
       },
       {
-        "file": "crates/rovai-core/src/context.rs",
+        "file": "crates/coaxi-core/src/context.rs",
         "sha256": "db928c90e724b1d2cfb9ebcdd15f2c9ba65fec96b2818b8ab57687dbd438c897"
       },
       {
-        "file": "crates/rovai-core/src/db.rs",
+        "file": "crates/coaxi-core/src/db.rs",
         "sha256": "36efa6bb3ef3869491f653113fdb2e54209084dd133061f7ebd9578c6fbeecd6"
       },
       {
-        "file": "crates/rovai-core/src/db_member_environment.rs",
+        "file": "crates/coaxi-core/src/db_member_environment.rs",
         "sha256": "f94da8ec7123a9f3357be7f387253ac9ded52f49bcef6b6ec6599f9095c53040"
       },
       {
-        "file": "crates/rovai-core/src/db_mission_description.rs",
+        "file": "crates/coaxi-core/src/db_mission_description.rs",
         "sha256": "e4bf4c096acf8567b183a83a8f8f4fddcb86f0a52c1340ef64ea7bd7e56f80cf"
       },
       {
-        "file": "crates/rovai-core/src/db_simplification.rs",
+        "file": "crates/coaxi-core/src/db_simplification.rs",
         "sha256": "fa8a7e339d4082817281227f05a41e649c7f6185558edb8e8ac1cf6fd4aabff3"
       },
       {
-        "file": "crates/rovai-core/src/health.rs",
+        "file": "crates/coaxi-core/src/health.rs",
         "sha256": "c7c14df8e77f37ed546ba03c9ac84ec82683bdd09342588a2b7c45e7b45c179a"
       },
       {
-        "file": "crates/rovai-core/src/monitoring.rs",
+        "file": "crates/coaxi-core/src/monitoring.rs",
         "sha256": "d95e9597682f8620c08a4037c9e374853ffdfd08b9e4110958068356fd0cb5ac"
       },
       {
-        "file": "crates/rovai-core/src/native_skills.rs",
+        "file": "crates/coaxi-core/src/native_skills.rs",
         "sha256": "3b04cbf5b48e802dc745c12161ec389796114f2475714239071f00594d1730be"
       },
       {
-        "file": "crates/rovai-core/src/runtime_activity_mapping.rs",
+        "file": "crates/coaxi-core/src/runtime_activity_mapping.rs",
         "sha256": "418f97f69832921fa2a43255e06e648fa2fab030f3125a590c044dce6f56ff9b"
       },
       {
-        "file": "crates/rovai-core/src/runtime_failure.rs",
+        "file": "crates/coaxi-core/src/runtime_failure.rs",
         "sha256": "455d4f8dac4f5871bd3fa1d59221387f9f5f4c230b13694f1558add0660df287"
       },
       {
-        "file": "crates/rovai-core/src/runtime_platform_admission.rs",
+        "file": "crates/coaxi-core/src/runtime_platform_admission.rs",
         "sha256": "5c5140f45a745eea2f2a2ace4edc8882521f3a71e695eaaf41640e3d7534f848"
       },
       {
-        "file": "crates/rovai-core/src/skill.rs",
+        "file": "crates/coaxi-core/src/skill.rs",
         "sha256": "1e306147eb4d36fce32ceb4f222df5af6f698e6372c32bd3c0b2eb8013c6ea17"
       },
       {
@@ -155,7 +155,7 @@
     "remainingPort": [
       "open_claw"
     ],
-    "authority": "rovai-core",
+    "authority": "coaxi-core",
     "lifecycle": "专用ACP实例、产品发现、精确Run查找/终止及双退出路径",
     "launch": [
       "hermes",
@@ -247,7 +247,7 @@
     "restore": "实测Python None经SDK序列化为空对象{}；Core先验证原生models/modes才确认绑定并释放重放；嵌套models/modes空对象同样拒绝，扩展既有恢复owner",
     "schema": "复用七表重建与既有owner覆盖146/147两个精确来源；旧夹具去除新闭集后再降版，不放宽生产准入；扩展回归修正真实旧库预检遗漏与Windows隔离夹具，107个DB owner均有通过证据（106全量＋最后1项修复复测），保留两次失败日志",
     "usage": "源码turn_finalizer复制session_*总量，避免误作delta；会话基线不能按Prompt拆分，跨Run完整归属仍研发待办",
-    "UI": "Codeg原SVG字节保留，Hermes使用既有主题mask；共享产品/原生模式页，未引入第二执行引擎"
+    "UI": "Coaxi原SVG字节保留，Hermes使用既有主题mask；共享产品/原生模式页，未引入第二执行引擎"
   },
   "testAdmission": {
     "newIndependentRustOwners": 0,

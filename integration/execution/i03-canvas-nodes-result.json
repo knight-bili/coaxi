@@ -13,31 +13,31 @@
       "sha256": "7855a3ce5c0fdd7d290b754c1d844d92ca1db6d89d18452c4a5c9d89647c8631"
     },
     {
-      "file": "crates/rovai-core/src/application.rs",
+      "file": "crates/coaxi-core/src/application.rs",
       "sha256": "a221326e4e9c477de2c1af8fe20c0da2ebff64cf82b8b56268d447c588211961"
     },
     {
-      "file": "crates/rovai-core/src/canvas_board.rs",
+      "file": "crates/coaxi-core/src/canvas_board.rs",
       "sha256": "41cba9e65379ca6cec41c19896aec65b3273e47858704aa85bf23d9c4841660a"
     },
     {
-      "file": "crates/rovai-core/src/canvas_node.rs",
+      "file": "crates/coaxi-core/src/canvas_node.rs",
       "sha256": "73778abbba0e36e0faee3bbf9a84c339636ab6f3d475bdc234de24b41afe84a9"
     },
     {
-      "file": "crates/rovai-core/src/db.rs",
+      "file": "crates/coaxi-core/src/db.rs",
       "sha256": "6636f8b32de177428a1b640d0367e532ebbfcf6476c88441680a38f90a2a8425"
     },
     {
-      "file": "crates/rovai-core/src/db_skill_pack_context.rs",
+      "file": "crates/coaxi-core/src/db_skill_pack_context.rs",
       "sha256": "ea5d2e96cbf05483262ad63d6a52a0da3e6a18ba9401dc6893c9d79692055c17"
     },
     {
-      "file": "crates/rovai-core/src/lib.rs",
+      "file": "crates/coaxi-core/src/lib.rs",
       "sha256": "a0a4bc177022f651d579ac0cd888b3a7c3efcfe110fc83b021e55fe2a74d3747"
     },
     {
-      "file": "crates/rovai-web/src/operations.rs",
+      "file": "crates/coaxi-web/src/operations.rs",
       "sha256": "86831685634dca13b8bafef6c5e614ab7f62e75f4d1c1c86db541497fc09a39c"
     },
     {
@@ -148,7 +148,7 @@
     "staged": {
       "plan": {
         "route": "full",
-        "reason": "crates/rovai-core/src/lib.rs changed",
+        "reason": "crates/coaxi-core/src/lib.rs changed",
         "scripts": [
           "test:rust:workspace-default"
         ]

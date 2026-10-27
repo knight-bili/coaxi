@@ -87,13 +87,13 @@ describe('DingTalk OpenAPI client', () => {
     }))
     const client = new DingTalkOpenApiClient({ appKey: 'ding-app', appSecret: 'secret' })
     await expect(client.sendGroupMarkdown({
-      openConversationId: 'group-1', robotCode: 'robot-1', title: 'Rovai', text: 'hello'
+      openConversationId: 'group-1', robotCode: 'robot-1', title: 'Coaxi', text: 'hello'
     })).rejects.toMatchObject({ status: 429, retryable: true })
 
     vi.stubGlobal('fetch', vi.fn(async () => { throw new TypeError('fetch failed') }))
     await expect(new DingTalkOpenApiClient({ appKey: 'ding-app', appSecret: 'secret' })
       .sendGroupMarkdown({
-        openConversationId: 'group-1', robotCode: 'robot-1', title: 'Rovai', text: 'hello'
+        openConversationId: 'group-1', robotCode: 'robot-1', title: 'Coaxi', text: 'hello'
       })).rejects.toMatchObject({ status: 0, retryable: true })
     expect(new DingTalkOpenApiError('dingtalk_open_api_http_400', 400).retryable).toBe(false)
   })
@@ -115,7 +115,7 @@ describe('DingTalk OpenAPI client', () => {
       openSpaceId: 'dtv1.card//IM_ROBOT.owner-1',
       robotCode: 'ding-app',
       space: 'p2p',
-      cardParamMap: dingtalkCardParams({ title: 'Rovai', content: '完成' })
+      cardParamMap: dingtalkCardParams({ title: 'Coaxi', content: '完成' })
     })).resolves.toEqual({ outTrackId: 'card-1', recallMessageId: 'carrier-1' })
 
     expect(calls[1]?.body).toMatchObject({
@@ -207,7 +207,7 @@ describe('DingTalk OpenAPI client', () => {
       openSpaceId: 'dtv1.card//IM_ROBOT.owner-1',
       robotCode: 'robot-1',
       space: 'p2p',
-      cardParamMap: dingtalkCardParams({ title: 'Rovai', content: '完成' })
+      cardParamMap: dingtalkCardParams({ title: 'Coaxi', content: '完成' })
     })).rejects.toThrow('dingtalk_open_api_card_delivery_failed')
   })
 
@@ -221,7 +221,7 @@ describe('DingTalk OpenAPI client', () => {
     await expect(client.sendPrivateMarkdown({
       robotCode: 'ding-app',
       userId: 'owner-1',
-      title: 'Rovai',
+      title: 'Coaxi',
       text: 'hello'
     })).rejects.toThrow('dingtalk_open_api_failed')
   })
@@ -237,7 +237,7 @@ describe('DingTalk OpenAPI client', () => {
     await expect(client.sendGroupMarkdown({
       openConversationId: 'group-1',
       robotCode: 'ding-app',
-      title: 'Rovai',
+      title: 'Coaxi',
       text: 'hello'
     })).rejects.toThrow('dingtalk_open_api_delivery_identity_missing')
   })
@@ -256,7 +256,7 @@ describe('DingTalk OpenAPI client', () => {
     await expect(client.sendGroupMarkdown({
       openConversationId: 'group-1',
       robotCode: 'ding-app',
-      title: 'Rovai',
+      title: 'Coaxi',
       text: 'hello'
     })).resolves.toBe('delivery-1')
 
@@ -266,7 +266,7 @@ describe('DingTalk OpenAPI client', () => {
         openConversationId: 'group-1',
         robotCode: 'ding-app',
         msgKey: 'sampleMarkdown',
-        msgParam: JSON.stringify({ title: 'Rovai', text: 'hello' })
+        msgParam: JSON.stringify({ title: 'Coaxi', text: 'hello' })
       }
     })
   })
@@ -384,10 +384,10 @@ describe('DingTalk OpenAPI client', () => {
   })
 
   it('rejects malformed or oversized dynamic card action ids', () => {
-    expect(decodeDingTalkCardActionId('rovai.v1.not+base64')).toBeNull()
-    expect(decodeDingTalkCardActionId('rovai.v1.W10')).toBeNull()
+    expect(decodeDingTalkCardActionId('coaxi.v1.not+base64')).toBeNull()
+    expect(decodeDingTalkCardActionId('coaxi.v1.W10')).toBeNull()
     expect(() => dingtalkCardParams({
-      title: 'Rovai',
+      title: 'Coaxi',
       buttons: [{ title: '操作', value: { payload: 'x'.repeat(4_096) } }]
     })).toThrow('dingtalk_card_action_too_large')
   })

@@ -21,21 +21,21 @@ const missingOnly = process.argv[4] === '--missing-only'
 const continueFixture = process.argv[4] === '--continue' || missingOnly
 assert.ok(outputRoot && isAbsolute(outputRoot))
 const specifications = {
-  'codex-cli': ['codex', 'ROVAI_CODEX_BIN', 'CODEX_HOME', '.codex', ['config.toml', 'auth.json']],
-  'claude-code-cli': ['claude', 'ROVAI_CLAUDE_CODE_BIN', 'CLAUDE_CONFIG_DIR', '.claude', ['settings.json', 'settings.local.json', 'config.json', '.credentials.json']],
-  'pi': ['pi', 'ROVAI_PI_BIN', 'PI_CODING_AGENT_DIR', '.pi/agent', ['auth.json', 'settings.json', 'models.json', 'models-store.json']],
-  'copilot-cli': ['copilot', 'ROVAI_COPILOT_BIN', 'COPILOT_HOME', '.copilot', ['config.json', 'settings.json', 'permissions-config.json']],
-  'qoder-cli': ['qodercli', 'ROVAI_QODER_BIN', 'QODER_CONFIG_DIR', '.qoder', ['settings.json', 'state.json', '.auth', '.models', 'security']],
-  'codebuddy-cli': ['codebuddy', 'ROVAI_CODEBUDDY_BIN', 'CODEBUDDY_CONFIG_DIR', '.codebuddy', ['settings.json', 'user-state.json']],
-  'qwen-code': ['qwen', 'ROVAI_QWEN_BIN', 'QWEN_HOME', '.qwen', ['settings.json', 'oauth_creds.json', 'installation_id']],
-  'kimi-code-cli': ['kimi', 'ROVAI_KIMI_BIN', 'KIMI_CODE_HOME', '.kimi-code', ['config.toml', 'device_id', 'credentials']],
-  'grok-build': ['grok', 'ROVAI_GROK_BIN', 'GROK_HOME', '.grok', ['config.toml', 'managed_config.toml', 'requirements.toml', '.env', 'agent_id']],
-  'kiro-cli': ['kiro-cli', 'ROVAI_KIRO_BIN', 'KIRO_HOME', '.kiro', ['settings', 'agents']],
-  'opencode-cli': ['opencode', 'ROVAI_OPENCODE_BIN'],
-  'trae-cn-cli': ['trae-cli', 'ROVAI_TRAE_CN_BIN'],
-  'deepseek-harness': ['dsh', 'ROVAI_DEEPSEEK_HARNESS_BIN', 'DSH_HOME', '.dsh', ['.credentials.yaml', 'settings.yaml', '.env', 'cordis.patch.yml', 'profiles']],
-  'antigravity-app': ['agy', 'ROVAI_ANTIGRAVITY_BIN'],
-  'zcode-app': ['zcode', 'ROVAI_ZCODE_BIN']
+  'codex-cli': ['codex', 'COAXI_CODEX_BIN', 'CODEX_HOME', '.codex', ['config.toml', 'auth.json']],
+  'claude-code-cli': ['claude', 'COAXI_CLAUDE_CODE_BIN', 'CLAUDE_CONFIG_DIR', '.claude', ['settings.json', 'settings.local.json', 'config.json', '.credentials.json']],
+  'pi': ['pi', 'COAXI_PI_BIN', 'PI_CODING_AGENT_DIR', '.pi/agent', ['auth.json', 'settings.json', 'models.json', 'models-store.json']],
+  'copilot-cli': ['copilot', 'COAXI_COPILOT_BIN', 'COPILOT_HOME', '.copilot', ['config.json', 'settings.json', 'permissions-config.json']],
+  'qoder-cli': ['qodercli', 'COAXI_QODER_BIN', 'QODER_CONFIG_DIR', '.qoder', ['settings.json', 'state.json', '.auth', '.models', 'security']],
+  'codebuddy-cli': ['codebuddy', 'COAXI_CODEBUDDY_BIN', 'CODEBUDDY_CONFIG_DIR', '.codebuddy', ['settings.json', 'user-state.json']],
+  'qwen-code': ['qwen', 'COAXI_QWEN_BIN', 'QWEN_HOME', '.qwen', ['settings.json', 'oauth_creds.json', 'installation_id']],
+  'kimi-code-cli': ['kimi', 'COAXI_KIMI_BIN', 'KIMI_CODE_HOME', '.kimi-code', ['config.toml', 'device_id', 'credentials']],
+  'grok-build': ['grok', 'COAXI_GROK_BIN', 'GROK_HOME', '.grok', ['config.toml', 'managed_config.toml', 'requirements.toml', '.env', 'agent_id']],
+  'kiro-cli': ['kiro-cli', 'COAXI_KIRO_BIN', 'KIRO_HOME', '.kiro', ['settings', 'agents']],
+  'opencode-cli': ['opencode', 'COAXI_OPENCODE_BIN'],
+  'trae-cn-cli': ['trae-cli', 'COAXI_TRAE_CN_BIN'],
+  'deepseek-harness': ['dsh', 'COAXI_DEEPSEEK_HARNESS_BIN', 'DSH_HOME', '.dsh', ['.credentials.yaml', 'settings.yaml', '.env', 'cordis.patch.yml', 'profiles']],
+  'antigravity-app': ['agy', 'COAXI_ANTIGRAVITY_BIN'],
+  'zcode-app': ['zcode', 'COAXI_ZCODE_BIN']
 }
 const spec = specifications[kind]
 assert.ok(spec, `Unsupported or excluded runtime: ${kind}`)
@@ -108,10 +108,10 @@ const sessionRoots = kind === 'trae-cn-cli' ? [join(homedir(), 'Library/Caches/t
 result.sessionRoots = sessionRoots
 // Read-only configuration copying never includes pre-existing native histories.
 // Disable unrelated executable overrides so this Core checks only its target.
-for (const row of Object.values(specifications)) process.env[row[1]] = '/nonexistent/rovai-resume-audit'
-process.env.ROVAI_CURSOR_BIN = '/nonexistent/rovai-resume-audit'
-process.env.ROVAI_CLINE_BIN = '/nonexistent/rovai-resume-audit'
-process.env.ROVAI_COMMAND_CODE_BIN = '/nonexistent/rovai-resume-audit'
+for (const row of Object.values(specifications)) process.env[row[1]] = '/nonexistent/coaxi-resume-audit'
+process.env.COAXI_CURSOR_BIN = '/nonexistent/coaxi-resume-audit'
+process.env.COAXI_CLINE_BIN = '/nonexistent/coaxi-resume-audit'
+process.env.COAXI_COMMAND_CODE_BIN = '/nonexistent/coaxi-resume-audit'
 const wrapper = join(fixture, 'runtime-wire-proxy')
 await writeFile(wrapper, `#!/usr/bin/python3
 import json, os, signal, subprocess, sys, threading
@@ -158,10 +158,10 @@ for flag in ['--resume','--session-id','--conversation']:
     if flag in args and args.index(flag)+1<len(args): resume,resume_flag=args[args.index(flag)+1],flag
 launch={'direction':'launch','resumeArgument':resume,'resumeFlag':resume_flag,
     'additionalDirectories':[{'path':args[i+1],'exists':os.path.isdir(args[i+1])} for i,arg in enumerate(args[:-1]) if arg=='--add-dir']}
-context_path=os.getenv('ROVAI_CLI_CONTEXT')
+context_path=os.getenv('COAXI_CLI_CONTEXT')
 if context_path:
     with open(context_path) as source: context=json.load(source)
-    run_tmp=os.environ['ROVAI_RUN_TMP']
+    run_tmp=os.environ['COAXI_RUN_TMP']
     launch['builtinTools']={'processId':context['processId'],'runTmp':run_tmp,'runTmpExists':os.path.isdir(run_tmp),'unbound':context.get('lease') is None}
 record(launch)
 child=subprocess.Popen([target]+args,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=None)
@@ -183,19 +183,19 @@ sys.exit(child.wait())
 process.env[spec[1]] = wrapper
 if (kind === 'zcode-app') {
   // The ZCode installation must keep its official bundle identity.
-  delete process.env.ROVAI_ZCODE_BIN
+  delete process.env.COAXI_ZCODE_BIN
   const node = spawnSync('/usr/bin/which', ['node'], { encoding: 'utf8' }).stdout.trim()
   await writeFile(wrapper, (await readFile(wrapper, 'utf8')).replace(JSON.stringify(executable), JSON.stringify(node)))
-  process.env.ROVAI_ZCODE_NODE_BIN = wrapper
+  process.env.COAXI_ZCODE_NODE_BIN = wrapper
 }
 
 function query(sql, ...params) {
-  const db = new DatabaseSync(join(data, 'rovai.sqlite'), { readOnly: true })
+  const db = new DatabaseSync(join(data, 'coaxi.sqlite'), { readOnly: true })
   try { return db.prepare(sql).all(...params) } finally { db.close() }
 }
 async function setStage(value) { stage = value; await writeFile(stagePath, value, { mode: 0o600 }) }
 async function startCore() {
-  core = startQualificationCore({ coreExecutable: join(repo, 'target/debug/rovai-core'), dataDirectory: data,
+  core = startQualificationCore({ coreExecutable: join(repo, 'target/debug/coaxi-core'), dataDirectory: data,
     workingDirectory: project, runtimeCacheDirectory: join(fixture, 'cache'), mcpConfigPath: join(data, 'mcp.json'),
     onNotification: message => {
       if (['agent_run.started','agent_run.native_session_bound','agent_run.native_session_continuity_lost','agent_run.terminal','error'].includes(message.method)) notifications.push({ stage, ...message })

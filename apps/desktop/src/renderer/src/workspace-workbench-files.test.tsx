@@ -29,7 +29,7 @@ vi.mock('./BrowserWorkbench', () => ({ BrowserWorkbench: () => null }))
 vi.mock('./ComputerWorkbench', () => ({ ComputerWorkbench: () => null }))
 vi.mock('./OfficePreviewWorkbench', () => ({ OfficePreviewWorkbench: ({path}:{path:string}) => createElement('div',null,'文档预览：'+path) }))
 vi.mock('./NativeHistoryWorkbench', () => ({ NativeHistoryWorkbench: () => null }))
-vi.mock('./codeg-native-content/components/diff/unified-diff-preview', () => ({ UnifiedDiffPreview: () => null }))
+vi.mock('./coaxi-native-content/components/diff/unified-diff-preview', () => ({ UnifiedDiffPreview: () => null }))
 vi.mock('./useShortcutActions', () => ({ useShortcutActions: () => undefined }))
 afterEach(()=>{cleanup();vi.clearAllMocks()})
 

@@ -31,7 +31,7 @@ function install():void{
   for(const method of Object.keys(names) as Array<keyof typeof names>){
     const original=console[method].bind(console)
     console[method]=(...args:unknown[]):void=>{
-      const target=typeof args[0]==='string'?/^\[([a-zA-Z0-9_.:-]{1,256})\]/.exec(args[0])?.[1]??'rovai-main':'rovai-main'
+      const target=typeof args[0]==='string'?/^\[([a-zA-Z0-9_.:-]{1,256})\]/.exec(args[0])?.[1]??'coaxi-main':'coaxi-main'
       const specific=active.targets.filter(value=>target.startsWith(value.target)).sort((a,b)=>b.target.length-a.target.length)[0]
       const threshold=specific?.level??active.level
       if(threshold!=='off'&&levels.indexOf(names[method])<=levels.indexOf(threshold))original(...args)

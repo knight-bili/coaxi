@@ -12,12 +12,12 @@ const releaseNotes = await readFile(join(root, 'build', 'release-notes.md'), 'ut
 const releaseSummary = selectReleaseNotesLanguage(releaseNotes, 'zh-CN').split('\n')
   .find((line) => line.trim() && !line.startsWith('#'))
 const appPath = resolve(process.argv[2] ?? join(root, 'dist', 'mac-arm64', 'Coaxi.app'))
-const fixtureRoot = process.env.ROVAI_APP_UPDATES_ACCEPT_FIXTURE_ROOT
-  ?? await mkdtemp(join(tmpdir(), 'rovai-app-updates-ui-accept-'))
+const fixtureRoot = process.env.COAXI_APP_UPDATES_ACCEPT_FIXTURE_ROOT
+  ?? await mkdtemp(join(tmpdir(), 'coaxi-app-updates-ui-accept-'))
 const dataDir = join(fixtureRoot, 'user-data')
-const outputDir = process.env.ROVAI_APP_UPDATES_ACCEPT_OUTPUT_DIR
-  ?? await mkdtemp(join(tmpdir(), 'rovai-app-updates-ui-captures-'))
-const port = Number(process.env.ROVAI_APP_UPDATES_ACCEPT_DEBUG_PORT ?? 9521)
+const outputDir = process.env.COAXI_APP_UPDATES_ACCEPT_OUTPUT_DIR
+  ?? await mkdtemp(join(tmpdir(), 'coaxi-app-updates-ui-captures-'))
+const port = Number(process.env.COAXI_APP_UPDATES_ACCEPT_DEBUG_PORT ?? 9521)
 
 await mkdir(dataDir, { recursive: true })
 await mkdir(outputDir, { recursive: true })
@@ -67,7 +67,7 @@ try {
       bundledCurrentRelease: true,
       bundledCurrentReleaseDate: true,
       duplicateReleaseTitleRemoved: true,
-      productAndBundleName: 'Rovai AI',
+      productAndBundleName: 'Coaxi AI',
       existingSettingsVisualWorld: true,
       noVerticalHeadingRules: true,
       automaticChecksDeterministicallyDisabled: true,
@@ -106,7 +106,7 @@ async function openAboutUpdates(cdp) {
 }
 
 async function assertAboutUpdates(cdp, context) {
-  const updaterSnapshot = await evaluate(cdp, 'window.rovai.appUpdates.get()', true)
+  const updaterSnapshot = await evaluate(cdp, 'window.coaxi.appUpdates.get()', true)
   assert(updaterSnapshot?.currentVersion === releaseVersion
     && updaterSnapshot.currentRelease?.version === releaseVersion
     && updaterSnapshot.currentRelease.releaseDate === releaseMetadata.releaseDate
@@ -139,7 +139,7 @@ async function assertAboutUpdates(cdp, context) {
       releaseNotesText: surface?.querySelector('.about-release-notes')?.textContent ?? '',
       releaseDate: surface?.querySelector('.about-release-header time')?.getAttribute('datetime') ?? '',
       releaseDateText: surface?.querySelector('.about-release-header time')?.textContent ?? '',
-      repeatedReleaseTitle: Boolean(surface?.querySelector(${JSON.stringify(`[data-markdown-heading="Rovai AI v${releaseVersion}"]`)})),
+      repeatedReleaseTitle: Boolean(surface?.querySelector(${JSON.stringify(`[data-markdown-heading="Coaxi AI v${releaseVersion}"]`)})),
       fallbackVisible: Boolean(surface?.querySelector('.about-update-fallback')),
       globalPromptVisible: Boolean(document.querySelector('.app-update-prompt')),
       forbiddenCopy: /校验 hash|等待当前任务|自动开始下载/.test(surface?.textContent ?? ''),
@@ -152,7 +152,7 @@ async function assertAboutUpdates(cdp, context) {
   assert(state.heading === '关于与更新', `${context} omitted the page heading`)
   assert(state.description === '自动检查新版本，下载与安装由你决定。',
     `${context} used the wrong description`)
-  assert(state.product === 'Rovai AI' && state.version === `v${releaseVersion}`,
+  assert(state.product === 'Coaxi AI' && state.version === `v${releaseVersion}`,
     `${context} used the wrong product/version: ${JSON.stringify(state)}`)
   assert(state.action === '检查更新' && state.actionTag === 'BUTTON' && state.actionFocused,
     `${context} did not expose a keyboard-focusable check action`)
@@ -190,7 +190,7 @@ async function assertNoHorizontalOverflow(cdp, context) {
 }
 
 async function setTheme(cdp, preference) {
-  await evaluate(cdp, `window.rovai.appearance.setPreference(${JSON.stringify(preference)})`, true)
+  await evaluate(cdp, `window.coaxi.appearance.setPreference(${JSON.stringify(preference)})`, true)
   const expected = preference === 'night' ? 'night' : 'day'
   await waitForExpression(cdp,
     `document.documentElement.dataset.theme === ${JSON.stringify(expected)}`)
@@ -208,8 +208,8 @@ async function launchApp(width, height) {
     stdio: ['ignore', 'ignore', 'pipe'],
     env: {
       ...process.env,
-      ROVAI_ALLOW_ISOLATED_INSTANCE: '1',
-      ROVAI_DISABLE_AUTO_UPDATE_CHECKS: '1'
+      COAXI_ALLOW_ISOLATED_INSTANCE: '1',
+      COAXI_DISABLE_AUTO_UPDATE_CHECKS: '1'
     }
   })
   child.stderr.on('data', (chunk) => stderr.push(String(chunk)))
@@ -226,12 +226,12 @@ async function launchApp(width, height) {
       mobile: false
     })
     await waitForExpression(cdp,
-      `Boolean(window.rovai && document.querySelector('.app-shell'))`, 45_000)
+      `Boolean(window.coaxi && document.querySelector('.app-shell'))`, 45_000)
     // The bootstrap shell is visible before authoritative Core requests are admitted.
-    await waitForExpression(cdp, `window.rovai.supervisor.getSnapshot().then(snapshot =>
+    await waitForExpression(cdp, `window.coaxi.supervisor.getSnapshot().then(snapshot =>
       snapshot.fullCoreState === 'ready' && snapshot.capabilities.coreRequests)`, 45_000)
-    const health = await evaluate(cdp, "window.rovai.request('health.check', {})", true)
-    assert(await realpath(health.database.path) === await realpath(join(dataDir, 'rovai.sqlite')),
+    const health = await evaluate(cdp, "window.coaxi.request('health.check', {})", true)
+    assert(await realpath(health.database.path) === await realpath(join(dataDir, 'coaxi.sqlite')),
       `Isolated App opened the wrong database: ${JSON.stringify(health.database.path)}`)
     await waitForExpression(cdp, `!document.querySelector('.startup-loading-canvas')`, 45_000)
     return { cdp, child }

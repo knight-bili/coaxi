@@ -8,12 +8,12 @@ import { buildHostWebParity } from '../review-host-web-parity.mjs'
 import { launchAcceptanceBrowser } from './host-web-browser.mjs'
 
 test('production continuation action preserves source, reconciles lost receipts and submits without session confirmation', { timeout: 90_000 }, async () => {
-  const fixture = await mkdtemp(join(tmpdir(), 'rovai-continuation-ui-'))
+  const fixture = await mkdtemp(join(tmpdir(), 'coaxi-continuation-ui-'))
   let browser
   try {
     const artifact = await buildHostWebParity(join(fixture, 'artifact'))
     browser = await launchAcceptanceBrowser({
-      executable: process.env.ROVAI_REVIEW_CHROME ?? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+      executable: process.env.COAXI_REVIEW_CHROME ?? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
       args: ['--headless=new', `--user-data-dir=${join(fixture, 'profile')}`, '--no-first-run', '--no-default-browser-check', '--remote-debugging-port=0', 'about:blank']
     })
     const url = pathToFileURL(artifact.productPath)
@@ -30,9 +30,9 @@ test('production continuation action preserves source, reconciles lost receipts 
     const original = await browser.evaluate(`JSON.stringify(${model}.get().snapshot.agentRuns)`)
     const draft = await browser.evaluate('document.querySelector("[contenteditable=true]").textContent')
     assert.deepEqual(await browser.evaluate(`(() => { const b=${button}, r=b.getBoundingClientRect(); return [r.width,r.height,b.textContent,b.getAttribute('aria-label')] })()`), [24, 24, '', '继续执行'])
-    if (process.env.ROVAI_CONTINUATION_UI_OUTPUT) {
-      await mkdir(process.env.ROVAI_CONTINUATION_UI_OUTPUT, { recursive: true })
-      await browser.capture(join(process.env.ROVAI_CONTINUATION_UI_OUTPUT, 'continuation-card.png'))
+    if (process.env.COAXI_CONTINUATION_UI_OUTPUT) {
+      await mkdir(process.env.COAXI_CONTINUATION_UI_OUTPUT, { recursive: true })
+      await browser.capture(join(process.env.COAXI_CONTINUATION_UI_OUTPUT, 'continuation-card.png'))
     }
     await browser.evaluate(`${model}.continuation.hold=true; ${button}.focus()`)
     assert.equal(await browser.evaluate(`document.activeElement === ${button}`), true)

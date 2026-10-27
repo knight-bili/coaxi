@@ -8,7 +8,7 @@ import './portable-configuration.css'
 
 type Row=Omit<PortableTaskTemplate,'config'>
 type Selection={row:PortableTaskTemplate;config:Record<string,unknown>;materials:Array<{key:string;name:string}>;settings:boolean}
-/** 沿 Codeg task-editor-dialog 模板弹层；跨主机材料和执行设置由 User 明确重映射。 */
+/** 沿 Coaxi task-editor-dialog 模板弹层；跨主机材料和执行设置由 User 明确重映射。 */
 export function TaskTemplateDraftPicker({disabled,memberCount,materials,onChooseMaterials,onApply}:{
   disabled:boolean;memberCount:number;materials:Array<{id:string;name:string}>;onChooseMaterials():void;onApply(value:{title:string;description:string}):void
 }):React.JSX.Element|null{

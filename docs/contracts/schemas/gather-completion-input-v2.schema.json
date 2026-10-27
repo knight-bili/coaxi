@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schemas.rovai.invalid/contracts/gather-completion-input-v2.schema.json",
-  "title": "Rovai Gather Completion Current Input v2",
+  "$id": "https://schemas.coaxi.invalid/contracts/gather-completion-input-v2.schema.json",
+  "title": "Coaxi Gather Completion Current Input v2",
   "type": "object",
   "additionalProperties": false,
   "required": [

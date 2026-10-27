@@ -21,7 +21,7 @@ export const CurrentUserProfileContext = createContext<ProfileState>({
 })
 
 export function CurrentUserProfileProvider({ children, api: providedApi }: { children: ReactNode; api?: CurrentUserProfileApi }): React.JSX.Element {
-  const api = providedApi ?? (typeof window !== 'undefined' ? window.rovai?.currentUserProfile : undefined)
+  const api = providedApi ?? (typeof window !== 'undefined' ? window.coaxi?.currentUserProfile : undefined)
   if (!api) throw new Error(uiAttribute('共享个人资料缺少显式适配。'))
   const [profile, setProfile] = useState(DEFAULT_CURRENT_USER_PROFILE)
   const [ready, setReady] = useState(false)

@@ -12,10 +12,10 @@ describe('controlled member avatar references', () => {
       kind: 'builtin',
       role: 'luoke',
       version: 1,
-      value: 'rovai://member-avatar/builtin/luoke/v1'
+      value: 'coaxi://member-avatar/builtin/luoke/v1'
     })
     const managed =
-      'rovai://member-avatar/managed/2b945f3f-4b45-4ae5-92b2-739fce600338'
+      'coaxi://member-avatar/managed/2b945f3f-4b45-4ae5-92b2-739fce600338'
     expect(parseControlledMemberAvatarRef(managed)).toEqual({
       kind: 'managed',
       assetId: '2b945f3f-4b45-4ae5-92b2-739fce600338',
@@ -32,16 +32,16 @@ describe('controlled member avatar references', () => {
       'https://example.com/avatar.png',
       'data:image/png;base64,AAAA',
       '/tmp/avatar.png',
-      'rovai://member-avatar/builtin/unknown/v1',
-      'rovai://member-avatar/builtin/luoke/v2',
-      'rovai://member-avatar/builtin/luoke/v1/',
-      'rovai://member-avatar/builtin/luoke/v1?size=32',
-      'rovai://member-avatar/builtin/luoke/v1#preview',
-      'rovai://member-avatar/managed/------------------------------------',
-      'rovai://member-avatar/managed/2B945F3F-4B45-4AE5-92B2-739FCE600338',
-      'ROVAI://MEMBER-AVATAR/builtin/luoke/v1',
-      'rovai://member-avatar/managed/2b945f3f-4b45-4ae5-92b2-739fce600338/extra',
-      'rovai://member-avatar/managed/2b945f3f-4b45-4ae5-92b2-739fce600338%2Fextra'
+      'coaxi://member-avatar/builtin/unknown/v1',
+      'coaxi://member-avatar/builtin/luoke/v2',
+      'coaxi://member-avatar/builtin/luoke/v1/',
+      'coaxi://member-avatar/builtin/luoke/v1?size=32',
+      'coaxi://member-avatar/builtin/luoke/v1#preview',
+      'coaxi://member-avatar/managed/------------------------------------',
+      'coaxi://member-avatar/managed/2B945F3F-4B45-4AE5-92B2-739FCE600338',
+      'COAXI://MEMBER-AVATAR/builtin/luoke/v1',
+      'coaxi://member-avatar/managed/2b945f3f-4b45-4ae5-92b2-739fce600338/extra',
+      'coaxi://member-avatar/managed/2b945f3f-4b45-4ae5-92b2-739fce600338%2Fextra'
     ]) {
       expect(parseControlledMemberAvatarRef(value), value).toBeNull()
     }

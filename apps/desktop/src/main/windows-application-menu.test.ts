@@ -22,7 +22,7 @@ describe('Windows application menu projection', () => {
     })
 
     expect(parseWindowsApplicationMenuPopupRequest({
-      section: 'rovai',
+      section: 'coaxi',
       x: 0,
       y: 0,
       sourceType: 'mouse'

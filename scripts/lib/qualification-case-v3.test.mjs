@@ -24,7 +24,7 @@ const CASE_ID = 'DC-900'
 const CASE_STEM = 'DC900'
 
 test('Case v3 admission proves initial, reference, Mutants, hermetic checks, and seal binding', async () => {
-  const root = await realpath(await mkdtemp(join(tmpdir(), 'rovai-case-v3-test-')))
+  const root = await realpath(await mkdtemp(join(tmpdir(), 'coaxi-case-v3-test-')))
   await chmod(root, 0o700)
   try {
     await buildPrivateCasePack(root)
@@ -87,7 +87,7 @@ test('Case v3 admission proves initial, reference, Mutants, hermetic checks, and
 })
 
 test('Case v3 rejects legacy fields, invalid topology, weak permissions, and a symlinked Pack root', async () => {
-  const parent = await realpath(await mkdtemp(join(tmpdir(), 'rovai-case-v3-test-negative-')))
+  const parent = await realpath(await mkdtemp(join(tmpdir(), 'coaxi-case-v3-test-negative-')))
   await chmod(parent, 0o700)
   const root = join(parent, 'pack')
   await mkdir(root, { mode: 0o700 })
@@ -126,7 +126,7 @@ test('Case v3 rejects legacy fields, invalid topology, weak permissions, and a s
 })
 
 test('Hermetic Node verification denies writes outside its per-check temporary directory', async () => {
-  const root = await realpath(await mkdtemp(join(tmpdir(), 'rovai-hermetic-negative-')))
+  const root = await realpath(await mkdtemp(join(tmpdir(), 'coaxi-hermetic-negative-')))
   await chmod(root, 0o700)
   try {
     await writeFile(join(root, 'attempt-write.mjs'), [
@@ -164,7 +164,7 @@ async function buildPrivateCasePack(root) {
   ].join('\n'))
   await writeWorkspace(paths.fixture, fixtureSource)
   await writeWorkspace(paths.reference, referenceSource)
-  await writePrivate(join(paths.reference, '.rovai-sealed-canary'), canary('REFERENCE'))
+  await writePrivate(join(paths.reference, '.coaxi-sealed-canary'), canary('REFERENCE'))
 
   const mutants = [
     {
@@ -192,7 +192,7 @@ async function buildPrivateCasePack(root) {
   for (const mutant of mutants) {
     const directory = join(root, `sealed/mutants/${mutant.name}`)
     await writePrivate(join(directory, 'src/solution.mjs'), mutant.source)
-    await writePrivate(join(directory, '.rovai-sealed-canary'), canary(mutant.name.toUpperCase()))
+    await writePrivate(join(directory, '.coaxi-sealed-canary'), canary(mutant.name.toUpperCase()))
   }
 
   const verifier = verifierSource()
@@ -213,14 +213,14 @@ async function buildPrivateCasePack(root) {
     caseId: CASE_ID,
     caseVersion: '1.0.0',
     manifestCanary: canary('MANIFEST'),
-    referenceCanaryFile: 'sealed/reference/.rovai-sealed-canary',
+    referenceCanaryFile: 'sealed/reference/.coaxi-sealed-canary',
     verifierCanary: canary('VERIFIER'),
     verificationPairs,
     mutants: mutants.map((mutant) => ({
       mutantId: mutant.mutantId,
       faultClass: mutant.faultClass,
       directory: `sealed/mutants/${mutant.name}`,
-      canaryFile: `sealed/mutants/${mutant.name}/.rovai-sealed-canary`,
+      canaryFile: `sealed/mutants/${mutant.name}/.coaxi-sealed-canary`,
       expectedFailingCheckIds: mutant.expectedFailingCheckIds
     }))
   }
@@ -364,18 +364,18 @@ function check(checkId, probe) {
     evidence: [{ code: passed ? 'withheld.passed' : 'withheld.failed', summary: passed ? 'Withheld behavior passed.' : 'Withheld behavior failed.' }]
   })
 }
-// ROVAI-WITHHELD-BEGIN:REQ-DC900-R1
+// COAXI-WITHHELD-BEGIN:REQ-DC900-R1
 check('CHK-DC900-R1-WITHHELD', () => module.normalizeEvent({ version: 2, type: '  UPDATED ' }) === 'v2:updated')
-// ROVAI-WITHHELD-END:REQ-DC900-R1
-// ROVAI-WITHHELD-BEGIN:REQ-DC900-R2
+// COAXI-WITHHELD-END:REQ-DC900-R1
+// COAXI-WITHHELD-BEGIN:REQ-DC900-R2
 check('CHK-DC900-R2-WITHHELD', () => { const state = new Map(); return module.reserveOnce(' Key ', state) && !module.reserveOnce('key', state) })
-// ROVAI-WITHHELD-END:REQ-DC900-R2
-// ROVAI-WITHHELD-BEGIN:REQ-DC900-R3
+// COAXI-WITHHELD-END:REQ-DC900-R2
+// COAXI-WITHHELD-BEGIN:REQ-DC900-R3
 check('CHK-DC900-R3-WITHHELD', () => JSON.stringify(module.migrateState({ version: 0, label: 'Lin' })) === JSON.stringify({ version: 2, userName: 'Lin' }))
-// ROVAI-WITHHELD-END:REQ-DC900-R3
-// ROVAI-WITHHELD-BEGIN:REQ-DC900-R4
+// COAXI-WITHHELD-END:REQ-DC900-R3
+// COAXI-WITHHELD-BEGIN:REQ-DC900-R4
 check('CHK-DC900-R4-WITHHELD', () => JSON.stringify(module.integrate({ event: 'v2:updated', reserved: false, userName: 'Lin' })) === JSON.stringify({ key: 'v2:updated:Lin', accepted: false }))
-// ROVAI-WITHHELD-END:REQ-DC900-R4
+// COAXI-WITHHELD-END:REQ-DC900-R4
 process.stdout.write(JSON.stringify({ schemaVersion: 2, checks }))
 `
 }
@@ -433,7 +433,7 @@ async function hardenParents(directory) {
   let current = directory
   while (current && current !== '/') {
     await chmod(current, 0o700)
-    if (current.includes('rovai-case-v3-test-')) break
+    if (current.includes('coaxi-case-v3-test-')) break
     current = current.slice(0, current.lastIndexOf('/'))
   }
 }
@@ -443,7 +443,7 @@ function canary(label) {
 }
 
 function withheldSection(source, requirementId) {
-  const begin = `// ROVAI-WITHHELD-BEGIN:${requirementId}\n`
-  const end = `// ROVAI-WITHHELD-END:${requirementId}`
+  const begin = `// COAXI-WITHHELD-BEGIN:${requirementId}\n`
+  const end = `// COAXI-WITHHELD-END:${requirementId}`
   return source.slice(source.indexOf(begin), source.indexOf(end) + end.length)
 }

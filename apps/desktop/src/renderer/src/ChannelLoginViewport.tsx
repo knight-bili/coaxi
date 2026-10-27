@@ -2,7 +2,7 @@ import { useLayoutEffect, useRef, useState } from 'react'
 import type { ChannelLoginViewBounds } from '@contracts'
 import { uiAttribute } from './interface-language'
 
-/** Only viewport geometry crosses IPC; the official page never receives the Rovai bridge. */
+/** Only viewport geometry crosses IPC; the official page never receives the Coaxi bridge. */
 export function ChannelLoginViewport({ attemptId }: { attemptId: string }): React.JSX.Element {
   const element = useRef<HTMLDivElement>(null)
   const [failed, setFailed] = useState(false)
@@ -20,7 +20,7 @@ export function ChannelLoginViewport({ attemptId }: { attemptId: string }): Reac
         const signature = JSON.stringify(bounds)
         if (signature === lastBounds) return
         lastBounds = signature
-        void window.rovai.channels.setLoginViewBounds(attemptId, bounds).catch(() => {
+        void window.coaxi.channels.setLoginViewBounds(attemptId, bounds).catch(() => {
           if (active) setFailed(true)
         })
       })
@@ -40,7 +40,7 @@ export function ChannelLoginViewport({ attemptId }: { attemptId: string }): Reac
       window.removeEventListener('resize', update)
       document.removeEventListener('scroll', update, true)
       document.removeEventListener('animationend', update, true)
-      void window.rovai.channels.setLoginViewBounds(attemptId, null).catch(() => undefined)
+      void window.coaxi.channels.setLoginViewBounds(attemptId, null).catch(() => undefined)
     }
   }, [attemptId])
 

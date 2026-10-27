@@ -13,7 +13,7 @@
     "child tasks and each-call spend supplied explicitly, no ambient directory traversal"
   ],
   "license": "Apache-2.0, integration/licenses/codeg/LICENSE",
-  "port": "crates/rovai-core/src/runtime_subagent_session/content/qoder.rs",
+  "port": "crates/coaxi-core/src/runtime_subagent_session/content/qoder.rs",
   "scope": "complete original Session replay/metadata/cache usage/window/turns, explicit Core child/task facts and verified agent full view; no User target grant",
   "source_audit": {
     "ok": true,
@@ -65,12 +65,12 @@
     "existing_private_source_gate_body_unchanged": true,
     "protected_files_unchanged": [
       "Cargo.lock",
-      "crates/rovai-core/Cargo.toml",
-      "crates/rovai-core/src/runtime_subagent_session.rs",
-      "crates/rovai-core/src/runtime_subagent_session/origin.rs",
-      "crates/rovai-core/src/runtime_subagent_session/source/qoder/branch.rs",
-      "crates/rovai-core/src/runtime_subagent_session/content/claude.rs",
-      "crates/rovai-core/src/runtime_subagent_session/content/claude_read.rs"
+      "crates/coaxi-core/Cargo.toml",
+      "crates/coaxi-core/src/runtime_subagent_session.rs",
+      "crates/coaxi-core/src/runtime_subagent_session/origin.rs",
+      "crates/coaxi-core/src/runtime_subagent_session/source/qoder/branch.rs",
+      "crates/coaxi-core/src/runtime_subagent_session/content/claude.rs",
+      "crates/coaxi-core/src/runtime_subagent_session/content/claude_read.rs"
     ],
     "adaptations": [
       "Record iterators/cancellation replace native file reads; original Session branch/sidechain behavior retained",

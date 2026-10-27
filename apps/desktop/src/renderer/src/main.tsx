@@ -7,11 +7,11 @@ import { applyRendererPlatform } from './renderer-platform'
 import './styles.css'
 import './member-editor.css'
 
-applyRendererPlatform(document.documentElement, window.rovai.platform)
+applyRendererPlatform(document.documentElement, window.coaxi.platform)
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    {window.rovai.platform === 'win32' && <WindowsApplicationMenu />}
+    {window.coaxi.platform === 'win32' && <WindowsApplicationMenu />}
     <App />
     <PageZoomFeedback />
   </StrictMode>

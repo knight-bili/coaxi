@@ -8,17 +8,17 @@ import { coreDataDirectoryArguments, removeEphemeralRuntimeCampFilesRoot } from 
 // --legacy-json measures the pre-binary-response Host using the same input.
 const root=resolve(import.meta.dirname, '..')
 const legacy=process.argv.includes('--legacy-json')
-const fixture=await realpath(await mkdtemp(join(tmpdir(),'rovai-resource-perf-')))
+const fixture=await realpath(await mkdtemp(join(tmpdir(),'coaxi-resource-perf-')))
 const data=join(fixture,'core'), workspace=join(fixture,'workspace')
 await mkdir(workspace)
 console.log(JSON.stringify({channel:'automatic_acceptance',dataDir:data,skillLibraryRoot:join(data,'skills'),mcpConfigPath:join(data,'mcp.json'),runtime:false}))
-const host=launchHost(process.env.ROVAI_HOST_BIN ?? join(root,'target/debug',process.platform==='win32'?'rovai-host.exe':'rovai-host'),[...coreDataDirectoryArguments(data),'--skill-library-root',join(data,'skills'),'--mcp-config-path',join(data,'mcp.json')],{cwd:root})
+const host=launchHost(process.env.COAXI_HOST_BIN ?? join(root,'target/debug',process.platform==='win32'?'coaxi-host.exe':'coaxi-host'),[...coreDataDirectoryArguments(data),'--skill-library-root',join(data,'skills'),'--mcp-config-path',join(data,'mcp.json')],{cwd:root})
 try {
  await within(host.ready)
  const members=await host.request('members.list')
  const validated=await host.request('workspaces.validate',{path:workspace})
  const camp=await host.request('camps.create',{commandId:crypto.randomUUID(),name:'Resource measurement',workspace:validated,memberAgentIds:[members[0].agentId],defaultLeadAgentId:members[0].agentId,collaborationMode:'peer'})
- const service=await host.request('host.web.start',{listen:'127.0.0.1:0',uiDirectory:process.env.ROVAI_WEB_UI ?? join(root,'out/web')})
+ const service=await host.request('host.web.start',{listen:'127.0.0.1:0',uiDirectory:process.env.COAXI_WEB_UI ?? join(root,'out/web')})
  const auth=await fetch(service.origin+'/api/v1/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({protocolVersion:3,administratorToken:service.administratorToken})}).then(r=>r.json())
  const call=async (action,request,binary=false)=>{
    const r=await fetch(service.origin+'/api/v1/files'+(binary?'/bytes':''),{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${auth.token}`},body:JSON.stringify({action,request})})

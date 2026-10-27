@@ -468,12 +468,12 @@ export function ExecutionWebSettingsPanel(): React.JSX.Element {
 
   useEffect(() => {
     let alive = true
-    void window.rovai.channels.getExecutionWebSettings().then((next) => {
+    void window.coaxi.channels.getExecutionWebSettings().then((next) => {
       if (alive) apply(next)
     }).catch(() => {
       if (alive) setError(uiAttribute('暂时无法读取执行台设置。'))
     })
-    const unsubscribe = window.rovai.channels.onExecutionWebSettingsChanged((next) => {
+    const unsubscribe = window.coaxi.channels.onExecutionWebSettingsChanged((next) => {
       if (alive) apply(next)
     })
     return () => {
@@ -503,7 +503,7 @@ export function ExecutionWebSettingsPanel(): React.JSX.Element {
     setSaving(true)
     setError(null)
     try {
-      apply(await window.rovai.channels.setExecutionWebSettings({ enabled, port: parsedPort }))
+      apply(await window.coaxi.channels.setExecutionWebSettings({ enabled, port: parsedPort }))
     } catch (nextError) {
       const message = nextError instanceof Error ? nextError.message : String(nextError)
       setError(message.includes('port') || message.includes('EADDRINUSE')

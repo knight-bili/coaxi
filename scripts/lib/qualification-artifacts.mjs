@@ -179,7 +179,7 @@ export function buildQualificationCaseArtifact({ result, caseRecord, producerDig
   }
   const artifact = envelope({
     artifactId: `qualification-case:${manifest.id}:${manifest.version}`,
-    schemaId: 'rovai.qualification.case',
+    schemaId: 'coaxi.qualification.case',
     schemaVersion: diagnostic ? '1.1.0' : '1.0.0',
     producer: producer(
       'qualification-case-admission',
@@ -214,7 +214,7 @@ export function buildVerificationCatalogArtifact({ result, caseRecord, producerD
   }
   const artifact = envelope({
     artifactId: payload.catalogId,
-    schemaId: 'rovai.qualification.verification-catalog',
+    schemaId: 'coaxi.qualification.verification-catalog',
     schemaVersion: diagnostic ? '1.2.0' : '1.1.0',
     producer: runnerProducer(producerDigest),
     binding: resultBinding(result),
@@ -267,7 +267,7 @@ export function buildDeliveredWorkspaceSnapshotArtifact({
   }
   const artifact = envelope({
     artifactId: payload.snapshotId,
-    schemaId: 'rovai.qualification.delivered-workspace-snapshot',
+    schemaId: 'coaxi.qualification.delivered-workspace-snapshot',
     schemaVersion: '1.0.0',
     producer: runnerProducer(producerDigest),
     binding: resultBinding(result),
@@ -326,7 +326,7 @@ export function buildVerifierObservationArtifact({
   }
   const artifact = envelope({
     artifactId: `verifier-observation:${payload.attemptId}`,
-    schemaId: 'rovai.qualification.verifier-observation',
+    schemaId: 'coaxi.qualification.verifier-observation',
     schemaVersion: '1.0.0',
     producer: producer(
       'withheld-verifier',
@@ -448,7 +448,7 @@ export function buildQualificationEnvironmentArtifact({
   }
   const artifact = envelope({
     artifactId: payload.environmentId,
-    schemaId: 'rovai.qualification.environment-manifest',
+    schemaId: 'coaxi.qualification.environment-manifest',
     schemaVersion: '1.1.0',
     producer: runnerProducer(producerDigest),
     binding: resultBinding(result),
@@ -538,7 +538,7 @@ export function buildQualificationTrialArtifact({
     evidenceIndexArtifact: nullableArtifactReference(evidenceIndex),
     evaluationAttempts: evaluationAttempts.map((attempt) => ({
       artifactId: `evaluation-attempt:${stableId(attempt.attemptId)}`,
-      schemaId: 'rovai.qualification.evaluation-attempt',
+      schemaId: 'coaxi.qualification.evaluation-attempt',
       schemaVersion: `${Number.isInteger(attempt.schemaVersion) ? attempt.schemaVersion : 1}.0.0`,
       payloadDigest: digest(attempt)
     }))
@@ -546,7 +546,7 @@ export function buildQualificationTrialArtifact({
   const identity = result.resultRevision?.revisionId ?? sha256(canonicalJson(payload)).slice(0, 32)
   const artifact = envelope({
     artifactId: `qualification-trial:${stableId(identity)}`,
-    schemaId: 'rovai.qualification.trial',
+    schemaId: 'coaxi.qualification.trial',
     schemaVersion: '1.1.0',
     producer: runnerProducer(producerDigest),
     binding: resultBinding(result),
@@ -593,7 +593,7 @@ function boundary(authorityClass, sourceId, value, coverage) {
 }
 
 function runnerProducer(producerDigest) {
-  return producer('rovai-qualification-runner', QUALIFICATION_RUNNER_VERSION, producerDigest)
+  return producer('coaxi-qualification-runner', QUALIFICATION_RUNNER_VERSION, producerDigest)
 }
 
 function producer(id, version, producerDigest) {

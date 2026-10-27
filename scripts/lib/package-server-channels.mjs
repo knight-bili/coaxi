@@ -21,9 +21,9 @@ export function packageServerChannels(repository,destination,target){
   const input=process.execPath
   if(!lstatSync(input).isFile()||lstatSync(input).isSymbolicLink())throw new Error('Resolve Node to a regular native executable before packaging')
   const binary=join(runtime,name);copyFileSync(input,binary);if(target.platform!=='win32')chmodSync(binary,0o755)
-  const licenseCandidates=[process.env.ROVAI_NODE_LICENSE,join(dirname(input),'LICENSE'),join(dirname(input),'LICENSE.txt'),join(dirname(input),'../share/doc/node/LICENSE')].filter(Boolean)
+  const licenseCandidates=[process.env.COAXI_NODE_LICENSE,join(dirname(input),'LICENSE'),join(dirname(input),'LICENSE.txt'),join(dirname(input),'../share/doc/node/LICENSE')].filter(Boolean)
   const license=licenseCandidates.find(path=>existsSync(path)&&lstatSync(path).isFile()&&!lstatSync(path).isSymbolicLink())
-  if(!license)throw new Error('Node distribution LICENSE is required; set ROVAI_NODE_LICENSE to its exact source file')
+  if(!license)throw new Error('Node distribution LICENSE is required; set COAXI_NODE_LICENSE to its exact source file')
   copyFileSync(license,join(runtime,'LICENSE'))
   cpSync(built,join(destination,'server-channels'),{recursive:true,filter:path=>!path.endsWith('inputs.json')})
   manifest.runtime={path:`channel-runtime/${name}`,version:process.versions.node,sha256:createHash('sha256').update(readFileSync(binary)).digest('hex')}

@@ -9,8 +9,8 @@ export async function qualifyCanvasObjectCold(window,{evaluate,wait,rpc,openCanv
   window.unmaximize();window.setContentSize(1680,1000);window.webContents.setZoomFactor(1)
   const git=(cwd,...args)=>execFileSync(config.git_executable,['-C',cwd,...args],{encoding:'utf8',windowsHide:true}).trim()
   const ownerCore=()=>{
-    const rows=JSON.parse(execFileSync(join(process.env.SystemRoot,'System32/WindowsPowerShell/v1.0/powershell.exe'),['-NoProfile','-NonInteractive','-Command',`$rows=@(Get-CimInstance Win32_Process -Filter 'ParentProcessId = ${process.pid}' | Where-Object {$_.Name -eq 'rovai-host.exe'} | Select-Object ProcessId,ExecutablePath,CommandLine);ConvertTo-Json -InputObject $rows -Compress`],{encoding:'utf8',windowsHide:true}))
-    assert.equal(rows.length,1);assert.equal(resolve(rows[0].ExecutablePath).toLowerCase(),resolve(process.env.ROVAI_HOST_BIN).toLowerCase())
+    const rows=JSON.parse(execFileSync(join(process.env.SystemRoot,'System32/WindowsPowerShell/v1.0/powershell.exe'),['-NoProfile','-NonInteractive','-Command',`$rows=@(Get-CimInstance Win32_Process -Filter 'ParentProcessId = ${process.pid}' | Where-Object {$_.Name -eq 'coaxi-host.exe'} | Select-Object ProcessId,ExecutablePath,CommandLine);ConvertTo-Json -InputObject $rows -Compress`],{encoding:'utf8',windowsHide:true}))
+    assert.equal(rows.length,1);assert.equal(resolve(rows[0].ExecutablePath).toLowerCase(),resolve(process.env.COAXI_HOST_BIN).toLowerCase())
     assert.ok(rows[0].CommandLine.toLowerCase().includes(join(config.data_root,'Core').toLowerCase()));return rows[0].ProcessId
   }
   const click=async expression=>{

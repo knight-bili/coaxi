@@ -1,8 +1,8 @@
 import type { PrivateAttachmentPreparationOwner, PrivateAttachmentPreparationRequest,
-  PrivateAttachmentPreparationResult, PrivateAttachmentUploadTarget, RovaiApi } from '@contracts'
+  PrivateAttachmentPreparationResult, PrivateAttachmentUploadTarget, CoaxiApi } from '@contracts'
 import { newCommandId } from '../../shared/command-id'
 
-type Api = RovaiApi['singleChatAttachments']
+type Api = CoaxiApi['singleChatAttachments']
 export interface PrivateUploadRow {
   request: PrivateAttachmentPreparationRequest
   displayName: string

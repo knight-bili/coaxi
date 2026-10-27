@@ -46,12 +46,12 @@ if (args.includes('--help') || args.length === 0) {
   const config = JSON.parse(await readFile(resolve(options['--config']), 'utf8'))
   const result = await runDaily({ ...config, date: options['--date'], exportTrace: async params => {
     if (options['--trace']) return JSON.parse(await readFile(resolve(options['--trace']), 'utf8'))
-    if (!config.cli) throw new Error('No local Rovai CLI configured')
+    if (!config.cli) throw new Error('No local Coaxi CLI configured')
     // The CLI remains a user operation; managed Agents consume a prepared report.
     const { mkdtemp } = await import('node:fs/promises')
     const { tmpdir } = await import('node:os')
     const { join } = await import('node:path')
-    const root = await mkdtemp(join(tmpdir(), 'rovai-trace-export-'))
+    const root = await mkdtemp(join(tmpdir(), 'coaxi-trace-export-'))
     const argv = ['app', 'trace', 'export', '--since', params.since, '--until', params.until, '--output', join(root, 'export'), '--json']
     for (const [key, flag] of [['threadIds', '--camp-id'], ['excludeThreadIds', '--exclude-camp-id'], ['excludeAutomationIds', '--exclude-automation-id']]) for (const id of params[key]) argv.push(flag, id)
     try {

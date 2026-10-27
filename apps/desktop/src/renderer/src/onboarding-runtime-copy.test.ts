@@ -227,7 +227,7 @@ describe('first-run Runtime copies with durable Desktop checkpoints', () => {
 })
 
 async function harness() {
-  const directory = await mkdtemp(join(tmpdir(), 'rovai-onboarding-copies-'))
+  const directory = await mkdtemp(join(tmpdir(), 'coaxi-onboarding-copies-'))
   directories.push(directory)
   const file = join(directory, 'onboarding.json')
   let store = await OnboardingStore.load(file)

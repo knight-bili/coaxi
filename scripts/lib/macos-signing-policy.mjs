@@ -1,5 +1,5 @@
 export const MACOS_SIGNING_POLICY = Object.freeze({
-  appId: 'ai.rovai.desktop',
+  appId: 'ai.coaxi.desktop',
   authorityPrefix: 'Developer ID Application:',
   intermediateAuthority: 'Developer ID Certification Authority',
   rootAuthorityPrefix: 'Apple Root CA'

@@ -89,7 +89,7 @@ test('Profile digest, uncontrolled channels, incomplete coverage and Runner acti
 })
 
 test('Profile file must be private, regular and non-symlinked', async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'rovai-isolation-profile-'))
+  const directory = await mkdtemp(join(tmpdir(), 'coaxi-isolation-profile-'))
   const profilePath = join(directory, 'profile.json')
   const symlinkPath = join(directory, 'profile-link.json')
   await writeFile(profilePath, `${JSON.stringify(validProfile())}\n`, { mode: 0o600 })
@@ -115,7 +115,7 @@ test('Profile file must be private, regular and non-symlinked', async () => {
 })
 
 test('continuity requires the same private Profile bytes and Runner identity after dispatch', async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'rovai-isolation-continuity-'))
+  const directory = await mkdtemp(join(tmpdir(), 'coaxi-isolation-continuity-'))
   const profilePath = join(directory, 'profile.json')
   await writeFile(profilePath, `${JSON.stringify(validProfile())}\n`, { mode: 0o600 })
   const initial = await loadAndAdmitInterventionIsolationProfile(profilePath, EXPECTED)
@@ -177,7 +177,7 @@ function validProfile() {
   }
   return {
     artifactId: 'isolation-profile-1',
-    schemaId: 'rovai.qualification.intervention-isolation-profile',
+    schemaId: 'coaxi.qualification.intervention-isolation-profile',
     schemaVersion: '1.0.0',
     producer: {
       id: 'test-isolation-controller',

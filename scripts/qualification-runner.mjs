@@ -56,7 +56,7 @@ import {
 import {
   assertExecutable,
   descendantsOf,
-  findCompetingRovaiProcesses,
+  findCompetingCoaxiProcesses,
   processTable,
   qualificationRuntimePrivateDiagnostic,
   startQualificationCore,
@@ -254,11 +254,11 @@ async function runTrial(options, registerCleanup) {
     }
     await assertExecutable(options.coreExecutable)
     if (options.mode === 'formal' && !isPackagedCore(options.coreExecutable)) {
-      throw new Error('formal mode requires the packaged Rovai-ai Release Core')
+      throw new Error('formal mode requires the packaged Coaxi Release Core')
     }
-    competingProcesses = await findCompetingRovaiProcesses()
+    competingProcesses = await findCompetingCoaxiProcesses()
     if (competingProcesses.length > 0 && !regression) {
-      throw new Error(`a Rovai App/Core is already running: ${competingProcesses.map((item) => item.pid).join(',')}`)
+      throw new Error(`a Coaxi App/Core is already running: ${competingProcesses.map((item) => item.pid).join(',')}`)
     }
     if (regression?.temporaryRoot) {
       // Assign ownership only after exclusive creation succeeds; pre-existing
@@ -266,7 +266,7 @@ async function runTrial(options, registerCleanup) {
       await mkdir(regression.temporaryRoot, { mode: 0o700 })
       temporaryRoot = regression.temporaryRoot
     } else {
-      temporaryRoot = await makeTemporaryDirectory(`rovai-qualification-${caseRecord.contract.manifest.id}-`)
+      temporaryRoot = await makeTemporaryDirectory(`coaxi-qualification-${caseRecord.contract.manifest.id}-`)
     }
     temporaryRoot = await realpath(temporaryRoot)
     dataDirectory = join(temporaryRoot, 'data')
@@ -1891,10 +1891,10 @@ function buildFreshStateAttestation({
   const artifactId = `fresh-state-attestation:${sha256(`${trialId}:${freshStateNonce}`).slice(0, 32)}`
   return {
     artifactId,
-    schemaId: 'rovai.benchmark.fresh-state-attestation',
+    schemaId: 'coaxi.benchmark.fresh-state-attestation',
     schemaVersion: '1.0.0',
     producer: {
-      id: 'rovai-qualification-runner',
+      id: 'coaxi-qualification-runner',
       version: QUALIFICATION_RUNNER_VERSION,
       digest: producerDigest.startsWith('sha256:') ? producerDigest : `sha256:${producerDigest}`
     },
@@ -2008,7 +2008,7 @@ async function initializeBaselineGit(workspacePath) {
   const commands = [
     ['init', '--initial-branch=main'],
     ['add', '--all'],
-    ['-c', 'user.name=Rovai Qualification', '-c', 'user.email=qualification@invalid', 'commit', '-m', 'sealed baseline']
+    ['-c', 'user.name=Coaxi Qualification', '-c', 'user.email=qualification@invalid', 'commit', '-m', 'sealed baseline']
   ]
   for (const args of commands) {
     const result = await runCaptured('git', args, { cwd: workspacePath, timeoutMs: 60_000 })
@@ -2047,7 +2047,7 @@ function isTurnTerminal(status) {
 }
 
 function isPackagedCore(path) {
-  return /\.app\/Contents\/Resources\/bin\/rovai-core$/.test(resolve(path))
+  return /\.app\/Contents\/Resources\/bin\/coaxi-core$/.test(resolve(path))
 }
 
 function sanitizeCoreStop(value) {

@@ -32,7 +32,7 @@ function aboutSnapshot() {
   const snapshot = fixture.updateSnapshot(state.scenario === 'server_no_candidate' ? 'current' : 'normal')
   if (state.scenario === 'server_download_failed') return {
     ...snapshot, status: 'download_failed', failureReason: 'download_failed',
-    currentRelease: { version: snapshot.currentVersion, releaseName: 'Rovai AI 0.0.6', releaseDate: null, releaseNotes: '当前版日志' }
+    currentRelease: { version: snapshot.currentVersion, releaseName: 'Coaxi AI 0.0.6', releaseDate: null, releaseNotes: '当前版日志' }
   }
   if (state.scenario === 'server_no_candidate') return {
     ...snapshot, status: 'check_failed', failureReason: 'updater_unavailable'
@@ -66,7 +66,7 @@ const savePreference = key => async value => {
   state.preferences[key] = clone(value)
   return clone(state.preferences)
 }
-Object.assign(window, { rovai: {
+Object.assign(window, { coaxi: {
   selectRuntimeExecutable: async () => '/sample/custom/codex',
   platform: 'darwin', onEvent: () => () => {},
   hostWeb: {
@@ -189,8 +189,8 @@ function Fixture() {
       onRemoveProject={async () => {}} onRename={async () => {}} onDelete={async () => {}} onError={error => { throw error }} />
     <main className="content settings-content">
       <div className="settings-workbench"><div className={`settings-panel settings-panel-${page}`} key={`${page}-${generation}`}>
-        {page === 'general' && <GeneralSettings api={window.rovai.generalPreferences} windowControls={window.rovai.windowControls} agents={roster} initialPreferences={state.preferences} onPreferencesChange={ignore} />}
-        {page === 'remote' && <HostWebSettings portDraft={remotePort} onPortDraftChange={setRemotePort} api={window.rovai.hostWeb} />}
+        {page === 'general' && <GeneralSettings api={window.coaxi.generalPreferences} windowControls={window.coaxi.windowControls} agents={roster} initialPreferences={state.preferences} onPreferencesChange={ignore} />}
+        {page === 'remote' && <HostWebSettings portDraft={remotePort} onPortDraftChange={setRemotePort} api={window.coaxi.hostWeb} />}
         {page === 'appearance' && <AppearanceSettings appearance={appearance} disabled={false} onChange={async value => { setAppearance(value); return value }} />}
         {page === 'notifications' && <NotificationSettings />}
         {page === 'runtime' && <RuntimeInstallationsPanel health={fixture.healthSnapshot()} installations={[]} onReload={async () => {}} />}

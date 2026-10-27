@@ -35,19 +35,19 @@ describe('local Thread Composer drafts', () => {
     const legacy: ThreadComposerDraftView = { ...emptyLocalThreadComposerDraft('thread'), body: 'legacy', content: { version: 2, segments: [{ kind: 'text', text: 'legacy' }] },
       attachments: [{ id: '11111111-1111-4111-8111-111111111111', displayName: 'old.txt', kind: 'file', fileCount: 1, mediaType: 'text/plain', byteSize: 10, previewKind: 'none', availability: 'available', sourcePath: '/old/private/source.txt' }] }
     saveLocalThreadComposerDraft(legacy, original)
-    const before = original.getItem('rovai.camp-composer-draft.v1:thread')
+    const before = original.getItem('coaxi.camp-composer-draft.v1:thread')
     const copied = copyLegacyThreadComposerDraft(emptyLocalThreadComposerDraft('thread'), loadLocalThreadComposerDraft('thread', original)!, current)!
     expect(copied.body).toBe('legacy')
     expect(copied.attachments[0].availability).toBe('unknown')
     expect(copied.attachments[0].sourcePath).toBeUndefined()
-    expect(original.getItem('rovai.camp-composer-draft.v1:thread')).toBe(before)
+    expect(original.getItem('coaxi.camp-composer-draft.v1:thread')).toBe(before)
     expect(copyLegacyThreadComposerDraft(copied, legacy, current)).toBeNull()
     expect(copyLegacyThreadComposerDraft(emptyLocalThreadComposerDraft('other'), legacy, current)).toBeNull()
-    const scopedBefore = current.getItem('rovai.camp-composer-draft.v1:thread')
+    const scopedBefore = current.getItem('coaxi.camp-composer-draft.v1:thread')
     const quota = { ...current, getItem: current.getItem.bind(current), removeItem: current.removeItem.bind(current), setItem() { throw new Error('quota') } }
     expect(() => copyLegacyThreadComposerDraft(emptyLocalThreadComposerDraft('thread'), legacy, quota)).toThrow('quota')
-    expect(current.getItem('rovai.camp-composer-draft.v1:thread')).toBe(scopedBefore)
-    expect(original.getItem('rovai.camp-composer-draft.v1:thread')).toBe(before)
+    expect(current.getItem('coaxi.camp-composer-draft.v1:thread')).toBe(scopedBefore)
+    expect(original.getItem('coaxi.camp-composer-draft.v1:thread')).toBe(before)
   })
   it('restores the same editor snapshot without reading another editor or deleting its draft', () => {
     const entriesA = new Map<string, unknown>(), entriesB = new Map<string, unknown>()
@@ -116,7 +116,7 @@ describe('local Thread Composer drafts', () => {
 
   it('rejects malformed local records instead of partially restoring them', () => {
     const storage = new MemoryStorage()
-    storage.setItem('rovai.camp-composer-draft.v1:camp-a', JSON.stringify({
+    storage.setItem('coaxi.camp-composer-draft.v1:camp-a', JSON.stringify({
       ...emptyLocalThreadComposerDraft('camp-a'),
       content: { version: 2, segments: [{ kind: 'atom', atom: { type: 'member' } }] }
     }))

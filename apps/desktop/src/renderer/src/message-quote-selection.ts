@@ -145,5 +145,5 @@ export function readMessageQuoteSelection(
 }
 
 export function dismissMessageQuoteSelection(): void {
-  window.dispatchEvent(new Event('rovai-dismiss-message-quote'))
+  window.dispatchEvent(new Event('coaxi-dismiss-message-quote'))
 }

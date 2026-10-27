@@ -20,10 +20,10 @@ import './styles.css'
 import './mobile.css'
 
 const transport = new ConsoleClient(window.location.origin, fetch, sessionStorage, browserAuthStorage(window.location.origin))
-const entryKind = document.querySelector<HTMLMetaElement>('meta[name="rovai-host-kind"]')?.content
+const entryKind = document.querySelector<HTMLMetaElement>('meta[name="coaxi-host-kind"]')?.content
 const hostKind = entryKind === 'desktop' || entryKind === 'server' ? entryKind : null
 document.documentElement.dataset.platform = browserPlatform()
-document.documentElement.dataset.rovaiSurface = 'web'
+document.documentElement.dataset.coaxiSurface = 'web'
 const loginTheme = matchMedia('(prefers-color-scheme: dark)')
 function applyLoginTheme(): void {
   document.documentElement.dataset.theme = loginTheme.matches ? 'night' : 'day'

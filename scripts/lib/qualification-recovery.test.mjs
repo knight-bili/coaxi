@@ -77,21 +77,21 @@ test('Evaluation recovery reuses one immutable Snapshot and appends attempts and
     assert.equal('verifier' in recovered.redactedSummary, false)
     assert.equal(recovered.resultBundle.dispatchBoundary.commandId, 'command-original')
     assert.equal(recovered.resultBundle.deliveredWorkspaceSnapshot.digest, snapshotBefore.digest)
-    assert.equal(recovered.resultBundle.evidenceIndex.schemaId, 'rovai.qualification.evidence-index')
+    assert.equal(recovered.resultBundle.evidenceIndex.schemaId, 'coaxi.qualification.evidence-index')
     assert.equal(recovered.resultBundle.evidenceIndex.recordCount > 0, true)
     assert.equal(recovered.redactedSummary.evidenceIndex.recordCount, recovered.resultBundle.evidenceIndex.recordCount)
     assert.equal(JSON.stringify(recovered.redactedSummary).includes(recovered.resultBundle.evidenceIndex.locator), false)
-    assert.equal(recovered.resultBundle.toolCallLedger.schemaId, 'rovai.qualification.tool-call-ledger')
+    assert.equal(recovered.resultBundle.toolCallLedger.schemaId, 'coaxi.qualification.tool-call-ledger')
     assert.equal(recovered.redactedSummary.toolCallLedger.recordCount, recovered.resultBundle.toolCallLedger.recordCount)
     assert.equal(JSON.stringify(recovered.redactedSummary).includes(recovered.resultBundle.toolCallLedger.locator), false)
-    assert.equal(recovered.resultBundle.workspaceMutationLedger.schemaId, 'rovai.qualification.workspace-mutation-ledger')
+    assert.equal(recovered.resultBundle.workspaceMutationLedger.schemaId, 'coaxi.qualification.workspace-mutation-ledger')
     assert.equal(recovered.redactedSummary.workspaceMutationLedger.recordCount, recovered.resultBundle.workspaceMutationLedger.recordCount)
     assert.equal(JSON.stringify(recovered.redactedSummary).includes(recovered.resultBundle.workspaceMutationLedger.locator), false)
     assert.equal((await jsonFiles(join(fixture.evidenceDirectory, 'evidence-indexes'))).length, 1)
     assert.equal((await jsonFiles(join(fixture.evidenceDirectory, 'tool-call-ledgers'))).length, 1)
     assert.equal((await jsonFiles(join(fixture.evidenceDirectory, 'workspace-mutation-ledgers'))).length, 1)
-    assert.equal(recovered.publicReport.schemaId, 'rovai.qualification.public-benchmark-report')
-    assert.equal(recovered.evidenceBundleManifest.schemaId, 'rovai.qualification.evidence-bundle-manifest')
+    assert.equal(recovered.publicReport.schemaId, 'coaxi.qualification.public-benchmark-report')
+    assert.equal(recovered.evidenceBundleManifest.schemaId, 'coaxi.qualification.evidence-bundle-manifest')
     const publicReport = JSON.parse(await readFile(
       join(fixture.evidenceDirectory, recovered.publicReport.locator),
       'utf8'
@@ -247,7 +247,7 @@ test('Irrecoverable Snapshot corruption invalidates the retained Trial without r
 })
 
 async function createPendingDemoTrial() {
-  const root = await mkdtemp(join(tmpdir(), 'rovai-qualification-recovery-test-'))
+  const root = await mkdtemp(join(tmpdir(), 'coaxi-qualification-recovery-test-'))
   const evidenceDirectory = join(root, 'evidence')
   const workspace = join(root, 'workspace')
   await mkdir(evidenceDirectory, { mode: 0o700 })

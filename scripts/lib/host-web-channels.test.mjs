@@ -15,13 +15,13 @@ const root = resolve(import.meta.dirname, '../..')
 const vite = await createViteServer({ root, configFile: false, appType: 'custom', optimizeDeps: { noDiscovery: true, include: [] }, server: { middlewareMode: true } })
 const { createHostChannelHandler, parseHostChannelRequest } = await vite.ssrLoadModule('/apps/desktop/src/main/host-channels.ts')
 await vite.close()
-const uiDirectory = process.env.ROVAI_WEB_UI ?? join(root, 'out/web')
-const binary = process.env.ROVAI_HOST_BIN ?? join(root, 'target/debug', process.platform === 'win32' ? 'rovai-host.exe' : 'rovai-host')
+const uiDirectory = process.env.COAXI_WEB_UI ?? join(root, 'out/web')
+const binary = process.env.COAXI_HOST_BIN ?? join(root, 'target/debug', process.platform === 'win32' ? 'coaxi-host.exe' : 'coaxi-host')
 
 // Real Axum/auth/Host/parent pipe and production Main adapter; platform service
 // is a controlled fixture, no real account login or Bot publication occurs.
 test('Hosted channels use the closed parent adapter and survive browser logout and Web stop', { timeout: 60_000 }, async () => {
-  const fixture = await realpath(await mkdtemp(join(tmpdir(), 'rovai-host-channels-')))
+  const fixture = await realpath(await mkdtemp(join(tmpdir(), 'coaxi-host-channels-')))
   const data = process.platform === 'win32'
     ? JSON.parse(execFileSync(binary, ['--prepare-windows-data-root', join(fixture, 'formal')], { encoding: 'utf8' })).core
     : join(fixture, 'data')
@@ -63,7 +63,7 @@ test('Hosted channels use the closed parent adapter and survive browser logout a
     let web = await host.request('host.web.start', { listen: '127.0.0.1:0', uiDirectory })
     const entry = await fetch(`${web.origin}/`)
     assert.equal(entry.headers.get('cache-control'), 'no-store')
-    assert.match(await entry.text(), /name="rovai-host-kind" content="desktop"/)
+    assert.match(await entry.text(), /name="coaxi-host-kind" content="desktop"/)
     const login = async () => {
       const reply = await fetch(`${web.origin}/api/v1/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ protocolVersion: 4, administratorToken: web.administratorToken }) })
       assert.equal(reply.status, 200)

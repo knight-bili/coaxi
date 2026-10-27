@@ -113,12 +113,12 @@
       "existing_private_source_gate_body_unchanged": true,
       "protected_files_unchanged": [
         "Cargo.lock",
-        "crates/rovai-core/Cargo.toml",
-        "crates/rovai-core/src/runtime_subagent_session.rs",
-        "crates/rovai-core/src/runtime_subagent_session/origin.rs",
-        "crates/rovai-core/src/runtime_subagent_session/source/qoder/branch.rs",
-        "crates/rovai-core/src/runtime_subagent_session/content/claude.rs",
-        "crates/rovai-core/src/runtime_subagent_session/content/claude_read.rs"
+        "crates/coaxi-core/Cargo.toml",
+        "crates/coaxi-core/src/runtime_subagent_session.rs",
+        "crates/coaxi-core/src/runtime_subagent_session/origin.rs",
+        "crates/coaxi-core/src/runtime_subagent_session/source/qoder/branch.rs",
+        "crates/coaxi-core/src/runtime_subagent_session/content/claude.rs",
+        "crates/coaxi-core/src/runtime_subagent_session/content/claude_read.rs"
       ],
       "adaptations": [
         "Record iterators/cancellation replace native file reads; original Session branch/sidechain behavior retained",
@@ -182,7 +182,7 @@
     "rustfmt_changed_files": true,
     "diff_check": true,
     "test_binary": {
-      "path": "D:\\soft\\codex\\build-cache\\codeg-rovai\\debug\\deps\\rovai_core-73391bc2aedcb5af.exe",
+      "path": "D:\\soft\\codex\\build-cache\\coaxi-coaxi\\debug\\deps\\coaxi_core-73391bc2aedcb5af.exe",
       "bytes": 131482624,
       "sha256": "6a406379f784af362d9cecd705ee4a1b484ba1b995e194ebe1daae28e018e67a",
       "modified_at": "2026-10-19T06:12:06.200437+00:00"
@@ -229,27 +229,27 @@
   "preserved_dirty_agents_sha256": "6d5c55bc4069cd453a36a38d9b0f48c112f1c256982388a27629c12f962c9f4b",
   "source_files": [
     {
-      "path": "crates/rovai-core/src/runtime_subagent_session/content/mod.rs",
+      "path": "crates/coaxi-core/src/runtime_subagent_session/content/mod.rs",
       "sha256": "f56d8618702a1f1954be166166e5affc3cefbc51055cfedda25be85ba450c7dd",
       "git_blob": "08bbd6a14772604f6b99d877235e4d61617b5a91"
     },
     {
-      "path": "crates/rovai-core/src/runtime_subagent_session/content/qoder.rs",
+      "path": "crates/coaxi-core/src/runtime_subagent_session/content/qoder.rs",
       "sha256": "00ca11fc8ddc671f7cb420566d66081999f5301d2aa055972bdf9aee4fff1879",
       "git_blob": "7e8dd5b7276133b6b0282449bacd53fa80a12081"
     },
     {
-      "path": "crates/rovai-core/src/runtime_subagent_session/content/qoder/reference_tests.rs",
+      "path": "crates/coaxi-core/src/runtime_subagent_session/content/qoder/reference_tests.rs",
       "sha256": "4e5c05c4cba5b8036364cdf3f77c6624d41233d7b7946b6f58f42e804c255d20",
       "git_blob": "367bfbcab6988cff6e897056426ad4d096e7401e"
     },
     {
-      "path": "crates/rovai-core/src/runtime_subagent_session/source/qoder.rs",
+      "path": "crates/coaxi-core/src/runtime_subagent_session/source/qoder.rs",
       "sha256": "4b1d0c9e13f7560982e704dbec17a37fa28c371630d8107509295b616493d970",
       "git_blob": "fdf8060c5401b8822e404d2fbf57f7cb946ffce5"
     },
     {
-      "path": "crates/rovai-core/src/runtime_subagent_session/source/qoder_tests.rs",
+      "path": "crates/coaxi-core/src/runtime_subagent_session/source/qoder_tests.rs",
       "sha256": "c7e28b1a26bb4e5805821c5721ade07de547ad6642515053a51e03746f77636d",
       "git_blob": "daeda8d7329f36c6b19e95a846ba96c747783fbf"
     },

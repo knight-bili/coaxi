@@ -1,4 +1,4 @@
-/* Codeg source: h-10 strips, h-7 icon controls and h-8 StatusBar. */
+/* Coaxi source: h-10 strips, h-7 icon controls and h-8 StatusBar. */
 .workspace-strip-icon { display:inline-flex;align-items:center;justify-content:center;flex:0 0 28px;width:28px;height:28px;padding:0;border:0;border-radius:6px;background:transparent;color:var(--muted);cursor:pointer;-webkit-app-region:no-drag; }
 .workspace-strip-icon:hover:not(:disabled) { background:var(--neutral-hover);color:var(--ink); }
 .workspace-strip-icon:focus-visible { outline:2px solid var(--brand);outline-offset:2px; }
@@ -116,7 +116,7 @@
 
 .engineering-entry-error {top:12px;}
 
-/* Codeg handoff feedback floats without resizing the live browser viewport. */
+/* Coaxi handoff feedback floats without resizing the live browser viewport. */
 .unified-browser {position:relative;}
 .browser-handoff-toast {position:absolute;z-index:610;right:16px;bottom:16px;max-width:calc(100% - 32px);padding:10px 16px;border:1px solid var(--line);border-radius:10px;background:var(--surface);box-shadow:var(--shadow-float);font-size:13px;pointer-events:none;}
 

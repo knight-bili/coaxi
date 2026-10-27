@@ -19,7 +19,7 @@ export async function lifecycleAcceptance(window: BrowserWindow, userData: strin
   // Observe only this fixture's supplemental endpoint, then restore the native
   // server method. Ending these responses leaves the site and author resources alive.
   ServerResponse.prototype.writeHead = function(this: ServerResponse, ...args: unknown[]) {
-    if (this.req.url?.startsWith('/__rovai-preview/events?')) streams.add(this)
+    if (this.req.url?.startsWith('/__coaxi-preview/events?')) streams.add(this)
     return Reflect.apply(writeHead, this, args)
   } as typeof writeHead
   try {
@@ -71,7 +71,7 @@ export async function lifecycleAcceptance(window: BrowserWindow, userData: strin
   // A fresh candidate can load its root while the supplemental endpoint fails.
   let diagnosticRequests = 0
   window.webContents.session.webRequest.onBeforeRequest({ urls: ['http://*/*'] }, (details, callback) => {
-    const diagnostic = details.url.includes('/__rovai-preview/events?')
+    const diagnostic = details.url.includes('/__coaxi-preview/events?')
     if (diagnostic) diagnosticRequests++
     callback({ cancel: diagnostic })
   })

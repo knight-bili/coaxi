@@ -22,7 +22,7 @@ export function NavigationShell({ platform, disabled = false, settings = false, 
   disabled?: boolean
   settings?: boolean
   browser?: boolean
-  nativeWindowControls?: Pick<import('@contracts').RovaiApi['windowControls'], 'onNavigationRequested'>
+  nativeWindowControls?: Pick<import('@contracts').CoaxiApi['windowControls'], 'onNavigationRequested'>
   navigation?: Pick<DesktopNavigation, 'getSnapshot' | 'subscribe' | 'back' | 'forward'>
 }): React.JSX.Element {
   const mobile = useMobileLayout()

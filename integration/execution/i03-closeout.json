@@ -169,7 +169,7 @@
         "Core受控观察IO在途时真实互动响应、满额拒绝、取消后名额保持/实际完成释放均通过；不是所有大文件或慢盘性能资格",
         "实际Windows隔离Desktop Main/preload/Core握手；生产画布三卡/选择恢复；原生可信键盘输入2+3，真实PTY计算5且xterm读者可见绘制、停止回收、App计划退出均通过",
         "生产Desktop文件API经实际Core/NTFS：7业务断言+1准备步骤通过，保留原显式外部具体文件策略；无模型或模拟Core",
-        "原rovai-web公开操作投影1owner先非零list再实际运行通过",
+        "原coaxi-web公开操作投影1owner先非零list再实际运行通过",
         "真实文本文件卡片可见；HTML HTTP入口缺陷原owner修复前1fail，修复后原站点/文件服务/资源池3owner文件91pass1原平台skip",
         "rc.7共享Renderer全量types exit0、4文件46项相关检查通过；rc.8仅CSS/既存Native owner改变，复用未变TypeScript检查",
         "rc.8 Desktop/Web构建exit0，149个Desktop文件及141个Web缓存条目逐SHA匹配，真实App副本一致",

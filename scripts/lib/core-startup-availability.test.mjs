@@ -14,13 +14,13 @@ import {
 } from './runtime-camp-files-root.mjs'
 
 const repository = resolve(import.meta.dirname, '../..')
-const binary = process.env.ROVAI_CORE_BIN
-  ?? join(repository, 'target', 'debug', process.platform === 'win32' ? 'rovai-core.exe' : 'rovai-core')
+const binary = process.env.COAXI_CORE_BIN
+  ?? join(repository, 'target', 'debug', process.platform === 'win32' ? 'coaxi-core.exe' : 'coaxi-core')
 
 // Core startup used to install a process-global wrapper. A ManagedProcess unit
 // test without run_core would miss that policy and pass on the broken build.
 test('Core-managed macOS probes can start their own native sandbox', { skip: process.platform !== 'darwin' }, async () => {
-  const fixture = await realpath(await mkdtemp(join(tmpdir(), 'rovai-native-sandbox-')))
+  const fixture = await realpath(await mkdtemp(join(tmpdir(), 'coaxi-native-sandbox-')))
   const dataDir = join(fixture, 'data')
   const resultPath = join(fixture, 'sandbox-exit.txt')
   const fakeCodex = join(fixture, 'codex')
@@ -37,7 +37,7 @@ fi
 exit 1
 `, { mode: 0o700 })
   const core = startCore(dataDir, join(dataDir, 'managed-skill-library'), join(dataDir, 'mcp.json'), [], {
-    ROVAI_CODEX_BIN: fakeCodex
+    COAXI_CODEX_BIN: fakeCodex
   })
   try {
     await core.ready
@@ -53,7 +53,7 @@ exit 1
       if (sandboxExit?.trim()) break
       await new Promise((resolve) => setTimeout(resolve, 20))
     }
-    assert.equal(sandboxExit?.trim(), '0', 'Rovai must not prevent a Runtime from creating its own sandbox')
+    assert.equal(sandboxExit?.trim(), '0', 'Coaxi must not prevent a Runtime from creating its own sandbox')
   } finally {
     await core.close()
     await removeEphemeralRuntimeCampFilesRoot(dataDir, { temporaryDirectory: fixture })
@@ -66,12 +66,12 @@ exit 1
 test('optional startup failures preserve authority RPC and can recover without restarting Core', async (t) => {
   for (const scenario of [
     { id: 'mcp', path: 'mcp.json', kind: 'directory', method: 'mcp.config.get' },
-    { id: 'skills', path: 'managed-skill-library/.staging', kind: 'file', method: 'skills.list' },
+    { id: 'maintenance', path: 'managed-skill-library/.staging', kind: 'file', readySubsystem: 'skills' },
     { id: 'runtime.claude-code-cli', path: 'runtime-private', kind: 'file' },
     { id: 'maintenance', path: 'runtime/mcp', kind: 'file' }
   ]) {
     await t.test(scenario.id, async () => {
-      const fixture = await realpath(await mkdtemp(join(tmpdir(), 'rovai-startup-availability-')))
+      const fixture = await realpath(await mkdtemp(join(tmpdir(), 'coaxi-startup-availability-')))
       const dataDir = process.platform === 'win32'
         ? JSON.parse(execFileSync(binary, ['--prepare-windows-data-root', join(fixture, 'formal')], { encoding: 'utf8' })).core
         : join(fixture, 'data')
@@ -98,6 +98,7 @@ test('optional startup failures preserve authority RPC and can recover without r
         assert.ok(frame.subsystems.some((entry) => entry.state === 'initializing'), 'authority ready precedes optional initialization')
         const statuses = await core.settled()
         assert.equal(statuses.find((entry) => entry.id === scenario.id)?.state, 'degraded')
+        if (scenario.readySubsystem) assert.equal(statuses.find((entry) => entry.id === scenario.readySubsystem)?.state, 'ready')
         assert.ok((await core.request('members.list')).length > 0)
         assert.ok(await core.request('navigation.snapshot'))
         if (scenario.method) {
@@ -132,7 +133,7 @@ test('a missing Pi executable stays in Runtime availability instead of subsystem
   // locations and Windows closes Pi discovery over the explicit override.
   skip: process.platform === 'darwin'
 }, async () => {
-  const fixture = await realpath(await mkdtemp(join(tmpdir(), 'rovai-missing-pi-availability-')))
+  const fixture = await realpath(await mkdtemp(join(tmpdir(), 'coaxi-missing-pi-availability-')))
   const dataDir = process.platform === 'win32'
     ? JSON.parse(execFileSync(binary, ['--prepare-windows-data-root', join(fixture, 'formal')], { encoding: 'utf8' })).core
     : join(fixture, 'data')
@@ -146,7 +147,7 @@ test('a missing Pi executable stays in Runtime availability instead of subsystem
     [],
     {
       PATH: emptySearchPath,
-      ROVAI_PI_BIN: missingPi,
+      COAXI_PI_BIN: missingPi,
       SHELL: join(fixture, 'missing-shell')
     }
   )
@@ -167,10 +168,10 @@ test('a missing Pi executable stays in Runtime availability instead of subsystem
   }
 })
 
-// This owns the Core RPC -> transaction -> private notification seam. Queue
-// ordering/edit semantics remain in pending_camp_input.rs; no Runtime is invoked.
-test('queued input commits notify Desktop without exposing private bodies in public history', async () => {
-  const fixture = await realpath(await mkdtemp(join(tmpdir(), 'rovai-queue-events-')))
+// This owns the current Core RPC -> publication transaction rollback seam.
+// Retired queue rows remain intact; failed publication must never launch a model.
+test('failed direct publication preserves legacy input without leaking new content', async () => {
+  const fixture = await realpath(await mkdtemp(join(tmpdir(), 'coaxi-queue-events-')))
   const dataDir = process.platform === 'win32'
     ? JSON.parse(execFileSync(binary, ['--prepare-windows-data-root', join(fixture, 'formal')], { encoding: 'utf8' })).core
     : join(fixture, 'data')
@@ -189,7 +190,7 @@ test('queued input commits notify Desktop without exposing private bodies in pub
     assert.equal(created.status, 'applied')
     const threadId = created.payload.threadId
     await core.close()
-    database = new DatabaseSync(join(dataDir, 'rovai.sqlite'))
+    database = new DatabaseSync(join(dataDir, 'coaxi.sqlite'))
     const now = new Date().toISOString()
     database.prepare(`INSERT INTO pending_camp_input(
       id, camp_id, enqueue_sequence, state, structured_content_json, execution_json, user_id,
@@ -204,41 +205,18 @@ test('queued input commits notify Desktop without exposing private bodies in pub
     database = null
     core = startCore(dataDir, skillRoot, mcpPath)
     await core.ready
-    const draft = await core.request('camp.composerDraft.save', {
-      threadId, expectedRevision: 0, content: composerDocumentForAddress({ mode: 'default' }, 'Private queued body')
-    })
-    const result = await core.request('camp.messages.send', {
-      commandId: randomUUID(), threadId, draftRevision: draft.revision,
+    await assert.rejects(core.request('camp.messages.send', {
+      commandId: randomUUID(), threadId, content: composerDocumentForAddress({ mode: 'default' }, 'Private queued body'),
       execution: { taskId: null, purpose: 'private queue fixture', completionRole: 'required' }
-    })
-    assert.equal(result.commandResult.code, 'pending_input.queued')
-    const item = (await core.request('camp.pendingInputs.get', { threadId })).items[1]
-    const edit = async (action, editToken = null, target = item) => core.request('camp.pendingInputs.edit', {
-      commandId: randomUUID(), command: { threadId, pendingInputId: target.id,
-        expectedRevision: target.revision, editToken, action }
-    })
-    const begun = await edit({ type: 'begin' })
-    assert.equal(begun.status, 'applied')
-    const editing = await core.request('camp.pendingInputs.get', { threadId })
-    assert.equal(editing.editSession.editToken, begun.payload.editToken)
-    assert.equal((await edit({ type: 'cancel' }, begun.payload.editToken)).status, 'applied')
-    assert.equal((await edit({ type: 'delete' }, null, editing.items[0])).status, 'applied')
-    const deadline = Date.now() + 10_000
-    while (!core.notifications.some(event => event.method === 'camp.pendingInputs.changed' && event.params.reason === 'publication_failed')) {
-      assert.ok(Date.now() < deadline, 'A failed publication must notify the private queue')
-      await new Promise(resolve => setTimeout(resolve, 20))
-    }
-    const failed = await core.request('camp.pendingInputs.get', { threadId })
-    assert.equal(failed.items.length, 1)
-    assert.equal(failed.items[0].state, 'needs_repair')
-    const invalidations = core.notifications.filter(event => event.method === 'camp.pendingInputs.changed')
-    assert.deepEqual(invalidations.map(event => event.params.reason), ['enqueued', 'edited', 'edited', 'edited', 'publication_failed'])
-    assert.ok(invalidations.every(event => event.params.threadId === threadId && Object.keys(event.params).length === 2))
+    }), error => error.code === 'CORE_REQUEST_FAILED' && /fixture publication refusal/u.test(error.message))
     await core.close()
-    database = new DatabaseSync(join(dataDir, 'rovai.sqlite'), { readOnly: true })
+    database = new DatabaseSync(join(dataDir, 'coaxi.sqlite'), { readOnly: true })
     assert.equal(database.prepare('SELECT COUNT(*) AS count FROM agent_run').get().count, 0)
     assert.equal(database.prepare('SELECT COUNT(*) AS count FROM camp_message').get().count, 0)
     assert.equal(database.prepare("SELECT COUNT(*) AS count FROM event_log WHERE payload_json LIKE '%Private queued body%'").get().count, 0)
+    const held = database.prepare('SELECT state, structured_content_json FROM pending_camp_input WHERE id = ?').get('held-head')
+    assert.equal(held.state, 'needs_repair')
+    assert.equal(JSON.parse(held.structured_content_json)[0].text, 'Private held head')
   } finally {
     database?.close()
     await core.close()
@@ -247,10 +225,9 @@ test('queued input commits notify Desktop without exposing private bodies in pub
   }
 })
 
-// The library owns aggregation and edit fences. This process test owns the
-// startup -> ready -> send RPC / scheduler seam, including an already emptied queue.
-test('idle camps accept new input and drain backlog after legacy failed-turn recovery', async () => {
-  const fixture = await realpath(await mkdtemp(join(tmpdir(), 'rovai-idle-queue-recovery-')))
+// Current direct sends must remain usable after restarting with legacy failed turns.
+test('idle camps accept direct input after legacy failed-turn recovery without replaying retired queues', async () => {
+  const fixture = await realpath(await mkdtemp(join(tmpdir(), 'coaxi-idle-queue-recovery-')))
   const dataDir = process.platform === 'win32'
     ? JSON.parse(execFileSync(binary, ['--prepare-windows-data-root', join(fixture, 'formal')], { encoding: 'utf8' })).core
     : join(fixture, 'data')
@@ -260,13 +237,9 @@ test('idle camps accept new input and drain backlog after legacy failed-turn rec
   let database
   const camps = []
   const sendText = async (threadId, body) => {
-    const current = await core.request('camp.composerDraft.get', { threadId })
-    const draft = await core.request('camp.composerDraft.save', {
-      threadId, expectedRevision: current.revision, content: composerDocumentForAddress({ mode: 'default' }, body)
-    })
     // No new Run or model is allowed in this transport/scheduler fixture.
     return core.request('camp.messages.send', {
-      commandId: randomUUID(), threadId, draftRevision: draft.revision, execution: null
+      commandId: randomUUID(), threadId, content: composerDocumentForAddress({ mode: 'default' }, body), execution: null
     })
   }
   try {
@@ -285,7 +258,7 @@ test('idle camps accept new input and drain backlog after legacy failed-turn rec
       camps.push({ threadId, backlog, messageId: first.commandResult.payload.threadMessageId, turnId: randomUUID() })
     }
     await core.close()
-    database = new DatabaseSync(join(dataDir, 'rovai.sqlite'))
+    database = new DatabaseSync(join(dataDir, 'coaxi.sqlite'))
     const now = new Date().toISOString()
     for (const { threadId, backlog, messageId, turnId } of camps) {
       database.prepare(`INSERT OR IGNORE INTO conversation(id, camp_id, agent_id, created_at, updated_at)
@@ -314,32 +287,21 @@ test('idle camps accept new input and drain backlog after legacy failed-turn rec
     database = null
     core = startCore(dataDir, skillRoot, mcpPath)
     await core.ready
+    await core.settled()
     for (const { threadId } of camps) {
-      assert.equal((await core.request('camp.pendingInputs.get', { threadId })).executionActive, false,
-        'A legacy failed turn cannot remain an execution blocker after ready')
+      const direct = await sendText(threadId, 'Fresh input after restart')
+      assert.equal(direct.commandResult.code, 'camp_message.sent')
     }
-    const direct = await sendText(camps[0].threadId, 'Fresh input after clearing queue')
-    assert.equal(direct.commandResult.code, 'camp_message.sent')
-    assert.equal((await core.request('camp.pendingInputs.get', { threadId: camps[0].threadId })).items.length, 0)
-    const deadline = Date.now() + 10_000
-    const publishedCount = () => core.notifications.filter(event => event.method === 'camp.pendingInputs.changed'
-      && event.params.threadId === camps[1].threadId && event.params.reason === 'published').length
-    // Publication commits before its notification is enqueued; an RPC can see
-    // the empty queue first. Wait for both observable outcomes before asserting.
-    while ((await core.request('camp.pendingInputs.get', { threadId: camps[1].threadId })).items.length > 0
-      || publishedCount() < 2) {
-      assert.ok(Date.now() < deadline, 'An idle Camp must drain its backlog without another user action')
-      await new Promise(resolve => setTimeout(resolve, 20))
-    }
-    assert.equal(publishedCount(), 2)
     await core.close()
-    database = new DatabaseSync(join(dataDir, 'rovai.sqlite'), { readOnly: true })
+    database = new DatabaseSync(join(dataDir, 'coaxi.sqlite'), { readOnly: true })
     for (const { threadId, backlog, turnId } of camps) {
       const turn = database.prepare('SELECT status, ended_at FROM camp_turn WHERE id = ?').get(turnId)
       assert.equal(turn.status, 'failed')
       assert.ok(turn.ended_at)
       const bodies = database.prepare('SELECT body FROM camp_message WHERE camp_id = ? ORDER BY sequence').all(threadId).map(row => row.body)
-      assert.deepEqual(bodies, backlog ? ['A', 'B', 'C'] : ['A', 'Fresh input after clearing queue'])
+      assert.deepEqual(bodies, ['A', 'Fresh input after restart'])
+      const legacy = database.prepare('SELECT state FROM pending_camp_input WHERE camp_id = ? ORDER BY enqueue_sequence').all(threadId)
+      assert.deepEqual(legacy.map(row => row.state), backlog ? ['queued', 'queued'] : ['cancelled', 'cancelled'])
     }
     assert.equal(database.prepare('SELECT COUNT(*) AS count FROM agent_run').get().count, 2,
       'Startup must neither retry old Runs nor invent new Runs for this non-executing fixture')
@@ -353,7 +315,7 @@ test('idle camps accept new input and drain backlog after legacy failed-turn rec
 })
 
 test('authority recovery errors produce a retryable refusal rather than a crash or false ready', async () => {
-  const fixture = await realpath(await mkdtemp(join(tmpdir(), 'rovai-authority-recovery-')))
+  const fixture = await realpath(await mkdtemp(join(tmpdir(), 'coaxi-authority-recovery-')))
   const dataDir = process.platform === 'win32'
     ? JSON.parse(execFileSync(binary, ['--prepare-windows-data-root', join(fixture, 'formal')], { encoding: 'utf8' })).core
     : join(fixture, 'data')
@@ -368,7 +330,7 @@ test('authority recovery errors produce a retryable refusal rather than a crash 
     await seed.settled()
     const before = await seed.request('members.list')
     await seed.close()
-    writer = new DatabaseSync(join(dataDir, 'rovai.sqlite'))
+    writer = new DatabaseSync(join(dataDir, 'coaxi.sqlite'))
     // Valid pending authority, with a fixture-only failure at its settlement
     // boundary. A generic SQLite writer lock fails earlier during DB open/seed
     // and cannot exercise run_core's post-database_ready recovery refusal.
@@ -390,7 +352,7 @@ test('authority recovery errors produce a retryable refusal rather than a crash 
       && entry.authorityState?.kind === 'admitted'), 'a later refusal cannot erase knowledge of an existing authority')
     await refused.close()
     assert.equal(refused.process.exitCode, 0, 'deterministic refusal must not be an unexpected Core crash')
-    writer = new DatabaseSync(join(dataDir, 'rovai.sqlite'))
+    writer = new DatabaseSync(join(dataDir, 'coaxi.sqlite'))
     assert.equal(writer.prepare("SELECT settled_at FROM planned_shutdown_cycle WHERE core_generation = 'acceptance-refused-settlement'").get().settled_at, null)
     writer.exec('DROP TRIGGER acceptance_refuse_settlement')
     writer.close()
@@ -409,7 +371,7 @@ test('authority recovery errors produce a retryable refusal rather than a crash 
 })
 
 test('a startup retry cannot initialize a disappeared authority', async () => {
-  const fixture = await realpath(await mkdtemp(join(tmpdir(), 'rovai-existing-authority-fence-')))
+  const fixture = await realpath(await mkdtemp(join(tmpdir(), 'coaxi-existing-authority-fence-')))
   const dataDir = process.platform === 'win32'
     ? JSON.parse(execFileSync(binary, ['--prepare-windows-data-root', join(fixture, 'formal')], { encoding: 'utf8' })).core
     : join(fixture, 'data')
@@ -417,7 +379,7 @@ test('a startup retry cannot initialize a disappeared authority', async () => {
   try {
     await assert.rejects(core.ready, error => error.code === 'authority_required_existing_missing' && error.retryable === false)
     await core.close()
-    assert.equal(await lstat(join(dataDir, 'rovai.sqlite')).catch(() => null), null)
+    assert.equal(await lstat(join(dataDir, 'coaxi.sqlite')).catch(() => null), null)
     assert.equal(await lstat(join(dataDir, 'lumen.sqlite')).catch(() => null), null)
     assert.equal(core.process.exitCode, 0)
   } finally {
@@ -526,7 +488,7 @@ function startCore(dataDir, skillRoot, mcpPath, extraArgs = [], environment = {}
 // RPC -> immutable search snapshot -> child environment -> restart is the owner
 // seam. Input-name cases stay in runtime_startup's unit matrix.
 test('startup settings keep drafts private and persist only the selected Runtime environment', { skip: process.platform === 'win32', timeout: 90_000 }, async () => {
-  const fixture = await realpath(await mkdtemp(join(tmpdir(), 'rovai-runtime-startup-settings-')))
+  const fixture = await realpath(await mkdtemp(join(tmpdir(), 'coaxi-runtime-startup-settings-')))
   const dataDir = join(fixture, 'data')
   const defaultProgram = join(fixture, 'default-codex')
   const selectedProgram = join(fixture, 'custom codex')
@@ -539,7 +501,7 @@ if [ "$1" = '--version' ]; then printf 'codex-cli 0.153.4\\n'; exit 0; fi
 # An explicit check sees the draft but cannot authenticate or become Ready.
 exit 1
 `, { mode: 0o700 })
-  const environment = { ROVAI_CODEX_BIN: defaultProgram }
+  const environment = { COAXI_CODEX_BIN: defaultProgram }
   let core = startCore(dataDir, join(dataDir, 'managed-skill-library'), join(dataDir, 'mcp.json'), [], environment)
   try {
     await core.ready

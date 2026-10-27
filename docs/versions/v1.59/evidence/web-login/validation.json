@@ -21,12 +21,12 @@
   "sourceCommit": "831092a069c7389640e05fcdb6965899989b2d88",
   "version": "0.2.6",
   "architecture": "macOS arm64",
-  "binarySource": "daily package Contents/Resources/bin/rovai-host",
+  "binarySource": "daily package Contents/Resources/bin/coaxi-host",
   "uiSource": "same daily package Contents/Resources/web-ui",
   "testIsolation": "temporary Core data root, Skill Library, MCP config and two Chrome profiles",
   "physicalPhoneTested": false,
   "htmlRegression": {
-    "command": "ROVAI_HOST_BIN=<daily package>/Contents/Resources/bin/rovai-host pnpm test:host-web-html",
+    "command": "COAXI_HOST_BIN=<daily package>/Contents/Resources/bin/coaxi-host pnpm test:host-web-html",
     "result": "1 passed",
     "uiMatchesPackagedDirectory": true
   },

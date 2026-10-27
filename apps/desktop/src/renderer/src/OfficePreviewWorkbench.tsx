@@ -6,7 +6,7 @@ import { useThreadClient } from './camp-client'
 import { useUiText } from './interface-language'
 import {NativeBrowserStage} from './NativeBrowserStage'
 type Lease={holdId:string;port:number;cap:string;editable:boolean}
-// Codeg OfficePreview's watch lifecycle, sandbox and install/retry states.
+// Coaxi OfficePreview's watch lifecycle, sandbox and install/retry states.
 export function OfficePreviewWorkbench({threadId,path}:{threadId:string;path:string}):React.JSX.Element{
   const client=useThreadClient(),t=useUiText()
   const [editable,setEditable]=useState(false),[attempt,setAttempt]=useState(0),[lease,setLease]=useState<Lease|null>(null),[error,setError]=useState<string|null>(null),[installed,setInstalled]=useState<boolean|null>(null),[opened,setOpened]=useState(false),[busy,setBusy]=useState(false)

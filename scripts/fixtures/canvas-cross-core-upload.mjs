@@ -11,7 +11,7 @@ import { launchAcceptanceBrowser, pause } from '../lib/host-web-browser.mjs'
 // Existing Web entry, actual Core authorities and browser navigation. Only the
 // old upload response is paused; no authentication or business reply is forged.
 export async function qualifyCrossCoreUpload({ binary, uiDirectory, chrome, output }) {
-  const fixture = await realpath(await mkdtemp(join(tmpdir(), 'rovai-cross-core-upload-')))
+  const fixture = await realpath(await mkdtemp(join(tmpdir(), 'coaxi-cross-core-upload-')))
   const profile = join(fixture, 'browser-profile'), home = join(fixture, 'home'), hosts = []
   await mkdir(output, { recursive: true }); await mkdir(home)
   const env = {}
@@ -118,7 +118,7 @@ export async function qualifyCrossCoreUpload({ binary, uiDirectory, chrome, outp
       await browser.wait(`Boolean(document.querySelector('[data-id="${host.scope.nodeId}"] button[aria-label="展开对话"]:not(:disabled)'))`)
       await browser.click(`document.querySelector('[data-id="${host.scope.nodeId}"] button[aria-label="展开对话"]')`)
       await browser.wait('Boolean(document.querySelector(".single-chat-composer textarea:not(:disabled)"))')
-      host.token = await browser.evaluate('JSON.parse(sessionStorage.getItem("rovai.web.auth.v1")).token')
+      host.token = await browser.evaluate('JSON.parse(sessionStorage.getItem("coaxi.web.auth.v1")).token')
       assert.ok(host.token)
     }
     await open(first)

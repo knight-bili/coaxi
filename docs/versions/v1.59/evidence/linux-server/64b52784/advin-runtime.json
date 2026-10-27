@@ -10,9 +10,9 @@
       "runtime": "zcode-app",
       "sourceCommit": "64b5278425dadc2169a4c7deabe426ae062d142f",
       "fullQualification": false,
-      "dataDir": "/home/rovai-test/qualification/server-integration-zcode-app-5/data",
-      "skillLibraryRoot": "/home/rovai-test/qualification/server-integration-zcode-app-5/data/skills",
-      "mcpConfigPath": "/home/rovai-test/qualification/server-integration-zcode-app-5/data/mcp.json",
+      "dataDir": "/home/coaxi-test/qualification/server-integration-zcode-app-5/data",
+      "skillLibraryRoot": "/home/coaxi-test/qualification/server-integration-zcode-app-5/data/skills",
+      "mcpConfigPath": "/home/coaxi-test/qualification/server-integration-zcode-app-5/data/mcp.json",
       "checks": [
         "native_discovery_auth_model_and_permissions",
         "http_send_native_tool_write_read_and_final_projection",

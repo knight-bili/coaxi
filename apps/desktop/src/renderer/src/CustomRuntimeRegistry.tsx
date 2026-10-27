@@ -16,7 +16,7 @@ function preferred(entry:Entry,platform:CustomRuntimePlatform|null):CustomRuntim
   if(platform&&binaryKeys[platform].some(key=>Boolean((spec.binary as Record<string,unknown>|undefined)?.[key])))return 'binary'
   if(spec.npx)return 'npx';if(spec.uvx)return 'uvx';if(spec.binary&&Object.keys(spec.binary).length)return 'binary';return null
 }
-/** 原 Codeg 注册表搜索列表：选择只带入表单，保存和安装仍需用户分别操作。 */
+/** 原 Coaxi 注册表搜索列表：选择只带入表单，保存和安装仍需用户分别操作。 */
 export function CustomRuntimeRegistry({onClose,onChoose}:{onClose():void;onChoose(seed:CustomRuntimeSeed):void}):React.JSX.Element{
   const client=useThreadClient(),t=useUiText(),generation=useRef(0)
   const [catalog,setCatalog]=useState<Catalog|null>(null),[search,setSearch]=useState(''),[limit,setLimit]=useState(100),[busy,setBusy]=useState(false),[error,setError]=useState('')

@@ -1,11 +1,11 @@
 import { createRoot } from 'react-dom/client'
 import { useCallback,useEffect,useRef,useState } from 'react'
-import { PetSprite } from './codeg-pets/PetSprite'
-import {PET_FRAME_DURATIONS_MS,type PetState} from './codeg-pets/animation'
+import { PetSprite } from './coaxi-pets/PetSprite'
+import {PET_FRAME_DURATIONS_MS,type PetState} from './coaxi-pets/animation'
 import { readPetSprite } from './pet-sprite-reader'
 import './pet-surface.css'
 type PetApi={hitTest(input:unknown):Promise<void>;request<T>(input:unknown):Promise<T>;control(action:'focus'|'hide'|'menu'):Promise<void>;onState(listener:(value:{state:string;changed?:boolean;error?:string})=>void):()=>void}
-const api=(window as unknown as {rovaiPet:PetApi}).rovaiPet
+const api=(window as unknown as {coaxiPet:PetApi}).coaxiPet
 function PetSurface():React.JSX.Element{
   const [pet,setPet]=useState<{id:string;name:string;scale:number;url:string}|null>(null),[state,setState]=useState<PetState>('idle'),[interaction,setInteraction]=useState<PetState|null>(null),[error,setError]=useState<string|null>(null),timer=useRef<ReturnType<typeof setTimeout>|null>(null)
   const character=useRef<HTMLElement>(null),image=useRef<HTMLImageElement|null>(null),canvas=useRef<HTMLCanvasElement|null>(null),frame=useRef({row:0,col:0})

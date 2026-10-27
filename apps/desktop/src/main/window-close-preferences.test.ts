@@ -6,7 +6,7 @@ import { WindowClosePreferences } from './window-close-preferences'
 
 const roots: string[] = []
 afterEach(async () => { await Promise.all(roots.splice(0).map(root => rm(root, { recursive: true, force: true }))) })
-async function path() { const root = await mkdtemp(join(tmpdir(), 'rovai-close-preference-')); roots.push(root); return join(root, 'window-close.json') }
+async function path() { const root = await mkdtemp(join(tmpdir(), 'coaxi-close-preference-')); roots.push(root); return join(root, 'window-close.json') }
 
 it('defaults to asking and persists all three choices across independent store loads', async () => {
   const file = await path()

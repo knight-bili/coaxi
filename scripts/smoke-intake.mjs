@@ -10,7 +10,7 @@ import {
 } from './lib/runtime-camp-files-root.mjs'
 
 const root = resolve(import.meta.dirname, '..')
-const fixtureRoot = await mkdtemp(join(tmpdir(), 'rovai-camp-intake-smoke-'))
+const fixtureRoot = await mkdtemp(join(tmpdir(), 'coaxi-camp-intake-smoke-'))
 const projectRoot = join(fixtureRoot, 'project')
 const dataDir = join(fixtureRoot, 'data')
 let core = null
@@ -19,8 +19,8 @@ try {
   await mkdir(projectRoot)
   await writeFile(join(projectRoot, 'README.md'), '# Camp intake fixture\n')
   await run('git', ['init', '-b', 'main'], projectRoot)
-  await run('git', ['config', 'user.name', 'Rovai-ai Camp Intake Smoke'], projectRoot)
-  await run('git', ['config', 'user.email', 'camp-intake@rovai.local'], projectRoot)
+  await run('git', ['config', 'user.name', 'Coaxi Camp Intake Smoke'], projectRoot)
+  await run('git', ['config', 'user.email', 'camp-intake@coaxi.local'], projectRoot)
   await run('git', ['add', 'README.md'], projectRoot)
   await run('git', ['commit', '-m', 'fixture'], projectRoot)
 
@@ -91,7 +91,7 @@ try {
 
   const restoredHealth = await core.request('health.check')
   if (process.platform === 'win32'
-      && process.env.ROVAI_WINDOWS_RUNTIME_QUALIFICATION_ADAPTER !== 'codex-cli') {
+      && process.env.COAXI_WINDOWS_RUNTIME_QUALIFICATION_ADAPTER !== 'codex-cli') {
     let platformBlock = null
     try {
       await configureCodexRuntime(core.request, restoredHealth, ['agent_1'])
@@ -261,7 +261,7 @@ try {
   }
 } finally {
   if (core) await core.stop()
-  if (process.env.ROVAI_KEEP_SMOKE_FIXTURE === '1') {
+  if (process.env.COAXI_KEEP_SMOKE_FIXTURE === '1') {
     console.error(`Preserved smoke fixture: ${fixtureRoot}`)
   } else {
     await removeEphemeralRuntimeCampFilesRoot(dataDir)
@@ -270,7 +270,7 @@ try {
 }
 
 function startCore(dataDirectory) {
-  const child = spawn(join(root, 'target', 'debug', 'rovai-core'), [
+  const child = spawn(join(root, 'target', 'debug', 'coaxi-core'), [
     ...coreDataDirectoryArguments(dataDirectory),
     '--skill-library-root', join(dataDirectory, 'managed-skill-library')
   ], {

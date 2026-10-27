@@ -57,22 +57,22 @@ test("Markdown-only changes skip Rust validation", () => {
   });
 });
 
-test("the rovai CLI source runs check and only CLI tests", () => {
-  assert.deepEqual(classify(["crates/rovai-core/src/bin/rovai.rs"]).scripts, [
+test("the coaxi CLI source runs check and only CLI tests", () => {
+  assert.deepEqual(classify(["crates/coaxi-core/src/bin/coaxi.rs"]).scripts, [
     "check:rust",
     "test:rust:cli",
   ]);
 });
 
 test("a library module runs check and only library tests", () => {
-  assert.deepEqual(classify(["crates/rovai-core/src/library.rs"]).scripts, [
+  assert.deepEqual(classify(["crates/coaxi-core/src/library.rs"]).scripts, [
     "check:rust",
     "test:rust:lib",
   ]);
 });
 
-test("a Main-only module runs check and only rovai-core binary tests", () => {
-  assert.deepEqual(classify(["crates/rovai-core/src/core_only.rs"]).scripts, [
+test("a Main-only module runs check and only coaxi-core binary tests", () => {
+  assert.deepEqual(classify(["crates/coaxi-core/src/core_only.rs"]).scripts, [
     "check:rust",
     "test:rust:core",
   ]);
@@ -81,12 +81,12 @@ test("a Main-only module runs check and only rovai-core binary tests", () => {
 test("Cargo, lib root, unknown Rust, shared, and multi-target changes run full tests", () => {
   const scenarios = [
     ["Cargo.toml"],
-    ["crates/rovai-core/Cargo.toml"],
+    ["crates/coaxi-core/Cargo.toml"],
     ["Cargo.lock"],
-    ["crates/rovai-core/src/lib.rs"],
-    ["crates/rovai-core/tests/unknown.rs"],
-    ["crates/rovai-core/src/shared.rs"],
-    ["crates/rovai-core/src/library.rs", "crates/rovai-core/src/bin/rovai.rs"],
+    ["crates/coaxi-core/src/lib.rs"],
+    ["crates/coaxi-core/tests/unknown.rs"],
+    ["crates/coaxi-core/src/shared.rs"],
+    ["crates/coaxi-core/src/library.rs", "crates/coaxi-core/src/bin/coaxi.rs"],
   ];
   for (const paths of scenarios) {
     assert.deepEqual(
@@ -99,12 +99,12 @@ test("Cargo, lib root, unknown Rust, shared, and multi-target changes run full t
 
 test("current main.rs and lib.rs declarations classify real modules", async () => {
   const [currentMain, currentLib] = await Promise.all([
-    readFile(path.join(repoRoot, "crates/rovai-core/src/main.rs"), "utf8"),
-    readFile(path.join(repoRoot, "crates/rovai-core/src/lib.rs"), "utf8"),
+    readFile(path.join(repoRoot, "crates/coaxi-core/src/main.rs"), "utf8"),
+    readFile(path.join(repoRoot, "crates/coaxi-core/src/lib.rs"), "utf8"),
   ]);
   assert.deepEqual(
     classifyStagedRustChanges({
-      paths: ["crates/rovai-core/src/acp.rs"],
+      paths: ["crates/coaxi-core/src/acp.rs"],
       mainSource: currentMain,
       libSource: currentLib,
     }).scripts,
@@ -112,7 +112,7 @@ test("current main.rs and lib.rs declarations classify real modules", async () =
   );
   assert.deepEqual(
     classifyStagedRustChanges({
-      paths: ["crates/rovai-core/src/action.rs"],
+      paths: ["crates/coaxi-core/src/action.rs"],
       mainSource: currentMain,
       libSource: currentLib,
     }).scripts,
@@ -152,9 +152,9 @@ async function runScenario({
 
 test("the staged runner invokes exactly the selected fast route", async () => {
   const scenarios = [
-    [["crates/rovai-core/src/bin/rovai.rs"], ["check:rust", "test:rust:cli"]],
-    [["crates/rovai-core/src/library.rs"], ["check:rust", "test:rust:lib"]],
-    [["crates/rovai-core/src/core_only.rs"], ["check:rust", "test:rust:core"]],
+    [["crates/coaxi-core/src/bin/coaxi.rs"], ["check:rust", "test:rust:cli"]],
+    [["crates/coaxi-core/src/library.rs"], ["check:rust", "test:rust:lib"]],
+    [["crates/coaxi-core/src/core_only.rs"], ["check:rust", "test:rust:core"]],
   ];
   for (const [paths, expectedScripts] of scenarios) {
     const result = await runScenario({ paths });
@@ -174,7 +174,7 @@ test("staged inspection and module classification failures fall back to full tes
   assert.equal(inspectionFailure.plan.route, "full");
 
   const classificationFailure = await runScenario({
-    paths: ["crates/rovai-core/src/core_only.rs"],
+    paths: ["crates/coaxi-core/src/core_only.rs"],
     readError: new Error("index read failed"),
   });
   assert.deepEqual(classificationFailure.scripts, ["test:rust:workspace-default"]);
@@ -182,7 +182,7 @@ test("staged inspection and module classification failures fall back to full tes
 });
 
 test("Rust deletes and renames fall back to full tests", async () => {
-  const result = await runScenario({ destructivePaths: ["crates/rovai-core/src/action.rs"] });
+  const result = await runScenario({ destructivePaths: ["crates/coaxi-core/src/action.rs"] });
   assert.deepEqual(result.scripts, ["test:rust:workspace-default"]);
   assert.equal(result.plan.route, "full");
 });

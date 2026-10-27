@@ -5105,7 +5105,7 @@
     "phase": "I10",
     "kind": "正常流程",
     "precondition": "隔离数据根、测试工程及必要授权已准备",
-    "steps": "使用rovai app检查和诊断自动化入口",
+    "steps": "使用coaxi app检查和诊断自动化入口",
     "expected": "只操作指定开发数据根，返回真实状态",
     "platforms": [
       "Windows Desktop",

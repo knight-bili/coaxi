@@ -7,7 +7,7 @@ import { evaluationBuildPath } from './eval-host-build-path.mjs'
 import { runCaptured } from './qualification-common.mjs'
 
 test('GUI PATH locates Cargo and lets the Host launch its build command', async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'rovai-eval-cargo-'))
+  const directory = await mkdtemp(join(tmpdir(), 'coaxi-eval-cargo-'))
   try {
     const cargo = join(directory, process.platform === 'win32' ? 'cargo.exe' : 'cargo')
     if (process.platform === 'win32') await copyFile(process.execPath, cargo)

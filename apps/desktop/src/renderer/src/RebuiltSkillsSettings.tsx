@@ -36,7 +36,7 @@ export function NativeSkillsSettings({ agents = [] }: { agents?: AgentProfile[] 
 
 function NativeSkillLibrary({agents}:{agents:AgentProfile[]}): React.JSX.Element {
   const id = useId()
-  const { root, compact, separator } = useCapabilitySplitter('rovai.native-skills-list-width.v1', `${id}-list ${id}-detail`)
+  const { root, compact, separator } = useCapabilitySplitter('coaxi.native-skills-list-width.v1', `${id}-list ${id}-detail`)
   const client = useThreadClient()
   const [runtime, setRuntime] = useState<AdapterKind>('codex-cli')
   const [customAgent,setCustomAgent]=useState('')
@@ -134,7 +134,7 @@ function NativeSkillLibrary({agents}:{agents:AgentProfile[]}): React.JSX.Element
 
 export function ToolboxSettings({ agents }: { agents: AgentProfile[] }): React.JSX.Element {
   const id = useId()
-  const { root, compact, separator } = useCapabilitySplitter('rovai.toolbox-list-width.v1', `${id}-list ${id}-detail`)
+  const { root, compact, separator } = useCapabilitySplitter('coaxi.toolbox-list-width.v1', `${id}-list ${id}-detail`)
   const client = useThreadClient()
   const [skills, setSkills] = useState<ToolboxSkillView[] | null>(null)
   const [selectedName, setSelectedName] = useState<string | null>(null)

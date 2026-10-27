@@ -9,7 +9,7 @@ import {
 } from './lib/runtime-camp-files-root.mjs'
 
 const root = resolve(import.meta.dirname, '..')
-const fixtureRoot = await mkdtemp(join(tmpdir(), 'rovai-memory-v3-smoke-'))
+const fixtureRoot = await mkdtemp(join(tmpdir(), 'coaxi-memory-v3-smoke-'))
 const dataDir = join(fixtureRoot, 'data')
 let core = null
 
@@ -117,7 +117,7 @@ try {
   'Forget left readable Memory content or Retrieval Keys')
 
   const exported = await core.request('memory.export')
-  assert(exported.format === 'rovai-memory-export-v3'
+  assert(exported.format === 'coaxi-memory-export-v3'
     && !Object.hasOwn(exported, 'hearthReviewItems'),
   'Memory export v3 format is unstable')
   assert(!JSON.stringify(exported).includes(forgetBody), 'Forgotten body leaked into export')
@@ -132,7 +132,7 @@ try {
   'Authoritative Memory changed across Core restart')
   const diagnostics = await core.request('diagnostics.export')
   const diagnosticText = JSON.stringify(diagnostics)
-  assert(diagnostics.format === 'rovai-diagnostics-v5'
+  assert(diagnostics.format === 'coaxi-diagnostics-v5'
     && diagnostics.diagnostics?.schemaVersion === 1
     && Array.isArray(diagnostics.diagnostics?.checks),
   'Diagnostics export v5 omitted the typed read-only report')
@@ -168,7 +168,7 @@ function assert(condition, message) {
 }
 
 function startCore(dataDirectory) {
-  const child = spawn(join(root, 'target', 'debug', 'rovai-core'), [
+  const child = spawn(join(root, 'target', 'debug', 'coaxi-core'), [
     ...coreDataDirectoryArguments(dataDirectory),
     '--skill-library-root', join(dataDirectory, 'managed-skill-library')
   ], {

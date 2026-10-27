@@ -15,12 +15,12 @@ test('trusted Web HTML uses native storage, forms, popups and modals while prese
   if (process.platform !== 'darwin') { t.skip('macOS Chrome acceptance; other platforms remain separately unverified'); return }
   const executable = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
   if (!await access(executable).then(() => true, () => false)) { t.skip('Chrome unavailable'); return }
-  const fixture = await realpath(await mkdtemp(join(tmpdir(), 'rovai-web-html-')))
+  const fixture = await realpath(await mkdtemp(join(tmpdir(), 'coaxi-web-html-')))
   const dataDir = join(fixture, 'core')
   const uploadScratch = join(fixture, 'uploads')
   await mkdir(uploadScratch)
   console.log(JSON.stringify({ channel: 'automatic_acceptance', dataDir, skillLibraryRoot: join(dataDir, 'skills'), browserProfile: join(fixture, 'chrome'), runtime: false }))
-  const host = launchHost(process.env.ROVAI_HOST_BIN ?? join(repository, 'target/debug/rovai-host'), [
+  const host = launchHost(process.env.COAXI_HOST_BIN ?? join(repository, 'target/debug/coaxi-host'), [
     ...coreDataDirectoryArguments(dataDir), '--skill-library-root', join(dataDir, 'skills'), '--mcp-config-path', join(dataDir, 'mcp.json')
   ], { cwd: repository, env: { ...process.env, TMPDIR: uploadScratch, TMP: uploadScratch, TEMP: uploadScratch } })
   let browser
@@ -61,7 +61,7 @@ test('trusted Web HTML uses native storage, forms, popups and modals while prese
     await browser.evaluate(`sessionStorage.setItem('acceptance-sentinel','private')`)
     await browser.setFiles('.conversation-controls .composer-file-input', [file])
     await browser.wait(`document.querySelector('.composer-attachment-card .attachment-open:not(:disabled)') !== null`)
-    const uploads = (await readdir(uploadScratch)).filter(name => name.startsWith('rovai-web-upload-'))
+    const uploads = (await readdir(uploadScratch)).filter(name => name.startsWith('coaxi-web-upload-'))
     assert.equal(uploads.length, 1)
     const stylesheet = join(uploadScratch, uploads[0], 'theme.css')
     await writeFile(stylesheet, 'body{background:rgb(236,238,239)}')
@@ -105,7 +105,7 @@ test('trusted Web HTML uses native storage, forms, popups and modals while prese
     await browser.send('Input.insertText', { text: 'Rendered HTML' })
     await browser.wait(`document.body.textContent.includes('共 1 处匹配')`)
     await browser.key('Escape')
-    await browser.capture('/tmp/rovai-web-html-rendered.png')
+    await browser.capture('/tmp/coaxi-web-html-rendered.png')
     const toggleSource = async label => {
       const target = await browser.evaluate(`(()=>{const r=document.querySelector('.file-preview-tab-activate').getBoundingClientRect();return{x:r.x+40,y:r.y+r.height/2}})()`)
       await browser.send('Input.dispatchMouseEvent', { type: 'mousePressed', ...target, button: 'right', clickCount: 1 })
@@ -114,7 +114,7 @@ test('trusted Web HTML uses native storage, forms, popups and modals while prese
     }
     await toggleSource('查看源码')
     await browser.wait(`document.querySelector('.file-preview-html-source')?.textContent.includes('Rendered HTML')`)
-    assert.equal(await browser.evaluate(`document.querySelector('.file-preview-html-source').textContent.includes('data-rovai-preview-diagnostic')`), false)
+    assert.equal(await browser.evaluate(`document.querySelector('.file-preview-html-source').textContent.includes('data-coaxi-preview-diagnostic')`), false)
     await toggleSource('交互预览')
     assert.equal(await browser.evaluate(`window.htmlAcceptance.at(-1).clicked`), 'INTERACTION_OK', 'source toggle preserves iframe interaction state')
     await writeFile(`${stylesheet}.tmp`, 'body{background:rgb(210,220,230)}')
@@ -140,7 +140,7 @@ test('trusted Web HTML uses native storage, forms, popups and modals while prese
     console.log(JSON.stringify({ rendered: true, realClick: true, originalSource: true, nativeStorage: true, form: true, popup: true, modal: true, mobileWidth: true, relativeCss: true, replacementSave: true, refresh: true, released: true }))
   } catch (error) {
     if (browser) console.log(JSON.stringify(await browser.evaluate(`({samples:window.htmlAcceptance,search:document.querySelector('input[aria-label="查找文件内容"]')?.value,active:document.activeElement?.outerHTML,frame:document.querySelector('.file-preview-html')?.getBoundingClientRect().toJSON()})`).catch(()=>null)))
-    if (browser) await browser.capture('/tmp/rovai-web-html-failure.png').catch(() => {})
+    if (browser) await browser.capture('/tmp/coaxi-web-html-failure.png').catch(() => {})
     throw error
   } finally {
     await browser?.close(); await host.close()

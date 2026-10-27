@@ -19,7 +19,7 @@
   "privateFileIsolationSatisfied": false,
   "releaseQualified": false,
   "schemaVersion": 1,
-  "scope": "Rovai ManagedProcess private-file and descendant probe; disposable fixture only",
+  "scope": "Coaxi ManagedProcess private-file and descendant probe; disposable fixture only",
   "treeStopRequested": true,
   "provenance": {
     "sourceCommit": "670dae367c6a00d45d0a9ec96eca57c575645249",

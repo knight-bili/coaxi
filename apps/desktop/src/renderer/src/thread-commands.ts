@@ -1,10 +1,10 @@
-import type { ActionApprovalView, AgentRunView, RovaiApi, SendThreadMessageResult, StoredCommandResult, ThreadComposerDraftView, ThreadMemberRemovalPreview, ThreadMessageView } from '@contracts'
+import type { ActionApprovalView, AgentRunView, CoaxiApi, SendThreadMessageResult, StoredCommandResult, ThreadComposerDraftView, ThreadMemberRemovalPreview, ThreadMessageView } from '@contracts'
 import { campMessageSendParams, requestAuthoritativeThreadOpenProjection } from './thread-workspace-data'
 import { uiAttribute } from './interface-language'
 
 /** A transport bound to one Core client and Thread; it never consults the selected sidebar row.
  * Core retains authorization, CAS, publication and receipt authority. No retries or Runtime launch live here. */
-export function threadCommands(client: Pick<RovaiApi, 'request'>, threadId: string) {
+export function threadCommands(client: Pick<CoaxiApi, 'request'>, threadId: string) {
   if (!threadId) throw new Error(uiAttribute('当前会话尚未准备好。'))
   return {
     threadId,

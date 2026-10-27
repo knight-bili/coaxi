@@ -1,7 +1,7 @@
-import { useEffect, useSyncExternalStore } from 'react'
+import { useCallback, useEffect, useSyncExternalStore } from 'react'
 import type { GeneralPreferencesApi, GeneralPreferencesSnapshot, InterfaceLanguage } from '@contracts'
 import englishCopy from './locales/en.json'
-import codegCommon from './locales/codeg-common.json'
+import coaxiCommon from './locales/coaxi-common.json'
 
 const english: Readonly<Record<string, string>> = englishCopy
 const listeners = new Set<() => void>()
@@ -119,7 +119,7 @@ export function translateUi(language: InterfaceLanguage, chinese: string, ...val
   const key = chinese.trim()
   const prefix = chinese.slice(0, chinese.indexOf(key))
   const suffix = chinese.slice(chinese.indexOf(key) + key.length)
-  const source: Readonly<Record<string, string>> = codegCommon[language]
+  const source: Readonly<Record<string, string>> = coaxiCommon[language]
   const template = language === 'zh-CN' ? key : language === 'en'
     ? english[key] ?? source[key] ?? key
     : source[key] ?? english[key] ?? key
@@ -132,7 +132,7 @@ export function translateUi(language: InterfaceLanguage, chinese: string, ...val
 
 export function useUiText(): (chinese: string, ...values: Array<string | number>) => string {
   const language = useInterfaceLanguage()
-  return (chinese, ...values) => translateUi(language, chinese, ...values)
+  return useCallback((chinese: string, ...values: Array<string | number>) => translateUi(language, chinese, ...values), [language])
 }
 
 export function UiText({ zh }: { zh: string }): string {

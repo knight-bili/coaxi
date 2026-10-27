@@ -1,12 +1,12 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schemas.rovai.invalid/contracts/paired-collaboration-experiment-v1.schema.json",
-  "title": "Rovai Paired Collaboration Comparison v1",
+  "$id": "https://schemas.coaxi.invalid/contracts/paired-collaboration-experiment-v1.schema.json",
+  "title": "Coaxi Paired Collaboration Comparison v1",
   "type": "object",
   "additionalProperties": false,
   "required": ["schemaId", "schemaVersion", "definition", "arms", "validity", "observedOutcomeStratum", "outcomeStratum", "qualityComparison", "resourceComparison", "classification", "integrity"],
   "properties": {
-    "schemaId": { "const": "rovai.benchmark.paired-comparison" },
+    "schemaId": { "const": "coaxi.benchmark.paired-comparison" },
     "schemaVersion": { "const": "1.0.0" },
     "definition": { "$ref": "#/$defs/definitionReference" },
     "arms": {

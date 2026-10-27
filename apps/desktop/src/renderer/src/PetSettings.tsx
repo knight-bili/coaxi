@@ -5,13 +5,13 @@ import { Cat, FolderOpen, Pencil, Trash2 } from 'lucide-react'
 import { useThreadClient } from './camp-client'
 import { useUiText } from './interface-language'
 import { AppDialogContent, AppDialogHeader, AppDialogBody, AppDialogFooter } from './AppDialog'
-import { PetSprite } from './codeg-pets/PetSprite'
-import type { PetState } from './codeg-pets/animation'
+import { PetSprite } from './coaxi-pets/PetSprite'
+import type { PetState } from './coaxi-pets/animation'
 import { readPetSprite } from './pet-sprite-reader'
 import './pet-settings.css'
 export type PetSettingsValue={enabled:boolean;activeId:string|null;scale:number}
 type Pet={id:string;displayName:string;description?:string|null;unavailable?:boolean;message?:string}
-export const PET_SETTINGS_CHANGED='rovai-pets-changed'
+export const PET_SETTINGS_CHANGED='coaxi-pets-changed'
 export function publishPetsChanged():void{document.dispatchEvent(new Event(PET_SETTINGS_CHANGED))}
 export function PetThumbnail({id,state='idle',scale=.5}:{id:string;state?:PetState;scale?:number}):React.JSX.Element{
   const client=useThreadClient(),[url,setUrl]=useState<string|null>(null),[error,setError]=useState(false),element=useRef<HTMLDivElement>(null)

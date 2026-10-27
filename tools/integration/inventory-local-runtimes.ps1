@@ -32,7 +32,7 @@ $taskResult = [ordered]@{
     foundCount = @($taskRows | Where-Object { $_.pathDiscovery -eq 'found_on_current_path' }).Count
     runtimes = @($taskRows)
     limits = @('PATH absence does not establish uninstalled status', 'No install, login, global configuration or model turn is performed', 'An alias is not an admitted adapter; product/version/integrity still require Core probing', 'macOS/Linux discovery and all execution tests remain not_run')
-    sourceMappings = @('crates/rovai-core/src/agent_profile.rs:174', 'Codeg fixed source src-tauri/src/acp/registry.rs Gemini/OpenClaw/Hermes entries')
+    sourceMappings = @('crates/coaxi-core/src/agent_profile.rs:174', 'Coaxi fixed source src-tauri/src/acp/registry.rs Gemini/OpenClaw/Hermes entries')
 }
 $taskAbsoluteOutput = [IO.Path]::GetFullPath($OutputPath)
 $taskResult | ConvertTo-Json -Depth 9 | Set-Content -LiteralPath $taskAbsoluteOutput -Encoding utf8

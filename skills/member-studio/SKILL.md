@@ -1,6 +1,6 @@
 ---
 name: member-studio
-description: Use to create a Rovai member or revise and confirm the unsaved identity card and avatar for that creation. Exclude profile questions, edits to existing members, and character or avatar designs without roster creation.
+description: Use to create a Coaxi member or revise and confirm the unsaved identity card and avatar for that creation. Exclude profile questions, edits to existing members, and character or avatar designs without roster creation.
 ---
 
 # Member Studio
@@ -43,7 +43,7 @@ Ask the user to confirm adding this member or edit any field.
 After confirmation:
 
 1. Generate one stable `creationKey` for this creation.
-2. Read `rovai member create --help` for current inputs.
+2. Read `coaxi member create --help` for current inputs.
 3. Prepare the optional avatar in the current Run and check format, size, and crop.
 4. Create with the confirmed six fields and optional avatar.
 5. Inspect the returned `agentId`, creation status, and avatar result.

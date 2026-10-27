@@ -11,7 +11,7 @@ import type {
   WorkspaceSelection
 } from '@contracts'
 
-export const CURRENT_PROJECT_STORAGE_KEY = 'rovai.current-project.v1'
+export const CURRENT_PROJECT_STORAGE_KEY = 'coaxi.current-project.v1'
 
 export type CurrentProject =
   | { kind: 'quick_chat' }

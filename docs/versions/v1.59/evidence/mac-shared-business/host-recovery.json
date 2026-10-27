@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "coreBinary": "rovai-host",
+  "coreBinary": "coaxi-host",
   "adapterKind": "codex-cli",
   "runtimeVersion": "codex-cli 0.153.4",
   "campId": "rvcamp_01m2bjgqvyff8vqcf54sxm9vvc",

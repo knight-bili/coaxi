@@ -131,7 +131,7 @@
       "violet"
     ],
     "boardCoordinates": "board units independent of application text zoom",
-    "authoritativeLayout": "source SQLite; destination Rovai Core SQLite",
+    "authoritativeLayout": "source SQLite; destination Coaxi Core SQLite",
     "localView": "viewport/expansion/selection/minimap/unsent drafts remain client advisory",
     "terminal": "ephemeral PTY, never restore stored process identity"
   },

@@ -11,7 +11,7 @@ export function weekDate(now = new Date()) {
   return day.toISOString().slice(0, 10)
 }
 
-// Weekly scheduling belongs to Rovai Automation. This wrapper only assigns a
+// Weekly scheduling belongs to Coaxi Automation. This wrapper only assigns a
 // bounded campaign per UTC week and projects retained attempts into a trend.
 export async function runWeekly(planPath, outputRoot, now = new Date()) {
   const plan = JSON.parse(await readFile(resolve(planPath), 'utf8'))

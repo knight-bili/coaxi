@@ -11,7 +11,7 @@ afterEach(async () => {
 })
 
 async function fixture(): Promise<{ root: string; registryPath: string }> {
-  const root = await mkdtemp(join(tmpdir(), 'rovai-local-composer-'))
+  const root = await mkdtemp(join(tmpdir(), 'coaxi-local-composer-'))
   temporaryRoots.push(root)
   return { root, registryPath: join(root, 'registry.json') }
 }

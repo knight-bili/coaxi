@@ -98,27 +98,27 @@
   "preserved_dirty_agents_sha256": "6d5c55bc4069cd453a36a38d9b0f48c112f1c256982388a27629c12f962c9f4b",
   "source_files": [
     {
-      "path": "crates/rovai-core/src/runtime_subagent_session/source.rs",
+      "path": "crates/coaxi-core/src/runtime_subagent_session/source.rs",
       "sha256": "6a85260f1bec84c4ad7c746e3f96024f6b9022ff08928cae3c41b4d20f960f43",
       "git_blob": "315bcd7262d773cf0cb782aeaadbfb001e195ead"
     },
     {
-      "path": "crates/rovai-core/src/runtime_subagent_session/source/qoder.rs",
+      "path": "crates/coaxi-core/src/runtime_subagent_session/source/qoder.rs",
       "sha256": "e7e75fcf7ffc05665aae955ac279b60dc5da6f19eaa09c6c2586c3cbc19cf4e2",
       "git_blob": "1cc6403d16f450186015c2959a113972446eae74"
     },
     {
-      "path": "crates/rovai-core/src/runtime_subagent_session/source/qoder/branch.rs",
+      "path": "crates/coaxi-core/src/runtime_subagent_session/source/qoder/branch.rs",
       "sha256": "b0b5e4ab127c8b7c674e289fc3a6049ad16325e692bcca168e4727e84ce765e9",
       "git_blob": "175e58c28b26cd5ee9bac4383fc9a2a9d0b4fc87"
     },
     {
-      "path": "crates/rovai-core/src/runtime_subagent_session/source/qoder_tests.rs",
+      "path": "crates/coaxi-core/src/runtime_subagent_session/source/qoder_tests.rs",
       "sha256": "674c9c83b0e20cd3f63c3a1f02581a475560093739370c3e25040abb1f940ceb",
       "git_blob": "d8519784bf626e4e949c5d3b7f3d87b4434a3b2d"
     },
     {
-      "path": "crates/rovai-core/src/runtime_subagent_session/source/tests.rs",
+      "path": "crates/coaxi-core/src/runtime_subagent_session/source/tests.rs",
       "sha256": "7afcaa5ec498363843f8c5d853496c1069b404d2e253401030ee459a17f06057",
       "git_blob": "62cc4035daed50126e60059c6fa81320ab60cc3d"
     },

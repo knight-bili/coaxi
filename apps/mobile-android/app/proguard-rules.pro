@@ -6,11 +6,11 @@
 -keepattributes *Annotation*, InnerClasses
 -dontnote kotlinx.serialization.**
 -keepclassmembers class **$$serializer { *; }
--keep,includedescriptorclasses class app.codeg.android.**$$serializer { *; }
--keepclassmembers class app.codeg.android.** {
+-keep,includedescriptorclasses class app.coaxi.android.**$$serializer { *; }
+-keepclassmembers class app.coaxi.android.** {
     *** Companion;
 }
--keepclasseswithmembers class app.codeg.android.** {
+-keepclasseswithmembers class app.coaxi.android.** {
     kotlinx.serialization.KSerializer serializer(...);
 }
 

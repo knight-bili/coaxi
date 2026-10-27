@@ -28,7 +28,7 @@ env.PATH = [path.dirname(binary), path.dirname(oldBinary), path.dirname(git),
   ...(process.platform === 'win32' ? [path.join(env.SystemRoot ?? env.SYSTEMROOT, 'System32')] : ['/usr/bin', '/bin'])].join(path.delimiter);
 Object.assign(env, {HOME: home, USERPROFILE: home, APPDATA: path.join(home, 'AppData/Roaming'),
   LOCALAPPDATA: path.join(home, 'AppData/Local'), TEMP: temp, TMP: temp,
-  ROVAI_BUNDLED_SKILLS_ROOT: path.join(root, 'skills')});
+  COAXI_BUNDLED_SKILLS_ROOT: path.join(root, 'skills')});
 await mkdir(env.APPDATA, {recursive: true}); await mkdir(env.LOCALAPPDATA, {recursive: true});
 const formal = path.join(fixture, 'formal');
 const dataDir = process.platform === 'win32'
@@ -66,13 +66,13 @@ async function start(executable) {
 }
 async function close() {await host.close(); host = undefined;}
 const command = (operation, value, commandId = randomUUID()) => call(operation, {commandId, command: value});
-const withDB = action => {const db = new DatabaseSync(path.join(dataDir, 'rovai.sqlite'), {readOnly: true});
+const withDB = action => {const db = new DatabaseSync(path.join(dataDir, 'coaxi.sqlite'), {readOnly: true});
   try {return action(db);} finally {db.close();}};
-const sourcePaths = ['crates/rovai-core/src/canvas_node.rs', 'crates/rovai-core/src/canvas_board.rs',
-  'crates/rovai-core/src/db.rs', 'crates/rovai-core/src/db_skill_pack_context.rs',
-  'crates/rovai-core/src/application.rs', 'crates/rovai-web/src/operations.rs',
-  'crates/rovai-core/src/read_model.rs', 'crates/rovai-core/src/read_model/canvas_references.rs', 'crates/rovai-core/src/read_model/navigation.rs',
-  'crates/rovai-core/src/git.rs', 'crates/rovai-core/src/git/worktrees.rs'];
+const sourcePaths = ['crates/coaxi-core/src/canvas_node.rs', 'crates/coaxi-core/src/canvas_board.rs',
+  'crates/coaxi-core/src/db.rs', 'crates/coaxi-core/src/db_skill_pack_context.rs',
+  'crates/coaxi-core/src/application.rs', 'crates/coaxi-web/src/operations.rs',
+  'crates/coaxi-core/src/read_model.rs', 'crates/coaxi-core/src/read_model/canvas_references.rs', 'crates/coaxi-core/src/read_model/navigation.rs',
+  'crates/coaxi-core/src/git.rs', 'crates/coaxi-core/src/git/worktrees.rs'];
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 try {
   await start(oldBinary);
@@ -98,7 +98,7 @@ try {
   const conversationId = single.payload.conversationId; assert(conversationId);
   await close();
   const oldFacts = withDB(db => {
-    assert.equal(db.prepare('SELECT projection_schema_version AS v FROM rovai_data_contract').get().v, 153);
+    assert.equal(db.prepare('SELECT projection_schema_version AS v FROM coaxi_data_contract').get().v, 153);
     assert.equal(db.prepare("SELECT COUNT(*) AS n FROM sqlite_master WHERE name='canvas_node'").get().n, 0);
     return {board: db.prepare('SELECT * FROM canvas_board WHERE id=?').get(boardId),
       thread: db.prepare('SELECT * FROM camp WHERE id=?').get(threadId)};
@@ -261,7 +261,7 @@ try {
     params: {commandId: deleteId, command: deleteCommand}}), {state: 'recorded', result: deleted});
   await close();
   withDB(db => {
-    assert.equal(db.prepare('SELECT projection_schema_version AS v FROM rovai_data_contract').get().v, 154);
+    assert.equal(db.prepare('SELECT projection_schema_version AS v FROM coaxi_data_contract').get().v, 154);
     assert.equal(db.prepare('SELECT COUNT(*) AS n FROM schema_migration WHERE version=204').get().n, 1);
     assert.equal(db.prepare('SELECT COUNT(*) AS n FROM canvas_node WHERE board_id=?').get(boardId).n, 0);
     assert.deepEqual(db.prepare('SELECT * FROM camp WHERE id=?').get(threadId), oldFacts.thread);

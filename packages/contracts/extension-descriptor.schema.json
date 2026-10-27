@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://codeg-rovai.local/contracts/extension-descriptor/v1",
+  "$id": "https://coaxi.local/contracts/extension-descriptor/v1",
   "title": "Core extension descriptor v1",
   "type": "object",
   "additionalProperties": false,
@@ -11,7 +11,7 @@
     "contractVersion": {"const": 1},
     "version": {"type": "string", "minLength": 1, "maxLength": 128},
     "displayName": {"type": "string", "minLength": 1, "maxLength": 256},
-    "dataOwner": {"const": "rovai-core"},
+    "dataOwner": {"const": "coaxi-core"},
     "hosts": {"type": "array", "uniqueItems": true, "items": {"enum": ["desktop", "server", "web", "android", "ios"]}},
     "permissions": {"type": "array", "uniqueItems": true, "items": {"type": "string", "maxLength": 128}},
     "capabilities": {"type": "array", "uniqueItems": true, "items": {"type": "string", "maxLength": 128}},

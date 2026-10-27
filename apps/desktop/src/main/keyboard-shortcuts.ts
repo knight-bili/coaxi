@@ -1,7 +1,7 @@
 import { promises as fs } from 'node:fs'
 import { join } from 'node:path'
 import { randomUUID } from 'node:crypto'
-import { DEFAULT_SHORTCUTS,SHORTCUT_DEFINITIONS,canShareShortcut,normalizeShortcut,normalizeShortcutSettings,shortcutsConflict } from '../shared/codeg-keyboard-shortcuts'
+import { DEFAULT_SHORTCUTS,SHORTCUT_DEFINITIONS,canShareShortcut,normalizeShortcut,normalizeShortcutSettings,shortcutsConflict } from '../shared/coaxi-keyboard-shortcuts'
 import { writePrivateJson } from './general-preferences'
 import type { KeyboardShortcutsSnapshot } from '@contracts'
 

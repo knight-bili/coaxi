@@ -1,4 +1,4 @@
-// Codeg drawer.tsx and the existing fused DelegationViewer: share the same
+// Coaxi drawer.tsx and the existing fused DelegationViewer: share the same
 // Radix/Base UI Escape sample across both kinds of nested session viewer.
 import { useEffect } from 'react'
 import type { Drawer } from '@base-ui/react/drawer'

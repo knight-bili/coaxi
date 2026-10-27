@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schemas.rovai.invalid/contracts/semantic-judge-view-suite-v2.schema.json",
-  "title": "Rovai Semantic Dual-View Judge Suite with bounded evidence adjudication",
+  "$id": "https://schemas.coaxi.invalid/contracts/semantic-judge-view-suite-v2.schema.json",
+  "title": "Coaxi Semantic Dual-View Judge Suite with bounded evidence adjudication",
   "$defs": {
     "view": {
       "enum": [
@@ -125,7 +125,7 @@
         "evidenceReferences": {
           "type": "array",
           "items": {
-            "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/evidenceRef"
+            "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/evidenceRef"
           }
         },
         "reason": {
@@ -155,21 +155,21 @@
           "$ref": "#/$defs/view"
         },
         "configurationArtifact": {
-          "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/artifactRef"
+          "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/artifactRef"
         },
         "packArtifact": {
-          "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/artifactRef"
+          "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/artifactRef"
         },
         "replicaArtifacts": {
           "type": "array",
           "minItems": 2,
           "maxItems": 2,
           "items": {
-            "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/artifactRef"
+            "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/artifactRef"
           }
         },
         "reviewArtifact": {
-          "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/artifactRef"
+          "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/artifactRef"
         },
         "state": {
           "$ref": "#/$defs/state"
@@ -197,29 +197,29 @@
   ],
   "properties": {
     "artifactId": {
-      "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/stableId"
+      "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/stableId"
     },
     "schemaId": {
-      "const": "rovai.qualification.semantic-judge-view-suite"
+      "const": "coaxi.qualification.semantic-judge-view-suite"
     },
     "schemaVersion": {
       "const": "2.0.0"
     },
     "producer": {
-      "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/producer"
+      "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/producer"
     },
     "binding": {
-      "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/binding"
+      "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/binding"
     },
     "sourceBoundaries": {
       "type": "array",
       "minItems": 1,
       "items": {
-        "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/sourceBoundary"
+        "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/sourceBoundary"
       }
     },
     "payloadDigest": {
-      "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/digest"
+      "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/digest"
     },
     "payload": {
       "type": "object",
@@ -234,7 +234,7 @@
       ],
       "properties": {
         "suiteId": {
-          "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/stableId"
+          "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/stableId"
         },
         "protocolId": {
           "const": "semantic-dual-view-judge-2"
@@ -285,7 +285,7 @@
         "unavailableReason": {
           "anyOf": [
             {
-              "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/typedReason"
+              "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/typedReason"
             },
             {
               "type": "null"

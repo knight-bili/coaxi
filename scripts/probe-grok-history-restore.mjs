@@ -4,33 +4,33 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { createInterface } from 'node:readline'
 
-const executable = process.env.ROVAI_GROK_BIN?.trim() || 'grok'
-const modelId = process.env.ROVAI_GROK_MODEL_ID?.trim()
-const baseUrl = process.env.ROVAI_GROK_MODEL_BASE_URL?.trim()
-const apiKey = process.env.ROVAI_GROK_MODEL_API_KEY?.trim()
-const apiBackend = process.env.ROVAI_GROK_MODEL_API_BACKEND?.trim() || 'chat_completions'
-const contextWindow = Number(process.env.ROVAI_GROK_MODEL_CONTEXT_WINDOW || 204800)
-const keepFixture = process.env.ROVAI_KEEP_GROK_PROBE_FIXTURE === '1'
+const executable = process.env.COAXI_GROK_BIN?.trim() || 'grok'
+const modelId = process.env.COAXI_GROK_MODEL_ID?.trim()
+const baseUrl = process.env.COAXI_GROK_MODEL_BASE_URL?.trim()
+const apiKey = process.env.COAXI_GROK_MODEL_API_KEY?.trim()
+const apiBackend = process.env.COAXI_GROK_MODEL_API_BACKEND?.trim() || 'chat_completions'
+const contextWindow = Number(process.env.COAXI_GROK_MODEL_CONTEXT_WINDOW || 204800)
+const keepFixture = process.env.COAXI_KEEP_GROK_PROBE_FIXTURE === '1'
 
 if (!modelId || !baseUrl || !apiKey) {
   throw new Error(
-    'ROVAI_GROK_MODEL_ID, ROVAI_GROK_MODEL_BASE_URL and ROVAI_GROK_MODEL_API_KEY are required'
+    'COAXI_GROK_MODEL_ID, COAXI_GROK_MODEL_BASE_URL and COAXI_GROK_MODEL_API_KEY are required'
   )
 }
 if (!['chat_completions', 'responses', 'messages'].includes(apiBackend)) {
   throw new Error(`Unsupported Grok custom-model API backend: ${apiBackend}`)
 }
 if (!Number.isSafeInteger(contextWindow) || contextWindow <= 0) {
-  throw new Error('ROVAI_GROK_MODEL_CONTEXT_WINDOW must be a positive integer')
+  throw new Error('COAXI_GROK_MODEL_CONTEXT_WINDOW must be a positive integer')
 }
 
-const fixtureRoot = await mkdtemp(join(tmpdir(), 'rovai-grok-history-restore-'))
+const fixtureRoot = await mkdtemp(join(tmpdir(), 'coaxi-grok-history-restore-'))
 const grokHome = join(fixtureRoot, 'grok-home')
 const projectRoot = join(fixtureRoot, 'project')
-const providerAlias = 'rovai-private-provider'
-const marker = `ROVAI_GROK_COLD_LOAD_${process.pid}_${Date.now()}`
-const nativeRulesTrigger = `ROVAI_GROK_COLD_RULES_TRIGGER_${process.pid}_${Date.now()}`
-const nativeRulesExpected = `ROVAI_GROK_COLD_RULES_OK_${process.pid}_${Date.now()}`
+const providerAlias = 'coaxi-private-provider'
+const marker = `COAXI_GROK_COLD_LOAD_${process.pid}_${Date.now()}`
+const nativeRulesTrigger = `COAXI_GROK_COLD_RULES_TRIGGER_${process.pid}_${Date.now()}`
+const nativeRulesExpected = `COAXI_GROK_COLD_RULES_OK_${process.pid}_${Date.now()}`
 
 try {
   await mkdir(grokHome, { mode: 0o700 })
@@ -44,8 +44,8 @@ try {
     `[model.${tomlString(providerAlias)}]`,
     `model = ${tomlString(modelId)}`,
     `base_url = ${tomlString(baseUrl)}`,
-    'name = "Rovai private provider"',
-    'env_key = "ROVAI_GROK_MODEL_API_KEY"',
+    'name = "Coaxi private provider"',
+    'env_key = "COAXI_GROK_MODEL_API_KEY"',
     `api_backend = ${tomlString(apiBackend)}`,
     `context_window = ${contextWindow}`,
     'supports_backend_search = false',
@@ -78,7 +78,7 @@ try {
       type: 'text',
       text: [
         `Remember this exact marker for the next turn: ${marker}.`,
-        'Reply with exactly ROVAI_GROK_HISTORY_STORED and nothing else.'
+        'Reply with exactly COAXI_GROK_HISTORY_STORED and nothing else.'
       ].join(' ')
     }]
   }, 180_000)
@@ -138,7 +138,7 @@ try {
     firstHost: {
       sessionIdPresent: true,
       stopReason: firstTerminal.stopReason ?? null,
-      storageAcknowledged: firstOutput.includes('ROVAI_GROK_HISTORY_STORED')
+      storageAcknowledged: firstOutput.includes('COAXI_GROK_HISTORY_STORED')
     },
     coldHistoryRestore: {
       exactSessionIdPreserved: loaded.sessionId == null || loaded.sessionId === sessionId,
@@ -171,7 +171,7 @@ async function startHost(label) {
       GROK_HOME: grokHome,
       GROK_DEFAULT_MODEL: providerAlias,
       GROK_DISABLE_AUTOUPDATER: '1',
-      ROVAI_GROK_MODEL_API_KEY: apiKey,
+      COAXI_GROK_MODEL_API_KEY: apiKey,
       XAI_API_KEY: apiKey
     },
     stdio: ['pipe', 'pipe', 'pipe']
@@ -288,8 +288,8 @@ async function initializeAndAuthenticate(host) {
       terminal: false
     },
     clientInfo: {
-      name: 'rovai_history_restore_probe',
-      title: 'Rovai-ai Grok HistoryRestore Probe',
+      name: 'coaxi_history_restore_probe',
+      title: 'Coaxi Grok HistoryRestore Probe',
       version: '1'
     }
   })

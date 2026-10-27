@@ -11,7 +11,7 @@ If the user addresses only you and asks for a group discussion, explain that the
 Handle this discussion's requests in the current batch; process other inputs normally. Use the Runtime's trusted requester Agent ID, not a guessed display name. Send the complete result once to that requester:
 
 ```text
-rovai send --to <requester-agent-id> --body <complete-result>
+coaxi send --to <requester-agent-id> --body <complete-result>
 ```
 
 Follow the reply contract in `SKILL.md`. Follow CLI recovery on failure; do not blindly resend. If a Runtime final response is required, keep the same complete view there. Do not request User attention.

@@ -11,9 +11,9 @@ import {
 } from './lib/runtime-camp-files-root.mjs'
 
 const root = resolve(import.meta.dirname, '..')
-const fixtureRoot = await mkdtemp(join(tmpdir(), 'rovai-action-approval-smoke-'))
+const fixtureRoot = await mkdtemp(join(tmpdir(), 'coaxi-action-approval-smoke-'))
 const projectRoot = join(fixtureRoot, 'project')
-const approvedMarker = join(fixtureRoot, 'approved-by-rovai')
+const approvedMarker = join(fixtureRoot, 'approved-by-coaxi')
 const approvedMarkerCommand = process.platform === 'win32'
   ? `New-Item -ItemType File -Force -Path '${approvedMarker.replaceAll("'", "''")}' | Out-Null`
   : `/usr/bin/touch ${approvedMarker}`
@@ -25,12 +25,12 @@ try {
   await mkdir(projectRoot)
   await writeFile(join(projectRoot, 'README.md'), '# Action Approval fixture\n')
   await runCommand('git', ['init', '-b', 'main'], projectRoot)
-  await runCommand('git', ['config', 'user.name', 'Rovai-ai Action Smoke'], projectRoot)
-  await runCommand('git', ['config', 'user.email', 'action-smoke@rovai.local'], projectRoot)
+  await runCommand('git', ['config', 'user.name', 'Coaxi Action Smoke'], projectRoot)
+  await runCommand('git', ['config', 'user.email', 'action-smoke@coaxi.local'], projectRoot)
   await runCommand('git', ['add', 'README.md'], projectRoot)
   await runCommand('git', ['commit', '-m', 'fixture'], projectRoot)
 
-  core = spawn(join(root, 'target', 'debug', 'rovai-core'), [
+  core = spawn(join(root, 'target', 'debug', 'coaxi-core'), [
     ...coreDataDirectoryArguments(dataDir),
     '--skill-library-root', join(dataDir, 'managed-skill-library')
   ], {
@@ -50,11 +50,11 @@ try {
   }
   core.once('error', rejectPending)
   core.once('close', (code, signal) => {
-    if (!shuttingDown) rejectPending(new Error(`rovai-core exited early (code=${code}, signal=${signal})`))
+    if (!shuttingDown) rejectPending(new Error(`coaxi-core exited early (code=${code}, signal=${signal})`))
   })
   const lines = createInterface({ input: core.stdout })
   lines.once('close', () => {
-    if (!shuttingDown) rejectPending(new Error('rovai-core stdout closed early'))
+    if (!shuttingDown) rejectPending(new Error('coaxi-core stdout closed early'))
   })
   lines.on('line', (line) => {
     const message = JSON.parse(line)
@@ -114,7 +114,7 @@ try {
     workspace,
     body: `Run exactly this command with the shell tool: ${approvedMarkerCommand}. The target is intentionally outside the project. Request approval, then after it succeeds reply ACTION_APPROVAL_OK.`,
     address: { mode: 'explicit', agentIds: ['agent_2'] },
-    purpose: 'Exercise one exact Rovai-ai Action Approval and then report success',
+    purpose: 'Exercise one exact Coaxi Action Approval and then report success',
   })
   const threadId = result.payload?.threadId
   const agentRunId = result.payload?.agentRunIds?.[0]

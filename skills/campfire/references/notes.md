@@ -30,4 +30,4 @@ User decisions needed: <items, or none>
 
 Add a separate Default Lead judgment only when requested: recommendation, strength, and what could change it. It is not group consensus.
 
-Publish with `rovai send --public-only --body <notes>`. Publication ends the discussion. Notes do not automatically create Tasks, Memory, version decisions or implementation work; late messages do not restart it.
+Publish with `coaxi send --public-only --body <notes>`. Publication ends the discussion. Notes do not automatically create Tasks, Memory, version decisions or implementation work; late messages do not restart it.

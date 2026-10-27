@@ -54,7 +54,7 @@ function rehypeInlineContent({ tokens }: { tokens: string[] }): (tree: InlineHtm
         const parts = node.value.split(pattern)
         if (parts.length === 1) return [node]
         return parts.filter(Boolean).map((value): InlineHtmlNode => tokenSet.has(value)
-          ? { type: 'element', tagName: 'span', properties: { 'data-rovai-inline-content': value }, children: [] }
+          ? { type: 'element', tagName: 'span', properties: { 'data-coaxi-inline-content': value }, children: [] }
           : { type: 'text', value })
       })
     }
@@ -77,7 +77,7 @@ function remarkLeadingContent({ enabled, inline }: { enabled: boolean; inline: b
     if (paragraph !== firstBlock) children.unshift(paragraph)
     paragraph.data = {
       ...paragraph.data,
-      hProperties: { ...paragraph.data?.hProperties, 'data-rovai-leading-content': 'true' }
+      hProperties: { ...paragraph.data?.hProperties, 'data-coaxi-leading-content': 'true' }
     }
   }
 }
@@ -95,16 +95,16 @@ type MarkdownHeadingTag = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
 
 function markdownCodeBlock(children: ReactNode): { code: string; languageName?: string;cardOrdinal?:number } | null {
   const child = Array.isArray(children) && children.length === 1 ? children[0] : children
-  if (!isValidElement<{ children?: ReactNode; className?: string;'data-rovai-card-ordinal'?:unknown }>(child)) return null
+  if (!isValidElement<{ children?: ReactNode; className?: string;'data-coaxi-card-ordinal'?:unknown }>(child)) return null
   const code = markdownHeadingText(child.props.children)
   const match = /(?:^|\s)language-([^\s]+)/u.exec(child.props.className ?? '')
-  const ordinal=Number(child.props['data-rovai-card-ordinal'])
+  const ordinal=Number(child.props['data-coaxi-card-ordinal'])
   return { code, languageName: match?.[1],...(Number.isSafeInteger(ordinal)&&ordinal>=0?{cardOrdinal:ordinal}:{}) }
 }
 
 function remarkCardOrdinals(): (tree:MarkdownTreeNode)=>void {
   return tree=>{let ordinal=0;const visit=(node:MarkdownTreeNode):void=>{
-    if(node.type==='code'&&(node as MarkdownTreeNode&{lang?:string}).lang==='spec')node.data={...node.data,hProperties:{...node.data?.hProperties,'data-rovai-card-ordinal':String(ordinal++)}}
+    if(node.type==='code'&&(node as MarkdownTreeNode&{lang?:string}).lang==='spec')node.data={...node.data,hProperties:{...node.data?.hProperties,'data-coaxi-card-ordinal':String(ordinal++)}}
     for(const child of node.children??[])visit(child)
   };visit(tree)}
 }
@@ -255,13 +255,13 @@ export function SafeMarkdown({
         components={{
           ...headingComponents,
           span({ node, children: spanChildren }) {
-            const token = node?.properties['data-rovai-inline-content']
+            const token = node?.properties['data-coaxi-inline-content']
             return typeof token === 'string'
               ? <InlineMarkdownContent token={token} />
               : <span>{spanChildren}</span>
           },
           p({ node, children: paragraphChildren }) {
-            const leading = node?.properties['data-rovai-leading-content'] === 'true'
+            const leading = node?.properties['data-coaxi-leading-content'] === 'true'
             return (
               <p>
                 {leading && <LeadingMarkdownContent />}

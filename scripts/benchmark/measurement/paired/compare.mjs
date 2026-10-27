@@ -2,7 +2,7 @@ import { canonicalJson, digestJson } from '../../protocol/canonical.mjs'
 import { validateResourceMeasurement } from '../resources/index.mjs'
 import { planPairedTrials, validatePairedTrialDefinition } from './definition.mjs'
 
-export const PAIRED_COMPARISON_SCHEMA_ID = 'rovai.benchmark.paired-comparison'
+export const PAIRED_COMPARISON_SCHEMA_ID = 'coaxi.benchmark.paired-comparison'
 export const PAIRED_COMPARISON_SCHEMA_VERSION = '1.0.0'
 
 const OUTCOMES = new Set(['pass', 'fail', 'indeterminate'])

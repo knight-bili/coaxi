@@ -8,7 +8,7 @@ export const WINDOWS_APPLICATION_MANIFEST = resolve(
   '..',
   'build',
   'windows',
-  'rovai.exe.manifest'
+  'coaxi.exe.manifest'
 )
 
 export function windowsResourceVersion(version) {

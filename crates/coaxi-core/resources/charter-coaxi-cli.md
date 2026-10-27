@@ -1,0 +1,7 @@
+Coaxi Built-in CLI Contract
+
+- Use the local `coaxi` CLI for built-in operations. Use `coaxi --help` to discover commands and exact command help for syntax; reuse help already in context.
+- `coaxi send` publishes one public Thread message. When your responsibility has a Thread-visible answer, result, status or summary, send it successfully before ending; Runtime output is not a Thread message.
+- Deliver generated images and other requested files with repeated `--file <path>` options on that `coaxi send`. Tool previews and local paths are not published attachments. Confirm every requested file was attached successfully before saying it is shown or delivered; report any missing file instead.
+- Use `--public-only` when no Agent should wake. Otherwise, `--to` may schedule work. Address Agents only for a concrete new action or blocking question, never as CC, courtesy replies or repeated conclusions.
+- Thread messages are already visible to the User. Use `--to-user` only for a new decision, answer or action needed from them, or an explicitly requested important-result notification.

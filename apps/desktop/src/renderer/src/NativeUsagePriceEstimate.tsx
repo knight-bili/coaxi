@@ -3,7 +3,7 @@ import type { PublicUsagePrices,TokenUsageReport } from '@contracts'
 import { useThreadClient } from './camp-client'
 import { useInterfaceLanguage,useUiText } from './interface-language'
 import { readErrorMessage } from './error-message'
-import { buildRateIndex,estimateItemCost,estimateReportCost,resolveRate } from './codeg-native-content/lib/model-api-rates'
+import { buildRateIndex,estimateItemCost,estimateReportCost,resolveRate } from './coaxi-native-content/lib/model-api-rates'
 
 /** 与原 TokenUsagePage 相同的公开价目估算，不覆盖实际成本或订阅账单。 */
 export function NativeUsagePriceEstimate({report}:{report:TokenUsageReport}):React.JSX.Element {
@@ -24,7 +24,7 @@ export function NativeUsagePriceEstimate({report}:{report:TokenUsageReport}):Rea
     try{
       const serialized=JSON.stringify(snapshot,null,2)
       if(client.usageCard?.saveEstimate)await client.usageCard.saveEstimate(serialized)
-      else {const url=URL.createObjectURL(new Blob([serialized+'\n'],{type:'application/json'})),anchor=document.createElement('a');anchor.href=url;anchor.download='codeg-rovai-usage-estimate.json';anchor.click();setTimeout(()=>URL.revokeObjectURL(url),30000)}
+      else {const url=URL.createObjectURL(new Blob([serialized+'\n'],{type:'application/json'})),anchor=document.createElement('a');anchor.href=url;anchor.download='coaxi-usage-estimate.json';anchor.click();setTimeout(()=>URL.revokeObjectURL(url),30000)}
     }catch(reason){if(observed===generation.current)setError(readErrorMessage(reason))}finally{if(observed===generation.current)setBusy(false)}
   }
   return <section className="usage-panel"><header className="mb-3 flex flex-wrap items-center justify-between gap-3"><div><h2 className="text-[0.8125rem] font-semibold">{t('API 价目估算')}</h2><p className="mt-1 text-xs text-muted-foreground">{t('按公开每百万 Token 价目换算，不代表订阅扣款或剩余额度。')}</p></div><button type="button" className="quiet-button" disabled={busy} onClick={()=>void refresh()}>{t(busy?'正在读取…':catalog?.available?'更新公开价目':'读取公开价目')}</button></header>

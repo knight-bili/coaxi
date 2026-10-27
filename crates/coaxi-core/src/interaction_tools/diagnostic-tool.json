@@ -1,0 +1,9 @@
+{
+  "name": "coaxi_diagnose_capabilities",
+  "description": "Read only the current Coaxi run's tool assignment, frozen delivery, connection, successful-call evidence and resource grant summary. Use for Coaxi tool troubleshooting, never as evidence that a web page or desktop window has been read. Returns no page content, window titles, credentials, file paths, other members' private data, or permission-changing actions.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  }
+}

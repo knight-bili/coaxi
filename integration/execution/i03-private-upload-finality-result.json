@@ -10,9 +10,9 @@
       "apps/web/src/client.test.ts": "e201183e9bb1c25fbc0f7d6b30652c3b26cdd065e493792129f9f50f3fc22fd0",
       "apps/web/src/client.ts": "887157c3b26609f70504005767a48e1f4dc53f53c69150222d6b0c0c1b882558",
       "apps/web/src/private-upload-preparations.test.ts": "2e63146c560b7b0c700a7f13f74dea298de19c2497e1950b7eed34e73220e645",
-      "crates/rovai-core/src/single_chat_composer_tests.rs": "e4dfb80717a5ae3bfd98b46b6765d9f10e209bb51e0e7d061cf78ff072870c0a",
-      "crates/rovai-core/src/web_upload.rs": "2a4ead7997836e20de5b7d0cd1668e1d0c2b8c5bcb820ff6ac35c7eca734bec3",
-      "crates/rovai-web/src/uploads.rs": "2e3ef31fefa1b4da278603cb9a02ad8c342ae3c5f3e3e4010827c543c9a97f19",
+      "crates/coaxi-core/src/single_chat_composer_tests.rs": "e4dfb80717a5ae3bfd98b46b6765d9f10e209bb51e0e7d061cf78ff072870c0a",
+      "crates/coaxi-core/src/web_upload.rs": "2a4ead7997836e20de5b7d0cd1668e1d0c2b8c5bcb820ff6ac35c7eca734bec3",
+      "crates/coaxi-web/src/uploads.rs": "2e3ef31fefa1b4da278603cb9a02ad8c342ae3c5f3e3e4010827c543c9a97f19",
       "docs/contracts/host-web-v5.md": "50fb82c5375a58fe95facf887916a403418a0629e6ba74a3ac1b47daeed49932",
       "docs/contracts/single-chat-composer-scope-v1.md": "15f9cebed26419ef94098c8e21fb269b110dcaafd33f3c36bcdebbe25278e38e",
       "docs/development/testing.md": "6625b68e0aa3f53e7417cb76ccaf6fb463e752d67f212f7a7134999632ab0b9c",
@@ -51,7 +51,7 @@
     "actual_host_native_browser_platform_model": "not_run",
     "full_PC01_PC24_and_formal324": "not_qualified"
   },
-  "build_exception": "Persistent original-result semantics blocked subsequent recovery UI; minimum3-owner Core lib batch combines prior uncompiled directory/Web ingress, then rovai-web type check; no workspace/Host/Actions",
+  "build_exception": "Persistent original-result semantics blocked subsequent recovery UI; minimum3-owner Core lib batch combines prior uncompiled directory/Web ingress, then coaxi-web type check; no workspace/Host/Actions",
   "self_review": [
     "Kept normal execution errors as errors; only readonly known business preconditions yield rejected",
     "Legacy upload clients must not treat a rejected snapshot as success or keep unknown forever, so added strong canonical code handling",
@@ -73,10 +73,10 @@
     "I02 remaining, I04-I12/BUF and formal324"
   ],
   "preserved_authorities": {
-    "crates/rovai-core/src/local_attachment_source.rs": "8830581e72fc103b2f359be17a0072c5ee0cedc6eb5fe58b179ae3d255dbc1ca",
-    "crates/rovai-core/src/context.rs": "329144f38675ebedeaf5652858d457d42369455eb26c6159af61d19c02218784",
-    "crates/rovai-core/src/message_quote.rs": "efb6e962946b85c089483bb1120fe92f32458bb3b3b5e5eb668e26f8aa96481e",
-    "crates/rovai-core/src/command.rs": "22258f81dc5b76040cd0fdba20074321b5be7104e648a8278412c0736ef0d85a"
+    "crates/coaxi-core/src/local_attachment_source.rs": "8830581e72fc103b2f359be17a0072c5ee0cedc6eb5fe58b179ae3d255dbc1ca",
+    "crates/coaxi-core/src/context.rs": "329144f38675ebedeaf5652858d457d42369455eb26c6159af61d19c02218784",
+    "crates/coaxi-core/src/message_quote.rs": "efb6e962946b85c089483bb1120fe92f32458bb3b3b5e5eb668e26f8aa96481e",
+    "crates/coaxi-core/src/command.rs": "22258f81dc5b76040cd0fdba20074321b5be7104e648a8278412c0736ef0d85a"
   },
   "approved_r1_files": {
     "I03_私聊材料怎么分开用_客户确认版_r1.docx": "87565f57fa0e994f676139e3376fe14e556ac9862c08f1573798d985f4dcecf7",

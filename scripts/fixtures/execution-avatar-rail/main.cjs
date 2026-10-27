@@ -10,8 +10,8 @@ app.setPath('sessionData', join(userData, 'session'))
 
 app.whenReady().then(async () => {
   const preview = process.argv.includes('--preview')
-  const window = new BrowserWindow({ title: 'Rovai 执行台 · 隔离验收', width: 1440, height: 920, useContentSize: true,
-    show: process.platform === 'linux' || preview || process.env.ROVAI_SHOW_EXECUTION_AVATAR_FIXTURE === '1',
+  const window = new BrowserWindow({ title: 'Coaxi 执行台 · 隔离验收', width: 1440, height: 920, useContentSize: true,
+    show: process.platform === 'linux' || preview || process.env.COAXI_SHOW_EXECUTION_AVATAR_FIXTURE === '1',
     webPreferences: { contextIsolation: true, sandbox: true, nodeIntegration: false, backgroundThrottling: false } })
   window.webContents.on('console-message', event => console.error(event.message))
   await window.loadFile(renderer)

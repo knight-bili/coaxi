@@ -6,7 +6,7 @@ import { UiText, uiAttribute } from './interface-language'
 export { DEFAULT_CAPABILITY_WIDTH, defaultCapabilityWidth, capabilityListWidth } from './useCapabilitySplitter'
 
 export type CapabilityFilter = 'all' | 'enabled' | 'disabled'
-const WIDTH_KEY = 'rovai.capability-list-width.v1'
+const WIDTH_KEY = 'coaxi.capability-list-width.v1'
 export function matchesCapabilityFilter(enabled: boolean, filter: CapabilityFilter): boolean {
   return filter === 'all' || enabled === (filter === 'enabled')
 }

@@ -10,12 +10,12 @@ import './user-feedback.css'
 
 export function conversationSourceReference(source: Pick<ConversationSourceDescriptor, 'title' | 'sourceSessionId'>): string {
   const title = source.title.replace(/[\r\n\t]+/g, ' ').replace(/([\\\[\]])/g, '\\$1')
-  return `[参考：${title}](rovai-source:${source.sourceSessionId})`
+  return `[参考：${title}](coaxi-source:${source.sourceSessionId})`
 }
 type Sources = { items: ConversationSourceDescriptor[]; next: string | null }
 type HistoryEntry = { id: string; linkedThreadId?: string; revision?: string; summary?: { title?: string } }
 const kindText: Record<ConversationSourceDescriptor['sourceKind'], string> = { public: '团队讨论', single_chat: '私聊', delegation_child: '帮手讨论', imported: '导入的历史讨论' }
-/** 沿原Rovai反馈弹窗与资料列表容器；引用进入已有消息草稿，不另建模型输入章节。 */
+/** 沿原Coaxi反馈弹窗与资料列表容器；引用进入已有消息草稿，不另建模型输入章节。 */
 export function ConversationSources({ scope, disabled = false, onInsert, open: controlledOpen, onOpenChange }: { open?: boolean; onOpenChange?(value: boolean): void; scope: ConversationToolScope; disabled?: boolean; onInsert(source: ConversationSourceDescriptor): Promise<void> | void }): React.JSX.Element {
   const client = useThreadClient(), t = useUiText(), generation = useRef(0), locked = useRef(false)
   const [localOpen, setLocalOpen] = useState(false), open = controlledOpen ?? localOpen, setOpen = onOpenChange ?? setLocalOpen

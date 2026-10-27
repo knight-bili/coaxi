@@ -93,7 +93,7 @@ export class ElectronDingTalkWebSession implements DingTalkWebSession {
     this.#parent = options.getParentWindow ?? (() => null)
     // No persist: partition: SQLite is the only durable credential authority.
     this.#createSession = options.createSession ?? (() => electronSession.fromPartition(
-      `rovai-dingtalk-developer-${randomUUID()}`, { cache: false }
+      `coaxi-dingtalk-developer-${randomUUID()}`, { cache: false }
     ))
     this.#session = options.session ?? this.#createSession()
     this.#session.setPermissionRequestHandler((_contents, _permission, callback) => callback(false))
@@ -181,7 +181,7 @@ export class ElectronDingTalkWebSession implements DingTalkWebSession {
         || error.message !== 'dingtalk_developer_session_expired') throw error
     }
     // Let DingTalk's own SSO redirect flow renew its console cookie. There is no
-    // Rovai OAuth refresh token, copied client secret, or replay of a mutation.
+    // Coaxi OAuth refresh token, copied client secret, or replay of a mutation.
     const deadline = dingTalkDeadline(AbortSignal.any([this.#closed.signal, ...(signal ? [signal] : [])]),
       this.#timings.identity, 'dingtalk_open_platform_timeout')
     try { return await this.#visitOfficialPage(PORTAL_URL, false, deadline.signal, () => {}) }

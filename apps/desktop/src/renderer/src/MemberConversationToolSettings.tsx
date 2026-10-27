@@ -15,7 +15,7 @@ const features: Array<{ key: keyof ConversationToolFlags; title: string; detail:
   { key: 'workTasks', title: '创建使命待办', detail: '保存完整待办，等待你从使命板启动。' }
 ]
 type Save = ConversationToolsInputs['conversationTools.policy.set']
-/** 沿原Rovai队员设置容器，四个总开关与队员分配分别展示。 */
+/** 沿原Coaxi队员设置容器，四个总开关与队员分配分别展示。 */
 export function MemberConversationToolSettings({ agentId, disabled = false }: { agentId: string; disabled?: boolean }): React.JSX.Element {
   const client = useThreadClient(), t = useUiText(), generation = useRef(0), locked = useRef(false)
   const [base, setBase] = useState<ConversationToolPolicy | null>(null), [flags, setFlags] = useState(empty), [global, setGlobal] = useState(empty), [feedback, setFeedback] = useState<boolean | null>(null)

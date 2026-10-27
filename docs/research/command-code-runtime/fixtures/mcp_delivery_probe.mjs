@@ -17,10 +17,10 @@ const arg = (key, fallback) => { const i = args.indexOf(key); return i < 0 ? fal
 const json = path => JSON.parse(readFileSync(path, 'utf8'));
 const put = (path, value) => writeFileSync(path, JSON.stringify(value, null, 2) + '\n', { mode: 0o600 });
 const privateDir = path => mkdirSync(path, { recursive: true, mode: 0o700 });
-const serverName = 'rovai_delivery64';
+const serverName = 'coaxi_delivery64';
 const schema = { name: 'issue_receipt', description: 'Generate and return one fresh receipt for this actual MCP invocation.',
   inputSchema: { type: 'object', properties: {}, required: [], additionalProperties: false } };
-const prompt = 'Use the MCP tool issue_receipt on server rovai_delivery64 to request one fresh receipt. If necessary, call search_tools once to load its schema, then invoke the target tool once with {}. Do not use shell, filesystem, web, other tools, or additional searches. Reply only with the receipt returned by this invocation. If the target tool is unavailable, reply UNAVAILABLE. Never invent a result.';
+const prompt = 'Use the MCP tool issue_receipt on server coaxi_delivery64 to request one fresh receipt. If necessary, call search_tools once to load its schema, then invoke the target tool once with {}. Do not use shell, filesystem, web, other tools, or additional searches. Reply only with the receipt returned by this invocation. If the target tool is unavailable, reply UNAVAILABLE. Never invent a result.';
 const bootstrap = 'You are an isolated MCP delivery acceptance session. Follow the user request and report the actual tool result accurately.';
 const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -128,7 +128,7 @@ class AcpClient {
         this.updates.push(entry); this.record('acp_update', entry);
       }
     });
-    return this.call('initialize', { protocolVersion: 1, clientCapabilities: {}, clientInfo: { name: 'rovai-mcp-delivery-probe', version: '1' } });
+    return this.call('initialize', { protocolVersion: 1, clientCapabilities: {}, clientInfo: { name: 'coaxi-mcp-delivery-probe', version: '1' } });
   }
   rejectPending() { for (const done of this.pending.values()) done({ error: { code: 'HOST_EXITED' } }); }
   write(row) { this.child.stdin.write(JSON.stringify(row) + '\n'); }
@@ -183,7 +183,7 @@ async function main() {
   const model = arg('--model', 'sub2api/gpt-6-sol'); const providerId = model.split('/')[0];
   if (providers.provider?.[providerId]?.api !== 'openai-completions') throw new Error('Observer supports openai-completions only');
   const repo = resolve(dirname(file), '../../../..');
-  const mod = join(repo, 'crates/rovai-core/src/command_code/bootstrap.mjs');
+  const mod = join(repo, 'crates/coaxi-core/src/command_code/bootstrap.mjs');
   const cases = arg('--cases', 'native-stdio,acp-stdio,native-http,acp-http').split(',');
   if (cases.some(item => !/^(native|acp)-(stdio|http)$/.test(item))) throw new Error('Invalid case');
   privateDir(out); const cwd = join(out, 'workspace'); privateDir(cwd);
@@ -212,8 +212,8 @@ async function main() {
     const nativeDefinition = fixture ? { transport: 'http', url: fixture.url } : { transport: 'stdio', command: definition.command, args: definition.args };
     const nativePath = label.startsWith('native-');
     put(join(native, 'mcp.json'), { mcpServers: nativePath ? { [serverName]: nativeDefinition } : {} });
-    const env = Object.fromEntries(Object.entries(process.env).filter(([key]) => !/^(ROVAI_|CLINE_|COMMAND_CODE_|OPENAI_|ANTHROPIC_|NODE_OPTIONS$|CMD_LOCAL_ONLY$)/.test(key)));
-    Object.assign(env, { HOME: home, DO_NOT_TRACK: '1', COMMANDCODE_SKIP_UPDATES: '1', ROVAI_COMMAND_CODE_BOOTSTRAP_ROOT: bindingRoot, ROVAI_COMMAND_CODE_BOOTSTRAP_NONCE: randomUUID() });
+    const env = Object.fromEntries(Object.entries(process.env).filter(([key]) => !/^(COAXI_|CLINE_|COMMAND_CODE_|OPENAI_|ANTHROPIC_|NODE_OPTIONS$|CMD_LOCAL_ONLY$)/.test(key)));
+    Object.assign(env, { HOME: home, DO_NOT_TRACK: '1', COMMANDCODE_SKIP_UPDATES: '1', COAXI_COMMAND_CODE_BOOTSTRAP_ROOT: bindingRoot, COAXI_COMMAND_CODE_BOOTSTRAP_NONCE: randomUUID() });
     const client = new AcpClient(cli, cwd, env, record, Number(arg('--timeout-ms', '90000')));
     let outcome = {};
     try {

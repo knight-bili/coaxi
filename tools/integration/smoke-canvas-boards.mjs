@@ -18,7 +18,7 @@ for(const directory of [home,temp,ui])await mkdir(directory);
 await writeFile(path.join(ui,'index.html'),'<!doctype html><html><head><meta charset="UTF-8"></head><body>Isolated canvas API acceptance only</body></html>');
 const env={};
 for(const [key,value] of Object.entries(process.env))if(['PATH','SYSTEMROOT','WINDIR','COMSPEC','PATHEXT'].includes(key.toUpperCase()))env[key]=value;
-Object.assign(env,{HOME:home,USERPROFILE:home,APPDATA:path.join(home,'AppData/Roaming'),LOCALAPPDATA:path.join(home,'AppData/Local'),TEMP:temp,TMP:temp,ROVAI_BUNDLED_SKILLS_ROOT:path.join(root,'skills')});
+Object.assign(env,{HOME:home,USERPROFILE:home,APPDATA:path.join(home,'AppData/Roaming'),LOCALAPPDATA:path.join(home,'AppData/Local'),TEMP:temp,TMP:temp,COAXI_BUNDLED_SKILLS_ROOT:path.join(root,'skills')});
 await mkdir(env.APPDATA,{recursive:true});await mkdir(env.LOCALAPPDATA,{recursive:true});
 const formal=path.join(fixture,'formal');
 const dataDir=process.platform==='win32'?JSON.parse(execFileSync(oldBinary,['--prepare-windows-data-root',formal],{env,encoding:'utf8',windowsHide:true})).core:formal;
@@ -49,8 +49,8 @@ try {
  const choice={commandId:randomUUID(),command:{skillId:'brainstorming',memberIds:[memberId],expectedVersion:selection.version}};
  const choiceReceipt=await call('skillPacks.members.set',choice);applied(choiceReceipt);
  record('old151_has_real_installation_member_choice_and_first_results');await close();
- const oldDB=new DatabaseSync(path.join(dataDir,'rovai.sqlite'),{readOnly:true});
- try {assert.equal(oldDB.prepare('SELECT projection_schema_version AS v FROM rovai_data_contract').get().v,151);assert.equal(oldDB.prepare('SELECT COUNT(*) AS n FROM schema_migration WHERE version=202').get().n,0);} finally {oldDB.close();}
+ const oldDB=new DatabaseSync(path.join(dataDir,'coaxi.sqlite'),{readOnly:true});
+ try {assert.equal(oldDB.prepare('SELECT projection_schema_version AS v FROM coaxi_data_contract').get().v,151);assert.equal(oldDB.prepare('SELECT COUNT(*) AS n FROM schema_migration WHERE version=202').get().n,0);} finally {oldDB.close();}
  stage='upgrade152';await start(binary);
  assert.deepEqual(await call('skillPacks.install',install),installReceipt);
  assert.deepEqual(await call('skillPacks.members.set',choice),choiceReceipt);
@@ -104,9 +104,9 @@ try {
  const afterReads=await call('canvas.boards.list');for(let i=0;i<3;i++)assert.deepEqual(await call('canvas.boards.list'),afterReads);
  record('repeated_snapshots_have_no_mutation_side_effect');
  await close();
- const db=new DatabaseSync(path.join(dataDir,'rovai.sqlite'),{readOnly:true});
+ const db=new DatabaseSync(path.join(dataDir,'coaxi.sqlite'),{readOnly:true});
  try {
-   assert.equal(db.prepare('SELECT projection_schema_version AS v FROM rovai_data_contract').get().v,152);
+   assert.equal(db.prepare('SELECT projection_schema_version AS v FROM coaxi_data_contract').get().v,152);
    assert.equal(db.prepare('SELECT COUNT(*) AS n FROM schema_migration WHERE version=202').get().n,1);
    assert.equal(db.prepare('SELECT COUNT(*) AS n FROM agent_run').get().n,0);
    assert.equal(db.prepare('SELECT COUNT(*) AS n FROM context_manifest').get().n,0);
@@ -116,7 +116,7 @@ try {
    for(const event of events)assert.deepEqual(Object.keys(JSON.parse(event.payload_json)).sort(),['boardId','revision']);
  } finally {db.close();}
  record('schema152_integrity_receipt_tombstones_and_invalidation_events_without_any_Run');
- const protectedFiles=['context.rs','current_input_skill.rs','context_contract.rs','managed_skills.rs'].map(name=>'crates/rovai-core/src/'+name);const protectedSources=[];
+ const protectedFiles=['context.rs','current_input_skill.rs','context_contract.rs','managed_skills.rs'].map(name=>'crates/coaxi-core/src/'+name);const protectedSources=[];
  for(const file of protectedFiles){const current=await readFile(path.join(root,file));const previous=execFileSync('git',['show','87d686443179b3175e44b5e964f7a1d83d3209e5:'+file],{cwd:root,windowsHide:true,maxBuffer:16*1024*1024});assert.deepEqual(current,previous,file);protectedSources.push({file,sha256:createHash('sha256').update(current).digest('hex')});}
  const result={status:'passed',checks,fixture,dataDir,scope:'actual_151_to_152_Host_HTTP_multi_board_metadata_only',schema:152,migration:202,oldBinarySha256:createHash('sha256').update(await readFile(oldBinary)).digest('hex'),currentBinarySha256:createHash('sha256').update(await readFile(binary)).digest('hex'),protectedSources,canvasUI:false,nodeKindsImplemented:0,modelInference:false,zeroAgentRun:true,zeroContextManifest:true,platform:process.platform};
  await writeFile(path.join(fixture,'result.json'),JSON.stringify(result,null,2)+'\n');console.log(JSON.stringify({status:'passed',checks:checks.length,evidence:path.join(fixture,'result.json')}));

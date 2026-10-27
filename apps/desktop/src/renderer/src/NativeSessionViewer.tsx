@@ -1,6 +1,6 @@
-// Codeg aff1e6c components/message/subagent-session-dialog.tsx: readonly
+// Coaxi aff1e6c components/message/subagent-session-dialog.tsx: readonly
 // non-modal drawer, 16px body column, role asides and preserved refresh body.
-// Core authority + shared Rovai Markdown are the integration seams.
+// Core authority + shared Coaxi Markdown are the integration seams.
 import { useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
 import { Drawer } from '@base-ui/react/drawer'
 import { Brain, ChevronDown, Eye, GitFork, Loader2, RefreshCw, X } from 'lucide-react'
@@ -9,49 +9,49 @@ import type { NativeSessionTarget } from './native-session-viewer-context'
 import { NativeSessionViewerContext } from './native-session-viewer-context'
 import { useThreadClient } from './camp-client'
 import { useInterfaceLanguage, useUiText } from './interface-language'
-import { CodegRuntimeMark } from './CodegRuntimeMark'
+import { CoaxiRuntimeMark } from './CoaxiRuntimeMark'
 import { DelegationViewerHost } from './DelegationViewer'
 import { useEscapeShield, shieldedDismissal } from './session-viewer-dismissal'
 import './native-session-viewer.css'
 import { nativeToolChildren, nativeToolPairs } from './native-transcript-model'
 import { adaptNativeMessages, nativeTurnStats } from './native-content-adapter'
-import type { AdaptedContentPart, AdaptedToolCallPart, AdapterMessageText } from './codeg-native-content/lib/adapters/ai-elements-adapter'
-import { normalizeToolName } from './codeg-native-content/lib/tool-call-normalization'
-import { isPlanModeToolName } from './codeg-native-content/lib/plan-parse'
-import { PlanCard } from './codeg-native-content/components/message/plan-card'
-import { PlanMarkdownCard, PlanModeCard } from './codeg-native-content/components/message/plan-mode-card'
-import { GoalRunPart, GoalToolCallPart } from './codeg-native-content/components/message/goal-tool-call'
-import { SourceMarkdownRenderer, useTranslations } from './codeg-native-content/ui/source-primitives'
-import { Tool, ToolHeader, ToolContent } from './codeg-native-content/components/ai-elements/tool'
-import { CodeBlock, CodeBlockHeader, CodeBlockTitle, CodeBlockCopyButton } from './codeg-native-content/components/ai-elements/code-block'
-import { JsonTreeView, parseJsonForTree } from './codeg-native-content/components/ai-elements/json-tree'
-import { Terminal } from './codeg-native-content/components/ai-elements/terminal'
-import { parseCodexCommandEnvelope } from './codeg-native-content/lib/codex-command-action'
-import { isShellSessionToolName } from './codeg-native-content/lib/shell-session-tool'
-import { ToolCallPart as OrdinaryToolCallPart } from './codeg-native-content/components/message/ordinary-tool-call'
-import { NativeFileActionsProvider } from './codeg-native-content/ui/native-file-actions'
-import { ReadonlyToolCard, readonlyToolCardKind } from './codeg-native-content/ui/readonly-tool-card'
-import { DelegationStatusGroupCard } from './codeg-native-content/components/message/delegation-status-group-card'
-import { ToolGroupPart } from './codeg-native-content/components/message/tool-group-part'
-import { BackgroundTaskCard } from './codeg-native-content/components/message/background-task-card'
-import { AgentToolCallPart } from './codeg-native-content/components/message/agent-tool-call'
-import { CollabAgentCard } from './codeg-native-content/components/message/collab-agent-card'
-import { SubagentSessionButton } from './codeg-native-content/components/message/subagent-session-button'
-import { NativeSessionActionsProvider, type SourceSessionTarget } from './codeg-native-content/ui/native-session-actions'
-import { COLLAB_AGENT_TOOL_NAME } from './codeg-collab-tool'
+import type { AdaptedContentPart, AdaptedToolCallPart, AdapterMessageText } from './coaxi-native-content/lib/adapters/ai-elements-adapter'
+import { normalizeToolName } from './coaxi-native-content/lib/tool-call-normalization'
+import { isPlanModeToolName } from './coaxi-native-content/lib/plan-parse'
+import { PlanCard } from './coaxi-native-content/components/message/plan-card'
+import { PlanMarkdownCard, PlanModeCard } from './coaxi-native-content/components/message/plan-mode-card'
+import { GoalRunPart, GoalToolCallPart } from './coaxi-native-content/components/message/goal-tool-call'
+import { SourceMarkdownRenderer, useTranslations } from './coaxi-native-content/ui/source-primitives'
+import { Tool, ToolHeader, ToolContent } from './coaxi-native-content/components/ai-elements/tool'
+import { CodeBlock, CodeBlockHeader, CodeBlockTitle, CodeBlockCopyButton } from './coaxi-native-content/components/ai-elements/code-block'
+import { JsonTreeView, parseJsonForTree } from './coaxi-native-content/components/ai-elements/json-tree'
+import { Terminal } from './coaxi-native-content/components/ai-elements/terminal'
+import { parseCodexCommandEnvelope } from './coaxi-native-content/lib/codex-command-action'
+import { isShellSessionToolName } from './coaxi-native-content/lib/shell-session-tool'
+import { ToolCallPart as OrdinaryToolCallPart } from './coaxi-native-content/components/message/ordinary-tool-call'
+import { NativeFileActionsProvider } from './coaxi-native-content/ui/native-file-actions'
+import { ReadonlyToolCard, readonlyToolCardKind } from './coaxi-native-content/ui/readonly-tool-card'
+import { DelegationStatusGroupCard } from './coaxi-native-content/components/message/delegation-status-group-card'
+import { ToolGroupPart } from './coaxi-native-content/components/message/tool-group-part'
+import { BackgroundTaskCard } from './coaxi-native-content/components/message/background-task-card'
+import { AgentToolCallPart } from './coaxi-native-content/components/message/agent-tool-call'
+import { CollabAgentCard } from './coaxi-native-content/components/message/collab-agent-card'
+import { SubagentSessionButton } from './coaxi-native-content/components/message/subagent-session-button'
+import { NativeSessionActionsProvider, type SourceSessionTarget } from './coaxi-native-content/ui/native-session-actions'
+import { COLLAB_AGENT_TOOL_NAME } from './coaxi-collab-tool'
 import { useOptionalFilePreview, useOptionalFilePreviewApi } from './FilePreviewContext'
-import { NativeMarkdown } from './codeg-native-content/ui/native-markdown'
-import { NativeMarkdownProvider } from './codeg-native-content/ui/native-markdown-context'
-import { NativeImageScope } from './codeg-native-content/ui/native-image-actions'
-import { NativeMessageScroll } from './codeg-native-content/ui/native-turn-actions'
-import { UserImageAttachments } from './codeg-native-content/components/message/user-image-attachments'
-import { GeneratedImagesBlock } from './codeg-native-content/components/message/generated-images-block'
-import { TurnStats } from './codeg-native-content/components/message/turn-stats'
-import './codeg-native-content/source-rich.css'
-import './codeg-native-content/source-media.css'
-import './codeg-native-content/source-markdown.css'
-import './codeg-native-content/source-reference.css'
-import './codeg-native-content/source-html.css'
+import { NativeMarkdown } from './coaxi-native-content/ui/native-markdown'
+import { NativeMarkdownProvider } from './coaxi-native-content/ui/native-markdown-context'
+import { NativeImageScope } from './coaxi-native-content/ui/native-image-actions'
+import { NativeMessageScroll } from './coaxi-native-content/ui/native-turn-actions'
+import { UserImageAttachments } from './coaxi-native-content/components/message/user-image-attachments'
+import { GeneratedImagesBlock } from './coaxi-native-content/components/message/generated-images-block'
+import { TurnStats } from './coaxi-native-content/components/message/turn-stats'
+import './coaxi-native-content/source-rich.css'
+import './coaxi-native-content/source-media.css'
+import './coaxi-native-content/source-markdown.css'
+import './coaxi-native-content/source-reference.css'
+import './coaxi-native-content/source-html.css'
 import 'katex/dist/katex.min.css'
 
 function readMessage(code: string): string {
@@ -83,7 +83,7 @@ export function NativeSessionViewer({ target, open, visible, onOpenChange, retur
           <Drawer.Title className="sr-only">{t('原生帮手会话')}</Drawer.Title>
           <Drawer.Description className="sr-only">{t('只读查看帮手已经保存的消息和工具记录。')}</Drawer.Description>
           <header className="native-session-header" tabIndex={-1} ref={heading}>
-            <CodegRuntimeMark target={target.runtime === 'claude' ? 'claude_code' : target.runtime} size={16} />
+            <CoaxiRuntimeMark target={target.runtime === 'claude' ? 'claude_code' : target.runtime} size={16} />
             <div><strong>{t('原生帮手会话')}</strong>{target.subtitle && <small>{target.subtitle}</small>}</div>
             {state.loading && <Loader2 size={14} className="native-session-spinner" aria-label={t('正在读取会话')} />}
             <button type="button" className="delegation-icon-button" aria-label={t('刷新原生帮手会话')} onClick={() => void reader.refresh()}><RefreshCw size={15} /></button>
@@ -188,7 +188,7 @@ export function NativeTranscriptBody({ data, reader, target, live, visible, onFo
   }
   return <NativeFileActionsProvider open={filePreview ? openFile : null}><NativeMarkdownProvider value={scope}><SourceMarkdownRenderer.Provider value={renderMarkdown}><NativeImageScope.Provider value={imageScope}><NativeMessageScroll.Provider value={scrolling}>
     {notice && <p className="native-session-note" role="status">{notice}</p>}
-    <div ref={transcript} className="native-session-transcript codeg-native-rich">{messages.map((message, turnIndex) => {
+    <div ref={transcript} className="native-session-transcript coaxi-native-rich">{messages.map((message, turnIndex) => {
       const previousUserIndex = turns.slice(0, turnIndex).findLastIndex(turn => turn.role === 'user')
       return <section data-native-turn-index={turnIndex} key={`${message.id}:${turnIndex}`} className={message.role === 'user' ? 'native-session-input-turn' : 'native-session-turn'}>
     {message.content.map((part, index) => renderPart(part, `${message.id}:${index}`, message.role === 'user', live && turnIndex === messages.length - 1, message.role === 'assistant'))}

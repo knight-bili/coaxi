@@ -139,7 +139,7 @@ describe('opt-in Feishu execution-card previews', () => {
   it('does not intercept real execution cards or project-picker callbacks', async () => {
     const h = harness()
     await h.service.connected(agentId, appId, h.channel)
-    for (const value of [{ action: 'execution_console_page', agentRunId: 'real-run' }, { rovaiAction: 'bind_project' }]) {
+    for (const value of [{ action: 'execution_console_page', agentRunId: 'real-run' }, { coaxiAction: 'bind_project' }]) {
       const event = h.action()
       event.action.value = value
       expect(await h.service.handleCardAction(appId, event)).toBeNull()
@@ -210,7 +210,7 @@ describe('opt-in Feishu execution-card previews', () => {
   })
 
   it('reads only the exact published Bot and frozen app-scoped Owner from a read-only store', async () => {
-    const root = await mkdtemp(join(tmpdir(), 'rovai-preview-owner-'))
+    const root = await mkdtemp(join(tmpdir(), 'coaxi-preview-owner-'))
     const path = join(root, 'fixture.sqlite')
     const db = new DatabaseSync(path)
     try {

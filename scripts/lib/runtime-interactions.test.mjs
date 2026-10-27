@@ -14,7 +14,7 @@ test('source-based native cards keep exact answers, honest delivery states and i
   if (!admitElectronIntegrationTest(t)) return
   const root = resolve(import.meta.dirname, '../..')
   const source = join(root, 'scripts/fixtures/runtime-interactions')
-  const fixture = await mkdtemp(join(tmpdir(), 'rovai-native-interaction-ui-'))
+  const fixture = await mkdtemp(join(tmpdir(), 'coaxi-native-interaction-ui-'))
   let child, closed
   try {
     await build({ configFile: false, root: source, base: './', logLevel: 'error', plugins: [react()],
@@ -37,7 +37,7 @@ test('source-based native cards keep exact answers, honest delivery states and i
     process.stdout.write(output.split('\n').find(line => line.startsWith('{')) + '\n')
   } finally {
     if (child && child.exitCode === null && child.signalCode === null) { child.kill('SIGKILL'); await closed }
-    if (process.env.ROVAI_KEEP_INTERACTION_FIXTURE === '1') process.stdout.write(`Native interaction screenshots: ${fixture}\n`)
+    if (process.env.COAXI_KEEP_INTERACTION_FIXTURE === '1') process.stdout.write(`Native interaction screenshots: ${fixture}\n`)
     else await rm(fixture, { recursive: true, force: true })
   }
 })

@@ -3,7 +3,7 @@
 <desc id="figure-description">普通成员会话以 Bootstrap 和首次动态输入建立；后续 Run 获得新的动态上下文。支持的原生压缩信号触发后，在后续受控输入补送 Bootstrap，继续同一个 Native Session。</desc>
 <rect width="1608" height="1186" fill="#fcfdfc"/>
 <g font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif" fill="#253c31">
-<text x="48" y="40" fill="#708078" font-size="12" font-weight="600" letter-spacing="2">ROVAI AI / ARCHITECTURE</text>
+<text x="48" y="40" fill="#708078" font-size="12" font-weight="600" letter-spacing="2">COAXI AI / ARCHITECTURE</text>
 <text x="1560" y="40" fill="#708078" font-size="13" text-anchor="end">图 09</text>
 <text x="48" y="94" font-size="34" font-weight="600">长会话：稳定引导与持续的动态输入</text>
 

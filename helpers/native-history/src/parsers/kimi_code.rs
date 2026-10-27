@@ -75,7 +75,7 @@ fn resolve_kimi_code_home_from(
 /// (and carry `origin.kind == "injection"` system reminders), so they are skipped
 /// to avoid duplicate / noise messages. The working directory is recovered from
 /// `session_index.jsonl` (state.json has none); the model name from the session's
-/// own `logs/kimi-code.log` (the wire only stores the codeg-managed model alias).
+/// own `logs/kimi-code.log` (the wire only stores the coaxi-managed model alias).
 pub struct KimiCodeParser {
     base_dir: PathBuf,
 }
@@ -296,7 +296,7 @@ struct WireParse {
     messages: Vec<UnifiedMessage>,
     first_ts: Option<DateTime<Utc>>,
     last_ts: Option<DateTime<Utc>>,
-    /// The codeg-managed model alias from a `config.update` record (fallback only;
+    /// The coaxi-managed model alias from a `config.update` record (fallback only;
     /// the real model name is recovered from the session log).
     model_alias: Option<String>,
     /// First user prompt, already truncated for use as a fallback title.
@@ -865,8 +865,8 @@ fn resolve_title(state_title: Option<String>, first_user_text: Option<String>) -
 }
 
 /// Best-effort real model name from the session's own log
-/// (`… llm config … model=kimi-k2.7-code modelAlias=codeg-managed …`). The wire
-/// only stores the (codeg-managed) alias, so the log is the sole place the actual
+/// (`… llm config … model=kimi-k2.7-code modelAlias=coaxi-managed …`). The wire
+/// only stores the (coaxi-managed) alias, so the log is the sole place the actual
 /// model id appears. `modelAlias=` does not collide: only the exact `model=`
 /// token is matched.
 fn read_session_log_model(session_dir: &Path) -> Option<String> {

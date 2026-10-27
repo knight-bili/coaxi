@@ -31,7 +31,7 @@ it.each([true, false])('keeps Core source identity separate from its Shell outpu
     contentBlobId: null, contentByteCount: 100, occurredAt: '2026-10-19T00:00:00Z',
     payload: core ? { sourceAuthority: 'core', canonicalTool: 'delegation.start', kind: 'builtin_tool_invocation', status: 'completed',
       operationProjection: { schemaVersion: 3, operation: 'delegation.start', canonicalInput: {}, canonicalResult: null } }
-      : { executionWindowBuiltinOperation: 'delegation.start', item: { type: 'commandExecution', command: 'rovai delegation start --task fixture', status: 'completed' } },
+      : { executionWindowBuiltinOperation: 'delegation.start', item: { type: 'commandExecution', command: 'coaxi delegation start --task fixture', status: 'completed' } },
     canonical: { operationId: id, activityDomain: core ? 'tool' : 'shell', semanticKind: null, toolName: core ? 'delegation.start' : 'shell',
       presentationHint: null, phase: 'terminal', outcome: 'succeeded', credibility: core ? 'core_verified' : 'runtime_structured',
       coverageLevel: 'fine_grained', sourceAuthority: core ? 'core' : 'runtime', sourceEvidenceIds: [id], classifierVersion: 'activity-v3',
@@ -279,7 +279,7 @@ describe('command disclosure presentation', () => {
           status: 'available',
           semanticKind: 'unified_diff_snapshot',
           entries: [{
-            path: 'crates/rovai-core/src/application/mission.rs',
+            path: 'crates/coaxi-core/src/application/mission.rs',
             changeKind: 'update',
             additions: 1,
             deletions: 1,
@@ -295,7 +295,7 @@ describe('command disclosure presentation', () => {
       filePreview: { open },
       threadId: 'mission-camp',
       evidence: selected.byToolId.get('edit-mission'),
-      path: 'crates/rovai-core/src/application/mission.rs',
+      path: 'crates/coaxi-core/src/application/mission.rs',
       onError: vi.fn()
     })).resolves.toBe(true)
 
@@ -305,8 +305,8 @@ describe('command disclosure presentation', () => {
       agentRunId: 'direct-camp-run',
       executionEpoch: 1,
       evidenceId: 'diff-evidence',
-      rawReference: 'crates/rovai-core/src/application/mission.rs'
-    }, undefined, { fileName: 'crates/rovai-core/src/application/mission.rs' }, {
+      rawReference: 'crates/coaxi-core/src/application/mission.rs'
+    }, undefined, { fileName: 'crates/coaxi-core/src/application/mission.rs' }, {
       commitOnSuccess: true,
       previewOnly: true
     })

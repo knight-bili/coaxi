@@ -368,8 +368,8 @@
   "no_owned_processes_remaining": true,
   "visual_review": {
     "screenshots_viewed": [
-      "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\c06\\fusion-i03-rc.23\\native-native-notifications-r2-prepare\\01-occluded-real-notification.png",
-      "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\c06\\fusion-i03-rc.23\\native-native-notifications-r2-prepare\\02-visible-public-private-notifications.png"
+      "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\c06\\fusion-i03-rc.23\\native-native-notifications-r2-prepare\\01-occluded-real-notification.png",
+      "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\c06\\fusion-i03-rc.23\\native-native-notifications-r2-prepare\\02-visible-public-private-notifications.png"
     ],
     "scope": "原编辑画板遮挡与实际两会话，98%缩放，保留必要内部滚动；不授予八类或日夜完整UI资格。"
   },
@@ -390,235 +390,235 @@
   "customer_action_required_now": false,
   "evidence_files": [
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\assemble-rc23-app.mjs",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\assemble-rc23-app.mjs",
       "sha256": "552b8b49271d7b1869e1e8e8288ebdd1797d23cff38d8cd4d83e778d3bef4dc5"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\build-rc23.mjs",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\build-rc23.mjs",
       "sha256": "ba74b990a0336f3d85e4918166045a8a43cb5123cb1c0f67dd0ab016bfd90580"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\c06\\fusion-i03-rc.23\\app-assembly.json",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\c06\\fusion-i03-rc.23\\app-assembly.json",
       "sha256": "d4d70ca2e613ccca4dd84fc00b340339339b4e6f8dd2a4d25d054d3abaef8416"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\c06\\fusion-i03-rc.23\\build-artifacts.json",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\c06\\fusion-i03-rc.23\\build-artifacts.json",
       "sha256": "e7cec1f62bdc285955e746a683b463846c662340283395cab9e305f1bdaf812c"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\c06\\fusion-i03-rc.23\\desktop-build-result.json",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\c06\\fusion-i03-rc.23\\desktop-build-result.json",
       "sha256": "d606e980215ba075cf88c2f23dbea24b4287b0b1f5fef75c312da8c0c81d12e1"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\c06\\fusion-i03-rc.23\\desktop-build.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\c06\\fusion-i03-rc.23\\desktop-build.log",
       "sha256": "59e117f333fc20c5f39ad6129828c3f80cfca52d26df7d94d784fcac6d2a486f"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\c06\\fusion-i03-rc.23\\desktop-output-inventory.json",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\c06\\fusion-i03-rc.23\\desktop-output-inventory.json",
       "sha256": "995556885871611444ed20c1169becb56b3c2dfde68db6af722df4d2ec5df632"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\c06\\fusion-i03-rc.23\\freeze.json",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\c06\\fusion-i03-rc.23\\freeze.json",
       "sha256": "15a4ad1463c38d090a7f8a110aadd9be0be6c880e9f5466241d1e26212a36b28"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\c06\\fusion-i03-rc.23\\native-build-result.json",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\c06\\fusion-i03-rc.23\\native-build-result.json",
       "sha256": "500b63e46b903ae50b5cd1d04e69c7a66496f419de7438e54a9e15a5f091f208"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\c06\\fusion-i03-rc.23\\native-native-notifications-r2-prepare-config.json",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\c06\\fusion-i03-rc.23\\native-native-notifications-r2-prepare-config.json",
       "sha256": "0e714f6efa820ec21b716aa60ee6a493299bec526bfe464523b99f456da61c91"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\c06\\fusion-i03-rc.23\\native-native-notifications-r2-prepare\\01-occluded-real-notification.png",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\c06\\fusion-i03-rc.23\\native-native-notifications-r2-prepare\\01-occluded-real-notification.png",
       "sha256": "e52423553d28395c76d7a2fd84dfcf8e0141de6ee2e956d838e116332752974d"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\c06\\fusion-i03-rc.23\\native-native-notifications-r2-prepare\\02-visible-public-private-notifications.png",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\c06\\fusion-i03-rc.23\\native-native-notifications-r2-prepare\\02-visible-public-private-notifications.png",
       "sha256": "f05a4912716252790d95225313f869d89c385c416794de619c76bfb8911dc7ac"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\c06\\fusion-i03-rc.23\\native-native-notifications-r2-prepare\\controlled-runtime-input.jsonl",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\c06\\fusion-i03-rc.23\\native-native-notifications-r2-prepare\\controlled-runtime-input.jsonl",
       "sha256": "c9a3f2c137adaddd10759324f0fdab52f72a42dbafd01c1475807e1006337d3e"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\c06\\fusion-i03-rc.23\\native-native-notifications-r2-prepare\\driver-exit.json",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\c06\\fusion-i03-rc.23\\native-native-notifications-r2-prepare\\driver-exit.json",
       "sha256": "4573f6d05e5176c3b013464b8399bdf6a22293d380e9d89ef18b50ce013b0f20"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\c06\\fusion-i03-rc.23\\native-native-notifications-r2-prepare\\result.json",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\c06\\fusion-i03-rc.23\\native-native-notifications-r2-prepare\\result.json",
       "sha256": "55b1fe082b82b511d0158ca0d4901c67b351e4ab88ae069dc15b8c50aa13ed3f"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\c06\\fusion-i03-rc.23\\web-build-result.json",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\c06\\fusion-i03-rc.23\\web-build-result.json",
       "sha256": "df74c223ae9e5c6cb0c63623563e2680dd9f86238a78d729b5473d7c937cac45"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\c06\\fusion-i03-rc.23\\web-build.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\c06\\fusion-i03-rc.23\\web-build.log",
       "sha256": "6317f654e825b73662f292375c6262340b41dafedbf3411da4a2d4f99edf71f1"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\c06\\fusion-i03-rc.23\\web-output-verification.json",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\c06\\fusion-i03-rc.23\\web-output-verification.json",
       "sha256": "aeb4c448ae5796e5748ba2025078e9c2bc00c55365d114716d0dcd2d2bfc49f0"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\prepare-rc23.py",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\prepare-rc23.py",
       "sha256": "0d33929d39de8214894975f44882420cc66cbaba30828df47a77bc41df7893f5"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\r08-actual-file-wait-r1-driver.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\r08-actual-file-wait-r1-driver.log",
       "sha256": "1714b05b24467cc6f31bfc3e502a59dd381a179eb7f816bacf5004f61ba8d172"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\r08-actual-file-wait-r1\\driver.mjs",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\r08-actual-file-wait-r1\\driver.mjs",
       "sha256": "a4c79b0a568b98ba5e96243bd44c383a5ca6c71ad8f808a0d50767f765c10410"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\r08-actual-file-wait-r1\\host-stderr.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\r08-actual-file-wait-r1\\host-stderr.log",
       "sha256": "91d02e4e415bd26ca37dc84f8a4044870a80a4a8f2fc46cae5dee2d1adc847b8"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\r08-actual-file-wait-r1\\owned-oplock.ps1",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\r08-actual-file-wait-r1\\owned-oplock.ps1",
       "sha256": "3811e51bd8df53840304e7ce5de9229da26bb284917826c7109d91a7148c0d9d"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\r08-actual-file-wait-r1\\result.json",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\r08-actual-file-wait-r1\\result.json",
       "sha256": "2173bc57ed9cec96a10ae05cb567fe08dcd434d2314013bf261b572508b7b6f0"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\r08-actual-file-wait-r2-driver.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\r08-actual-file-wait-r2-driver.log",
       "sha256": "c9c40dd1bfbf3d87b65efe4863710b226f83acbce566371cdeea6c5682e673c8"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\r08-actual-file-wait-r2\\driver.mjs",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\r08-actual-file-wait-r2\\driver.mjs",
       "sha256": "6bc8c2d673caceda137e000d1bffdd802407566a9b5df79df9c132fef5e25731"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\r08-actual-file-wait-r2\\host-stderr.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\r08-actual-file-wait-r2\\host-stderr.log",
       "sha256": "97095ab6e61d93feabf8514e987f4b07fb15b9ffcdadecfdf72b20c128813cff"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\r08-actual-file-wait-r2\\owned-oplock.ps1",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\r08-actual-file-wait-r2\\owned-oplock.ps1",
       "sha256": "3811e51bd8df53840304e7ce5de9229da26bb284917826c7109d91a7148c0d9d"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\r08-actual-file-wait-r2\\result.json",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\r08-actual-file-wait-r2\\result.json",
       "sha256": "3115c90ade12fa12fbd9c69f1c43cd511d262bf589028981bf6fdd28d024a782"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\r08-actual-file-wait-r3-driver.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\r08-actual-file-wait-r3-driver.log",
       "sha256": "33d230fb985eb5b39ba3b7b7af7e91f3c02e7cbf8b689c7256cae888015a8fcc"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\r08-actual-file-wait-r3\\driver.mjs",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\r08-actual-file-wait-r3\\driver.mjs",
       "sha256": "4561e518229b23225d5935d1e31babfa88cf85919ae6be04336488300d4d8c49"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\r08-actual-file-wait-r3\\host-stderr.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\r08-actual-file-wait-r3\\host-stderr.log",
       "sha256": "f2e2a91a6814e74917430c664d679a8bde2c472c0619bade8775abe7ca8c8e4e"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\r08-actual-file-wait-r3\\owned-oplock.ps1",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\r08-actual-file-wait-r3\\owned-oplock.ps1",
       "sha256": "3811e51bd8df53840304e7ce5de9229da26bb284917826c7109d91a7148c0d9d"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\r08-actual-file-wait-r3\\result.json",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\r08-actual-file-wait-r3\\result.json",
       "sha256": "bbe5c220a68597c587cc625e49cab692d30d51b074271e54400bd14778f7666e"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\r08-actual-file-wait-r4-driver.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\r08-actual-file-wait-r4-driver.log",
       "sha256": "8b630b8abd926cf7faa834a18ac365682fc312c4427fb3cc4289ce0609840bba"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\r08-actual-file-wait-r4\\driver.mjs",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\r08-actual-file-wait-r4\\driver.mjs",
       "sha256": "b56b6b17e24f639cfe5dbade6ce8f2004b44f8f7cbc4c70e687c502b963ac063"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\r08-actual-file-wait-r4\\host-stderr.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\r08-actual-file-wait-r4\\host-stderr.log",
       "sha256": "81e0127fb90d0fde4520b8df52def576ff55d3db8b85b96c25492416ad5af841"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\r08-actual-file-wait-r4\\owned-oplock.ps1",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\r08-actual-file-wait-r4\\owned-oplock.ps1",
       "sha256": "3811e51bd8df53840304e7ce5de9229da26bb284917826c7109d91a7148c0d9d"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\r08-actual-file-wait-r4\\result.json",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\r08-actual-file-wait-r4\\result.json",
       "sha256": "0808d23234615a72a19795e72514b727e9212d0d5970fe38ffa34451087bc8c1"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\r08-io-owner-sync-retry.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\r08-io-owner-sync-retry.log",
       "sha256": "4b5e6457c82b34383f70240f2de6ba2c4356069cd254d5755442097468fb99ef"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\r08-rc23-notifications-r1-driver.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\r08-rc23-notifications-r1-driver.log",
       "sha256": "b69bf746dadf6956fb66f88c0e09d4a26cceb2121df7e51bbefe44da030574c0"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\r08-rc23-notifications-r2-driver.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\r08-rc23-notifications-r2-driver.log",
       "sha256": "5571ea44246e478320d205c911148140ce8d0fe333d49f7a83eb8bf3b55d8a8e"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\r08-rc23-owned-process-audit.json",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\r08-rc23-owned-process-audit.json",
       "sha256": "1b984d6de7cb9daf2e42a412e7cd92404d094a2824cee77d2d03941ba32b027d"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\r09-canvas-source-review-tests.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\r09-canvas-source-review-tests.log",
       "sha256": "95cd52a951cc7e39324176b16cffd060459130181a7747506378f969d6f84ef2"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\r09-retention-shutdown-tests.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\r09-retention-shutdown-tests.log",
       "sha256": "28864bbead96da0fcb3868eeb933e9ac85cd3789f4dda009b14f474ed6ace15b"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\r09-source-review-codegraph-sync-retry.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\r09-source-review-codegraph-sync-retry.log",
       "sha256": "4b5e6457c82b34383f70240f2de6ba2c4356069cd254d5755442097468fb99ef"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\r09-source-review-types-result.json",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\r09-source-review-types-result.json",
       "sha256": "81179a9dba28984ce5ffd6a42de915a946920c4076fb29558e9c239b224d60a6"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\record-r08-closeout.py",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\record-r08-closeout.py",
       "sha256": "e1fe75fde039b460ed91b22bc4a10555b401849c90d3a49b791682a7a1adf5a6"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\run-r08-rc23-native-notifications.mjs",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\run-r08-rc23-native-notifications.mjs",
       "sha256": "ec3e8a14e0691399babb50b38c5790de00f006c3618636430bb82c35f5646a92"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\main\\index.ts",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\apps\\desktop\\src\\main\\index.ts",
       "sha256": "c5136a978cd75d439b68f5702b416ddf101f5ad05c2244ed6b72385980f201d2"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\SingleChatPanel.tsx",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\apps\\desktop\\src\\renderer\\src\\SingleChatPanel.tsx",
       "sha256": "560e6a3f46353f7ed5b3b5f7f29eafbc3cd1bff98c5aabcc6e6df4ec5ebc616f"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\execution\\i03-r08-native-large-input-verification.json",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\integration\\execution\\i03-r08-native-large-input-verification.json",
       "sha256": "556f2e8f081b067835d5f47e1808ab789e1c458d3ec5d065125d2c7d2f925348"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\execution\\i03-r08-notification-progress.json",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\integration\\execution\\i03-r08-notification-progress.json",
       "sha256": "83404c023a5a922cc9fe60ef535842ee8cc93a146bc8e37566c154b571a39d2b"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\execution\\i03-r08-source-load-verification.json",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\integration\\execution\\i03-r08-source-load-verification.json",
       "sha256": "113b1c1d6f3c4e6adbac0e16693b4371a975075629fc0ed1d972eb8f7828daaf"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\scripts\\fixtures\\canvas-native-input.mjs",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\scripts\\fixtures\\canvas-native-input.mjs",
       "sha256": "9298197a26fb023e97227c97bc1a4bbef06126d47b86ef7dfa937b88ba5aca6e"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\scripts\\fixtures\\canvas-notification-workflow.mjs",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\scripts\\fixtures\\canvas-notification-workflow.mjs",
       "sha256": "30909d4e05bd5008120047a013f32ad21600c28374769372aade96b4df11b8ec"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\scripts\\fixtures\\canvas-owned-oplock.ps1",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\scripts\\fixtures\\canvas-owned-oplock.ps1",
       "sha256": "3811e51bd8df53840304e7ce5de9229da26bb284917826c7109d91a7148c0d9d"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\scripts\\fixtures\\canvas-source-io-wait.mjs",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\scripts\\fixtures\\canvas-source-io-wait.mjs",
       "sha256": "b56b6b17e24f639cfe5dbade6ce8f2004b44f8f7cbc4c70e687c502b963ac063"
     }
   ]

@@ -1,7 +1,7 @@
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
-import type { PrivateAttachmentPreparationRequest, PrivateAttachmentPreparationResult, PrivateAttachmentUploadTarget, RovaiApi, StoredCommandResult } from '@contracts'
+import type { PrivateAttachmentPreparationRequest, PrivateAttachmentPreparationResult, PrivateAttachmentUploadTarget, CoaxiApi, StoredCommandResult } from '@contracts'
 import { PrivateUploadController, privateUploadController } from './private-upload-controller'
 import { PrivateUploadRecoveryPanel } from './PrivateUploadRecoveryPanel'
 import { inactiveUploadTargets } from './PrivateUploadHistoryPanel'
@@ -27,7 +27,7 @@ function fixture(records = new Map<string, PrivateAttachmentPreparationRequest>(
   const retry = vi.fn(async (request: PrivateAttachmentPreparationRequest) => receipt(request))
   const api = { prepareInput: prepare, reconcileInput: reconcile, retryInput: retry,
     pendingPreparations: vi.fn(async () => [...records.values()].map(request => ({ request: structuredClone(request), displayName: 'input.txt', state: 'unknown' as const })))
-  } as unknown as RovaiApi['singleChatAttachments']
+  } as unknown as CoaxiApi['singleChatAttachments']
   return { api, prepare, reconcile, retry, records, controller: new PrivateUploadController(api, owner, target), found: () => { found = true } }
 }
 

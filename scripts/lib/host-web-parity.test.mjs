@@ -10,17 +10,17 @@ import { buildHostWebParity } from '../review-host-web-parity.mjs'
 import { admitElectronIntegrationTest } from './electron-sandbox-capability.mjs'
 
 const root = resolve(import.meta.dirname, '../..')
-const chrome = process.env.ROVAI_REVIEW_CHROME ?? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+const chrome = process.env.COAXI_REVIEW_CHROME ?? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
 const pause = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 test('production Camp components run in Chrome and Electron without a fake native bridge', { timeout: 240_000 }, async t => {
   try { await access(chrome) } catch { t.skip('This visual seam requires an explicit local Chrome binary; no native/browser qualification claimed.'); return }
   if (!admitElectronIntegrationTest(t)) return
-  const fixture = await mkdtemp(join(tmpdir(), 'rovai-host-web-parity-'))
-  const output = process.env.ROVAI_PARITY_OUTPUT ?? join(fixture, 'review')
-  const artifact = process.env.ROVAI_PARITY_ARTIFACT_ROOT
-    ? { productPath: join(process.env.ROVAI_PARITY_ARTIFACT_ROOT, 'production-components.html'),
-      viewerPath: join(process.env.ROVAI_PARITY_ARTIFACT_ROOT, 'rovai-desktop-web-parity.html') }
+  const fixture = await mkdtemp(join(tmpdir(), 'coaxi-host-web-parity-'))
+  const output = process.env.COAXI_PARITY_OUTPUT ?? join(fixture, 'review')
+  const artifact = process.env.COAXI_PARITY_ARTIFACT_ROOT
+    ? { productPath: join(process.env.COAXI_PARITY_ARTIFACT_ROOT, 'production-components.html'),
+      viewerPath: join(process.env.COAXI_PARITY_ARTIFACT_ROOT, 'coaxi-desktop-web-parity.html') }
     : await buildHostWebParity(join(fixture, 'artifact'))
   await mkdir(output, { recursive: true })
   process.stdout.write(`Isolated UI fixtures: ${fixture}; no Core, Runtime, daily profile or workspace access.\n`)
@@ -35,7 +35,7 @@ test('production Camp components run in Chrome and Electron without a fake nativ
           await driver.send('Page.navigate', { url: url.href })
           await driver.wait(`location.href === ${JSON.stringify(url.href)} && document.querySelector('.app-shell') !== null`)
           await pause(400)
-          const state = await driver.evaluate(`(() => ({ nativeBridge: typeof window.rovai, require: typeof window.require,
+          const state = await driver.evaluate(`(() => ({ nativeBridge: typeof window.coaxi, require: typeof window.require,
             viewport: [innerWidth, innerHeight], rail: document.querySelector('.unified-sidebar')?.getBoundingClientRect().width,
             topbar: document.querySelector('.camp-topbar')?.getBoundingClientRect().height,
             overflow: document.documentElement.scrollWidth > innerWidth,
@@ -43,7 +43,7 @@ test('production Camp components run in Chrome and Electron without a fake nativ
             dialog: !!document.querySelector('[role="dialog"]') }))()`)
           await driver.capture(join(output, `${surface}-${scenario}-${theme}.png`))
           assert.equal(state.rail, 270, 'production navigation width')
-          assert.equal(state.nativeBridge, 'undefined', `${surface}/${scenario}: no window.rovai substitute`)
+          assert.equal(state.nativeBridge, 'undefined', `${surface}/${scenario}: no window.coaxi substitute`)
           assert.equal(state.require, 'undefined')
           assert.deepEqual(state.viewport, [1440, 920])
           assert.equal(state.overflow, false, `${surface}/${theme}/${scenario}: no product overflow`)
@@ -106,8 +106,8 @@ async function exerciseScenario(driver, scenario, surface, downloads, theme) {
     await driver.wait(`document.querySelector('[role="menu"]') !== null`)
     await driver.click(`Array.from(document.querySelectorAll('[role="menuitem"]')).find(e=>e.textContent.trim()==='选择工作目录…')`)
     await driver.wait(`Array.from(document.querySelectorAll('[role="dialog"]')).some(e=>e.textContent.includes('固定示例目录'))`)
-    await driver.click(`Array.from(document.querySelectorAll('button')).find(e=>e.textContent.includes('rovai-workspace · /review/rovai-workspace'))`)
-    await driver.wait(`document.querySelector('#new-camp-workspace-value')?.textContent === 'rovai-workspace'`)
+    await driver.click(`Array.from(document.querySelectorAll('button')).find(e=>e.textContent.includes('coaxi-workspace · /review/coaxi-workspace'))`)
+    await driver.wait(`document.querySelector('#new-camp-workspace-value')?.textContent === 'coaxi-workspace'`)
     await driver.wait(`!document.querySelector('.new-camp-dialog')?.textContent.includes('正在确认工作区')`)
     assert.equal(await driver.evaluate(`document.querySelector('.new-camp-workspace-warning') !== null`), false)
     await driver.click(`document.querySelector('.member-trigger')`)
@@ -286,7 +286,7 @@ async function exerciseExecutionEntry(driver, runningCount, surface) {
 async function exerciseViewer(driver, path) {
   await driver.send('Page.navigate', { url: pathToFileURL(path).href })
   await driver.wait(`!!document.querySelector('#web')?.contentDocument?.querySelector('[contenteditable="true"]') && !!document.querySelector('#desktop')?.contentDocument?.querySelector('[contenteditable="true"]')`)
-  assert.deepEqual(await driver.evaluate(`['desktop','web'].map(id=>{const f=document.getElementById(id); return [f.width || f.getBoundingClientRect().width, f.contentWindow.innerWidth, f.contentWindow.innerHeight, typeof f.contentWindow.rovai]})`),
+  assert.deepEqual(await driver.evaluate(`['desktop','web'].map(id=>{const f=document.getElementById(id); return [f.width || f.getBoundingClientRect().width, f.contentWindow.innerWidth, f.contentWindow.innerHeight, typeof f.contentWindow.coaxi]})`),
     [[1440, 1440, 920, 'undefined'], [1440, 1440, 920, 'undefined']])
   await driver.evaluate(`document.querySelector('#offline').click()`)
   await driver.wait(`document.querySelector('#status').textContent.includes('模拟离线')`)
@@ -296,7 +296,7 @@ async function exerciseViewer(driver, path) {
   await driver.wait(`['desktop','web'].every(id=>{const d=document.getElementById(id).contentDocument; return d?.documentElement?.dataset.theme==='night' && Array.from(d.querySelectorAll('button')).some(e=>e.textContent.trim()==='Allow once')})`)
   await driver.wait(`scrollY === 0 && document.documentElement.scrollHeight <= 1150`)
   assert.deepEqual(driver.errors.splice(0), [], 'standalone reviewer loads srcdoc modules and controls without exceptions')
-  return { simulation: true, file: 'rovai-desktop-web-parity.html', checks: ['two-production-frames', 'isolated-surface-state', 'theme-and-scenario-reset', 'inactive-frame-does-not-create-blank-scroll-page'] }
+  return { simulation: true, file: 'coaxi-desktop-web-parity.html', checks: ['two-production-frames', 'isolated-surface-state', 'theme-and-scenario-reset', 'inactive-frame-does-not-create-blank-scroll-page'] }
 }
 
 async function launch(surface, profile) {

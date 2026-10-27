@@ -32,10 +32,10 @@
     "work/i03/c06/fusion-i03-rc.8/native-file-cards-r1/02-updated-text-and-retained-html.png": "c1d2e311b9e78b283ae7b696b8cc15272141a2f9d1dee4f208741771c1ce49c6"
   },
   "frozen_authority_files": {
-    "crates/rovai-core/src/local_attachment_source.rs": "8830581e72fc103b2f359be17a0072c5ee0cedc6eb5fe58b179ae3d255dbc1ca",
-    "crates/rovai-core/src/context.rs": "329144f38675ebedeaf5652858d457d42369455eb26c6159af61d19c02218784",
-    "crates/rovai-core/src/message_quote.rs": "efb6e962946b85c089483bb1120fe92f32458bb3b3b5e5eb668e26f8aa96481e",
-    "crates/rovai-core/src/command.rs": "22258f81dc5b76040cd0fdba20074321b5be7104e648a8278412c0736ef0d85a"
+    "crates/coaxi-core/src/local_attachment_source.rs": "8830581e72fc103b2f359be17a0072c5ee0cedc6eb5fe58b179ae3d255dbc1ca",
+    "crates/coaxi-core/src/context.rs": "329144f38675ebedeaf5652858d457d42369455eb26c6159af61d19c02218784",
+    "crates/coaxi-core/src/message_quote.rs": "efb6e962946b85c089483bb1120fe92f32458bb3b3b5e5eb668e26f8aa96481e",
+    "crates/coaxi-core/src/command.rs": "22258f81dc5b76040cd0fdba20074321b5be7104e648a8278412c0736ef0d85a"
   },
   "validation": {
     "types_exit": 0,
@@ -57,7 +57,7 @@
       "pathRows": 0,
       "exposedPaths": 0,
       "headerActions": true,
-      "title": "交互 #预览.html\nC:\\Users\\JiaLe\\AppData\\Local\\Temp\\rovai-canvas-native-190cf86d\\文件工程A\\交互 #预览.html",
+      "title": "交互 #预览.html\nC:\\Users\\JiaLe\\AppData\\Local\\Temp\\coaxi-canvas-native-190cf86d\\文件工程A\\交互 #预览.html",
       "headerHeight": 38.566673278808594,
       "iconCenterDelta": 0.3296213150024414
     },
@@ -87,7 +87,7 @@
     "function_clusters": 81,
     "work_packages": 48,
     "engineering_scenarios": 324,
-    "core_authority": "rovai-core",
+    "core_authority": "coaxi-core",
     "model_input_changed": false,
     "paid_models": false,
     "push": false,

@@ -10,15 +10,15 @@ async function createProbe(config) {
   const trace = async (stage, details = {}) => appendFile(join(config.evidence, 'interruption-trace.jsonl'), JSON.stringify({stage, at: new Date().toISOString(), ...details})+'\n')
   const query = (sql, params) => {
     const code = "import {DatabaseSync} from 'node:sqlite';const db=new DatabaseSync(process.argv[1],{readOnly:true});try{console.log(JSON.stringify(db.prepare(process.argv[2]).all(...JSON.parse(process.argv[3]))))}finally{db.close()}"
-    return JSON.parse(execFileSync(process.env.ROVAI_ACCEPTANCE_NODE, ['--no-warnings','--input-type=module','-e',code,join(core,'rovai.sqlite'),sql,JSON.stringify(params)], {encoding:'utf8',windowsHide:true}))
+    return JSON.parse(execFileSync(process.env.COAXI_ACCEPTANCE_NODE, ['--no-warnings','--input-type=module','-e',code,join(core,'coaxi.sqlite'),sql,JSON.stringify(params)], {encoding:'utf8',windowsHide:true}))
   }
   const ownerProcess = async () => {
-    const ps = `$rows=@(Get-CimInstance Win32_Process -Filter 'ParentProcessId = ${process.pid}' | Where-Object {$_.Name -eq 'rovai-host.exe'} | Select-Object ProcessId,ParentProcessId,ExecutablePath,CommandLine);ConvertTo-Json -InputObject $rows -Compress`
+    const ps = `$rows=@(Get-CimInstance Win32_Process -Filter 'ParentProcessId = ${process.pid}' | Where-Object {$_.Name -eq 'coaxi-host.exe'} | Select-Object ProcessId,ParentProcessId,ExecutablePath,CommandLine);ConvertTo-Json -InputObject $rows -Compress`
     const rows = JSON.parse(execFileSync(join(process.env.SystemRoot,'System32/WindowsPowerShell/v1.0/powershell.exe'), ['-NoProfile','-NonInteractive','-Command',ps], {encoding:'utf8',windowsHide:true}))
     assert.equal(rows.length, 1)
     const child = rows[0]
     assert.equal(child.ParentProcessId, process.pid)
-    assert.equal(resolve(child.ExecutablePath).toLowerCase(), resolve(process.env.ROVAI_HOST_BIN).toLowerCase())
+    assert.equal(resolve(child.ExecutablePath).toLowerCase(), resolve(process.env.COAXI_HOST_BIN).toLowerCase())
     assert.ok(child.CommandLine.toLowerCase().includes(core.toLowerCase()))
     return child
   }
@@ -55,7 +55,7 @@ export async function qualifyPrivateCoreInterruption(window, tools) {
   const otherBody='R04 Core退出不能清空另一卡正文'; await typeBody(1,otherBody)
   for (const boundary of ['before_native_confirmation','after_native_confirmation']) {
     await addMaterial(scopes[0],`R04 ${boundary}.txt`,'甲材料对应的问题')
-    const marker = boundary==='before_native_confirmation'?'ROVAI_SKILL_RECOVERY_SILENT_HELD_INPUT':'ROVAI_R04_CONFIRMED_COMPLETED_INPUT'
+    const marker = boundary==='before_native_confirmation'?'COAXI_SKILL_RECOVERY_SILENT_HELD_INPUT':'COAXI_R04_CONFIRMED_COMPLETED_INPUT'
     const body=`${marker} R04 ${randomUUID()}`; await typeBody(0,body)
     const beta=(await get(scopes[1])).draft, count=(await get(null)).agentRuns.length
     const gate=seam.holdSend({conversationId,scope:scopes[0]}), mark=seam.mark()
@@ -73,7 +73,7 @@ export async function qualifyPrivateCoreInterruption(window, tools) {
     assert.ok(received[0].params.prompt.some(part=>part.type==='text'&&part.text.includes(before.bytes.toString('utf8'))))
     await writeFile(join(config.evidence,boundary+'-before.txt'),before.bytes,{flag:'wx'})
     await trace('frozen', {boundary, commandId, runId})
-    const supervisor=await evaluate('window.rovai.supervisor.getSnapshot()')
+    const supervisor=await evaluate('window.coaxi.supervisor.getSnapshot()')
     await trace('supervisor_before', {supervisor})
     const old=await ownerProcess()
     await trace('owner_before', {old})
@@ -81,7 +81,7 @@ export async function qualifyPrivateCoreInterruption(window, tools) {
     assert.equal(before.row.run_status,boundary==='before_native_confirmation'?'running':'succeeded')
     process.kill(old.ProcessId,'SIGKILL')
     await trace('core_killed', {pid:old.ProcessId})
-    await wait(`window.rovai.supervisor.getSnapshot().then(value=>value.generation>${supervisor.generation}&&value.fullCoreState==='ready')`,60_000)
+    await wait(`window.coaxi.supervisor.getSnapshot().then(value=>value.generation>${supervisor.generation}&&value.fullCoreState==='ready')`,60_000)
     const next=await ownerProcess(); assert.notEqual(next.ProcessId,old.ProcessId)
     await trace('core_restarted', {next})
     await waitPrivateSnapshot(rpc,conversationId,value=>['succeeded','failed','cancelled'].includes(value.agentRuns.find(run=>run.id===runId)?.status))
@@ -124,7 +124,7 @@ async function qualifyPrivateAppInterruption(window, tools) {
     await typeBody(1, otherBody)
     const beta = (await get(scopes[1])).draft
     await addMaterial(scopes[0], 'R04 整App退出甲卡已发送.txt', '甲材料对应的问题')
-    const body = `ROVAI_SKILL_RECOVERY_SILENT_HELD_INPUT R04 整App ${randomUUID()}`
+    const body = `COAXI_SKILL_RECOVERY_SILENT_HELD_INPUT R04 整App ${randomUUID()}`
     await typeBody(0, body)
     const count = (await get(null)).agentRuns.length, gate = seam.holdSend({conversationId, scope:scopes[0]})
     await clickNative(`${frame(0)}.querySelector('.single-chat-composer button[type="submit"]')`)

@@ -1,5 +1,5 @@
 {
-  "name": "@rovai/server-channels",
+  "name": "@coaxi/server-channels",
   "version": "1.0.0",
   "private": true,
   "type": "module",

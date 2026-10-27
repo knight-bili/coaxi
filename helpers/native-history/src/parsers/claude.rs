@@ -40,7 +40,7 @@ fn system_tag_regex() -> &'static Regex {
 /// (`lib/background-agent.ts`) splits on it and renders a lifecycle card;
 /// anything else renders the preview verbatim, so the prefix must never occur
 /// in organic tool output.
-pub(crate) const BACKGROUND_TASK_MARKER: &str = "[[codeg-background-task]]";
+pub(crate) const BACKGROUND_TASK_MARKER: &str = "[[coaxi-background-task]]";
 
 /// Cap for the folded `<result>` markdown carried on the lifecycle marker —
 /// generous for a sub-agent summary, bounded against a pathological one. Also
@@ -779,21 +779,21 @@ pub(crate) fn capture_title_record(
     }
 }
 
-/// A stored or published session title as codeg shows it: trimmed, without
+/// A stored or published session title as coaxi shows it: trimmed, without
 /// JetBrains AIR's archive marker, and capped at 100 characters. `None` when
 /// nothing is left.
 ///
 /// AIR archives a Claude session by appending its title again with an
 /// `[archived] ` prefix (a `custom-title` record, plus an `agent-name` record
-/// codeg does not read). From claude-agent-acp 0.89.0 the adapter publishes
-/// such a title to an AIR client, which codeg is, with the marker removed
+/// coaxi does not read). From claude-agent-acp 0.89.0 the adapter publishes
+/// such a title to an AIR client, which coaxi is, with the marker removed
 /// once (`clientTitle`, AIR's `visibleTitle`), while the transcript keeps it.
-/// codeg has two producers for a Claude title, this transcript reader and the
+/// coaxi has two producers for a Claude title, this transcript reader and the
 /// wire's `session_info_update.title`
 /// (`acp::session_title::native_title_from_session_info`), and
 /// `publish_native_title` only collapses identical strings. So both go
 /// through this one function; otherwise a session archived in AIR would flip
-/// between the two names on the sidebar while it is open in codeg.
+/// between the two names on the sidebar while it is open in coaxi.
 ///
 /// The marker follows AIR's rule: `[archived]`, a run of ASCII white space,
 /// then a title. A bare `[archived]`, or one with no white space after it, is
@@ -2639,7 +2639,7 @@ impl ClaudeRecordAccumulator {
     /// `<task-notification>`:
     ///
     /// ```text
-    /// [[codeg-background-task]]{"task_id":…,"status":…,"summary":…,"result":…}
+    /// [[coaxi-background-task]]{"task_id":…,"status":…,"summary":…,"result":…}
     /// ```
     ///
     /// `status` is null while no notification was observed — the frontend
@@ -3564,7 +3564,7 @@ pub(crate) fn parse_subagent_tool_calls(path: &PathBuf) -> SubagentTranscript {
 /// The frame is model-directed provenance: it tells the MODEL that the text
 /// below is a subagent's words and carries no user authority. Over ACP,
 /// `claude-agent-acp` 0.81.0 strips it (`unwrapHandbackFrame`) before the
-/// report reaches a client — but codeg's history path parses the CLI's own
+/// report reaches a client — but coaxi's history path parses the CLI's own
 /// JSONL, where the frame is still sitting on the tool_result, so without this
 /// every subagent card in history opens with the whole paragraph and shows the
 /// report indented two spaces underneath.

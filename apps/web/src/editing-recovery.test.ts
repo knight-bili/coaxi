@@ -12,7 +12,7 @@ class Store {
   setItem(key: string, value: string) { this.values.set(key, value) }
   removeItem(key: string) { this.values.delete(key) }
 }
-const identity = 'rovai.camp-composer-draft.v1:thread'
+const identity = 'coaxi.camp-composer-draft.v1:thread'
 const draft = (body: string) => ({ ...emptyLocalThreadComposerDraft('thread'), body, content: { version: 2 as const, segments: [{ kind: 'text' as const, text: body }] } })
 
 describe('Web body snapshots', () => {
@@ -71,20 +71,20 @@ describe('Web body snapshots', () => {
     const client = { editingRecovery: recovery, request: (async () => ({})) as never }
     const store = canvasComposerDraftStorage(client, context)
     saveLocalThreadComposerDraft(draft('saved'), store)
-    const before = archive.getItem(`rovai.web.thread-drafts.v1:${scope}`), write = archive.setItem.bind(archive)
+    const before = archive.getItem(`coaxi.web.thread-drafts.v1:${scope}`), write = archive.setItem.bind(archive)
     archive.setItem = () => { throw new Error('quota') }
     expect(() => saveLocalThreadComposerDraft(draft('new'), store)).toThrow('quota')
-    expect(archive.getItem(`rovai.web.thread-drafts.v1:${scope}`)).toBe(before)
+    expect(archive.getItem(`coaxi.web.thread-drafts.v1:${scope}`)).toBe(before)
     archive.setItem = write
     expect(() => recovery.set(bundleKey, '{"version":2,"drafts":{}}')).toThrow()
-    expect(archive.getItem(`rovai.web.thread-drafts.v1:${scope}`)).toBe(before)
+    expect(archive.getItem(`coaxi.web.thread-drafts.v1:${scope}`)).toBe(before)
     expect(tab.length).toBe(0)
     const saved = JSON.parse(before!)
     saved.entries[bundleKey].value = '{"version":2,"drafts":{}}'
-    archive.setItem(`rovai.web.thread-drafts.v1:${scope}`, JSON.stringify(saved))
+    archive.setItem(`coaxi.web.thread-drafts.v1:${scope}`, JSON.stringify(saved))
     expect(() => loadLocalThreadComposerDraft('thread', store)).toThrow()
     expect(() => saveLocalThreadComposerDraft(draft('overwrite'), store)).toThrow()
-    expect(archive.getItem(`rovai.web.thread-drafts.v1:${scope}`)).toContain('\\"version\\":2')
+    expect(archive.getItem(`coaxi.web.thread-drafts.v1:${scope}`)).toContain('\\"version\\":2')
   })
 
   it('keeps editors separate after tab loss, filters Host/Owner, and retains copies after restoring or clearing another editor', () => {
@@ -113,15 +113,15 @@ describe('Web body snapshots', () => {
     const old = browserEditingRecovery('host/owner/editor', tab)
     saveLocalThreadComposerDraft(draft('before upgrade'), threadComposerDraftStorage(old))
     old.set('single-chat:thread', { body: 'private', editToken: 'private-proof' })
-    old.set('rovai.camp-composer-draft.v1:broken', '{invalid-old-record')
-    tab.setItem('rovai.web.session.v1', JSON.stringify({ token: 'session-secret', editor: { proof: 'editor-proof' }, pending: ['pending-command'] }))
+    old.set('coaxi.camp-composer-draft.v1:broken', '{invalid-old-record')
+    tab.setItem('coaxi.web.session.v1', JSON.stringify({ token: 'session-secret', editor: { proof: 'editor-proof' }, pending: ['pending-command'] }))
     const current = browserEditingRecovery('host/owner/editor', tab, { ownerScope: 'host/owner', storage: archive })
     expect(loadLocalThreadComposerDraft('thread', threadComposerDraftStorage(current))?.body).toBe('before upgrade')
     saveLocalThreadComposerDraft(draft('after upgrade'), threadComposerDraftStorage(current))
     const raw = [...archive.values.values()].join('')
     for (const secret of ['private-proof', 'session-secret', 'editor-proof', 'pending-command']) expect(raw).not.toContain(secret)
     expect(raw).not.toContain('invalid-old-record')
-    expect(tab.getItem('rovai.web.edits.v1')).toContain('invalid-old-record')
+    expect(tab.getItem('coaxi.web.edits.v1')).toContain('invalid-old-record')
     saveLocalThreadComposerDraft(emptyLocalThreadComposerDraft('thread'), threadComposerDraftStorage(current))
     expect(current.get(identity)).toBeNull()
     expect(browserEditingRecovery('host/owner/editor', tab, { ownerScope: 'host/owner', storage: archive }).get(identity)).toBeNull()
@@ -131,16 +131,16 @@ describe('Web body snapshots', () => {
     const archive = new Store()
     const current = browserEditingRecovery('host/owner/editor', new Store(), { ownerScope: 'host/owner', storage: archive })
     saveLocalThreadComposerDraft(draft('saved'), threadComposerDraftStorage(current))
-    const before = archive.getItem('rovai.web.thread-drafts.v1:host/owner/editor')
+    const before = archive.getItem('coaxi.web.thread-drafts.v1:host/owner/editor')
     saveLocalThreadComposerDraft(draft('saved'), threadComposerDraftStorage(current))
-    expect(archive.getItem('rovai.web.thread-drafts.v1:host/owner/editor')).toBe(before)
+    expect(archive.getItem('coaxi.web.thread-drafts.v1:host/owner/editor')).toBe(before)
     const write = archive.setItem.bind(archive)
     archive.setItem = () => { throw new Error('quota') }
     expect(() => saveLocalThreadComposerDraft(draft('new input'), threadComposerDraftStorage(current))).toThrow('quota')
-    expect(archive.getItem('rovai.web.thread-drafts.v1:host/owner/editor')).toBe(before)
+    expect(archive.getItem('coaxi.web.thread-drafts.v1:host/owner/editor')).toBe(before)
     archive.setItem = write
-    archive.setItem('rovai.web.thread-drafts.v1:host/owner/editor', '{broken')
+    archive.setItem('coaxi.web.thread-drafts.v1:host/owner/editor', '{broken')
     expect(() => current.get(identity)).toThrow()
-    expect(archive.getItem('rovai.web.thread-drafts.v1:host/owner/editor')).toBe('{broken')
+    expect(archive.getItem('coaxi.web.thread-drafts.v1:host/owner/editor')).toBe('{broken')
   })
 })

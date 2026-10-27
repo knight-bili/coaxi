@@ -3,7 +3,7 @@
 <desc id="figure-description">咕咕参与不同会话，可切换 Codex 或 Claude Code；共同记忆、队员记忆与队员间记忆分别用围炉、专属手册和双人经验交换表示。</desc>
 <rect width="1608" height="1132" fill="#fcfdfc"/>
 <g font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif" fill="#253c31">
-<text x="48" y="40" fill="#708078" font-size="12" font-weight="600" letter-spacing="2">ROVAI AI / ARCHITECTURE</text>
+<text x="48" y="40" fill="#708078" font-size="12" font-weight="600" letter-spacing="2">COAXI AI / ARCHITECTURE</text>
 <text x="1560" y="40" fill="#708078" font-size="13" text-anchor="end">图 02</text>
 <text x="48" y="94" font-size="34" font-weight="600">咕咕：会话、Runtime 与记忆</text>
 

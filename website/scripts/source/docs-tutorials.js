@@ -1,6 +1,6 @@
 // Continuous tutorials. Screenshots and outcomes are backed by review/evidence-manifest.json.
 (() => {
-  const {topics,groups}=window.RovaiDocs;
+  const {topics,groups}=window.CoaxiDocs;
   const P=(en,zh,ep,zp)=>({kind:'prose',title:[en,zh],paragraphs:[ep,zp]});
   const S=(en,zh,ep,zp)=>({kind:'steps',title:[en,zh],steps:[ep,zp]});
   const F=(en,zh,rows)=>({kind:'fields',title:[en,zh],rows:rows.map(([a,b,c,d])=>({label:[a,b],text:[c,d]}))});
@@ -22,39 +22,39 @@
   groups[1].ids.splice(groups[1].ids.indexOf('messages')+1,0,'collaboration');
   groups[3].ids.splice(groups[3].ids.indexOf('channels')+1,0,'feishu');
 
-  topics.understanding=T('Meet Rovai','认识 Rovai',
+  topics.understanding=T('Meet Coaxi','认识 Coaxi',
     'Bring your existing coding Agents into a workspace where a team can continue working together.',
     '让已有的编程智能体在同一个工作台中，围绕同一项工作持续协作。',[
     P('From one answer to an ongoing project','从一次回答，到一项持续的工作',
-      ['A coding Agent can read a repository, change files and run commands. When a project continues over several days, you also need to know who owns an unfinished item, which decision was made, and where to resume. Rovai gives that work a lasting place.', 'For the Orbit download page, Dingding implements a scoped change and Cheese reviews it. Their identities stay in the roster. The conversation retains requests and replies; execution records and changed files let you inspect what actually happened.'],
-      ['编程智能体能阅读仓库、修改文件、执行命令。工作跨越几天后，你还需要知道谁负责未完成事项、之前作过什么决定，以及应该从哪里继续。Rovai 为这些工作提供持续的组织方式。', '例如修改 Orbit 下载页：叮叮负责实现，芝士负责审查。两位队员的身份保留在名册里；会话留下需求和回复，执行记录与文件变化帮助你检查实际发生的操作。']),
+      ['A coding Agent can read a repository, change files and run commands. When a project continues over several days, you also need to know who owns an unfinished item, which decision was made, and where to resume. Coaxi gives that work a lasting place.', 'For the Orbit download page, Dingding implements a scoped change and Cheese reviews it. Their identities stay in the roster. The conversation retains requests and replies; execution records and changed files let you inspect what actually happened.'],
+      ['编程智能体能阅读仓库、修改文件、执行命令。工作跨越几天后，你还需要知道谁负责未完成事项、之前作过什么决定，以及应该从哪里继续。Coaxi 为这些工作提供持续的组织方式。', '例如修改 Orbit 下载页：叮叮负责实现，芝士负责审查。两位队员的身份保留在名册里；会话留下需求和回复，执行记录与文件变化帮助你检查实际发生的操作。']),
     F('What the workspace adds','工作台具体提供什么',[
       ['Lasting teammates','长期队员','Save a name, responsibilities and working principles once, then invite that teammate into different conversations.','保存名称、职责与工作准则，随后把同一位队员邀请到不同会话。'],
       ['Shared conversation','共同会话','Keep requests, explicit recipients, reviews and handoff messages around one goal. Use a private one-on-one for a side question.','围绕目标保留请求、接收对象、审查和交接消息；旁支问题可以在单聊中追问。'],
       ['Responsibility and execution','责任与执行','A Task records an owner and responsibility; a Run records one execution. Read both when work spans several attempts.','任务记录负责人及责任，执行记录某一次实际操作。需要多次推进时，两者结合着看。'],
       ['Reusable memory','可延续的记忆','Store a durable agreement at the right scope, inspect its source and revise it later.','把长期约定保存到合适范围，查看来源，并在约定变化后修订。']]),
     P('Start with the smallest useful team','从最小的有用队伍开始',
-      ['One teammate is enough for a small, clear change. Add a reviewer when another perspective can reduce a specific risk: a platform link, an authorization change, or a release checklist. More participants do not automatically make a better result.', 'Rovai coordinates the Agent products installed on the host. Those products still need their own installation, sign-in and model access. The workspace does not imply that model computation runs locally.'],
-      ['范围清楚的小改动，一位队员就够。需要第二种视角检查平台链接、权限变化或交付条件时，再邀请审查队员。参与人数不会自动提高结果质量。', 'Rovai 协调主机上安装的智能体产品；它们仍需各自的安装、登录和模型访问权限。工作台在本地，不代表模型计算全部发生在本地。']),
+      ['One teammate is enough for a small, clear change. Add a reviewer when another perspective can reduce a specific risk: a platform link, an authorization change, or a release checklist. More participants do not automatically make a better result.', 'Coaxi coordinates the Agent products installed on the host. Those products still need their own installation, sign-in and model access. The workspace does not imply that model computation runs locally.'],
+      ['范围清楚的小改动，一位队员就够。需要第二种视角检查平台链接、权限变化或交付条件时，再邀请审查队员。参与人数不会自动提高结果质量。', 'Coaxi 协调主机上安装的智能体产品；它们仍需各自的安装、登录和模型访问权限。工作台在本地，不代表模型计算全部发生在本地。']),
     S('Try one complete loop','先走完一个小闭环',
       ['Configure one Agent and one teammate, then complete the Quick start.', 'Open the collaboration tutorial to extend that task with a second teammate and an explicit review request.', 'Keep the original conversation for follow-up work; save only durable agreements as memory.'],
       ['配置一种智能体和一位队员，完成快速开始中的任务。','再阅读协作教程，增加第二位队员，并主动发出审查请求。','后续工作继续使用原会话；只有长期有用的约定才整理为记忆。'])
   ]);
-  topics.mechanism=T('How work moves through Rovai','工作机制',
+  topics.mechanism=T('How work moves through Coaxi','工作机制',
     'Understand who decides, who executes, and where the files and results live.',
     '弄清谁作决定、谁执行，以及文件和结果在哪里。',[
     D('Responsibilities and data flow','职责与数据流','responsibilities',
-      'You choose a goal and recipients. Rovai routes work through a teammate’s configured Agent. That Agent may contact its configured model service and operate on the host’s project files.',
-      '你确定目标和接收队员；Rovai 按配置调用智能体。智能体可能访问配置的模型服务，并在执行主机上操作项目文件。'),
+      'You choose a goal and recipients. Coaxi routes work through a teammate’s configured Agent. That Agent may contact its configured model service and operate on the host’s project files.',
+      '你确定目标和接收队员；Coaxi 按配置调用智能体。智能体可能访问配置的模型服务，并在执行主机上操作项目文件。'),
     F('Five different roles','五种不同职责',[
       ['You','用户','Set the goal, choose recipients, inspect output and decide whether to approve an operation or accept a delivery.','提出目标、选择接收对象、检查结果，决定是否批准操作或接受交付。'],
-      ['Rovai','Rovai','Organize teammates and conversations, queue addressed messages, launch configured Agents and retain observable execution facts.','组织队员和会话，对明确寻址的消息排队，启动已配置智能体并保留可观察的执行事实。'],
+      ['Coaxi','Coaxi','Organize teammates and conversations, queue addressed messages, launch configured Agents and retain observable execution facts.','组织队员和会话，对明确寻址的消息排队，启动已配置智能体并保留可观察的执行事实。'],
       ['Teammate','队员','A lasting identity with responsibilities and configuration. Several teammates can use the same Agent product with different roles.','具有长期身份、职责和配置；几位队员可以使用同一种智能体产品，承担不同工作。'],
       ['Native Agent','原生智能体','Products such as Codex CLI or Claude Code interpret the request, call the configured model and use tools under their own capabilities and permissions.','Codex CLI、Claude Code 等产品解释请求，调用配置的模型，并按自身能力和权限使用工具。'],
       ['Project and services','项目与模型服务','Files are on the execution host. Model requests follow the chosen Agent/provider configuration; a local workspace is not a guarantee that all inputs stay on the computer.','项目文件位于执行主机；模型请求遵循所选智能体与服务配置。本地工作台并不意味着所有输入都不离开电脑。']]),
     S('Follow one request','沿着一条请求看',
-      ['Select Dingding in the mention picker and send a scoped request in the Orbit conversation.', 'Rovai accepts the message and records a delivery for that teammate. When execution can start, it freezes the selected input and configuration into a Run.', 'The Agent reads or edits files and returns observable steps and output. Read the public answer, the Run and the actual files together.', 'To request review, select Cheese and send a new request. That creates new work; merely naming a reviewer in prose is not the same action.'],
-      ['在 Orbit 会话的提及选择器中选择叮叮，发送范围明确的请求。','Rovai 接收消息并记录给这位队员的投递；具备执行条件后，选中的输入和运行配置会固定在本次执行中。','智能体读取或修改文件，返回可观察的步骤和输出。结合公屏答案、执行记录与实际文件判断结果。','需要审查时，再选择芝士并发送新请求。这会产生后续工作；正文中提到某个名字并不等于执行了这个动作。']),
+      ['Select Dingding in the mention picker and send a scoped request in the Orbit conversation.', 'Coaxi accepts the message and records a delivery for that teammate. When execution can start, it freezes the selected input and configuration into a Run.', 'The Agent reads or edits files and returns observable steps and output. Read the public answer, the Run and the actual files together.', 'To request review, select Cheese and send a new request. That creates new work; merely naming a reviewer in prose is not the same action.'],
+      ['在 Orbit 会话的提及选择器中选择叮叮，发送范围明确的请求。','Coaxi 接收消息并记录给这位队员的投递；具备执行条件后，选中的输入和运行配置会固定在本次执行中。','智能体读取或修改文件，返回可观察的步骤和输出。结合公屏答案、执行记录与实际文件判断结果。','需要审查时，再选择芝士并发送新请求。这会产生后续工作；正文中提到某个名字并不等于执行了这个动作。']),
     P('What is shared, and what is separate','哪些共享，哪些独立',
       ['Participants in a project conversation work against its selected workspace. A private one-on-one has separate messages and a separate queue, but it does not automatically create an isolated file copy.', 'A Git-backed Mission can have a shared managed worktree. Its teammates use that Mission execution location together; each teammate does not automatically get a worktree.', 'Permissions and actual model support come from the current Agent configuration. A profile description, a Skill or an @ mention does not grant filesystem or network access.'],
       ['同一项目会话中的队员使用选定的工作目录。单聊有独立消息和队列，但不会自动复制一份隔离文件。','Git 项目的使命可以拥有一个共同使用的受管工作树。参与该使命的队员共享其执行位置，并非每人自动分配一个工作树。','权限与模型支持取决于当前智能体配置。资料中的职责、Skill 或 @ 提及都不会自行增加文件和网络权限。'])
@@ -98,7 +98,7 @@
       ['Reply to a teammate','回复队员消息','Reply adds the original message reference and, while its author is an available participant, inserts that teammate as a recipient. Check all selected mentions; existing recipients can remain. If the author is unavailable, choose a replacement.','回复会增加原消息引用；原作者仍是可参与队员时，会把它加入接收对象。检查全部已选提及，已有接收对象可能仍保留。原作者不可用时需要另选接收者。'],
       ['Reply to your own or a system message','回复用户或系统消息','The reference supplies context. It is not an Agent recipient; choose whom to ask and check the composer’s route.','引用提供上下文，用户或系统本身不是智能体接收者；需要确认你在请哪位队员处理。'],
       ['Default lead','默认队长','Provides a default recipient and has task-responsibility powers defined by the product. The title does not promise automatic planning or assignment of every request.','提供默认接收对象，并拥有产品规定的任务责任操作。这个称谓不保证自动规划和分配每条请求。'],
-      ['Agent-to-agent handoff','队员之间的主动交接','An Agent can use Rovai’s explicit send capability to address another present teammate with continuing work. Check the displayed recipients and the following execution. A name in ordinary narration, a thank-you or “ready for review” alone is not proof of a handoff.','智能体可使用 Rovai 的显式发送能力，把具体后续工作交给在场队员。以消息展示的接收对象和后续执行为准；普通叙述中的名字、感谢或一句“等待审查”都不能证明已发生交接。']]),
+      ['Agent-to-agent handoff','队员之间的主动交接','An Agent can use Coaxi’s explicit send capability to address another present teammate with continuing work. Check the displayed recipients and the following execution. A name in ordinary narration, a thank-you or “ready for review” alone is not proof of a handoff.','智能体可使用 Coaxi 的显式发送能力，把具体后续工作交给在场队员。以消息展示的接收对象和后续执行为准；普通叙述中的名字、感谢或一句“等待审查”都不能证明已发生交接。']]),
     P('Resume this work later','下一次怎样继续',
       ['Reopen the same conversation, read the latest delivery and outstanding Task, and state what has changed since then. Use a new message to define the remaining work.', 'Save only a durable agreement as memory, such as the project’s platform naming. Temporary review instructions and this run’s completion status belong in the conversation or Task.'],
       ['重新打开原会话，先读最新交付和未完成任务，再说明此后发生了哪些变化。用新消息界定剩余工作。','只有长期约定值得整理成记忆，例如项目的平台命名。临时审查要求和本次完成状态留在会话或任务里。'])
@@ -106,8 +106,8 @@
 
   prepend('members',[
     P('A pair you can adapt','可以照着改的两份资料',
-      ['These are documentation profiles in an isolated example, not changes to Rovai’s default teammates. Start with stable responsibilities. Put “only edit index.html today” and this review’s acceptance criteria in the conversation request.', 'A personality tag describes collaboration style. A working principle describes a repeatable practice. Neither gives the Agent extra permissions. Save identity and Agent configuration separately.'],
-      ['以下是隔离示例中的文档资料，并未修改 Rovai 默认队员。先写稳定的职责；“今天只改 index.html”和这次验收条件放进会话请求。','性格标签描述协作风格，工作准则描述可反复采用的做法；两者都不增加智能体权限。队员资料和智能体配置分别保存。']),
+      ['These are documentation profiles in an isolated example, not changes to Coaxi’s default teammates. Start with stable responsibilities. Put “only edit index.html today” and this review’s acceptance criteria in the conversation request.', 'A personality tag describes collaboration style. A working principle describes a repeatable practice. Neither gives the Agent extra permissions. Save identity and Agent configuration separately.'],
+      ['以下是隔离示例中的文档资料，并未修改 Coaxi 默认队员。先写稳定的职责；“今天只改 index.html”和这次验收条件放进会话请求。','性格标签描述协作风格，工作准则描述可反复采用的做法；两者都不增加智能体权限。队员资料和智能体配置分别保存。']),
     F('Dingding · implementation','叮叮 · 实现示例',[
       ['Role','团队角色','Implementation','实现'],
       ['Responsibilities','专业职责','Implement focused changes and explain the delivered files.','完成范围明确的修改，并说明交付了哪些文件。'],
@@ -182,11 +182,11 @@
   const memoryReference=references('memory');
   topics.memory.sections=[
     P('Save a decision that will matter again','保存下一次还会用到的约定',
-      ['The Orbit team repeatedly needs the same platform labels and matching notes. That is worth saving because it applies beyond one message. “The review is done” is a transient result and belongs in the conversation or Task.', 'The following agreement is tutorial data, not a Rovai product rule. Its wording names the project so it cannot be mistaken for a naming policy for every future project.'],
-      ['Orbit 后续工作还会反复用到统一的平台名称和对应说明，因此适合保存。“审查已经完成”是临时结果，留在会话或任务即可。','下面的约定属于教程示例，不是 Rovai 的产品规则。正文写明适用项目，避免被误解为所有未来项目都要遵守的命名规范。']),
+      ['The Orbit team repeatedly needs the same platform labels and matching notes. That is worth saving because it applies beyond one message. “The review is done” is a transient result and belongs in the conversation or Task.', 'The following agreement is tutorial data, not a Coaxi product rule. Its wording names the project so it cannot be mistaken for a naming policy for every future project.'],
+      ['Orbit 后续工作还会反复用到统一的平台名称和对应说明，因此适合保存。“审查已经完成”是临时结果，留在会话或任务即可。','下面的约定属于教程示例，不是 Coaxi 的产品规则。正文写明适用项目，避免被误解为所有未来项目都要遵守的命名规范。']),
     Q('The agreement','示例约定',
-      'For the Orbit tutorial, use Apple Silicon, Intel and Windows x64 consistently. Keep each platform note beside its matching download. The files are text demos, not real installers. This is a tutorial agreement, not a Rovai product rule.',
-      '在 Orbit 教程下载页中统一使用 Apple Silicon、Intel、Windows x64。各平台说明放在对应下载旁边。文件是文本演示，不是真实安装包。这是教程约定，不是 Rovai 产品规则。'),
+      'For the Orbit tutorial, use Apple Silicon, Intel and Windows x64 consistently. Keep each platform note beside its matching download. The files are text demos, not real installers. This is a tutorial agreement, not a Coaxi product rule.',
+      '在 Orbit 教程下载页中统一使用 Apple Silicon、Intel、Windows x64。各平台说明放在对应下载旁边。文件是文本演示，不是真实安装包。这是教程约定，不是 Coaxi 产品规则。'),
     F('Choose the scope before saving','保存前选对适用范围',[
       ['Shared memory','共同记忆','An agreement useful across the local team, such as Orbit’s platform naming. Shared memory is broader than the current conversation, so name the project and limits explicitly.','适用于本机队伍共同遵守的约定，例如 Orbit 平台命名。共同记忆的范围比当前会话更广，应明确项目与边界。'],
       ['Teammate memory','队员记忆','A durable habit or lesson for one teammate, such as an implementer’s handoff checklist. Select the intended teammate.','一位队员长期使用的习惯或经验，例如实现交付检查方法，需选定目标队员。'],
@@ -247,8 +247,8 @@
   const automationReference=references('automations');
   topics.automations.sections=[
     P('Repeat a bounded check','重复执行一个有边界的检查',
-      ['The Orbit example checks the existing download fixtures and reports errors without editing files. It uses a saved prompt, one teammate and the Orbit project. First run it manually to verify the result before choosing a recurring time.','This is host-based automation: Rovai and the configured Agent must be available on the computer doing the work. A schedule is not an independent cloud service.'],
-      ['Orbit 示例检查现有下载文件并报告错误，不修改文件。它保存一条明确请求、一位执行队员和 Orbit 项目。先手动运行一次，确认结果后再选择重复时间。','定时任务依赖执行主机：电脑上的 Rovai 与已配置智能体需要可用。保存时间计划并不意味着创建了独立云服务。']),
+      ['The Orbit example checks the existing download fixtures and reports errors without editing files. It uses a saved prompt, one teammate and the Orbit project. First run it manually to verify the result before choosing a recurring time.','This is host-based automation: Coaxi and the configured Agent must be available on the computer doing the work. A schedule is not an independent cloud service.'],
+      ['Orbit 示例检查现有下载文件并报告错误，不修改文件。它保存一条明确请求、一位执行队员和 Orbit 项目。先手动运行一次，确认结果后再选择重复时间。','定时任务依赖执行主机：电脑上的 Coaxi 与已配置智能体需要可用。保存时间计划并不意味着创建了独立云服务。']),
     Q('A repeatable request','可以重复使用的请求',
       'Run node verify.mjs in the Orbit project. Read index.html and report the three platform labels, the check result and any concrete error. Do not change files, commit, publish or contact teammates. Keep the final report under 150 words.',
       '在 Orbit 项目运行 node verify.mjs，读取 index.html，报告三个平台名称、检查结果以及具体错误。不要修改文件、提交、发布或联系其他队员。最后用简短摘要交付。'),
@@ -269,8 +269,8 @@
   ];
   prepend('skills',[
     P('Use a capability to improve one step','让能力改变一个具体工作步骤',
-      ['The Orbit implementation needed responsive layout and visible keyboard focus. In the recorded execution, the native Agent discovered and read an installed UI design Skill and used its search guidance before editing the page. The result was actual CSS plus checks, not merely a Skill listed in Settings.','This was native Agent discovery. It is not evidence that the user selected a / token or that a Rovai Toolbox workflow ran. The independent review still found a contrast issue, which shows why a selected capability is not a quality certificate.'],
-      ['Orbit 的实现需要响应式布局和清晰的键盘焦点。真实执行中，原生智能体发现并阅读了已安装的界面设计 Skill，使用其检索指引后再修改页面。结果是实际 CSS 和检查脚本，而不只是设置页里多了一项。','这次采用的是原生智能体发现路径，并不代表用户选择过 / 标记，也不代表 Rovai 工具箱工作流被执行。独立审查仍发现对比度问题，说明使用能力不等于质量认证。']),
+      ['The Orbit implementation needed responsive layout and visible keyboard focus. In the recorded execution, the native Agent discovered and read an installed UI design Skill and used its search guidance before editing the page. The result was actual CSS plus checks, not merely a Skill listed in Settings.','This was native Agent discovery. It is not evidence that the user selected a / token or that a Coaxi Toolbox workflow ran. The independent review still found a contrast issue, which shows why a selected capability is not a quality certificate.'],
+      ['Orbit 的实现需要响应式布局和清晰的键盘焦点。真实执行中，原生智能体发现并阅读了已安装的界面设计 Skill，使用其检索指引后再修改页面。结果是实际 CSS 和检查脚本，而不只是设置页里多了一项。','这次采用的是原生智能体发现路径，并不代表用户选择过 / 标记，也不代表 Coaxi 工具箱工作流被执行。独立审查仍发现对比度问题，说明使用能力不等于质量认证。']),
     S('Request an available native Skill','为一条请求选择可用原生 Skill',
       ['Inspect Settings → Skills for the teammate’s Agent. Read the capability’s purpose and confirm that the required native installation exists. This screen does not install or edit it.','Return to the project conversation, choose the intended teammate, type / and select an available Skill candidate. The candidate may come from the Agent’s user or project scope.','Describe the desired result and file limits beside the selected token. Send the request.','Look for an actual Skill read or related tool step in Run, and inspect the delivered files. A token establishes the request; execution evidence establishes what happened.'],
       ['在“设置 → Skills”查看队员所用智能体的清单，阅读用途，确认原生安装已存在。此页不会安装或编辑 Skill。','回到项目会话，选定队员，输入 / 并选择可用候选。候选可能来自智能体的用户范围或项目范围。','在已选择的标记旁说明预期结果和文件边界，再发送。','在执行记录中找实际阅读 Skill 或相关工具步骤，并检查交付文件。标记说明你的要求，执行证据说明实际发生的操作。']),
@@ -278,8 +278,8 @@
       'Use the selected Skill to improve the Orbit page’s narrow-screen layout and visible keyboard focus. Preserve the three existing fixture links and demo labels. Change only index.html and styles.css, then report the checks actually completed.',
       '使用已选 Skill 改进 Orbit 页面窄屏布局与键盘焦点。保留三个现有演示链接及示例标记，只修改 index.html 和 styles.css，报告真正完成的检查。'),
     P('Assign a Toolbox capability separately','工具箱能力另行分配',
-      ['Settings → Toolbox contains Rovai collaboration instructions such as review-duo. Open the item, read its instructions and choose the teammates who should receive it. This persistent assignment differs from selecting a native Skill for one message.','An assigned instruction can guide a teammate’s working method, but it does not independently trigger a Run, create approvals or grant new filesystem rights. Send a real request and inspect how the Agent uses it.'],
-      ['“设置 → 工具箱”提供 review-duo 等 Rovai 协作指引。打开条目阅读说明，再选择接收它的队员。这种长期分配与为某条消息选择原生 Skill 是不同入口。','分配指引可以影响队员的工作方法，但不会自行触发执行、完成审批或增加文件权限。仍需发送实际请求，并检查智能体如何使用它。'])
+      ['Settings → Toolbox contains Coaxi collaboration instructions such as review-duo. Open the item, read its instructions and choose the teammates who should receive it. This persistent assignment differs from selecting a native Skill for one message.','An assigned instruction can guide a teammate’s working method, but it does not independently trigger a Run, create approvals or grant new filesystem rights. Send a real request and inspect how the Agent uses it.'],
+      ['“设置 → 工具箱”提供 review-duo 等 Coaxi 协作指引。打开条目阅读说明，再选择接收它的队员。这种长期分配与为某条消息选择原生 Skill 是不同入口。','分配指引可以影响队员的工作方法，但不会自行触发执行、完成审批或增加文件权限。仍需发送实际请求，并检查智能体如何使用它。'])
   ]);
 
   topics.feishu=T('Feishu: from connection to a reply','飞书：从连接到收到回复',
@@ -287,26 +287,26 @@
     '从桌面应用发布队员机器人，再用自己的飞书聊天验证一条小范围请求。',[
     P('Prepare the account and host','准备账号与主机',
       ['Use the Feishu identity and tenant that will own the application. That identity needs access to the Feishu developer console and the ability to create and publish an internal application; some tenants require an administrator to approve publication or permissions. Confirm that approval route before setup.','Keep Coaxi Desktop and the teammate’s configured Agent running on the execution host. Complete a small local conversation first. This tutorial uses an already published teammate bot. A private text test was followed by a dedicated demonstration group containing only the owner and that bot.','Feishu and Lark are separate providers. Choose the tenant’s actual provider; a Feishu connection is not a Lark connection.'],
-      ['使用准备持有应用的飞书身份和租户。该身份需要能访问开放平台并创建、发布企业自建应用；部分租户需要管理员审核发布或权限，配置前先确认审核方式。','保持执行主机上的 Rovai 桌面应用与队员智能体可用，先在本地完成一条简单会话。本教程先用已发布队员机器人测试所有者私聊，再建立仅含所有者和该机器人的专用演示群。','飞书与 Lark 是不同平台，请选择租户实际所属的平台；飞书连接不能等同于 Lark 连接。']),
-    S('Sign in from Coaxi Desktop','从 Rovai 桌面端登录',
+      ['使用准备持有应用的飞书身份和租户。该身份需要能访问开放平台并创建、发布企业自建应用；部分租户需要管理员审核发布或权限，配置前先确认审核方式。','保持执行主机上的 Coaxi 桌面应用与队员智能体可用，先在本地完成一条简单会话。本教程先用已发布队员机器人测试所有者私聊，再建立仅含所有者和该机器人的专用演示群。','飞书与 Lark 是不同平台，请选择租户实际所属的平台；飞书连接不能等同于 Lark 连接。']),
+    S('Sign in from Coaxi Desktop','从 Coaxi 桌面端登录',
       ['Open Settings → Channels and select Feishu. Start the developer-account sign-in from the native desktop App.','Use your Feishu client to complete the platform login. On the confirmation screen, inspect the account and tenant you are authorizing. Never share the live QR code in a tutorial or support message.','Return to Channels and check the displayed developer identity. Signing in establishes the account context; it does not itself publish every teammate.'],
       ['打开“设置 → 渠道”，选择飞书，在桌面端发起开发者账号登录。','用飞书客户端完成平台登录，在确认界面核对授权身份与租户。有效登录二维码不要放进教程或支持消息。','回到渠道页，确认显示的开发者身份。登录只是建立账号上下文，不会自动发布全部队员。']),
     S('Publish the intended teammate','发布选定队员',
-      ['In the Feishu section, select the teammate you want to make available and use its publish action. Verify that teammate’s role and Agent configuration first. Each published teammate has its own bot identity.','Rovai progresses through application creation or reuse, bot capability, permissions and event setup, version publication and connection verification. Read the current stage if it stops. Do not create a duplicate platform application merely because verification is taking time.','If tenant approval is required, open the application’s official platform entry. Check its application identity, requested capabilities and available-user scope, then ask the tenant administrator to complete the platform’s review. Return to Rovai and use the available continue or verification action for that same application.','Wait for both publication and connection to succeed. A created application, a submitted version and a connected bot are different milestones. The native App owns account login; desktop Web access does not replace that login step.'],
-      ['在飞书区域选中要开放的队员，使用该队员的发布操作。先核对职责与智能体配置；每位已发布队员对应自己的机器人身份。','Rovai 会推进应用创建或复用、机器人能力、权限与事件设置、版本发布和连接验证。停住时查看当前阶段，不要因验证耗时而重复创建平台应用。','需要租户审核时，打开该应用的官方平台入口，核对应用身份、请求能力和可用成员范围，再请租户管理员在平台完成审核。回到 Rovai，对同一个应用继续或重新验证。','等待发布与连接都成功。“已创建应用”“已提交版本”和“机器人已连接”是不同节点。账号登录由原生桌面端完成，桌面 Web 入口不能替代这一步。']),
+      ['In the Feishu section, select the teammate you want to make available and use its publish action. Verify that teammate’s role and Agent configuration first. Each published teammate has its own bot identity.','Coaxi progresses through application creation or reuse, bot capability, permissions and event setup, version publication and connection verification. Read the current stage if it stops. Do not create a duplicate platform application merely because verification is taking time.','If tenant approval is required, open the application’s official platform entry. Check its application identity, requested capabilities and available-user scope, then ask the tenant administrator to complete the platform’s review. Return to Coaxi and use the available continue or verification action for that same application.','Wait for both publication and connection to succeed. A created application, a submitted version and a connected bot are different milestones. The native App owns account login; desktop Web access does not replace that login step.'],
+      ['在飞书区域选中要开放的队员，使用该队员的发布操作。先核对职责与智能体配置；每位已发布队员对应自己的机器人身份。','Coaxi 会推进应用创建或复用、机器人能力、权限与事件设置、版本发布和连接验证。停住时查看当前阶段，不要因验证耗时而重复创建平台应用。','需要租户审核时，打开该应用的官方平台入口，核对应用身份、请求能力和可用成员范围，再请租户管理员在平台完成审核。回到 Coaxi，对同一个应用继续或重新验证。','等待发布与连接都成功。“已创建应用”“已提交版本”和“机器人已连接”是不同节点。账号登录由原生桌面端完成，桌面 Web 入口不能替代这一步。']),
     I('Find the Channels entry','找到渠道入口','This isolated layout reference shows where providers and teammate publication are configured. It is not a screenshot of the account used in the live test.','这张隔离环境界面参考图展示平台与队员发布的入口，不是实测账号的连接截图。','channels-en.png'),
     S('Send the first private request','发送第一条私聊请求',
-      ['In Feishu, find the published bot with the same teammate name. Open its private conversation using the owner account associated with the connection.','For the first test, send the text-only request below. It does not need a project selection or file access.','Watch the execution card and the final text reply. On the Rovai host, open the corresponding Quick chat and inspect the same request and execution. If the card offers Show recent output or Open execution desk, use the entry available for your configured host.','Confirm the platform names in the reply. A delivered request, a running card and a final reply are separate evidence; do not treat sending alone as a successful connection.'],
-      ['在飞书中找到与目标队员同名的已发布机器人，使用连接所属账号打开它的私聊。','首次发送下面这条纯文字请求，不需要选择项目或访问文件。','观察执行卡片和最终文字回复；在 Rovai 主机中打开对应快速对话，检查同一请求与执行。卡片提供“显示最近输出”或“打开执行台”时，使用当前主机已配置的可用入口。','核对回复中的平台名称。请求送达、卡片运行和最终回复是不同证据，不能把按下发送当成连接成功。']),
+      ['In Feishu, find the published bot with the same teammate name. Open its private conversation using the owner account associated with the connection.','For the first test, send the text-only request below. It does not need a project selection or file access.','Watch the execution card and the final text reply. On the Coaxi host, open the corresponding Quick chat and inspect the same request and execution. If the card offers Show recent output or Open execution desk, use the entry available for your configured host.','Confirm the platform names in the reply. A delivered request, a running card and a final reply are separate evidence; do not treat sending alone as a successful connection.'],
+      ['在飞书中找到与目标队员同名的已发布机器人，使用连接所属账号打开它的私聊。','首次发送下面这条纯文字请求，不需要选择项目或访问文件。','观察执行卡片和最终文字回复；在 Coaxi 主机中打开对应快速对话，检查同一请求与执行。卡片提供“显示最近输出”或“打开执行台”时，使用当前主机已配置的可用入口。','核对回复中的平台名称。请求送达、卡片运行和最终回复是不同证据，不能把按下发送当成连接成功。']),
     Q('The request used in the live test','实测使用的请求',
-      'This is a Rovai website tutorial request. Give three short platform-selection notes for the Orbit download page: Apple Silicon, Intel and Windows x64. Say which computers each fits and mark each as a tutorial example. Reply with text only. Do not read or write files or contact other teammates.',
-      '这是 Rovai 官网渠道教程的演示请求。请为 Orbit 下载页整理三条简短的平台选择说明：Apple Silicon、Intel、Windows x64。每条说明适合哪种电脑，并提醒这是教程示例。只回复文字，不读写文件，不联系其他队员。'),
+      'This is a Coaxi website tutorial request. Give three short platform-selection notes for the Orbit download page: Apple Silicon, Intel and Windows x64. Say which computers each fits and mark each as a tutorial example. Reply with text only. Do not read or write files or contact other teammates.',
+      '这是 Coaxi 官网渠道教程的演示请求。请为 Orbit 下载页整理三条简短的平台选择说明：Apple Silicon、Intel、Windows x64。每条说明适合哪种电脑，并提醒这是教程示例。只回复文字，不读写文件，不联系其他队员。'),
     P('What actually came back','实际收到的结果',
       ['The live tests used Chinese and English requests in the dedicated Orbit group. The execution card progressed from running to completed. Its reply matched Apple Silicon to Apple M-series Macs, Intel to Intel Macs, and Windows x64 to Intel/AMD x64 computers running 64-bit Windows; each line was marked as a tutorial example.','This verifies private text exchange and a new group’s Quick chat selection, request routing and replies. It does not verify first-time application publication, a project-bound group, file attachments, Lark or DingTalk. The real account’s surrounding chat history is not included in the website assets.'],
       ['实测在 Orbit 专用群里分别发送中英文请求，执行卡从“执行中”变为“已完成”。回复分别把 Apple Silicon 对应到 Apple M 系列 Mac，把 Intel 对应到 Intel Mac，把 Windows x64 对应到运行 64 位 Windows 的 Intel/AMD x64 电脑；每条均标注教程示例。','这验证了已有连接下的私聊收发，以及新群选择快速对话后的寻址和回复；没有验证首次发布、绑定具体项目的群、附件、Lark 或钉钉。本次素材不包含真实账号周边的聊天历史。']),
     P('Move to a group deliberately','需要群聊时再建立关联',
-      ['Create a dedicated group and add only the intended published bot and authorized participants. Use Feishu’s actual mention picker to address the bot. The first valid group or topic request can offer a project selection or Quick chat; choose the host project deliberately.','The resulting external conversation binding is stable. Later messages do not silently move it to another project. Being in the same Feishu group does not automatically authorize every person to operate the Rovai owner’s computer; the current inbound ownership checks still apply.'],
-      ['建立专用群，添加目标已发布机器人及需要参与的人，再用飞书真正的提及选择器选中机器人。群组或话题首条有效请求可以出现项目选择或快速对话入口，应明确选择主机项目。','建立后，外部会话关联保持稳定；后续消息不会悄悄切换到另一个项目。同在飞书群里也不意味着每个人自动获得操作 Rovai 所有者电脑的权限，当前入站所有权检查仍然适用。']),
+      ['Create a dedicated group and add only the intended published bot and authorized participants. Use Feishu’s actual mention picker to address the bot. The first valid group or topic request can offer a project selection or Quick chat; choose the host project deliberately.','The resulting external conversation binding is stable. Later messages do not silently move it to another project. Being in the same Feishu group does not automatically authorize every person to operate the Coaxi owner’s computer; the current inbound ownership checks still apply.'],
+      ['建立专用群，添加目标已发布机器人及需要参与的人，再用飞书真正的提及选择器选中机器人。群组或话题首条有效请求可以出现项目选择或快速对话入口，应明确选择主机项目。','建立后，外部会话关联保持稳定；后续消息不会悄悄切换到另一个项目。同在飞书群里也不意味着每个人自动获得操作 Coaxi 所有者电脑的权限，当前入站所有权检查仍然适用。']),
     F('Locate a connection problem','按环节排查',[
       ['Bot cannot be found','搜不到机器人','Check the application identity, publication status and platform available-user scope. Confirm you are searching in the correct Feishu tenant.','检查应用身份、发布状态及平台可用成员范围，确认在正确飞书租户中查找。'],
       ['Message arrives but work does not start','消息到达但未开始','Check the owner account, connected host, teammate readiness and current Run or queue. Do not repeatedly send the same file-changing request.','检查所有者账号、连接主机、队员可用性及当前执行或队列。不要反复发送会改文件的同一请求。'],
@@ -344,7 +344,7 @@
 
 
   topics.collaboration.sections.push(
-    I('Open the delivered page in Rovai','在 Rovai 中打开交付页面','The file reference opens the real index.html in Rovai’s HTML preview. The image was captured after the contrast repair; it is a rendered delivery, not a replacement mockup.','文件引用在 Rovai HTML 预览中打开真实 index.html。图像采集于对比度修复之后，是实际渲染的交付，不是另外画的效果图。','orbit-preview-en.jpg')
+    I('Open the delivered page in Coaxi','在 Coaxi 中打开交付页面','The file reference opens the real index.html in Coaxi’s HTML preview. The image was captured after the contrast repair; it is a rendered delivery, not a replacement mockup.','文件引用在 Coaxi HTML 预览中打开真实 index.html。图像采集于对比度修复之后，是实际渲染的交付，不是另外画的效果图。','orbit-preview-en.jpg')
   );
   topics.missions.sections.splice(topics.missions.sections.findIndex(x=>x.kind==='fields'),0,
     P('The actual continuation','实际推进过程',
@@ -356,16 +356,16 @@
   const groupIndex=topics.feishu.sections.findIndex(x=>x.title?.[0]==='Move to a group deliberately');
   topics.feishu.sections.splice(groupIndex,0,
     S('The dedicated group used in the captures','截图中的专用群操作',
-      ['Create a group containing only your own account. Open group settings → Group bots → Add bot and select the already published teammate. Check the identity, then add it.','In the message composer, type @ and select that bot from the real mention picker. Add the bounded request and send.','For this text-only tutorial, select Start Quick chat in Rovai’s project-selection card. A project-dependent request should instead choose the intended project on the host.','Rovai creates the corresponding conversation. Compare the incoming message, running teammate and final answer with the external group. The next English request used the same established group conversation.'],
-      ['创建仅含自己账号的群，在群设置 → 群机器人 → 添加机器人中选择已发布队员，核对身份后添加。','在输入区键入 @，从实际提及选择器中选中机器人，再填写有边界的请求并发送。','本次是纯文字教程，在 Rovai 项目选择卡片点击“开始快速对话”；依赖文件的请求则应选择主机上的正确项目。','Rovai 会建立对应会话，核对入站消息、运行队员和最终回复与外部群一致。后续英文请求沿用了已建立的群会话。']),
+      ['Create a group containing only your own account. Open group settings → Group bots → Add bot and select the already published teammate. Check the identity, then add it.','In the message composer, type @ and select that bot from the real mention picker. Add the bounded request and send.','For this text-only tutorial, select Start Quick chat in Coaxi’s project-selection card. A project-dependent request should instead choose the intended project on the host.','Coaxi creates the corresponding conversation. Compare the incoming message, running teammate and final answer with the external group. The next English request used the same established group conversation.'],
+      ['创建仅含自己账号的群，在群设置 → 群机器人 → 添加机器人中选择已发布队员，核对身份后添加。','在输入区键入 @，从实际提及选择器中选中机器人，再填写有边界的请求并发送。','本次是纯文字教程，在 Coaxi 项目选择卡片点击“开始快速对话”；依赖文件的请求则应选择主机上的正确项目。','Coaxi 会建立对应会话，核对入站消息、运行队员和最终回复与外部群一致。后续英文请求沿用了已建立的群会话。']),
     I('Choose the initial context','选择首次工作上下文','The first group request offered a project or Quick chat. This actual test chose Quick chat and did not access a real project.','第一条群请求可选项目或快速对话。本次实测选择快速对话，没有访问真实项目。','feishu-project-choice-zh.jpg'),
-    I('The request and execution in Rovai','Rovai 中的请求与执行','The left side contains the addressed request and reply; the expanded Run on the right shows the actual completed steps, including the successful public reply operation. Unrelated navigation is collapsed.','左侧是带接收对象的请求与回复，右侧展开的执行记录展示实际完成的步骤，包括成功返回公开回复的操作。截图收起了无关导航。',['feishu-rovai-execution-en.jpg','feishu-rovai-execution-zh.jpg']),
+    I('The request and execution in Coaxi','Coaxi 中的请求与执行','The left side contains the addressed request and reply; the expanded Run on the right shows the actual completed steps, including the successful public reply operation. Unrelated navigation is collapsed.','左侧是带接收对象的请求与回复，右侧展开的执行记录展示实际完成的步骤，包括成功返回公开回复的操作。截图收起了无关导航。',['feishu-coaxi-execution-en.jpg','feishu-coaxi-execution-zh.jpg']),
     I('Receive the actual reply','收到实际回复','The dedicated group contains the tutorial request, the platform-specific answer and the completed execution card. This is an actual reply from the connected host. Feishu’s interface remains in Chinese; the English page uses the separate English request and response.','专用群中展示教程请求、各平台说明和完成卡片。这是已连接主机返回的实际回复；英文页面采用另一次英文请求与回复，飞书界面仍保留中文。',['feishu-result-en.jpg','feishu-result-zh.jpg'])
   );
   topics.feishu.sections.splice(topics.feishu.sections.findIndex(x=>x.title?.[0]==='Publish the intended teammate')+1,0,
     S('Check the platform-side publication','在飞书平台核对发布',
-      ['Open the same application from the Feishu developer console. Compare its name and App ID with the application shown by Rovai, and verify the tenant.','In the application’s capabilities, confirm that the bot capability is present. Rovai’s managed publication configures the bot, permissions and events; inspect the reported stage when setup is incomplete.','Open Version management and release (版本管理与发布), select the submitted version, and inspect its publication status and available-user scope. If it awaits review, have the authorized tenant administrator review that version and its requested permissions.','Once the platform shows the version as published and your account is in the available scope, return to the same teammate in Rovai and continue connection verification. Then find that bot in Feishu and send the small text request below.'],
-      ['在飞书开放平台控制台打开同一个应用，对照 Rovai 显示的应用名称与 App ID，并确认所属租户。','在应用能力中确认已添加机器人。Rovai 的受管发布负责配置机器人、权限与事件；配置未完成时，结合 Rovai 报告的具体阶段检查。','进入“版本管理与发布”，打开已提交版本，查看发布状态与可用成员范围。若正在等待审核，请有权限的租户管理员审核该版本及其请求的权限。','平台显示版本已发布、当前账号属于可用范围后，回到 Rovai 的同一队员继续验证连接，再在飞书找到该机器人，发送下面的小范围文字请求。']),
+      ['Open the same application from the Feishu developer console. Compare its name and App ID with the application shown by Coaxi, and verify the tenant.','In the application’s capabilities, confirm that the bot capability is present. Coaxi’s managed publication configures the bot, permissions and events; inspect the reported stage when setup is incomplete.','Open Version management and release (版本管理与发布), select the submitted version, and inspect its publication status and available-user scope. If it awaits review, have the authorized tenant administrator review that version and its requested permissions.','Once the platform shows the version as published and your account is in the available scope, return to the same teammate in Coaxi and continue connection verification. Then find that bot in Feishu and send the small text request below.'],
+      ['在飞书开放平台控制台打开同一个应用，对照 Coaxi 显示的应用名称与 App ID，并确认所属租户。','在应用能力中确认已添加机器人。Coaxi 的受管发布负责配置机器人、权限与事件；配置未完成时，结合 Coaxi 报告的具体阶段检查。','进入“版本管理与发布”，打开已提交版本，查看发布状态与可用成员范围。若正在等待审核，请有权限的租户管理员审核该版本及其请求的权限。','平台显示版本已发布、当前账号属于可用范围后，回到 Coaxi 的同一队员继续验证连接，再在飞书找到该机器人，发送下面的小范围文字请求。']),
     {kind:'links',title:['Feishu platform references','飞书平台参考'],links:[
       {url:'https://open.feishu.cn/document/home/introduction-to-custom-app-development/self-built-application-development-process',label:['Custom app development and publication','企业自建应用开发与发布']},
       {url:'https://www.feishu.cn/content/389799179937',label:['Bot capability and adding a bot to a group','机器人能力与添加机器人进群']}
@@ -418,8 +418,8 @@
   ]});
   topics.installation.sections.splice(1,0,
     {kind:'aside',body:[
-      'Mac users upgrading from v0.4.0 or earlier to v0.4.1 need one manual replacement because the signing identity changed. Finish current work and quit Rovai, download the DMG for your chip, drag the app into Applications, choose Replace, then reopen it and check your conversations and settings. Do not uninstall the old app or clear user data.',
-      'Mac 用户从 v0.4.0 或更早版本升级到 v0.4.1 时，由于签名身份变更，需要手动覆盖安装一次。完成手头工作并退出 Rovai，下载对应芯片的 DMG，拖入“应用程序”并选择“替换”；重新打开后检查会话与设置。不要卸载旧版或清理用户数据。'
+      'Mac users upgrading from v0.4.0 or earlier to v0.4.1 need one manual replacement because the signing identity changed. Finish current work and quit Coaxi, download the DMG for your chip, drag the app into Applications, choose Replace, then reopen it and check your conversations and settings. Do not uninstall the old app or clear user data.',
+      'Mac 用户从 v0.4.0 或更早版本升级到 v0.4.1 时，由于签名身份变更，需要手动覆盖安装一次。完成手头工作并退出 Coaxi，下载对应芯片的 DMG，拖入“应用程序”并选择“替换”；重新打开后检查会话与设置。不要卸载旧版或清理用户数据。'
     ]},
     {kind:'links',title:['Release details','版本说明'],links:[
       {url:'https://github.com/knight-bili/coaxi/releases/tag/v0.4.1',label:['Read the v0.4.1 upgrade notes','查看 v0.4.1 升级说明']}

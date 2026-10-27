@@ -1,4 +1,4 @@
-import type { CanvasConversationRef, CanvasNode, CanvasObjectReference, CoreEvent, MissionChangedFile, MissionDelivery, MissionRecord, MissionWorkspaceChangesView, RovaiApi, TaskListPage, TaskView } from '@contracts'
+import type { CanvasConversationRef, CanvasNode, CanvasObjectReference, CoreEvent, MissionChangedFile, MissionDelivery, MissionRecord, MissionWorkspaceChangesView, CoaxiApi, TaskListPage, TaskView } from '@contracts'
 import { uiAttribute } from './interface-language'
 
 export type CanvasObjectTarget = { threadId: string; object: CanvasObjectReference }
@@ -37,7 +37,7 @@ export function canvasObjectInvalidated(event: CoreEvent, target: CanvasObjectTa
 }
 
 /** Resolve the saved ID. No list fallback, Thread-current Mission derivation, enter, or Runtime action. */
-export async function readCanvasObject(client: Pick<RovaiApi, 'request'>, target: CanvasObjectTarget,
+export async function readCanvasObject(client: Pick<CoaxiApi, 'request'>, target: CanvasObjectTarget,
   isCurrent: () => boolean): Promise<CanvasObjectRead | null> {
   const { threadId } = target, object = { ...target.object }
   if (!isCurrent()) return null
@@ -59,7 +59,7 @@ export async function readCanvasObject(client: Pick<RovaiApi, 'request'>, target
   return { kind: 'mission_diff', mission, delivery }
 }
 
-export async function readCanvasTaskPage(client: Pick<RovaiApi, 'request'>, threadId: string, cursor: string | null): Promise<TaskListPage> {
+export async function readCanvasTaskPage(client: Pick<CoaxiApi, 'request'>, threadId: string, cursor: string | null): Promise<TaskListPage> {
   const page = await client.request<TaskListPage>('tasks.list', { threadId, cursor, limit: 50 })
   if (!Array.isArray(page.tasks) || page.tasks.length > 50 || page.tasks.some(task => !task.taskId)
     || new Set(page.tasks.map(task => task.taskId)).size !== page.tasks.length
@@ -76,7 +76,7 @@ export function canvasDiffFile(files: readonly MissionChangedFile[] | null, path
   return files?.find(file => file.path === path) ?? null
 }
 
-export async function readCanvasDiffFiles(client: Pick<RovaiApi, 'request'>, missionId: string): Promise<MissionChangedFile[]> {
+export async function readCanvasDiffFiles(client: Pick<CoaxiApi, 'request'>, missionId: string): Promise<MissionChangedFile[]> {
   const view = await client.request<MissionWorkspaceChangesView>('missions.changes', { missionId })
   if (view.diffError) throw new Error(view.diffError)
   if (!view.viewId || !Array.isArray(view.files) || view.files.some(file => !file.id || typeof file.path !== 'string' || !file.path)) {

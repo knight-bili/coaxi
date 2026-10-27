@@ -38,7 +38,7 @@ async function connect() {
   switchAccount.click()
   for (let attempt = 0; attempt < 200 && !document.querySelector('[role="dialog"]'); attempt++) await wait(25)
   await settle()
-  check(document.querySelector('[role="dialog"]'), 'Connect must open the Rovai dialog: ' + document.body.textContent)
+  check(document.querySelector('[role="dialog"]'), 'Connect must open the Coaxi dialog: ' + document.body.textContent)
 }
 function closed() {
   check(!document.querySelector('[role="dialog"]'), 'Cancel must close the dialog')
@@ -76,7 +76,7 @@ Object.assign(window, { dingtalkLoginTest: {
     await connect()
     check(!button('关闭').disabled, 'DingTalk login close is available while connect is pending')
     check(!document.querySelector('iframe,webview'), 'Remote content must not live inside the privileged Renderer')
-    cases.push('DingTalk opens the incumbent Rovai dialog with an enabled close action')
+    cases.push('DingTalk opens the incumbent Coaxi dialog with an enabled close action')
     await stage('awaiting_scan')
     const image = document.querySelector<HTMLImageElement>('img[alt="钉钉连接二维码"]')
     check(image?.complete && image.naturalWidth === 280, 'The Main QR PNG must be displayed')
@@ -109,7 +109,7 @@ Object.assign(window, { dingtalkLoginTest: {
     await stage('awaiting_interaction')
     await wait(220)
     const native = await window.loginFixture.facts()
-    check(native.attached, 'Enterprise selection must be inside Rovai')
+    check(native.attached, 'Enterprise selection must be inside Coaxi')
     check(document.querySelector('.has-platform-view')!.getBoundingClientRect().width >= 750, 'Official interaction needs the wider dialog')
     layout()
     button('关闭').click()

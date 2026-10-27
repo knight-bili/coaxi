@@ -60,9 +60,9 @@ export function renderLegacyProjectReport(summary) {
   const boundaryViolations = renderCounts(summary.qualitySignals.boundaryViolations)
   const samples = summary.score.validTrials
   const roundLabel = repeatLabel(summary.score.perCase)
-  return `# Rovai ${summary.suiteVersion} Benchmark Review
+  return `# Coaxi ${summary.suiteVersion} Benchmark Review
 
-本目录由 Rovai-ai Qualification 证据生成，项目名为 \`benchmark\`。它保存 ${samples} 个正式 Team Collaboration Trial 的脱敏结果，并通过公共 Core RPC 投影到本地 Rovai 应用。
+本目录由 Coaxi Qualification 证据生成，项目名为 \`benchmark\`。它保存 ${samples} 个正式 Team Collaboration Trial 的脱敏结果，并通过公共 Core RPC 投影到本地 Coaxi 应用。
 
 ## 结论
 
@@ -117,7 +117,7 @@ ${trialRows}
 
 function renderLegacyDiagnosticReport(summary, caseRows, trialRows) {
   const samples = summary.score.validTrials
-  return `# Rovai ${summary.suiteVersion} Benchmark Review
+  return `# Coaxi ${summary.suiteVersion} Benchmark Review
 
 本目录保存 ${samples} 个 post-gate 诊断样本的脱敏结果。
 

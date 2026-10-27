@@ -30,15 +30,15 @@
         {
           "case": "select",
           "method": "session/set_model",
-          "model": "rovai-a/model-a",
+          "model": "coaxi-a/model-a",
           "ok": false,
           "error": {
             "code": -32602,
-            "message": "Unknown model: rovai-a/model-a"
+            "message": "Unknown model: coaxi-a/model-a"
           }
         },
         {
-          "case": "after:session/set_model:rovai-a/model-a",
+          "case": "after:session/set_model:coaxi-a/model-a",
           "ok": true,
           "stopReason": "end_turn",
           "requests": [
@@ -53,15 +53,15 @@
         {
           "case": "select",
           "method": "session/set_config_option",
-          "model": "rovai-a/model-a",
+          "model": "coaxi-a/model-a",
           "ok": false,
           "error": {
             "code": -32602,
-            "message": "Unknown model: rovai-a/model-a"
+            "message": "Unknown model: coaxi-a/model-a"
           }
         },
         {
-          "case": "after:session/set_config_option:rovai-a/model-a",
+          "case": "after:session/set_config_option:coaxi-a/model-a",
           "ok": true,
           "stopReason": "end_turn",
           "requests": [
@@ -76,15 +76,15 @@
         {
           "case": "select",
           "method": "session/set_model",
-          "model": "rovai-b/vendor/shared",
+          "model": "coaxi-b/vendor/shared",
           "ok": false,
           "error": {
             "code": -32602,
-            "message": "Unknown model: rovai-b/vendor/shared"
+            "message": "Unknown model: coaxi-b/vendor/shared"
           }
         },
         {
-          "case": "after:session/set_model:rovai-b/vendor/shared",
+          "case": "after:session/set_model:coaxi-b/vendor/shared",
           "ok": true,
           "stopReason": "end_turn",
           "requests": [
@@ -99,15 +99,15 @@
         {
           "case": "select",
           "method": "session/set_config_option",
-          "model": "rovai-b/vendor/shared",
+          "model": "coaxi-b/vendor/shared",
           "ok": false,
           "error": {
             "code": -32602,
-            "message": "Unknown model: rovai-b/vendor/shared"
+            "message": "Unknown model: coaxi-b/vendor/shared"
           }
         },
         {
-          "case": "after:session/set_config_option:rovai-b/vendor/shared",
+          "case": "after:session/set_config_option:coaxi-b/vendor/shared",
           "ok": true,
           "stopReason": "end_turn",
           "requests": [
@@ -122,15 +122,15 @@
         {
           "case": "select",
           "method": "session/set_model",
-          "model": "rovai-a/vendor/shared",
+          "model": "coaxi-a/vendor/shared",
           "ok": false,
           "error": {
             "code": -32602,
-            "message": "Unknown model: rovai-a/vendor/shared"
+            "message": "Unknown model: coaxi-a/vendor/shared"
           }
         },
         {
-          "case": "after:session/set_model:rovai-a/vendor/shared",
+          "case": "after:session/set_model:coaxi-a/vendor/shared",
           "ok": true,
           "stopReason": "end_turn",
           "requests": [
@@ -145,15 +145,15 @@
         {
           "case": "select",
           "method": "session/set_config_option",
-          "model": "rovai-a/vendor/shared",
+          "model": "coaxi-a/vendor/shared",
           "ok": false,
           "error": {
             "code": -32602,
-            "message": "Unknown model: rovai-a/vendor/shared"
+            "message": "Unknown model: coaxi-a/vendor/shared"
           }
         },
         {
-          "case": "after:session/set_config_option:rovai-a/vendor/shared",
+          "case": "after:session/set_config_option:coaxi-a/vendor/shared",
           "ok": true,
           "stopReason": "end_turn",
           "requests": [
@@ -168,15 +168,15 @@
         {
           "case": "select",
           "method": "session/set_model",
-          "model": "rovai-missing/absent",
+          "model": "coaxi-missing/absent",
           "ok": false,
           "error": {
             "code": -32602,
-            "message": "Unknown model: rovai-missing/absent"
+            "message": "Unknown model: coaxi-missing/absent"
           }
         },
         {
-          "case": "after:session/set_model:rovai-missing/absent",
+          "case": "after:session/set_model:coaxi-missing/absent",
           "ok": true,
           "stopReason": "end_turn",
           "requests": [
@@ -191,15 +191,15 @@
         {
           "case": "select",
           "method": "session/set_config_option",
-          "model": "rovai-missing/absent",
+          "model": "coaxi-missing/absent",
           "ok": false,
           "error": {
             "code": -32602,
-            "message": "Unknown model: rovai-missing/absent"
+            "message": "Unknown model: coaxi-missing/absent"
           }
         },
         {
-          "case": "after:session/set_config_option:rovai-missing/absent",
+          "case": "after:session/set_config_option:coaxi-missing/absent",
           "ok": true,
           "stopReason": "end_turn",
           "requests": [
@@ -262,7 +262,7 @@
         },
         {
           "case": "native-cli-model",
-          "model": "rovai-a/model-a",
+          "model": "coaxi-a/model-a",
           "exitCode": 0,
           "requests": [
             {
@@ -275,7 +275,7 @@
         },
         {
           "case": "native-cli-model",
-          "model": "rovai-b/vendor/shared",
+          "model": "coaxi-b/vendor/shared",
           "exitCode": 0,
           "requests": [
             {
@@ -288,7 +288,7 @@
         },
         {
           "case": "native-cli-model",
-          "model": "rovai-a/vendor/shared",
+          "model": "coaxi-a/vendor/shared",
           "exitCode": 0,
           "requests": [
             {
@@ -333,9 +333,9 @@
         }
       },
       "cliListedCustomModels": {
-        "rovai-a/model-a": true,
-        "rovai-a/vendor/shared": true,
-        "rovai-b/vendor/shared": true
+        "coaxi-a/model-a": true,
+        "coaxi-a/vendor/shared": true,
+        "coaxi-b/vendor/shared": true
       },
       "nativeAuthSourceUnchanged": true,
       "requests": [
@@ -444,8 +444,8 @@
       ],
       "rawSummarySha256": "4a3fe765a56baa133c02131a3d1aabc54434595919b6e53aaf221d761bf6cae5",
       "modelCatalog": {
-        "current": "rovai-a/model-a",
-        "configCurrent": "rovai-a/model-a",
+        "current": "coaxi-a/model-a",
+        "configCurrent": "coaxi-a/model-a",
         "advertisedCount": 85,
         "customIds": []
       }
@@ -471,15 +471,15 @@
         {
           "case": "select",
           "method": "session/set_model",
-          "model": "rovai-a/model-a",
+          "model": "coaxi-a/model-a",
           "ok": false,
           "error": {
             "code": -32602,
-            "message": "Unknown model: rovai-a/model-a"
+            "message": "Unknown model: coaxi-a/model-a"
           }
         },
         {
-          "case": "after:session/set_model:rovai-a/model-a",
+          "case": "after:session/set_model:coaxi-a/model-a",
           "ok": true,
           "stopReason": "end_turn",
           "requests": [
@@ -500,15 +500,15 @@
         {
           "case": "select",
           "method": "session/set_config_option",
-          "model": "rovai-a/model-a",
+          "model": "coaxi-a/model-a",
           "ok": false,
           "error": {
             "code": -32602,
-            "message": "Unknown model: rovai-a/model-a"
+            "message": "Unknown model: coaxi-a/model-a"
           }
         },
         {
-          "case": "after:session/set_config_option:rovai-a/model-a",
+          "case": "after:session/set_config_option:coaxi-a/model-a",
           "ok": true,
           "stopReason": "end_turn",
           "requests": [
@@ -523,15 +523,15 @@
         {
           "case": "select",
           "method": "session/set_model",
-          "model": "rovai-b/vendor/shared",
+          "model": "coaxi-b/vendor/shared",
           "ok": false,
           "error": {
             "code": -32602,
-            "message": "Unknown model: rovai-b/vendor/shared"
+            "message": "Unknown model: coaxi-b/vendor/shared"
           }
         },
         {
-          "case": "after:session/set_model:rovai-b/vendor/shared",
+          "case": "after:session/set_model:coaxi-b/vendor/shared",
           "ok": true,
           "stopReason": "end_turn",
           "requests": [
@@ -546,15 +546,15 @@
         {
           "case": "select",
           "method": "session/set_config_option",
-          "model": "rovai-b/vendor/shared",
+          "model": "coaxi-b/vendor/shared",
           "ok": false,
           "error": {
             "code": -32602,
-            "message": "Unknown model: rovai-b/vendor/shared"
+            "message": "Unknown model: coaxi-b/vendor/shared"
           }
         },
         {
-          "case": "after:session/set_config_option:rovai-b/vendor/shared",
+          "case": "after:session/set_config_option:coaxi-b/vendor/shared",
           "ok": true,
           "stopReason": "end_turn",
           "requests": [
@@ -569,15 +569,15 @@
         {
           "case": "select",
           "method": "session/set_model",
-          "model": "rovai-a/vendor/shared",
+          "model": "coaxi-a/vendor/shared",
           "ok": false,
           "error": {
             "code": -32602,
-            "message": "Unknown model: rovai-a/vendor/shared"
+            "message": "Unknown model: coaxi-a/vendor/shared"
           }
         },
         {
-          "case": "after:session/set_model:rovai-a/vendor/shared",
+          "case": "after:session/set_model:coaxi-a/vendor/shared",
           "ok": true,
           "stopReason": "end_turn",
           "requests": [
@@ -592,15 +592,15 @@
         {
           "case": "select",
           "method": "session/set_config_option",
-          "model": "rovai-a/vendor/shared",
+          "model": "coaxi-a/vendor/shared",
           "ok": false,
           "error": {
             "code": -32602,
-            "message": "Unknown model: rovai-a/vendor/shared"
+            "message": "Unknown model: coaxi-a/vendor/shared"
           }
         },
         {
-          "case": "after:session/set_config_option:rovai-a/vendor/shared",
+          "case": "after:session/set_config_option:coaxi-a/vendor/shared",
           "ok": true,
           "stopReason": "end_turn",
           "requests": [
@@ -615,15 +615,15 @@
         {
           "case": "select",
           "method": "session/set_model",
-          "model": "rovai-missing/absent",
+          "model": "coaxi-missing/absent",
           "ok": false,
           "error": {
             "code": -32602,
-            "message": "Unknown model: rovai-missing/absent"
+            "message": "Unknown model: coaxi-missing/absent"
           }
         },
         {
-          "case": "after:session/set_model:rovai-missing/absent",
+          "case": "after:session/set_model:coaxi-missing/absent",
           "ok": true,
           "stopReason": "end_turn",
           "requests": [
@@ -638,15 +638,15 @@
         {
           "case": "select",
           "method": "session/set_config_option",
-          "model": "rovai-missing/absent",
+          "model": "coaxi-missing/absent",
           "ok": false,
           "error": {
             "code": -32602,
-            "message": "Unknown model: rovai-missing/absent"
+            "message": "Unknown model: coaxi-missing/absent"
           }
         },
         {
-          "case": "after:session/set_config_option:rovai-missing/absent",
+          "case": "after:session/set_config_option:coaxi-missing/absent",
           "ok": true,
           "stopReason": "end_turn",
           "requests": [
@@ -709,7 +709,7 @@
         },
         {
           "case": "native-cli-model",
-          "model": "rovai-a/model-a",
+          "model": "coaxi-a/model-a",
           "exitCode": 0,
           "requests": [
             {
@@ -722,7 +722,7 @@
         },
         {
           "case": "native-cli-model",
-          "model": "rovai-b/vendor/shared",
+          "model": "coaxi-b/vendor/shared",
           "exitCode": 0,
           "requests": [
             {
@@ -735,7 +735,7 @@
         },
         {
           "case": "native-cli-model",
-          "model": "rovai-a/vendor/shared",
+          "model": "coaxi-a/vendor/shared",
           "exitCode": 0,
           "requests": [
             {
@@ -780,9 +780,9 @@
         }
       },
       "cliListedCustomModels": {
-        "rovai-a/model-a": true,
-        "rovai-a/vendor/shared": true,
-        "rovai-b/vendor/shared": true
+        "coaxi-a/model-a": true,
+        "coaxi-a/vendor/shared": true,
+        "coaxi-b/vendor/shared": true
       },
       "nativeAuthSourceUnchanged": true,
       "requests": [
@@ -891,8 +891,8 @@
       ],
       "rawSummarySha256": "7c771b20f797feafd742c4430095f3c566f13537b6edaf11c03d897797d907b7",
       "modelCatalog": {
-        "current": "rovai-a/model-a",
-        "configCurrent": "rovai-a/model-a",
+        "current": "coaxi-a/model-a",
+        "configCurrent": "coaxi-a/model-a",
         "advertisedCount": 87,
         "customIds": []
       }
@@ -924,11 +924,11 @@
         {
           "case": "select",
           "method": "session/set_model",
-          "model": "rovai-a/model-a",
+          "model": "coaxi-a/model-a",
           "ok": true
         },
         {
-          "case": "after:session/set_model:rovai-a/model-a",
+          "case": "after:session/set_model:coaxi-a/model-a",
           "ok": true,
           "stopReason": "end_turn",
           "requests": [
@@ -943,11 +943,11 @@
         {
           "case": "select",
           "method": "session/set_config_option",
-          "model": "rovai-a/model-a",
+          "model": "coaxi-a/model-a",
           "ok": true
         },
         {
-          "case": "after:session/set_config_option:rovai-a/model-a",
+          "case": "after:session/set_config_option:coaxi-a/model-a",
           "ok": true,
           "stopReason": "end_turn",
           "requests": [
@@ -962,11 +962,11 @@
         {
           "case": "select",
           "method": "session/set_model",
-          "model": "rovai-b/vendor/shared",
+          "model": "coaxi-b/vendor/shared",
           "ok": true
         },
         {
-          "case": "after:session/set_model:rovai-b/vendor/shared",
+          "case": "after:session/set_model:coaxi-b/vendor/shared",
           "ok": true,
           "stopReason": "end_turn",
           "requests": [
@@ -981,11 +981,11 @@
         {
           "case": "select",
           "method": "session/set_config_option",
-          "model": "rovai-b/vendor/shared",
+          "model": "coaxi-b/vendor/shared",
           "ok": true
         },
         {
-          "case": "after:session/set_config_option:rovai-b/vendor/shared",
+          "case": "after:session/set_config_option:coaxi-b/vendor/shared",
           "ok": true,
           "stopReason": "end_turn",
           "requests": [
@@ -1000,11 +1000,11 @@
         {
           "case": "select",
           "method": "session/set_model",
-          "model": "rovai-a/vendor/shared",
+          "model": "coaxi-a/vendor/shared",
           "ok": true
         },
         {
-          "case": "after:session/set_model:rovai-a/vendor/shared",
+          "case": "after:session/set_model:coaxi-a/vendor/shared",
           "ok": true,
           "stopReason": "end_turn",
           "requests": [
@@ -1019,11 +1019,11 @@
         {
           "case": "select",
           "method": "session/set_config_option",
-          "model": "rovai-a/vendor/shared",
+          "model": "coaxi-a/vendor/shared",
           "ok": true
         },
         {
-          "case": "after:session/set_config_option:rovai-a/vendor/shared",
+          "case": "after:session/set_config_option:coaxi-a/vendor/shared",
           "ok": true,
           "stopReason": "end_turn",
           "requests": [
@@ -1038,15 +1038,15 @@
         {
           "case": "select",
           "method": "session/set_model",
-          "model": "rovai-missing/absent",
+          "model": "coaxi-missing/absent",
           "ok": false,
           "error": {
             "code": -32602,
-            "message": "Invalid params: model not found: rovai-missing/absent"
+            "message": "Invalid params: model not found: coaxi-missing/absent"
           }
         },
         {
-          "case": "after:session/set_model:rovai-missing/absent",
+          "case": "after:session/set_model:coaxi-missing/absent",
           "ok": true,
           "stopReason": "end_turn",
           "requests": [
@@ -1061,15 +1061,15 @@
         {
           "case": "select",
           "method": "session/set_config_option",
-          "model": "rovai-missing/absent",
+          "model": "coaxi-missing/absent",
           "ok": false,
           "error": {
             "code": -32602,
-            "message": "Invalid params: model not found: rovai-missing/absent"
+            "message": "Invalid params: model not found: coaxi-missing/absent"
           }
         },
         {
-          "case": "after:session/set_config_option:rovai-missing/absent",
+          "case": "after:session/set_config_option:coaxi-missing/absent",
           "ok": true,
           "stopReason": "end_turn",
           "requests": [
@@ -1252,13 +1252,13 @@
       "rawSummarySha256": "7277988d51c2dd90e9d014681962fd8875072eba62aa89eb9fe642c79cd28bb3",
       "modelCatalog": {
         "current": null,
-        "configCurrent": "rovai-a/model-a",
+        "configCurrent": "coaxi-a/model-a",
         "advertisedCount": 4,
         "customIds": [
-          "rovai-a/model-a",
-          "rovai-a/vendor/shared",
-          "rovai-b/model-a",
-          "rovai-b/vendor/shared"
+          "coaxi-a/model-a",
+          "coaxi-a/vendor/shared",
+          "coaxi-b/model-a",
+          "coaxi-b/vendor/shared"
         ]
       }
     },
@@ -1283,11 +1283,11 @@
         {
           "case": "select",
           "method": "set_model",
-          "model": "rovai-a/model-a",
+          "model": "coaxi-a/model-a",
           "ok": true
         },
         {
-          "case": "after:set_model:rovai-a/model-a",
+          "case": "after:set_model:coaxi-a/model-a",
           "ok": true,
           "stopReason": null,
           "requests": [
@@ -1302,11 +1302,11 @@
         {
           "case": "select",
           "method": "set_model",
-          "model": "rovai-b/vendor/shared",
+          "model": "coaxi-b/vendor/shared",
           "ok": true
         },
         {
-          "case": "after:set_model:rovai-b/vendor/shared",
+          "case": "after:set_model:coaxi-b/vendor/shared",
           "ok": true,
           "stopReason": null,
           "requests": [
@@ -1321,11 +1321,11 @@
         {
           "case": "select",
           "method": "set_model",
-          "model": "rovai-a/vendor/shared",
+          "model": "coaxi-a/vendor/shared",
           "ok": true
         },
         {
-          "case": "after:set_model:rovai-a/vendor/shared",
+          "case": "after:set_model:coaxi-a/vendor/shared",
           "ok": true,
           "stopReason": null,
           "requests": [
@@ -1340,12 +1340,12 @@
         {
           "case": "select",
           "method": "set_model",
-          "model": "rovai-missing/absent",
+          "model": "coaxi-missing/absent",
           "ok": false,
-          "error": "Model not found: rovai-missing/absent"
+          "error": "Model not found: coaxi-missing/absent"
         },
         {
-          "case": "after:set_model:rovai-missing/absent",
+          "case": "after:set_model:coaxi-missing/absent",
           "ok": true,
           "stopReason": null,
           "requests": [
@@ -1374,7 +1374,7 @@
       "scriptSha256": "0f6e4204a5bea5d614590fc615534be31a535b6e1e1018d2a4ba65174fa1e7f5",
       "initialize": {},
       "coldModel": {
-        "provider": "rovai-a",
+        "provider": "coaxi-a",
         "id": "vendor/shared"
       },
       "requests": [
@@ -1421,10 +1421,10 @@
         "configCurrent": null,
         "advertisedCount": 4,
         "customIds": [
-          "rovai-a/model-a",
-          "rovai-a/vendor/shared",
-          "rovai-b/model-a",
-          "rovai-b/vendor/shared"
+          "coaxi-a/model-a",
+          "coaxi-a/vendor/shared",
+          "coaxi-b/model-a",
+          "coaxi-b/vendor/shared"
         ]
       }
     },
@@ -1435,19 +1435,19 @@
       "cases": [
         {
           "case": "native-cli-model",
-          "model": "rovai-a/model-a",
+          "model": "coaxi-a/model-a",
           "exitCode": 3,
           "requests": []
         },
         {
           "case": "native-cli-model",
-          "model": "rovai-b/vendor/shared",
+          "model": "coaxi-b/vendor/shared",
           "exitCode": 3,
           "requests": []
         },
         {
           "case": "native-cli-model",
-          "model": "rovai-a/vendor/shared",
+          "model": "coaxi-a/vendor/shared",
           "exitCode": 3,
           "requests": []
         }
@@ -1489,9 +1489,9 @@
         "message": "{\"ok\": false, \"error\": {\"code\": -32000, \"message\": \"Not authenticated. Run `cmd login` in a terminal first.\"}}"
       },
       "cliListedCustomModels": {
-        "rovai-a/model-a": true,
-        "rovai-a/vendor/shared": true,
-        "rovai-b/vendor/shared": true
+        "coaxi-a/model-a": true,
+        "coaxi-a/vendor/shared": true,
+        "coaxi-b/vendor/shared": true
       },
       "requests": [],
       "rawSummarySha256": "edb05a77540384feb96d7b3f2d4fcb6d3d0cb76a7db7fc30f7309fc70a57546d",

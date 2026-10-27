@@ -1,8 +1,8 @@
 import { useEffect,useRef,useState,type CSSProperties,type ReactNode } from 'react'
 import { Columns2,Rows2,PanelLeftClose,RotateCw,X } from 'lucide-react'
-import { GroupSplitHandle } from './CodegGroupSplitHandle'
-import { computeRects,isLayoutNode,leafIds,makeGroupId,neighborGroupId,removeGroup,resizeSplitAt,ROOT_GROUP_ID,singleGroupLayout,splitGroup,toggleOrientation,type GroupRect,type LayoutNode,type SplitDirection } from '../../shared/codeg-tab-group-layout'
-import { NUMBERED_TAB_ACTION_IDS } from '../../shared/codeg-keyboard-shortcuts'
+import { GroupSplitHandle } from './CoaxiGroupSplitHandle'
+import { computeRects,isLayoutNode,leafIds,makeGroupId,neighborGroupId,removeGroup,resizeSplitAt,ROOT_GROUP_ID,singleGroupLayout,splitGroup,toggleOrientation,type GroupRect,type LayoutNode,type SplitDirection } from '../../shared/coaxi-tab-group-layout'
+import { NUMBERED_TAB_ACTION_IDS } from '../../shared/coaxi-keyboard-shortcuts'
 import { useShortcutActions } from './useShortcutActions'
 import type { ShortcutActions } from './shortcut-action-driver'
 import { useUiText } from './interface-language'
@@ -24,7 +24,7 @@ function restored(value:unknown):State|null{
     return structuredClone(state)
   }catch{return null}
 }
-const MIME='application/x-codeg-rovai-split-tab'
+const MIME='application/x-coaxi-split-tab'
 function initial():State{return {tree:singleGroupLayout(),groups:{[ROOT_GROUP_ID]:{tabs:[],selected:null}},active:ROOT_GROUP_ID}}
 function project(state:State,items:SplitDeckItem[],selected:string|null):State{
   const live=new Set(items.map(item=>item.id)),ids=leafIds(state.tree),active=ids.includes(state.active)?state.active:ids[0],groups:Record<string,Group>={}
@@ -36,7 +36,7 @@ function project(state:State,items:SplitDeckItem[],selected:string|null):State{
   return {tree:state.tree,groups,active:focused??active}
 }
 
-/** Codeg 原分屏树与平铺兄弟节点：移动标签只改变坐标，不重挂编辑器。 */
+/** Coaxi 原分屏树与平铺兄弟节点：移动标签只改变坐标，不重挂编辑器。 */
 export function SplitTabDeck({items,selected,onSelect,onClose,renderBody,disabled=false,scopeKey,externalBodies=false,onPlacement,restoredLayout,restoreToken=0,onLayoutChange,externalTabBar=false}:{
   items:SplitDeckItem[];selected:string|null;onSelect(id:string):void;onClose(id:string):void;externalTabBar?:boolean;
   renderBody(item:SplitDeckItem,visible:boolean):ReactNode;disabled?:boolean;scopeKey:string;

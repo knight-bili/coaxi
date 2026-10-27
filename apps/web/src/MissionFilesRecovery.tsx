@@ -3,7 +3,7 @@ import * as Dialog from '@radix-ui/react-dialog'
 import { AppDialogBody, AppDialogContent, AppDialogFooter, AppDialogHeader } from '../../desktop/src/renderer/src/AppDialog'
 import type { ConsoleClient } from './client'
 
-/** Reuses the original Rovai dialog and sidebar status, without another visual shell. */
+/** Reuses the original Coaxi dialog and sidebar status, without another visual shell. */
 export function MissionFilesRecovery({ transport }: { transport: ConsoleClient }) {
   const [, update] = useState(0)
   const [open, setOpen] = useState(false)

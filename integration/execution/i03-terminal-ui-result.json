@@ -64,10 +64,10 @@
     "work/i03/terminal-ui-source/src/lib/terminal/write-queue.ts": "759a58ca3baeafb1fb44848f98cdaec3734e7cd51a7679fd95120a8dfa5a5327"
   },
   "frozen_authority_files": {
-    "crates/rovai-core/src/local_attachment_source.rs": "8830581e72fc103b2f359be17a0072c5ee0cedc6eb5fe58b179ae3d255dbc1ca",
-    "crates/rovai-core/src/context.rs": "329144f38675ebedeaf5652858d457d42369455eb26c6159af61d19c02218784",
-    "crates/rovai-core/src/message_quote.rs": "efb6e962946b85c089483bb1120fe92f32458bb3b3b5e5eb668e26f8aa96481e",
-    "crates/rovai-core/src/command.rs": "22258f81dc5b76040cd0fdba20074321b5be7104e648a8278412c0736ef0d85a"
+    "crates/coaxi-core/src/local_attachment_source.rs": "8830581e72fc103b2f359be17a0072c5ee0cedc6eb5fe58b179ae3d255dbc1ca",
+    "crates/coaxi-core/src/context.rs": "329144f38675ebedeaf5652858d457d42369455eb26c6159af61d19c02218784",
+    "crates/coaxi-core/src/message_quote.rs": "efb6e962946b85c089483bb1120fe92f32458bb3b3b5e5eb668e26f8aa96481e",
+    "crates/coaxi-core/src/command.rs": "22258f81dc5b76040cd0fdba20074321b5be7104e648a8278412c0736ef0d85a"
   },
   "previous_evidence": {
     "path": "integration/execution/i03-terminal-api-result.json",
@@ -140,7 +140,7 @@
     "Minimum card toolbar stays within its own horizontal scroller",
     "Moved padding into xterm element to match fixed FitAddon dimension calculation; applied semantic background to viewport",
     "Reset accessibility live region with session generation",
-    "Virtual key encoding preserves Codeg CSI modifiers and application cursor mode"
+    "Virtual key encoding preserves Coaxi CSI modifiers and application cursor mode"
   ],
   "not_run": [
     "actual Core/helper/Host compilation and process owner",

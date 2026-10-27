@@ -1,4 +1,4 @@
-// 依据固定 Codeg computer/stop_shortcut.rs 的闭集和强度要求。
+// 依据固定 Coaxi computer/stop_shortcut.rs 的闭集和强度要求。
 const punctuation:Record<string,string>={Minus:'-',Equal:'=',BracketLeft:'[',BracketRight:']',Backslash:'\\',Semicolon:';',Quote:"'",Backquote:'`',Comma:',',Period:'.',Slash:'/'}
 export const defaultInteractionStopShortcut=(platform:string):string=>platform==='darwin'?'Control+Command+Escape':'Control+Alt+Escape'
 export function interactionStopAccelerator(spelling:string,platform:string):string|null{

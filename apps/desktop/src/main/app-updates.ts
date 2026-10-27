@@ -389,11 +389,11 @@ export class AppUpdatesService {
       void this.check(source)
         .then((snapshot) => {
           if (snapshot.status === 'check_failed') {
-            this.#warn(`[rovai] Automatic update check failed (${snapshot.failureReason ?? 'unknown'}).`)
+            this.#warn(`[coaxi] Automatic update check failed (${snapshot.failureReason ?? 'unknown'}).`)
           }
         })
         .catch((error: unknown) => {
-          this.#warn(`[rovai] Automatic update check failed (${String(error)}).`)
+          this.#warn(`[coaxi] Automatic update check failed (${String(error)}).`)
         })
         .finally(() => {
           if (!this.#disposed) this.#scheduleAutomaticCheck('interval', CHECK_INTERVAL_MS)

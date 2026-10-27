@@ -54,7 +54,7 @@ jobs:
           fi
 
           BASE_SHA="${{ github.event.pull_request.base.sha }}"
-          changed_file_list="$RUNNER_TEMP/rovai-ci-changed-files"
+          changed_file_list="$RUNNER_TEMP/coaxi-ci-changed-files"
           git diff --name-only "$BASE_SHA" HEAD > "$changed_file_list"
 
           node=false

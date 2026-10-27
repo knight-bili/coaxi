@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "productId": "codeg-rovai-workbench",
+  "productId": "coaxi",
   "targetVersion": "1.0.0",
   "developmentBranch": "develop/V1.0.0",
   "repository": "https://github.com/knight-bili/coaxi",
@@ -14,9 +14,9 @@
   "sourceProductVersionPreservedUntilRelease": true,
   "desktopIdentity": {
     "productName": "Coaxi",
-    "applicationId": "app.codegrovai.workbench.desktop",
-    "defaultDataDirectory": "Codeg Rovai Workbench",
-    "bootstrapDirectory": "Codeg Rovai Workbench Bootstrap",
+    "applicationId": "app.coaxi.desktop",
+    "defaultDataDirectory": "Coaxi",
+    "bootstrapDirectory": "Coaxi Bootstrap",
     "legacyDataPolicy": "never_auto_adopt",
     "explicitDataRootPreserved": true,
     "uninstallPreservesDataByDefault": true,

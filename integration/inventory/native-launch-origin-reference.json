@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "baseline": "0366ffaeac94a1a40edee18cfff7387026a2971a",
-  "fixedCodegCommit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
-  "codegSources": [
+  "fixedCoaxiCommit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
+  "coaxiSources": [
     {
       "path": "src-tauri/src/parsers/claude.rs",
       "bytes": 367323,
@@ -123,7 +123,7 @@
   },
   "adaptations": [
     "Replaces original parser live environment/directory assumptions with the existing trusted final launch snapshot.",
-    "Publisher package investigation corrected empty-value masking and supplied missing name validation/NFC; original fixed Codeg Rust helper alone was insufficient.",
+    "Publisher package investigation corrected empty-value masking and supplied missing name validation/NFC; original fixed Coaxi Rust helper alone was insufficient.",
     "Windows drive-relative resolution uses only captured cwd/drive entries, never today process drive state.",
     "Unicode normalization reuses existing locked 0.1.25 as a direct Core dependency; no package or version added/upgraded.",
     "No original source root is selected through arbitrary UI ids/paths; parent Native Session provenance does not promote a legacy agent id to a Session."

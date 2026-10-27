@@ -38,7 +38,7 @@ Skill Library，不启动 Core／Runtime，也不访问日常数据库。保留�
 测试脚本、固定请求与数值来源分别位于：
 
 - [Renderer 生命周期 owner](../../../apps/desktop/src/renderer/src/execution-metrics-reader.test.ts)
-- [Core 批量查询与迟到通知资格 owner](../../../crates/rovai-core/src/monitoring.rs)
+- [Core 批量查询与迟到通知资格 owner](../../../crates/coaxi-core/src/monitoring.rs)
 - [Electron 入口](../../../scripts/lib/execution-metrics-ui.test.mjs)
 - [生产 Renderer 动态步骤](../../../scripts/fixtures/camp-fast-layout/metrics-main.cjs)
 - [封闭合成数据](../../../scripts/fixtures/camp-fast-layout/renderer.tsx)

@@ -12,12 +12,12 @@ import { createHostChannelHandler, parseHostChannelRequest } from '../apps/deskt
 // Platform service responses are controlled fixtures: no account or Bot is changed.
 const root = resolve(import.meta.dirname, '..')
 if (process.platform !== 'darwin') throw Error('This browser acceptance is macOS-only; native Windows evidence is separate')
-const fixture = await realpath(await mkdtemp(join(tmpdir(), 'rovai-channels-ui-')))
+const fixture = await realpath(await mkdtemp(join(tmpdir(), 'coaxi-channels-ui-')))
 const data = join(fixture, 'data'), skills = join(fixture, 'skills')
 await mkdir(skills)
-const output = resolve(process.env.ROVAI_CHANNEL_UI_OUTPUT ?? join(fixture, 'evidence')); await mkdir(output, { recursive: true })
+const output = resolve(process.env.COAXI_CHANNEL_UI_OUTPUT ?? join(fixture, 'evidence')); await mkdir(output, { recursive: true })
 console.log(JSON.stringify({ channel: 'automatic_acceptance', dataDir: data, skillLibraryRoot: skills, mcpConfigPath: join(data, 'mcp.json'), runtime: false, platformService: 'fixture' }))
-const host = launchHost(join(root, 'target/debug/rovai-host'), [...coreDataDirectoryArguments(data), '--skill-library-root', skills, '--mcp-config-path', join(data, 'mcp.json')], { cwd: fixture })
+const host = launchHost(join(root, 'target/debug/coaxi-host'), [...coreDataDirectoryArguments(data), '--skill-library-root', skills, '--mcp-config-path', join(data, 'mcp.json')], { cwd: fixture })
 let browser, release, server, serverClosed, stage = 'startup'
 const callbacks = [], operations = []
 const snapshot = { schemaVersion: 4, channels: [], pendingBindingCount: 0, bindingIssueCount: 0, activeQrAttempt: null, activeProvisioning: null }
@@ -66,12 +66,12 @@ try {
   await browser.click(`document.querySelector('.web-login .primary-button')`)
   await browser.wait(`document.querySelector('.unified-sidebar')!==null && document.querySelector('.web-login-overlay')===null`)
   stage = 'hosted channels'
-  assert.equal(await browser.evaluate('typeof window.rovai'), 'undefined')
+  assert.equal(await browser.evaluate('typeof window.coaxi'), 'undefined')
   assert.equal(await browser.evaluate(`document.querySelector('.unified-sidebar').innerText.includes('退出登录')`), false)
   await browser.click(`document.querySelector('.sidebar-settings-entry button[aria-label^="设置"]')`)
   await selectSection('渠道')
   await browser.wait(`document.querySelector('.channel-settings')?.textContent.includes('连接离线')`)
-  assert.equal(await browser.evaluate(`document.querySelector('.channel-settings').textContent.includes('运行此服务的 Rovai Desktop')`), true)
+  assert.equal(await browser.evaluate(`document.querySelector('.channel-settings').textContent.includes('运行此服务的 Coaxi Desktop')`), true)
   assert.equal(await browser.evaluate(`document.querySelector('.channel-connection-actions')===null`), true)
   assert.equal(await browser.evaluate(`document.querySelector('.execution-web-settings')===null`), true)
   await browser.capture(join(output, 'desktop-web-channels-day.png'))
@@ -106,7 +106,7 @@ try {
   stage = 'standalone channel boundary'
   const serverData = join(fixture, 'server-data')
   console.log(JSON.stringify({ channel: 'automatic_acceptance', dataDir: serverData, skillLibraryRoot: join(serverData, 'skills'), mcpConfigPath: join(serverData, 'mcp.json'), runtime: false }))
-  server = spawn(join(root, 'target/debug/rovai-server'), ['--data-dir', serverData, '--web-ui', join(root, 'out/web'), '--listen', '127.0.0.1:0'], { stdio: ['ignore', 'pipe', 'pipe'] })
+  server = spawn(join(root, 'target/debug/coaxi-server'), ['--data-dir', serverData, '--web-ui', join(root, 'out/web'), '--listen', '127.0.0.1:0'], { stdio: ['ignore', 'pipe', 'pipe'] })
   let serverOutput = ''
   server.stdout.on('data', bytes => { serverOutput += bytes }); server.stderr.on('data', bytes => { serverOutput += bytes })
   serverClosed = new Promise(resolve => server.once('close', resolve))
@@ -127,9 +127,9 @@ try {
   assert.equal(await browser.evaluate(`[...document.querySelectorAll('.settings-sidebar-menu button')].some(e=>e.textContent.trim()==='渠道')`), false)
   await selectSection('远程连接')
   await browser.evaluate(`(()=>{const key=Object.keys(localStorage).find(key=>key.endsWith(':general'));if(!key)throw Error('Presentation preference missing');const value=JSON.parse(localStorage.getItem(key));value.lastSettingsSection='channels';localStorage.setItem(key,JSON.stringify(value))})()`)
-  await browser.evaluate(`(()=>{const key=Object.keys(sessionStorage).find(key=>key.startsWith('rovai.web.history.v1:'));const saved=JSON.parse(sessionStorage.getItem(key));const target={kind:'settings',section:'channels'};saved.snapshot.entries[saved.snapshot.index]=target;sessionStorage.setItem(key,JSON.stringify(saved));history.replaceState({rovai:{...history.state.rovai,target}},'')})()`)
+  await browser.evaluate(`(()=>{const key=Object.keys(sessionStorage).find(key=>key.startsWith('coaxi.web.history.v1:'));const saved=JSON.parse(sessionStorage.getItem(key));const target={kind:'settings',section:'channels'};saved.snapshot.entries[saved.snapshot.index]=target;sessionStorage.setItem(key,JSON.stringify(saved));history.replaceState({coaxi:{...history.state.coaxi,target}},'')})()`)
   await browser.send('Page.reload')
-  await browser.wait(`document.body.innerText.includes('独立 Server 当前不支持飞书／钉钉渠道。渠道功能请使用 Rovai Desktop。')`)
+  await browser.wait(`document.body.innerText.includes('独立 Server 当前不支持飞书／钉钉渠道。渠道功能请使用 Coaxi Desktop。')`)
   await browser.capture(join(output, 'standalone-legacy-channel.png'))
   assert.equal(await browser.evaluate(`document.querySelector('.channel-member-bot-table')===null`), true)
   assert.deepEqual(browser.errors, [])

@@ -22,7 +22,7 @@ import {
 } from './install-macos-daily.mjs'
 
 test('installs only after source and same-volume stage verification', (context) => {
-  const directory = mkdtempSync(join(tmpdir(), 'rovai-daily-install-'))
+  const directory = mkdtempSync(join(tmpdir(), 'coaxi-daily-install-'))
   context.after(() => rmSync(directory, { recursive: true, force: true }))
   const source = join(directory, 'source.app')
   const target = join(directory, 'target.app')
@@ -50,7 +50,7 @@ test('installs only after source and same-volume stage verification', (context) 
 })
 
 test('refuses a non-ad-hoc source before changing the daily installation', (context) => {
-  const directory = mkdtempSync(join(tmpdir(), 'rovai-daily-reject-'))
+  const directory = mkdtempSync(join(tmpdir(), 'coaxi-daily-reject-'))
   context.after(() => rmSync(directory, { recursive: true, force: true }))
   const source = join(directory, 'source.app')
   const target = join(directory, 'target.app')
@@ -78,7 +78,7 @@ test('refuses a non-ad-hoc source before changing the daily installation', (cont
 })
 
 test('rejects a non-App destructive target before verification or copy', (context) => {
-  const directory = mkdtempSync(join(tmpdir(), 'rovai-daily-target-guard-'))
+  const directory = mkdtempSync(join(tmpdir(), 'coaxi-daily-target-guard-'))
   context.after(() => rmSync(directory, { recursive: true, force: true }))
   const source = join(directory, 'source.app')
   const target = join(directory, 'Applications')
@@ -122,7 +122,7 @@ test('rejects a non-App destructive target before verification or copy', (contex
 })
 
 test('rejects a dangling backup path entry without following or replacing it', (context) => {
-  const directory = mkdtempSync(join(tmpdir(), 'rovai-daily-backup-symlink-'))
+  const directory = mkdtempSync(join(tmpdir(), 'coaxi-daily-backup-symlink-'))
   context.after(() => rmSync(directory, { recursive: true, force: true }))
   const source = join(directory, 'source.app')
   const target = join(directory, 'target.app')
@@ -148,7 +148,7 @@ test('rejects a dangling backup path entry without following or replacing it', (
 })
 
 test('rejects a dangling canonical target without replacing it as an empty install', (context) => {
-  const directory = mkdtempSync(join(tmpdir(), 'rovai-daily-target-symlink-'))
+  const directory = mkdtempSync(join(tmpdir(), 'coaxi-daily-target-symlink-'))
   context.after(() => rmSync(directory, { recursive: true, force: true }))
   const source = join(directory, 'source.app')
   const target = join(directory, 'target.app')
@@ -174,7 +174,7 @@ test('rejects a dangling canonical target without replacing it as an empty insta
 })
 
 test('reports the original installation unchanged when stage verification fails', (context) => {
-  const directory = mkdtempSync(join(tmpdir(), 'rovai-daily-stage-reject-'))
+  const directory = mkdtempSync(join(tmpdir(), 'coaxi-daily-stage-reject-'))
   context.after(() => rmSync(directory, { recursive: true, force: true }))
   const source = join(directory, 'source.app')
   const target = join(directory, 'target.app')
@@ -206,7 +206,7 @@ test('reports the original installation unchanged when stage verification fails'
 })
 
 test('restores the original target when installed verification fails', (context) => {
-  const directory = mkdtempSync(join(tmpdir(), 'rovai-daily-rollback-'))
+  const directory = mkdtempSync(join(tmpdir(), 'coaxi-daily-rollback-'))
   context.after(() => rmSync(directory, { recursive: true, force: true }))
   const source = join(directory, 'source.app')
   const target = join(directory, 'target.app')
@@ -243,7 +243,7 @@ test('restores the original target when installed verification fails', (context)
 })
 
 test('reports an occupied canonical target when the failed candidate cannot be moved', (context) => {
-  const directory = mkdtempSync(join(tmpdir(), 'rovai-daily-candidate-stuck-'))
+  const directory = mkdtempSync(join(tmpdir(), 'coaxi-daily-candidate-stuck-'))
   context.after(() => rmSync(directory, { recursive: true, force: true }))
   const source = join(directory, 'source.app')
   const target = join(directory, 'target.app')
@@ -284,7 +284,7 @@ test('reports an occupied canonical target when the failed candidate cannot be m
 })
 
 test('reports a missing canonical target when restoring the backup fails', (context) => {
-  const directory = mkdtempSync(join(tmpdir(), 'rovai-daily-restore-stuck-'))
+  const directory = mkdtempSync(join(tmpdir(), 'coaxi-daily-restore-stuck-'))
   context.after(() => rmSync(directory, { recursive: true, force: true }))
   const source = join(directory, 'source.app')
   const target = join(directory, 'target.app')

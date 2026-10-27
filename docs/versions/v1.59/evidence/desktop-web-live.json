@@ -20,7 +20,7 @@
   "sameComposerAfterReauth": true,
   "nativeBridgeInBrowser": false,
   "coreAliveAfterWebStop": true,
-  "command": "ROVAI_REQUIRE_ELECTRON_INTEGRATION=1 ROVAI_KEEP_HOST_WEB_LIVE_FIXTURE=1 pnpm test:host-web-live",
+  "command": "COAXI_REQUIRE_ELECTRON_INTEGRATION=1 COAXI_KEEP_HOST_WEB_LIVE_FIXTURE=1 pnpm test:host-web-live",
   "sourceHead": "9c7c9afd1f6e4881ce3db7aa17bbc268dc595208",
   "sourceDirty": true,
   "sourceDigests": {
@@ -33,10 +33,10 @@
     "apps/web/src/main.tsx": "72314e3efd8c59b97392db243fa5d8e9cd9fd6096bd081ccb214c65dab95a821",
     "apps/web/src/client.ts": "3ebea8c06330dfe644be2c9ad4dbba4a248e8cc7c55dbbd7013ae71e92c948a3",
     "apps/web/src/camp-adapter.ts": "c2185eca2c4ad45e2bf7fc462297ca400067a0bb9acccdf7310b2f680771ea65",
-    "crates/rovai-core/src/application/web_commands.rs": "b88dbd06230e4384e7c9f0bd07a0327d26fdc9faaa1934917ad039b26ee3502d",
-    "crates/rovai-core/src/local_attachment_snapshot.rs": "dbd4eb00007067885a1bd8585e2deed0bf77743e7c1db34e906d318d0607b1fb",
-    "crates/rovai-core/src/draft_client.rs": "651d61c4788d6205f11abbe5979dd21f9a08c4e3378d2cb889ee2598dac2ed1e",
-    "crates/rovai-web/src/resources.rs": "8ad76fa5b8b627ea9cc6771825708d12f7ac86ee6e9558bad9c13532e39fb541",
+    "crates/coaxi-core/src/application/web_commands.rs": "b88dbd06230e4384e7c9f0bd07a0327d26fdc9faaa1934917ad039b26ee3502d",
+    "crates/coaxi-core/src/local_attachment_snapshot.rs": "dbd4eb00007067885a1bd8585e2deed0bf77743e7c1db34e906d318d0607b1fb",
+    "crates/coaxi-core/src/draft_client.rs": "651d61c4788d6205f11abbe5979dd21f9a08c4e3378d2cb889ee2598dac2ed1e",
+    "crates/coaxi-web/src/resources.rs": "8ad76fa5b8b627ea9cc6771825708d12f7ac86ee6e9558bad9c13532e39fb541",
     "scripts/lib/host-web-browser.mjs": "7a90fef3c13d602f0db6427b3ef573d2394e1950c375f50b45731a6e78285fbb",
     "scripts/lib/host-web-live.test.mjs": "3878211a5fbba557e5fa1180a44a70ef0809fa04b97c7fa0b6ac037bc1b3dafc"
   },

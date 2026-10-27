@@ -5,13 +5,13 @@ import { join } from 'node:path'
 
 export async function prepareDshSmokeHome(home, extraPatches = []) {
   await mkdir(home, { recursive: true, mode: 0o700 })
-  const settings = process.env.ROVAI_DSH_SMOKE_SETTINGS_PATH
+  const settings = process.env.COAXI_DSH_SMOKE_SETTINGS_PATH
   if (settings) {
     const target = join(home, 'settings.yaml')
     await copyFile(settings, target)
     await chmod(target, 0o600)
   }
-  const patchPath = process.env.ROVAI_DSH_SMOKE_PATCH_PATH
+  const patchPath = process.env.COAXI_DSH_SMOKE_PATCH_PATH
   const patches = patchPath ? JSON.parse(await readFile(patchPath, 'utf8')) : []
   if (!Array.isArray(patches)) throw new Error('DSH smoke patch must be a JSON array')
   if (patches.length || extraPatches.length) {

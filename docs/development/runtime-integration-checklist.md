@@ -19,7 +19,7 @@ last_updated: 2026-09-16
 - [Runtime Platform Admission v2](../contracts/runtime-platform-admission-v2.md)
 - [Contracts Index](../contracts/README.md)
 - [Runtime 兼容性清单](../runtime-compatibility.md)
-- [`AdapterKind::ALL`](../../crates/rovai-core/src/agent_profile.rs)
+- [`AdapterKind::ALL`](../../crates/coaxi-core/src/agent_profile.rs)
 
 ## 1. 完成定义
 

@@ -15,9 +15,9 @@
     "baseCommit": "8dee908be685df91fe6f9d6dab33024e7d86029d",
     "change": "collect Grok context on catalog notifications before dropping their content",
     "sha256": {
-      "rovai-core": "cdf9c3d703546221eeef0183056306d7e07e1dc60cd20ea19b5921d7210783cd",
-      "rovai-host": "bb0c8a598bdb2a12b250fdaafe2296d7a38a4af963f661ebd59ce3c83c682941",
-      "rovai": "40844e3580b0cbd2bc4c7d00a74fac8242497ef5289118bbc15df63fdd9cfbc5"
+      "coaxi-core": "cdf9c3d703546221eeef0183056306d7e07e1dc60cd20ea19b5921d7210783cd",
+      "coaxi-host": "bb0c8a598bdb2a12b250fdaafe2296d7a38a4af963f661ebd59ce3c83c682941",
+      "coaxi": "40844e3580b0cbd2bc4c7d00a74fac8242497ef5289118bbc15df63fdd9cfbc5"
     },
     "codesign": "passed"
   },

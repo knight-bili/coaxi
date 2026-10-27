@@ -7,7 +7,7 @@ import { NativeSessionViewerContext } from './native-session-viewer-context'
 
 const record = (value: unknown): Record<string, unknown> | null => value !== null && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : null
 
-/** Codeg Agent/Task eye action; Core keeps the actual file and provider authority. */
+/** Coaxi Agent/Task eye action; Core keeps the actual file and provider authority. */
 export function LegacyAgentEntries({ threadId, runId, parentConversationId, evidence }: {
   threadId: string; runId: string; parentConversationId: string; evidence: AgentRunExecutionEvidenceView[]
 }): React.JSX.Element | null {

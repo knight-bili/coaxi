@@ -3,7 +3,7 @@
   "scope": "User 97 authorized installed Cline upgrade and ACP restore/compaction verification",
   "platform": "macos-arm64",
   "admission": "preview",
-  "rovaiSourceCommit": "b60579662664bc8a6fb9192d64e4ba4c1360c1f4",
+  "coaxiSourceCommit": "b60579662664bc8a6fb9192d64e4ba4c1360c1f4",
   "packagedExecutionCodeCommit": "9b8fa131d77e8b98feb79667d4a74c699bca0336",
   "installation": {
     "wrapper": "/opt/homebrew/lib/node_modules/cline/bin/cline",

@@ -1,5 +1,5 @@
-// Adapted from Codeg aff1e6c278453ed8d0b96a5f664edcdca621aa3f canvas-model.ts.
-// Apache-2.0: integration/licenses/codeg/LICENSE. Geometry uses board units, never rem/app text zoom.
+// Adapted from Coaxi aff1e6c278453ed8d0b96a5f664edcdca621aa3f canvas-model.ts.
+// Apache-2.0: integration/licenses/component-a/LICENSE. Geometry uses board units, never rem/app text zoom.
 import type { CanvasConversationRef, CanvasNode, CanvasNodeData, CanvasNodeKind, CanvasNodeMove } from '@contracts'
 
 export const CARD_WIDTH = 224, CARD_HEIGHT = 132

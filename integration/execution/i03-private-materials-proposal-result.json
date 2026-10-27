@@ -19,12 +19,12 @@
     "approved_proposal_sha256": "3c5a3dcb12a37e8239c23ad9a94aba9361bac72bd57bde1710e11c74b77dd587",
     "approved_artifacts": [
       {
-        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I03_私聊材料隔离_r1\\final\\I03_私聊材料怎么分开用_客户确认版_r1.docx",
+        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\outputs\\I03_私聊材料隔离_r1\\final\\I03_私聊材料怎么分开用_客户确认版_r1.docx",
         "bytes": 53543,
         "sha256": "87565f57fa0e994f676139e3376fe14e556ac9862c08f1573798d985f4dcecf7"
       },
       {
-        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I03_私聊材料隔离_r1\\final\\I03_私聊材料怎么分开用_客户确认版_r1.pdf",
+        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\outputs\\I03_私聊材料隔离_r1\\final\\I03_私聊材料怎么分开用_客户确认版_r1.pdf",
         "bytes": 516820,
         "sha256": "4b3446c0d97f2c6b8529a206d965a60229dcc1e5966e280647856fc88576e8df"
       }
@@ -62,12 +62,12 @@
   ],
   "artifacts": [
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I03_私聊材料隔离_r1\\final\\I03_私聊材料怎么分开用_客户确认版_r1.docx",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\outputs\\I03_私聊材料隔离_r1\\final\\I03_私聊材料怎么分开用_客户确认版_r1.docx",
       "bytes": 53543,
       "sha256": "87565f57fa0e994f676139e3376fe14e556ac9862c08f1573798d985f4dcecf7"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I03_私聊材料隔离_r1\\final\\I03_私聊材料怎么分开用_客户确认版_r1.pdf",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\outputs\\I03_私聊材料隔离_r1\\final\\I03_私聊材料怎么分开用_客户确认版_r1.pdf",
       "bytes": 516820,
       "sha256": "4b3446c0d97f2c6b8529a206d965a60229dcc1e5966e280647856fc88576e8df"
     }
@@ -88,42 +88,42 @@
       "current_sha256_matches": true
     },
     {
-      "path": "crates/rovai-core/src/draft_client.rs",
+      "path": "crates/coaxi-core/src/draft_client.rs",
       "line": 21,
       "symbol": "verified_web",
       "sha256": "651d61c4788d6205f11abbe5979dd21f9a08c4e3378d2cb889ee2598dac2ed1e",
       "current_sha256_matches": true
     },
     {
-      "path": "crates/rovai-core/src/single_chat.rs",
+      "path": "crates/coaxi-core/src/single_chat.rs",
       "line": 628,
       "symbol": "load_single_chat_draft_refs",
       "sha256": "098d540d33d36983ffbbbcb929af1bb08c74ff602f65600a14e5728f9ed28e8e",
       "current_sha256_matches": true
     },
     {
-      "path": "crates/rovai-core/src/message_quote.rs",
+      "path": "crates/coaxi-core/src/message_quote.rs",
       "line": 159,
       "symbol": "QuoteStorage",
       "sha256": "84a1974469c8aa1ce4aa27c7f30aa357dea608aeab06a832cb13997ddc8b6bc6",
       "current_sha256_matches": true
     },
     {
-      "path": "crates/rovai-core/src/context.rs",
+      "path": "crates/coaxi-core/src/context.rs",
       "line": 693,
       "symbol": "load_current_input",
       "sha256": "3cc5ac1391dece1cad82f5dce7397723a6c99bd04cdea562568e17040e821fd9",
       "current_sha256_matches": true
     },
     {
-      "path": "crates/rovai-core/src/context_contract.rs",
+      "path": "crates/coaxi-core/src/context_contract.rs",
       "line": 7,
       "symbol": "AGENT_RUN_CONTEXT_FORMATTER_VERSION",
       "sha256": "d69fc337182fdab43feb84435c852ca92bf9a4ae57b9e532cb73ad350ccd736c",
       "current_sha256_matches": true
     },
     {
-      "path": "crates/rovai-core/src/db.rs",
+      "path": "crates/coaxi-core/src/db.rs",
       "line": 4687,
       "symbol": "single_chat_composer_draft_client",
       "sha256": "6636f8b32de177428a1b640d0367e532ebbfcf6476c88441680a38f90a2a8425",
@@ -132,7 +132,7 @@
     {
       "path": "apps/desktop/src/main/index.ts",
       "line": 2311,
-      "symbol": "rovai:single-chat-attachment-remove",
+      "symbol": "coaxi:single-chat-attachment-remove",
       "sha256": "f66e4fabf3ede35912bd3c32359df6872728fbb6375f5e7e9f96410972758ac0",
       "current_sha256_matches": true
     },
@@ -144,7 +144,7 @@
       "current_sha256_matches": true
     },
     {
-      "path": "crates/rovai-web/src/operations.rs",
+      "path": "crates/coaxi-web/src/operations.rs",
       "line": 96,
       "symbol": "singleChat.get",
       "sha256": "e7d2b203700f888676aa122c8c5cd5c5d4520ac6c92a8c83e2a5881a223c62d3",

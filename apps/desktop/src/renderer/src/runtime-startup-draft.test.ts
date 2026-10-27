@@ -21,7 +21,7 @@ describe('startup editor draft contract', () => {
       expect(Boolean(runtimeEnvironmentErrors(keyDraft, false, 'claude-code-cli')[0])).toBe(name === 'ANTHROPIC_API_KEY')
       expect(Boolean(runtimeEnvironmentErrors(keyDraft, false, 'codex-cli')[0])).toBe(name === 'OPENAI_API_KEY')
     }
-    for (const name of ['', '1KEY', 'BAD-KEY', 'ROVAI_CONTEXT']) {
+    for (const name of ['', '1KEY', 'BAD-KEY', 'COAXI_CONTEXT']) {
       expect(runtimeEnvironmentErrors({ ...draft, environment: [{ name, value: '' }] }, false, 'pi')[0]).toBeTruthy()
     }
   })

@@ -17,7 +17,7 @@ test('Composer edits preserve text, structured tokens and Skill query interactio
   timeout: 60_000
 }, async (t) => {
   if (!admitElectronIntegrationTest(t)) return
-  const fixture = await mkdtemp(join(tmpdir(), 'rovai-composer-input-test-'))
+  const fixture = await mkdtemp(join(tmpdir(), 'coaxi-composer-input-test-'))
   let child
   let closed
   try {

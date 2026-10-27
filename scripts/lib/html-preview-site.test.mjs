@@ -16,14 +16,14 @@ import { admitElectronIntegrationTest } from './electron-sandbox-capability.mjs'
 const root = resolve(import.meta.dirname, '../..')
 for (const scenario of ['basic', 'navigation', 'lifecycle', 'policy']) test(scenario === 'basic' ? 'production HTML preview runs History initialization and a query-addressed nested canvas independently' : scenario === 'navigation' ? 'production HTML preview isolates document navigation state and diagnostics' : scenario === 'policy' ? 'production HTML preview distinguishes internal CSP denial from author errors' : 'production HTML preview recovers diagnostic loss without replacing the page', { timeout: 90_000 }, async t => {
   if (!admitElectronIntegrationTest(t)) return
-  const fixture = await mkdtemp(join(tmpdir(), 'rovai-html-site-'))
+  const fixture = await mkdtemp(join(tmpdir(), 'coaxi-html-site-'))
   const source = join(root, 'scripts/fixtures/html-preview')
   let child, network
   try {
     const resources = join(fixture, 'resources')
     await cp(source, resources, {recursive:true})
     await copyFile(join(resources, 'history.html'), join(resources, 'attachment.html'))
-    for (const [key, name] of [['ROVAI_HTML_HISTORY_SAMPLE','original-history.html'],['ROVAI_HTML_CANVAS_SAMPLE','original-canvas.html']]) {
+    for (const [key, name] of [['COAXI_HTML_HISTORY_SAMPLE','original-history.html'],['COAXI_HTML_CANVAS_SAMPLE','original-canvas.html']]) {
       if (process.env[key]) { await copyFile(process.env[key], join(resources,name)); console.log(`${name} sha256 ${createHash('sha256').update(await readFile(join(resources,name))).digest('hex')}`) }
     }
     network = createServer((request,response) => {
@@ -42,7 +42,7 @@ for (const scenario of ['basic', 'navigation', 'lifecycle', 'policy']) test(scen
     })
     network.listen(0,'127.0.0.1');await once(network,'listening')
     const networkOrigin=`http://localhost:${network.address().port}`
-    const fontPath=process.env.ROVAI_TEST_FONT ?? '/System/Library/Fonts/Supplemental/Arial.ttf'
+    const fontPath=process.env.COAXI_TEST_FONT ?? '/System/Library/Fonts/Supplemental/Arial.ttf'
     const font=await access(fontPath).then(()=>true,()=>false)
     if(font) await copyFile(fontPath,join(resources,'assets/font.ttf'))
     await writeFile(join(resources,'network.html'),`<!doctype html><link rel="stylesheet" href="${networkOrigin}/app.css"><style>${font?'@font-face{font-family:PreviewFixture;src:url(./assets/font.ttf)}#network-result{font-family:PreviewFixture}':''}</style><h1 id="network-result">loading</h1><script src="${networkOrigin}/app.js"></script><iframe src="${networkOrigin}/frame.html"></iframe><script>fetch('${networkOrigin}/data.json').then(r=>r.json()).then(d=>document.querySelector('#network-result').textContent=window.networkScript+' '+d.value);fetch('${networkOrigin}/denied.json').then(()=>window.corsBlocked=false,()=>window.corsBlocked=true);document.fonts.ready.then(()=>window.fontLoaded=${font?"document.fonts.check('16px PreviewFixture')":'null'});</script>`)
@@ -53,7 +53,7 @@ for (const scenario of ['basic', 'navigation', 'lifecycle', 'policy']) test(scen
     const alias = { '@contracts': join(root, 'packages/contracts/src/index.ts') }
     await build({ configFile: false, root: source, base: './', logLevel: 'error', plugins: [react()], resolve: { alias }, build: { outDir: join(fixture, 'renderer'), minify: false } })
     await build({ configFile: false, logLevel: 'error', resolve: { alias }, ssr: { noExternal: ['parse5', 'entities'] }, build: { ssr: join(source, 'main.ts'), outDir: join(fixture, 'main'), minify: false, rollupOptions: { external: ['electron'], output: { format: 'cjs', entryFileNames: 'main.cjs' } } } })
-    const env = { ...process.env, ELECTRON_DISABLE_SECURITY_WARNINGS: 'true', ROVAI_HTML_PREVIEW_SCENARIO: scenario }
+    const env = { ...process.env, ELECTRON_DISABLE_SECURITY_WARNINGS: 'true', COAXI_HTML_PREVIEW_SCENARIO: scenario }
     delete env.ELECTRON_RUN_AS_NODE
     console.log(`Isolated HTML acceptance: ${userData}; Skill Library: ${join(userData, 'managed-skill-library')}; no Core/Runtime`)
     child = spawn(electron, [join(fixture, 'main/main.cjs'), join(fixture, 'renderer/index.html'), userData, resources, join(fixture, 'preload.cjs'), ...(process.platform === 'linux' ? ['--no-sandbox'] : [])], { env, stdio: ['ignore', 'pipe', 'pipe'] })
@@ -73,7 +73,7 @@ for (const scenario of ['basic', 'navigation', 'lifecycle', 'policy']) test(scen
   } finally {
     if(network){network.closeAllConnections();await new Promise(resolve=>network.close(resolve))}
     if (child && child.exitCode === null && child.signalCode === null) child.kill('SIGKILL')
-    if (process.env.ROVAI_KEEP_HTML_PREVIEW_FIXTURE === '1') console.log(`HTML fixture: ${fixture}`)
+    if (process.env.COAXI_KEEP_HTML_PREVIEW_FIXTURE === '1') console.log(`HTML fixture: ${fixture}`)
     else await rm(fixture, { recursive: true, force: true })
   }
 })

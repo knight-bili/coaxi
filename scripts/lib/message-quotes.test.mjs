@@ -13,7 +13,7 @@ import { admitElectronIntegrationTest } from './electron-sandbox-capability.mjs'
 const root = resolve(import.meta.dirname, '../..')
 test('message quotes preserve native selection, compact interaction and copy boundaries', { timeout: 90_000 }, async t => {
   if (!admitElectronIntegrationTest(t)) return
-  const fixture = await mkdtemp(join(tmpdir(), 'rovai-message-quotes-ui-'))
+  const fixture = await mkdtemp(join(tmpdir(), 'coaxi-message-quotes-ui-'))
   let child, closed
   try {
     await build({ configFile: false, root: join(root, 'scripts/fixtures/message-quotes'), base: './', logLevel: 'error',
@@ -33,9 +33,9 @@ test('message quotes preserve native selection, compact interaction and copy bou
     assert.equal(code, 0, output)
     const report = JSON.parse(output.split('\n').find(line => line.startsWith('{')))
     assert.equal(report.ok, true)
-    if (process.env.ROVAI_KEEP_QUOTE_FIXTURE === '1') console.log(`Quote UI evidence: ${fixture}`)
+    if (process.env.COAXI_KEEP_QUOTE_FIXTURE === '1') console.log(`Quote UI evidence: ${fixture}`)
   } finally {
     if (child && child.exitCode === null && child.signalCode === null) { child.kill('SIGKILL'); await closed }
-    if (process.env.ROVAI_KEEP_QUOTE_FIXTURE !== '1') await rm(fixture, { recursive: true, force: true })
+    if (process.env.COAXI_KEEP_QUOTE_FIXTURE !== '1') await rm(fixture, { recursive: true, force: true })
   }
 })

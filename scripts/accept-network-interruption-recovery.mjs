@@ -16,7 +16,7 @@ const usage = `Usage: pnpm accept:network-recovery
 
 Runs the two interactive macOS qualification chains required by v1.53:
   1. Claude Code keeps ownership while its native API retry recovers.
-  2. OpenCode returns an ACP not-accepted network terminal and Rovai retries
+  2. OpenCode returns an ACP not-accepted network terminal and Coaxi retries
      the same AgentRun in a new execution epoch.
 
 The script never changes network settings. It pauses twice for the operator to
@@ -24,9 +24,9 @@ disconnect Wi-Fi, and twice to reconnect it. If the script aborts while the
 machine is offline, reconnect Wi-Fi manually.
 
 Optional environment variables:
-  ROVAI_NETWORK_RECOVERY_ACCEPT_FIXTURE_ROOT  isolated data/workspace root
-  ROVAI_NETWORK_RECOVERY_ACCEPT_OUTPUT_DIR    report directory
-  ROVAI_KEEP_NETWORK_RECOVERY_FIXTURE=1       keep a successful fixture
+  COAXI_NETWORK_RECOVERY_ACCEPT_FIXTURE_ROOT  isolated data/workspace root
+  COAXI_NETWORK_RECOVERY_ACCEPT_OUTPUT_DIR    report directory
+  COAXI_KEEP_NETWORK_RECOVERY_FIXTURE=1       keep a successful fixture
 `
 
 if (process.argv.includes('--help')) {
@@ -43,16 +43,16 @@ if (!process.stdin.isTTY || !process.stdout.isTTY) {
 
 const root = resolve(import.meta.dirname, '..')
 const fixtureRoot = await realpath(
-  process.env.ROVAI_NETWORK_RECOVERY_ACCEPT_FIXTURE_ROOT
-    ?? await mkdtemp(join(tmpdir(), 'rovai-network-recovery-accept-'))
+  process.env.COAXI_NETWORK_RECOVERY_ACCEPT_FIXTURE_ROOT
+    ?? await mkdtemp(join(tmpdir(), 'coaxi-network-recovery-accept-'))
 )
 const outputDir = await realpath(
-  process.env.ROVAI_NETWORK_RECOVERY_ACCEPT_OUTPUT_DIR
-    ?? await mkdtemp(join(tmpdir(), 'rovai-network-recovery-evidence-'))
+  process.env.COAXI_NETWORK_RECOVERY_ACCEPT_OUTPUT_DIR
+    ?? await mkdtemp(join(tmpdir(), 'coaxi-network-recovery-evidence-'))
 )
 const projectRoot = join(fixtureRoot, 'project')
 const dataDir = join(fixtureRoot, 'data')
-const databasePath = join(dataDir, 'rovai.sqlite')
+const databasePath = join(dataDir, 'coaxi.sqlite')
 const reportPath = join(outputDir, 'network-interruption-recovery-acceptance.json')
 const failurePath = join(outputDir, 'network-interruption-recovery-failure.json')
 const claudeAgentId = 'agent_1'
@@ -69,8 +69,8 @@ try {
   await mkdir(outputDir, { recursive: true })
   await writeFile(join(projectRoot, 'README.md'), '# Network recovery acceptance fixture\n')
   await run('git', ['init', '-b', 'main'], projectRoot)
-  await run('git', ['config', 'user.name', 'Rovai-ai Network Recovery Acceptance'], projectRoot)
-  await run('git', ['config', 'user.email', 'network-recovery@rovai.local'], projectRoot)
+  await run('git', ['config', 'user.name', 'Coaxi Network Recovery Acceptance'], projectRoot)
+  await run('git', ['config', 'user.email', 'network-recovery@coaxi.local'], projectRoot)
   await run('git', ['add', 'README.md'], projectRoot)
   await run('git', ['commit', '-m', 'fixture'], projectRoot)
 
@@ -99,7 +99,7 @@ try {
     agentId: claudeAgentId
   })
   const openCodeCampId = await createThread(core.request, {
-    name: 'Rovai network recovery acceptance',
+    name: 'Coaxi network recovery acceptance',
     workspace,
     agentId: openCodeAgentId
   })
@@ -108,16 +108,16 @@ try {
   const claudeBaseline = await sendAndWaitForSuccess(core, {
     threadId: claudeCampId,
     agentId: claudeAgentId,
-    body: 'Do not call tools or inspect files. Reply with exactly ROVAI_CLAUDE_NETWORK_BASELINE_OK and nothing else.',
+    body: 'Do not call tools or inspect files. Reply with exactly COAXI_CLAUDE_NETWORK_BASELINE_OK and nothing else.',
     purpose: 'Establish the Claude Code session before native network retry acceptance.',
-    marker: 'ROVAI_CLAUDE_NETWORK_BASELINE_OK'
+    marker: 'COAXI_CLAUDE_NETWORK_BASELINE_OK'
   })
   const openCodeBaseline = await sendAndWaitForSuccess(core, {
     threadId: openCodeCampId,
     agentId: openCodeAgentId,
-    body: 'Do not call tools or inspect files. Reply with exactly ROVAI_OPENCODE_NETWORK_BASELINE_OK and nothing else.',
-    purpose: 'Establish the OpenCode ACP session before Rovai network recovery acceptance.',
-    marker: 'ROVAI_OPENCODE_NETWORK_BASELINE_OK'
+    body: 'Do not call tools or inspect files. Reply with exactly COAXI_OPENCODE_NETWORK_BASELINE_OK and nothing else.',
+    purpose: 'Establish the OpenCode ACP session before Coaxi network recovery acceptance.',
+    marker: 'COAXI_OPENCODE_NETWORK_BASELINE_OK'
   })
   const claudeBaselineStart = requiredStartEvent(core.events, claudeBaseline.run.id)
   const openCodeBaselineStart = requiredStartEvent(core.events, openCodeBaseline.run.id)
@@ -132,7 +132,7 @@ try {
     'Then return to this terminal and press Enter.'
   ])
 
-  const claudeMarker = 'ROVAI_CLAUDE_NATIVE_NETWORK_RECOVERY_OK'
+  const claudeMarker = 'COAXI_CLAUDE_NATIVE_NETWORK_RECOVERY_OK'
   const claudeRequest = await sendThreadMessage(core.request, {
     threadId: claudeCampId,
     body: `Do not call tools or inspect files. Reply with exactly ${claudeMarker} and nothing else.`,
@@ -187,20 +187,20 @@ try {
   assert(claudeInitialStart.params.nativeThreadId === claudeBaselineStart.params.nativeThreadId,
     'Claude Code native retry did not retain the established Native Session')
   assert(claudeNetworkTakeovers.length === 0,
-    'Rovai incorrectly took ownership of Claude Code native API retry')
+    'Coaxi incorrectly took ownership of Claude Code native API retry')
 
   activeStep = 'opencode_disconnect'
   await operatorCheckpoint(prompt, [
-    'CHAIN 2/2 — ACP terminal followed by Rovai recovery',
+    'CHAIN 2/2 — ACP terminal followed by Coaxi recovery',
     'Disconnect Wi-Fi again and wait until macOS shows the network is offline.',
     'Then return to this terminal and press Enter.'
   ])
 
-  const openCodeMarker = 'ROVAI_OPENCODE_NEW_EPOCH_NETWORK_RECOVERY_OK'
+  const openCodeMarker = 'COAXI_OPENCODE_NEW_EPOCH_NETWORK_RECOVERY_OK'
   const openCodeRequest = await sendThreadMessage(core.request, {
     threadId: openCodeCampId,
     body: `Do not call tools or inspect files. Reply with exactly ${openCodeMarker} and nothing else.`,
-    purpose: 'Prove Rovai recovers an ACP not-accepted network terminal in a new epoch.'
+    purpose: 'Prove Coaxi recovers an ACP not-accepted network terminal in a new epoch.'
   })
   const openCodeRunId = requiredAgentRunId(openCodeRequest, 'OpenCode network recovery')
   const openCodeInitialStart = await waitForEvent(
@@ -216,13 +216,13 @@ try {
     (event) => event.method === 'agent_run.network_recovery_waiting'
       && event.params?.agentRunId === openCodeRunId
       && event.params?.source === 'acp_prompt_terminal',
-    'OpenCode ACP network terminal and Rovai waiting state',
+    'OpenCode ACP network terminal and Coaxi waiting state',
     { threadId: openCodeCampId, agentRunId: openCodeRunId, timeoutMs: 180_000 }
   )
 
   activeStep = 'opencode_reconnect'
   await operatorCheckpoint(prompt, [
-    `Rovai recorded ${firstWaitingEvent.params.category} and queued a safe retry.`,
+    `Coaxi recorded ${firstWaitingEvent.params.category} and queued a safe retry.`,
     'Reconnect Wi-Fi now and wait until macOS shows the network is online.',
     'Then return to this terminal and press Enter.'
   ])
@@ -232,7 +232,7 @@ try {
     threadId: openCodeCampId,
     agentRunId: openCodeRunId,
     marker: openCodeMarker,
-    label: 'Rovai ACP network recovery',
+    label: 'Coaxi ACP network recovery',
     timeoutMs: 360_000
   })
   const waitingEvents = core.events.filter((event) =>
@@ -247,11 +247,11 @@ try {
   const openCodeStarts = core.events.filter((event) =>
     event.method === 'agent_run.started' && event.params?.agentRunId === openCodeRunId
   )
-  assert(waitingEvents.length >= 1, 'Rovai did not publish a network recovery waiting event')
-  assert(recoveringEvents.length >= 1, 'Rovai did not admit a network recovery attempt')
+  assert(waitingEvents.length >= 1, 'Coaxi did not publish a network recovery waiting event')
+  assert(recoveringEvents.length >= 1, 'Coaxi did not admit a network recovery attempt')
   assert(openCodeStarts.length >= 2, 'OpenCode AgentRun was not restarted in a new execution epoch')
   assert(openCodeRecovered.run.executionEpoch > openCodeInitialStart.params.executionEpoch,
-    'Rovai recovery did not advance the OpenCode execution epoch')
+    'Coaxi recovery did not advance the OpenCode execution epoch')
   assert(openCodeRecovered.run.waitReason === null && openCodeRecovered.run.failure === null,
     `Recovered OpenCode AgentRun retained a network failure: ${JSON.stringify(openCodeRecovered.run)}`)
   assert(openCodeInitialStart.params.nativeThreadId === openCodeBaselineStart.params.nativeThreadId,
@@ -270,7 +270,7 @@ try {
   const claudeLedger = readRunLedger(databasePath, claudeRunId)
   const openCodeLedger = readRunLedger(databasePath, openCodeRunId)
   assert(!claudeLedger.some((event) => event.eventType.startsWith('agent_run.network_recovery_')),
-    'Claude Code native retry unexpectedly entered the Rovai network recovery ledger')
+    'Claude Code native retry unexpectedly entered the Coaxi network recovery ledger')
   assert(openCodeLedger.some((event) => event.eventType === 'runtime.input_not_accepted'),
     'OpenCode acceptance did not record a not-accepted input')
   assert(openCodeLedger.some((event) => event.eventType === 'agent_run.network_recovery_waiting'),
@@ -307,11 +307,11 @@ try {
       executionEpoch: claudeRecovered.run.executionEpoch,
       nativeSessionId: claudeInitialStart.params.nativeThreadId,
       diagnostic: selectDiagnostic(nativeRetryDiagnostic),
-      rovaiTakeoverObserved: false,
+      coaxiTakeoverObserved: false,
       outputMarker: claudeMarker,
       ledger: claudeLedger
     },
-    rovaiNetworkRecovery: {
+    coaxiNetworkRecovery: {
       adapterKind: 'opencode-cli',
       runtimeVersion: openCodeInstallation.snapshot.reportedVersion,
       agentRunId: openCodeRunId,
@@ -346,7 +346,7 @@ try {
       await writeFile(join(outputDir, 'core-stderr.log'), core.stderr.join('')).catch(() => undefined)
     }
   }
-  if (passed && process.env.ROVAI_KEEP_NETWORK_RECOVERY_FIXTURE !== '1') {
+  if (passed && process.env.COAXI_KEEP_NETWORK_RECOVERY_FIXTURE !== '1') {
     await removeEphemeralRuntimeCampFilesRoot(dataDir).catch(() => undefined)
     await rm(fixtureRoot, { recursive: true, force: true })
   } else if (!passed) {
@@ -356,7 +356,7 @@ try {
 }
 
 function startCore(dataDirectory) {
-  const child = spawn(join(root, 'target', 'debug', 'rovai-core'), [
+  const child = spawn(join(root, 'target', 'debug', 'coaxi-core'), [
     ...coreDataDirectoryArguments(dataDirectory),
     '--skill-library-root', join(dataDirectory, 'managed-skill-library'),
     '--mcp-config-path', join(dataDirectory, 'mcp.json')
@@ -385,7 +385,7 @@ function startCore(dataDirectory) {
   }
   child.once('error', rejectPending)
   child.once('close', (code, signal) => {
-    if (!stopping) rejectPending(new Error(`rovai-core exited early (code=${code}, signal=${signal})`))
+    if (!stopping) rejectPending(new Error(`coaxi-core exited early (code=${code}, signal=${signal})`))
   })
   createLineInterface({ input: child.stdout }).on('line', (line) => {
     const message = JSON.parse(line)

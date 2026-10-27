@@ -17,7 +17,7 @@ const rows:Array<{key:Exclude<keyof Preferences,'revision'|'stopShortcut'>;name:
   {key:'foreground',name:'前台操作',description:'允许操作时把共享窗口带到前台。'},
   {key:'screen',name:'整屏共享选项',description:'在支持的平台提供整屏选项，选中后仍须单独共享。'},
 ]
-/** Codeg ComputerSettings 的独立开关和 ComputerWindowPicker 的窗口/应用分组。 */
+/** Coaxi ComputerSettings 的独立开关和 ComputerWindowPicker 的窗口/应用分组。 */
 export function InteractionComputerPanel({threadId}:{threadId:string}):React.JSX.Element|null{
   const client=useThreadClient(),api=client.interactionComputer,resources=client.interactionWorkspace,t=useUiText(),epoch=useRef(0)
   const [open,setOpen]=useState(false),[preferences,setPreferences]=useState<Preferences|null>(null),[saved,setSaved]=useState<Preferences|null>(null),[targets,setTargets]=useState<Target[]>([]),[selected,setSelected]=useState(''),[windows,setWindows]=useState<NativeWindow[]>([]),[screenId,setScreenId]=useState(''),[busy,setBusy]=useState(false),[error,setError]=useState('')

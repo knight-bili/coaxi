@@ -10,8 +10,8 @@
     {
       "id": "antigravity",
       "sources": [
-        "codeg",
-        "rovai-ai"
+        "coaxi",
+        "coaxi"
       ],
       "aliases": [
         "agy"
@@ -27,8 +27,8 @@
     {
       "id": "claude_code",
       "sources": [
-        "codeg",
-        "rovai-ai"
+        "coaxi",
+        "coaxi"
       ],
       "aliases": [
         "claude"
@@ -50,8 +50,8 @@
     {
       "id": "cline",
       "sources": [
-        "codeg",
-        "rovai-ai"
+        "coaxi",
+        "coaxi"
       ],
       "aliases": [
         "cline"
@@ -67,8 +67,8 @@
     {
       "id": "code_buddy",
       "sources": [
-        "codeg",
-        "rovai-ai"
+        "coaxi",
+        "coaxi"
       ],
       "aliases": [
         "codebuddy"
@@ -84,8 +84,8 @@
     {
       "id": "codex",
       "sources": [
-        "codeg",
-        "rovai-ai"
+        "coaxi",
+        "coaxi"
       ],
       "aliases": [
         "codex"
@@ -107,7 +107,7 @@
     {
       "id": "command_code",
       "sources": [
-        "rovai-ai"
+        "coaxi"
       ],
       "aliases": [
         "command-code",
@@ -124,7 +124,7 @@
     {
       "id": "copilot",
       "sources": [
-        "rovai-ai"
+        "coaxi"
       ],
       "aliases": [
         "copilot"
@@ -140,8 +140,8 @@
     {
       "id": "cursor",
       "sources": [
-        "codeg",
-        "rovai-ai"
+        "coaxi",
+        "coaxi"
       ],
       "aliases": [
         "cursor-agent",
@@ -158,8 +158,8 @@
     {
       "id": "deepseek",
       "sources": [
-        "codeg",
-        "rovai-ai"
+        "coaxi",
+        "coaxi"
       ],
       "aliases": [
         "dsh"
@@ -175,7 +175,7 @@
     {
       "id": "gemini",
       "sources": [
-        "codeg"
+        "coaxi"
       ],
       "aliases": [
         "gemini"
@@ -197,8 +197,8 @@
     {
       "id": "grok",
       "sources": [
-        "codeg",
-        "rovai-ai"
+        "coaxi",
+        "coaxi"
       ],
       "aliases": [
         "grok"
@@ -214,7 +214,7 @@
     {
       "id": "hermes",
       "sources": [
-        "codeg"
+        "coaxi"
       ],
       "aliases": [
         "hermes"
@@ -230,8 +230,8 @@
     {
       "id": "kimi_code",
       "sources": [
-        "codeg",
-        "rovai-ai"
+        "coaxi",
+        "coaxi"
       ],
       "aliases": [
         "kimi"
@@ -247,7 +247,7 @@
     {
       "id": "kiro",
       "sources": [
-        "rovai-ai"
+        "coaxi"
       ],
       "aliases": [
         "kiro-cli"
@@ -263,7 +263,7 @@
     {
       "id": "open_claw",
       "sources": [
-        "codeg"
+        "coaxi"
       ],
       "aliases": [
         "openclaw"
@@ -285,8 +285,8 @@
     {
       "id": "open_code",
       "sources": [
-        "codeg",
-        "rovai-ai"
+        "coaxi",
+        "coaxi"
       ],
       "aliases": [
         "opencode"
@@ -302,8 +302,8 @@
     {
       "id": "pi",
       "sources": [
-        "codeg",
-        "rovai-ai"
+        "coaxi",
+        "coaxi"
       ],
       "aliases": [
         "pi"
@@ -319,8 +319,8 @@
     {
       "id": "qoder",
       "sources": [
-        "codeg",
-        "rovai-ai"
+        "coaxi",
+        "coaxi"
       ],
       "aliases": [
         "qodercli"
@@ -336,7 +336,7 @@
     {
       "id": "qwen_code",
       "sources": [
-        "rovai-ai"
+        "coaxi"
       ],
       "aliases": [
         "qwen"
@@ -352,7 +352,7 @@
     {
       "id": "trae_cn",
       "sources": [
-        "rovai-ai"
+        "coaxi"
       ],
       "aliases": [
         "traecli"
@@ -368,7 +368,7 @@
     {
       "id": "zcode",
       "sources": [
-        "rovai-ai"
+        "coaxi"
       ],
       "aliases": [
         "ZCode"
@@ -389,19 +389,19 @@
     "macOS/Linux discovery and all execution tests remain not_run"
   ],
   "sourceMappings": [
-    "crates/rovai-core/src/agent_profile.rs:174",
-    "Codeg fixed source src-tauri/src/acp/registry.rs Gemini/OpenClaw/Hermes entries"
+    "crates/coaxi-core/src/agent_profile.rs:174",
+    "Coaxi fixed source src-tauri/src/acp/registry.rs Gemini/OpenClaw/Hermes entries"
   ],
   "source": {
     "coreAdapters": 18,
-    "codegOnlyAdaptersToPort": [
+    "coaxiOnlyAdaptersToPort": [
       "gemini",
       "hermes",
       "open_claw"
     ],
     "sourceFiles": [
       {
-        "file": "crates/rovai-core/src/agent_profile.rs",
+        "file": "crates/coaxi-core/src/agent_profile.rs",
         "sha256": "257e0deb64a2d8599a81893bb72cd1a67d63b8af37be29cfbcc24d1f3a2725c9"
       },
       {
@@ -409,7 +409,7 @@
         "sha256": "cfeffb65092841b3d0a90de38d657fdb230faeb4ef4248cb760e4d7053a7473e"
       }
     ],
-    "codegRegistry": {
+    "coaxiRegistry": {
       "fixedCommit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
       "file": "src-tauri/src/acp/registry.rs",
       "sha256": "07dcbe932edaa44ab31fc7a47e2b154449631d4ac92ec4353f9a461d9ee4f694"
@@ -425,7 +425,7 @@
     {
       "id": "open_claw",
       "installedVersion": "2026.6.10",
-      "fixedCodegVersion": "2026.9.8",
+      "fixedCoaxiVersion": "2026.9.8",
       "sourceNodeFloor": ">=24.16.0 <25 || >=26.1.0",
       "localWorkspaceNode": "24.9.0",
       "sourceSupportsMcpServers": false,

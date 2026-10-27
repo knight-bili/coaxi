@@ -12,7 +12,7 @@ type Preview = ConfigurationSnapshotPreview & {kind: 'configuration'; selectionI
 type Transfer = {commandId: string; result: {snapshot: {id: string; sha256: string; kind?: 'backup' | 'configuration'}}}
 const names: Record<string, string> = {appearance: '外观', general: '界面偏好', windowClose: '关闭窗口', messageLibrary: '全局消息库'}
 
-/** Codeg backup preview/confirm flow, handed off from a verified local pull. */
+/** Coaxi backup preview/confirm flow, handed off from a verified local pull. */
 export function WebdavRestorePreview({transfer, accountRevision, disabled}: {transfer: Transfer; accountRevision: string; disabled: boolean}): React.JSX.Element | null {
   const client = useThreadClient(), native = client.webdavWorkspace, backups = client.nativeBackups, t = useUiText()
   const [open, setOpen] = useState(false), [busy, setBusy] = useState(false), [passphrase, setPassphrase] = useState(''), [confirmation, setConfirmation] = useState('')

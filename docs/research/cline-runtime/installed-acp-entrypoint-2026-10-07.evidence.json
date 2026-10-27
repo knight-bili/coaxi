@@ -27,17 +27,17 @@
   "normalSelection": {
     "dailyDatabase": {
       "access": "mode=ro",
-      "path": "<user-home>/Library/Application Support/Rovai-ai/rovai.sqlite",
+      "path": "<user-home>/Library/Application Support/Coaxi/coaxi.sqlite",
       "clineStartupSettingCount": 0,
       "clineInstallationCount": 0
     },
     "clineBinPathOverridePresent": false,
-    "rovaiClineBinOverridePresent": false,
+    "coaxiClineBinOverridePresent": false,
     "shellPath": "/opt/homebrew/bin/cline",
     "wrapperRealpath": "/opt/homebrew/Cellar/cline/3.0.3/libexec/lib/node_modules/cline/bin/cline",
-    "rovaiDiscovery": {
+    "coaxiDiscovery": {
       "pid": 80397,
-      "coreExecutable": "<user-home>/Library/Application Support/RovaiRuntimeAcceptance/mission-052-cline-20261004-swrfa_xh/Application/Rovai AI.app/Contents/Resources/bin/rovai-core",
+      "coreExecutable": "<user-home>/Library/Application Support/CoaxiRuntimeAcceptance/mission-052-cline-20261004-swrfa_xh/Application/Coaxi AI.app/Contents/Resources/bin/coaxi-core",
       "core": {
         "builtinToolCatalogDigest": "sha256:4f905d500bdb2f27659ac936051f5d361750c04bea21a3800ad90d2d150b8334",
         "builtinToolContractVersion": 35,
@@ -172,7 +172,7 @@
       }
     },
     "coreExecutableSha256": "5633570f634a82598d77fc080b4406de686df6a25a6c1ac489598fd07438b95d",
-    "coreProvenance": "Unchanged isolated acceptance Rovai Core from prior Mission tests; this is the host, not the Cline runtime."
+    "coreProvenance": "Unchanged isolated acceptance Coaxi Core from prior Mission tests; this is the host, not the Cline runtime."
   },
   "installation": {
     "source": "Homebrew formula cline, bottle",
@@ -391,7 +391,7 @@
             "terminal": true
           },
           "clientInfo": {
-            "name": "rovai-installation-inspection",
+            "name": "coaxi-installation-inspection",
             "version": "1"
           }
         }

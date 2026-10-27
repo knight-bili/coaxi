@@ -1,5 +1,5 @@
-// Codeg canvas-view-storage behavior adapted to explicit Host/Core/board identity.
-// Fixed donor aff1e6c278453ed8d0b96a5f664edcdca621aa3f; Apache-2.0: integration/licenses/codeg/LICENSE.
+// Coaxi canvas-view-storage behavior adapted to explicit Host/Core/board identity.
+// Fixed donor aff1e6c278453ed8d0b96a5f664edcdca621aa3f; Apache-2.0: integration/licenses/component-a/LICENSE.
 import type { ThreadClient } from './camp-client'
 export const CANVAS_MIN_ZOOM = 0.1, CANVAS_MAX_ZOOM = 2
 export interface CanvasViewport { x: number; y: number; zoom: number }
@@ -37,9 +37,9 @@ export function parseCanvasViewport(value: unknown): CanvasViewport | null {
   return finite(source.x) && finite(source.y) && finite(source.zoom)
     ? { x: source.x, y: source.y, zoom: Math.min(CANVAS_MAX_ZOOM, Math.max(CANVAS_MIN_ZOOM, source.zoom)) } : null
 }
-const viewKey = (scope: CanvasViewScope, board: string) => `rovai.canvas.view.v1:${JSON.stringify([scope.host, scope.core, board])}`
-const mapKey = (scope: CanvasViewScope) => `rovai.canvas.minimap.v1:${JSON.stringify([scope.host, scope.core])}`
-const boardKey = (scope: CanvasViewScope) => `rovai.canvas.board.v1:${JSON.stringify([scope.host, scope.core])}`
+const viewKey = (scope: CanvasViewScope, board: string) => `coaxi.canvas.view.v1:${JSON.stringify([scope.host, scope.core, board])}`
+const mapKey = (scope: CanvasViewScope) => `coaxi.canvas.minimap.v1:${JSON.stringify([scope.host, scope.core])}`
+const boardKey = (scope: CanvasViewScope) => `coaxi.canvas.board.v1:${JSON.stringify([scope.host, scope.core])}`
 function read(storage: ViewStorage | undefined, key: string): unknown {
   try { return JSON.parse(storage?.getItem(key) ?? 'null') } catch { return null }
 }
@@ -53,7 +53,7 @@ export function saveCanvasBoardSelection(storage: ViewStorage | undefined, scope
 }
 export function loadCanvasViewState(storage: ViewStorage | undefined, scope: CanvasViewScope | null, boardId: string): CanvasViewState {
   if (!scope || !identity(scope.host) || !identity(scope.core) || !identity(boardId)) return initialCanvasViewState()
-  // Unscoped Codeg keys are not adopted: its numeric IDs belong to another database.
+  // Unscoped Coaxi keys are not adopted: its numeric IDs belong to another database.
   const source = record(read(storage, viewKey(scope, boardId)))
   return { viewport: parseCanvasViewport(source.viewport), expandedCards: ids(source.expandedCards),
     expandedRegions: ids(source.expandedRegions), minimap: read(storage, mapKey(scope)) !== false }

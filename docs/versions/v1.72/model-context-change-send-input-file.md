@@ -35,7 +35,7 @@ r5 只纳入已展示并确认的三项调整：正文帮助明确 `reply text i
 | 本轮交付 | 实现、精简教学、当前规范与验证证据 |
 | 授权范围 | User 消息 19 确认实施 r4 与消息 17 后已展示的三项取舍；不扩展为 UI、寻址或 Schema 修改 |
 
-当前输入解析见 [rovai.rs](../../../crates/rovai-core/src/bin/rovai.rs)，Schema 与正文业务校验见 [team_tool.rs](../../../crates/rovai-core/src/team_tool.rs)，教学真源见 [camp_message_send_teaching.rs](../../../crates/rovai-core/src/camp_message_send_teaching.rs)。本方案遵循[上下文变更治理](../../development/model-context-change-governance.md)和[渐进加载分层](../../development/skill-authoring.md#渐进加载分层)。
+当前输入解析见 [rovai.rs](../../../crates/coaxi-core/src/bin/coaxi.rs)，Schema 与正文业务校验见 [team_tool.rs](../../../crates/coaxi-core/src/team_tool.rs)，教学真源见 [camp_message_send_teaching.rs](../../../crates/coaxi-core/src/camp_message_send_teaching.rs)。本方案遵循[上下文变更治理](../../development/model-context-change-governance.md)和[渐进加载分层](../../development/skill-authoring.md#渐进加载分层)。
 
 ## 输入行为
 
@@ -138,7 +138,7 @@ r3 的新版提示词已不含旧 JSON 兼容教学，但方案说明仍有一�
 
 ### 公共 Bootstrap 完整共用 Charter
 
-来源：[公共 Charter 组装](../../../crates/rovai-core/src/context.rs)与 [CLI Contract 资源](../../../crates/rovai-core/resources/charter-rovai-cli.md)。唯一改动是删除输入来源互斥句；其余共用文本逐字不变。
+来源：[公共 Charter 组装](../../../crates/coaxi-core/src/context.rs)与 [CLI Contract 资源](../../../crates/coaxi-core/resources/charter-coaxi-cli.md)。唯一改动是删除输入来源互斥句；其余共用文本逐字不变。
 
 **变更前**
 
@@ -199,7 +199,7 @@ Rovai Built-in CLI Contract
 
 ### Send help 整页
 
-来源：[帮助渲染](../../../crates/rovai-core/src/bin/rovai.rs)与[集中教学常量](../../../crates/rovai-core/src/camp_message_send_teaching.rs)。普通命令继续使用原页头；Send 专用页头只改变本命令的输入说明。
+来源：[帮助渲染](../../../crates/coaxi-core/src/bin/coaxi.rs)与[集中教学常量](../../../crates/coaxi-core/src/camp_message_send_teaching.rs)。普通命令继续使用原页头；Send 专用页头只改变本命令的输入说明。
 
 **变更前**
 
@@ -465,7 +465,7 @@ Use `--file <path>` to publish a file or directory with the message; repeat it t
 
 ### 根帮助与其他命令帮助
 
-来源：[root_help_text](../../../crates/rovai-core/src/bin/rovai.rs)。根 help 只保留操作目录与精确帮助入口，删除统一列举输入形式的句子。以下为受管 Runtime 的完整前后文本。
+来源：[root_help_text](../../../crates/coaxi-core/src/bin/coaxi.rs)。根 help 只保留操作目录与精确帮助入口，删除统一列举输入形式的句子。以下为受管 Runtime 的完整前后文本。
 
 **变更前**
 
@@ -517,7 +517,7 @@ Input: direct flags, JSON stdin/heredoc, or --input-file <path>. Choose exactly 
 
 ### Catalog、Schema 和 CLI 结果
 
-[Send summary](../../../crates/rovai-core/src/camp_message_send_teaching.rs)与 [Send Schema](../../../crates/rovai-core/src/team_tool.rs)前后不变，包括 `body/to/mentionUser/publicOnly/taskId/files` 的属性描述、默认值和约束。`body` 仍是字符串；CLI 的文件类型不成为 Core Schema 的新分支。
+[Send summary](../../../crates/coaxi-core/src/camp_message_send_teaching.rs)与 [Send Schema](../../../crates/coaxi-core/src/team_tool.rs)前后不变，包括 `body/to/mentionUser/publicOnly/taskId/files` 的属性描述、默认值和约束。`body` 仍是字符串；CLI 的文件类型不成为 Core Schema 的新分支。
 
 | 模型可见结果 | 变更前 | 变更后 |
 | --- | --- | --- |
@@ -564,7 +564,7 @@ A2A 返回指导中的公开答复句：
 If it changes the User-facing conclusion, publish exactly one Thread update with `rovai send --public-only`.
 ````
 
-来源均为 [context.rs](../../../crates/rovai-core/src/context.rs)。正文文件是 CLI 的输入来源，`--file` 仍是给收件人的附件，因此不修改渠道交付提示。其他 A2A 指令、继续执行与缺失 Send 恢复指导不变，不用动态补发通知推广新用法。
+来源均为 [context.rs](../../../crates/coaxi-core/src/context.rs)。正文文件是 CLI 的输入来源，`--file` 仍是给收件人的附件，因此不修改渠道交付提示。其他 A2A 指令、继续执行与缺失 Send 恢复指导不变，不用动态补发通知推广新用法。
 
 ### Skill 索引、其他 Skill 和 Runtime 上下文
 
@@ -585,7 +585,7 @@ interface:
 | [grill-duo](../../../skills/grill-duo/SKILL.md)、[grill-duo-with-docs](../../../skills/grill-duo-with-docs/SKILL.md) | 问题与建议的消息流示例 | 保留 |
 | [review-duo](../../../skills/review-duo/SKILL.md) | 审核分工、回传、公开结论 | 保留 |
 | [member-studio 头像来源](../../../skills/member-studio/references/avatar-sourcing.md) | 头像素材的已有可选临时目录建议 | 保留；不推广为 Send 目录要求 |
-| [Single Chat Charter](../../../crates/rovai-core/resources/charter-rovai-single-chat.md) | 私聊专用允许目录，不提供 Send | 保留；不加入正文文件教程 |
+| [Single Chat Charter](../../../crates/coaxi-core/resources/charter-coaxi-single-chat.md) | 私聊专用允许目录，不提供 Send | 保留；不加入正文文件教程 |
 | Runtime Adapter 提示、原生工具输入 Schema | 提供原生文件/命令执行能力 | 保留；不注入第二份 Rovai Send 文案 |
 | `MEMBER_IDENTITY / COLLABORATION_STATE / SELF_ACTIVE_TASKS / RUN_FACTS / RUN_INPUT` 等 | 成员、职责和实际消息输入 | shape、选择、预算、投递和解释语义均不变 |
 | Memory Entrypoint、Skill 索引、历史与引用 | 按既有权限和选择规则加载 | 不重写旧文字，不注入迁移通知 |
@@ -620,7 +620,7 @@ interface:
 | Operation 数量、Send Schema、输出字段 | 当前目录 | 不变 |
 | 数据库 Schema、应用版本指针 | 当前状态 | 不因本方案改变 |
 
-来源：[context_contract.rs](../../../crates/rovai-core/src/context_contract.rs)、[builtin_tool_transport.rs](../../../crates/rovai-core/src/builtin_tool_transport.rs)。Antigravity 等 Runtime 已有固定兼容身份不被 live catalog 版本替换。若实施前编号已被其他交付占用，重新核对当前基线和版本记录，不静默覆盖别人已交付的版本语义。
+来源：[context_contract.rs](../../../crates/coaxi-core/src/context_contract.rs)、[builtin_tool_transport.rs](../../../crates/coaxi-core/src/builtin_tool_transport.rs)。Antigravity 等 Runtime 已有固定兼容身份不被 live catalog 版本替换。若实施前编号已被其他交付占用，重新核对当前基线和版本记录，不静默覆盖别人已交付的版本语义。
 
 新 CLI 能力、帮助和受管 Skill 随同一产品版本发布，避免新教学遇到旧解析器。新 Run 按既有 preflight 使用兼容 CLI/Core，本文不承诺独立混装新旧二进制。已有 Session 保持冻结 Bootstrap，合法 JSON 继续执行；受管 Skill 沿原路径同步，旧 Session 主动读取时可看到新版文件，但不承诺其自动改变习惯。
 
@@ -704,15 +704,15 @@ User 已查看完整 r4，并收到对三项修改意见的具体判断与替换
 
 | 文件 | 基线 SHA-256 |
 | --- | --- |
-| [crates/rovai-core/resources/charter-rovai-cli.md](../../../crates/rovai-core/resources/charter-rovai-cli.md) | `6fc8b98edd8e1bdaf99cc85eceb5e30ff73b913a49c5ebd091412e2c56168bd0` |
-| [crates/rovai-core/src/bin/rovai.rs](../../../crates/rovai-core/src/bin/rovai.rs) | `eb47a548a8ba15602d2096d53837ae21d2fc405e447ceae9affc5c3db1251659` |
-| [crates/rovai-core/src/camp_message_send_teaching.rs](../../../crates/rovai-core/src/camp_message_send_teaching.rs) | `ad043af06d76d095d163d1544b372cbb7ca9f9e213c4db8e4a4e46745bc9007f` |
+| [crates/rovai-core/resources/charter-rovai-cli.md](../../../crates/coaxi-core/resources/charter-coaxi-cli.md) | `6fc8b98edd8e1bdaf99cc85eceb5e30ff73b913a49c5ebd091412e2c56168bd0` |
+| [crates/rovai-core/src/bin/rovai.rs](../../../crates/coaxi-core/src/bin/coaxi.rs) | `eb47a548a8ba15602d2096d53837ae21d2fc405e447ceae9affc5c3db1251659` |
+| [crates/rovai-core/src/camp_message_send_teaching.rs](../../../crates/coaxi-core/src/camp_message_send_teaching.rs) | `ad043af06d76d095d163d1544b372cbb7ca9f9e213c4db8e4a4e46745bc9007f` |
 | [skills/cli-operations/SKILL.md](../../../skills/cli-operations/SKILL.md) | `58eb093bd43fffc383bb3b005d71d2df1294c94a5ff3d0fb7a5b4a79ccec9755` |
 | [skills/cli-operations/references/send.md](../../../skills/cli-operations/references/send.md) | `db28fa639b4eb1b4d8008feb7645bf1198e6a2290030cb19950ce288123c3928` |
-| [crates/rovai-core/src/context.rs](../../../crates/rovai-core/src/context.rs) | `422605947774deb5380cde820f3284cddd7829f01334f4f62c77732f4b533466` |
-| [crates/rovai-core/src/context_contract.rs](../../../crates/rovai-core/src/context_contract.rs) | `55094c915b06a3742e48fbaaf93b7cd19391baf6cfec449594e3d8de676cd9b6` |
-| [crates/rovai-core/src/team_tool.rs](../../../crates/rovai-core/src/team_tool.rs) | `401e46bb5c10ec91270da64eb1c4ff401ea36aefdaf35b78dfbac1239492bb4e` |
-| [crates/rovai-core/src/builtin_tool_transport.rs](../../../crates/rovai-core/src/builtin_tool_transport.rs) | `90b3a9e979763bed71faa81a465d9705a24ab6f47c0de0a51c950a7747bf3cd4` |
+| [crates/rovai-core/src/context.rs](../../../crates/coaxi-core/src/context.rs) | `422605947774deb5380cde820f3284cddd7829f01334f4f62c77732f4b533466` |
+| [crates/rovai-core/src/context_contract.rs](../../../crates/coaxi-core/src/context_contract.rs) | `55094c915b06a3742e48fbaaf93b7cd19391baf6cfec449594e3d8de676cd9b6` |
+| [crates/rovai-core/src/team_tool.rs](../../../crates/coaxi-core/src/team_tool.rs) | `401e46bb5c10ec91270da64eb1c4ff401ea36aefdaf35b78dfbac1239492bb4e` |
+| [crates/rovai-core/src/builtin_tool_transport.rs](../../../crates/coaxi-core/src/builtin_tool_transport.rs) | `90b3a9e979763bed71faa81a465d9705a24ab6f47c0de0a51c950a7747bf3cd4` |
 
 ## r4 文档交付验证记录（实施前历史）
 

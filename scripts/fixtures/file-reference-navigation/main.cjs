@@ -3,7 +3,7 @@ const { mkdirSync, writeFileSync } = require('node:fs')
 const { isAbsolute, join, dirname } = require('node:path')
 const { app, BrowserWindow } = require('electron')
 const [renderer, userData] = process.argv.slice(2)
-const interactive = process.env.ROVAI_SHOW_FILE_REFERENCE_FIXTURE === '1'
+const interactive = process.env.COAXI_SHOW_FILE_REFERENCE_FIXTURE === '1'
 assert.ok(isAbsolute(renderer) && isAbsolute(userData))
 mkdirSync(userData, { recursive: true })
 app.setPath('userData', userData)
@@ -12,7 +12,7 @@ app.setPath('sessionData', join(userData, 'session'))
 // This fixture mounts the production Camp and file preview with a closed fake API.
 // It never starts Core, SQLite, a Skill Library, or a Runtime.
 app.whenReady().then(async () => {
-  const window = new BrowserWindow({ show: process.platform === 'linux' || interactive, width: 1440, height: 920, useContentSize: true,
+  const window = new BrowserWindow({ show: true, width: 1440, height: 920, useContentSize: true,
     webPreferences: { contextIsolation: true, sandbox: true, nodeIntegration: false, backgroundThrottling: false } })
   window.webContents.on('console-message', event => console.error(event.message))
   await window.loadFile(renderer)
@@ -72,8 +72,8 @@ app.whenReady().then(async () => {
   const cases = []
   const measurements = {}
   const check = async (name, operation) => {
-    try { await operation(); cases.push(name) } catch (error) {
-      console.error(await state())
+    try { await operation(); cases.push(name); console.log(`PASS ${name}`) } catch (error) {
+      console.error(JSON.stringify(await state(), null, 2))
       await capture('failure')
       throw new Error(`${name}: ${error.message}`, { cause: error })
     }
@@ -82,7 +82,10 @@ app.whenReady().then(async () => {
   await check('an explicit Markdown location highlights the range and anchors a long message', async () => {
     await run('window.navigationTest.bookmark()')
     const before = await state()
-    const after = await click('[title="run_report.py:44-46"]')
+    await click('[title="run_report.py:44-46"]')
+    const deadline = Date.now() + 10_000
+    let after = await state()
+    while ((!after.visible || after.targetLines.length !== 3 || !after.targetVisible) && Date.now() < deadline) after = await state()
     assert.equal(after.visible, true)
     assert.ok(after.width < before.width)
     closeTo(after.linkY, before.linkY, 'Clicked link Y after reflow')

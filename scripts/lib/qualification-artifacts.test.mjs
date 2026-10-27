@@ -41,7 +41,7 @@ test('accepted Trial normalization produces schema-valid Case, Catalog, Snapshot
     evaluationAttempts: fixture.evaluationAttempts
   })
 
-  assert.equal(caseArtifact.schemaId, 'rovai.qualification.case')
+  assert.equal(caseArtifact.schemaId, 'coaxi.qualification.case')
   assert.equal(catalogArtifact.schemaVersion, '1.1.0')
   assert.equal(snapshotArtifact.payload.coverage.state, 'complete')
   assert.equal(verifierArtifact.payload.process.state, 'succeeded')
@@ -100,7 +100,7 @@ test('Trial v1.1 represents invalid preflight without fabricating unavailable ar
 test('normalized present-role artifacts are immutable and private', async () => {
   const caseRecord = await verifyStoredCaseSeal('qualification/demo/DEMO-001')
   const fixture = acceptedFixture(caseRecord)
-  const root = await mkdtemp(join(tmpdir(), 'rovai-normalized-artifacts-'))
+  const root = await mkdtemp(join(tmpdir(), 'coaxi-normalized-artifacts-'))
   try {
     const { writeFile } = await import('node:fs/promises')
     await writeFile(
@@ -152,7 +152,7 @@ function acceptedFixture(caseRecord) {
   const result = resultFixture(caseRecord, evidenceIndex)
   const pointer = (name, schemaVersion = '1.0.0') => ({
     artifactId: `${name}:fixture`,
-    schemaId: `rovai.qualification.${name}`,
+    schemaId: `coaxi.qualification.${name}`,
     schemaVersion,
     payloadDigest: `sha256:${'b'.repeat(64)}`,
     payload: {}
@@ -289,7 +289,7 @@ function indexFixture() {
   ]
   return {
     artifactId,
-    schemaId: 'rovai.qualification.evidence-index',
+    schemaId: 'coaxi.qualification.evidence-index',
     schemaVersion: '1.0.0',
     payloadDigest: `sha256:${'3'.repeat(64)}`,
     sourceBoundaries: [{

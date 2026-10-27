@@ -102,7 +102,7 @@ function PreviewDeck({ resources, anchor, resolvedTheme, missionActivity, regist
 export function FilePreviewProvider({ threadId, resolvedTheme, api: providedApi, children, missionActivity, contained = false }: {
   threadId: string | null; resolvedTheme: ResolvedTheme; api?: FilePreviewApi; children: ReactNode; missionActivity?: ReactNode; contained?: boolean
 }): React.JSX.Element {
-  const api = providedApi ?? (typeof window === 'undefined' || window.rovai ? desktopFilePreviewApi : null)
+  const api = providedApi ?? (typeof window === 'undefined' || window.coaxi ? desktopFilePreviewApi : null)
   if (!api) throw new Error(uiAttribute('共享文件页面缺少显式资源适配。'))
   const resources = useMemo(() => windowFilePreviewResources(api), [api])
   const owner = useRef({}).current

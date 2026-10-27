@@ -5,7 +5,7 @@
   "artifactId": 10279240314,
   "inspection": "llvm-objdump -p on native CI release artifacts; SHA-256 verified against their manifest",
   "files": {
-    "rovai-host": {
+    "coaxi-host": {
       "sha256": "75b0ba33afbff50f136ebadf2f83d48698728c4783d0a84bd50638f2f9da3e9b",
       "neededLibraries": [
         "libgcc_s.so.1",
@@ -40,7 +40,7 @@
       ],
       "highestGlibcSymbolVersion": "2.39"
     },
-    "rovai": {
+    "coaxi": {
       "sha256": "11d4aabbb53d646c4acdedef8365acaef9158abf61d46333ef327affe2c36e35",
       "neededLibraries": [
         "libgcc_s.so.1",

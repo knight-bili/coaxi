@@ -429,7 +429,7 @@ describe('DingTalk channel account connection', () => {
       expect(fixture.welcomeCard).toHaveBeenCalledOnce()
       expect(fixture.intent()).toMatchObject({ state: 'completed', lastCompletedStep: 'completed' })
       expect(warn).toHaveBeenCalledWith(
-        '[rovai] DingTalk member Bot welcome failed: dingtalk_open_api_http_503'
+        '[coaxi] DingTalk member Bot welcome failed: dingtalk_open_api_http_503'
       )
     } finally {
       warn.mockRestore()
@@ -517,7 +517,7 @@ describe('DingTalk channel account connection', () => {
       deliveries: [{
         ...common,
         deliveryId: 'queue-send', deliveryKind: 'queue_ack',
-        payload: { text: 'Rovai 已接收，正在排队' },
+        payload: { text: 'Coaxi 已接收，正在排队' },
         updateMessageId: null, recallMessageId: null
       }, {
         ...common,
@@ -550,7 +550,7 @@ describe('DingTalk channel account connection', () => {
       expect(fixture.welcomeCard).toHaveBeenCalledWith(expect.objectContaining({
         outTrackId,
         space: 'p2p',
-        cardParamMap: expect.objectContaining({ staticMsgContent: 'Rovai 已接收，正在排队' })
+        cardParamMap: expect.objectContaining({ staticMsgContent: 'Coaxi 已接收，正在排队' })
       }))
       expect(fixture.welcomeCard).toHaveBeenCalledWith(expect.objectContaining({
         outTrackId: dingtalkOutTrackId('status', 'failure-attention'),
@@ -587,7 +587,7 @@ describe('DingTalk channel account connection', () => {
   })
 
   it('delivers a Core-owned agent file and settles the exact robot message identity', async () => {
-    const dir = await mkdtemp(join(tmpdir(), 'rovai-dingtalk-outbound-'))
+    const dir = await mkdtemp(join(tmpdir(), 'coaxi-dingtalk-outbound-'))
     const path = join(dir, 'report.pdf')
     const bytes = Buffer.from('report bytes')
     await writeFile(path, bytes)
@@ -624,7 +624,7 @@ describe('DingTalk channel account connection', () => {
   })
 
   it('reads an exact message Source Ref and delivers its image to the original group', async () => {
-    const dir = await mkdtemp(join(tmpdir(), 'rovai-dingtalk-image-'))
+    const dir = await mkdtemp(join(tmpdir(), 'coaxi-dingtalk-image-'))
     const path = join(dir, 'image.jpg')
     const bytes = Buffer.from('jpeg bytes')
     await writeFile(path, bytes)
@@ -721,7 +721,7 @@ describe('DingTalk channel account connection', () => {
   })
 
   it('settles an oversized file before reading or uploading bytes', async () => {
-    const dir = await mkdtemp(join(tmpdir(), 'rovai-dingtalk-oversize-'))
+    const dir = await mkdtemp(join(tmpdir(), 'coaxi-dingtalk-oversize-'))
     const path = join(dir, 'oversize.pdf')
     await writeFile(path, '')
     await truncate(path, MAX_DINGTALK_MEDIA_UPLOAD_BYTES + 1)

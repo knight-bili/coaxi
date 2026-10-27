@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { createRoot } from 'react-dom/client'
-import type { AgentProfile, AutomationRunSummary, AutomationView, CoreEvent, ProjectNavigationGroup, RovaiApi } from '@contracts'
+import type { AgentProfile, AutomationRunSummary, AutomationView, CoreEvent, ProjectNavigationGroup, CoaxiApi } from '@contracts'
 import { AutomationWorkspace } from '../../../apps/desktop/src/renderer/src/AutomationWorkspace'
 import { ThreadNavigation } from '../../../apps/desktop/src/renderer/src/ThreadNavigation'
 import { WindowDragStrip } from '../../../apps/desktop/src/renderer/src/App'
@@ -17,12 +17,12 @@ const now = '2026-09-07T01:00:00Z'
 const agents: AgentProfile[] = [
   ['luoke', '洛克', '工程实现'], ['mianzhi', '棉枝', '技术写作'], ['qilu', '祈露', '产品设计']
 ].map(([id, displayName, teamRole], memberOrder) => ({
-  agentId: id, displayName, teamRole, avatarRef: `rovai://member-avatar/builtin/${id}/v1`, accent: null,
+  agentId: id, displayName, teamRole, avatarRef: `coaxi://member-avatar/builtin/${id}/v1`, accent: null,
   professionalResponsibilities: '', personalityTraits: [], workingPrinciples: '', growthTopic: '', defaultCapabilities: [],
   presence: 'present', runtimeConfiguration: { adapterKind: 'codex-cli', model: { mode: 'explicit', modelId: 'gpt-5.4', options: {} }, permissions: { adapterKind: 'codex-cli', schemaVersion: 1, values: {} } },
   runtimeReadiness: { status: 'ready', blockers: [] }, memberOrder, version: 1, createdAt: now, updatedAt: now, removedAt: null
 }))
-const projects: ProjectNavigationGroup[] = [{ projectKey: '/workspace/rovai-ai', projectPath: '/workspace/rovai-ai', name: 'rovai-ai', lastActivityAt: now, lastActivityGlobalSequence: 0, totalCount: 0, recentThreads: [] }]
+const projects: ProjectNavigationGroup[] = [{ projectKey: '/workspace/coaxi', projectPath: '/workspace/coaxi', name: 'coaxi', lastActivityAt: now, lastActivityGlobalSequence: 0, totalCount: 0, recentThreads: [] }]
 const history: Record<string, AutomationRunSummary[]> = {}
 let automations: AutomationView[] = Object.entries(templates).map(([id, template], index) => {
   history[id] = Array.from({ length: 24 }, (_, position): AutomationRunSummary => {
@@ -48,7 +48,7 @@ const callListeners = new Set<() => void>()
 function changed(): void {
   queueMicrotask(() => listeners.forEach(listener => listener({ method: 'automations.updated', params: {} } as CoreEvent)))
 }
-window.rovai = {
+window.coaxi = {
   platform: 'darwin',
   onEvent(listener: (event: CoreEvent) => void) { listeners.add(listener); return () => listeners.delete(listener) },
   channels: { get: async () => ({ channels: ['feishu', 'dingtalk'].map(kind => ({ kind, memberBots: agents.map(agent => ({ agentId: agent.agentId, publicationStatus: kind === 'feishu' ? 'published' : 'unpublished', botDisplayName: `${agent.displayName} Bot` })) })) }), onChanged: () => () => undefined },
@@ -101,7 +101,7 @@ window.rovai = {
     changed()
     return structuredClone({ status: 'applied', code: 'ok', payload: result })
   }
-} as unknown as RovaiApi
+} as unknown as CoaxiApi
 
 function Fixture(): React.JSX.Element {
   const [, setCallRevision] = useState(0)

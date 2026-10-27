@@ -7,7 +7,7 @@ import test from 'node:test'
 import { sharedNativeTestHistory } from './native-resume-probe-history.mjs'
 
 test('shared native deletion requires an exact fresh fixture target and native ownership', async () => {
-  const root = await realpath(await mkdtemp(join(tmpdir(), 'rovai-history-owner-')))
+  const root = await realpath(await mkdtemp(join(tmpdir(), 'coaxi-history-owner-')))
   const id = '00000000-0000-4000-8000-000000000001', project = join(root, 'project')
   const base = { root, id, project, boundId: id, stages: [
     { stage: 'seed', status: 'succeeded', currentId: id, requests: [{ direction: 'launch', cwd: project }] },

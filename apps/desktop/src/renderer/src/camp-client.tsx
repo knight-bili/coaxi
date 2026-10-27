@@ -1,6 +1,6 @@
 import { uiAttribute } from './interface-language'
 import { createContext, useContext, type ReactNode } from 'react'
-import type { RovaiApi } from '@contracts'
+import type { CoaxiApi } from '@contracts'
 import { desktopThreadClient } from './desktop-camp-client'
 
 /** Dependencies of the existing Thread UI, not a public HTTP operation allowlist.
@@ -14,31 +14,31 @@ export interface EditingRecovery {
   draftCopies?(identity: string): SavedDraftCopy[]
 }
 
-export type ThreadClient = Pick<RovaiApi,
+export type ThreadClient = Pick<CoaxiApi,
   'request' | 'singleChatAttachments' | 'platform'
 > & {
-  missionAttachments: RovaiApi['missionAttachments'] | null
-  composerAttachments: Omit<RovaiApi['composerAttachments'], 'preview'> & {
+  missionAttachments: CoaxiApi['missionAttachments'] | null
+  composerAttachments: Omit<CoaxiApi['composerAttachments'], 'preview'> & {
     preview(locator: import('@contracts').LocalAttachmentOwnerLocator): Promise<Omit<import('@contracts').AttachmentPreviewResult, 'preview'> & {
       preview: import('@contracts').AttachmentPreview | { blob: Blob } | null
     }>
   }
-  nativePets?: RovaiApi['nativePets']
-  webdavWorkspace?: RovaiApi['webdavWorkspace']
-  nativeBackups?: RovaiApi['nativeBackups']
-  portableConfiguration?:RovaiApi['portableConfiguration']
-  keyboardShortcuts?:RovaiApi['keyboardShortcuts']
-  workbenchEditorRecovery?:RovaiApi['workbenchEditorRecovery']
-  nativeCustomSkills?: RovaiApi['nativeCustomSkills']
-  nativeHistory?: RovaiApi['nativeHistory']
-  projectLauncher?:RovaiApi['projectLauncher']
-  officeWorkspace?: RovaiApi['officeWorkspace']
-  interactionComputer?:RovaiApi['interactionComputer']
-  interactionWorkspace?: RovaiApi['interactionWorkspace']
-  browserWorkspace?: RovaiApi['browserWorkspace']
-  computerWorkspace?: RovaiApi['computerWorkspace']
+  nativePets?: CoaxiApi['nativePets']
+  webdavWorkspace?: CoaxiApi['webdavWorkspace']
+  nativeBackups?: CoaxiApi['nativeBackups']
+  portableConfiguration?:CoaxiApi['portableConfiguration']
+  keyboardShortcuts?:CoaxiApi['keyboardShortcuts']
+  workbenchEditorRecovery?:CoaxiApi['workbenchEditorRecovery']
+  nativeCustomSkills?: CoaxiApi['nativeCustomSkills']
+  nativeHistory?: CoaxiApi['nativeHistory']
+  projectLauncher?:CoaxiApi['projectLauncher']
+  officeWorkspace?: CoaxiApi['officeWorkspace']
+  interactionComputer?:CoaxiApi['interactionComputer']
+  interactionWorkspace?: CoaxiApi['interactionWorkspace']
+  browserWorkspace?: CoaxiApi['browserWorkspace']
+  computerWorkspace?: CoaxiApi['computerWorkspace']
   editingRecovery?: EditingRecovery
-  privateInputRecovery?: RovaiApi['privateInputRecovery']
+  privateInputRecovery?: CoaxiApi['privateInputRecovery']
   retryPendingCommand?: (method: 'runtime.interactions.resolve' | import('../../shared/private-conversation-operations').PrivateInputMethod | import('../../shared/private-conversation-operations').DelegationActionMethod, params: unknown) => Promise<void>
   /** Authenticated Host/Owner identity for advisory presentation preferences; never a resource grant. */
   presentationScope?: string
@@ -49,28 +49,28 @@ export type ThreadClient = Pick<RovaiApi,
   /** Explicit resource/platform dependencies of the shared management pages. */
   exportMonitoring: (filter: import('@contracts').MonitoringFilter) => Promise<{ exported: boolean; path?: string }>
   exportUsageActivityReport?: (query: import('@contracts').UsageActivityQuery) => Promise<{exported:boolean;path?:string}>
-  usageCard?:import('@contracts').RovaiApi['usageCard']
+  usageCard?:import('@contracts').CoaxiApi['usageCard']
   syncNativeHistoryUsage?:(input:{operation:'sync';force:boolean;after?:string})=>Promise<import('@contracts').NativeHistoryUsageSync>
   exportNativeHistoryUsage?:(query:unknown)=>Promise<{exported:boolean;path?:string}>
-  revealMonitoringExport: RovaiApi['revealMonitoringExport'] | null
+  revealMonitoringExport: CoaxiApi['revealMonitoringExport'] | null
   exportDiagnostics: () => Promise<{ exported: boolean; path?: string }>
-  revealDiagnosticsExport: RovaiApi['revealDiagnosticsExport'] | null
-  memberAvatars: RovaiApi['memberAvatars']
-  selectSkillImportDirectory: RovaiApi['selectSkillImportDirectory']
-  selectRuntimeExecutable: RovaiApi['selectRuntimeExecutable'] | null
-  revealMcpConfig: RovaiApi['revealMcpConfig'] | null
-  channels: (Pick<RovaiApi['channels'], 'get' | 'onChanged' | 'publishMemberBot' | 'retryMemberBot' | 'selectPublicationApprover'> & {
-    native: Pick<RovaiApi['channels'], 'connect' | 'disconnect' | 'cancelQrAttempt' | 'refreshLoginQr'> | null
+  revealDiagnosticsExport: CoaxiApi['revealDiagnosticsExport'] | null
+  memberAvatars: CoaxiApi['memberAvatars']
+  selectSkillImportDirectory: CoaxiApi['selectSkillImportDirectory']
+  selectRuntimeExecutable: CoaxiApi['selectRuntimeExecutable'] | null
+  revealMcpConfig: CoaxiApi['revealMcpConfig'] | null
+  channels: (Pick<CoaxiApi['channels'], 'get' | 'onChanged' | 'publishMemberBot' | 'retryMemberBot' | 'selectPublicationApprover'> & {
+    native: Pick<CoaxiApi['channels'], 'connect' | 'disconnect' | 'cancelQrAttempt' | 'refreshLoginQr'> | null
   }) | null
-  onEvent?: RovaiApi['onEvent']
+  onEvent?: CoaxiApi['onEvent']
   /** Authorized invalidation signal; it is deliberately not a CoreEvent. */
   onInvalidated?: (listener: (change?: import('@contracts').ThreadReadInvalidation) => void) => () => void
   /** Optional host shortcut; browsers retain their own tab/window shortcuts. */
-  onClosePreviewRequested?: RovaiApi['windowControls']['onCloseTabRequested']
+  onClosePreviewRequested?: CoaxiApi['windowControls']['onCloseTabRequested']
   attachmentLocation?: (locator: import('@contracts').LocalAttachmentOwnerLocator) => Promise<{ path: string; location: 'local' | 'server' } | null>
-  attachments: (RovaiApi['attachments'] & { kind: 'native' }) | {
+  attachments: (CoaxiApi['attachments'] & { kind: 'native' }) | {
     kind: 'download'
-    download: RovaiApi['attachments']['open']
+    download: CoaxiApi['attachments']['open']
   }
 }
 
@@ -89,10 +89,10 @@ export function useOptionalThreadClient():ThreadClient|null{return useContext(Th
 
 export function useThreadClient(): ThreadClient {
   // Existing Desktop mounts retain their real bridge. Browser/review mounts must
-  // inject a client; no global window.rovai shim or empty-result fallback is created.
+  // inject a client; no global window.coaxi shim or empty-result fallback is created.
   const client = useOptionalThreadClient()
   if (client) return client
-  if (typeof window === 'undefined' || window.rovai) return desktopThreadClient
+  if (typeof window === 'undefined' || window.coaxi) return desktopThreadClient
   throw new Error(uiAttribute('共享页面缺少 ThreadClientProvider；浏览器不能使用 Desktop 默认适配。'))
 }
 

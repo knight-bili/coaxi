@@ -1,8 +1,8 @@
 import type { CanvasConversationRef, CanvasNodeMutation } from '@contracts'
 import { canvasReferenceKey, regionWidthForColumns, regionHeightForRows, type CanvasDragSource, type CanvasDropHint } from './canvas-layout'
 
-// Adapted from Codeg aff1e6c278453ed8d0b96a5f664edcdca621aa3f canvas-view.tsx applyDrop/selection.
-// Apache-2.0 source license is retained at integration/licenses/codeg/LICENSE.
+// Adapted from Coaxi aff1e6c278453ed8d0b96a5f664edcdca621aa3f canvas-view.tsx applyDrop/selection.
+// Apache-2.0 source license is retained at integration/licenses/component-a/LICENSE.
 
 export type CanvasConversationSelection = { conversation: CanvasConversationRef; x: number; y: number; nodeId?: string; regionId?: string }
 
@@ -10,7 +10,7 @@ export function canvasMemberMutationSupported(mutation: CanvasNodeMutation, memb
   return mutation.type !== 'group' || !mutation.sourceMembers?.length || memberTransferVersion === 1
 }
 
-/** Codeg member cards are presentation references, not persisted node IDs or business moves. */
+/** Coaxi member cards are presentation references, not persisted node IDs or business moves. */
 export function canvasDropMutation(source: CanvasDragSource, hint: CanvasDropHint): CanvasNodeMutation | null {
   if (hint.type === 'same') return null
   if (hint.type === 'canvas') return source.kind === 'member'

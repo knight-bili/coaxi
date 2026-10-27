@@ -227,7 +227,7 @@
     ],
     "implementationFiles": [
       {
-        "file": "crates/rovai-core/src/openclaw_gateway.rs",
+        "file": "crates/coaxi-core/src/openclaw_gateway.rs",
         "sha256": "7eed72c23aa4c97f27ef2b41b9c764562c5e024a54373d4a41462c3f5f9b3945"
       },
       {

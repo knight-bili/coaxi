@@ -1,19 +1,19 @@
 ---
 name: cli-operations
-description: Choose among Rovai messages, Tasks, Missions, history and Memory; coordinate parallel member requests, multi-step operations or recovery. For one known operation, use its command help directly.
+description: Operate Coaxi's built-in browser, right-side browser panel and shared desktop windows through Coaxi tools; diagnose missing capabilities and choose the matching MCP or CLI. Also coordinate messages, Tasks, Missions, automation, history, Memory and member requests. For one known operation, use its command help directly.
 ---
 
-# Rovai CLI coordination
+# Coaxi CLI coordination
 
-Use `rovai --help` to find an operation and its exact `--help` for syntax. Read only the references needed by the current decision. Write user-facing prose in the user's language.
+Use `coaxi --help` to find an operation and its exact `--help` for syntax. Read only the references needed by the current decision. Write user-facing prose in the user's language.
 
 ## Coaxi built-in resources
 
-When the user names Coaxi's built-in browser, its right-side browser panel, or a page shared in Coaxi, use the tools of the rovai-interaction MCP server for that resource. Start with browser_list_tabs, then browser_snapshot for the chosen tab. Use the returned tab identity, generation and element ref for later actions. Do not substitute Chrome, another browser, a desktop screenshot, an external computer-use skill, or a web search for this named target.
+When the user names Coaxi's built-in browser, its right-side browser panel, or a page shared in Coaxi, use the tools of the coaxi-interaction MCP server for that resource. Start with browser_list_tabs, then browser_snapshot for the chosen tab. Use the returned tab identity, generation and element ref for later actions. Do not substitute Chrome, another browser, a desktop screenshot, an external computer-use skill, or a web search for this named target.
 
-When the user names a desktop window shared in Coaxi, use computer_list_windows and computer_snapshot from rovai-interaction for that window. A visible window or tab is not a grant. Reading needs a read grant; clicking, typing and other writes need a control grant. browser_eval needs its own enabled capability and user approval for the exact code.
+When the user names a desktop window shared in Coaxi, use computer_list_windows and computer_snapshot from coaxi-interaction for that window. A visible window or tab is not a grant. Reading needs a read grant; clicking, typing and other writes need a control grant. browser_eval needs its own enabled capability and user approval for the exact code.
 
-For Coaxi tool availability, use coaxi_diagnose_capabilities when present. Distinguish an assigned capability, its frozen delivery to the current run, a successful native tool call, and a resource grant. Do not claim one from evidence of another. If the MCP tools are absent or discovery fails, describe the missing Coaxi connection and the smallest recovery action. Do not invent a rovai browser/computer CLI command, enable a capability, widen a grant, or switch to another resource on the user's behalf. After a write returns an unknown outcome, inspect current state before any retry.
+For Coaxi tool availability, use coaxi_diagnose_capabilities when present. Distinguish an assigned capability, its frozen delivery to the current run, a successful native tool call, and a resource grant. Do not claim one from evidence of another. If the MCP tools are absent or discovery fails, describe the missing Coaxi connection and the smallest recovery action. Do not invent a coaxi browser/computer CLI command, enable a capability, widen a grant, or switch to another resource on the user's behalf. After a write returns an unknown outcome, inspect current state before any retry.
 
 ## Choose the result to preserve
 

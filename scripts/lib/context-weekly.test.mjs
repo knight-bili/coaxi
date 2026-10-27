@@ -6,7 +6,7 @@ import { join } from 'node:path'
 import { updateWeeklyTrend, weekDate, renderWeeklyTrend } from './context-weekly.mjs'
 
 test('weekly trends preserve first failures, every attempt and missing evidence instead of selecting a passing rerun', async () => {
-  const root = await mkdtemp(join(tmpdir(), 'rovai-weekly-test-'))
+  const root = await mkdtemp(join(tmpdir(), 'coaxi-weekly-test-'))
   try {
     const report = { slots: [{ arm: 'candidate', state: 'complete', hardOutcome: 'fail', rules: [], environmentKey: 'same' }], status: 'degraded', configuration: {}, suite: { digest: 'suite' }, products: { candidate: { source: { commit: 'version', contentDigest: 'source' }, coreDigest: 'binary' } }, evidenceGaps: [] }
     const retain = async (week, attempt, value) => { const dir = join(root, week, attempt); await mkdir(dir, { recursive: true }); await writeFile(join(dir, 'report.json'), JSON.stringify(value)) }

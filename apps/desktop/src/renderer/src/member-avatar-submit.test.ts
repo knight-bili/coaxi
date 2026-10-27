@@ -25,7 +25,7 @@ describe('member avatar submission', () => {
         order.push('asset')
         return {
           avatarRef:
-            'rovai://member-avatar/managed/123e4567-e89b-12d3-a456-426614174000',
+            'coaxi://member-avatar/managed/123e4567-e89b-12d3-a456-426614174000',
           crop: source.crop
         }
       },
@@ -38,9 +38,9 @@ describe('member avatar submission', () => {
     expect(order).toEqual([
       'asset',
       'draft',
-      'profile:rovai://member-avatar/managed/123e4567-e89b-12d3-a456-426614174000'
+      'profile:coaxi://member-avatar/managed/123e4567-e89b-12d3-a456-426614174000'
     ])
-    expect(result.avatarRef).toBe('rovai://member-avatar/managed/123e4567-e89b-12d3-a456-426614174000')
+    expect(result.avatarRef).toBe('coaxi://member-avatar/managed/123e4567-e89b-12d3-a456-426614174000')
     expect(result.source?.needsSave).toBe(false)
   })
 
@@ -55,7 +55,7 @@ describe('member avatar submission', () => {
         source,
         async () => ({
           avatarRef:
-            'rovai://member-avatar/managed/123e4567-e89b-12d3-a456-426614174000',
+            'coaxi://member-avatar/managed/123e4567-e89b-12d3-a456-426614174000',
           crop: source.crop
         }),
         async () => {
@@ -68,7 +68,7 @@ describe('member avatar submission', () => {
       )
     ).rejects.toThrow('version_conflict')
 
-    expect(retry.avatarRef).toBe('rovai://member-avatar/managed/123e4567-e89b-12d3-a456-426614174000')
+    expect(retry.avatarRef).toBe('coaxi://member-avatar/managed/123e4567-e89b-12d3-a456-426614174000')
     expect(retry.source?.needsSave).toBe(false)
   })
 
@@ -76,7 +76,7 @@ describe('member avatar submission', () => {
     const persist = vi.fn()
     const commit = vi.fn(async () => undefined)
     await submitMemberAvatar(
-      'rovai://member-avatar/managed/123e4567-e89b-12d3-a456-426614174000',
+      'coaxi://member-avatar/managed/123e4567-e89b-12d3-a456-426614174000',
       { ...source, needsSave: false },
       persist,
       commit,

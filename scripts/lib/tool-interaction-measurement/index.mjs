@@ -13,9 +13,9 @@ import { validateQualificationContractArtifactSchema } from '../qualification-sc
 
 export const TOOL_INTERACTION_MEASUREMENT_SCHEMA_VERSION = '2.0.0'
 export const TOOL_INTERACTION_MEASUREMENT_SCHEMA_ID =
-  'rovai.qualification.tool-interaction-measurement'
-export const TOOL_USE_JUDGE_PACK_SCHEMA_ID = 'rovai.qualification.tool-use-judge-pack'
-export const TOOL_INTERACTION_SOURCE_SCHEMA_ID = 'rovai.qualification.tool-interaction-source'
+  'coaxi.qualification.tool-interaction-measurement'
+export const TOOL_USE_JUDGE_PACK_SCHEMA_ID = 'coaxi.qualification.tool-use-judge-pack'
+export const TOOL_INTERACTION_SOURCE_SCHEMA_ID = 'coaxi.qualification.tool-interaction-source'
 export const TOOL_INTERACTION_MEASUREMENT_POLICY_ID = 'tool-interaction-measurement-v2'
 export const TOOL_USE_JUDGE_PACK_POLICY_ID = 'tool-use-judge-pack-treatment-blind-v2'
 
@@ -308,7 +308,7 @@ export function buildToolInteractionSourceArtifact({
     schemaId: TOOL_INTERACTION_SOURCE_SCHEMA_ID,
     schemaVersion: SCHEMA_VERSION,
     producer: {
-      id: 'rovai-benchmark-tool-interaction-private-source',
+      id: 'coaxi-benchmark-tool-interaction-private-source',
       version: SCHEMA_VERSION,
       digest: withSha256Prefix(producerDigest)
     },
@@ -352,7 +352,7 @@ export function validateToolInteractionSourceArtifact(artifact, measurement) {
     'Prepared Tool Fixture reference'
   )
   if (artifact.payload.preparedFixtureArtifact.schemaId
-        !== 'rovai.qualification.prepared-tool-fixture-manifest'
+        !== 'coaxi.qualification.prepared-tool-fixture-manifest'
       || artifact.payload.preparedFixtureArtifact.schemaVersion !== '2.0.0'
       || !stableDigest(artifact.payload.preparedFixtureArtifact.payloadDigest)) {
     throw new Error('Prepared Tool Fixture reference identity is invalid')
@@ -1849,7 +1849,7 @@ function envelope({ artifactId, schemaId, producerDigest, binding, sourceId, cov
     schemaId,
     schemaVersion: SCHEMA_VERSION,
     producer: {
-      id: 'rovai-benchmark-tool-interaction-measurement',
+      id: 'coaxi-benchmark-tool-interaction-measurement',
       version: SCHEMA_VERSION,
       digest: withSha256Prefix(producerDigest)
     },

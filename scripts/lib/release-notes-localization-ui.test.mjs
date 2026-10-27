@@ -14,7 +14,7 @@ const root = resolve(import.meta.dirname, '../..')
 const source = join(root, 'scripts/fixtures/release-notes-localization')
 test('真实 Electron 中更新说明随界面语言即时切换并保留版本选择与安全边界', { timeout: 120_000 }, async t => {
   if (!admitElectronIntegrationTest(t)) return
-  const fixture = await mkdtemp(join(tmpdir(), 'rovai-release-notes-localization-'))
+  const fixture = await mkdtemp(join(tmpdir(), 'coaxi-release-notes-localization-'))
   let child, closed
   try {
     await build({ configFile: false, root: source, base: './', logLevel: 'error', plugins: [react()],
@@ -38,7 +38,7 @@ test('真实 Electron 中更新说明随界面语言即时切换并保留版本�
     assert.equal(JSON.parse(output.split('\n').find(line => line.startsWith('{'))).ok, true)
   } finally {
     if (child && child.exitCode === null && child.signalCode === null) { child.kill('SIGKILL'); await closed }
-    if (process.env.ROVAI_KEEP_RELEASE_NOTES_FIXTURE === '1') process.stdout.write(`更新日志截图：${fixture}\n`)
+    if (process.env.COAXI_KEEP_RELEASE_NOTES_FIXTURE === '1') process.stdout.write(`更新日志截图：${fixture}\n`)
     else await rm(fixture, { recursive: true, force: true })
   }
 })

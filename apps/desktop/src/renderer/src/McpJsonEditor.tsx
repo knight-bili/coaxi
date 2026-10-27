@@ -5,7 +5,7 @@ import { NewConversationQuickHelp } from './NewConversationQuickHelp'
 import { UiText, uiAttribute } from './interface-language'
 
 const MASK = '********'
-const PRESERVE = '__ROVAI_PRESERVE_STORED_VALUE__'
+const PRESERVE = '__COAXI_PRESERVE_STORED_VALUE__'
 type Definition = Record<string, unknown> & {
   env?: Record<string, string>
   headers?: Record<string, string>

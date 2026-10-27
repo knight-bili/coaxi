@@ -12,7 +12,7 @@ import { startQualificationCore } from './lib/qualification-core.mjs'
 import { removeEphemeralRuntimeCampFilesRoot } from './lib/runtime-camp-files-root.mjs'
 
 const repository = resolve(import.meta.dirname, '..')
-const root = await realpath(process.env.ROVAI_DSH_SMOKE_ROOT ?? await mkdtemp(join(tmpdir(), 'rovai-dsh-availability-')))
+const root = await realpath(process.env.COAXI_DSH_SMOKE_ROOT ?? await mkdtemp(join(tmpdir(), 'coaxi-dsh-availability-')))
 assert(root.startsWith((await realpath(tmpdir())) + sep), 'Smoke root must be under the system temporary directory')
 assert.equal((await readdir(root)).length, 0, 'Use an empty isolated smoke root')
 const data = join(root, 'data'), home = join(root, 'home'), project = join(root, 'project')
@@ -120,7 +120,7 @@ async function run(threadId, expected = 'succeeded', errorCode = 'runtime_model_
     if (['succeeded', 'failed', 'cancelled'].includes(record?.status)) break
     await new Promise(done => setTimeout(done, 100))
   }
-  const db = new DatabaseSync(join(data, 'rovai.sqlite'), { readOnly: true })
+  const db = new DatabaseSync(join(data, 'coaxi.sqlite'), { readOnly: true })
   let failure
   try { failure = db.prepare('SELECT last_error_code, public_runtime_failure_json, effective_config_json FROM agent_run WHERE id = ?').get(record?.id) }
   finally { db.close() }
@@ -204,8 +204,8 @@ child.on('close', code => process.exit(code ?? 1))
   Object.assign(process.env, { DSH_HOME: home, DSH_AGENTS_HOME: join(root, 'agents'),
     DSH_TELEMETRY_DISABLED: '1', NATIVE_FIXTURE_KEY: 'native-synthetic', WEB_FIXTURE_KEY: 'web-synthetic',
     DEEPSEEK_API_KEY: 'native-synthetic' })
-  core = startQualificationCore({ coreExecutable: process.env.ROVAI_DSH_SMOKE_CORE
-    ?? join(repository, 'target/debug', process.platform === 'win32' ? 'rovai-core.exe' : 'rovai-core'),
+  core = startQualificationCore({ coreExecutable: process.env.COAXI_DSH_SMOKE_CORE
+    ?? join(repository, 'target/debug', process.platform === 'win32' ? 'coaxi-core.exe' : 'coaxi-core'),
     dataDirectory: data, workingDirectory: repository, runtimeCacheDirectory: join(root, 'cache'),
     mcpConfigPath: join(root, 'mcp.json'), onNotification: message => events.push(message) })
   await core.request('health.check')
@@ -258,7 +258,7 @@ child.on('close', code => process.exit(code ?? 1))
   assert.equal(successfulAt(await cachedTarget('effort-b'), 'effort-b'), bTime, 'Full refresh must preserve B without retimestamping it')
   // Age only the successful timestamp in this isolated fixture instead of sleeping.
   const ageB = () => {
-    const cacheDb = new DatabaseSync(join(data, 'rovai.sqlite'))
+    const cacheDb = new DatabaseSync(join(data, 'coaxi.sqlite'))
     try {
       const row = cacheDb.prepare('SELECT installation_id, model_catalog_json FROM adapter_capability_snapshot WHERE installation_id = ?').get(installation.id)
       const cached = JSON.parse(row.model_catalog_json)

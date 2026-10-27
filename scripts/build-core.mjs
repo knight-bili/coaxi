@@ -12,7 +12,7 @@ import {
 const root = resolve(import.meta.dirname, '..')
 const release = process.argv.includes('--release')
 const profile = release ? 'release' : 'debug'
-const args = ['build', '--package', 'rovai-core', '--package', 'rovai-host', '--package', 'rovai-computer']
+const args = ['build', '--package', 'coaxi-core', '--package', 'coaxi-host', '--package', 'coaxi-computer']
 const targetOption = process.argv.indexOf('--target-key')
 const targetKey = targetOption === -1
   ? hostSidecarTargetKey()
@@ -39,7 +39,7 @@ const destinationDir = stagedSidecarDirectory(root, targetKey)
 rmSync(destinationDir, { recursive: true, force: true })
 mkdirSync(destinationDir, { recursive: true })
 
-for (const binary of ['rovai-core', 'rovai-host', 'rovai', 'rovai-computer-helper']) {
+for (const binary of ['coaxi-core', 'coaxi-host', 'coaxi', 'coaxi-computer-helper']) {
   const executable = sidecarExecutableName(binary, targetKey)
   const source = resolve(sourceDir, executable)
   const destination = resolve(destinationDir, executable)

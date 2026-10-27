@@ -2,9 +2,9 @@ import type { NavigationPreferencesSnapshot, NavigationProjectLayoutEntry } from
 import { navigationProjectSidebarLayout, applyNavigationProjectLayout } from '../../shared/navigation-project-groups'
 import type { CanvasFolderResolution } from './canvas-reference-model'
 
-// Adapted from Codeg aff1e6c278453ed8d0b96a5f664edcdca621aa3f:
+// Adapted from Coaxi aff1e6c278453ed8d0b96a5f664edcdca621aa3f:
 // src/components/conversations/sidebar-conversation-grouping.ts (Apache-2.0).
-// Source license is retained at integration/licenses/codeg/LICENSE.
+// Source license is retained at integration/licenses/coaxi/LICENSE.
 
 export type ProjectLayoutItem = { kind: 'group'; groupId: string } | { kind: 'project'; projectPath: string }
 export type ProjectLayout = { top: ProjectLayoutItem[]; members: Record<string, string[]> }
@@ -14,7 +14,7 @@ export type ProjectLayoutSlot = { item: ProjectLayoutItem | null; target: Projec
 const same = (a: ProjectLayoutItem, b: ProjectLayoutItem) => a.kind === b.kind
   && (a.kind === 'group' ? a.groupId === (b as typeof a).groupId : a.projectPath === (b as typeof a).projectPath)
 
-/** Codeg's per-container layout, using Rovai paths/UUIDs. Derived worktrees never become movable roots. */
+/** Coaxi's per-container layout, using Coaxi paths/UUIDs. Derived worktrees never become movable roots. */
 export function createProjectLayout(snapshot: NavigationPreferencesSnapshot, folders: ReadonlyMap<string, CanvasFolderResolution>): ProjectLayout {
   const projects = snapshot.registeredProjects.filter(path => !snapshot.removedProjects.some(item => item.targetKey === `directory:${path}`)
     && !folders.get(path)?.parentPath).map(projectPath => ({ projectPath, projectKey: `directory:${projectPath}` }))

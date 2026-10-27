@@ -6,9 +6,9 @@ function fixture() {
   const handlers=new Map(), calls=[]
   const ipc={handle(channel,handler){handlers.set(channel,handler)}},original=ipc.handle
   const seam=installCanvasMissionIpc(ipc)
-  ipc.handle('rovai:request',async(event,method,params)=>{calls.push({event,method,params});return {kind:'value',value:{viewId:params.missionId}}})
+  ipc.handle('coaxi:request',async(event,method,params)=>{calls.push({event,method,params});return {kind:'value',value:{viewId:params.missionId}}})
   ipc.handle('other',()=> 'untouched');seam.finishRegistration();assert.equal(ipc.handle,original)
-  return {seam,calls,invoke:(method,params)=>handlers.get('rovai:request')({owner:'actual-sender'},method,params),other:()=>handlers.get('other')()}
+  return {seam,calls,invoke:(method,params)=>handlers.get('coaxi:request')({owner:'actual-sender'},method,params),other:()=>handlers.get('other')()}
 }
 test('holds one exact Mission file reply after the original handler and keeps unrelated requests unchanged',async()=>{
   const f=fixture(),gate=f.seam.holdNext({method:'missions.fileDiff',missionId:'own',fileId:'a'})

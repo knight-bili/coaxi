@@ -12,10 +12,10 @@ import { startQualificationCore } from './lib/qualification-core.mjs'
 import { removeEphemeralRuntimeCampFilesRoot } from './lib/runtime-camp-files-root.mjs'
 
 const repository = resolve(import.meta.dirname, '..')
-const root = await realpath(process.env.ROVAI_DSH_SMOKE_ROOT ?? await mkdtemp(join(tmpdir(), 'rovai-dsh-responses-')))
+const root = await realpath(process.env.COAXI_DSH_SMOKE_ROOT ?? await mkdtemp(join(tmpdir(), 'coaxi-dsh-responses-')))
 assert.equal((await readdir(root)).length, 0, 'Smoke root must be an empty, isolated directory')
 const data = join(root, 'data'), project = join(root, 'project'), home = join(root, 'home')
-const source = process.env.ROVAI_DSH_SMOKE_SOURCE ?? 'shared'
+const source = process.env.COAXI_DSH_SMOKE_SOURCE ?? 'shared'
 assert(['shared', 'web'].includes(source))
 const cases = [
   { id: 'default', provider: 'fixture', strict: false },
@@ -25,7 +25,7 @@ const cases = [
 ]
 const requests = new Map(), results = []
 let core, wireFailure
-const marker = 'ROVAI_DSH_RESPONSES_OK'
+const marker = 'COAXI_DSH_RESPONSES_OK'
 const server = createServer(async (request, response) => {
   try {
     assert.equal(request.method, 'POST')
@@ -83,7 +83,7 @@ try {
   await mkdir(home, { mode: 0o700 })
   const route = {
     api: 'openai-responses', baseURL: `http://127.0.0.1:${server.address().port}/v1`,
-    apiKeyEnv: 'ROVAI_DSH_FIXTURE_KEY', models: cases.map(item => ({
+    apiKeyEnv: 'COAXI_DSH_FIXTURE_KEY', models: cases.map(item => ({
       id: item.id, contextWindow: 200000, maxTokens: 4096, reasoningEfforts: { high: 'high' },
       ...(item.id === 'model-off' ? { compat: { supportsStrictMode: false } } : {})
     }))
@@ -103,9 +103,9 @@ try {
   process.env.DSH_HOME = home
   process.env.DSH_AGENTS_HOME = join(root, 'agents-home')
   process.env.DSH_TELEMETRY_DISABLED = '1'
-  process.env.ROVAI_DSH_FIXTURE_KEY = 'synthetic-loopback-only'
+  process.env.COAXI_DSH_FIXTURE_KEY = 'synthetic-loopback-only'
   core = startQualificationCore({
-    coreExecutable: join(repository, 'target/debug/rovai-core'), dataDirectory: data,
+    coreExecutable: join(repository, 'target/debug/coaxi-core'), dataDirectory: data,
     workingDirectory: repository, runtimeCacheDirectory: join(root, 'cache'), mcpConfigPath: join(root, 'mcp.json')
   })
   await core.request('health.check')
@@ -157,7 +157,7 @@ try {
       await new Promise(resolveWait => setTimeout(resolveWait, 200))
     }
     if (run?.status !== 'succeeded') {
-      const db = new DatabaseSync(join(data, 'rovai.sqlite'), { readOnly: true })
+      const db = new DatabaseSync(join(data, 'coaxi.sqlite'), { readOnly: true })
       try {
         const failure = db.prepare('SELECT last_error_code, public_runtime_failure_json FROM agent_run WHERE id = ?').get(run?.id)
         assert.fail(JSON.stringify(failure))
@@ -170,7 +170,7 @@ try {
       throw error
     })
     assert.equal(file?.trim() ?? null, scenario.rejected ? null : marker)
-    const db = new DatabaseSync(join(data, 'rovai.sqlite'), { readOnly: true })
+    const db = new DatabaseSync(join(data, 'coaxi.sqlite'), { readOnly: true })
     try {
       const evidence = db.prepare("SELECT result_preview_json FROM agent_run_execution_evidence WHERE agent_run_id = ? AND kind = 'tool_result'").all(runId)
       assert(evidence.length > 0, 'Core omitted tool result')

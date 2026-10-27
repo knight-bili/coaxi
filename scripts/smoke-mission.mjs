@@ -65,7 +65,7 @@ const applied = value => { assert.equal(value.status, 'applied', JSON.stringify(
 const accepted = value => { assert.equal(value.status, 'accepted', JSON.stringify(value)); return value.payload }
 async function createProfile(displayName) {
   const result = await command('members.create', { displayName, teamRole: '使命验收队员', professionalResponsibilities: '执行隔离使命验收步骤并核对真实 Core 结果。',
-    personalityTraits: ['严谨'], workingPrinciples: '收到 mission_start 时先用 rovai mission get 读取描述，再执行其中指定的 Node 脚本。其他消息执行其中明确指定的 Node 脚本。不要改写脚本，不要额外创建 Task 或委派；脚本负责发布本次结果。', growthTopic: '' })
+    personalityTraits: ['严谨'], workingPrinciples: '收到 mission_start 时先用 coaxi mission get 读取描述，再执行其中指定的 Node 脚本。其他消息执行其中明确指定的 Node 脚本。不要改写脚本，不要额外创建 Task 或委派；脚本负责发布本次结果。', growthTopic: '' })
   applied(result); return result.resultEntity.entityId
 }
 async function setRuntime(agentId) {
@@ -123,11 +123,11 @@ async function waitForWorkspaceCleanupFinished(missionId) {
   }
   throw new Error('Mission workspace cleanup did not finish')
 }
-const generatedPreamble = `import assert from 'node:assert/strict';\nimport {execFileSync} from 'node:child_process';\nimport {readFileSync,writeFileSync,existsSync} from 'node:fs';\nimport {resolve,join} from 'node:path';\nconst cli=(args,input={})=>JSON.parse(execFileSync(process.env.ROVAI_AGENT_CLI,args,{input:JSON.stringify(input),encoding:'utf8'}));\nconst output=${JSON.stringify(output)};\nconst info=cli(['mission','get']);\nassert.deepEqual(Object.keys(info).sort(),['attachments','description','missionId','sourceMessageId','status','title']);\nassert.deepEqual(info.attachments,[]);\n`
+const generatedPreamble = `import assert from 'node:assert/strict';\nimport {execFileSync} from 'node:child_process';\nimport {readFileSync,writeFileSync,existsSync} from 'node:fs';\nimport {resolve,join} from 'node:path';\nconst cli=(args,input={})=>JSON.parse(execFileSync(process.env.COAXI_AGENT_CLI,args,{input:JSON.stringify(input),encoding:'utf8'}));\nconst output=${JSON.stringify(output)};\nconst info=cli(['mission','get']);\nassert.deepEqual(Object.keys(info).sort(),['attachments','description','missionId','sourceMessageId','status','title']);\nassert.deepEqual(info.attachments,[]);\n`
 const shellQuote = value => `'${value.replaceAll("'", "'\\''")}'`
 try {
   client = startCore(); await client.request('members.list')
-  db = new DatabaseSync(join(dataDirectory, 'rovai.sqlite')); db.exec('PRAGMA busy_timeout=5000')
+  db = new DatabaseSync(join(dataDirectory, 'coaxi.sqlite')); db.exec('PRAGMA busy_timeout=5000')
   const members = [await createProfile('Mission Lead'), await createProfile('Mission Reviewer')]
   await configureProductRuntime(client.request, 'codex-cli', members); for (const member of members) await setRuntime(member)
   const follower = join(output, 'follower.mjs'), lead = join(output, 'lead.mjs'), continuation = join(output, 'continuation.mjs'), detached = join(output, 'detached.mjs'), rebuilt = join(output, 'rebuilt.mjs'), nonGit = join(output, 'non-git.mjs')
@@ -135,9 +135,9 @@ try {
   await writeFile(lead, generatedPreamble + `assert.equal(info.status,'not_started');assert.equal(readFileSync('tracked.txt','utf8'),'base\\n');assert(!existsSync('private-untracked.txt'));\nconst updated=cli(['mission','update'],{title:'已验证持久工作区'});assert.equal(updated.changed,true);\nconst git=(...args)=>execFileSync(${JSON.stringify(gitExecutable)},args,{encoding:'utf8'}).trim();\nwriteFileSync('tracked.txt','committed\\n');git('add','tracked.txt');git('commit','-m','mission fixture committed');\nwriteFileSync('tracked.txt','staged\\n');git('add','tracked.txt');writeFileSync('tracked.txt','current net\\n');\nwriteFileSync('new.txt','new untracked\\n');writeFileSync('secret.ignored','ignored\\n');writeFileSync('delivery.md','# Mission delivery\\n实际 Agent 文件交付。\\n');\nconst sent=cli(['send'],{publicOnly:true,body:'MISSION_LEAD_FILE_OK',files:[resolve('delivery.md')]});\nconst delegated=cli(['send'],{to:[${JSON.stringify(members[1])}],body:${JSON.stringify(`执行本次使命验收：node ${shellQuote(follower)}。脚本完成后结束本轮。`)}});\nwriteFileSync(join(output,'lead-evidence.json'),JSON.stringify({cwd:process.cwd(),info,updated,sent,delegated}));\n`)
   await writeFile(continuation, generatedPreamble + `assert.equal(info.status,'completed');assert.equal(readFileSync('tracked.txt','utf8'),'current net\\n');const branch=execFileSync(${JSON.stringify(gitExecutable)},['symbolic-ref','--short','HEAD'],{encoding:'utf8'}).trim();assert.equal(branch,'external/mission-validation');cli(['send'],{publicOnly:true,body:'MISSION_CONTINUATION_OK'});writeFileSync(join(output,'continuation-evidence.json'),JSON.stringify({cwd:process.cwd(),info,branch}));\n`)
   await writeFile(detached, generatedPreamble + `assert.equal(info.status,'completed');let detached=false;try{execFileSync(${JSON.stringify(gitExecutable)},['symbolic-ref','--quiet','HEAD'],{encoding:'utf8'})}catch{detached=true}assert.equal(detached,true);cli(['send'],{publicOnly:true,body:'MISSION_DETACHED_OK'});writeFileSync(join(output,'detached-evidence.json'),JSON.stringify({cwd:process.cwd(),info,detached}));\n`)
-  await writeFile(rebuilt, generatedPreamble + `assert.equal(info.status,'completed');assert.equal(readFileSync('tracked.txt','utf8'),'base\\n');const branch=execFileSync(${JSON.stringify(gitExecutable)},['symbolic-ref','--short','HEAD'],{encoding:'utf8'}).trim();assert.equal(branch,'rovai/mission/001');cli(['send'],{publicOnly:true,body:'MISSION_REBUILT_OK'});writeFileSync(join(output,'rebuilt-evidence.json'),JSON.stringify({cwd:process.cwd(),info,branch}));\n`)
+  await writeFile(rebuilt, generatedPreamble + `assert.equal(info.status,'completed');assert.equal(readFileSync('tracked.txt','utf8'),'base\\n');const branch=execFileSync(${JSON.stringify(gitExecutable)},['symbolic-ref','--short','HEAD'],{encoding:'utf8'}).trim();assert.equal(branch,'coaxi/mission/001');cli(['send'],{publicOnly:true,body:'MISSION_REBUILT_OK'});writeFileSync(join(output,'rebuilt-evidence.json'),JSON.stringify({cwd:process.cwd(),info,branch}));\n`)
   await writeFile(nonGit, generatedPreamble + `assert.equal(info.status,'not_started');cli(['send'],{publicOnly:true,body:'MISSION_NON_GIT_OK'});writeFileSync(join(output,'non-git-evidence.json'),JSON.stringify({cwd:process.cwd(),info}));\n`)
-  const mission = await createMission('持久使命工作区验收', `执行 node ${shellQuote(lead)}。脚本通过 Rovai CLI 验证权限和交付，并将独立检查交给队员。无需修改脚本。`, project, members)
+  const mission = await createMission('持久使命工作区验收', `执行 node ${shellQuote(lead)}。脚本通过 Coaxi CLI 验证权限和交付，并将独立检查交给队员。无需修改脚本。`, project, members)
   report.mission = mission
   assert.equal(db.prepare('SELECT count(*) n FROM agent_run r JOIN camp_turn t ON t.id=r.camp_turn_id WHERE t.camp_id=?').get(mission.threadId).n, 0)
   assert.equal(db.prepare('SELECT count(*) n FROM mission_workspace').get().n, 0)
@@ -150,7 +150,7 @@ try {
   const snapshot = await waitForIdle(mission.threadId, 2)
   await writeFile(join(output, 'first-snapshot.json'), JSON.stringify(snapshot, null, 2))
   const workspace = db.prepare('SELECT * FROM mission_workspace WHERE mission_id=?').get(mission.missionId)
-  assert.equal(workspace.base_sha, baseSha); assert.equal(workspace.branch, 'rovai/mission/001')
+  assert.equal(workspace.base_sha, baseSha); assert.equal(workspace.branch, 'coaxi/mission/001')
   assert.equal(workspace.worktree_path, `${source}-mission-001`)
   assert.equal(workspace.working_directory, join(workspace.worktree_path, 'packages/app'))
   assert(snapshot.agentRuns.every(run => run.workspace.path === workspace.working_directory))
@@ -192,7 +192,7 @@ try {
   await client.request('missions.fileDiff', { missionId: mission.missionId, fileId: tracked.id, viewId: switched.viewId })
   report.cases.push('activity view follows the actual checkout while managed branch identity stays unchanged; old file views are rejected without reusing their temporary index')
   db.close(); db = null; await client.stop(); client = startCore(); await client.request('members.list')
-  db = new DatabaseSync(join(dataDirectory, 'rovai.sqlite')); db.exec('PRAGMA busy_timeout=5000')
+  db = new DatabaseSync(join(dataDirectory, 'coaxi.sqlite')); db.exec('PRAGMA busy_timeout=5000')
   await sendMessage(mission.threadId, `只验证原使命目录和当前状态：node ${shellQuote(continuation)}。不要推进或重开使命。`)
   const resumed = await waitForIdle(mission.threadId, 3)
   const newManifest = resumed.contextManifests.find(m => !manifests.some(old => old.id === m.id))

@@ -3,7 +3,7 @@ import type {NativeSteerEvidence} from '@contracts'
 import {useThreadClient} from './camp-client'
 import {useUiText} from './interface-language'
 import {readErrorMessage} from './error-message'
-import {JsonTreeView} from './codeg-native-content/components/ai-elements/json-tree'
+import {JsonTreeView} from './coaxi-native-content/components/ai-elements/json-tree'
 
 export function NativeSteerEvidenceDetails({commandId}:{commandId:string}):React.JSX.Element{
   const client=useThreadClient(),t=useUiText(),generation=useRef(0),busyRef=useRef(false)

@@ -15,7 +15,7 @@ test('deduplicated Built-in Command View loads only its Shell evidence and prese
   if (!admitElectronIntegrationTest(t)) return
   const root = resolve(import.meta.dirname, '../..')
   const source = join(root, 'scripts/fixtures/command-view')
-  const fixture = await mkdtemp(join(tmpdir(), 'rovai-command-view-'))
+  const fixture = await mkdtemp(join(tmpdir(), 'coaxi-command-view-'))
   let child, closed, passed = false
   try {
     await build({ configFile: false, root: source, base: './', logLevel: 'error', plugins: [react()],
@@ -41,7 +41,7 @@ test('deduplicated Built-in Command View loads only its Shell evidence and prese
     passed = true
   } finally {
     if (child && child.exitCode === null && child.signalCode === null) { child.kill('SIGKILL'); await closed }
-    if (passed && process.env.ROVAI_KEEP_COMMAND_VIEW_FIXTURE !== '1') await rm(fixture, { recursive: true, force: true })
+    if (passed && process.env.COAXI_KEEP_COMMAND_VIEW_FIXTURE !== '1') await rm(fixture, { recursive: true, force: true })
     else process.stdout.write(`Preserved Command View fixture: ${fixture}\n`)
   }
 })

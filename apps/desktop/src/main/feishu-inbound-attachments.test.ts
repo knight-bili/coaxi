@@ -27,7 +27,7 @@ describe('Feishu inbound attachments', () => {
       const message = await normalize({ sender: { sender_id: { open_id: 'user' } },
         message: { message_id: 'message', chat_id: 'chat', chat_type: 'p2p', message_type: 'post',
           content: JSON.stringify(content) }
-      } as RawMessageEvent, { botIdentity: { openId: 'bot', name: 'Rovai' }, includeRaw: true })
+      } as RawMessageEvent, { botIdentity: { openId: 'bot', name: 'Coaxi' }, includeRaw: true })
       expect(message.resources).toEqual([])
       expect(feishuInboundResources(message)).toEqual([
         { fileKey: 'file_one', name: 'read-me.txt', kind: 'file' }
@@ -43,7 +43,7 @@ describe('Feishu inbound attachments', () => {
           { tag: 'text', text: '请参考' }, { tag: 'img', image_key: 'img_one' },
           { tag: 'img', image_key: 'img_two' }, { tag: 'img', image_key: 'img_one' }
         ]] } }) }
-    } as RawMessageEvent, { botIdentity: { openId: 'bot', name: 'Rovai' } })
+    } as RawMessageEvent, { botIdentity: { openId: 'bot', name: 'Coaxi' } })
     expect(feishuInboundResources(message)).toEqual([
       { fileKey: 'img_one', name: 'image', kind: 'image' },
       { fileKey: 'img_two', name: 'image', kind: 'image' }

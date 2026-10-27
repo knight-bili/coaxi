@@ -48,7 +48,7 @@ export class BackupWorkspace{
       let output='',errors='',pending=''
       child.stdout.setEncoding('utf8');child.stderr.setEncoding('utf8')
       child.stdout.on('data',(chunk:string)=>{output+=chunk;if(output.length>40*1024*1024)child.kill()})
-      child.stderr.on('data',(chunk:string)=>{errors=(errors+chunk).slice(-16000);pending+=chunk;const lines=pending.split('\n');pending=lines.pop()??'';for(const line of lines){try{const value=JSON.parse(line) as {phase?:unknown;done?:unknown;total?:unknown};if(typeof value.phase==='string'&&typeof value.done==='number'&&typeof value.total==='number'&&!event.sender.isDestroyed())event.sender.send('rovai:backup-progress',value)}catch{/* diagnostic text stays outside the progress stream */}}})
+      child.stderr.on('data',(chunk:string)=>{errors=(errors+chunk).slice(-16000);pending+=chunk;const lines=pending.split('\n');pending=lines.pop()??'';for(const line of lines){try{const value=JSON.parse(line) as {phase?:unknown;done?:unknown;total?:unknown};if(typeof value.phase==='string'&&typeof value.done==='number'&&typeof value.total==='number'&&!event.sender.isDestroyed())event.sender.send('coaxi:backup-progress',value)}catch{/* diagnostic text stays outside the progress stream */}}})
       child.once('error',reject)
       child.once('close',code=>{if(code!==0){reject(new Error(errors||'backup.helper_failed'));return}try{resolve(JSON.parse(output.trim()) as T)}catch{reject(new Error('backup.invalid_helper_response'))}})
       child.stdin.on('error',()=>undefined);child.stdin.end(JSON.stringify({passphrase}))
@@ -60,11 +60,11 @@ export class BackupWorkspace{
     try{
       if(operation==='config_export'){
         if([...passphrase].length<8)throw new Error('config_sync.passphrase_too_short')
-        const selected=await dialog.showSaveDialog(owner,{title:'导出加密配置',defaultPath:`Rovai-settings-${new Date().toISOString().slice(0,10)}.rovai-config`,filters:[{name:'加密配置',extensions:['rovai-config']}]});if(selected.canceled||!selected.filePath)return null
+        const selected=await dialog.showSaveDialog(owner,{title:'导出加密配置',defaultPath:`Coaxi-settings-${new Date().toISOString().slice(0,10)}.coaxi-config`,filters:[{name:'加密配置',extensions:['coaxi-config']}]});if(selected.canceled||!selected.filePath)return null
         return this.execute('export',root,selected.filePath,passphrase,event,'config-snapshot',extra)
       }
       if(operation==='config_inspect'){
-        const selected=await dialog.showOpenDialog(owner,{title:'预览加密配置',properties:['openFile'],filters:[{name:'加密配置',extensions:['rovai-config']}]});if(selected.canceled||!selected.filePaths[0])return null
+        const selected=await dialog.showOpenDialog(owner,{title:'预览加密配置',properties:['openFile'],filters:[{name:'加密配置',extensions:['coaxi-config']}]});if(selected.canceled||!selected.filePaths[0])return null
         const path=selected.filePaths[0],digest=await backupFileDigest(path),preview=await this.execute<ConfigurationSnapshotPreview>('inspect',root,path,passphrase,event,'config-snapshot',[...extra,'--summary-only']);if(await backupFileDigest(path)!==digest)throw new Error('config_sync.archive_changed')
         const id=randomUUID();this.configSelections.set(id,{path,digest,localDigest:preview.localDigest,preferencesRoot:preferences,expires:Date.now()+15*60000});return {...preview,selectionId:id}
       }
@@ -110,7 +110,7 @@ export class BackupWorkspace{
     this.busy=true;let offline=false,restarting=false
     try{
       if(operation==='inspect'){
-        const chosen=await dialog.showOpenDialog(owner,{title:'选择加密备份',properties:['openFile'],filters:[{name:'加密备份',extensions:['rovai-backup','codegbak']}]})
+        const chosen=await dialog.showOpenDialog(owner,{title:'选择加密备份',properties:['openFile'],filters:[{name:'加密备份',extensions:['coaxi-backup','coaxibak']}]})
         if(chosen.canceled||!chosen.filePaths[0])return null
         const path=chosen.filePaths[0],before=await backupFileDigest(path),result=await this.execute('inspect',root,path,passphrase,event)
         if(await backupFileDigest(path)!==before)throw new Error('backup.archive_changed')
@@ -119,7 +119,7 @@ export class BackupWorkspace{
       let file:string
       if(operation==='create'){
         if([...passphrase].length<8)throw new Error('backup.passphrase_too_short')
-        const destination=await dialog.showSaveDialog(owner,{title:'保存加密备份',defaultPath:`Rovai-${new Date().toISOString().slice(0,10)}.rovai-backup`,filters:[{name:'加密备份',extensions:['rovai-backup']}]})
+        const destination=await dialog.showSaveDialog(owner,{title:'保存加密备份',defaultPath:`Coaxi-${new Date().toISOString().slice(0,10)}.coaxi-backup`,filters:[{name:'加密备份',extensions:['coaxi-backup']}]})
         if(destination.canceled||!destination.filePath)return null
         file=destination.filePath
       }else if(operation==='restore'){

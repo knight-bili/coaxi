@@ -10,7 +10,7 @@ import { DraftMutationCoordinator } from './draft-mutation-coordinator'
 import { mutateComposerDraft } from './ThreadWorkspace'
 import { emptyLocalThreadComposerDraft, loadLocalThreadComposerDraft, saveLocalThreadComposerDraft } from './camp-composer-local-store'
 import { campMessageSendParams } from './thread-workspace-data'
-import { readPageHandoffBlock } from './codeg-native-content/lib/browser/page-handoff-block'
+import { readPageHandoffBlock } from './coaxi-native-content/lib/browser/page-handoff-block'
 
 const readBytes = (file: File): Promise<Uint8Array> => new Promise((resolve, reject) => {
   const reader = new FileReader()

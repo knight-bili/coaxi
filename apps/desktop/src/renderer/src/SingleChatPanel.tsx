@@ -94,7 +94,7 @@ import { useThreadDetailCopy } from './camp-detail-copy'
 
 const NON_TERMINAL_RUNS = new Set<SingleChatRunView['status']>(['queued', 'running', 'waiting'])
 export const SINGLE_CHAT_POLL_INTERVAL_MS = 800
-const END_CONFIRMATION_STORAGE_KEY = 'rovai.single-chat.skip-end-confirmation.v1'
+const END_CONFIRMATION_STORAGE_KEY = 'coaxi.single-chat.skip-end-confirmation.v1'
 
 export type SingleChatTargetRequest = {
   agentId: string
@@ -723,7 +723,7 @@ export function SingleChatPanel({
   const client = useThreadClient()
   const child = conversationKind === 'delegation_child'
   const operations = privateConversationOperations(conversationKind)
-  const endConfirmationKey = child ? 'rovai.delegation-child.skip-end-confirmation.v1' : END_CONFIRMATION_STORAGE_KEY
+  const endConfirmationKey = child ? 'coaxi.delegation-child.skip-end-confirmation.v1' : END_CONFIRMATION_STORAGE_KEY
   const mobile = useMobileLayout()
   const copy = useThreadDetailCopy()
   const panelId = useId()
@@ -1813,7 +1813,7 @@ export function SingleChatPanel({
       <div className="conversation-tools-rail">
       {currentSnapshot&&<ConversationQuestionsDock key={`questions:${currentSnapshot.conversation.id}`} scope={{threadId,conversationId:currentSnapshot.conversation.id,scopeKind:conversationKind}} members={members}/>}
       {currentSnapshot&&<ConversationSources open={sourcesToolsOpen} onOpenChange={setSourcesToolsOpen} key={`sources:${currentSnapshot.conversation.id}`} scope={{threadId,conversationId:currentSnapshot.conversation.id,scopeKind:conversationKind}} disabled={!sharedDraftState.ready||sending||returningPending||ending||!!inputState.pending} onInsert={async source=>{
-        if(!draftStore.update(current=>{const body=current[bodyDraftKey]??'';return body.includes(`rovai-source:${source.sourceSessionId}`)?current:{...current,[bodyDraftKey]:`${body}${body?'\n':''}${conversationSourceReference(source)}`}}))throw new Error(uiAttribute('当前输入已变化，资料授权记录已保留。'));
+        if(!draftStore.update(current=>{const body=current[bodyDraftKey]??'';return body.includes(`coaxi-source:${source.sourceSessionId}`)?current:{...current,[bodyDraftKey]:`${body}${body?'\n':''}${conversationSourceReference(source)}`}}))throw new Error(uiAttribute('当前输入已变化，资料授权记录已保留。'));
         if(input)await input.prepareBody();
       }}/>}
       {currentSnapshot&&<UserFeedbackDock open={feedbackToolsOpen} onOpenChange={setFeedbackToolsOpen} key={`feedback:${currentSnapshot.conversation.id}`} scope={{threadId,conversationId:currentSnapshot.conversation.id,scopeKind:conversationKind}} agentId={currentSnapshot.conversation.agentId} members={members}

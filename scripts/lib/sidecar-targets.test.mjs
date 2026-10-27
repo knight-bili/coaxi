@@ -12,7 +12,7 @@ import {
 } from './sidecar-targets.mjs'
 
 test('Windows release verification matches the current Core transport versions', () => {
-  const transport = readFileSync(new URL('../../crates/rovai-core/src/builtin_tool_transport.rs', import.meta.url), 'utf8')
+  const transport = readFileSync(new URL('../../crates/coaxi-core/src/builtin_tool_transport.rs', import.meta.url), 'utf8')
   const verifier = readFileSync(new URL('../verify-windows-release.mjs', import.meta.url), 'utf8')
   const contract = transport.match(/BUILTIN_TOOL_CONTRACT_VERSION: u32 = (\d+);/)?.[1]
   const ipc = transport.match(/BUILTIN_TOOL_IPC_PROTOCOL_VERSION: u32 = (\d+);/)?.[1]
@@ -52,27 +52,27 @@ test('maps only the four shipped sidecar targets', () => {
   assert.equal(hostServerTargetKey('linux', 'x64'), 'linux-x64')
   assert.equal(serverTarget('linux-x64').rustTarget, 'x86_64-unknown-linux-gnu')
   assert.equal(serverTarget('macos-arm64'), sidecarTarget('macos-arm64'))
-  assert.throws(() => serverTarget('linux-arm64'), /Unsupported Rovai Server target/)
+  assert.throws(() => serverTarget('linux-arm64'), /Unsupported Coaxi Server target/)
   assert.throws(
     () => hostSidecarTargetKey('win32', 'arm64'),
-    /Unsupported Rovai sidecar host/
+    /Unsupported Coaxi sidecar host/
   )
   assert.throws(
     () => sidecarTarget('windows-arm64'),
-    /Unsupported Rovai sidecar target/
+    /Unsupported Coaxi sidecar target/
   )
 })
 
 test('keeps Windows executables and staging isolated from macOS', () => {
-  assert.equal(sidecarExecutableName('rovai-core', 'windows-x64'), 'rovai-core.exe')
-  assert.equal(sidecarExecutableName('rovai', 'windows-x64'), 'rovai.exe')
-  assert.equal(sidecarExecutableName('rovai-core', 'macos-arm64'), 'rovai-core')
+  assert.equal(sidecarExecutableName('coaxi-core', 'windows-x64'), 'coaxi-core.exe')
+  assert.equal(sidecarExecutableName('coaxi', 'windows-x64'), 'coaxi.exe')
+  assert.equal(sidecarExecutableName('coaxi-core', 'macos-arm64'), 'coaxi-core')
   assert.match(
-    stagedSidecarPath('/repo', 'rovai-core', 'windows-x64'),
-    /resources[\\/]bin[\\/]windows-x64[\\/]rovai-core\.exe$/
+    stagedSidecarPath('/repo', 'coaxi-core', 'windows-x64'),
+    /resources[\\/]bin[\\/]windows-x64[\\/]coaxi-core\.exe$/
   )
   assert.match(
-    stagedSidecarPath('/repo', 'rovai-core', 'macos-x64'),
-    /resources[\\/]bin[\\/]macos-x64[\\/]rovai-core$/
+    stagedSidecarPath('/repo', 'coaxi-core', 'macos-x64'),
+    /resources[\\/]bin[\\/]macos-x64[\\/]coaxi-core$/
   )
 })

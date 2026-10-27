@@ -82,7 +82,7 @@
       ]
     },
     {
-      "case": "native clamp must be rejected by Rovai",
+      "case": "native clamp must be rejected by Coaxi",
       "thinking": "high",
       "requested": "max",
       "exact": false,

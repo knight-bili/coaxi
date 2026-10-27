@@ -1,118 +1,118 @@
 [
   {
-    "command": "rovai send --body hello",
+    "command": "coaxi send --body hello",
     "operation": "thread.message.send"
   },
   {
-    "command": "/bin/zsh -lc 'rovai send --body hello'",
+    "command": "/bin/zsh -lc 'coaxi send --body hello'",
     "operation": "thread.message.send"
   },
   {
-    "command": "env MODE=test npx --yes rovai send --body 'hello world'",
+    "command": "env MODE=test npx --yes coaxi send --body 'hello world'",
     "operation": "thread.message.send"
   },
   {
-    "command": "rovai send <<'JSON'\n{\"body\":\"$(not executed)\"}\nJSON",
+    "command": "coaxi send <<'JSON'\n{\"body\":\"$(not executed)\"}\nJSON",
     "operation": "thread.message.send"
   },
   {
-    "command": "rovai send <<JSON\n{\"body\":\"hello\"}\nJSON",
+    "command": "coaxi send <<JSON\n{\"body\":\"hello\"}\nJSON",
     "operation": "thread.message.send"
   },
   {
-    "command": "rovai send <<<'{\"body\":\"hello\"}'",
+    "command": "coaxi send <<<'{\"body\":\"hello\"}'",
     "operation": "thread.message.send"
   },
   {
-    "command": "\u001b[32mrovai\u001b[0m send --body hello",
+    "command": "\u001b[32mcoaxi\u001b[0m send --body hello",
     "operation": "thread.message.send"
   },
   {
-    "command": "\"C:\\Program Files\\PowerShell\\7\\pwsh.exe\" -Command 'rovai send --body hello'",
+    "command": "\"C:\\Program Files\\PowerShell\\7\\pwsh.exe\" -Command 'coaxi send --body hello'",
     "operation": "thread.message.send"
   },
   {
-    "command": "ROVAI send --body hello",
+    "command": "COAXI send --body hello",
     "operation": "thread.message.send"
   },
   {
-    "command": "rovai send --body hello;",
+    "command": "coaxi send --body hello;",
     "operation": "thread.message.send"
   },
   {
-    "command": "rovai send --body \"中文🙂\"",
+    "command": "coaxi send --body \"中文🙂\"",
     "operation": "thread.message.send"
   },
   {
-    "command": "rovai send --help",
+    "command": "coaxi send --help",
     "operation": null
   },
   {
-    "command": "rovai send --body hello && git status",
+    "command": "coaxi send --body hello && git status",
     "operation": null
   },
   {
-    "command": "rovai send > output.json",
+    "command": "coaxi send > output.json",
     "operation": null
   },
   {
-    "command": "rovai send --body \"$(pwd)\"",
+    "command": "coaxi send --body \"$(pwd)\"",
     "operation": null
   },
   {
-    "command": "rovai send <<JSON\n{\"body\":\"$(pwd)\"}\nJSON",
+    "command": "coaxi send <<JSON\n{\"body\":\"$(pwd)\"}\nJSON",
     "operation": null
   },
   {
-    "command": "rovai send <<JSON\n{\"body\":\"missing terminator\"}",
+    "command": "coaxi send <<JSON\n{\"body\":\"missing terminator\"}",
     "operation": null
   },
   {
-    "command": "echo 'rovai send'",
+    "command": "echo 'coaxi send'",
     "operation": null
   },
   {
-    "command": "rovai send --body 'unclosed",
+    "command": "coaxi send --body 'unclosed",
     "operation": null
   },
   {
-    "command": "rovai send --body hello; git status",
+    "command": "coaxi send --body hello; git status",
     "operation": null
   },
   {
-    "command": "rovai send --body `pwd`",
+    "command": "coaxi send --body `pwd`",
     "operation": null
   },
   {
-    "command": "rovai send --body hello | cat",
+    "command": "coaxi send --body hello | cat",
     "operation": null
   },
   {
-    "command": "rovai task nope",
+    "command": "coaxi task nope",
     "operation": null
   },
   {
-    "command": "rovai camp read",
+    "command": "coaxi camp read",
     "operation": null
   },
   {
-    "command": "pwsh -File 'rovai send'",
+    "command": "pwsh -File 'coaxi send'",
     "operation": null
   },
   {
-    "command": "rovai task get --task-id task",
+    "command": "coaxi task get --task-id task",
     "operation": "team.get_task"
   },
   {
-    "command": "rovai thread read",
+    "command": "coaxi thread read",
     "operation": "thread.read"
   },
   {
-    "command": "rovai member create",
+    "command": "coaxi member create",
     "operation": "member.create"
   },
   {
-    "command": "rovai mission status",
+    "command": "coaxi mission status",
     "operation": "mission.status"
   }
 ]

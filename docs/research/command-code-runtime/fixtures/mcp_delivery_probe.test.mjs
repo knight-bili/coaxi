@@ -52,7 +52,7 @@ test('search/schema/completed and model claims never substitute for a server cal
 });
 
 test('fixture creates a different receipt only after each actual tools/call', async () => {
-  const root = mkdtempSync(join(tmpdir(), 'rovai-mcp-fixture-test-'));
+  const root = mkdtempSync(join(tmpdir(), 'coaxi-mcp-fixture-test-'));
   const log = join(root, 'events.jsonl');
   const child = spawn(process.execPath, [fileURLToPath(new URL('./mcp_delivery_probe.mjs', import.meta.url)),
     '--server-stdio', '--record', log, '--probe-run', 'unit-test'], { stdio: ['pipe', 'pipe', 'ignore'] });

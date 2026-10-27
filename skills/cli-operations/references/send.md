@@ -1,6 +1,6 @@
 # Send
 
-Read `rovai send --help` for current inputs. A Send can independently:
+Read `coaxi send --help` for current inputs. A Send can independently:
 
 - publish a message visible to everyone in the current Thread;
 - route concrete work to Agents through frozen Deliveries;

@@ -12,14 +12,14 @@ import { removeEphemeralRuntimeCampFilesRoot } from './lib/runtime-camp-files-ro
 const repository=resolve(import.meta.dirname,'..')
 // Native workspace-write intentionally permits OS temporary directories. Put
 // the owned outside-workspace targets outside those temporary allowances.
-const root=await realpath(await mkdtemp(join(tmpdir(),'rovai-dsh-safety-')))
-const outsideRoot=await realpath(await mkdtemp(join(homedir(),'.rovai-dsh-safety-')))
+const root=await realpath(await mkdtemp(join(tmpdir(),'coaxi-dsh-safety-')))
+const outsideRoot=await realpath(await mkdtemp(join(homedir(),'.coaxi-dsh-safety-')))
 const project=join(root,'project'), data=join(root,'data'), events=[]
 await mkdir(project)
 await writeFile(join(project,'README.md'),'# Isolated DSH permission acceptance\n')
 execFileSync('git',['init','-b','main'],{cwd:project,stdio:'ignore'})
-execFileSync('git',['-c','user.name=Runtime acceptance','-c','user.email=runtime@rovai.local','commit','--allow-empty','-m','fixture'],{cwd:project,stdio:'ignore'})
-const core=startQualificationCore({coreExecutable:join(repository,'target/debug/rovai-core'),dataDirectory:data,
+execFileSync('git',['-c','user.name=Runtime acceptance','-c','user.email=runtime@coaxi.local','commit','--allow-empty','-m','fixture'],{cwd:project,stdio:'ignore'})
+const core=startQualificationCore({coreExecutable:join(repository,'target/debug/coaxi-core'),dataDirectory:data,
   workingDirectory:repository,runtimeCacheDirectory:join(root,'cache'),mcpConfigPath:join(root,'mcp.json'),onNotification:event=>events.push(event)})
 const evidence={runtime:'deepseek-harness',version:'0.1.5-rc.2',checks:[]}
 try {

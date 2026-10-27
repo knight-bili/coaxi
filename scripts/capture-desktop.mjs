@@ -7,17 +7,17 @@ import {
 } from './lib/dev-desktop.mjs'
 
 const appPath = process.argv[2]
-const outputPrefix = process.argv[3] ?? '/tmp/rovai-desktop'
-const port = Number(process.env.ROVAI_DEBUG_PORT ?? 9333)
-const captureWidth = Number(process.env.ROVAI_CAPTURE_WIDTH ?? 1440)
-const captureHeight = Number(process.env.ROVAI_CAPTURE_HEIGHT ?? 920)
-const captureScale = Number(process.env.ROVAI_CAPTURE_SCALE ?? 1)
-const captureTheme = process.env.ROVAI_CAPTURE_THEME ?? null
+const outputPrefix = process.argv[3] ?? '/tmp/coaxi-desktop'
+const port = Number(process.env.COAXI_DEBUG_PORT ?? 9333)
+const captureWidth = Number(process.env.COAXI_CAPTURE_WIDTH ?? 1440)
+const captureHeight = Number(process.env.COAXI_CAPTURE_HEIGHT ?? 920)
+const captureScale = Number(process.env.COAXI_CAPTURE_SCALE ?? 1)
+const captureTheme = process.env.COAXI_CAPTURE_THEME ?? null
 const expectedCaptureTheme = captureTheme === 'day' || captureTheme === 'night'
   ? captureTheme
   : null
-const reducedMotion = process.env.ROVAI_REDUCED_MOTION === '1'
-const targetRuntimeKind = process.env.ROVAI_CAPTURE_RUNTIME_KIND ?? null
+const reducedMotion = process.env.COAXI_REDUCED_MOTION === '1'
+const targetRuntimeKind = process.env.COAXI_CAPTURE_RUNTIME_KIND ?? null
 const targetRuntimeLabel = targetRuntimeKind && ({
   'codex-cli': 'Codex CLI',
   'opencode-cli': 'OpenCode CLI',
@@ -26,14 +26,14 @@ const targetRuntimeLabel = targetRuntimeKind && ({
   'antigravity-app': 'Antigravity App'
 })[targetRuntimeKind]
 if (!appPath) throw new Error('Usage: node scripts/capture-desktop.mjs <Coaxi.app> [output-prefix]')
-const userDataDirectory = assertUserDataIsIsolated(process.env.ROVAI_CAPTURE_USER_DATA_DIR)
+const userDataDirectory = assertUserDataIsIsolated(process.env.COAXI_CAPTURE_USER_DATA_DIR)
 seedCompletedOnboardingForAcceptance(userDataDirectory)
-if (targetRuntimeKind && !targetRuntimeLabel) throw new Error(`Unknown ROVAI_CAPTURE_RUNTIME_KIND: ${targetRuntimeKind}`)
+if (targetRuntimeKind && !targetRuntimeLabel) throw new Error(`Unknown COAXI_CAPTURE_RUNTIME_KIND: ${targetRuntimeKind}`)
 if (captureTheme && !['system', 'day', 'night'].includes(captureTheme)) {
-  throw new Error(`Unknown ROVAI_CAPTURE_THEME: ${captureTheme}`)
+  throw new Error(`Unknown COAXI_CAPTURE_THEME: ${captureTheme}`)
 }
 if (!Number.isFinite(captureScale) || captureScale < 1) {
-  throw new Error(`Unknown ROVAI_CAPTURE_SCALE: ${captureScale}`)
+  throw new Error(`Unknown COAXI_CAPTURE_SCALE: ${captureScale}`)
 }
 
 const executable = join(appPath, 'Contents', 'MacOS', 'Coaxi')
@@ -43,7 +43,7 @@ const launchArguments = [
 ]
 const app = spawn(executable, launchArguments, {
   stdio: ['ignore', 'ignore', 'pipe'],
-  env: { ...process.env, ROVAI_ALLOW_ISOLATED_INSTANCE: '1' }
+  env: { ...process.env, COAXI_ALLOW_ISOLATED_INSTANCE: '1' }
 })
 const stderr = []
 app.stderr.on('data', (chunk) => stderr.push(String(chunk)))
@@ -67,7 +67,7 @@ try {
   await waitForAppReady(cdp, 45_000)
   if (captureTheme) {
     await cdp.send('Runtime.evaluate', {
-      expression: `window.rovai.appearance.setPreference(${JSON.stringify(captureTheme)})`,
+      expression: `window.coaxi.appearance.setPreference(${JSON.stringify(captureTheme)})`,
       awaitPromise: true,
       returnByValue: true
     })
@@ -97,7 +97,7 @@ try {
       || defaultQuickChatState?.composer
       || defaultQuickChatState?.projectChoice
       || defaultQuickChatState?.intakeBoundary
-      || defaultQuickChatState?.brand !== 'Rovai AI'
+      || defaultQuickChatState?.brand !== 'Coaxi AI'
       || defaultQuickChatState?.brandSubtitle
       || defaultQuickChatState?.coreHealthEntry
       || defaultQuickChatState?.lastProjectGroup !== 'quick-chat'
@@ -108,7 +108,7 @@ try {
     throw new Error(`Packaged App did not open simplified Quick Chat by default: ${JSON.stringify(defaultQuickChatState)}`)
   }
   await capture(cdp, `${outputPrefix}-home.png`)
-  if (process.env.ROVAI_CAPTURE_ASSERT_EMPTY_ON_START === '1') {
+  if (process.env.COAXI_CAPTURE_ASSERT_EMPTY_ON_START === '1') {
     const navigationState = await cdp.send('Runtime.evaluate', {
       expression: `({
         camps: document.querySelectorAll('.camp-nav-row').length,
@@ -259,7 +259,7 @@ try {
           ? cards.find((candidate) => candidate.textContent?.includes(targetLabel))
           : cards[0]
         const button = [...(card?.querySelectorAll('button') ?? [])]
-          .find((candidate) => candidate.textContent?.includes('纳入 Rovai-ai'))
+          .find((candidate) => candidate.textContent?.includes('纳入 Coaxi'))
         if (!button || button.disabled) return false
         button.click()
         return true
@@ -478,7 +478,7 @@ try {
     }
     await capture(cdp, `${outputPrefix}-new-conversation.png`)
     capturedQuickChatComposer = true
-    if (process.env.ROVAI_CAPTURE_MENTIONS === '1') {
+    if (process.env.COAXI_CAPTURE_MENTIONS === '1') {
       const openedMembers = await cdp.send('Runtime.evaluate', {
         expression: `(() => {
           const trigger = document.querySelector('.new-camp-picker-trigger.member-trigger')
@@ -502,7 +502,7 @@ try {
         returnByValue: true
       })
       const memberState = memberMenu.result?.result?.value
-      const expectedMentionCount = Number(process.env.ROVAI_CAPTURE_EXPECT_MENTION_COUNT ?? 0)
+      const expectedMentionCount = Number(process.env.COAXI_CAPTURE_EXPECT_MENTION_COUNT ?? 0)
       if (!memberState?.memberCount
           || memberState.selectedCount !== memberState.memberCount
           || (expectedMentionCount > 0 && memberState.memberCount !== expectedMentionCount)
@@ -518,7 +518,7 @@ try {
       await capture(cdp, `${outputPrefix}-mentions.png`)
       capturedMentions = true
     }
-    if (process.env.ROVAI_CAPTURE_SEND_CAMP === '1') {
+    if (process.env.COAXI_CAPTURE_SEND_CAMP === '1') {
       const createdEmptyCamp = await cdp.send('Runtime.evaluate', {
         expression: `(() => {
           const button = document.querySelector('.new-camp-dialog .primary-button')
@@ -604,7 +604,7 @@ try {
       }
       await capture(cdp, `${outputPrefix}-camp.png`)
       capturedCampWorkspace = true
-      if (process.env.ROVAI_CAPTURE_CAMP_MANAGEMENT === '1') {
+      if (process.env.COAXI_CAPTURE_CAMP_MANAGEMENT === '1') {
         await waitForSelector(cdp, '.camp-nav-row.selected', 5_000)
         await openSelectedCampMenuItem(cdp, '删除')
         await waitForSelector(cdp, '.camp-action-dialog', 5_000)
@@ -620,7 +620,7 @@ try {
         if (!requestedDelete.result?.result?.value) throw new Error('Camp permanent delete confirmation was unavailable')
         await waitForSelector(cdp, '.delete-blockers', 5_000)
         await capture(cdp, `${outputPrefix}-delete-blocked.png`)
-        if (process.env.ROVAI_CAPTURE_DELETE_AFTER_RUN === '1') {
+        if (process.env.COAXI_CAPTURE_DELETE_AFTER_RUN === '1') {
           const stopRequested = await cdp.send('Runtime.evaluate', {
             expression: `(() => {
               const button = [...document.querySelectorAll('.camp-action-dialog button')]
@@ -639,7 +639,7 @@ try {
           })
         }
         await waitForExpression(cdp, `!document.querySelector('.camp-action-dialog')`, 5_000)
-        if (process.env.ROVAI_CAPTURE_DELETE_AFTER_RUN === '1') {
+        if (process.env.COAXI_CAPTURE_DELETE_AFTER_RUN === '1') {
           await waitForExpression(cdp, `(() => {
             const row = document.querySelector('.camp-nav-row.selected')
             return Boolean(row) && !row.querySelector('.camp-marker-loading') && !document.querySelector('.runtime-loading-mark')
@@ -693,7 +693,7 @@ try {
         await waitForExpression(cdp, `document.querySelector('.topbar h1')?.textContent === '导航与 Camp 管理验收'`, 5_000)
         await capture(cdp, `${outputPrefix}-renamed.png`)
 
-        if (process.env.ROVAI_CAPTURE_DELETE_AFTER_RUN === '1') {
+        if (process.env.COAXI_CAPTURE_DELETE_AFTER_RUN === '1') {
           await deleteSelectedCampWhenQuiescent(cdp)
           await waitForSelector(cdp, '.new-conversation-workspace.quick-chat-workspace', 5_000)
           const emptyNavigation = await cdp.send('Runtime.evaluate', {
@@ -727,7 +727,7 @@ try {
   if (capturedEmptyCamp) process.stdout.write(`${outputPrefix}-camp-empty.png\n`)
   if (capturedEmptyCampApproval) process.stdout.write(`${outputPrefix}-camp-empty-approval.png\n`)
   if (capturedCampWorkspace) process.stdout.write(`${outputPrefix}-camp.png\n`)
-  if (capturedCampWorkspace && process.env.ROVAI_CAPTURE_CAMP_MANAGEMENT === '1') {
+  if (capturedCampWorkspace && process.env.COAXI_CAPTURE_CAMP_MANAGEMENT === '1') {
     process.stdout.write(`${outputPrefix}-delete-blocked.png\n`)
     process.stdout.write(`${outputPrefix}-lead-warning.png\n`)
     process.stdout.write(`${outputPrefix}-renamed.png\n`)
@@ -888,7 +888,7 @@ async function waitForAppReady(cdp, timeoutMs) {
     if (state.result?.result?.value) return
     await wait(150)
   }
-  throw new Error(`Rovai-ai did not become ready within ${timeoutMs}ms. ${stderr.join('')}`)
+  throw new Error(`Coaxi did not become ready within ${timeoutMs}ms. ${stderr.join('')}`)
 }
 
 async function waitForSelector(cdp, selector, timeoutMs) {

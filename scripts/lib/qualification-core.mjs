@@ -7,15 +7,15 @@ import { windowsProcessTable } from './windows-process-table.mjs'
 import { runCaptured } from './qualification-common.mjs'
 import { coreDataDirectoryArguments } from './runtime-camp-files-root.mjs'
 
-export async function findCompetingRovaiProcesses() {
+export async function findCompetingCoaxiProcesses() {
   return (await processTable()).filter((process) => {
     const executable = process.executable?.replaceAll('\\', '/') ?? ''
     const command = process.command
-    return /\/rovai-core\.exe$/iu.test(executable)
-      || /\/Rovai-ai\.exe$/iu.test(executable)
-      || /^(?:\S*\/)rovai-core(?:\s|$)/.test(command)
-      || /^rovai-core(?:\s|$)/.test(command)
-      || /^\S*Rovai(?:-ai| AI)\.app\/Contents\/MacOS\/Rovai(?:-ai| AI)(?:\s|$)/.test(command)
+    return /\/coaxi-core\.exe$/iu.test(executable)
+      || /\/Coaxi\.exe$/iu.test(executable)
+      || /^(?:\S*\/)coaxi-core(?:\s|$)/.test(command)
+      || /^coaxi-core(?:\s|$)/.test(command)
+      || /^\S*Coaxi(?:-ai| AI)\.app\/Contents\/MacOS\/Coaxi(?:-ai| AI)(?:\s|$)/.test(command)
   })
 }
 
@@ -92,7 +92,7 @@ export function startQualificationCore({
   if (mcpConfigPath) args.push('--mcp-config-path', resolve(mcpConfigPath))
   const environment = { ...process.env }
   for (const key of Object.keys(environment)) {
-    if (key.startsWith('ROVAI_QUALIFICATION_')) delete environment[key]
+    if (key.startsWith('COAXI_QUALIFICATION_')) delete environment[key]
   }
   environment.CARGO_TARGET_DIR = resolve(runtimeCacheDirectory, 'cargo-target')
   environment.npm_config_cache = resolve(runtimeCacheDirectory, 'npm-cache')
@@ -113,7 +113,7 @@ export function startQualificationCore({
     child.once('close', (code, signal) => {
       closeResult = { code, signal }
       resolveClose(closeResult)
-      if (!stopping) rejectPending(new Error(`rovai-core exited early (code=${code}, signal=${signal})`))
+      if (!stopping) rejectPending(new Error(`coaxi-core exited early (code=${code}, signal=${signal})`))
     })
   })
   child.stderr.on('data', (chunk) => {
@@ -127,7 +127,7 @@ export function startQualificationCore({
     try {
       message = JSON.parse(line)
     } catch (error) {
-      rejectPending(new Error(`rovai-core emitted invalid JSON: ${error.message}`))
+      rejectPending(new Error(`coaxi-core emitted invalid JSON: ${error.message}`))
       return
     }
     if (message.kind === 'core_startup') {
@@ -166,7 +166,7 @@ export function startQualificationCore({
     pid: child.pid,
     executable,
     request(method, params = {}, timeoutMs = 60_000) {
-      if (child.exitCode !== null) return Promise.reject(new Error(`rovai-core is not running: ${method}`))
+      if (child.exitCode !== null) return Promise.reject(new Error(`coaxi-core is not running: ${method}`))
       const id = nextId++
       return new Promise((resolveRequest, rejectRequest) => {
         const timer = setTimeout(() => {
@@ -191,7 +191,7 @@ export function startQualificationCore({
       ])
       if (child.exitCode === null) child.kill('SIGKILL')
       await closePromise
-      rejectPending(new Error('rovai-core stopped'))
+      rejectPending(new Error('coaxi-core stopped'))
       return {
         ...closeResult,
         stderrDigest: stderrHash.digest('hex'),

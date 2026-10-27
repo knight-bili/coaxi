@@ -207,6 +207,6 @@ AllMembersMention 解释为目标 Camp 的所有成员并在该消息发送时�
 - [ADR-0080: Durable Camp Composer Draft](../v0.25/decisions.md#adr-0080)
 - [结构化 Mention UI 合同](../../ui/components/structured-mentions.md#不得回退的交互合同)
 - [`AgentMentionTextarea.tsx` at the ADR creation commit](https://github.com/murray17/rovai-ai/blob/8af34a17e7634a8cdb35afe4e4b84625c5162e89/apps/desktop/src/renderer/src/AgentMentionTextarea.tsx)
-- [`collaboration.rs`](../../../crates/rovai-core/src/collaboration.rs)
+- [`collaboration.rs`](../../../crates/coaxi-core/src/collaboration.rs)
 <!-- legacy-adr-body:end id=ADR-0096 -->
 <!-- legacy-adr:end id=ADR-0096 -->

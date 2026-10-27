@@ -132,7 +132,7 @@ async function runCommand(options) {
     armArtifacts[plannedArm.treatment] = arm
   }
   const executionRecord = {
-    schemaId: 'rovai.benchmark.paired-execution',
+    schemaId: 'coaxi.benchmark.paired-execution',
     schemaVersion: '1.0.0',
     definition: { id: definition.id, digest: definition.definitionDigest },
     plan: { digest: plan.integrity.payloadDigest, pairSlotId: pair.pairSlotId },
@@ -176,7 +176,7 @@ async function buildArmArtifact({
   const resultDigest = digestJson(result)
   const hardOutcomeReference = {
     artifactRole: 'qualification-trial',
-    schemaId: 'rovai.qualification.trial-result',
+    schemaId: 'coaxi.qualification.trial-result',
     schemaVersion: String(result.schemaVersion ?? 1),
     payloadDigest: resultDigest,
     disclosure: 'private'
@@ -405,7 +405,7 @@ function resourceObservation(result, trialId) {
 function resourceReference(result, trialId) {
   return {
     artifactRole: 'qualification-trial',
-    schemaId: 'rovai.qualification.trial-result',
+    schemaId: 'coaxi.qualification.trial-result',
     schemaVersion: String(result.schemaVersion ?? 1),
     payloadDigest: digestJson(result),
     disclosure: 'private',
@@ -419,7 +419,7 @@ function armReference(arm) {
 
 async function loadDefinition(path) {
   const input = JSON.parse(await readFile(path, 'utf8'))
-  const definition = input.schemaId === 'rovai.benchmark.paired-trial-definition'
+  const definition = input.schemaId === 'coaxi.benchmark.paired-trial-definition'
     ? input
     : createPairedTrialDefinition(input)
   validatePairedTrialDefinition(definition)

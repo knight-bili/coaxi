@@ -41,7 +41,7 @@
   "seams": [
     "Core per-card UUID/status/viewer model explicitly replaces original numeric DB/global connection hook; no donor store or execution authority",
     "existing Core Runtime labels and source Runtime marks replace donor custom-agent registry lookup",
-    "original presentational and pure parser bodies unchanged apart imports; existing Rovai Markdown/Terminal/locale seams remain explicit",
+    "original presentational and pure parser bodies unchanged apart imports; existing Coaxi Markdown/Terminal/locale seams remain explicit",
     "existing Core User list is metadata-only: no fabricated task body or resume reason, child bodies stay in existing viewer; full original parent-tool correlation remains pending"
   ],
   "verification": {
@@ -149,17 +149,17 @@
       "git_blob_with_filters": "95525fe9f627d1aab55c7185a58ced2ff208664d"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/types.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/lib/types.ts",
       "sha256": "19ed3a158cbb06b3342f32b0c42b1a9950d4093ac79802cac5b7cd2d9506e987",
       "git_blob_with_filters": "11debdff3d0daa0d27ebefa080d73d07c3206eea"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/source-rich.css",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/source-rich.css",
       "sha256": "4b43745e6b896dd9f8303d16522fed83abcc29124950980b1b1edaea84914178",
       "git_blob_with_filters": "699c027c3fa070942bdd0ac5f9cbffbf2f216541"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/source-copy.json",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/ui/source-copy.json",
       "sha256": "37e59b0a288181a05c3447791747aed74f77264c962f7a2c68a02d280b2e5bf7",
       "git_blob_with_filters": "5c1a94870b11076e313096a1f374b4e61b74f87c"
     },
@@ -199,52 +199,52 @@
       "git_blob_with_filters": "3f6a715f8be084333081fd77ac77d3c57dbc9aa4"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/background-task-card.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/message/background-task-card.tsx",
       "sha256": "c506cc6ff054fa2ad23a940ba1b6b27772c8700de7a26bb71c93a8c00ef41637",
       "git_blob_with_filters": "3a72f96cbce9b9a8549c1be3350c893f42f521df"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/delegated-sub-thread.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/message/delegated-sub-thread.tsx",
       "sha256": "bbc446edbc54e0248647c58ff650f65c14945697b04b0f3ddfbb319d068a68d0",
       "git_blob_with_filters": "1d4f2acd84b15bd52ef8259c8c9c664766d4ea4e"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/delegation-card-row.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/message/delegation-card-row.tsx",
       "sha256": "cd863817fa443793984a01819456c990d075ed9cd251a14cf55ef2379d04b9ed",
       "git_blob_with_filters": "2773f31f6238dd56c075040b4462b73e21244373"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/resumed-delegation-card.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/message/resumed-delegation-card.tsx",
       "sha256": "3d15f852a3ca0c00d3fda0b1f29fe5f16c378e99619e6e4ff6f5841cc277268a",
       "git_blob_with_filters": "6d71e416f5c394b3d34e4e3e35e957b8e9f6041d"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/background-task.test.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/lib/background-task.test.ts",
       "sha256": "75d9b5b0e83f2abf77858dd19c056bc8896b7993e5410e518387e80cc55973c7",
       "git_blob_with_filters": "87855d03e632ee4701ff2eab0d5c2133470f3d20"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/delegation-card.test.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/lib/delegation-card.test.ts",
       "sha256": "de5d0e7d1dcbec81e27e30e1cd846e0edfb7b11e006e77a2bd61710b68a1d499",
       "git_blob_with_filters": "fd28cb782eb008855f58689f6e04972f03038eea"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/delegation-card.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/lib/delegation-card.ts",
       "sha256": "531955d644c437d4add6d4668669dc017c851a17c51ad8b91ceb37903e28c665",
       "git_blob_with_filters": "f5f56900e0dea747bfb244b8091e0635265dea4c"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/source-agent-label.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/ui/source-agent-label.tsx",
       "sha256": "c8fa9935bc7a81a65ed3f64af1119defb1ca0b69326992064f727f8862a9ed56",
       "git_blob_with_filters": "34380740b8f08b5ab4fa5588970348782cfa4219"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/source-delegation-host.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/ui/source-delegation-host.tsx",
       "sha256": "bc0884771b819f09f6ce64c89993b74ea2f4755ee025d8c490974e0305470418",
       "git_blob_with_filters": "17d0801faabbd5052e4178632c936c1985c25a6b"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/source-delegation-types.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/ui/source-delegation-types.ts",
       "sha256": "74e6cbad149f798297c22fde88f7a087c8a7b6c28a657565dd1a27fc3bdf3e73",
       "git_blob_with_filters": "2f5791e3b3ecfd4c25b14ae081de237ae634df2d"
     },
@@ -486,42 +486,42 @@
       "sha256": "96e2a045ce0aaa92615b652c3769e5edf76561f5b5c24e52520d35683f2bede8"
     },
     {
-      "path": "file/I04委派恢复与后台卡/drafts/host-regression/rovai-delegation-viewer-UFz5MR/viewer-day-narrow.png",
+      "path": "file/I04委派恢复与后台卡/drafts/host-regression/coaxi-delegation-viewer-UFz5MR/viewer-day-narrow.png",
       "bytes": 77287,
       "sha256": "5b21f2c18545781fb11c2e80dce1d6dc89712133bf4e3e66d88297a8653bc061"
     },
     {
-      "path": "file/I04委派恢复与后台卡/drafts/host-regression/rovai-delegation-viewer-UFz5MR/viewer-day-wide.png",
+      "path": "file/I04委派恢复与后台卡/drafts/host-regression/coaxi-delegation-viewer-UFz5MR/viewer-day-wide.png",
       "bytes": 109855,
       "sha256": "11b04d1f057b23212fc909883b0be1946474d2b4345fbb4758ad303897e0e055"
     },
     {
-      "path": "file/I04委派恢复与后台卡/drafts/host-regression/rovai-delegation-viewer-UFz5MR/viewer-night-narrow.png",
+      "path": "file/I04委派恢复与后台卡/drafts/host-regression/coaxi-delegation-viewer-UFz5MR/viewer-night-narrow.png",
       "bytes": 76833,
       "sha256": "c4efcda3ff73043ea9dcf62abac1fc903a19575be4bbddb822eaa735143e81ac"
     },
     {
-      "path": "file/I04委派恢复与后台卡/drafts/host-regression/rovai-delegation-viewer-UFz5MR/viewer-night-wide.png",
+      "path": "file/I04委派恢复与后台卡/drafts/host-regression/coaxi-delegation-viewer-UFz5MR/viewer-night-wide.png",
       "bytes": 110118,
       "sha256": "8f157bed17e6941db0b4d2caa32f984a68e64730f3b5e3bfc5e930a7eb792d9e"
     },
     {
-      "path": "file/I04委派恢复与后台卡/drafts/host-regression/rovai-delegation-viewer-71TjU7/child-chat-day-narrow.png",
+      "path": "file/I04委派恢复与后台卡/drafts/host-regression/coaxi-delegation-viewer-71TjU7/child-chat-day-narrow.png",
       "bytes": 60447,
       "sha256": "15d92ec584b9e1b7347fce762c7b8c9ea90d5f06129666d74f05128522893459"
     },
     {
-      "path": "file/I04委派恢复与后台卡/drafts/host-regression/rovai-delegation-viewer-71TjU7/child-chat-day-wide.png",
+      "path": "file/I04委派恢复与后台卡/drafts/host-regression/coaxi-delegation-viewer-71TjU7/child-chat-day-wide.png",
       "bytes": 128636,
       "sha256": "717d0e7516e61c8c2e91f47ecfe7f28c3e7bd3f736852f4b9d3561490bf4e2b4"
     },
     {
-      "path": "file/I04委派恢复与后台卡/drafts/host-regression/rovai-delegation-viewer-71TjU7/child-chat-night-narrow.png",
+      "path": "file/I04委派恢复与后台卡/drafts/host-regression/coaxi-delegation-viewer-71TjU7/child-chat-night-narrow.png",
       "bytes": 62583,
       "sha256": "679aed06f2c5cb6197c64e8e50c3dbf4fb69f087fe6305714b33bcee17710716"
     },
     {
-      "path": "file/I04委派恢复与后台卡/drafts/host-regression/rovai-delegation-viewer-71TjU7/child-chat-night-wide.png",
+      "path": "file/I04委派恢复与后台卡/drafts/host-regression/coaxi-delegation-viewer-71TjU7/child-chat-night-wide.png",
       "bytes": 128467,
       "sha256": "041094a574f22ecb6bf8e59cfc74c2d10d64b96ba3b3098b410b83f90ef2cc19"
     }

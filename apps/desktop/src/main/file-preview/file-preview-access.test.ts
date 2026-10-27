@@ -12,7 +12,7 @@ afterEach(async () => {
 
 describe('file preview access', () => {
   it('opens a regular file and produces a root-relative display path', async () => {
-    const root = await mkdtemp(join(tmpdir(), 'rovai-preview-'))
+    const root = await mkdtemp(join(tmpdir(), 'coaxi-preview-'))
     await mkdir(join(root, 'docs'))
     await writeFile(join(root, 'docs', 'guide.md'), '# Guide')
     const result = await openPreviewFile(root, join(root, 'docs', 'guide.md'))
@@ -22,8 +22,8 @@ describe('file preview access', () => {
   })
 
   it('rejects symlinks that escape the authorized root', async () => {
-    const root = await mkdtemp(join(tmpdir(), 'rovai-preview-root-'))
-    const outside = await mkdtemp(join(tmpdir(), 'rovai-preview-outside-'))
+    const root = await mkdtemp(join(tmpdir(), 'coaxi-preview-root-'))
+    const outside = await mkdtemp(join(tmpdir(), 'coaxi-preview-outside-'))
     await writeFile(join(outside, 'secret.txt'), 'secret')
     await symlink(join(outside, 'secret.txt'), join(root, 'link.txt'))
     await expect(openPreviewFile(root, join(root, 'link.txt'))).rejects.toMatchObject({
@@ -32,8 +32,8 @@ describe('file preview access', () => {
   })
 
   it('opens one exact external file without turning the source root into a directory grant', async () => {
-    const root = await mkdtemp(join(tmpdir(), 'rovai-preview-root-'))
-    const outside = await mkdtemp(join(tmpdir(), 'rovai-preview-outside-'))
+    const root = await mkdtemp(join(tmpdir(), 'coaxi-preview-root-'))
+    const outside = await mkdtemp(join(tmpdir(), 'coaxi-preview-outside-'))
     await writeFile(join(outside, 'notes.txt'), 'outside note')
     await symlink(join(outside, 'notes.txt'), join(root, 'link.txt'))
 

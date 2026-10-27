@@ -54,19 +54,19 @@
       "sha256": "c358caa69003580c63d067ca5c821ff98be4060df976a6e04acc23e80edff819"
     },
     {
-      "path": "crates/rovai-core/src/application.rs",
+      "path": "crates/coaxi-core/src/application.rs",
       "sha256": "0674366a0266a85675f7ebfae45e92cce7a560d1879daf4aca1b7e3d88e8d5f1"
     },
     {
-      "path": "crates/rovai-core/src/read_model.rs",
+      "path": "crates/coaxi-core/src/read_model.rs",
       "sha256": "ffb85d224294c714d68cf31a184a5191f38d0af9eeeb8cef7a54f791df104371"
     },
     {
-      "path": "crates/rovai-core/src/read_model/canvas_references.rs",
+      "path": "crates/coaxi-core/src/read_model/canvas_references.rs",
       "sha256": "7101eebb5b1d41308ff996e43a05123955a746f936a4e05d32c01eeed953241d"
     },
     {
-      "path": "crates/rovai-web/src/operations.rs",
+      "path": "crates/coaxi-web/src/operations.rs",
       "sha256": "9d63ac2d5d64caa288b5c4aeb0ef86a1ce350ed124ad029f8b9dfa4c0c42713f"
     },
     {

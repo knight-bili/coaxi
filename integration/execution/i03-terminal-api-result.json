@@ -17,11 +17,11 @@
       "apps/web/src/client.test.ts": "4b2e223dfdfb8dbeb7fbc2a71b405039bc23fa27163bc67b76c075f8ec804e82",
       "apps/web/src/camp-adapter.test.ts": "3c1aebfb5cddb0aeffafb93398d2df002772056c0b5b99e3f7d129e5c9c0265c",
       "packages/contracts/src/index.ts": "b2d9d5cc29d0399ef02315174acbac79e77d00c59ba3b2afb5f6fa8b8375046f",
-      "crates/rovai-core/src/application.rs": "71b2e24f4acab045560b015d6fbdb826c34faa2a35fa5cbb5de236d10576c9dd",
-      "crates/rovai-core/src/canvas_node.rs": "435249999ebd179971cf763b433e10398ad30e5fbd8499ae4530a4db0c774764",
-      "crates/rovai-core/src/canvas_terminal.rs": "8fee81cbab63142449a67907eb7a45d9d8fdc3deb2dce167f3a3653b40ac309a",
-      "crates/rovai-core/src/application/canvas_terminal.rs": "e7a943d376a2e39b1397c4ab36fdc1936aab422b420ca3f0b61ea8012424f648",
-      "crates/rovai-web/src/operations.rs": "e1227fbb411aa6468831464739868109356ffbd6957fe9c6f2496f995db47144",
+      "crates/coaxi-core/src/application.rs": "71b2e24f4acab045560b015d6fbdb826c34faa2a35fa5cbb5de236d10576c9dd",
+      "crates/coaxi-core/src/canvas_node.rs": "435249999ebd179971cf763b433e10398ad30e5fbd8499ae4530a4db0c774764",
+      "crates/coaxi-core/src/canvas_terminal.rs": "8fee81cbab63142449a67907eb7a45d9d8fdc3deb2dce167f3a3653b40ac309a",
+      "crates/coaxi-core/src/application/canvas_terminal.rs": "e7a943d376a2e39b1397c4ab36fdc1936aab422b420ca3f0b61ea8012424f648",
+      "crates/coaxi-web/src/operations.rs": "e1227fbb411aa6468831464739868109356ffbd6957fe9c6f2496f995db47144",
       "docs/architecture/canvas.md": "0e9039ee4f4485949f94926ea355b8820ce8e9925e2d489d0f2273de26e9f405",
       "docs/contracts/canvas-nodes-v1.md": "f80be42c73b6f5cf0e349a22efac50f29f7e1101a32a179b839c0b76444fabc3",
       "docs/development/testing.md": "f5fce5206516210f6b0c97e50e452f30ea7b02a3d90c7229274543190a63a140",
@@ -45,10 +45,10 @@
     "work/i03/canvas-terminal-api-docs.log": "6eb03e1b66af4f3a2ae337d42e11ddb5a595f11fc6e89cd079e7d49f34c7f9e8"
   },
   "frozen_authority_files": {
-    "crates/rovai-core/src/local_attachment_source.rs": "8830581e72fc103b2f359be17a0072c5ee0cedc6eb5fe58b179ae3d255dbc1ca",
-    "crates/rovai-core/src/context.rs": "329144f38675ebedeaf5652858d457d42369455eb26c6159af61d19c02218784",
-    "crates/rovai-core/src/message_quote.rs": "efb6e962946b85c089483bb1120fe92f32458bb3b3b5e5eb668e26f8aa96481e",
-    "crates/rovai-core/src/command.rs": "22258f81dc5b76040cd0fdba20074321b5be7104e648a8278412c0736ef0d85a"
+    "crates/coaxi-core/src/local_attachment_source.rs": "8830581e72fc103b2f359be17a0072c5ee0cedc6eb5fe58b179ae3d255dbc1ca",
+    "crates/coaxi-core/src/context.rs": "329144f38675ebedeaf5652858d457d42369455eb26c6159af61d19c02218784",
+    "crates/coaxi-core/src/message_quote.rs": "efb6e962946b85c089483bb1120fe92f32458bb3b3b5e5eb668e26f8aa96481e",
+    "crates/coaxi-core/src/command.rs": "22258f81dc5b76040cd0fdba20074321b5be7104e648a8278412c0736ef0d85a"
   },
   "previous_evidence": {
     "path": "integration/execution/i03-terminal-parent-result.json",
@@ -80,7 +80,7 @@
       "exit_code": 0
     },
     "rust_syntax": {
-      "file": "crates/rovai-core/src/application.rs",
+      "file": "crates/coaxi-core/src/application.rs",
       "exit_code": 0,
       "scope": "rustfmt stdout parse only; not compiled"
     },

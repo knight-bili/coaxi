@@ -1,4 +1,4 @@
-// Adapted from Codeg aff1e6c nodes/note-node.tsx; Apache-2.0: integration/licenses/codeg/LICENSE.
+// Adapted from Codeg aff1e6c nodes/note-node.tsx; Apache-2.0: integration/licenses/component-a/LICENSE.
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import type { CanvasNode, ResolvedTheme } from '@contracts'
 import { browserCanvasStorage, type CanvasViewScope } from './canvas-view-state'

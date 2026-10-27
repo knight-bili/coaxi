@@ -12,13 +12,13 @@ import { acceptExecutionText } from './lib/execution-text-acceptance.mjs'
 
 const root = resolve(import.meta.dirname, '..')
 const defaultAppPath = process.platform === 'win32'
-  ? join(root, 'dist', 'win-unpacked', 'Rovai-ai.exe')
+  ? join(root, 'dist', 'win-unpacked', 'Coaxi.exe')
   : join(root, 'dist', 'mac-arm64', 'Coaxi.app')
 const appPath = resolve(process.argv[2] ?? defaultAppPath)
-const fixtureRoot = process.env.ROVAI_PLANNED_SHUTDOWN_ACCEPT_FIXTURE_ROOT
-  ?? await mkdtemp(join(tmpdir(), 'rovai-planned-shutdown-accept-'))
-const outputDir = process.env.ROVAI_PLANNED_SHUTDOWN_ACCEPT_OUTPUT_DIR
-  ?? await mkdtemp(join(tmpdir(), 'rovai-planned-shutdown-captures-'))
+const fixtureRoot = process.env.COAXI_PLANNED_SHUTDOWN_ACCEPT_FIXTURE_ROOT
+  ?? await mkdtemp(join(tmpdir(), 'coaxi-planned-shutdown-accept-'))
+const outputDir = process.env.COAXI_PLANNED_SHUTDOWN_ACCEPT_OUTPUT_DIR
+  ?? await mkdtemp(join(tmpdir(), 'coaxi-planned-shutdown-captures-'))
 const dataDir = join(fixtureRoot, 'user-data')
 const electronUserDataDir = process.platform === 'win32'
   ? join(dataDir, 'Electron', 'User Data')
@@ -29,11 +29,11 @@ const feedbackElectronUserDataDir = process.platform === 'win32'
   ? join(feedbackDataDir, 'Electron', 'User Data')
   : feedbackDataDir
 const projectRoot = join(fixtureRoot, 'project')
-const databasePath = join(coreDataDir, 'rovai.sqlite')
-const runtimeTempDir = process.env.ROVAI_PLANNED_SHUTDOWN_ACCEPT_RUNTIME_TMP ?? tmpdir()
+const databasePath = join(coreDataDir, 'coaxi.sqlite')
+const runtimeTempDir = process.env.COAXI_PLANNED_SHUTDOWN_ACCEPT_RUNTIME_TMP ?? tmpdir()
 const agentId = 'agent_1'
-const runtimeKind = process.env.ROVAI_PLANNED_SHUTDOWN_RUNTIME_KIND?.trim() || 'claude-code-cli'
-const textAcceptanceMode = process.env.ROVAI_EXECUTION_TEXT_ACCEPT
+const runtimeKind = process.env.COAXI_PLANNED_SHUTDOWN_RUNTIME_KIND?.trim() || 'claude-code-cli'
+const textAcceptanceMode = process.env.COAXI_EXECUTION_TEXT_ACCEPT
 const shutdownDeadlineMs = 10_000
 const promptCancellationTargetMs = 5_000
 const reportPath = join(outputDir, 'planned-shutdown-acceptance.json')
@@ -60,10 +60,10 @@ try {
   seedCompletedOnboardingForAcceptance(feedbackElectronUserDataDir)
   await writeFile(join(projectRoot, 'README.md'), '# Planned shutdown acceptance fixture\n')
   await runProcess('git', ['init', '-b', 'main'], { cwd: projectRoot })
-  await runProcess('git', ['config', 'user.name', 'Rovai-ai Planned Shutdown Acceptance'], {
+  await runProcess('git', ['config', 'user.name', 'Coaxi Planned Shutdown Acceptance'], {
     cwd: projectRoot
   })
-  await runProcess('git', ['config', 'user.email', 'planned-shutdown@rovai.local'], {
+  await runProcess('git', ['config', 'user.email', 'planned-shutdown@coaxi.local'], {
     cwd: projectRoot
   })
   await runProcess('git', ['add', 'README.md'], { cwd: projectRoot })
@@ -78,7 +78,7 @@ try {
   if (['1', 'text-and-partial'].includes(textAcceptanceMode)) {
     await evaluate(firstApp.cdp, `(() => {
       window.__textAcceptFrames = {};
-      window.rovai.onEvent((event) => {
+      window.coaxi.onEvent((event) => {
         const runId = event.params?.agentRunId;
         if (!runId || !['agent.text.delta', 'agent.thought.delta', 'agent.reasoning.summary.delta'].includes(event.method)) return;
         const counts = window.__textAcceptFrames[runId] ??= {};
@@ -103,7 +103,7 @@ try {
       'Emit that explanation as one long streaming commentary block, not as tool arguments. Do not start with a short acknowledgement or call tools before finishing that block.',
       'Stay within this one response and do not send messages through any external tool.'
     ].join(' '),
-    purpose: 'Keep one real Runtime turn active while Rovai performs a controlled shutdown.'
+    purpose: 'Keep one real Runtime turn active while Coaxi performs a controlled shutdown.'
   })
   const threadId = sent.payload?.threadId
   const agentRunId = sent.payload?.agentRunIds?.[0]
@@ -294,7 +294,7 @@ try {
     const dayCapture = join(outputDir, 'planned-shutdown-day-1040x700.png')
     await capture(feedbackApp.cdp, dayCapture)
 
-    await evaluate(feedbackApp.cdp, `window.rovai.appearance.setPreference('night')`, true)
+    await evaluate(feedbackApp.cdp, `window.coaxi.appearance.setPreference('night')`, true)
     await waitForExpression(feedbackApp.cdp,
       `document.documentElement.dataset.theme === 'night'`, 2_000, 20)
     const nightOverlay = await collectShutdownOverlay(feedbackApp.cdp, 'night', 1040, 700, 1)
@@ -404,7 +404,7 @@ try {
   if (firstApp) await terminateIsolatedApp(firstApp)
   if (recoveredApp) await terminateIsolatedApp(recoveredApp)
   if (feedbackApp) await terminateIsolatedApp(feedbackApp)
-  if (!failed && process.env.ROVAI_KEEP_PLANNED_SHUTDOWN_FIXTURE !== '1') {
+  if (!failed && process.env.COAXI_KEEP_PLANNED_SHUTDOWN_FIXTURE !== '1') {
     await rm(fixtureRoot, { recursive: true, force: true })
   } else if (failed) {
     process.stderr.write(`Preserved planned shutdown fixture: ${fixtureRoot}\n`)
@@ -426,7 +426,7 @@ async function launchApp(port, width, height, {
     stdio: ['ignore', 'ignore', 'pipe'],
     env: {
       ...process.env,
-      ROVAI_ALLOW_ISOLATED_INSTANCE: '1',
+      COAXI_ALLOW_ISOLATED_INSTANCE: '1',
       ...(process.platform === 'win32'
         ? { TEMP: runtimeTempDir, TMP: runtimeTempDir }
         : { TMPDIR: runtimeTempDir })
@@ -435,7 +435,7 @@ async function launchApp(port, width, height, {
   child.stderr.on('data', (chunk) => {
     const text = String(chunk)
     stderr.push(text)
-    if (process.env.ROVAI_PLANNED_SHUTDOWN_ACCEPT_TRACE === '1') {
+    if (process.env.COAXI_PLANNED_SHUTDOWN_ACCEPT_TRACE === '1') {
       process.stderr.write(`[${new Date().toISOString()}] packaged App stderr\n${text}`)
     }
   })
@@ -455,7 +455,7 @@ async function launchApp(port, width, height, {
     await cdp.send('Emulation.setEmulatedMedia', {
       features: [{ name: 'prefers-reduced-motion', value: 'reduce' }]
     })
-    await waitForExpression(cdp, `Boolean(window.rovai && document.querySelector('.app-shell'))`, 45_000)
+    await waitForExpression(cdp, `Boolean(window.coaxi && document.querySelector('.app-shell'))`, 45_000)
     if (waitForHealth) {
       // The shell is intentionally visible before Core startup completes.
       const health = await waitFor(async () => {
@@ -483,12 +483,12 @@ function packagedAppExecutable() {
 
 function packagedCoreExecutable() {
   return process.platform === 'win32'
-    ? join(resolve(appPath, '..'), 'resources', 'bin', 'rovai-core.exe')
-    : join(appPath, 'Contents', 'Resources', 'bin', 'rovai-core')
+    ? join(resolve(appPath, '..'), 'resources', 'bin', 'coaxi-core.exe')
+    : join(appPath, 'Contents', 'Resources', 'bin', 'coaxi-core')
 }
 
 function parseShutdownResult(stderr) {
-  const prefix = '[rovai-core] controlled shutdown result '
+  const prefix = '[coaxi-core] controlled shutdown result '
   for (const chunk of stderr.toReversed()) {
     const line = chunk.split(/\r?\n/).find((candidate) => candidate.includes(prefix))
     if (!line) continue
@@ -504,13 +504,13 @@ function parseShutdownResult(stderr) {
 async function appRequest(cdp, method, params = {}) {
   return evaluate(
     cdp,
-    `window.rovai.request(${JSON.stringify(method)}, ${JSON.stringify(params)})`,
+    `window.coaxi.request(${JSON.stringify(method)}, ${JSON.stringify(params)})`,
     true
   )
 }
 
 async function setTheme(cdp, preference) {
-  await evaluate(cdp, `window.rovai.appearance.setPreference(${JSON.stringify(preference)})`, true)
+  await evaluate(cdp, `window.coaxi.appearance.setPreference(${JSON.stringify(preference)})`, true)
   await waitForExpression(cdp,
     `document.documentElement.dataset.theme === ${JSON.stringify(preference)}`)
 }
@@ -520,7 +520,7 @@ async function requestAppQuit(app) {
 }
 
 function trace(message) {
-  if (process.env.ROVAI_PLANNED_SHUTDOWN_ACCEPT_TRACE === '1') {
+  if (process.env.COAXI_PLANNED_SHUTDOWN_ACCEPT_TRACE === '1') {
     process.stderr.write(`[${new Date().toISOString()}] ${message}\n`)
   }
 }

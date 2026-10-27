@@ -58,7 +58,7 @@ export function renderSystemOverview() {
     panel(18, 14, 1468, 132, '01  用户与工作入口', P.access, '提供目标与约束 · 参与讨论与验收 · 按需介入')
     + panel(18, 208, 1468, 376, '02  长期队员与 Camp 协作空间', P.peer, 'Peer 协作 · 轻量 Lead · 持续身份')
     + panel(334, 262, 1128, 299, 'Camp · 本次协作空间', P.peer, '未指定收件人时由 Default Lead 承接')
-    + panel(18, 644, 1468, 318, '03  Rovai Core · 核心领域与执行控制', P.resource, 'Rust · 协作事实与领域操作由 Core 承载')
+    + panel(18, 644, 1468, 318, '03  Coaxi Core · 核心领域与执行控制', P.resource, 'Rust · 协作事实与领域操作由 Core 承载')
     + panel(18, 1040, 1468, 202, '04  本机 Coding Agent Runtimes', P.runtime, '代表性产品与协议 · 按已接入能力适配')
     + panel(18, 1310, 1468, 150, '05  工作资源与外部能力', P.resource, '本地工作区与 Runtime 配置保持用户所有');
 
@@ -119,7 +119,7 @@ export function renderSystemOverview() {
     + component(282, 708, 220, 223, '协作组织与责任', 'Task · Mission · Delivery', ['目标 · 负责人 · 验收', '普通消息 · 多人邀请', '业务对象各自结算'], P.responsibility)
     + component(522, 708, 220, 223, '动态上下文', 'Bootstrap · ContextManifest', ['同伴名册 · 任务责任', '增量公共历史', '运行事实 · 工作区', '完整 RUN_INPUT 批次'], P.context)
     + component(762, 708, 220, 223, '长期记忆', ['Hearth · Companion', 'Relationship'], ['用户审核 · 正式晋升', '修订 · 替代 · 退役 · 遗忘', '按 Scope 授权读取'], P.memory)
-    + component(1002, 708, 220, 223, 'CLI + Skill Toolkit', 'Skill · CLI · Router', ['Skill 按需提供协作方法', 'rovai CLI 表达平台动作', '认证 IPC · Run 身份', '结构化结果 · 原生投影'], P.toolkit)
+    + component(1002, 708, 220, 223, 'CLI + Skill Toolkit', 'Skill · CLI · Router', ['Skill 按需提供协作方法', 'coaxi CLI 表达平台动作', '认证 IPC · Run 身份', '结构化结果 · 原生投影'], P.toolkit)
     + component(1242, 708, 220, 223, 'AgentRun 执行', 'AgentRun · Runtime Fleet', ['队列准入 · 执行配置', 'Runtime Adapter · 协议', '模型 / 权限 · 按能力接入', '原生事件 · 过程与结果'], P.runtime);
 
   const runtimes =

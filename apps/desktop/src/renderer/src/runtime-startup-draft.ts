@@ -24,8 +24,8 @@ export function runtimeEnvironmentErrors(draft: RuntimeStartupConfiguration, win
     const name = raw.trim()
     if (!/^[A-Za-z_][A-Za-z0-9_]{0,255}$/.test(name)) {
       errors[index] = '变量名需以字母或下划线开头，只含字母、数字、下划线。'
-    } else if (name.toUpperCase().startsWith('ROVAI_')) {
-      errors[index] = 'ROVAI_ 开头的变量由应用管理。'
+    } else if (name.toUpperCase().startsWith('COAXI_')) {
+      errors[index] = 'COAXI_ 开头的变量由应用管理。'
     } else if ((kind === 'claude-code-cli' ? ['ANTHROPIC_API_KEY', 'ANTHROPIC_AUTH_TOKEN', 'CLAUDE_CODE_OAUTH_TOKEN'] : kind === 'codex-cli' ? ['OPENAI_API_KEY', 'CODEX_API_KEY', 'CODEX_ACCESS_TOKEN'] : []).includes(name.toUpperCase())) {
       errors[index] = '请在原生凭据来源中配置此密钥。'
     } else if (value.includes('\0') || value.length > 65536) {

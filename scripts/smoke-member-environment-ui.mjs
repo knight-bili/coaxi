@@ -10,7 +10,7 @@ import react from '@vitejs/plugin-react'
 import { build } from 'vite'
 
 const root = resolve(import.meta.dirname, '..')
-const fixture = await mkdtemp(join(tmpdir(), 'rovai-member-session-ui-'))
+const fixture = await mkdtemp(join(tmpdir(), 'coaxi-member-session-ui-'))
 const src = join(root, '.local', 'member-session-ui-acceptance')
 const source = path => JSON.stringify(join(root, 'apps/desktop/src/renderer/src', path))
 await mkdir(src, { recursive: true })
@@ -100,6 +100,6 @@ try {
 } finally {
   if (child && child.exitCode === null && child.signalCode === null) { child.kill('SIGTERM'); await closed }
   await rm(src, { recursive: true, force: true })
-  if (passed && !process.env.ROVAI_KEEP_MEMBER_ENV_UI) await rm(fixture, { recursive: true, force: true })
+  if (passed && !process.env.COAXI_KEEP_MEMBER_ENV_UI) await rm(fixture, { recursive: true, force: true })
   else console.log(`UI evidence: ${fixture}`)
 }

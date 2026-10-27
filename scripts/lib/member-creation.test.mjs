@@ -16,7 +16,7 @@ for (const [name, entry] of [
   ['One-click conversation drafts survive switching, refresh and window recreation', 'pending-draft-main.cjs']
 ]) test(name, { timeout: 180_000 }, async t => {
   if (!admitElectronIntegrationTest(t)) return
-  const fixture = await mkdtemp(join(tmpdir(), 'rovai-member-creation-test-'))
+  const fixture = await mkdtemp(join(tmpdir(), 'coaxi-member-creation-test-'))
   let child, closed, passed = false
   try {
     await build({ configFile: false, root: source, base: './', logLevel: 'error', plugins: [react()],
@@ -37,7 +37,7 @@ for (const [name, entry] of [
     passed = true
   } finally {
     if (child && child.exitCode === null && child.signalCode === null) { child.kill('SIGKILL'); await closed }
-    if (!passed || process.env.ROVAI_KEEP_MEMBER_CREATION_FIXTURE === '1') console.log(`Member creation fixture: ${fixture}`)
+    if (!passed || process.env.COAXI_KEEP_MEMBER_CREATION_FIXTURE === '1') console.log(`Member creation fixture: ${fixture}`)
     else await rm(fixture, { recursive: true, force: true })
   }
 })

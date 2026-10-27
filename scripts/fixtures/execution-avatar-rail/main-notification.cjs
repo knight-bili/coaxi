@@ -13,7 +13,7 @@ const pause = (milliseconds = 25) => new Promise(resolve => setTimeout(resolve, 
 
 app.whenReady().then(async () => {
   const window = new BrowserWindow({
-    title: 'Rovai 通知执行定位 · 隔离验收',
+    title: 'Coaxi 通知执行定位 · 隔离验收',
     width: 1040,
     height: 700,
     useContentSize: true,

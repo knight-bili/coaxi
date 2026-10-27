@@ -20,7 +20,7 @@ export async function buildHostWebParity(outDirectory = join(repository, 'out/re
     + js.replaceAll('</script', '<\\/script') + '</script></body></html>'
   const productPath = join(outDirectory, 'production-components.html')
   await writeFile(productPath, product)
-  const viewer = `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><title>Rovai Desktop / Web 宽屏交互对照稿</title>
+  const viewer = `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><title>Coaxi Desktop / Web 宽屏交互对照稿</title>
   <style>${css}
   html,body{height:auto;min-height:100%;overflow:auto}body{margin:0;background:var(--canvas);color:var(--ink);font-family:var(--font-ui,system-ui)}
   .review-controls{padding:14px 20px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--surface);z-index:2}
@@ -41,10 +41,10 @@ export async function buildHostWebParity(outDirectory = join(repository, 'out/re
   function show(){byId('offline').checked=offline[byId('surface').value]===true;for(const s of ['desktop','web'])byId(s).hidden=s!==byId('surface').value;byId('status').textContent=notes[byId('surface').value]||'固定模拟数据；尚未发生操作。'}
   function reset(){byId('offline').checked=false;document.documentElement.dataset.theme=byId('theme').value;for(const s of ['desktop','web']){notes[s]='固定模拟数据；尚未发生操作。';offline[s]=false;byId(s).srcdoc=product.replace('<html lang="zh-CN">','<html lang="zh-CN" data-review-surface="'+s+'" data-review-scenario="'+byId('scenario').value+'" data-review-theme="'+byId('theme').value+'">')}show()}
   byId('surface').onchange=show;byId('scenario').onchange=reset;byId('theme').onchange=reset;byId('reset').onclick=reset;
-  byId('offline').onchange=()=>byId(byId('surface').value).contentWindow.postMessage({type:'rovai-parity-offline',offline:byId('offline').checked},'*');
-  window.addEventListener('message',event=>{if(event.data?.type!=='rovai-parity-status')return;const s=event.data.surface;if(!['desktop','web'].includes(s)||event.source!==byId(s).contentWindow)return;notes[s]=event.data.note;offline[s]=event.data.offline===true;show()});reset();
+  byId('offline').onchange=()=>byId(byId('surface').value).contentWindow.postMessage({type:'coaxi-parity-offline',offline:byId('offline').checked},'*');
+  window.addEventListener('message',event=>{if(event.data?.type!=='coaxi-parity-status')return;const s=event.data.surface;if(!['desktop','web'].includes(s)||event.source!==byId(s).contentWindow)return;notes[s]=event.data.note;offline[s]=event.data.offline===true;show()});reset();
   </script></body></html>`
-  const viewerPath = join(outDirectory, 'rovai-desktop-web-parity.html')
+  const viewerPath = join(outDirectory, 'coaxi-desktop-web-parity.html')
   await writeFile(viewerPath, viewer)
   return { viewerPath, productPath, outDirectory }
 }

@@ -43,9 +43,9 @@ r2 将公开 Bootstrap 收敛为同一份生成模板：已有冻结 Bootstrap �
 
 当前已经具备两项需要保留的机制：
 
-- [上下文兼容身份](../../../crates/rovai-core/src/context_contract.rs)将 Charter revision 17 与绑定兼容 revision 16 分开；
-  [Bootstrap 准备](../../../crates/rovai-core/src/context.rs)优先读取既有绑定保存的 Charter、平台 Skill 索引和 Memory Entrypoint。
-- [受管 Skill 同步](../../../crates/rovai-core/src/managed_skills.rs)在 Core 启动和新 Run 准备时更新安装包拥有的文件；
+- [上下文兼容身份](../../../crates/coaxi-core/src/context_contract.rs)将 Charter revision 17 与绑定兼容 revision 16 分开；
+  [Bootstrap 准备](../../../crates/coaxi-core/src/context.rs)优先读取既有绑定保存的 Charter、平台 Skill 索引和 Memory Entrypoint。
+- [受管 Skill 同步](../../../crates/coaxi-core/src/managed_skills.rs)在 Core 启动和新 Run 准备时更新安装包拥有的文件；
   原路径不变，模型过去已读的文字不受文件更新影响。
 
 完整原文见附录；其中 Rust 字符串已经还原为模型实际看到的文本，不用源码转义或摘要代替原文。

@@ -10,8 +10,8 @@ import { coreDataDirectoryArguments } from '../../scripts/lib/runtime-camp-files
 
 // I01验收夹具：真实Core对象和回执；不是生产旧库/消息/Session导入器。
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
-const binary = process.env.ROVAI_HOST_BIN;
-const ui = process.env.ROVAI_WEB_UI;
+const binary = process.env.COAXI_HOST_BIN;
+const ui = process.env.COAXI_WEB_UI;
 assert(binary && path.isAbsolute(binary) && ui && path.isAbsolute(ui));
 const evidenceRoot = path.resolve(process.env.FOUNDATION_EVIDENCE_ROOT ?? path.join(root, 'integration/local/migration'));
 await mkdir(evidenceRoot, { recursive: true });
@@ -23,7 +23,7 @@ const hash = (bytes) => createHash('sha256').update(bytes).digest('hex');
 const sourceLock = JSON.parse(await readFile(path.join(root, 'integration/sources.lock.json'), 'utf8'));
 const sourceCommit = sourceLock.sources.find(source => source.id === 'codeg').commit;
 const sourceFile = path.join(fixture, 'source-fixture.json');
-const source = { kind: 'normalized_codeg_test_record', sourceCommit, sourceHost: 'fixture-host-A', record: {
+const source = { kind: 'normalized_coaxi_test_record', sourceCommit, sourceHost: 'fixture-host-A', record: {
   folderId: 1, conversationId: 7, agentType: 'codex', title: 'Imported fixture', projectPath: project,
   nativeSessionRef: 'fixture-native-session-not-resumed'
 } };
@@ -47,7 +47,7 @@ const backupData = path.join(backupRoot, 'data');
 const backupProject = path.join(backupRoot, 'project');
 const skillRoot = path.join(dataDir, 'skills');
 const mcpConfig = path.join(dataDir, 'mcp.json');
-const databasePath = path.join(dataDir, 'rovai.sqlite');
+const databasePath = path.join(dataDir, 'coaxi.sqlite');
 let host;
 let origin;
 let session;
@@ -88,7 +88,7 @@ async function call(operation, params = {}) {
 function databaseState() {
   const db = new DatabaseSync(databasePath, { readOnly: true });
   try {
-    const marker = db.prepare('SELECT contract_version,projection_schema_version FROM rovai_data_contract WHERE singleton=1').get();
+    const marker = db.prepare('SELECT contract_version,projection_schema_version FROM coaxi_data_contract WHERE singleton=1').get();
     const threads = db.prepare('SELECT id FROM camp ORDER BY id').all().map(row => row.id);
     const runs = db.prepare('SELECT count(*) AS n FROM agent_run').get().n;
     const integrity = Object.values(db.prepare('PRAGMA integrity_check').get())[0];
@@ -97,7 +97,7 @@ function databaseState() {
 }
 async function plan(input, team) {
   assert.equal(input.sourceCommit, sourceCommit, 'unknown_source_version');
-  assert.equal(input.kind, 'normalized_codeg_test_record');
+  assert.equal(input.kind, 'normalized_coaxi_test_record');
   assert.equal(typeof input.sourceHost, 'string');
   assert(input.sourceHost.length > 0);
   const record = input.record;
@@ -150,7 +150,7 @@ try {
   assert.equal(before.threads.length, 0);
   await copyPrivateFixture(dataDir, backupData);
   await copyPrivateFixture(project, backupProject);
-  const backupHash = hash(await readFile(path.join(backupData, 'rovai.sqlite')));
+  const backupHash = hash(await readFile(path.join(backupData, 'coaxi.sqlite')));
   stage = 'start_before_import';
   await start();
 

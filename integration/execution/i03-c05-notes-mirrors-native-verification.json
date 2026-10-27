@@ -13,7 +13,7 @@
       "revision": "r4",
       "status": "failed",
       "checks": [],
-      "error": "Error: Native condition timed out: window.rovai.request('canvas.nodes.snapshot',{boardId:\"dc211ba3-f5c2-4afe-9159-a04c6f4bcd8f\"}).then(graph=>graph.nodes.find(node=>node.id===\"d7a268d1-0635-4b25-b60a-06b6d54461bb\")?.data.x===72)\n    at wait (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/codeg-rovai-ai-rovai-core-codeg/work/integration/integration/local/i03-c06-rc14/app/c06-native-notes-r4.mjs:38:163)\n    at async qualifyNotes (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/codeg-rovai-ai-rovai-core-codeg/work/integration/integration/local/i03-c06-rc14/app/c06-native-notes-r4.mjs:636:2)\n    at async qualify (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/codeg-rovai-ai-rovai-core-codeg/work/integration/integration/local/i03-c06-rc14/app/c06-native-notes-r4.mjs:82:4)",
+      "error": "Error: Native condition timed out: window.coaxi.request('canvas.nodes.snapshot',{boardId:\"dc211ba3-f5c2-4afe-9159-a04c6f4bcd8f\"}).then(graph=>graph.nodes.find(node=>node.id===\"d7a268d1-0635-4b25-b60a-06b6d54461bb\")?.data.x===72)\n    at wait (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/coaxi-coaxi-coaxi-core-coaxi/work/integration/integration/local/i03-c06-rc14/app/c06-native-notes-r4.mjs:38:163)\n    at async qualifyNotes (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/coaxi-coaxi-coaxi-core-coaxi/work/integration/integration/local/i03-c06-rc14/app/c06-native-notes-r4.mjs:636:2)\n    at async qualify (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/coaxi-coaxi-coaxi-core-coaxi/work/integration/integration/local/i03-c06-rc14/app/c06-native-notes-r4.mjs:82:4)",
       "renderer_errors": [],
       "runtime_errors": [],
       "test_owner_revision": "7dfacfa62972b5f5485ddb1523e05179217d7ee9",
@@ -39,7 +39,7 @@
       "revision": "r5",
       "status": "failed",
       "checks": [],
-      "error": "Error: Native condition timed out: document.querySelector('.canvas-zoom-readout').textContent==='100%'\n    at wait (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/codeg-rovai-ai-rovai-core-codeg/work/integration/integration/local/i03-c06-rc14/app/c06-native-notes-r5.mjs:38:163)\n    at async qualifyNotes (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/codeg-rovai-ai-rovai-core-codeg/work/integration/integration/local/i03-c06-rc14/app/c06-native-notes-r5.mjs:607:2)\n    at async qualify (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/codeg-rovai-ai-rovai-core-codeg/work/integration/integration/local/i03-c06-rc14/app/c06-native-notes-r5.mjs:82:4)",
+      "error": "Error: Native condition timed out: document.querySelector('.canvas-zoom-readout').textContent==='100%'\n    at wait (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/coaxi-coaxi-coaxi-core-coaxi/work/integration/integration/local/i03-c06-rc14/app/c06-native-notes-r5.mjs:38:163)\n    at async qualifyNotes (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/coaxi-coaxi-coaxi-core-coaxi/work/integration/integration/local/i03-c06-rc14/app/c06-native-notes-r5.mjs:607:2)\n    at async qualify (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/coaxi-coaxi-coaxi-core-coaxi/work/integration/integration/local/i03-c06-rc14/app/c06-native-notes-r5.mjs:82:4)",
       "renderer_errors": [
         "ResizeObserver loop completed with undelivered notifications."
       ],
@@ -72,7 +72,7 @@
       "revision": "r6",
       "status": "failed",
       "checks": [],
-      "error": "Error: Native condition timed out: window.rovai.request('canvas.nodes.snapshot',{boardId:\"de99ee6d-4dcc-49ba-8bb8-afde7d55ad45\"}).then(graph=>graph.nodes.find(node=>node.id===\"5b184edf-12a0-4fc0-94f8-73cd90a9fc35\")?.data.x===72)\n    at wait (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/codeg-rovai-ai-rovai-core-codeg/work/integration/integration/local/i03-c06-rc14/app/c06-native-notes-r6.mjs:38:163)\n    at async qualifyNotes (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/codeg-rovai-ai-rovai-core-codeg/work/integration/integration/local/i03-c06-rc14/app/c06-native-notes-r6.mjs:643:2)\n    at async qualify (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/codeg-rovai-ai-rovai-core-codeg/work/integration/integration/local/i03-c06-rc14/app/c06-native-notes-r6.mjs:82:4)",
+      "error": "Error: Native condition timed out: window.coaxi.request('canvas.nodes.snapshot',{boardId:\"de99ee6d-4dcc-49ba-8bb8-afde7d55ad45\"}).then(graph=>graph.nodes.find(node=>node.id===\"5b184edf-12a0-4fc0-94f8-73cd90a9fc35\")?.data.x===72)\n    at wait (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/coaxi-coaxi-coaxi-core-coaxi/work/integration/integration/local/i03-c06-rc14/app/c06-native-notes-r6.mjs:38:163)\n    at async qualifyNotes (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/coaxi-coaxi-coaxi-core-coaxi/work/integration/integration/local/i03-c06-rc14/app/c06-native-notes-r6.mjs:643:2)\n    at async qualify (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/coaxi-coaxi-coaxi-core-coaxi/work/integration/integration/local/i03-c06-rc14/app/c06-native-notes-r6.mjs:82:4)",
       "renderer_errors": [],
       "runtime_errors": [],
       "test_owner_revision": "9e83a0c0353f20ab4ffedf179fec3361e10c83fc",

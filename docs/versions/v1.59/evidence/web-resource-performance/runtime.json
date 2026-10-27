@@ -26,8 +26,8 @@
   "campId": "rvcamp_01m2fs85brffgaz0xryy2z9qmq",
   "status": "passed",
   "sourceCommit": "2ace68a6a7c514d143005ab75f2cf2657266235e",
-  "command": "ROVAI_HOST_ENTRY=desktop ROVAI_HOST_BIN=<packaged Host> ROVAI_APP_BIN=<packaged App> node /tmp/rovai-perf-mobile-command-20260914.mjs",
+  "command": "COAXI_HOST_ENTRY=desktop COAXI_HOST_BIN=<packaged Host> COAXI_APP_BIN=<packaged App> node /tmp/coaxi-perf-mobile-command-20260914.mjs",
   "scriptSha256": "953295cb42fe67c587fa7c602432d03af605d4c4e3105490d12b49beb1bbecfc",
-  "log": "/tmp/rovai-perf-runtime-packaged.log",
+  "log": "/tmp/coaxi-perf-runtime-packaged.log",
   "realPhone": false
 }

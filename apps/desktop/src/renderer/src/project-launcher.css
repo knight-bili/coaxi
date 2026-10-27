@@ -1,4 +1,4 @@
-html[data-coaxi-surface="project-launcher"][data-rovai-platform] #root{display:block}
+html[data-coaxi-surface="project-launcher"][data-coaxi-platform] #root{display:block}
 .project-launcher-page{height:100%;display:flex;flex-direction:column;min-height:0;overflow:hidden;background:var(--surface);color:var(--ink);font-size:13px}
 .launcher-page-heading{display:flex;align-items:center;gap:12px;padding:14px 24px;border-bottom:1px solid var(--line);flex:none}
 .launcher-page-heading>span{color:var(--muted);font-size:12px}

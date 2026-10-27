@@ -4,8 +4,8 @@ import { mkdtempSync, writeFileSync, readdirSync, readFileSync, rmSync, renameSy
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { createHash } from 'node:crypto'
-import { apply, readinessService } from '../../crates/rovai-core/src/dsh/bootstrap.mjs'
-import { prepareModels, withResponsesDefaults, observeNativeImport } from '../../crates/rovai-core/src/dsh/models.mjs'
+import { apply, readinessService } from '../../crates/coaxi-core/src/dsh/bootstrap.mjs'
+import { prepareModels, withResponsesDefaults, observeNativeImport } from '../../crates/coaxi-core/src/dsh/models.mjs'
 
 test('DSH Web supplementation preserves whole native routes and localizes unknown sources', () => {
   const route = (url, model = 'same-model') => ({ api: 'openai-responses', baseURL: url,
@@ -62,7 +62,7 @@ test('DSH Responses defaults preserve explicit Provider and Model compatibility 
 })
 
 test('DSH Patch isolation waits for native writes after rename and verifies swallowed failures', async () => {
-  const root = mkdtempSync(join(tmpdir(), 'rovai-dsh-migration-test-'))
+  const root = mkdtempSync(join(tmpdir(), 'coaxi-dsh-migration-test-'))
   try {
     const legacy = join(root, 'settings.yaml')
     const bytes = '{"llm-pi-ai":{"providers":{"relay":{"apiKeyEnv":"REFERENCE"}}}}'
@@ -102,7 +102,7 @@ test('DSH Patch isolation waits for native writes after rename and verifies swal
 })
 
 test('DSH official prompt seam binds immutable root identity per session and fails closed', async () => {
-  const root = mkdtempSync(join(tmpdir(), 'rovai-dsh-host-test-'))
+  const root = mkdtempSync(join(tmpdir(), 'coaxi-dsh-host-test-'))
   try {
     const variables = new Map(), sections = [], events = new Map(), provided = new Map()
     let denied = []
@@ -122,7 +122,7 @@ test('DSH official prompt seam binds immutable root identity per session and fai
     const binding = { schemaVersion: 1, sessionId: 'session-a', bootstrap,
       sha256: createHash('sha256').update(bootstrap).digest('hex') }
     writeFileSync(join(root, 'session-a.json'), JSON.stringify(binding))
-    const render = (id, header = {}) => variables.get('rovai_bootstrap')({ agent: { session: { id, header } } })
+    const render = (id, header = {}) => variables.get('coaxi_bootstrap')({ agent: { session: { id, header } } })
     assert.equal(render('session-a'), bootstrap)
     assert.equal(render('session-a'), bootstrap) // same assembly after a native compact
     assert.throws(() => render('session-b'))
@@ -130,7 +130,7 @@ test('DSH official prompt seam binds immutable root identity per session and fai
     assert.throws(() => render('../session-a'))
     writeFileSync(join(root, 'session-a.json'), JSON.stringify({ ...binding, bootstrap: 'tampered' }))
     assert.throws(() => render('session-a'), /binding_invalid/)
-    assert.deepEqual(sections, [{ name: 'rovai:bootstrap', order: 11000, text: '{{rovai_bootstrap}}' }])
+    assert.deepEqual(sections, [{ name: 'coaxi:bootstrap', order: 11000, text: '{{coaxi_bootstrap}}' }])
     events.get('tools/result')({ name: 'bash', callId: 'call', agent: { session: { id: 'session-a', header: {} } } },
       { isError: false, value: { exitCode: 7, stdout: { text: 'private body' } } })
     const observation = readdirSync(root).find(name => name !== 'session-a.json')

@@ -72,7 +72,7 @@ export function buildEvaluationContext(snapshot, boundary) {
     const command = item.command
     if (typeof command !== 'string' || !/(?:\b(?:npm|pnpm|yarn|bun)\s+(?:run\s+)?test\b|\bgit\b[^\n]*\bdiff\b[^\n]*--check\b|\b(?:node|python3?|jq)\b)/.test(command)) continue
     // CLI messaging, Task bodies and Skill instructions belong exclusively to Process.
-    if (/(?:^|[\s;&|('\"])(?:[^\s]*\/)?rovai(?:['\"])?(?:\s|$)/.test(command)
+    if (/(?:^|[\s;&|('\"])(?:[^\s]*\/)?coaxi(?:['\"])?(?:\s|$)/.test(command)
         || /review-duo|cli-operations|\bagent_\d+\b|SKILL\.md/.test(redactEvaluationText(command + '\n' + (item.aggregatedOutput ?? '')))) { omitted.push({sourceEvidenceId:event.id,reason:'mixed_process_command'}); continue }
     const output = typeof item.aggregatedOutput === 'string' ? item.aggregatedOutput : null
     if (command.length > MAX_TEXT || receipts.length >= MAX_RECEIPTS || characters + command.length + Math.min(output?.length ?? 0, MAX_TEXT) > MAX_TOTAL) { omitted.push({sourceEvidenceId:event.id,reason:'bounded_receipt_limit'}); continue }

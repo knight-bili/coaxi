@@ -9,15 +9,15 @@ import {
 } from './lib/runtime-camp-files-root.mjs'
 
 const root = resolve(import.meta.dirname, '..')
-const dataFixtureRoot = await realpath(await mkdtemp(join(tmpdir(), 'rovai-member-config-smoke-')))
+const dataFixtureRoot = await realpath(await mkdtemp(join(tmpdir(), 'coaxi-member-config-smoke-')))
 const dataDir = process.platform === 'win32'
   ? await realpath(JSON.parse(execFileSync(
-    join(root, 'target', 'debug', 'rovai-core.exe'),
+    join(root, 'target', 'debug', 'coaxi-core.exe'),
     ['--prepare-windows-data-root', join(dataFixtureRoot, 'formal')],
     { encoding: 'utf8' }
   )).core)
   : dataFixtureRoot
-const runtimeHome = await realpath(await mkdtemp(join(tmpdir(), 'rovai-member-config-home-')))
+const runtimeHome = await realpath(await mkdtemp(join(tmpdir(), 'coaxi-member-config-home-')))
 let first
 let reopened
 
@@ -206,22 +206,22 @@ function startCore(dataDirectory) {
     PNPM_HOME: ''
   }
   for (const key of [
-    'ROVAI_CODEX_BIN',
-    'ROVAI_OPENCODE_BIN',
-    'ROVAI_COPILOT_BIN',
-    'ROVAI_CLAUDE_CODE_BIN',
-    'ROVAI_KIRO_BIN',
-    'ROVAI_QODER_BIN',
-    'ROVAI_CODEBUDDY_BIN',
-    'ROVAI_QWEN_BIN',
-    'ROVAI_TRAE_CN_BIN',
-    'ROVAI_CURSOR_BIN',
-    'ROVAI_KIMI_BIN',
-    'ROVAI_ANTIGRAVITY_BIN'
+    'COAXI_CODEX_BIN',
+    'COAXI_OPENCODE_BIN',
+    'COAXI_COPILOT_BIN',
+    'COAXI_CLAUDE_CODE_BIN',
+    'COAXI_KIRO_BIN',
+    'COAXI_QODER_BIN',
+    'COAXI_CODEBUDDY_BIN',
+    'COAXI_QWEN_BIN',
+    'COAXI_TRAE_CN_BIN',
+    'COAXI_CURSOR_BIN',
+    'COAXI_KIMI_BIN',
+    'COAXI_ANTIGRAVITY_BIN'
   ]) {
     delete childEnvironment[key]
   }
-  const child = spawn(join(root, 'target', 'debug', 'rovai-core'), [
+  const child = spawn(join(root, 'target', 'debug', 'coaxi-core'), [
     ...coreDataDirectoryArguments(dataDirectory, { homeDirectory: runtimeHome }),
     '--skill-library-root', join(dataDirectory, 'managed-skill-library')
   ], {
@@ -264,7 +264,7 @@ function startCore(dataDirectory) {
   child.once('close', (code, signal) => {
     for (const request of pending.values()) {
       clearTimeout(request.timer)
-      request.reject(new Error(`rovai-core exited before replying (code=${code}, signal=${signal}): ${JSON.stringify(startupFailures)} ${stderr.slice(-10).join('')}`))
+      request.reject(new Error(`coaxi-core exited before replying (code=${code}, signal=${signal}): ${JSON.stringify(startupFailures)} ${stderr.slice(-10).join('')}`))
     }
     pending.clear()
   })

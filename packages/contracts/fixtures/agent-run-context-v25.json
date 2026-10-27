@@ -122,7 +122,7 @@
       }
     ],
     "attachments": [
-      "/Users/test/.rovai/instances/v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef/runtime-files/camps/rvcamp_01h47kvsy5fk1shh6w1g60eecf/attachments/00000000-0000-4000-8000-000000000001/payload/spec.pdf"
+      "/Users/test/.coaxi/instances/v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef/runtime-files/camps/rvcamp_01h47kvsy5fk1shh6w1g60eecf/attachments/00000000-0000-4000-8000-000000000001/payload/spec.pdf"
     ],
     "quotes": [
       {
@@ -265,7 +265,7 @@
       "delegation"
     ],
     "emptyOptionalProjection": "attachment_output_root_only",
-    "attachmentOutputRoot": "/Users/test/.rovai/instances/v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef/attachments/rvcamp_01h47kvsy5fk1shh6w1g60eecf"
+    "attachmentOutputRoot": "/Users/test/.coaxi/instances/v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef/attachments/rvcamp_01h47kvsy5fk1shh6w1g60eecf"
   },
   "campAttachmentViewReceipt": {
     "schemaVersion": 2,

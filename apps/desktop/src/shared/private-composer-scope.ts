@@ -1,4 +1,4 @@
-import type { RovaiApi, ScopedSingleChatSnapshot, SingleChatComposerScope } from '@contracts'
+import type { CoaxiApi, ScopedSingleChatSnapshot, SingleChatComposerScope } from '@contracts'
 import { privateConversationOperations, type PrivateConversationKind } from './private-conversation-operations'
 
 /** 只核对服务端能力与精确归属，不登记草稿或发送输入。 */
@@ -20,7 +20,7 @@ export function matchesPrivateComposerScope(
 }
 
 export async function readScopedPrivateChat(
-  api: Pick<RovaiApi, 'request'>,
+  api: Pick<CoaxiApi, 'request'>,
   threadId: string,
   conversationId: string,
   scope: SingleChatComposerScope | null,

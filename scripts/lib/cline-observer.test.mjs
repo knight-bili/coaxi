@@ -6,14 +6,14 @@ import { join } from 'node:path';
 import test from 'node:test';
 
 test('Cline official hooks emit only leased, structured observations', async () => {
-  const root = mkdtempSync(join(tmpdir(), 'rovai-cline-hooks-'));
-  const previous = process.env.ROVAI_CLINE_OBSERVER_ROOT;
-  process.env.ROVAI_CLINE_OBSERVER_ROOT = root;
+  const root = mkdtempSync(join(tmpdir(), 'coaxi-cline-hooks-'));
+  const previous = process.env.COAXI_CLINE_OBSERVER_ROOT;
+  process.env.COAXI_CLINE_OBSERVER_ROOT = root;
   try {
     mkdirSync(join(root, 'bindings'));
     mkdirSync(join(root, 'observations'));
     writeFileSync(join(root, 'model-windows.json'), JSON.stringify({ 'native-provider': { 'native-model': 272000 } }));
-    const { default: plugin } = await import('../../crates/rovai-core/src/cline/observer.js');
+    const { default: plugin } = await import('../../crates/coaxi-core/src/cline/observer.js');
     // The running Host must retain its own snapshot, not reread changed config.
     writeFileSync(join(root, 'model-windows.json'), JSON.stringify({ 'native-provider': { 'native-model': 872000 } }));
     plugin.setup({}, { session: { sessionId: 'native-session' } });
@@ -75,8 +75,8 @@ test('Cline official hooks emit only leased, structured observations', async () 
     assert.doesNotThrow(() => plugin.hooks.beforeRun({ snapshot: { runId: 'unwritable' } }));
     assert.doesNotThrow(() => plugin.hooks.afterRun({ result: { runId: 'unwritable', status: 'completed' } }));
   } finally {
-    if (previous === undefined) delete process.env.ROVAI_CLINE_OBSERVER_ROOT;
-    else process.env.ROVAI_CLINE_OBSERVER_ROOT = previous;
+    if (previous === undefined) delete process.env.COAXI_CLINE_OBSERVER_ROOT;
+    else process.env.COAXI_CLINE_OBSERVER_ROOT = previous;
     rmSync(root, { recursive: true, force: true });
   }
 });

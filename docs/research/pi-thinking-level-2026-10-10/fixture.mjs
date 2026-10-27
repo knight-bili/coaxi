@@ -9,9 +9,9 @@ import { pathToFileURL } from 'node:url'
 
 // Native interoperability only: synthetic history, fixture credential, no Prompt.
 // Production Host behavior is separately exercised by the Rust regression owner.
-const executable = process.env.ROVAI_REAL_PI_EXECUTABLE ?? '/opt/homebrew/bin/pi'
+const executable = process.env.COAXI_REAL_PI_EXECUTABLE ?? '/opt/homebrew/bin/pi'
 const packageRoot = resolve(dirname(await realpath(executable)), '../..')
-const root = await realpath(await mkdtemp(join(tmpdir(), 'rovai-pi-thinking-native-')))
+const root = await realpath(await mkdtemp(join(tmpdir(), 'coaxi-pi-thinking-native-')))
 const profile = join(root, 'pi-agent'), cwd = join(root, 'workspace'), sessions = join(root, 'sessions')
 for (const path of [profile, cwd, sessions]) await mkdir(path, { recursive: true, mode: 0o700 })
 process.env.PI_CODING_AGENT_DIR = profile
@@ -120,7 +120,7 @@ try {
   }
   const narrowed = await apply(host, modelA, 'max')
   assert.equal(narrowed.exact, false)
-  scenarios.push({ case: 'native clamp must be rejected by Rovai', ...narrowed })
+  scenarios.push({ case: 'native clamp must be rejected by Coaxi', ...narrowed })
   await apply(host, modelA, 'high')
   await host.command('new_session')
   const newSession = await host.command('get_state')
@@ -140,6 +140,6 @@ try {
     root, profile, modelA: { provider: modelA.provider, id: modelA.id }, modelB: { provider: modelB.provider, id: modelB.id },
     coldStartupMs, catalogMs, catalogEntries: catalog.models.length, rpcHostStarts: starts, generationRequests: 0,
     nativeSettingsChanged: beforeSettings !== await readFile(join(profile, 'settings.json'), 'utf8'), scenarios, trace }
-  await writeFile(process.env.ROVAI_PI_THINKING_EVIDENCE ?? join(root, 'evidence.json'), JSON.stringify(evidence, null, 2) + '\n')
+  await writeFile(process.env.COAXI_PI_THINKING_EVIDENCE ?? join(root, 'evidence.json'), JSON.stringify(evidence, null, 2) + '\n')
   console.log(JSON.stringify({ ok: true, ...evidence, trace: undefined }))
 } finally { if (host) await host.stop() }

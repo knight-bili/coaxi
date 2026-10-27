@@ -9,7 +9,7 @@ import {
 } from './qualification-common.mjs'
 import { validateCatalogedQualificationArtifact } from './qualification-schema-validation.mjs'
 
-export const COLLABORATION_LEDGER_SCHEMA_ID = 'rovai.qualification.collaboration-ledger'
+export const COLLABORATION_LEDGER_SCHEMA_ID = 'coaxi.qualification.collaboration-ledger'
 export const COLLABORATION_LEDGER_SCHEMA_VERSION = '1.1.0'
 
 const FORBIDDEN_FIELDS = new Set([
@@ -167,7 +167,7 @@ export function buildCollaborationLedger({
     schemaId: COLLABORATION_LEDGER_SCHEMA_ID,
     schemaVersion: COLLABORATION_LEDGER_SCHEMA_VERSION,
     producer: {
-      id: 'rovai-qualification-runner',
+      id: 'coaxi-qualification-runner',
       version: QUALIFICATION_RUNNER_VERSION,
       digest: withSha256Prefix(producerDigest)
     },

@@ -1,4 +1,4 @@
-// Behavior ported from Codeg aff1e6c terminal-node/terminal-view; Apache-2.0 notice: integration/licenses/codeg/LICENSE.
+// Behavior ported from Codeg aff1e6c terminal-node/terminal-view; Apache-2.0 notice: integration/licenses/component-a/LICENSE.
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
 import { ClipboardPaste, Copy, Keyboard, Play, RefreshCw, RotateCcw, Square } from 'lucide-react'
 import { CanvasIconButton } from './CanvasDock'

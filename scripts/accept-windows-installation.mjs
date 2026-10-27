@@ -23,30 +23,30 @@ const installer = join(
     .replaceAll('${ext}', 'exe')
 )
 if (!existsSync(installer)) throw new Error(`Windows installer is missing: ${installer}`)
-const baselineInstaller = process.env.ROVAI_WINDOWS_UPGRADE_BASE_INSTALLER
-  ? resolve(process.env.ROVAI_WINDOWS_UPGRADE_BASE_INSTALLER)
+const baselineInstaller = process.env.COAXI_WINDOWS_UPGRADE_BASE_INSTALLER
+  ? resolve(process.env.COAXI_WINDOWS_UPGRADE_BASE_INSTALLER)
   : installer
 if (!existsSync(baselineInstaller)) {
   throw new Error(`Windows upgrade baseline installer is missing: ${baselineInstaller}`)
 }
 const crossVersionUpgrade = baselineInstaller.toLocaleLowerCase() !== installer.toLocaleLowerCase()
 
-const preexisting = installedRovaiEntries()
+const preexisting = installedCoaxiEntries()
 if (preexisting.length > 0) {
-  throw new Error(`refusing to replace an existing Rovai installation: ${JSON.stringify(preexisting)}`)
+  throw new Error(`refusing to replace an existing Coaxi installation: ${JSON.stringify(preexisting)}`)
 }
 
 const programRoot = join(process.env.LOCALAPPDATA ?? '', 'Programs')
 const installCandidates = [
   join(programRoot, packageMetadata.build.productName),
   join(programRoot, packageMetadata.name),
-  join(programRoot, 'Rovai AI')
+  join(programRoot, 'Coaxi AI')
 ]
 if (installCandidates.some((candidate) => existsSync(candidate))) {
-  throw new Error('refusing to replace a pre-existing Rovai program directory')
+  throw new Error('refusing to replace a pre-existing Coaxi program directory')
 }
 
-const fixtureRoot = await mkdtemp(join(tmpdir(), 'rovai-windows-install-accept-'))
+const fixtureRoot = await mkdtemp(join(tmpdir(), 'coaxi-windows-install-accept-'))
 const outputRoot = join(root, 'dist', 'windows-installation-acceptance')
 const reportPath = join(outputRoot, 'installation-report.json')
 await mkdir(outputRoot, { recursive: true })
@@ -83,10 +83,10 @@ function run(command, args, options = {}) {
   return `${result.stdout ?? ''}${result.stderr ?? ''}`.trim()
 }
 
-function installedRovaiEntries() {
+function installedCoaxiEntries() {
   const script = [
     "$entries = Get-ItemProperty 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*' -ErrorAction SilentlyContinue",
-    "$entries = @($entries | Where-Object { $_.DisplayName -like '*Rovai*' } | Select-Object DisplayName, DisplayVersion, InstallLocation, UninstallString)",
+    "$entries = @($entries | Where-Object { $_.DisplayName -like '*Coaxi*' } | Select-Object DisplayName, DisplayVersion, InstallLocation, UninstallString)",
     '$entries | ConvertTo-Json -Compress'
   ].join('; ')
   const output = run('powershell.exe', [
@@ -117,7 +117,7 @@ async function sha256(path) {
 }
 
 async function locateInstallation() {
-  const registryDirectory = installedRovaiEntries()
+  const registryDirectory = installedCoaxiEntries()
     .map((entry) => entry.InstallLocation)
     .find((value) => typeof value === 'string' && value.length > 0)
   const candidates = registryDirectory ? [registryDirectory, ...installCandidates] : installCandidates
@@ -129,13 +129,13 @@ async function locateInstallation() {
 async function installedFileEvidence(directory, { compareWithCurrentPayload = true } = {}) {
   const files = {
     app: join(directory, `${executableName}.exe`),
-    core: join(directory, 'resources', 'bin', 'rovai-core.exe'),
-    cli: join(directory, 'resources', 'bin', 'rovai.exe')
+    core: join(directory, 'resources', 'bin', 'coaxi-core.exe'),
+    cli: join(directory, 'resources', 'bin', 'coaxi.exe')
   }
   const unpacked = {
     app: join(root, 'dist', 'win-unpacked', `${executableName}.exe`),
-    core: join(root, 'dist', 'win-unpacked', 'resources', 'bin', 'rovai-core.exe'),
-    cli: join(root, 'dist', 'win-unpacked', 'resources', 'bin', 'rovai.exe')
+    core: join(root, 'dist', 'win-unpacked', 'resources', 'bin', 'coaxi-core.exe'),
+    cli: join(root, 'dist', 'win-unpacked', 'resources', 'bin', 'coaxi.exe')
   }
   const evidence = {}
   for (const [name, path] of Object.entries(files)) {
@@ -156,14 +156,14 @@ async function waitForUninstall(directory, timeoutMs = 20_000) {
   const deadline = Date.now() + timeoutMs
   while (Date.now() < deadline) {
     if (!existsSync(join(directory, `${executableName}.exe`))
-        && installedRovaiEntries().length === 0) return
+        && installedCoaxiEntries().length === 0) return
     await new Promise((resolveWait) => setTimeout(resolveWait, 200))
   }
   throw new Error('per-user uninstall did not finish within the acceptance timeout')
 }
 
 function launchRunningUpgradeApp(executable, dataRoot, logPath) {
-  const preparer = join(dirname(executable), 'resources', 'bin', 'rovai-core.exe')
+  const preparer = join(dirname(executable), 'resources', 'bin', 'coaxi-core.exe')
   run(preparer, ['--prepare-windows-data-root', dataRoot])
   const logHandle = openSync(logPath, 'w')
   try {
@@ -171,7 +171,7 @@ function launchRunningUpgradeApp(executable, dataRoot, logPath) {
       cwd: dirname(executable),
       env: {
         ...process.env,
-        ROVAI_ALLOW_ISOLATED_INSTANCE: '1'
+        COAXI_ALLOW_ISOLATED_INSTANCE: '1'
       },
       stdio: ['ignore', 'ignore', logHandle]
     })
@@ -184,7 +184,7 @@ function launchRunningUpgradeApp(executable, dataRoot, logPath) {
 async function waitForMainWindow(processId, timeoutMs = 30_000) {
   const deadline = Date.now() + timeoutMs
   const script = [
-    '$process = Get-Process -Id ([int]$env:ROVAI_ACCEPT_PID) -ErrorAction SilentlyContinue',
+    '$process = Get-Process -Id ([int]$env:COAXI_ACCEPT_PID) -ErrorAction SilentlyContinue',
     'if ($null -ne $process -and $process.MainWindowHandle -ne 0) { exit 0 }',
     'exit 1'
   ].join('; ')
@@ -194,7 +194,7 @@ async function waitForMainWindow(processId, timeoutMs = 30_000) {
       '-NoLogo', '-NoProfile', '-NonInteractive', '-Command', script
     ], {
       cwd: root,
-      env: windowsPowerShellEnvironment({ ROVAI_ACCEPT_PID: String(processId) }),
+      env: windowsPowerShellEnvironment({ COAXI_ACCEPT_PID: String(processId) }),
       windowsHide: true,
       stdio: 'ignore'
     })
@@ -272,7 +272,7 @@ function processExists(processId) {
 }
 
 function parseShutdownResult(log) {
-  const prefix = '[rovai-core] controlled shutdown result '
+  const prefix = '[coaxi-core] controlled shutdown result '
   const line = log.split(/\r?\n/u).findLast((candidate) => candidate.includes(prefix))
   if (!line) return null
   try {
@@ -316,14 +316,14 @@ try {
   run(baselineInstaller, ['/S'])
   installDirectory = await locateInstallation()
   if (!installDirectory) throw new Error('clean install did not create the expected per-user program directory')
-  const baselineEntry = installedRovaiEntries()
+  const baselineEntry = installedCoaxiEntries()
     .find((entry) => resolve(entry.InstallLocation ?? '').toLocaleLowerCase()
       === resolve(installDirectory).toLocaleLowerCase())
   const baselineVersion = baselineEntry?.DisplayVersion ?? null
   if (crossVersionUpgrade
       && (!baselineVersion || compareReleaseVersions(baselineVersion, packageMetadata.version) >= 0)) {
     throw new Error(
-      `ROVAI_WINDOWS_UPGRADE_BASE_INSTALLER did not install an older version: ${baselineVersion ?? 'unknown'}`
+      `COAXI_WINDOWS_UPGRADE_BASE_INSTALLER did not install an older version: ${baselineVersion ?? 'unknown'}`
     )
   }
   report.baselineVersion = baselineVersion
@@ -339,10 +339,10 @@ try {
     cwd: root,
     env: {
       ...process.env,
-      ROVAI_ONBOARDING_ACCEPT_FIXTURE_ROOT: fixtureRoot,
-      ROVAI_ONBOARDING_ACCEPT_OUTPUT_DIR: outputRoot,
-      ROVAI_ONBOARDING_ACCEPT_DEBUG_PORT: '9589',
-      ROVAI_ONBOARDING_ALLOW_PLATFORM_BLOCKED: '1'
+      COAXI_ONBOARDING_ACCEPT_FIXTURE_ROOT: fixtureRoot,
+      COAXI_ONBOARDING_ACCEPT_OUTPUT_DIR: outputRoot,
+      COAXI_ONBOARDING_ACCEPT_DEBUG_PORT: '9589',
+      COAXI_ONBOARDING_ALLOW_PLATFORM_BLOCKED: '1'
     },
     stdio: 'inherit'
   })
@@ -400,7 +400,7 @@ try {
   if (existsSync(join(installDirectory, `${executableName}.exe`))) {
     throw new Error('default uninstall left the application executable installed')
   }
-  if (installedRovaiEntries().length > 0) throw new Error('default uninstall left its HKCU uninstall registration')
+  if (installedCoaxiEntries().length > 0) throw new Error('default uninstall left its HKCU uninstall registration')
   if (!existsSync(persistedOnboarding)) throw new Error('default uninstall deleted isolated user data')
   report.defaultUninstallRetainedData = true
   report.result = 'passed'

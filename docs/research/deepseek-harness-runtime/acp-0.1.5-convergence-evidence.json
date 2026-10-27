@@ -139,13 +139,13 @@
     }
   },
   "commands": [
-    "cargo test -p rovai-core --lib dsh -- --nocapture",
-    "cargo test -p rovai-core --lib warm_hosts_never_cross_camp_compatibility_keys",
-    "cargo test -p rovai-core --lib successful_terminal_acp_diff_content_is_kept_for_evidence_projection_only",
-    "cargo test -p rovai-core --lib external_mcp_projection_capability_matches_the_verified_matrix",
+    "cargo test -p coaxi-core --lib dsh -- --nocapture",
+    "cargo test -p coaxi-core --lib warm_hosts_never_cross_camp_compatibility_keys",
+    "cargo test -p coaxi-core --lib successful_terminal_acp_diff_content_is_kept_for_evidence_projection_only",
+    "cargo test -p coaxi-core --lib external_mcp_projection_capability_matches_the_verified_matrix",
     "node --test scripts/lib/dsh-host.test.mjs",
-    "ROVAI_DSH_SCRIPTED_MCP=1 ROVAI_MCP_PROJECTION_SMOKE_ADAPTERS=deepseek-harness node scripts/smoke-mcp-projection.mjs",
-    "ROVAI_ACP_SMOKE_ADAPTER=deepseek-harness ROVAI_ACP_FILE_OPERATION_MATRIX=1 node scripts/smoke-acp-runtime.mjs",
+    "COAXI_DSH_SCRIPTED_MCP=1 COAXI_MCP_PROJECTION_SMOKE_ADAPTERS=deepseek-harness node scripts/smoke-mcp-projection.mjs",
+    "COAXI_ACP_SMOKE_ADAPTER=deepseek-harness COAXI_ACP_FILE_OPERATION_MATRIX=1 node scripts/smoke-acp-runtime.mjs",
     "pnpm exec vitest run apps/desktop/src/renderer/src/MemberRuntimeParameters.test.ts apps/desktop/src/renderer/src/runtime-status.test.ts"
   ],
   "limitations": [

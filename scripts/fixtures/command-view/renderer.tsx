@@ -4,7 +4,7 @@ import { buildLiveExecutionProgress, selectCompleteExecutionEvidence } from '../
 import type { AgentRunExecutionEvidenceView, CanonicalRuntimeActivityView } from '@contracts'
 import '../../../apps/desktop/src/renderer/src/styles.css'
 
-const command = `rovai memory write --body '正文首行\n  ${'正文与空格 '.repeat(700)}END_OF_BODY'`
+const command = `coaxi memory write --body '正文首行\n  ${'正文与空格 '.repeat(700)}END_OF_BODY'`
 const output = JSON.stringify({ password: 'TEST_PASSWORD', result: Array.from({ length: 8_100 }, (_, i) => `line-${i}`) }, null, 2)
 const expected = `$ ${command}\n${output}`
 const canonical = (id: string, shell: boolean): CanonicalRuntimeActivityView => ({
@@ -27,14 +27,14 @@ const progress = buildLiveExecutionProgress(evidence.map(item => ({ ...item, cre
 const items = progress.items.filter(item => item.kind === 'tool')
 const reads: string[] = []
 let fail = true
-window.rovai = {
+window.coaxi = {
   request: async (method: string, params: { evidenceId: string }) => {
     if (method !== 'agentRunEvidence.getContent' || params.evidenceId !== 'shell-evidence') throw new Error('Wrong evidence source')
     reads.push(params.evidenceId)
     if (fail) { fail = false; throw new Error('fixture read failure') }
     return { payload: { item: { type: 'commandExecution', command, aggregatedOutput: output } } }
   }
-} as unknown as typeof window.rovai
+} as unknown as typeof window.coaxi
 const root = createRoot(document.getElementById('root')!)
 function render(theme = 'day'): void {
   document.documentElement.dataset.theme = theme

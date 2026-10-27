@@ -1,8 +1,8 @@
 import type { ProjectNavigationGroup, WorkspaceWorktree } from '@contracts'
 import type { CanvasFolderResolution } from './canvas-reference-model'
 
-// Codeg aff1e6c278453ed8d0b96a5f664edcdca621aa3f sidebar worktree presentation,
-// adapted to Core topology and client registration. Apache-2.0: integration/licenses/codeg/LICENSE.
+// Coaxi aff1e6c278453ed8d0b96a5f664edcdca621aa3f sidebar worktree presentation,
+// adapted to Core topology and client registration. Apache-2.0: integration/licenses/component-a/LICENSE.
 
 export type NavigationProjectTree = {
   project: ProjectNavigationGroup

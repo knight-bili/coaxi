@@ -59,7 +59,7 @@ Bundle、Profile、Home Patch、命令行 Patch；插件行的 `config` 是整�
 因此，简单在 ACP 启动参数后追加 Web Patch，既不能可靠保留原生配置，也可能让临时覆盖进入 DSH 自己的旧配置迁移。
 [DSH 固定版本 CLI 说明](https://github.com/deepseek-ai/deepseek-harness/blob/dsh-v0.2.1-alpha.1/apps/cli/reference/README.md)
 
-修复将 Provider 准备集中到 [models.mjs](../../crates/rovai-core/src/dsh/models.mjs)，由探测和实际 Host 共同使用。
+修复将 Provider 准备集中到 [models.mjs](../../crates/coaxi-core/src/dsh/models.mjs)，由探测和实际 Host 共同使用。
 DSH 完成原生初始化／需要的原生迁移后，Rovai 才准备完整的 Web 补充和既有 Responses 兼容参数，并应用到内存配置。
 最终模型目录仍来自原生 ACP，不由 Rovai 从 YAML 另造一份目录。
 
@@ -79,7 +79,7 @@ DSH 完成原生初始化／需要的原生迁移后，Rovai 才准备完整的 
 
 同时移除显式选模阶段重复的全文件新鲜度检查：保留等待准备完成和路由验证，把输入变化检查留在准备与目录发布边界，
 后续 Run 通过已有 Host 兼容性入口判断。这样 Web 主题等非模型变化不会与已有指纹口径冲突。
-对应行为见 [dsh.rs](../../crates/rovai-core/src/dsh.rs) 和 [PR #679](https://github.com/murray17/rovai-ai/pull/679)。
+对应行为见 [dsh.rs](../../crates/coaxi-core/src/dsh.rs) 和 [PR #679](https://github.com/murray17/rovai-ai/pull/679)。
 
 ### 3. 思考强度被错误当作整个 Runtime 的公共能力
 
@@ -181,8 +181,8 @@ Linux、macOS x64，以及用户实际 Windows 安装包＋DeepSeek v4.1 的完�
 | 措施 | 状态 | 完成依据／后续范围 |
 | --- | --- | --- |
 | 配置准备统一、原生优先、补充失败局部化 | 已完成 | PR #679；[配置 smoke](../../scripts/smoke-dsh-model-configuration.mjs)、[availability smoke](../../scripts/smoke-dsh-model-availability.mjs) |
-| 档位只归属目标模型，执行前按原生返回校验 | 已完成 | PR #681；[ACP 执行](../../crates/rovai-core/src/acp.rs)、[目录适配](../../crates/rovai-core/src/agent_runtime_adapter.rs) |
-| 逐模型合并、时间独立、空能力缓存、未命中继续读取 | 已完成 | PR #683／#684；[目录存储与选择](../../crates/rovai-core/src/agent_profile.rs)、[前端参数](../../apps/desktop/src/renderer/src/MemberRuntimeParameters.tsx) |
+| 档位只归属目标模型，执行前按原生返回校验 | 已完成 | PR #681；[ACP 执行](../../crates/coaxi-core/src/acp.rs)、[目录适配](../../crates/coaxi-core/src/agent_runtime_adapter.rs) |
+| 逐模型合并、时间独立、空能力缓存、未命中继续读取 | 已完成 | PR #683／#684；[目录存储与选择](../../crates/coaxi-core/src/agent_profile.rs)、[前端参数](../../apps/desktop/src/renderer/src/MemberRuntimeParameters.tsx) |
 | Windows 路径在摘要入口统一 | 已完成 | PR #685；程序／配置／环境变化仍失效的回归 |
 | 两路响应都遵守观测时间，不覆盖更新结果 | 已完成 | PR #686；[Runtime picker 原生交互夹具](../../scripts/fixtures/runtime-model-picker/main.cjs) |
 | 补齐安装版 Windows 的同场景交互 | 待补充证据 | Desktop／发布验收范围；需要记录构建、DSH 和目标模型身份，不以 Chrome 通过代替 |

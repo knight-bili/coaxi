@@ -3,7 +3,7 @@ import { randomUUID } from 'node:crypto'
 import { promises as fs } from 'node:fs'
 import path from 'node:path'
 import type { BrowserPreferences } from '@contracts'
-import { isHostRule, matchHostRule, parseHostRulePattern, normalizeHostRulePattern } from '../shared/codeg-browser-host-rules'
+import { isHostRule, matchHostRule, parseHostRulePattern, normalizeHostRulePattern } from '../shared/coaxi-browser-host-rules'
 
 const validate = (value: BrowserPreferences): BrowserPreferences => {
   if (!value || typeof value.revision !== 'string' || typeof value.devtools !== 'boolean' || !Array.isArray(value.hostRules) || value.hostRules.length > 200 || value.hostRules.some(rule => !isHostRule(rule) || !parseHostRulePattern(rule.pattern))) throw new Error('browser.invalid_preferences')

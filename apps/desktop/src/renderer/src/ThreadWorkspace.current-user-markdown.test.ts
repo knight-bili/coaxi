@@ -385,7 +385,7 @@ describe('Agent Current User Mention Markdown rendering', () => {
     expect(markup).not.toContain('cache()')
     for (const displayName of ['Murray✨', '小雪_[团队]', '新的昵称']) {
       for (const content of [nonLeading, repeated, [
-        { kind: 'text', text: '**完成**\n\nROVAICURRENTUSER1END\n' },
+        { kind: 'text', text: '**完成**\n\nCOAXICURRENTUSER1END\n' },
         { kind: 'current_user_mention', userId: 'local_user' },
         { kind: 'text', text: ' 请确认 `@Principal`' }
       ] as StructuredThreadMessageContent]) {
@@ -398,23 +398,23 @@ describe('Agent Current User Mention Markdown rendering', () => {
       }
     }
     const collision = renderMessage([
-      { kind: 'text', text: '**完成**\n\nROVAICURRENTUSER1END\n' },
+      { kind: 'text', text: '**完成**\n\nCOAXICURRENTUSER1END\n' },
       { kind: 'current_user_mention', userId: 'local_user' },
       { kind: 'text', text: ' 请确认 `@Principal`' }
     ])
     expect(collision).toContain('<strong>完成</strong>')
-    expect(collision).toContain('ROVAICURRENTUSER1END')
+    expect(collision).toContain('COAXICURRENTUSER1END')
     expect(collision).toContain('<code>@Principal</code>')
 
     const encodedDefinition = renderMessage([
       { kind: 'current_user_mention', userId: 'local_user' },
-      { kind: 'text', text: '[x]: ROVAI&#67;URRENTUSER2END\n' },
+      { kind: 'text', text: '[x]: COAXI&#67;URRENTUSER2END\n' },
       { kind: 'current_user_mention', userId: 'local_user' }
     ])
     expect(encodedDefinition.match(/class="message-mention-token current-user/g)).toHaveLength(2)
-    expect(encodedDefinition).toContain('[x]: ROVAICURRENTUSER2END')
+    expect(encodedDefinition).toContain('[x]: COAXICURRENTUSER2END')
 
-    for (const text of ['ROVAI&#67;URRENTUSER1END\n', '&#82;OVAICURRENTUSER1END\n', '\t', '    ']) {
+    for (const text of ['COAXI&#67;URRENTUSER1END\n', '&#67;OAXICURRENTUSER1END\n', '\t', '    ']) {
       const rendered = renderMessage([
         { kind: 'text', text },
         { kind: 'current_user_mention', userId: 'local_user' },
@@ -422,10 +422,10 @@ describe('Agent Current User Mention Markdown rendering', () => {
       ], undefined, 'agent', members, { displayName: '小雪_[团队]', avatarDataUrl: null })
       expect(rendered.match(/class="message-mention-token current-user/g)).toHaveLength(1)
       expect(rendered).toContain('>@小雪_[团队]</span>')
-      if (text.includes('&#')) expect(rendered).toContain('ROVAICURRENTUSER1END')
+      if (text.includes('&#')) expect(rendered).toContain('COAXICURRENTUSER1END')
       else {
         expect(rendered).toContain('<pre><code>')
-        expect(rendered).not.toContain('ROVAICURRENTUSER')
+        expect(rendered).not.toContain('COAXICURRENTUSER')
       }
     }
   })

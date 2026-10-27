@@ -11,7 +11,7 @@ import {
 } from './qualification-common.mjs'
 import { validateQualificationArtifactSchema, validateQualificationContractArtifactSchema } from './qualification-schema-validation.mjs'
 
-export const PUBLIC_BENCHMARK_REPORT_SCHEMA_ID = 'rovai.qualification.public-benchmark-report'
+export const PUBLIC_BENCHMARK_REPORT_SCHEMA_ID = 'coaxi.qualification.public-benchmark-report'
 export const PUBLIC_BENCHMARK_REPORT_SCHEMA_VERSION = '1.0.0'
 
 const FORBIDDEN_PUBLIC_KEYS = new Set([
@@ -90,7 +90,7 @@ export function buildPublicBenchmarkReport({
     schemaId: PUBLIC_BENCHMARK_REPORT_SCHEMA_ID,
     schemaVersion: layer5SemanticReview.items.some(item => item.state === 'adjudicated') ? '2.0.0' : PUBLIC_BENCHMARK_REPORT_SCHEMA_VERSION,
     producer: {
-      id: 'rovai-qualification-runner',
+      id: 'coaxi-qualification-runner',
       version: QUALIFICATION_RUNNER_VERSION,
       digest: withSha256Prefix(producerDigest)
     },

@@ -1,5 +1,5 @@
 // Permission keys, choice labels/order, recommended values and member defaults mirror
-// crates/rovai-core/src/agent_runtime_adapter.rs. They are display fixtures, not a live probe.
+// crates/coaxi-core/src/agent_runtime_adapter.rs. They are display fixtures, not a live probe.
 // TRAE uses trae_static_permission_options; a real session may return an updated mode catalog.
 const option = (
   key,

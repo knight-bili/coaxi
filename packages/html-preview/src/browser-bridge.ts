@@ -17,7 +17,7 @@ export interface PreviewBridgeConfig {
 /** Serialized into a site-owned script. All runtime dependencies are arguments
  * or browser APIs; author globals, History and resource attributes stay native. */
 export function previewBrowserBridge(config: PreviewBridgeConfig, createIndex: typeof createFileFindDomIndex, parseDiagnostic: typeof parseHtmlPreviewDiagnostic): void {
-  const protocol = 'rovai-html-preview-v1'
+  const protocol = 'coaxi-html-preview-v1'
   const nativePost = window.postMessage
   // Native Desktop can host from file: (opaque parent); Web always uses its actual HTTP(S) origin.
   const post = (target: Window, origin: string, data: unknown): void => nativePost.call(target, data, { targetOrigin: origin === 'null' ? '*' : origin })
@@ -33,7 +33,7 @@ export function previewBrowserBridge(config: PreviewBridgeConfig, createIndex: t
   // Stopping supplemental diagnostics must leave the document bridge alive.
   const diagnosticsAbort = new AbortController()
   abort.signal.addEventListener('abort', () => diagnosticsAbort.abort(), { once: true })
-  const diagnosticUrl = `${config.origin}/__rovai-preview/events?documentId=${encodeURIComponent(config.documentId)}`
+  const diagnosticUrl = `${config.origin}/__coaxi-preview/events?documentId=${encodeURIComponent(config.documentId)}`
   const bridgeSource = document.currentScript?.getAttribute('src')
   const bridgeUrl = bridgeSource ? new URL(bridgeSource, config.documentUrl).href : null
   let serverDiagnosticsStarted = false
@@ -116,7 +116,7 @@ export function previewBrowserBridge(config: PreviewBridgeConfig, createIndex: t
   const clearFind = (): void => {
     for (const item of indexes) {
       const view = item.document.defaultView as (Window & typeof globalThis) | null
-      view?.CSS?.highlights?.delete('rovai-file-find-match'); view?.CSS?.highlights?.delete('rovai-file-find-current')
+      view?.CSS?.highlights?.delete('coaxi-file-find-match'); view?.CSS?.highlights?.delete('coaxi-file-find-current')
     }
   }
   const invalidate = (): void => {
@@ -176,13 +176,13 @@ export function previewBrowserBridge(config: PreviewBridgeConfig, createIndex: t
       const rangeFor = (match: { from: number; to: number } | undefined): Range | null => match ? item.index.range(match.from - item.offset, match.to - item.offset) : null
       const ranges = matches.map(rangeFor).filter((range): range is Range => Boolean(range))
       const selected = rangeFor(matches[data.current as number])
-      let style = item.document.querySelector<HTMLStyleElement>('style[data-rovai-preview-find]')
-      if (!style) { style = item.document.createElement('style'); style.dataset.rovaiPreviewFind = ''; item.document.head.append(style) }
+      let style = item.document.querySelector<HTMLStyleElement>('style[data-coaxi-preview-find]')
+      if (!style) { style = item.document.createElement('style'); style.dataset.coaxiPreviewFind = ''; item.document.head.append(style) }
       if (Array.isArray(data.colors) && data.colors.length === 3 && data.colors.every(color => typeof color === 'string' && view.CSS.supports('color', color))) {
-        style.textContent = `::highlight(rovai-file-find-match){background:${data.colors[0]};color:${data.colors[2]}}::highlight(rovai-file-find-current){background:${data.colors[1]};color:${data.colors[2]};text-decoration:underline}`
+        style.textContent = `::highlight(coaxi-file-find-match){background:${data.colors[0]};color:${data.colors[2]}}::highlight(coaxi-file-find-current){background:${data.colors[1]};color:${data.colors[2]};text-decoration:underline}`
       }
-      view.CSS.highlights.set('rovai-file-find-match', new view.Highlight(...ranges))
-      view.CSS.highlights.set('rovai-file-find-current', new view.Highlight(...(selected ? [selected] : [])))
+      view.CSS.highlights.set('coaxi-file-find-match', new view.Highlight(...ranges))
+      view.CSS.highlights.set('coaxi-file-find-current', new view.Highlight(...(selected ? [selected] : [])))
       if (selected && data.scroll) { selected.startContainer.parentElement?.scrollIntoView({ block: 'center', inline: 'nearest' }); view.frameElement?.scrollIntoView({ block: 'nearest' }) }
     }
   }

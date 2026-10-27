@@ -2,12 +2,12 @@ import { useEffect, useRef, useState } from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
 import { ArrowUpRight, Square, Undo2, Eraser } from 'lucide-react'
 import { AppDialogContent,AppDialogHeader,AppDialogBody,AppDialogFooter } from './AppDialog'
-import { drawMarkup,markFromDrag,renderMarkedScreenshot,type MarkupMark,type MarkupPoint,type MarkupTool } from './codeg-workbench/screenshot-markup'
+import { drawMarkup,markFromDrag,renderMarkedScreenshot,type MarkupMark,type MarkupPoint,type MarkupTool } from './coaxi-workbench/screenshot-markup'
 import { readErrorMessage } from './error-message'
 import { useUiText } from './interface-language'
 
 export interface BrowserCapture{data:string;mime?:string;url:string;title:string}
-/** Uses Codeg's image-coordinate markup renderer; the captured picture stays frozen while drawing. */
+/** Uses Coaxi's image-coordinate markup renderer; the captured picture stays frozen while drawing. */
 export function BrowserMarkupDialog({capture,onClose,onDeliver}:{capture:BrowserCapture;onClose():void;onDeliver(file:File):Promise<boolean>}):React.JSX.Element{
   const t=useUiText(),canvas=useRef<HTMLCanvasElement>(null),image=useRef<HTMLImageElement|null>(null),drag=useRef<MarkupPoint|null>(null),live=useRef(true)
   const [tool,setTool]=useState<MarkupTool>('box'),[marks,setMarks]=useState<MarkupMark[]>([]),[draft,setDraft]=useState<MarkupMark|null>(null),[ready,setReady]=useState(false),[busy,setBusy]=useState(false),[error,setError]=useState('')

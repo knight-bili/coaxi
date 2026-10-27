@@ -123,7 +123,7 @@ export function CanvasNodeEditor({ target, revision, latestRevision, agents, gro
             <label className="field-label"><UiText zh="标题" /><input data-dialog-autofocus value={title} onChange={event => setTitle(event.target.value)} autoComplete="off"
               onKeyDown={event => { if (event.key === 'Enter' && event.nativeEvent.isComposing) event.preventDefault() }} /></label>
             <div className="field-label"><span id="canvas-node-color-label"><UiText zh="标记颜色" /></span>
-              {/* 沿用Codeg canvas-swatches.tsx的十二色色板与再次选色清空；许可证见integration/licenses/codeg/LICENSE。 */}
+              {/* 沿用Coaxi canvas-swatches.tsx的十二色色板与再次选色清空；许可证见integration/licenses/coaxi/LICENSE。 */}
               <div className="canvas-color-palette" role="group" aria-labelledby="canvas-node-color-label">
                 {canvasColors.map(value => <button key={value} type="button" data-color={value} className="canvas-color-choice"
                   aria-label={uiAttribute(canvasColorName(value))} title={uiAttribute(canvasColorName(value))} aria-pressed={color === value}

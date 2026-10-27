@@ -8,8 +8,8 @@ import { assertUserDataIsIsolated } from './lib/dev-desktop.mjs'
 
 const root = resolve(import.meta.dirname, '..')
 const appPath = resolve(process.argv[2] ?? join(root, 'dist', 'mac-arm64', 'Coaxi.app'))
-const fixtureRoot = resolve(process.env.ROVAI_ONBOARDING_ACCEPT_FIXTURE_ROOT
-  ?? await mkdtemp(join(tmpdir(), 'rovai-onboarding-ui-accept-')))
+const fixtureRoot = resolve(process.env.COAXI_ONBOARDING_ACCEPT_FIXTURE_ROOT
+  ?? await mkdtemp(join(tmpdir(), 'coaxi-onboarding-ui-accept-')))
 const dataDir = assertUserDataIsIsolated(join(fixtureRoot, 'user-data'))
 const electronUserDataDir = process.platform === 'win32'
   ? join(dataDir, 'Electron', 'User Data')
@@ -17,13 +17,13 @@ const electronUserDataDir = process.platform === 'win32'
 const coreDataDir = process.platform === 'win32'
   ? join(dataDir, 'Core')
   : dataDir
-const outputDir = resolve(process.env.ROVAI_ONBOARDING_ACCEPT_OUTPUT_DIR
+const outputDir = resolve(process.env.COAXI_ONBOARDING_ACCEPT_OUTPUT_DIR
   ?? join(fixtureRoot, 'captures'))
-const firstPort = Number(process.env.ROVAI_ONBOARDING_ACCEPT_DEBUG_PORT ?? 9489)
+const firstPort = Number(process.env.COAXI_ONBOARDING_ACCEPT_DEBUG_PORT ?? 9489)
 const width = 1040
 const height = 700
 const selectedRole = 'qilu'
-const initialLanguage = process.env.ROVAI_ONBOARDING_ACCEPT_INTERFACE_LANGUAGE ?? 'zh-CN'
+const initialLanguage = process.env.COAXI_ONBOARDING_ACCEPT_INTERFACE_LANGUAGE ?? 'zh-CN'
 assert(['zh-CN', 'en'].includes(initialLanguage), 'Unsupported onboarding interface language')
 const englishCopy = JSON.parse(await readFile(join(root, 'apps/desktop/src/renderer/src/locales/en.json'), 'utf8'))
 const initialCopy = (text) => initialLanguage === 'en' ? englishCopy[text] ?? text : text
@@ -67,7 +67,7 @@ try {
 
   await clickSelector(running.cdp, '.onboarding-language input[value="en"]')
   await waitForExpression(running.cdp,
-    `document.documentElement.lang === 'en' && document.querySelector('#onboarding-welcome-title')?.textContent === 'Welcome to Rovai'`)
+    `document.documentElement.lang === 'en' && document.querySelector('#onboarding-welcome-title')?.textContent === 'Welcome to Coaxi'`)
   const englishWelcome = await surfaceState(running.cdp, '.onboarding-welcome')
   assert(englishWelcome.visible && englishWelcome.primaryVisible && !englishWelcome.horizontalOverflow,
     `English welcome is clipped or overflows: ${JSON.stringify(englishWelcome)}`)
@@ -78,7 +78,7 @@ try {
   await capture(running.cdp, captures.welcomeEnglishNight)
   await clickSelector(running.cdp, '.onboarding-language input[value="zh-CN"]')
   await waitForExpression(running.cdp,
-    `document.documentElement.lang === 'zh-CN' && document.querySelector('#onboarding-welcome-title')?.textContent === '欢迎来到 Rovai'`)
+    `document.documentElement.lang === 'zh-CN' && document.querySelector('#onboarding-welcome-title')?.textContent === '欢迎来到 Coaxi'`)
 
   captures.welcomeNight = join(outputDir, '02-welcome-night-1040x700.png')
   await capture(running.cdp, captures.welcomeNight)
@@ -159,7 +159,7 @@ try {
     || runtime.className?.includes('status-installed_unverified')
   ))
   if (!usableRuntime
-      && process.env.ROVAI_ONBOARDING_ALLOW_PLATFORM_BLOCKED === '1'
+      && process.env.COAXI_ONBOARDING_ALLOW_PLATFORM_BLOCKED === '1'
       && runtimeAvailability.length > 0
       && runtimeAvailability.every((runtime) => (
         runtime.disabled && runtime.className?.includes('status-not_qualified')
@@ -340,7 +340,7 @@ try {
       `document.querySelector('#camp-message')?.textContent === ${JSON.stringify(prompt)}
         && document.activeElement === document.querySelector('#camp-message')`, 5_000)
     await waitForExpression(running.cdp,
-      `JSON.parse(window.localStorage.getItem('rovai.camp-composer-draft.v1:' + ${JSON.stringify(completed.quickChatThreadId)}) || 'null')?.body === ${JSON.stringify(prompt)}`,
+      `JSON.parse(window.localStorage.getItem('coaxi.camp-composer-draft.v1:' + ${JSON.stringify(completed.quickChatThreadId)}) || 'null')?.body === ${JSON.stringify(prompt)}`,
       10_000)
   }
   await clickSelector(running.cdp, '.first-run-starters button')
@@ -349,7 +349,7 @@ try {
       && document.activeElement === document.querySelector('#camp-message')`,
     5_000)
   await waitForExpression(running.cdp,
-    `JSON.parse(window.localStorage.getItem('rovai.camp-composer-draft.v1:' + ${JSON.stringify(completed.quickChatThreadId)}) || 'null')?.body === ${JSON.stringify(expectedStarter)}`,
+    `JSON.parse(window.localStorage.getItem('coaxi.camp-composer-draft.v1:' + ${JSON.stringify(completed.quickChatThreadId)}) || 'null')?.body === ${JSON.stringify(expectedStarter)}`,
     10_000)
   const afterProjection = await request(running.cdp, 'camps.open', {
     traceId: randomUUID(),
@@ -434,7 +434,7 @@ try {
   captures.campEnglishDay = join(outputDir, '12-first-run-camp-english-day-1040x700.png')
   await capture(running.cdp, captures.campEnglishDay)
   const savedLanguage = await evaluate(running.cdp,
-    `window.rovai.generalPreferences.get().then((preferences) => preferences.interfaceLanguage)`, true)
+    `window.coaxi.generalPreferences.get().then((preferences) => preferences.interfaceLanguage)`, true)
   assert(savedLanguage === 'en', `English language was not persisted: ${savedLanguage}`)
   report.language = { saved: savedLanguage, routeAndDraftPreserved: true }
   await closeApp(running)
@@ -486,7 +486,7 @@ async function launchApp(port) {
     ? appPath
     : join(appPath, 'Contents', 'MacOS', 'Coaxi')
   if (process.platform === 'win32' && !existsSync(dataDir)) {
-    const preparer = join(dirname(executable), 'resources', 'bin', 'rovai-core.exe')
+    const preparer = join(dirname(executable), 'resources', 'bin', 'coaxi-core.exe')
     const prepared = spawnSync(preparer, ['--prepare-windows-data-root', dataDir], {
       cwd: root,
       encoding: 'utf8'
@@ -501,7 +501,7 @@ async function launchApp(port) {
     `--user-data-dir=${dataDir}`
   ], {
     cwd: root,
-    env: { ...process.env, ROVAI_ALLOW_ISOLATED_INSTANCE: '1' },
+    env: { ...process.env, COAXI_ALLOW_ISOLATED_INSTANCE: '1' },
     stdio: ['ignore', 'ignore', 'pipe']
   })
   child.stderr.on('data', (chunk) => stderr.push(String(chunk)))
@@ -518,7 +518,7 @@ async function launchApp(port) {
       mobile: false
     })
     await waitForExpression(cdp,
-      `Boolean(window.rovai && document.querySelector('.app-shell'))`, 45_000)
+      `Boolean(window.coaxi && document.querySelector('.app-shell'))`, 45_000)
     return { cdp, port, stderr, child }
   } catch (error) {
     cdp?.close()
@@ -558,7 +558,7 @@ async function closeApp(app) {
 }
 
 async function waitForCoreProcessExit(timeoutMs = 15_000) {
-  const lockPath = join(coreDataDir, '.rovai-core-instance.lock')
+  const lockPath = join(coreDataDir, '.coaxi-core-instance.lock')
   const startedAt = Date.now()
   while (Date.now() - startedAt < timeoutMs) {
     try {
@@ -569,7 +569,7 @@ async function waitForCoreProcessExit(timeoutMs = 15_000) {
     }
     await wait(100)
   }
-  throw new Error(`Isolated rovai-core did not exit for ${dataDir}`)
+  throw new Error(`Isolated coaxi-core did not exit for ${dataDir}`)
 }
 
 function processIsAlive(processId) {
@@ -592,12 +592,12 @@ async function terminateChild(child) {
 }
 
 async function onboardingGet(cdp) {
-  return evaluate(cdp, 'window.rovai.onboarding.get()', true)
+  return evaluate(cdp, 'window.coaxi.onboarding.get()', true)
 }
 
 async function request(cdp, method, params = {}) {
   return evaluate(cdp,
-    `window.rovai.request(${JSON.stringify(method)}, ${JSON.stringify(params)})`, true)
+    `window.coaxi.request(${JSON.stringify(method)}, ${JSON.stringify(params)})`, true)
 }
 
 async function setTheme(cdp, theme) {
@@ -609,7 +609,7 @@ async function setTheme(cdp, theme) {
       await clickSelector(cdp, '.onboarding-theme-toggle')
     } else {
       await evaluate(cdp,
-        `window.rovai.appearance.setPreference(${JSON.stringify(theme)})`, true)
+        `window.coaxi.appearance.setPreference(${JSON.stringify(theme)})`, true)
     }
   }
   await waitForExpression(cdp,

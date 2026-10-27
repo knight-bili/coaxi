@@ -9,7 +9,7 @@ type CacheEntry = {
 }
 
 const managedAvatarCaches = new Map<ManagedAvatarRead, Map<string, CacheEntry>>()
-const desktopRead: ManagedAvatarRead = (avatarRef, rendition) => window.rovai.memberAvatars.read(avatarRef, rendition)
+const desktopRead: ManagedAvatarRead = (avatarRef, rendition) => window.coaxi.memberAvatars.read(avatarRef, rendition)
 function cacheFor(read: ManagedAvatarRead): Map<string, CacheEntry> {
   let cache = managedAvatarCaches.get(read)
   if (!cache) { cache = new Map(); managedAvatarCaches.set(read, cache) }

@@ -22,7 +22,7 @@ const transport = { request: async (method: string, params: { groupKeys?: string
   throw new Error('Unexpected navigation fixture request: ' + method)
 } } as unknown as ConsoleClient
 const preferences = browserPreferences('navigation-shell-fixture', transport).preferences.navigationPreferences
-Object.assign(window, { rovai: { platform: 'win32', request: transport.request, onEvent: () => noop, clipboard: { write: async ({ text }: { text: string }) => { actions.push('clipboard:' + text) } }, windowControls: {
+Object.assign(window, { coaxi: { platform: 'win32', request: transport.request, onEvent: () => noop, clipboard: { write: async ({ text }: { text: string }) => { actions.push('clipboard:' + text) } }, windowControls: {
   popupApplicationMenu: async () => undefined,
   onNavigationRequested: (listener: (direction: 'back' | 'forward') => void) => {
     navigationListeners.add(listener)
@@ -43,13 +43,13 @@ const ordinaryCamp = {
 } satisfies NavigationThreadItem
 const runningCamp = {
   ...pinnedCamp, id: 'rvcamp_01h47kvsy5fk1shh6w1g60eec2', title: '会话 sidecar 交互优化与实现',
-  projectBindingKind: 'directory', projectPath: '/fixture/rovai-ai', marker: 'loading', lastSeenGlobalSequence: 0
+  projectBindingKind: 'directory', projectPath: '/fixture/coaxi', marker: 'loading', lastSeenGlobalSequence: 0
 } satisfies NavigationThreadItem
 const navigationSnapshot = {
   schemaVersion: 3,
   throughGlobalSequence: 2,
   quickChat: { totalCount: 2, recentThreads: [pinnedCamp, ordinaryCamp] },
-  projects: [{ projectKey: 'directory:/fixture/rovai-ai', name: 'rovai-ai', projectPath: '/fixture/rovai-ai',
+  projects: [{ projectKey: 'directory:/fixture/coaxi', name: 'coaxi', projectPath: '/fixture/coaxi',
     lastActivityAt: runningCamp.lastActivityAt, lastActivityGlobalSequence: 2, totalCount: 1, recentThreads: [runningCamp] }]
 } satisfies NavigationSnapshot
 const navigationPins = [{
@@ -76,8 +76,8 @@ function Fixture(): React.JSX.Element {
   }, [])
   const [platform, setPlatform] = useState<'win32' | 'darwin'>('win32')
   const [disabled, setDisabled] = useState(false)
-  document.documentElement.dataset.rovaiPlatform = browser ? 'browser' : platform
-  document.documentElement.dataset.rovaiSurface = browser ? 'web' : 'desktop'
+  document.documentElement.dataset.coaxiPlatform = browser ? 'browser' : platform
+  document.documentElement.dataset.coaxiSurface = browser ? 'web' : 'desktop'
   Object.assign(window, { navigationTest: {
     renders: () => renders, setSettings, setPlatform, setDisabled, setBrowser, navigation, target, actions, setRunning, setProjectHome,
     threadReadStates, preferences,
@@ -93,7 +93,7 @@ function Fixture(): React.JSX.Element {
       } while (document.getAnimations().some(animation => animation instanceof CSSTransition && animation.playState === 'running'))
     }
   } })
-  return <><WindowsApplicationMenu /><NavigationShell platform={platform} browser={browser} disabled={disabled} settings={settings} navigation={navigation} nativeWindowControls={browser ? undefined : window.rovai.windowControls}>
+  return <><WindowsApplicationMenu /><NavigationShell platform={platform} browser={browser} disabled={disabled} settings={settings} navigation={navigation} nativeWindowControls={browser ? undefined : window.coaxi.windowControls}>
     <ThreadNavigation platform={platform} view={settings ? 'settings' : 'compose'} state="ready"
       navigation={{ ...navigationSnapshot, projects: navigationSnapshot.projects.map(project => ({ ...project,
         recentThreads: [{ ...runningCamp, marker: running ? 'loading' : 'none' }] })) }}

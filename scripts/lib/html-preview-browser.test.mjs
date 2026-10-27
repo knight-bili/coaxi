@@ -11,9 +11,9 @@ import { build } from 'vite'
 
 const root = resolve(import.meta.dirname, '../..')
 test('ordinary browser embeds isolated preview sites and uses the shared diagnostic/find channel without Electron', { timeout: 90_000 }, async t => {
-  const chrome = process.env.ROVAI_TEST_CHROME ?? (process.platform === 'darwin' ? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' : '/usr/bin/google-chrome')
+  const chrome = process.env.COAXI_TEST_CHROME ?? (process.platform === 'darwin' ? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' : '/usr/bin/google-chrome')
   if (!await access(chrome).then(() => true, () => false)) { t.skip('Chrome is not installed; browser acceptance did not run'); return }
-  const fixture = await mkdtemp(join(tmpdir(), 'rovai-html-browser-'))
+  const fixture = await mkdtemp(join(tmpdir(), 'coaxi-html-browser-'))
   let child, childClosed, socket, server
   const sites = []
   try {
@@ -65,7 +65,7 @@ test('ordinary browser embeds isolated preview sites and uses the shared diagnos
     if (childClosed) await childClosed
     await Promise.all(sites.map(site=>site.close()))
     if(server) {server.closeAllConnections();await new Promise(resolve=>server.close(resolve))}
-    if(process.env.ROVAI_KEEP_HTML_PREVIEW_FIXTURE==='1')console.log(`Browser fixture: ${fixture}`)
+    if(process.env.COAXI_KEEP_HTML_PREVIEW_FIXTURE==='1')console.log(`Browser fixture: ${fixture}`)
     else await rm(fixture,{recursive:true,force:true,maxRetries:5,retryDelay:100})
   }
 })

@@ -1,5 +1,5 @@
-import { adaptMessageTurns, type AdaptedMessage, type AdapterMessageText } from './codeg-native-content/lib/adapters/ai-elements-adapter'
-import type { ContentBlock, MessageTurn, TurnUsage } from './codeg-native-content/lib/types'
+import { adaptMessageTurns, type AdaptedMessage, type AdapterMessageText } from './coaxi-native-content/lib/adapters/ai-elements-adapter'
+import type { ContentBlock, MessageTurn, TurnUsage } from './coaxi-native-content/lib/types'
 import type { NativeTranscriptTurn } from './native-child-reader'
 import { nativeToolPairs } from './native-transcript-model'
 

@@ -9,8 +9,8 @@ import { once } from 'node:events'
 
 // Owns the fixed ACP's promised recovery behavior, not production inference.
 test('controlled ACP resumes the requested session and holds only the current input', { timeout: 10_000 }, async () => {
-  const root = await mkdtemp(join(tmpdir(), 'rovai-fixed-acp-recovery-'))
-  const capture = join(root, 'captured.jsonl'), env = { ROVAI_SKILL_RECOVERY_CAPTURE: capture }
+  const root = await mkdtemp(join(tmpdir(), 'coaxi-fixed-acp-recovery-'))
+  const capture = join(root, 'captured.jsonl'), env = { COAXI_SKILL_RECOVERY_CAPTURE: capture }
   for (const key of ['SystemRoot', 'WINDIR', 'COMSPEC', 'PATHEXT']) if (process.env[key]) env[key] = process.env[key]
   const child = spawn(process.execPath, ['scripts/fixtures/streaming-acp-runtime.mjs'], { env, windowsHide: true, stdio: ['pipe', 'pipe', 'pipe'] })
   const closed = once(child, 'exit'), messages = [], waiters = []
@@ -34,15 +34,15 @@ test('controlled ACP resumes the requested session and holds only the current in
     send(2, 'session/resume', { sessionId: 'fixture-stream-from-a-prior-process' })
     assert.equal((await wait(message => message.id === 2)).result.sessionId, 'fixture-stream-from-a-prior-process')
     send(3, 'session/prompt', { sessionId: 'fixture-stream-from-a-prior-process', prompt: [{ type: 'text',
-      text: '[REFERENCE]\nROVAI_SKILL_RECOVERY_HELD_INPUT old history\n[/REFERENCE]\n[CURRENT_INPUT]\n{"message":"ordinary successor"}\n[/CURRENT_INPUT]' }] })
+      text: '[REFERENCE]\nCOAXI_SKILL_RECOVERY_HELD_INPUT old history\n[/REFERENCE]\n[CURRENT_INPUT]\n{"message":"ordinary successor"}\n[/CURRENT_INPUT]' }] })
     assert.equal((await wait(message => message.id === 3)).result.stopReason, 'end_turn')
-    send(4, 'session/prompt', { sessionId: 'fixture-stream-from-a-prior-process', prompt: [{ type: 'text', text: '[CURRENT_INPUT]\n{"message":"ROVAI_SKILL_RECOVERY_HELD_INPUT current"}\n[/CURRENT_INPUT]' }] })
+    send(4, 'session/prompt', { sessionId: 'fixture-stream-from-a-prior-process', prompt: [{ type: 'text', text: '[CURRENT_INPUT]\n{"message":"COAXI_SKILL_RECOVERY_HELD_INPUT current"}\n[/CURRENT_INPUT]' }] })
     await wait(message => message.method === 'session/update' && message.params.update.content?.text.includes('waiting for recovery'))
     assert.ok(!messages.some(message => message.id === 4))
     send(null, 'session/cancel', { sessionId: 'fixture-stream-from-a-prior-process' })
     assert.equal((await wait(message => message.id === 4)).result.stopReason, 'cancelled')
     const silentStart = messages.length
-    send(5, 'session/prompt', { sessionId: 'fixture-stream-from-a-prior-process', prompt: [{ type: 'text', text: '[CURRENT_INPUT]\n{"message":"ROVAI_SKILL_RECOVERY_SILENT_HELD_INPUT current"}\n[/CURRENT_INPUT]' }] })
+    send(5, 'session/prompt', { sessionId: 'fixture-stream-from-a-prior-process', prompt: [{ type: 'text', text: '[CURRENT_INPUT]\n{"message":"COAXI_SKILL_RECOVERY_SILENT_HELD_INPUT current"}\n[/CURRENT_INPUT]' }] })
     send(6, 'fixture/check')
     await wait(message => message.id === 6)
     assert.ok(!messages.slice(silentStart).some(message => message.id === 5 || message.method === 'session/update'))

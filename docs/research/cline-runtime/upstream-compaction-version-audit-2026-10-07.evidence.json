@@ -3,7 +3,7 @@
   "evidenceKind": "upstream_source_audit",
   "observedAt": "2026-10-07T04:48:51.037301+00:00",
   "requestMessageId": "13c99703-c15d-4789-8023-04a0476f472e",
-  "rovaiBaseline": "d5cb7d264d25afce0447518b0ce7cc4058aab0e1",
+  "coaxiBaseline": "d5cb7d264d25afce0447518b0ce7cc4058aab0e1",
   "upstreamRepository": "https://github.com/cline/cline",
   "registry": {
     "url": "https://registry.npmjs.org/cline",

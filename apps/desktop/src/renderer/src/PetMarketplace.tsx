@@ -12,7 +12,7 @@ function MarketImage({url,name}:{url:string|undefined;name:string}):React.JSX.El
   useEffect(()=>{if(!url)return;const controller=new AbortController();let asset:string|null=null;void readPetSprite(input=>client.request('pets.operation',{operation:'market_asset',url,offset:input.offset}),url,controller.signal).then(value=>{if(controller.signal.aborted)URL.revokeObjectURL(value);else{asset=value;setSource(value)}},()=>undefined);return()=>{controller.abort();if(asset)URL.revokeObjectURL(asset)}},[client,url])
   return source?<img className="pet-market-poster" src={source} alt={name}/>:<div className="pet-market-poster"><Cat size={34}/></div>
 }
-// Codeg PetMarketplaceDialog: explicit search/filter, original stats and
+// Coaxi PetMarketplaceDialog: explicit search/filter, original stats and
 // reinstall choice; all network/package rules are the fixed source backend.
 export function PetMarketplace({onInstalled}:{onInstalled():Promise<void>}):React.JSX.Element{
   const client=useThreadClient(),t=useUiText(),[open,setOpen]=useState(false),[query,setQuery]=useState(''),[search,setSearch]=useState(''),[sort,setSort]=useState('latest'),[kind,setKind]=useState('all'),[page,setPage]=useState(1)

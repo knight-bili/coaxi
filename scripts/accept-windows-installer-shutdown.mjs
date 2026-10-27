@@ -13,9 +13,9 @@ const packageMetadata = JSON.parse(await readFile(join(root, 'package.json'), 'u
 const executableName = `${packageMetadata.build.win.executableName ?? packageMetadata.build.productName}.exe`
 const executable = resolve(process.argv[2] ?? join(root, 'dist', 'win-unpacked', executableName))
 const installDirectory = dirname(executable)
-const core = join(installDirectory, 'resources', 'bin', 'rovai-host.exe')
+const core = join(installDirectory, 'resources', 'bin', 'coaxi-host.exe')
 const coordinator = join(root, 'build', 'installer-process-coordinator.ps1')
-const fixtureRoot = await mkdtemp(join(tmpdir(), 'rovai-installer-shutdown-accept-'))
+const fixtureRoot = await mkdtemp(join(tmpdir(), 'coaxi-installer-shutdown-accept-'))
 const dataRoot = join(fixtureRoot, 'user-data')
 const outputDirectory = join(root, 'dist', 'windows-installer-shutdown-acceptance')
 const reportPath = join(outputDirectory, 'report.json')
@@ -116,7 +116,7 @@ function launchApp() {
       cwd: installDirectory,
       env: {
         ...process.env,
-        ROVAI_ALLOW_ISOLATED_INSTANCE: '1'
+        COAXI_ALLOW_ISOLATED_INSTANCE: '1'
       },
       stdio: ['ignore', stdoutHandle, stderrHandle]
     })
@@ -171,7 +171,7 @@ function runCoordinator(action, timeoutMilliseconds = null) {
 async function waitForMainWindow(processId, timeoutMs = 30_000) {
   const deadline = Date.now() + timeoutMs
   const script = [
-    '$process = Get-Process -Id ([int]$env:ROVAI_ACCEPT_PID) -ErrorAction SilentlyContinue',
+    '$process = Get-Process -Id ([int]$env:COAXI_ACCEPT_PID) -ErrorAction SilentlyContinue',
     'if ($null -ne $process -and $process.MainWindowHandle -ne 0) { exit 0 }',
     'exit 1'
   ].join('; ')
@@ -181,7 +181,7 @@ async function waitForMainWindow(processId, timeoutMs = 30_000) {
       '-NoLogo', '-NoProfile', '-NonInteractive', '-Command', script
     ], {
       cwd: root,
-      env: { ...process.env, ROVAI_ACCEPT_PID: String(processId) },
+      env: { ...process.env, COAXI_ACCEPT_PID: String(processId) },
       windowsHide: true,
       stdio: 'ignore'
     })
@@ -230,7 +230,7 @@ function parseCoordinatorOutput(output) {
 }
 
 function parseShutdownResult(log) {
-  const prefix = '[rovai-core] controlled shutdown result '
+  const prefix = '[coaxi-core] controlled shutdown result '
   const line = log.split(/\r?\n/u).findLast((candidate) => candidate.includes(prefix))
   if (!line) return null
   try {

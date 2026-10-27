@@ -16,35 +16,35 @@ module.exports = async function afterPack(context) {
       originalFilename: appFilename,
       iconPath
     })
-    await stampWindowsExecutable(join(bundledBin, 'rovai-core.exe'), {
+    await stampWindowsExecutable(join(bundledBin, 'coaxi-core.exe'), {
       version,
       description: 'Coaxi Core',
-      originalFilename: 'rovai-core.exe',
+      originalFilename: 'coaxi-core.exe',
       iconPath
     })
-    await stampWindowsExecutable(join(bundledBin, 'rovai-host.exe'), {
+    await stampWindowsExecutable(join(bundledBin, 'coaxi-host.exe'), {
       version,
       description: 'Coaxi Host',
-      originalFilename: 'rovai-host.exe',
+      originalFilename: 'coaxi-host.exe',
       iconPath
     })
-    await stampWindowsExecutable(join(bundledBin, 'rovai.exe'), {
+    await stampWindowsExecutable(join(bundledBin, 'coaxi.exe'), {
       version,
       description: 'Coaxi CLI',
-      originalFilename: 'rovai.exe',
+      originalFilename: 'coaxi.exe',
       iconPath
     })
-    await stampWindowsExecutable(join(bundledBin, 'rovai-computer-helper.exe'), {
+    await stampWindowsExecutable(join(bundledBin, 'coaxi-computer-helper.exe'), {
       version,
       description: 'Coaxi Computer Helper',
-      originalFilename: 'rovai-computer-helper.exe',
+      originalFilename: 'coaxi-computer-helper.exe',
       iconPath
     })
     recordWorkbenchPackage(context)
     return
   }
   if (context.electronPlatformName === 'linux') {
-    for (const name of ['rovai-core', 'rovai-host', 'rovai', 'rovai-native-history']) chmodSync(join(context.appOutDir, 'resources', 'bin', name), 0o755)
+    for (const name of ['coaxi-core', 'coaxi-host', 'coaxi', 'coaxi-native-history']) chmodSync(join(context.appOutDir, 'resources', 'bin', name), 0o755)
     recordWorkbenchPackage(context)
     return
   }
@@ -53,10 +53,10 @@ module.exports = async function afterPack(context) {
   const appName = `${context.packager.appInfo.productFilename}.app`
   const infoPlist = join(context.appOutDir, appName, 'Contents', 'Info.plist')
   const bundledBin = join(context.appOutDir, appName, 'Contents', 'Resources', 'bin')
-  chmodSync(join(bundledBin, 'rovai-core'), 0o755)
-  chmodSync(join(bundledBin, 'rovai-host'), 0o755)
-  chmodSync(join(bundledBin, 'rovai'), 0o755)
-  chmodSync(join(bundledBin, 'rovai-native-history'), 0o755)
+  chmodSync(join(bundledBin, 'coaxi-core'), 0o755)
+  chmodSync(join(bundledBin, 'coaxi-host'), 0o755)
+  chmodSync(join(bundledBin, 'coaxi'), 0o755)
+  chmodSync(join(bundledBin, 'coaxi-native-history'), 0o755)
   execFileSync('/usr/libexec/PlistBuddy', [
     '-c',
     'Set :NSAppTransportSecurity:NSAllowsArbitraryLoads false',

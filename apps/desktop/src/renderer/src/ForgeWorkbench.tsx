@@ -20,7 +20,7 @@ const item=(value:unknown):Item=>value!==null&&typeof value==='object'&&!Array.i
 const number=(value:Item):number=>Number(value.iid??value.number??value.index??0)
 const body=(value:Item):string=>String(value.body??value.description??'')
 
-// Codeg forge-page / forge-issue-row / detail-sheet interaction, within Rovai's
+// Coaxi forge-page / forge-issue-row / detail-sheet interaction, within Coaxi's
 // current project. The server owns provider, repository and credential choices.
 export function ForgeWorkbench({threadId,projectPath,members,onDirtyChange}:{threadId:string;projectPath:string;members:Array<{id:string;name:string}>;onDirtyChange(dirty:boolean):void}):React.JSX.Element{
   const client=useThreadClient(),t=useUiText(),scope=useMemo(()=>({threadId}),[threadId])

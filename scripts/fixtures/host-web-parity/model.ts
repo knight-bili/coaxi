@@ -128,7 +128,7 @@ export function createReviewModel(surface: Surface, scenario: Scenario) {
       }
       case 'workspaces.inspect':
         if (p.path !== workspacePath) return unavailable('unauthorized workspace')
-        return { projectPath: workspacePath, name: 'rovai-workspace',
+        return { projectPath: workspacePath, name: 'coaxi-workspace',
         gitObservation: { state: 'not_git', repositoryRoot: null, gitCommonDir: null, objectFormat: null, headCommit: null, branch: null, dirty: null, observedAt: now } }
       case 'agentRunExecution.page': {
         const all = state.snapshot.executionEvidence

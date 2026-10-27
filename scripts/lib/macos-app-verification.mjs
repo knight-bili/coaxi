@@ -39,19 +39,19 @@ export function verifyAdhocMacosApp(appPath, arch, options = {}) {
       deep: true
     },
     {
-      label: 'rovai-host',
-      path: join(resolvedAppPath, 'Contents', 'Resources', 'bin', 'rovai-host'),
-      binaryPath: join(resolvedAppPath, 'Contents', 'Resources', 'bin', 'rovai-host')
+      label: 'coaxi-host',
+      path: join(resolvedAppPath, 'Contents', 'Resources', 'bin', 'coaxi-host'),
+      binaryPath: join(resolvedAppPath, 'Contents', 'Resources', 'bin', 'coaxi-host')
     },
     {
-      label: 'rovai-core',
-      path: join(resolvedAppPath, 'Contents', 'Resources', 'bin', 'rovai-core'),
-      binaryPath: join(resolvedAppPath, 'Contents', 'Resources', 'bin', 'rovai-core')
+      label: 'coaxi-core',
+      path: join(resolvedAppPath, 'Contents', 'Resources', 'bin', 'coaxi-core'),
+      binaryPath: join(resolvedAppPath, 'Contents', 'Resources', 'bin', 'coaxi-core')
     },
     {
-      label: 'rovai',
-      path: join(resolvedAppPath, 'Contents', 'Resources', 'bin', 'rovai'),
-      binaryPath: join(resolvedAppPath, 'Contents', 'Resources', 'bin', 'rovai')
+      label: 'coaxi',
+      path: join(resolvedAppPath, 'Contents', 'Resources', 'bin', 'coaxi'),
+      binaryPath: join(resolvedAppPath, 'Contents', 'Resources', 'bin', 'coaxi')
     }
   ]
 

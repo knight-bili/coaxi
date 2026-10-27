@@ -116,7 +116,7 @@ describe('window state', () => {
   })
 
   it('persists atomically with private permissions and restores through the reader', async () => {
-    const directory = await mkdtemp(join(tmpdir(), 'rovai-window-'))
+    const directory = await mkdtemp(join(tmpdir(), 'coaxi-window-'))
     cleanup.push(directory)
     const filePath = join(directory, 'window-state.json')
 

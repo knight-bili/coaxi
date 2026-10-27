@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import type { AgentProfile, MemberRuntimeConfiguration, RovaiApi, RuntimePlatformAdmission } from '@contracts'
+import type { AgentProfile, MemberRuntimeConfiguration, CoaxiApi, RuntimePlatformAdmission } from '@contracts'
 import { applyRuntimeToMember, reconcileUnknownRuntimeApply, runtimeApplyEligibility, runtimeConfigurationsEqual } from './member-runtime-apply'
 
 const configuration: MemberRuntimeConfiguration = {
@@ -13,7 +13,7 @@ const member: AgentProfile = {
   memberOrder: 1, version: 9, createdAt: '', updatedAt: '', removedAt: null
 }
 const environment = { hostPlatform: null, admissions: [] }
-const requestAs = (request: ReturnType<typeof vi.fn>): RovaiApi['request'] => request as RovaiApi['request']
+const requestAs = (request: ReturnType<typeof vi.fn>): CoaxiApi['request'] => request as CoaxiApi['request']
 
 describe('applying a saved member Runtime configuration', () => {
   it('copies only Runtime fields and freezes all values before waiting for the receipt', async () => {

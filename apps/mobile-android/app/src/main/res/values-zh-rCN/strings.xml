@@ -223,7 +223,7 @@
     <string name="settings_accent_button">强调色按钮</string>
     <string name="settings_version">版本 %1$s</string>
     <string name="settings_server">服务器：%1$s</string>
-    <string name="settings_codeg_version">Coaxi %1$s</string>
+    <string name="settings_coaxi_version">Coaxi %1$s</string>
     <string name="settings_about_description">面向 Coaxi 多智能体编程服务器的原生 Android 客户端。</string>
     <string name="settings_coming_soon">将在里程碑 M9 中推出。</string>
     <string name="settings_licenses_unavailable">无法加载开源许可声明。</string>

@@ -13,18 +13,18 @@ import { admitElectronIntegrationTest } from './lib/electron-sandbox-capability.
 // Setup, sends, upload, approval, file reading and stop use the production Web UI.
 // Read-only HTTP observations verify the durable results independently.
 const repository = resolve(import.meta.dirname, '..')
-const chrome = process.env.ROVAI_REVIEW_CHROME ?? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+const chrome = process.env.COAXI_REVIEW_CHROME ?? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
 if (process.platform !== 'darwin') throw Error('This local acceptance currently requires macOS; other platform qualification is separate.')
 await access(chrome)
-const fixture = await realpath(await mkdtemp(join(tmpdir(), 'rovai-web-runtime-')))
+const fixture = await realpath(await mkdtemp(join(tmpdir(), 'coaxi-web-runtime-')))
 const data = join(fixture, 'data')
 const skills = join(fixture, 'skills')
 const workspace = join(fixture, 'workspace')
 for (const directory of [data, skills, workspace]) await mkdir(directory, { mode: 0o700 })
 console.log(JSON.stringify({ channel: 'automatic_acceptance', fixture, data, skills, workspace, mcp: join(data, 'mcp.json') }))
-const hostBinary = resolve(process.env.ROVAI_HOST_BIN ?? join(repository, 'target/debug/rovai-host'))
-const webUi = resolve(process.env.ROVAI_WEB_UI ?? join(repository, 'out/web'))
-const desktopEntry = process.env.ROVAI_HOST_ENTRY === 'desktop'
+const hostBinary = resolve(process.env.COAXI_HOST_BIN ?? join(repository, 'target/debug/coaxi-host'))
+const webUi = resolve(process.env.COAXI_WEB_UI ?? join(repository, 'out/web'))
+const desktopEntry = process.env.COAXI_HOST_ENTRY === 'desktop'
 let administrator = randomBytes(32).toString('hex')
 let child, closed, desktop, token, browser, origin
 let log = ''
@@ -41,14 +41,14 @@ try {
     const userData = join(fixture, 'desktop-user-data')
     await mkdir(userData, { mode: 0o700 })
     console.log(JSON.stringify({ channel: 'automatic_acceptance', userData, skills: join(userData, 'managed-skill-library'), mcp: join(userData, 'mcp.json') }))
-    const env = { ...process.env, ROVAI_ALLOW_ISOLATED_INSTANCE: '1', ROVAI_HOST_BIN: hostBinary }
+    const env = { ...process.env, COAXI_ALLOW_ISOLATED_INSTANCE: '1', COAXI_HOST_BIN: hostBinary }
     delete env.ELECTRON_RUN_AS_NODE
     desktop = await launchAcceptanceBrowser({ executable: (await import('electron')).default,
       args: [repository, `--user-data-dir=${userData}`, '--remote-debugging-port=0'], env })
-    await desktop.wait(`Boolean(window.rovai?.request)`)
-    await desktop.wait(`window.rovai.supervisor.getSnapshot().then(s=>s.fullCoreState==='ready')`, 30_000)
-    await desktop.evaluate(`(async()=>{const api=window.rovai.onboarding;let s=await api.get();if(s.status==='uninitialized')s=await api.showWelcome();if(s.status==='in_progress'&&s.step==='welcome')s=await api.completeWelcome();if(s.status==='in_progress'&&s.step==='member'){await api.selectMember('luoke');s=await api.completeMemberSelection()}if(s.status==='in_progress'&&s.step==='runtime')s=await api.deferRuntimeSetup();return s.status})()`)
-    const started = await desktop.evaluate(`window.rovai.hostWeb.start({listen:'127.0.0.1:0',allowInsecureLan:false})`)
+    await desktop.wait(`Boolean(window.coaxi?.request)`)
+    await desktop.wait(`window.coaxi.supervisor.getSnapshot().then(s=>s.fullCoreState==='ready')`, 30_000)
+    await desktop.evaluate(`(async()=>{const api=window.coaxi.onboarding;let s=await api.get();if(s.status==='uninitialized')s=await api.showWelcome();if(s.status==='in_progress'&&s.step==='welcome')s=await api.completeWelcome();if(s.status==='in_progress'&&s.step==='member'){await api.selectMember('luoke');s=await api.completeMemberSelection()}if(s.status==='in_progress'&&s.step==='runtime')s=await api.deferRuntimeSetup();return s.status})()`)
+    const started = await desktop.evaluate(`window.coaxi.hostWeb.start({listen:'127.0.0.1:0',allowInsecureLan:false})`)
     origin = started.origin; administrator = started.administratorToken
   } else {
     child = spawn(hostBinary, [
@@ -128,7 +128,7 @@ try {
   assert.ok(browser.responses.some(r => r.path === '/api/v1/uploads' && r.status === 200))
   console.log(JSON.stringify({ stage: 'browser-source-upload-and-read-passed' }))
 
-  const publishCommand = '"$ROVAI_AGENT_CLI" send --public-only --body "CLI-only verification" --file host-web-result.txt'
+  const publishCommand = '"$COAXI_AGENT_CLI" send --public-only --body "CLI-only verification" --file host-web-result.txt'
   const prompt = `This is an isolated real execution acceptance. Write host-web-result.txt in the current workspace using printf with content Unified Rust Host real execution passed. Publish it with exactly ${publishCommand}. The native workspace-write sandbox denies Unix socket access. Request native approval for this exact CLI command before running it, and run it only once after approval. Do not add other commands or shell wrappers to the approval request. Do not change global permissions, contact another member, read other files or print credentials. The acceptance client will select the Host-provided allow_once option.`
   await type(prompt)
   await browser.key('Enter')
@@ -208,10 +208,10 @@ try {
   await browser.wait(`document.querySelector('[data-agent-run-id="${stopRun.id}"]')?.innerText.includes('/bin/sleep 120')`)
   await capture('web-stop-active.png')
   if (desktop) {
-    await desktop.evaluate(`window.rovai.hostWeb.stop()`)
-    const observed = await desktop.evaluate(`window.rovai.request('camps.open',{threadId:${JSON.stringify(threadId)},traceId:${JSON.stringify(randomUUID())}})`)
+    await desktop.evaluate(`window.coaxi.hostWeb.stop()`)
+    const observed = await desktop.evaluate(`window.coaxi.request('camps.open',{threadId:${JSON.stringify(threadId)},traceId:${JSON.stringify(randomUUID())}})`)
     assert.equal(observed.agentRuns.find(run=>run.id===stopRun.id)?.status, 'running', 'closing Web must preserve the active native Run')
-    const resumed = await desktop.evaluate(`window.rovai.hostWeb.start({listen:${JSON.stringify(new URL(origin).host)},allowInsecureLan:false})`)
+    const resumed = await desktop.evaluate(`window.coaxi.hostWeb.start({listen:${JSON.stringify(new URL(origin).host)},allowInsecureLan:false})`)
     assert.equal(resumed.origin, origin)
     assert.equal(resumed.administratorToken, administrator)
     const relogin = await fetch(origin + '/api/v1/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ protocolVersion: 3, administratorToken: administrator }), redirect: 'error' })
@@ -233,7 +233,7 @@ try {
   evidence.stopRunId = stopRun.id
   evidence.checks.browserStopBeforeHostShutdown = true
   await browser.wait(`document.body.innerText.includes('已停止') || document.body.innerText.includes('你已在')`)
-  assert.equal(await browser.evaluate('typeof window.rovai'), 'undefined')
+  assert.equal(await browser.evaluate('typeof window.coaxi'), 'undefined')
   assert.deepEqual(browser.errors, [])
   evidence.checks.noElectronBridgeOrRuntimeExceptions = true
   await capture('web-stop-complete.png')

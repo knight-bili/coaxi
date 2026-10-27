@@ -12,8 +12,8 @@ it('没有桌面桥时可读取可选能力且不伪造实现', () => {
 })
 
 it('能力从当前桥惰性读取，不缓存已替换的桥', () => {
-  vi.stubGlobal('window', {rovai: {platform: 'win32'}})
+  vi.stubGlobal('window', {coaxi: {platform: 'win32'}})
   expect(desktopThreadClient.platform).toBe('win32')
-  vi.stubGlobal('window', {rovai: {platform: 'darwin'}})
+  vi.stubGlobal('window', {coaxi: {platform: 'darwin'}})
   expect(desktopThreadClient.platform).toBe('darwin')
 })

@@ -28,7 +28,7 @@
   "sourceReportSha256": "7007bec5c617422a9d0db041567ffd8a0a8c6c009c8438a3dcec7625716c3008",
   "scope": "macOS arm64 development package; actual previous preview data, one durable message and stopped in-place rollback; no cross-machine backup claim.",
   "archive": {
-    "name": "rovai-server-macos-arm64-69e1bb83.tar.gz",
+    "name": "coaxi-server-macos-arm64-69e1bb83.tar.gz",
     "sha256": "94d4a68b3d51ab7e8184414cf05719fd020e36ea2fba26a02c25a807d1250e34",
     "bytes": 20009675
   },

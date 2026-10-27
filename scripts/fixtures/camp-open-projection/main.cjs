@@ -16,7 +16,7 @@ app.whenReady().then(async () => {
     width: attachmentReview ? 1440 : 1200,
     height: attachmentReview ? 920 : 800,
     useContentSize: true,
-    title: attachmentReview ? 'Rovai AI · 附件呈现 Mock Camp' : 'CampOpen refresh acceptance fixture',
+    title: attachmentReview ? 'Coaxi AI · 附件呈现 Mock Camp' : 'CampOpen refresh acceptance fixture',
     webPreferences: { contextIsolation: true, sandbox: true, nodeIntegration: false, backgroundThrottling: false } })
   const errors = []
   window.webContents.on('console-message', event => {
@@ -774,7 +774,7 @@ app.whenReady().then(async () => {
     await run("document.documentElement.dataset.theme = 'night'")
     await state()
     await capture('refresh-night')
-    const acceptanceFile = JSON.parse(process.env.ROVAI_IMAGE_ACCEPTANCE_FILES ?? '[]')[0]
+    const acceptanceFile = JSON.parse(process.env.COAXI_IMAGE_ACCEPTANCE_FILES ?? '[]')[0]
     if (acceptanceFile) assert.ok(isAbsolute(acceptanceFile.path))
     const result = acceptanceFile
       ? { displayName: acceptanceFile.displayName, mediaType: acceptanceFile.mediaType, data: readFileSync(acceptanceFile.path).toString('base64') }
@@ -835,7 +835,7 @@ app.whenReady().then(async () => {
     assert.equal(attachmentState.longUserFile.cardWidth, 220)
     assert.equal(
       attachmentState.longUserFile.title,
-      'rovai-file-reference-and-tab-icons-md-doc-code-larger.html'
+      'coaxi-file-reference-and-tab-icons-md-doc-code-larger.html'
     )
     assert.ok(attachmentState.longUserFile.nameScrollWidth > attachmentState.longUserFile.nameClientWidth,
       'Long user attachment names are visibly truncated')

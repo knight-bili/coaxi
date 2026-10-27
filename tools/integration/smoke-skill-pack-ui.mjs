@@ -16,7 +16,7 @@ await mkdir(evidenceRoot,{recursive:true});const fixture=await realpath(await mk
 const home=path.join(fixture,'fake-home'),temp=path.join(fixture,'tmp'),src=path.join(fixture,'ui-source'),ui=path.join(fixture,'ui-build');
 await mkdir(home);await mkdir(temp);await mkdir(src);
 const env={};for(const [key,value] of Object.entries(process.env))if(['PATH','SYSTEMROOT','WINDIR','COMSPEC','PATHEXT'].includes(key.toUpperCase()))env[key]=value;
-Object.assign(env,{HOME:home,USERPROFILE:home,APPDATA:path.join(home,'AppData/Roaming'),LOCALAPPDATA:path.join(home,'AppData/Local'),TEMP:temp,TMP:temp,ROVAI_BUNDLED_SKILLS_ROOT:path.join(root,'skills')});
+Object.assign(env,{HOME:home,USERPROFILE:home,APPDATA:path.join(home,'AppData/Roaming'),LOCALAPPDATA:path.join(home,'AppData/Local'),TEMP:temp,TMP:temp,COAXI_BUNDLED_SKILLS_ROOT:path.join(root,'skills')});
 await mkdir(env.APPDATA,{recursive:true});await mkdir(env.LOCALAPPDATA,{recursive:true});
 const source=file=>JSON.stringify(path.join(root,'apps/desktop/src/renderer/src',file).replaceAll('\\','/'));
 await writeFile(path.join(src,'index.html'),'<!doctype html><html lang="zh-CN" data-theme="day"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body><div id="root"></div><script type="module" src="./fixture.jsx"></script></body></html>');

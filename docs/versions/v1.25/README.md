@@ -32,7 +32,7 @@ Camp 答案指导；过程、状态和中间结果仍可按现有规则多次发
 
   > When publishing the Camp-visible final answer with `rovai send`, use the complete final response in polished Markdown; do not send a compressed one-line summary and then write a richer Runtime final.
 
-- 保持共享 [`charter-rovai-cli.md`](../../../crates/rovai-core/resources/charter-rovai-cli.md) bytes 不变，
+- 保持共享 [`charter-rovai-cli.md`](../../../crates/coaxi-core/resources/charter-coaxi-cli.md) bytes 不变，
   由 `ContextService` 在计算 Charter blob/digest 前仅为 `codex-cli` 追加上述指导；
 - 新增 Codex-only Session Guidance revision 并只进入 Codex Native Binding compatibility digest；其他 Runtime
   的 Bootstrap bytes、Binding digest 与 Session 连续性不变；

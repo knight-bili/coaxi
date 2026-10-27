@@ -59,35 +59,35 @@
   ],
   "evidence": [
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\canvas-resize-loading-red.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\canvas-resize-loading-red.log",
       "sha256": "357434445965cb71f968e3a0da2f6d2c6dde9e03d9faec05fa4f0392e32db24a"
     },
     {
-      "path": "C:\\Users\\JiaLe\\AppData\\Local\\Temp\\rovai-canvas-source-ui-SsGXVs\\source-files.json",
+      "path": "C:\\Users\\JiaLe\\AppData\\Local\\Temp\\coaxi-canvas-source-ui-SsGXVs\\source-files.json",
       "sha256": "42f275d805d9d65c4e3cb4fa39d28bd63f6882c00ab2867d948da7a1505865e4"
     },
     {
-      "path": "C:\\Users\\JiaLe\\AppData\\Local\\Temp\\rovai-canvas-source-ui-SsGXVs\\summary.json",
+      "path": "C:\\Users\\JiaLe\\AppData\\Local\\Temp\\coaxi-canvas-source-ui-SsGXVs\\summary.json",
       "sha256": "2639c78745ccb509783cab8ddffa7defe3d5382494ba7b5641b353e70305e80f"
     },
     {
-      "path": "C:\\Users\\JiaLe\\AppData\\Local\\Temp\\rovai-canvas-source-ui-SsGXVs\\canvas-source.cjs",
+      "path": "C:\\Users\\JiaLe\\AppData\\Local\\Temp\\coaxi-canvas-source-ui-SsGXVs\\canvas-source.cjs",
       "sha256": "438fa93a058222085ec0ed8335b54b123df8e48871957a72392d2e26cb2bda78"
     },
     {
-      "path": "C:\\Users\\JiaLe\\AppData\\Local\\Temp\\rovai-canvas-source-ui-SsGXVs\\resize-day.log",
+      "path": "C:\\Users\\JiaLe\\AppData\\Local\\Temp\\coaxi-canvas-source-ui-SsGXVs\\resize-day.log",
       "sha256": "d6e13d4c59d8ab0b94d8394817fe261ca874cdce9bfed3a13f99fe49ffdec768"
     },
     {
-      "path": "C:\\Users\\JiaLe\\AppData\\Local\\Temp\\rovai-canvas-source-ui-SsGXVs\\resize-night.log",
+      "path": "C:\\Users\\JiaLe\\AppData\\Local\\Temp\\coaxi-canvas-source-ui-SsGXVs\\resize-night.log",
       "sha256": "7516b58d15ea77fdfd0ebd1cad62c1a51aaebab15191d0359914010ad4203958"
     },
     {
-      "path": "C:\\Users\\JiaLe\\AppData\\Local\\Temp\\rovai-canvas-source-ui-SsGXVs\\resize-day\\result.json",
+      "path": "C:\\Users\\JiaLe\\AppData\\Local\\Temp\\coaxi-canvas-source-ui-SsGXVs\\resize-day\\result.json",
       "sha256": "114e8739be0d99b997e73097ca867a52f5edfab89bc0dcac966c04354aefcc34"
     },
     {
-      "path": "C:\\Users\\JiaLe\\AppData\\Local\\Temp\\rovai-canvas-source-ui-SsGXVs\\resize-night\\result.json",
+      "path": "C:\\Users\\JiaLe\\AppData\\Local\\Temp\\coaxi-canvas-source-ui-SsGXVs\\resize-night\\result.json",
       "sha256": "682f8610ed3276160d35b78caf3ed506acf2005aafdde706d305f195ad0c3135"
     }
   ],

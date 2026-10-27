@@ -49,7 +49,7 @@
   },
   "artifactSha256": {
     "production-components.html": "73fa7f34cabc2c5d20acaaa9c7b1c459ae09fceb0e5723cbd2a61340dae3d686",
-    "rovai-desktop-web-parity.html": "b278c6d0556a0ba9e44588838863d8b97be9a28b08aeb47bcd95081494000481"
+    "coaxi-desktop-web-parity.html": "b278c6d0556a0ba9e44588838863d8b97be9a28b08aeb47bcd95081494000481"
   },
   "checks": [
     {
@@ -345,7 +345,7 @@
   ],
   "standaloneReviewer": {
     "simulation": true,
-    "file": "rovai-desktop-web-parity.html",
+    "file": "coaxi-desktop-web-parity.html",
     "checks": [
       "two-production-frames",
       "isolated-surface-state",

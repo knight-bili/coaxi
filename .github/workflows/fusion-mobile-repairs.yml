@@ -86,11 +86,11 @@ jobs:
         working-directory: apps/mobile-ios
         run: |
           set -o pipefail
-          xcodebuild -project CodegiOS.xcodeproj -scheme CodegiOS -configuration Debug -sdk iphonesimulator \
+          xcodebuild -project CoaxiiOS.xcodeproj -scheme CoaxiiOS -configuration Debug -sdk iphonesimulator \
             -destination 'generic/platform=iOS Simulator' -derivedDataPath "$RUNNER_TEMP/fusion-ios-derived" \
             OTHER_SWIFT_FLAGS='$(inherited) -continue-building-after-errors' \
             CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY= build 2>&1 | tee "$RUNNER_TEMP/fusion-ios-compile.log"
-          test -d "$RUNNER_TEMP/fusion-ios-derived/Build/Products/Debug-iphonesimulator/RovaiWorkbench.app"
+          test -d "$RUNNER_TEMP/fusion-ios-derived/Build/Products/Debug-iphonesimulator/CoaxiWorkbench.app"
       - name: Preserve iOS compilation log
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

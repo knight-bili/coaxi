@@ -2,7 +2,7 @@
   {
     "id": "I00-T01",
     "name": "建立主仓和来源基线",
-    "detail": "以 Rovai 历史建立私有融合主仓，Codeg 和移动源码作为固定版本移植来源；保留 MIT、Apache 2.0 许可证和 NOTICE。",
+    "detail": "以 Coaxi 历史建立私有融合主仓，Coaxi 和移动源码作为固定版本移植来源；保留 MIT、Apache 2.0 许可证和 NOTICE。",
     "phase": "I00",
     "feature_ids": [],
     "acceptance": "主仓、固定 SHA、许可清单和一期完整待办可查；源仓不被改写，仓库中没有凭据。",
@@ -32,7 +32,7 @@
   {
     "id": "I01-T01",
     "name": "复现两个应用基线",
-    "detail": "隔离安装依赖和数据目录，运行 Rovai 与 Codeg；记录 Windows 基线，启动 macOS、Linux、Android 和 iOS 构建验证。",
+    "detail": "隔离安装依赖和数据目录，运行 Coaxi 与 Coaxi；记录 Windows 基线，启动 macOS、Linux、Android 和 iOS 构建验证。",
     "phase": "I01",
     "feature_ids": [],
     "acceptance": "基线可启动、协议测试可复跑；各平台缺陷和外部依赖有负责人及修复任务，禁止把基线构建当成融合完成。",
@@ -41,7 +41,7 @@
   {
     "id": "I01-T02",
     "name": "确定 Core 和宿主边界",
-    "detail": "保留 Rovai Core 为唯一业务权威；定义 Renderer、Electron、Rust Host、Web Server 和移植服务的调用契约。",
+    "detail": "保留 Coaxi Core 为唯一业务权威；定义 Renderer、Electron、Rust Host、Web Server 和移植服务的调用契约。",
     "phase": "I01",
     "feature_ids": [],
     "acceptance": "基线可启动、协议测试可复跑；各平台缺陷和外部依赖有负责人及修复任务，禁止把基线构建当成融合完成。",
@@ -104,7 +104,7 @@
   {
     "id": "I02-T03",
     "name": "融合 Skills 和 MCP",
-    "detail": "兼容 Rovai 原址发现、工具箱与 Codeg 安装、市场和专家包；提供来源、更新、卸载及按成员投递。",
+    "detail": "兼容 Coaxi 原址发现、工具箱与 Coaxi 安装、市场和专家包；提供来源、更新、卸载及按成员投递。",
     "phase": "I02",
     "feature_ids": [
       "C02",
@@ -164,7 +164,7 @@
   {
     "id": "I04-T01",
     "name": "保留协作全流程",
-    "detail": "保留平级与负责人团队、动态成员、单聊、公开消息、责任 Task、交接、Mission 交付及 Codeg 待办运行和验收体验。",
+    "detail": "保留平级与负责人团队、动态成员、单聊、公开消息、责任 Task、交接、Mission 交付及 Coaxi 待办运行和验收体验。",
     "phase": "I04",
     "feature_ids": [
       "C01",
@@ -476,7 +476,7 @@
   {
     "id": "I08-T01",
     "name": "适配 Electron 浏览器宿主",
-    "detail": "迁移 Codeg 依赖 Tauri/wry/WebView2 的页面宿主到 Electron；保留页面管理、共享、元素、截图、DOM、控制台和导航。",
+    "detail": "迁移 Coaxi 依赖 Tauri/wry/WebView2 的页面宿主到 Electron；保留页面管理、共享、元素、截图、DOM、控制台和导航。",
     "phase": "I08",
     "feature_ids": [
       "C30",

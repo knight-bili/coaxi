@@ -22,7 +22,7 @@ last_updated: 2026-08-12
 
 P1 从以下已确认的实现事实开始，不再重复把 Session 恢复当作 Turn 恢复：
 
-- [`AcpSessionRoute.active_prompt`](../../../crates/rovai-core/src/acp.rs) 和 `PendingRpc::Prompt` 都只存在于
+- [`AcpSessionRoute.active_prompt`](../../../crates/coaxi-core/src/acp.rs) 和 `PendingRpc::Prompt` 都只存在于
   当前 ACP Host 内存；Host 退出时原 JSON-RPC response route 消失；
 - `acp_prompt_id(host_instance_id, request_id)` 是 Rovai 为本地 correlation 生成的 ID，不是 Provider
   返回的跨进程 Native Turn ID；

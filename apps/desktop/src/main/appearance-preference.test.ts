@@ -40,7 +40,7 @@ describe('appearance preference', () => {
   })
 
   it('persists a valid preference atomically and restores it', async () => {
-    const directory = await mkdtemp(join(tmpdir(), 'rovai-appearance-'))
+    const directory = await mkdtemp(join(tmpdir(), 'coaxi-appearance-'))
     cleanup.push(directory)
     const filePath = join(directory, 'appearance.json')
 
@@ -56,7 +56,7 @@ describe('appearance preference', () => {
   })
 
   it('discards missing, malformed, and obsolete values', async () => {
-    const directory = await mkdtemp(join(tmpdir(), 'rovai-appearance-'))
+    const directory = await mkdtemp(join(tmpdir(), 'coaxi-appearance-'))
     cleanup.push(directory)
     const filePath = join(directory, 'appearance.json')
 
@@ -78,7 +78,7 @@ describe('appearance preference', () => {
 
 describe('appearance reading preferences', () => {
   async function fixture(): Promise<string> {
-    const directory = await mkdtemp(join(tmpdir(), 'rovai-appearance-reading-'))
+    const directory = await mkdtemp(join(tmpdir(), 'coaxi-appearance-reading-'))
     cleanup.push(directory)
     return join(directory, 'appearance.json')
   }

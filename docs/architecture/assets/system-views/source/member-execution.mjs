@@ -30,7 +30,7 @@ function portrait(id, x, y, radius) {
 
 // Rough.js uses a fixed seed so the editable SVG and its exports are reproducible.
 function sketchTools() {
-  const requireTool = createRequire(path.join(path.resolve(process.env.ROVAI_DIAGRAM_TOOLS), 'package.json'));
+  const requireTool = createRequire(path.join(path.resolve(process.env.COAXI_DIAGRAM_TOOLS), 'package.json'));
   const generator = requireTool('roughjs').generator();
   let seed = 20909;
   const draw = (kind, args, color, fill = 'none', options = {}) => generator.toPaths(generator[kind](...args, {

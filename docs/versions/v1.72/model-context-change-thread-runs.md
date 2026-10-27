@@ -39,10 +39,10 @@ last_updated: 2026-10-03
 [公开消息与执行架构](../../architecture/public-a2a-message-delivery.md)、
 [Built-in Transport v34](../../contracts/builtin-tool-transport-v34.md)和
 [Single Chat v8](../../contracts/single-chat-v8.md)。代码事实以本基线的
-[camp_history.rs](../../../crates/rovai-core/src/camp_history.rs)、
-[delivery_queue.rs](../../../crates/rovai-core/src/delivery_queue.rs)、
-[read_model.rs](../../../crates/rovai-core/src/read_model.rs)及
-[single_chat.rs](../../../crates/rovai-core/src/single_chat.rs)核对。
+[camp_history.rs](../../../crates/coaxi-core/src/camp_history.rs)、
+[delivery_queue.rs](../../../crates/coaxi-core/src/delivery_queue.rs)、
+[read_model.rs](../../../crates/coaxi-core/src/read_model.rs)及
+[single_chat.rs](../../../crates/coaxi-core/src/single_chat.rs)核对。
 
 ## 变更前
 
@@ -426,7 +426,7 @@ type ThreadRunsResult = {
 2. **新 Session 使用新版 Bootstrap。** 仅在新 Native Binding 首次准备 Bootstrap 时生成并冻结新版 Charter。新 Run、Core 重启或软件升级本身都不等于新 Session。无需批量重置会话、失效旧 Evidence 或增加 Bootstrap 迁移。
 3. **升级后直接读取新版受管 Skill。** 新安装包携带修改后的 `cli-operations/SKILL.md` 与 reference；Core 启动及新 Run 准备时使用现有 `ManagedSkills::sync` 同步到原受管路径。用户无需重新导入、重新勾选或重建 Session。旧、新 Session 后续实际读取该路径时均得到新版文件；已进入模型对话历史的旧正文保持，不承诺自动改写模型已经读过的内容。
 
-本轮已核对基线实现：[context_contract.rs](../../../crates/rovai-core/src/context_contract.rs)将 Charter revision 与 Binding compatibility 分开；[context.rs](../../../crates/rovai-core/src/context.rs)的 `prepare_session_bootstrap_evidence_for_snapshot` 优先复用既有 Evidence；[core_subsystems.rs](../../../crates/rovai-core/src/core_subsystems.rs)与 `prepare_additional_skills` 已调用 [ManagedSkills::sync](../../../crates/rovai-core/src/managed_skills.rs)，后者递归同步正文与 references。实施只接通这些现有路径，不增加热更新通知、版本协商或按 Session 维护 Skill 副本。
+本轮已核对基线实现：[context_contract.rs](../../../crates/coaxi-core/src/context_contract.rs)将 Charter revision 与 Binding compatibility 分开；[context.rs](../../../crates/coaxi-core/src/context.rs)的 `prepare_session_bootstrap_evidence_for_snapshot` 优先复用既有 Evidence；[core_subsystems.rs](../../../crates/coaxi-core/src/core_subsystems.rs)与 `prepare_additional_skills` 已调用 [ManagedSkills::sync](../../../crates/coaxi-core/src/managed_skills.rs)，后者递归同步正文与 references。实施只接通这些现有路径，不增加热更新通知、版本协商或按 Session 维护 Skill 副本。
 
 当前安装包的 Core 与 CLI 按既有发布流程配套更新；新调用使用当前目录/输出合同，不能只替换一个运行中进程的 CLI 二进制。已有原始工具结果保留自身版本和 digest，不用当前必填字段重新伪造旧响应。实现时须明确验证历史结果读取与新结果严格校验分别走各自路径。
 

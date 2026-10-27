@@ -16,7 +16,7 @@ const longNarration = `这是隔离验收数据。长正文、路径和行内代
 const names = ['洛可', '沐瓦', '绵栀', '奇鹿', '言川', '予墨', '知夏', '负责跨项目执行审查与回归验收的长名称队员', '时屿', '星澜', '安禾', '云舒']
 const agents: AgentProfile[] = Array.from({ length: 49 }, (_, index) => ({
   agentId: `agent-${index + 1}`, displayName: names[index] ?? `队员 ${index + 1}`,
-  avatarRef: index < 4 ? `rovai://member-avatar/builtin/${['luoke', 'muwa', 'mianzhi', 'qilu'][index]}/v1` : null,
+  avatarRef: index < 4 ? `coaxi://member-avatar/builtin/${['luoke', 'muwa', 'mianzhi', 'qilu'][index]}/v1` : null,
   accent: null, teamRole: '项目协作', professionalResponsibilities: '', personalityTraits: [],
   workingPrinciples: '', growthTopic: '', defaultCapabilities: [], presence: 'present',
   runtimeConfiguration: { adapterKind: 'claude-code-cli', model: { mode: 'explicit', modelId: 'claude-opus-4-6', options: {} },
@@ -111,7 +111,7 @@ function snapshotFor(count: number, revision: number, recipientCount = 0): Threa
 
 let draft: ThreadComposerDraftView = { threadId, body: '', content: { version: 2, segments: [] }, revision: 1, attachments: [],
   replyIntent: null, continuationIntent: null, updatedAt: now, expiresAt: null }
-Object.assign(window, { rovai: {
+Object.assign(window, { coaxi: {
   platform: 'darwin', onEvent: () => () => {},
   filePreview: { bindThread: async () => {}, onExternalUpdate: () => () => {} },
   windowControls: { onCloseTabRequested: () => () => {} },
@@ -293,7 +293,7 @@ function Fixture(): React.JSX.Element {
     <NotificationFixtureBridge />
     <div className="app-shell app-shell-camp">
     <aside style={{ gridRow: '1 / -1', padding: '48px 24px', background: 'var(--rail)', color: 'var(--rail-ink)' }}>
-      <strong>Rovai AI · 隔离验收</strong>
+      <strong>Coaxi AI · 隔离验收</strong>
       <p style={{ fontSize: 12, lineHeight: 1.7 }}>真实生产组件，模拟队员数据。<br />不调用模型，不访问日常 Camp。</p>
       <div style={{ display: 'grid', gap: 8 }}>
         <label>入口运行人数 <select data-entry-running-count value={entryRunningCount ?? 'mixed'}

@@ -1,11 +1,11 @@
 import { useMemo, useState } from 'react'
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels'
-import { computeMergeHunks, buildResult } from './codeg-workbench/merge-diff'
-import { parseConflictMarkers } from './codeg-workbench/conflict-parser'
+import { computeMergeHunks, buildResult } from './coaxi-workbench/merge-diff'
+import { parseConflictMarkers } from './coaxi-workbench/conflict-parser'
 import { WorkspaceCodeEditor } from './WorkspaceCodeEditor'
 import { useUiText } from './interface-language'
 
-/** Codeg base/ours/result/theirs hunk model with Rovai's shared editor host. */
+/** Coaxi base/ours/result/theirs hunk model with Coaxi's shared editor host. */
 export function WorkspaceMergeEditor({ path, base, ours, theirs, merged, onApply, onClose }: {
   path:string; base:string; ours:string; theirs:string; merged:string; onApply(value:string):void; onClose():void
 }):React.JSX.Element {

@@ -16,10 +16,10 @@ export async function qualifyCanvasBoardUi(window,{evaluate,wait,rpc,config,repo
  const targetId=report.board_ui.boards[0]
  await click('document.querySelector(\'button[aria-label="无限画布"]\')');await wait('Boolean(document.querySelector(".canvas-breadcrumb-root:not(:disabled)"))');await click('document.querySelector(".canvas-breadcrumb-root")')
  await wait('document.querySelectorAll(".canvas-board-item").length===12')
- const originalAppearance=await evaluate('window.rovai.appearance.get()');report.board_ui.originalAppearance=originalAppearance
+ const originalAppearance=await evaluate('window.coaxi.appearance.get()');report.board_ui.originalAppearance=originalAppearance
  try{
   for(const theme of ['day','night']){
-   await evaluate(`window.rovai.appearance.setPreference(${JSON.stringify(theme)})`);await wait(`document.documentElement.dataset.theme===${JSON.stringify(theme)}`)
+   await evaluate(`window.coaxi.appearance.setPreference(${JSON.stringify(theme)})`);await wait(`document.documentElement.dataset.theme===${JSON.stringify(theme)}`)
    window.setContentSize(1040,700);await pause(200)
    const list='document.querySelector(".canvas-board-scroll")'
    const p=await evaluate(`(()=>{const r=${list}.getBoundingClientRect();return{x:Math.round(r.x+r.width/2),y:Math.round(r.y+r.height/2)}})()`)
@@ -63,6 +63,6 @@ export async function qualifyCanvasBoardUi(window,{evaluate,wait,rpc,config,repo
   report.board_ui.fallbackBoardId=fallback
   await click('document.querySelector(".canvas-breadcrumb-root")');await wait('Boolean(document.querySelector(".canvas-boards-home"))');await text('document.querySelector("input[aria-label=搜索画板]")','R09 不存在的画板');await wait('document.querySelector(".canvas-board-grid").textContent.includes("没有匹配的画板")');record('actual_board_search_empty_state_keeps_the_original_board_catalog')
  }finally{
-  await evaluate(`window.rovai.appearance.setPreference(${JSON.stringify(originalAppearance.preference)})`).catch(()=>{});await checkpoint()
+  await evaluate(`window.coaxi.appearance.setPreference(${JSON.stringify(originalAppearance.preference)})`).catch(()=>{});await checkpoint()
  }
 }

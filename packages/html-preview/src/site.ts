@@ -20,8 +20,8 @@ export interface HtmlPreviewSiteOptions {
   idleTimeoutMs?: number | null
 }
 
-const COOKIE = '__Host-rovai-preview'
-const INTERNAL = '/__rovai-preview/'
+const COOKIE = '__Host-coaxi-preview'
+const INTERNAL = '/__coaxi-preview/'
 
 function sameSecret(value: string, expected: string): boolean {
   const left = Buffer.from(value), right = Buffer.from(expected)

@@ -153,7 +153,7 @@
     }
   ],
   "implementation": [
-    "BusinessApp实际多卡实例集合已接CanvasSurface稳定ViewportPortal；每卡复用生产ThreadWorkspace、独立草稿上下文和leave guard；同Thread镜像完整输入，原地/侧边移动不重建编辑器。固定Codeg单drawer行为保留，多张inline并存。",
+    "BusinessApp实际多卡实例集合已接CanvasSurface稳定ViewportPortal；每卡复用生产ThreadWorkspace、独立草稿上下文和leave guard；同Thread镜像完整输入，原地/侧边移动不重建编辑器。固定Coaxi单drawer行为保留，多张inline并存。",
     "精确Host/Core/Board/pin/Thread/私有Conversation上下文；只读校验私有引用后open，不enter/创建Conversation/启动Runtime。批量关闭全部准备后移除，准备失败回滚；图写入只准备/解除相关输入，原pin消失保留孤立实例。",
     "每唯一Thread一个CanvasThreadReader承接Core事件/Host失效及原有界poll，订阅后补读，所有卡片共享既有ThreadProjectionStore和原命令factory。",
     "共享threadWorkspaceActions逐字提取8个原handler及8个停止声明、2个事件声明；thread-commands/thread-workspace-data未改，私聊send及2个pending edit表达式未改。",
@@ -430,43 +430,43 @@
     },
     "logs": [
       {
-        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\canvas-multi-owners-final.log",
+        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\canvas-multi-owners-final.log",
         "sha256": "1cd1222ee7f8248db4a80802bd5f33d398f86337d377e84d79a40808634e6669"
       },
       {
-        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\canvas-multi-types-final.log",
+        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\canvas-multi-types-final.log",
         "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
       },
       {
-        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\canvas-multi-copy-final.log",
+        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\canvas-multi-copy-final.log",
         "sha256": "10c82e5a4aa35363d76038119db88cea051e5981de74196e29cc4184dc5ed078"
       },
       {
-        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\canvas-multi-doc-version-final.log",
+        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\canvas-multi-doc-version-final.log",
         "sha256": "01dbc9daf44dff0600954e17b82ec917ad4998a3eb5eefa32505c4ca15a8552d"
       },
       {
-        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\canvas-multi-doc-decisions-final.log",
+        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\canvas-multi-doc-decisions-final.log",
         "sha256": "d58168f462b9dd5bd281a72af820169f9a7e92d02aa34b1c51c5aef9e29aa77e"
       },
       {
-        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\canvas-multi-doc-policy-final.log",
+        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\canvas-multi-doc-policy-final.log",
         "sha256": "de9961cd2e95758c508b1d552ff358b84e6ca04cee35c3332859fc46b3cdd5ba"
       },
       {
-        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\canvas-multi-diff-final.log",
+        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\canvas-multi-diff-final.log",
         "sha256": "dc76a2e44b441b4ada3efca5ffad9b037cfb5cb5d417ec7fc0a8fceef88c82be"
       },
       {
-        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\canvas-multi-source-proof.log",
+        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\canvas-multi-source-proof.log",
         "sha256": "d7e8f344fd681132e1a278fab6426c7ff1e37cfcb47ce78d6ba67550133578e7"
       },
       {
-        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\canvas-multi-source-proof.json",
+        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\canvas-multi-source-proof.json",
         "sha256": "d5a160b6040b5d4ccf1e6d525dcf9c1eef2d78c56c9790cd61db6e4acea08cfe"
       },
       {
-        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\canvas-multi-browser-witness.json",
+        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\canvas-multi-browser-witness.json",
         "sha256": "9d0b58fa7e65fb4d33ad11f87d65f6f140e6879ea7136672f5c62d3df89e00c6"
       }
     ]

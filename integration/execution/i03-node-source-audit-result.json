@@ -117,7 +117,7 @@
     "Mission/Task/Thread/member bindings resolve current Core objects; no copied business status",
     "File paths require current grants; terminal launch intent is not PTY identity",
     "Client viewport/selection/drafts stay scoped to Core identity and board",
-    "Codeg global LWW event replay adapts to Core CAS/invalidation/snapshot authority"
+    "Coaxi global LWW event replay adapts to Core CAS/invalidation/snapshot authority"
   ],
   "existingCore": {
     "implemented": "Canvas board metadata lifecycle only",

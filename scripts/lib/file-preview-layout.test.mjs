@@ -15,7 +15,7 @@ const fixtureSource = join(root, 'scripts/fixtures/file-preview-layout')
 
 test('production file preview keeps split geometry, reading state and stable preferences through native input', { timeout: 180_000 }, async (t) => {
   if (!admitElectronIntegrationTest(t)) return
-  const fixture = await mkdtemp(join(tmpdir(), 'rovai-file-preview-layout-test-'))
+  const fixture = await mkdtemp(join(tmpdir(), 'coaxi-file-preview-layout-test-'))
   let child
   let closed
   try {
@@ -59,7 +59,7 @@ contextBridge.exposeInMainWorld('previewWindowControls', {
       child.kill('SIGKILL')
       await closed
     }
-    if (process.env.ROVAI_KEEP_FILE_PREVIEW_FIXTURE === '1') {
+    if (process.env.COAXI_KEEP_FILE_PREVIEW_FIXTURE === '1') {
       process.stdout.write(`File preview fixture: ${fixture}\n`)
     } else {
       await rm(fixture, { recursive: true, force: true })

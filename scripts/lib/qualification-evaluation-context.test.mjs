@@ -7,7 +7,7 @@ const event = (id, command, output, status='completed') => ({id,agentRunId:'lead
 const snapshot = () => ({agentRuns:[{id:'lead-run',agentId:'lead',campTurnId:'turn'}],messages:[],tasks:[],executionEvidence:[]})
 test('isolated receipt projection retains observed success/failure, deduplicates, excludes foreign and private activity', () => {
   const s=snapshot(), ok=event('ok','npm test','tests 5 pass 5'), bad=event('bad','node --test tests/public.test.mjs','assertion failed','failed')
-  s.executionEvidence=[ok,ok,bad,{...event('foreign','npm test','FOREIGN'),agentRunId:'foreign'},event('pending','npm test','PENDING','inProgress'),{id:'thought',agentRunId:'lead-run',payload:{text:'PRIVATE_THOUGHT'}},event('mixed','node check.mjs && rovai task view','PROCESS_SECRET')]
+  s.executionEvidence=[ok,ok,bad,{...event('foreign','npm test','FOREIGN'),agentRunId:'foreign'},event('pending','npm test','PENDING','inProgress'),{id:'thought',agentRunId:'lead-run',payload:{text:'PRIVATE_THOUGHT'}},event('mixed','node check.mjs && coaxi task view','PROCESS_SECRET')]
   const result=buildEvaluationContext(s,boundary)
   assert.equal(result.receipts.length,2)
   assert.equal(JSON.parse(result.receipts[1].content).exitCode,1)
@@ -37,9 +37,9 @@ test('delivery includes earlier public Lead result before late acknowledgement, 
 })
 
 
-test('verification in a rovai-prefixed temporary workspace and package remains eligible, actual CLI stays excluded', () => {
+test('verification in a coaxi-prefixed temporary workspace and package remains eligible, actual CLI stays excluded', () => {
   const s=snapshot()
-  s.executionEvidence=[event('python',"/bin/zsh -lc 'cd /private/tmp/rovai-qualification-123/workspace && python3 verify.py'",'verified'),event('npm','npm test','> rovai-context-demo-106@1.0.0 test\npass 5'),event('cli',"node check.mjs && /private/tmp/bin/rovai task view --task-id x",'task details')]
+  s.executionEvidence=[event('python',"/bin/zsh -lc 'cd /private/tmp/coaxi-qualification-123/workspace && python3 verify.py'",'verified'),event('npm','npm test','> coaxi-context-demo-106@1.0.0 test\npass 5'),event('cli',"node check.mjs && /private/tmp/bin/coaxi task view --task-id x",'task details')]
   const c=buildEvaluationContext(s,boundary)
   assert.deepEqual(c.receipts.map(r=>r.sourceEvidenceId),['python','npm'])
   assert.equal(c.omitted[0].sourceEvidenceId,'cli')
@@ -49,7 +49,7 @@ test('verification in a rovai-prefixed temporary workspace and package remains e
 test('private command capture preserves selected source bytes and digest without broadening Judge evidence', () => {
   const s = snapshot()
   const command = event('ok', 'node check.mjs', 'first output\nlast output')
-  s.executionEvidence = [command, event('private', 'rovai task view', 'TASK CONTENT')]
+  s.executionEvidence = [command, event('private', 'coaxi task view', 'TASK CONTENT')]
   const context = buildEvaluationContext(s, boundary)
   const capture = buildEvaluationCommandSources(s, context)
   assert.equal(capture.judgeVisible, false)

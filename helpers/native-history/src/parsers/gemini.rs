@@ -254,8 +254,8 @@ impl GeminiParser {
             if let Some(legacy) = Self::parse_legacy_record_value(raw) {
                 return Some(legacy);
             }
-            // Upstream gives up here. codeg keeps a transcript that named its
-            // own session: `projectHash` is metadata codeg never reads, and
+            // Upstream gives up here. coaxi keeps a transcript that named its
+            // own session: `projectHash` is metadata coaxi never reads, and
             // dropping the session would hide history the user can still see in
             // gemini's own `/resume` list for older files.
             if !has_session_id {
@@ -756,7 +756,7 @@ impl GeminiParser {
     ///   (`thoughtsTokenCount`) and `tool` (`toolUsePromptTokenCount`);
     /// - `total` is the API's `totalTokenCount`.
     ///
-    /// codeg's [`TurnUsage`] buckets are Anthropic-shaped and DISJOINT —
+    /// coaxi's [`TurnUsage`] buckets are Anthropic-shaped and DISJOINT —
     /// `compute_session_stats` adds all four. Passing `input` through verbatim
     /// alongside `cached` therefore counted the cache twice, and `thoughts` /
     /// `tool` were dropped entirely.

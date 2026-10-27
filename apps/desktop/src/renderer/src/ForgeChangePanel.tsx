@@ -5,7 +5,7 @@ import {AppDialogContent,AppDialogHeader, AppDialogBody, AppDialogFooter } from 
 import {useThreadClient} from './camp-client'
 import {useUiText} from './interface-language'
 import {newCommandId} from '../../shared/command-id'
-import {UnifiedDiffPreview} from './codeg-native-content/components/diff/unified-diff-preview'
+import {UnifiedDiffPreview} from './coaxi-native-content/components/diff/unified-diff-preview'
 
 type Check={id:string;name:string;state:string;summary?:string;url?:string;allow_failure:boolean}
 type Detail={number:number;base_ref:string;head_ref:string;head_repo?:string;head_sha?:string;draft:boolean;state:string;mergeable:boolean|null;merge_state?:string;additions?:number;deletions?:number;changed_files?:number;commits?:number;checks:{available:boolean;partial:boolean;checks:Check[]}}
@@ -14,7 +14,7 @@ type Options={methods:Array<'merge'|'squash'|'rebase'>;default_method:'merge'|'s
 type Result<T>={success:boolean;status:number;data:T;nextPage:number|null}
 const safeLink=(value?:string):string|undefined=>{try{const url=new URL(value??'');return ['https:','http:'].includes(url.protocol)&&!url.username&&!url.password?url.href:undefined}catch{return undefined}}
 
-// Codeg detail-sheet: shared detail identity, branch strip, CI rows, lazy file
+// Coaxi detail-sheet: shared detail identity, branch strip, CI rows, lazy file
 // disclosures and a merge dialog pinned to the head visible when it opened.
 export function ForgeChangePanel({threadId,number,repositoryKey,accountId,onDirtyChange}:{threadId:string;number:number;repositoryKey:string;accountId?:string;onDirtyChange(value:boolean):void}):React.JSX.Element{
   const client=useThreadClient(),t=useUiText(),epoch=useRef(0)
@@ -28,7 +28,7 @@ export function ForgeChangePanel({threadId,number,repositoryKey,accountId,onDirt
   useEffect(()=>{onDirtyChange(merge!==null);return()=>onDirtyChange(false)},[merge,onDirtyChange])
   const prepareMerge=async():Promise<void>=>run(async current=>{if(!detail?.head_sha)return;const headSha=detail.head_sha;const response=await call<Options>('merge_options');if(current===epoch.current)setMerge({headSha,options:response.data,method:response.data.default_method,commandId:newCommandId()})})
   const submit=async():Promise<void>=>run(async current=>{if(!merge)return;const sent=merge.sent??{scope:{threadId},action:'merge_pr',number,...(accountId?{accountId}:{}),headSha:merge.headSha,mergeMethod:merge.method,commandId:merge.commandId,confirmed:true,expectedRepositoryKey:repositoryKey};setMerge(previous=>previous?{...previous,sent}:previous);await client.request<Result<unknown>>('forge.operation',sent);if(current!==epoch.current)return;setMerge(null);const response=await call<Detail>('change_detail');if(current===epoch.current)setDetail(response.data)})
-  return <section className="workbench-forge-change codeg-native-rich">
+  return <section className="workbench-forge-change coaxi-native-rich">
     <div className="workbench-toolbar"><code>{detail?.head_repo?`${detail.head_repo}:`:''}{detail?.head_ref??'…'}</code><span>→</span><code>{detail?.base_ref??'…'}</code><button type="button" className="quiet-button" disabled={busy} onClick={()=>void refresh()} aria-label={t('刷新 PR 详情')}><RefreshCw size={13}/></button></div>
     <div className="workbench-toolbar" role="tablist"><button className="quiet-button" type="button" role="tab" aria-selected={tab==='checks'} onClick={()=>setTab('checks')}>{t('检查')}</button><button className="quiet-button" type="button" role="tab" aria-selected={tab==='files'} onClick={()=>{setTab('files');if(!page)void loadFiles()}}>{t('文件')}{detail?.changed_files!=null?` (${detail.changed_files})`:''}</button><small>{detail?.additions!=null?`+${detail.additions}`:''} {detail?.deletions!=null?`−${detail.deletions}`:''} {detail?.commits!=null?t('{0} 次提交',String(detail.commits)):''}</small></div>
     {error&&<p className="workbench-error" role="alert">{error}</p>}

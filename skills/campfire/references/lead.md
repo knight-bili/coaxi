@@ -9,7 +9,7 @@ Choose 2-3 present, available contributors, normally 3. Prefer the user's choice
 Send one message per round with repeated `--to`:
 
 ```text
-rovai send --to <agent-a-id> --to <agent-b-id> --body <round-request>
+coaxi send --to <agent-a-id> --to <agent-b-id> --body <round-request>
 ```
 
 For round 1, include the user's original topic, confirmed shared facts, each member's perspective, and the member reply contract in `SKILL.md`. Include no host recommendation. A compact request is sufficient:

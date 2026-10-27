@@ -102,7 +102,7 @@
     "detectorPolicy": "disabled",
     "capabilityStatus": "unverified_not_observed"
   },
-  "rovaiPolicy": {
+  "coaxiPolicy": {
     "publicOutputMode": "explicit_send_only",
     "charterDelivery": "first_payload",
     "nativeSystemPromptCapability": "observed",

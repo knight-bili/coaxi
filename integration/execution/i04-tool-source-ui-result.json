@@ -210,17 +210,17 @@
       "git_blob_with_filters": "1539506f1c80f8eb2bf01ae89d58fb9442a2838d"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/resumed-delegation-card.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/message/resumed-delegation-card.tsx",
       "sha256": "329c091e865023f7a49e900de3aa7b8fa2f55fd966edf0f89ef59d68b1ed3fef",
       "git_blob_with_filters": "5a542e13d4e7ae21bdc6647297f45b6cacef1f90"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/codeg-mcp-tool.test.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/lib/coaxi-mcp-tool.test.ts",
       "sha256": "1c0436a1e9fb487ba3807fbfac4340c352654a1d8163e180a008024616a1f9bc",
       "git_blob_with_filters": "65adf51b337037a656d3c811ccaa3de1601c4dd1"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/codeg-mcp-tool.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/lib/coaxi-mcp-tool.ts",
       "sha256": "115091c57d395ff621f737bf92bd9db908513212c3f8575b83efd5619950732e",
       "git_blob_with_filters": "1d437c44bd7a08ec1dd0749590d15bc4c0590e6b"
     },

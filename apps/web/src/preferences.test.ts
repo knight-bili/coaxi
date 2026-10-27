@@ -130,7 +130,7 @@ it('persists local unread intent, preserves it across other tab writes, and publ
   expect((await first.get()).projectOrder).not.toContain('directory:/work/a')
   await other.setThreadReadState(id, { manualUnread: false, readThroughGlobalSequence: 8 })
   const event = new Event('storage')
-  Object.assign(event, { storageArea: storage, key: 'rovai.presentation:host-a:navigation' })
+  Object.assign(event, { storageArea: storage, key: 'coaxi.presentation:host-a:navigation' })
   const changed = new Promise<NavigationPreferencesSnapshot>((resolve) => {
     let unsubscribeChanged: () => void = () => {}
     unsubscribeChanged = first.onChanged(snapshot => {
@@ -146,11 +146,11 @@ it('persists local unread intent, preserves it across other tab writes, and publ
   await first.get()
   const count = seen.length
   const requestCount = firstTransport.request.mock.calls.length
-  const storedNavigation = entries.get('rovai.presentation:host-a:navigation')
+  const storedNavigation = entries.get('coaxi.presentation:host-a:navigation')
   failWrite = true
   await expect(first.setThreadReadState(id, { manualUnread: true, readThroughGlobalSequence: 12 })).rejects.toThrow('Storage unavailable')
   expect(seen).toHaveLength(count)
-  expect(entries.get('rovai.presentation:host-a:navigation')).toBe(storedNavigation)
+  expect(entries.get('coaxi.presentation:host-a:navigation')).toBe(storedNavigation)
   expect(JSON.parse(storedNavigation!).threadReadStates[id].manualUnread).toBe(false)
   expect(firstTransport.request).toHaveBeenCalledTimes(requestCount)
   expect(firstTransport.request.mock.calls.every(([operation]) => operation === 'navigation.projectGroups')).toBe(true)
@@ -172,7 +172,7 @@ it('merges concurrent directory writes and protects removal, completed migration
   expect(await b.get()).toMatchObject({ registeredProjects: [], legacyProjectsSynced: true })
   await b.restoreProject('directory:/gone')
   expect((await a.get()).registeredProjects).toEqual(['/gone'])
-  const key = 'rovai.presentation:projects:navigation'
+  const key = 'coaxi.presentation:projects:navigation'
   entries.set(key, '{broken')
   expect((await a.get()).readError).toBeTruthy()
   await expect(a.registerProjects(['/lost'], true)).rejects.toThrow()

@@ -11,7 +11,7 @@ const scope: DailyScope = { threadIds: [], excludeThreadIds: [], excludeAutomati
 const now = new Date('2026-09-10T02:00:00Z')
 describe('daily calendar and evidence contract', () => {
   it('prepared CLI rejects modified analysis input before it reaches an analysis model', async () => {
-    const output=await mkdtemp(join(tmpdir(),'rovai-daily-test-'));roots.push(output)
+    const output=await mkdtemp(join(tmpdir(),'coaxi-daily-test-'));roots.push(output)
     const result=await runDaily({output,timezone:'UTC',scope,exportTrace:async params=>{
       const facts={runs:[],deliveries:[],tools:[],deliveryEvents:[]}
       return {schemaVersion:1,window:params,scope:params,asOf:new Date().toISOString(),facts,factsDigest:digest(facts),metrics:{definitionVersion:2,runs:{terminalOutcomesInWindow:{}}}}
@@ -24,7 +24,7 @@ describe('daily calendar and evidence contract', () => {
     expect(()=>execFileSync(process.execPath,args,{stdio:'pipe'})).toThrow()
   })
   it('bounds metadata samples to their actual metric population and includes pending handoff evidence', async () => {
-    const output=await mkdtemp(join(tmpdir(),'rovai-daily-test-'));roots.push(output)
+    const output=await mkdtemp(join(tmpdir(),'coaxi-daily-test-'));roots.push(output)
     const facts={runs:[],deliveries:[{deliveryId:'old-open',deliveryKind:'public_a2a',dispatchDisposition:'dispatch',status:'pending',createdAt:'2026-09-08T01:00:00Z',waitCondition:'target_running'}],deliveryEvents:[{eventId:'completion-failure',deliveryKind:'completion',dispatchDisposition:'dispatch',eventType:'message_delivery.failed',occurredAt:'2026-09-09T01:00:00Z'}],tools:[{agentRunId:'r',operationId:'replayed',executionEpoch:1,sourceAuthority:'core',phase:'terminal',outcome:'failed',idempotentReplay:true,lastObservedAt:'2026-09-09T01:00:00Z'}]}
     const result=await runDaily({output,timezone:'Asia/Shanghai',now,scope,exportTrace:async params=>({schemaVersion:1,window:params,scope:params,asOf:now.toISOString(),facts,factsDigest:digest(facts),metrics:{definitionVersion:2,runs:{terminalOutcomesInWindow:{}},a2a:{terminalCoverage:{numerator:0,denominator:0},openWaitReasonsAsOf:{target_running:1}}}})})
     const pack=JSON.parse(await readFile(join(result.directory,'analysis-input.json'),'utf8'))
@@ -42,7 +42,7 @@ describe('daily calendar and evidence contract', () => {
     expect(() => dailyWindow('bad/zone', now)).toThrow()
   })
   it('retains a failed attempt, accepts verified evidence, freezes success and rejects scope reuse', async () => {
-    const output = await mkdtemp(join(tmpdir(), 'rovai-daily-test-')); roots.push(output)
+    const output = await mkdtemp(join(tmpdir(), 'coaxi-daily-test-')); roots.push(output)
     const options = { output, timezone: 'Asia/Shanghai', now, scope }
     const failed = await runDaily({ ...options, exportTrace: async () => { throw new Error('Core unavailable') } })
     expect(failed.report.status).toBe('unavailable')
@@ -63,7 +63,7 @@ describe('daily calendar and evidence contract', () => {
     await expect(runDaily({ ...options, scope: { ...scope, threadIds: ['new-camp'] }, exportTrace: async () => null })).rejects.toThrow('scope changed')
   })
   it('rejects exported window fields or scalar filters before collecting a daily report', async () => {
-    const output = await mkdtemp(join(tmpdir(), 'rovai-daily-test-')); roots.push(output)
+    const output = await mkdtemp(join(tmpdir(), 'coaxi-daily-test-')); roots.push(output)
     let exported = false
     for (const invalid of [{ ...scope, since: '2026-09-08T16:00:00Z' }, { ...scope, threadIds: 'camp-1' }]) {
       await expect(runDaily({ output, timezone: 'Asia/Shanghai', now, scope: invalid as unknown as DailyScope,

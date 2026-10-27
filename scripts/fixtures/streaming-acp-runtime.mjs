@@ -4,7 +4,7 @@
 import { createInterface } from 'node:readline'
 import { appendFile } from 'node:fs/promises'
 
-const copilot = process.env.ROVAI_STREAMING_ACP_KIND === 'copilot-cli'
+const copilot = process.env.COAXI_STREAMING_ACP_KIND === 'copilot-cli'
 if (process.argv.includes('--version')) {
   process.stdout.write(copilot ? 'GitHub Copilot CLI 1.0.83.\n' : '0.24.5\n')
   process.exit(0)
@@ -45,18 +45,18 @@ for await (const line of createInterface({ input: process.stdin })) {
       continue
     }
     busy = true
-    if (process.env.ROVAI_SKILL_RECOVERY_CAPTURE) {
-      await appendFile(process.env.ROVAI_SKILL_RECOVERY_CAPTURE, `${JSON.stringify({
+    if (process.env.COAXI_SKILL_RECOVERY_CAPTURE) {
+      await appendFile(process.env.COAXI_SKILL_RECOVERY_CAPTURE, `${JSON.stringify({
         pid: process.pid, parentPid: process.ppid, method: message.method,
         requestId: message.id, params: message.params
       })}\n`)
-      // The fixed Charter also names ROVAI_SKILL_PACKS. Hold the unique work
+      // The fixed Charter also names COAXI_SKILL_PACKS. Hold the unique work
       // item, never the preceding Bootstrap handshake.
       const rendered = (message.params.prompt ?? []).filter(part => part.type === 'text').map(part => part.text).join('\n')
       const current = /\[CURRENT_INPUT\]\s*([\s\S]*?)\s*\[\/CURRENT_INPUT\]/.exec(rendered)
       const input = JSON.stringify(current ? JSON.parse(current[1]) : message.params)
-      const silent = input.includes('ROVAI_SKILL_RECOVERY_SILENT_HELD_INPUT')
-      if (silent || input.includes('ROVAI_SKILL_RECOVERY_HELD_INPUT')) {
+      const silent = input.includes('COAXI_SKILL_RECOVERY_SILENT_HELD_INPUT')
+      if (silent || input.includes('COAXI_SKILL_RECOVERY_HELD_INPUT')) {
         heldPromptId = message.id
         if (!silent) update({ sessionUpdate: 'agent_message_chunk', content: {
           type: 'text', text: 'Controlled input received; waiting for recovery injection.'
@@ -68,13 +68,13 @@ for await (const line of createInterface({ input: process.stdin })) {
       busy = false
       continue
     }
-    if (JSON.stringify(message.params).includes('ROVAI_STREAM_FAST_SETUP')) {
-      update({ sessionUpdate: 'agent_message_chunk', content: { type: 'text', text: 'ROVAI_STREAM_FAST_READY' } })
+    if (JSON.stringify(message.params).includes('COAXI_STREAM_FAST_SETUP')) {
+      update({ sessionUpdate: 'agent_message_chunk', content: { type: 'text', text: 'COAXI_STREAM_FAST_READY' } })
       send({ id: message.id, result: { stopReason: 'end_turn' } })
       busy = false
       continue
     }
-    if (process.env.ROVAI_METRICS_HELD_FINAL === '1') {
+    if (process.env.COAXI_METRICS_HELD_FINAL === '1') {
       update({ sessionUpdate: 'agent_message_chunk', content: { type: 'text', text: 'Context acceptance running' } })
       await pause(4_000)
       update({ sessionUpdate: 'usage_update', used: 12_800, size: 200_000 })
@@ -120,7 +120,7 @@ for await (const line of createInterface({ input: process.stdin })) {
       update({ sessionUpdate: 'agent_message_chunk', content: { type: 'text', text } })
       await pause(500)
     }
-    update({ sessionUpdate: 'agent_message_chunk', content: { type: 'text', text: 'ROVAI_QWEN_ACP_OK' } })
+    update({ sessionUpdate: 'agent_message_chunk', content: { type: 'text', text: 'COAXI_QWEN_ACP_OK' } })
     send({ id: message.id, result: { stopReason: 'end_turn' } })
     busy = false
   } else if (message.method === 'session/cancel' && heldPromptId !== null) {

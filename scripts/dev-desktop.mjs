@@ -9,7 +9,7 @@ import {
 } from './lib/dev-desktop.mjs'
 
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
-const requestedUserDataDirectory = process.env.ROVAI_DEV_USER_DATA_DIR
+const requestedUserDataDirectory = process.env.COAXI_DEV_USER_DATA_DIR
   ?? defaultDevelopmentUserDataDirectory({ repositoryRoot })
 const userDataDirectory = assertDevelopmentUserDataIsIsolated(requestedUserDataDirectory)
 const electronViteCli = join(repositoryRoot, 'node_modules', 'electron-vite', 'bin', 'electron-vite.js')
@@ -27,7 +27,7 @@ if (process.argv.includes('--print-config')) {
 }
 
 const releaseLock = acquireDevelopmentLaunchLock(userDataDirectory)
-console.log(`[rovai-dev] isolated userData: ${userDataDirectory}`)
+console.log(`[coaxi-dev] isolated userData: ${userDataDirectory}`)
 const electronViteArguments = process.argv.slice(2).filter((argument) => argument !== '--print-config')
 
 const child = spawn(process.execPath, [
@@ -40,8 +40,8 @@ const child = spawn(process.execPath, [
   cwd: repositoryRoot,
   env: {
     ...process.env,
-    ROVAI_ALLOW_ISOLATED_INSTANCE: '1',
-    ROVAI_DEV_USER_DATA_DIR: userDataDirectory
+    COAXI_ALLOW_ISOLATED_INSTANCE: '1',
+    COAXI_DEV_USER_DATA_DIR: userDataDirectory
   },
   stdio: 'inherit'
 })

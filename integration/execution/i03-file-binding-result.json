@@ -10,17 +10,17 @@
     "files": {
       "apps/desktop/src/renderer/src/canvas-graph-controller.test.ts": "abeca58549d906896464787630d3f1a6c03bc08a062d379dc588ea8144ec7346",
       "apps/desktop/src/renderer/src/canvas-graph-controller.ts": "e14f5870ebb4d8f4db791f8a8959f5d9e545f39a15b693fb7187865db1afacb4",
-      "crates/rovai-core/src/canvas_node.rs": "fcb33c44165c9d83a7008bc284c5c830b2ad55368c984704cfb38bf13c363c6f",
-      "crates/rovai-core/src/db.rs": "4514402dec91c8c37e5b6cf7046913242df2e0fc08a9915b303fe6b1621a7f49",
-      "crates/rovai-core/src/db_canvas_objects.rs": "ff6615fbdc6aa0f8bb13efc31ec25ec078c8f022f7c9ddcc831a91c60fec7569",
-      "crates/rovai-core/src/db_private_source_observation.rs": "2393cc7f8cf1050e6b321632ec9a76dcc9c8b8352b58913c78587031daa08a94",
-      "crates/rovai-core/src/lib.rs": "1d6832edc034705ae80e8b65d6d436c93629b4024ca6a3b83b0940a312c67298",
+      "crates/coaxi-core/src/canvas_node.rs": "fcb33c44165c9d83a7008bc284c5c830b2ad55368c984704cfb38bf13c363c6f",
+      "crates/coaxi-core/src/db.rs": "4514402dec91c8c37e5b6cf7046913242df2e0fc08a9915b303fe6b1621a7f49",
+      "crates/coaxi-core/src/db_canvas_objects.rs": "ff6615fbdc6aa0f8bb13efc31ec25ec078c8f022f7c9ddcc831a91c60fec7569",
+      "crates/coaxi-core/src/db_private_source_observation.rs": "2393cc7f8cf1050e6b321632ec9a76dcc9c8b8352b58913c78587031daa08a94",
+      "crates/coaxi-core/src/lib.rs": "1d6832edc034705ae80e8b65d6d436c93629b4024ca6a3b83b0940a312c67298",
       "docs/architecture/canvas.md": "2ff26910bcdfa81a1357f637913f36eeb9c30298387d2411ce38cb961dc170d8",
       "docs/contracts/canvas-nodes-v1.md": "9c5a3bba42b4580b937e896f5f9ed3a0a21b09efd6537839f4ddaf7f5b83ad62",
       "docs/development/testing.md": "bfd5a5433a2d2828d7f22be43ded0c5c54f5b908cefcd7d81547e8435c16ba75",
       "packages/contracts/src/index.ts": "36799ff53ac59d2e8677c4221536f70e1b04ba0a21cc536345371df8c720ebe2",
-      "crates/rovai-core/src/canvas_file_reference.rs": "90acb4a2ac51b34351a54663c3ee03881954ffe19ec581fdd23c45e8cdf5c64e",
-      "crates/rovai-core/src/db_canvas_files.rs": "65d0afd345dc4a26bc012c54c34bac778c23cb6e84df627b2bb36b72f3e4a36e"
+      "crates/coaxi-core/src/canvas_file_reference.rs": "90acb4a2ac51b34351a54663c3ee03881954ffe19ec581fdd23c45e8cdf5c64e",
+      "crates/coaxi-core/src/db_canvas_files.rs": "65d0afd345dc4a26bc012c54c34bac778c23cb6e84df627b2bb36b72f3e4a36e"
     }
   },
   "previous_stage_evidence": {
@@ -74,10 +74,10 @@
     "formal324/fullPC01-PC24/real model/platform matrices"
   ],
   "preserved_authorities": {
-    "crates/rovai-core/src/local_attachment_source.rs": "8830581e72fc103b2f359be17a0072c5ee0cedc6eb5fe58b179ae3d255dbc1ca",
-    "crates/rovai-core/src/context.rs": "329144f38675ebedeaf5652858d457d42369455eb26c6159af61d19c02218784",
-    "crates/rovai-core/src/message_quote.rs": "efb6e962946b85c089483bb1120fe92f32458bb3b3b5e5eb668e26f8aa96481e",
-    "crates/rovai-core/src/command.rs": "22258f81dc5b76040cd0fdba20074321b5be7104e648a8278412c0736ef0d85a"
+    "crates/coaxi-core/src/local_attachment_source.rs": "8830581e72fc103b2f359be17a0072c5ee0cedc6eb5fe58b179ae3d255dbc1ca",
+    "crates/coaxi-core/src/context.rs": "329144f38675ebedeaf5652858d457d42369455eb26c6159af61d19c02218784",
+    "crates/coaxi-core/src/message_quote.rs": "efb6e962946b85c089483bb1120fe92f32458bb3b3b5e5eb668e26f8aa96481e",
+    "crates/coaxi-core/src/command.rs": "22258f81dc5b76040cd0fdba20074321b5be7104e648a8278412c0736ef0d85a"
   },
   "artifacts": {
     "i03/canvas-file-binding-tests-01.log": "a00b60517c09c0eb7e6aea8e26247c14a763839535bee9f5a2639ee11b066104",

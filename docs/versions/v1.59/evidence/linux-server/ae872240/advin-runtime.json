@@ -9,9 +9,9 @@
       "runtime": "opencode-cli",
       "sourceCommit": "ae872240f42437d8f581a5e011a0b50981e2a758",
       "fullQualification": false,
-      "dataDir": "/home/rovai-test/qualification/server-integration-opencode-cli-3/data",
-      "skillLibraryRoot": "/home/rovai-test/qualification/server-integration-opencode-cli-3/data/skills",
-      "mcpConfigPath": "/home/rovai-test/qualification/server-integration-opencode-cli-3/data/mcp.json",
+      "dataDir": "/home/coaxi-test/qualification/server-integration-opencode-cli-3/data",
+      "skillLibraryRoot": "/home/coaxi-test/qualification/server-integration-opencode-cli-3/data/skills",
+      "mcpConfigPath": "/home/coaxi-test/qualification/server-integration-opencode-cli-3/data/mcp.json",
       "checks": [
         "native_discovery_auth_model_and_permissions",
         "http_send_native_tool_write_read_and_final_projection",
@@ -93,9 +93,9 @@
       "runtime": "qoder-cli",
       "sourceCommit": "ae872240f42437d8f581a5e011a0b50981e2a758",
       "fullQualification": false,
-      "dataDir": "/home/rovai-test/qualification/server-integration-qoder-cli-3/data",
-      "skillLibraryRoot": "/home/rovai-test/qualification/server-integration-qoder-cli-3/data/skills",
-      "mcpConfigPath": "/home/rovai-test/qualification/server-integration-qoder-cli-3/data/mcp.json",
+      "dataDir": "/home/coaxi-test/qualification/server-integration-qoder-cli-3/data",
+      "skillLibraryRoot": "/home/coaxi-test/qualification/server-integration-qoder-cli-3/data/skills",
+      "mcpConfigPath": "/home/coaxi-test/qualification/server-integration-qoder-cli-3/data/mcp.json",
       "checks": [
         "native_discovery_auth_model_and_permissions",
         "http_send_native_tool_write_read_and_final_projection",
@@ -177,9 +177,9 @@
       "runtime": "antigravity-app",
       "sourceCommit": "ae872240f42437d8f581a5e011a0b50981e2a758",
       "fullQualification": false,
-      "dataDir": "/home/rovai-test/qualification/server-integration-antigravity-app-2/data",
-      "skillLibraryRoot": "/home/rovai-test/qualification/server-integration-antigravity-app-2/data/skills",
-      "mcpConfigPath": "/home/rovai-test/qualification/server-integration-antigravity-app-2/data/mcp.json",
+      "dataDir": "/home/coaxi-test/qualification/server-integration-antigravity-app-2/data",
+      "skillLibraryRoot": "/home/coaxi-test/qualification/server-integration-antigravity-app-2/data/skills",
+      "mcpConfigPath": "/home/coaxi-test/qualification/server-integration-antigravity-app-2/data/mcp.json",
       "checks": [
         "native_discovery_auth_model_and_permissions"
       ],

@@ -1,7 +1,7 @@
 import { useEffect,useMemo,useSyncExternalStore } from 'react'
 import type { KeyboardShortcutsApi,KeyboardShortcutsSnapshot } from '@contracts'
 import { useThreadClient } from './camp-client'
-import { DEFAULT_SHORTCUTS,SHORTCUTS_STORAGE_KEY,SHORTCUTS_UPDATED_EVENT,normalizeShortcutSettings,type ShortcutSettings } from '../../shared/codeg-keyboard-shortcuts'
+import { DEFAULT_SHORTCUTS,SHORTCUTS_STORAGE_KEY,SHORTCUTS_UPDATED_EVENT,normalizeShortcutSettings,type ShortcutSettings } from '../../shared/coaxi-keyboard-shortcuts'
 
 interface State {revision:string;bindings:ShortcutSettings;loaded:boolean;error:string|null}
 class ShortcutEntry {

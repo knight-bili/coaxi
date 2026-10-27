@@ -11,40 +11,40 @@ import {
 } from './runtime-camp-files-root.mjs'
 
 test('derives a full domain-separated instance key for macOS data directories', () => {
-  const root = runtimeCampFilesRootForDataDirectory('/tmp/rovai-user-data', {
+  const root = runtimeCampFilesRootForDataDirectory('/tmp/coaxi-user-data', {
     platform: 'darwin',
-    homeDirectory: '/tmp/rovai-home'
+    homeDirectory: '/tmp/coaxi-home'
   })
   const expectedKey = `v1-${createHash('sha256')
-    .update('rovai-runtime-camp-files-instance-v1\0/tmp/rovai-user-data')
+    .update('coaxi-runtime-camp-files-instance-v1\0/tmp/coaxi-user-data')
     .digest('hex')}`
   assert.equal(
     root,
-    `/tmp/rovai-home/.rovai/instances/${expectedKey}/runtime-files`
+    `/tmp/coaxi-home/.coaxi/instances/${expectedKey}/runtime-files`
   )
 })
 
 test('keeps the Windows derived root inside the protected data directory', () => {
   assert.equal(
-    runtimeCampFilesRootForDataDirectory('C:\\Rovai AI\\Core', {
+    runtimeCampFilesRootForDataDirectory('C:\\Coaxi AI\\Core', {
       platform: 'win32',
       homeDirectory: 'C:\\Users\\test'
     }),
-    'C:\\Rovai AI\\Core\\runtime-files'
+    'C:\\Coaxi AI\\Core\\runtime-files'
   )
 })
 
 test('emits the two mandatory Core root arguments together', () => {
-  const args = coreDataDirectoryArguments('/tmp/rovai-script-data')
-  assert.deepEqual(args.slice(0, 2), ['--data-dir', '/tmp/rovai-script-data'])
+  const args = coreDataDirectoryArguments('/tmp/coaxi-script-data')
+  assert.deepEqual(args.slice(0, 2), ['--data-dir', '/tmp/coaxi-script-data'])
   assert.equal(args[2], '--runtime-camp-files-root')
-  assert.match(args[3], /\/\.rovai\/instances\/v1-[0-9a-f]{64}\/runtime-files$/)
+  assert.match(args[3], /\/\.coaxi\/instances\/v1-[0-9a-f]{64}\/runtime-files$/)
 })
 
 test('removes only a marked Runtime Files Root owned by a temporary data directory', {
   skip: process.platform === 'win32'
 }, async () => {
-  const fixture = await mkdtemp(join(tmpdir(), 'rovai-runtime-root-cleanup-'))
+  const fixture = await mkdtemp(join(tmpdir(), 'coaxi-runtime-root-cleanup-'))
   const homeDirectory = join(fixture, 'home')
   const temporaryDirectory = join(fixture, 'temporary')
   const dataDirectory = join(temporaryDirectory, 'fixture', 'data')
@@ -95,7 +95,7 @@ test('removes only a marked Runtime Files Root owned by a temporary data directo
 test('refuses cleanup for a data directory outside the declared temporary root', {
   skip: process.platform === 'win32'
 }, async () => {
-  const fixture = await mkdtemp(join(tmpdir(), 'rovai-runtime-root-persistent-'))
+  const fixture = await mkdtemp(join(tmpdir(), 'coaxi-runtime-root-persistent-'))
   const dataDirectory = join(fixture, 'persistent', 'data')
   await mkdir(dataDirectory, { recursive: true })
   try {

@@ -20,10 +20,10 @@ export class PetWindowService{
   private writeTail:Promise<void>=Promise.resolve()
   private displayChanged:(()=>void)|null=null
   private positionPath():string{return join(app.getPath('userData'),'pet-window-state.json')}
-  private async saveScale(scale:number):Promise<void>{const catalog=await this.request<Catalog>('pets.operation',{operation:'list'});await this.request('pets.operation',{operation:'settings',value:{...catalog.settings,scale}});await this.sync();const owner=this.owner();if(owner&&!owner.isDestroyed())owner.webContents.send('rovai:pets-changed')}
+  private async saveScale(scale:number):Promise<void>{const catalog=await this.request<Catalog>('pets.operation',{operation:'list'});await this.request('pets.operation',{operation:'settings',value:{...catalog.settings,scale}});await this.sync();const owner=this.owner();if(owner&&!owner.isDestroyed())owner.webContents.send('coaxi:pets-changed')}
   private size(scale:number):{width:number;height:number}{return {width:Math.max(220,Math.ceil(192*scale+16)),height:Math.ceil(208*scale+52)}}
   private place(window:BrowserWindow,width:number,height:number):void{const bounds=window.getBounds(),area=screen.getDisplayMatching(bounds).workArea;window.setBounds(clampWindowBounds({...bounds,width,height},area,1,1))}
-  private persist(window:BrowserWindow):void{if(window.isDestroyed())return;const bounds=window.getBounds();this.writeTail=this.writeTail.catch(()=>undefined).then(()=>writeWindowStateFile(this.positionPath(),bounds)).catch(()=>{if(!window.isDestroyed())window.webContents.send('rovai:pet-state',{state:this.state,error:'宠物位置未能保存。'})})}
+  private persist(window:BrowserWindow):void{if(window.isDestroyed())return;const bounds=window.getBounds();this.writeTail=this.writeTail.catch(()=>undefined).then(()=>writeWindowStateFile(this.positionPath(),bounds)).catch(()=>{if(!window.isDestroyed())window.webContents.send('coaxi:pet-state',{state:this.state,error:'宠物位置未能保存。'})})}
 
   constructor(private readonly request:Request,private readonly owner:()=>BrowserWindow|null){}
   private trusted(event:IpcMainInvokeEvent,pet:boolean):void{
@@ -35,10 +35,10 @@ export class PetWindowService{
     const catalog=await this.request<Catalog>('pets.operation',{operation:'list'})
     if(this.disposed)return
     if(!catalog.settings.enabled||!catalog.settings.activeId){this.close();return}
-    if(this.window&&!this.window.isDestroyed()){const size=this.size(catalog.settings.scale);this.place(this.window,size.width,size.height);this.window.webContents.send('rovai:pet-state',{state:this.state,changed:true});return}
+    if(this.window&&!this.window.isDestroyed()){const size=this.size(catalog.settings.scale);this.place(this.window,size.width,size.height);this.window.webContents.send('coaxi:pet-state',{state:this.state,changed:true});return}
     const area=screen.getPrimaryDisplay().workArea,{width,height}=this.size(catalog.settings.scale)
     const saved=readWindowStateFile(this.positionPath()),bounds=saved?sanitizeWindowState(saved,screen.getAllDisplays().map(display=>display.workArea),1,1,area):{x:area.x+area.width-width-12,y:area.y+area.height-height-12,width,height}
-    const window=new BrowserWindow({...bounds,transparent:true,backgroundColor:'#00000000',frame:false,show:false,resizable:false,alwaysOnTop:true,skipTaskbar:true,hasShadow:false,webPreferences:{preload:join(import.meta.dirname,'../preload/pet.js'),partition:'rovai-pet',nodeIntegration:false,contextIsolation:true,sandbox:true,webSecurity:true}})
+    const window=new BrowserWindow({...bounds,transparent:true,backgroundColor:'#00000000',frame:false,show:false,resizable:false,alwaysOnTop:true,skipTaskbar:true,hasShadow:false,webPreferences:{preload:join(import.meta.dirname,'../preload/pet.js'),partition:'coaxi-pet',nodeIntegration:false,contextIsolation:true,sandbox:true,webSecurity:true}})
     this.window=window;this.place(window,width,height);window.setMenuBarVisibility(false)
     window.on('move',()=>{if(this.persistTimer)clearTimeout(this.persistTimer);this.persistTimer=setTimeout(()=>{this.persistTimer=null;this.persist(window)},220)})
     this.displayChanged=()=>{if(!window.isDestroyed()){const current=window.getBounds();this.place(window,current.width,current.height);this.persist(window)}}
@@ -74,11 +74,11 @@ export class PetWindowService{
     this.trusted(event,true)
     if(action==='focus'){this.focusOwner();return}
     if(action==='hide'){await this.hide();return}
-    if(action==='menu'&&this.window){const catalog=await this.request<Catalog>('pets.operation',{operation:'list'});const window=this.window;if(!window||window.isDestroyed())return;Menu.buildFromTemplate([{label:'打开工作区',click:()=>this.focusOwner()},{label:'大小',submenu:[.5,.75,1,1.25,1.5,2].map(scale=>({label:`${Math.round(scale*100)}%`,type:'radio' as const,checked:scale===catalog.settings.scale,click:()=>{void this.saveScale(scale).catch(()=>window.webContents.send('rovai:pet-state',{state:this.state,error:'宠物大小未能保存。'}))}}))},{label:'重置位置',click:()=>{const area=screen.getPrimaryDisplay().workArea,bounds=window.getBounds();window.setPosition(area.x+area.width-bounds.width-12,area.y+area.height-bounds.height-12);this.persist(window)}},{type:'separator'},{label:'让宠物休息',click:()=>{void this.hide()}}]).popup({window});return}
+    if(action==='menu'&&this.window){const catalog=await this.request<Catalog>('pets.operation',{operation:'list'});const window=this.window;if(!window||window.isDestroyed())return;Menu.buildFromTemplate([{label:'打开工作区',click:()=>this.focusOwner()},{label:'大小',submenu:[.5,.75,1,1.25,1.5,2].map(scale=>({label:`${Math.round(scale*100)}%`,type:'radio' as const,checked:scale===catalog.settings.scale,click:()=>{void this.saveScale(scale).catch(()=>window.webContents.send('coaxi:pet-state',{state:this.state,error:'宠物大小未能保存。'}))}}))},{label:'重置位置',click:()=>{const area=screen.getPrimaryDisplay().workArea,bounds=window.getBounds();window.setPosition(area.x+area.width-bounds.width-12,area.y+area.height-bounds.height-12);this.persist(window)}},{type:'separator'},{label:'让宠物休息',click:()=>{void this.hide()}}]).popup({window});return}
     throw new Error('pets.operation_not_admitted')
   }
   private focusOwner():void{const owner=this.owner();if(owner&&!owner.isDestroyed()){if(owner.isMinimized())owner.restore();owner.show();owner.focus()}}
-  private async hide():Promise<void>{const catalog=await this.request<Catalog>('pets.operation',{operation:'list'});await this.request('pets.operation',{operation:'settings',value:{...catalog.settings,enabled:false}});this.close();const owner=this.owner();if(owner&&!owner.isDestroyed())owner.webContents.send('rovai:pets-changed')}
+  private async hide():Promise<void>{const catalog=await this.request<Catalog>('pets.operation',{operation:'list'});await this.request('pets.operation',{operation:'settings',value:{...catalog.settings,enabled:false}});this.close();const owner=this.owner();if(owner&&!owner.isDestroyed())owner.webContents.send('coaxi:pets-changed')}
   onCoreEvent(event:CoreEvent):void{
     const params=event.params&&typeof event.params==='object'?event.params as Record<string,unknown>:{},id=typeof params.agentRunId==='string'?params.agentRunId:null
     if(event.method==='runtime.state'&&['shutting_down','stopped','failed'].includes(String(params.status))){this.running.clear();this.waiting.clear()}
@@ -86,7 +86,7 @@ export class PetWindowService{
     if(id&&['agent_run.context_waiting','agent_run.network_recovery_needs_attention','agent_run.network_recovery_waiting'].includes(event.method))this.waiting.add(id)
     if(id&&['agent_run.terminal','agent_run.failed','agent_run.cancelled'].includes(event.method)){this.running.delete(id);this.waiting.delete(id)}
     const state=this.waiting.size?'waiting':this.running.size?'running':'idle'
-    if(state!==this.state){this.state=state;this.window?.webContents.send('rovai:pet-state',{state})}
+    if(state!==this.state){this.state=state;this.window?.webContents.send('coaxi:pet-state',{state})}
   }
   private releaseResources():void{this.hitRegions=[];if(this.pointerTimer)clearInterval(this.pointerTimer);this.pointerTimer=null;if(this.persistTimer)clearTimeout(this.persistTimer);this.persistTimer=null;if(this.displayChanged){screen.removeListener('display-removed',this.displayChanged);screen.removeListener('display-metrics-changed',this.displayChanged);this.displayChanged=null}}
   close():void{const window=this.window;if(window&&!window.isDestroyed())this.persist(window);this.window=null;this.releaseResources();if(window&&!window.isDestroyed())window.destroy()}

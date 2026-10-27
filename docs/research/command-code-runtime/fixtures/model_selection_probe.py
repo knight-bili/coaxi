@@ -74,7 +74,7 @@ class Client:
         self.reader = asyncio.create_task(self.read())
         if self.args.runtime != 'pi':
             return await self.call('initialize', {'protocolVersion': 1, 'clientCapabilities': {},
-                'clientInfo': {'name': 'rovai-model-routing-control', 'version': '1'}})
+                'clientInfo': {'name': 'coaxi-model-routing-control', 'version': '1'}})
 
     def write(self, row):
         self.process.stdin.write((json.dumps(row) + '\n').encode())
@@ -150,11 +150,11 @@ async def probe(args):
               'vendor/shared': {'name': 'Shared model', 'contextWindow': 128000, 'maxOutput': 1024}}
     if args.runtime == 'command':
         native = Path(env['HOME']) / '.commandcode'
-        put(native / 'providers.json', {'provider': {f'rovai-{name}': {'name': name,
+        put(native / 'providers.json', {'provider': {f'coaxi-{name}': {'name': name,
             'baseURL': f'{base}/{name}/v1', 'api': 'openai-completions', 'apiKey': f'$MODEL_PROBE_KEY_{name.upper()}',
             'models': models} for name in ['a', 'b']}})
         env.update(MODEL_PROBE_KEY_A='fixture-a', MODEL_PROBE_KEY_B='fixture-b')
-        put(native / 'config.json', {'model': 'rovai-a/model-a', 'localOnly': True})
+        put(native / 'config.json', {'model': 'coaxi-a/model-a', 'localOnly': True})
         put(native / 'settings.json', {})
         if args.auth_file:
             source = Path(args.auth_file)
@@ -166,8 +166,8 @@ async def probe(args):
         command += ['--no-auto-update', '--skip-onboarding', 'acp']
     elif args.runtime == 'opencode':
         config = out / 'opencode.json'
-        put(config, {'model': 'rovai-a/model-a', 'small_model': 'rovai-a/model-a',
-            'enabled_providers': ['rovai-a', 'rovai-b'], 'provider': {f'rovai-{name}': {
+        put(config, {'model': 'coaxi-a/model-a', 'small_model': 'coaxi-a/model-a',
+            'enabled_providers': ['coaxi-a', 'coaxi-b'], 'provider': {f'coaxi-{name}': {
                 'npm': '@ai-sdk/openai-compatible', 'name': name,
                 'options': {'baseURL': f'{base}/{name}/v1', 'apiKey': f'fixture-{name}'},
                 'models': {key: {'name': key, 'limit': {'context': 128000, 'output': 1024}}
@@ -176,12 +176,12 @@ async def probe(args):
         command = [args.program, 'acp']
     else:
         native = out / 'pi'
-        put(native / 'models.json', {'providers': {f'rovai-{name}': {
+        put(native / 'models.json', {'providers': {f'coaxi-{name}': {
             'baseUrl': f'{base}/{name}/v1', 'api': 'openai-completions', 'apiKey': f'fixture-{name}',
             'models': [{'id': key, 'contextWindow': 128000, 'maxTokens': 1024} for key in models]}
             for name in ['a', 'b']}})
         env['PI_CODING_AGENT_DIR'] = str(native)
-        command = [args.program, '--mode', 'rpc', '--provider', 'rovai-a', '--model', 'model-a',
+        command = [args.program, '--mode', 'rpc', '--provider', 'coaxi-a', '--model', 'model-a',
             '--session', str(out / 'session.jsonl'), '--no-extensions', '--no-skills', '--no-prompt-templates']
     summary = {'syntheticProvider': True, 'runtime': args.runtime, 'program': args.program, 'cases': [],
         'scriptSha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest()}
@@ -219,7 +219,7 @@ async def probe(args):
             summary['models'] = state.get('models', {})
             summary['configOptions'] = state.get('configOptions', [])
         await prompt('default', session)
-        for model in ['rovai-a/model-a', 'rovai-b/vendor/shared', 'rovai-a/vendor/shared', 'rovai-missing/absent']:
+        for model in ['coaxi-a/model-a', 'coaxi-b/vendor/shared', 'coaxi-a/vendor/shared', 'coaxi-missing/absent']:
             methods = ['set_model'] if args.runtime == 'pi' else ['session/set_model', 'session/set_config_option']
             for method in methods:
                 params = ({'provider': model.split('/')[0], 'modelId': model.split('/', 1)[1]} if args.runtime == 'pi' else
@@ -268,7 +268,7 @@ async def probe(args):
                 await catalog_process.wait()
                 catalog_bytes = b''
             summary['cliListedCustomModels'] = {model: model.encode() in catalog_bytes for model in [
-                'rovai-a/model-a', 'rovai-a/vendor/shared', 'rovai-b/vendor/shared']}
+                'coaxi-a/model-a', 'coaxi-a/vendor/shared', 'coaxi-b/vendor/shared']}
             if args.auth_file:
                 summary['nativeAuthSourceUnchanged'] = hashlib.sha256(source.read_bytes()).digest() == original_auth
         server.shutdown()

@@ -52,7 +52,7 @@ export function WindowsApplicationMenu(): React.JSX.Element {
     button: HTMLButtonElement,
     sourceType: WindowsApplicationMenuPopupRequest['sourceType']
   ): void => {
-    void window.rovai.windowControls
+    void window.coaxi.windowControls
       .popupApplicationMenu(popupRequest(section, button, sourceType))
       .catch(() => undefined)
   }

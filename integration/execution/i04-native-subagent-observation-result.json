@@ -11,7 +11,7 @@
   },
   "problem": "Core识别Codex协作工具事件，但公开Evidence投影原先丢弃接收会话编号和报告状态。",
   "implementation": {
-    "authority": "rovai-core existing Execution Evidence service",
+    "authority": "coaxi-core existing Execution Evidence service",
     "event_types": [
       "activity.started",
       "activity.completed"
@@ -78,7 +78,7 @@
   "remaining": [
     "newer Codex native-team activity protocol and Grok native extension observation, verified against actual producer shapes",
     "read-only native transcript lookup with Core-derived exact reference and parent ownership; never accept arbitrary local path or session capability",
-    "reuse Codeg native session drawer and card, preserve parent readability, refresh/error/late response behavior, and compare actual running UI",
+    "reuse Coaxi native session drawer and card, preserve parent readability, refresh/error/late response behavior, and compare actual running UI",
     "real Runtime, full integration, platform and all 84 I04 formal cases",
     "specific independent-helper r1 confirmation before its separate model semantics, business relations or Schema changes"
   ],
@@ -99,7 +99,7 @@
   "main_merge": "not_run",
   "paid_model_requests": 0,
   "source": {
-    "codeg_commit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
+    "coaxi_commit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
     "map": "../inventory/delegation-source-map.md",
     "runtime_root_filter": "unchanged"
   },

@@ -80,13 +80,6 @@ export function ReadonlyCodeViewer({
     theme
   }), [fileName, interfaceLanguage, language, startLine, targetEndLine, targetLine, theme])
 
-  const targetScrollTop = useCallback((view: EditorView): number | null => {
-    const local = sourceTargetLocalLines(startLine, view.state.doc.lines, target)
-    if (!local) return null
-    const block = view.lineBlockAt(view.state.doc.line(local.from).from)
-    return Math.max(0, block.top - (view.scrollDOM.clientHeight - block.height) / 2)
-  }, [startLine, targetEndLine, targetLine])
-
   const scheduleTargetScroll = useCallback((view: EditorView): void => {
     if (!targetLine) return
     const scheduled = scheduledTargetRef.current
@@ -94,16 +87,14 @@ export function ReadonlyCodeViewer({
       && scheduled.line === targetLine && scheduled.endLine === targetEndLine && scheduled.target === target) return
     window.requestAnimationFrame(() => {
       if (viewRef.current !== view || !view.dom.isConnected) return
-      view.requestMeasure({
-        read: view => view.scrollDOM.clientHeight > 0 ? targetScrollTop(view) : null,
-        write: (scrollTop) => {
-          if (scrollTop === null || viewRef.current !== view || !view.dom.isConnected) return
-          scheduledTargetRef.current = { view, text, startLine, line: targetLine, endLine: targetEndLine, target }
-          view.scrollDOM.scrollTop = scrollTop
-        }
-      })
+      if (view.scrollDOM.clientHeight <= 0) return
+      const local = sourceTargetLocalLines(startLine, view.state.doc.lines, target)
+      if (!local) return
+      scheduledTargetRef.current = { view, text, startLine, line: targetLine, endLine: targetEndLine, target }
+      // Let CodeMirror resolve virtual line heights after its next layout pass.
+      view.dispatch({ effects: EditorView.scrollIntoView(view.state.doc.line(local.from).from, { y: 'center' }) })
     })
-  }, [startLine, target, targetEndLine, targetLine, targetScrollTop, text])
+  }, [startLine, target, targetEndLine, targetLine, text])
 
   useEffect(() => {
     if (!editor || !languageSettled || !targetLine) return

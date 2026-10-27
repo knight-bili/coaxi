@@ -8,8 +8,8 @@ import { createInterface } from 'node:readline'
 
 const root = resolve(import.meta.dirname, '..')
 const cli = parseArguments(process.argv.slice(2))
-const executable = process.env.ROVAI_P1_COPILOT_PATH ?? '/opt/homebrew/bin/copilot'
-const experimentRoot = await mkdtemp(join(tmpdir(), 'rovai-copilot-turn-reconciliation-'))
+const executable = process.env.COAXI_P1_COPILOT_PATH ?? '/opt/homebrew/bin/copilot'
+const experimentRoot = await mkdtemp(join(tmpdir(), 'coaxi-copilot-turn-reconciliation-'))
 const outputRoot = cli.output
   ? resolve(cli.output)
   : join(root, 'docs', 'versions', 'v0.64', 'evidence', `copilot-native-turn-reconciliation-${timestampStem()}`)
@@ -237,7 +237,7 @@ async function runPreflight(runtime) {
 async function runCase({ runtime, model, caseName, repetition, sampleAttempt }) {
   const caseId = `${caseName}-${repetition}-attempt-${sampleAttempt}-${randomUUID()}`
   const fixture = await createFixture(caseId)
-  const token = `ROVAI_P1_${caseName.toUpperCase()}_${repetition}_${randomUUID().replaceAll('-', '')}`
+  const token = `COAXI_P1_${caseName.toUpperCase()}_${repetition}_${randomUUID().replaceAll('-', '')}`
   const noncePath = join(fixture.workspace, 'p1-nonce.txt')
   const sleepSeconds = caseName === 'in_flight_kill' ? 30 : 1
   const expectedCommand = `printf '%s\\n' '${token}' >> p1-nonce.txt && sleep ${sleepSeconds}`
@@ -670,8 +670,8 @@ class AcpHost {
         terminal: false
       },
       clientInfo: {
-        name: 'rovai_p1_experiment',
-        title: 'Rovai P1 Native Turn Reconciliation Experiment',
+        name: 'coaxi_p1_experiment',
+        title: 'Coaxi P1 Native Turn Reconciliation Experiment',
         version: '0.0.1'
       }
     })
@@ -846,10 +846,10 @@ async function createFixture(name) {
   const logs = join(data, 'copilot-logs')
   await mkdir(workspace, { recursive: true })
   await mkdir(logs, { recursive: true })
-  await writeFile(join(workspace, 'README.md'), '# Rovai P1 isolated Native Turn experiment\n')
+  await writeFile(join(workspace, 'README.md'), '# Coaxi P1 isolated Native Turn experiment\n')
   await runCommand('git', ['init', '-b', 'main'], workspace)
-  await runCommand('git', ['config', 'user.name', 'Rovai P1 Experiment'], workspace)
-  await runCommand('git', ['config', 'user.email', 'p1-experiment@rovai.local'], workspace)
+  await runCommand('git', ['config', 'user.name', 'Coaxi P1 Experiment'], workspace)
+  await runCommand('git', ['config', 'user.email', 'p1-experiment@coaxi.local'], workspace)
   await runCommand('git', ['add', 'README.md'], workspace)
   await runCommand('git', ['commit', '-m', 'isolated fixture'], workspace)
   return { root: fixtureRoot, workspace, data, logs }
@@ -877,12 +877,12 @@ function readModelOptions(session) {
 }
 
 function chooseModel(session) {
-  const requested = process.env.ROVAI_P1_COPILOT_MODEL
+  const requested = process.env.COAXI_P1_COPILOT_MODEL
   const option = session?.configOptions?.find((candidate) => candidate.id === 'model')
   const available = readModelOptions(session)
   if (requested) {
     if (available.length > 0 && !available.includes(requested)) {
-      throw new Error(`ROVAI_P1_COPILOT_MODEL=${requested} is not advertised by Copilot`)
+      throw new Error(`COAXI_P1_COPILOT_MODEL=${requested} is not advertised by Copilot`)
     }
     return requested
   }

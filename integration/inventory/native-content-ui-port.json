@@ -1,13 +1,13 @@
 {
   "sourceCommit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
-  "sourceAuthority": "fixed Codeg presentation only; Rovai Core remains the sole business/execution/database authority",
+  "sourceAuthority": "fixed Coaxi presentation only; Coaxi Core remains the sole business/execution/database authority",
   "adapter": {
     "baseline": "899fff9b4ba6e93f2062d3027490433ca4253ed0",
     "sourceCommit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
     "files": [
       {
         "source": "src/lib/adapters/ai-elements-adapter.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/adapters/ai-elements-adapter.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/lib/adapters/ai-elements-adapter.ts",
         "sourceSha256": "30472a8bc48fef60024c85403f7d9560ee00f0cb0316fbdcb8ba4f03f4261820",
         "portedSha256": "ba41939f9ba0b55e40dc6fa6ee3efc4cd36ece10fda8ac6803e01421783019b0",
         "modulePathRewrites": 15,
@@ -17,7 +17,7 @@
       },
       {
         "source": "src/lib/adapters/tool-kind-classifier.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/adapters/tool-kind-classifier.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/lib/adapters/tool-kind-classifier.ts",
         "sourceSha256": "da7ffa253f080471192b73a324d70169c512efcdffac02003d5635cdf22da75b",
         "portedSha256": "922eed68176d9394493534c8de59548d5f215b4fe888a1234cb3c219a16586b0",
         "modulePathRewrites": 2,
@@ -25,7 +25,7 @@
       },
       {
         "source": "src/lib/tool-call-normalization.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/tool-call-normalization.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/lib/tool-call-normalization.ts",
         "sourceSha256": "d95cff277eea8f0d073ac15598fdc00b9bf119dbdfc43c2b5bd6a28eb7367d06",
         "portedSha256": "56b33ce6d31166665b406cc02acbc7b02d9bcc718521d9d3c2562193d3040255",
         "modulePathRewrites": 4,
@@ -33,7 +33,7 @@
       },
       {
         "source": "src/lib/codex-command-action.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/codex-command-action.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/lib/codex-command-action.ts",
         "sourceSha256": "3ccc7badad17ac35046e0d6aec4621ccce1107d79e6d0c3a7540bebb6cbf78f1",
         "portedSha256": "0dbfda266dee82c87f08b6c072b3c8c0cfb4a1171bb6208a8395da2a04fad273",
         "modulePathRewrites": 0,
@@ -41,7 +41,7 @@
       },
       {
         "source": "src/lib/grep-no-match.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/grep-no-match.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/lib/grep-no-match.ts",
         "sourceSha256": "b84402eb464c5c6bf8d48ebbaaa17607d4af056ec3ac122177527950fa4c983f",
         "portedSha256": "f7f402c8ec3e014a7234478c972b97aec5cb80cecc5d16edfcaec2d6529713b4",
         "modulePathRewrites": 0,
@@ -49,7 +49,7 @@
       },
       {
         "source": "src/lib/background-task.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/background-task.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/lib/background-task.ts",
         "sourceSha256": "128a2483964034514528e891951058f21993a6b43669179761f7a0f41dbdaf9a",
         "portedSha256": "2f7079835426d99384ecc64559b31f698fdb7bcc47a07605f512312ff29c7bfa",
         "modulePathRewrites": 2,
@@ -57,7 +57,7 @@
       },
       {
         "source": "src/lib/context-compaction.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/context-compaction.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/lib/context-compaction.ts",
         "sourceSha256": "9d27c161f26e315ef7d67f0ca70b9afb1afe2488554bc14a874a1ee560327c5c",
         "portedSha256": "353ca2dd127a9fe7caebeaffb24e38a73f8af890348d5bcab3c91ddeec6ed9e0",
         "modulePathRewrites": 0,
@@ -65,7 +65,7 @@
       },
       {
         "source": "src/lib/tool-call-lifecycle.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/tool-call-lifecycle.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/lib/tool-call-lifecycle.ts",
         "sourceSha256": "0c93599d080afbbc6663da92e71b92e3d638cdcc6b6aa8cd8ab541cf0aac01c1",
         "portedSha256": "c42f1019bc1769f096f22d7bc66d42ec7a3cde20af2313e08b5b96f745bd87ea",
         "modulePathRewrites": 1,
@@ -73,7 +73,7 @@
       },
       {
         "source": "src/lib/feedback-check.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/feedback-check.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/lib/feedback-check.ts",
         "sourceSha256": "f5d033a46b0a79c61cb44219cf660ffe0634c5d0f7450fa1a07afc0cae2876b4",
         "portedSha256": "0ee8eac8eea92c2e54a2bd497d2d17bc124a4e6dd51cd21b1d38f9c275418e72",
         "modulePathRewrites": 0,
@@ -81,7 +81,7 @@
       },
       {
         "source": "src/lib/plan-parse.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/plan-parse.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/lib/plan-parse.ts",
         "sourceSha256": "291a74f83ff9f017dc5f925df6da3adbe181de36fdc03671e6a85ede25e79f52",
         "portedSha256": "52e743329397986775c805d6ace66123cb9232aa7aa9e5c6e61c03526f9597c0",
         "modulePathRewrites": 1,
@@ -89,7 +89,7 @@
       },
       {
         "source": "src/lib/reference-link.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/reference-link.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/lib/reference-link.ts",
         "sourceSha256": "23eaa41e0b413da4918e537eaf559e6268022cde7b479b1b85e9509a7ba5cde3",
         "portedSha256": "d61c99bc22c16cecdafc11af24ec548f1958316556ac909a5ec08b9ef996dbbe",
         "modulePathRewrites": 0,
@@ -97,7 +97,7 @@
       },
       {
         "source": "src/lib/image-tool-label.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/image-tool-label.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/lib/image-tool-label.ts",
         "sourceSha256": "1d80f2977c67bbd433d80a8de3cbf6da570722c3222965f02d34904431876698",
         "portedSha256": "fbd9567edf9c86d7ed691f82dbceef3b4f6d6bcf9fc02b5c602858b1e198a3bb",
         "modulePathRewrites": 0,
@@ -105,7 +105,7 @@
       },
       {
         "source": "src/lib/browser/page-handoff-block.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/browser/page-handoff-block.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/lib/browser/page-handoff-block.ts",
         "sourceSha256": "7f7f6cef6c911fac59b7ab2aac8f5193cbee77d45e0ecbe2eb8b8aabf8584503",
         "portedSha256": "c3dad373df6c716376c83dc7ebe1345975142375f4fa01ca83687dc0a0c3c793",
         "modulePathRewrites": 0,
@@ -113,7 +113,7 @@
       },
       {
         "source": "src/components/chat/composer/reference-text.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/chat/composer/reference-text.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/chat/composer/reference-text.ts",
         "sourceSha256": "62eb80d9f289117a39cde07e35207006e2f99390f9f58ce83d0e155419d11999",
         "portedSha256": "7214b4b0312b9f66100b3851e5e095f50ecc5a4ca1b1fbd705d4dbd3fb2c183e",
         "modulePathRewrites": 1,
@@ -121,7 +121,7 @@
       },
       {
         "source": "src/components/chat/composer/reference-uri.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/chat/composer/reference-uri.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/chat/composer/reference-uri.ts",
         "sourceSha256": "4ecba4dab6cc9fd01be9d5e21ddaa1a6cb75bc371e0f9f69fbd6d3c1a6bed666",
         "portedSha256": "e564e6ed3a27c25e2a56531c566404ff796dd9377e65647464627d5b951958a5",
         "modulePathRewrites": 3,
@@ -129,7 +129,7 @@
       },
       {
         "source": "src/lib/shell-session-tool.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/shell-session-tool.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/lib/shell-session-tool.ts",
         "sourceSha256": "ac09d8ffb190c4a0930f0091f97654d1ca5f476446e71e00af0c2555852d35b8",
         "portedSha256": "6f426846304c9550caebbe5080f2bfcd20882cd7fa5a0af173b262c53eae3c60",
         "modulePathRewrites": 0,
@@ -137,7 +137,7 @@
       },
       {
         "source": "src/lib/codex-code-mode.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/codex-code-mode.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/lib/codex-code-mode.ts",
         "sourceSha256": "6bf38fa52bf8d0850a9591d182c4e75cfc2a8ce58d76c6ece0061f68969e6ab7",
         "portedSha256": "59715c55cb42a929a1dfdce8f85782d8e2a9139e9ee7d00a43141e70a1d53314",
         "modulePathRewrites": 0,
@@ -145,7 +145,7 @@
       },
       {
         "source": "src/lib/types.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/types.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/lib/types.ts",
         "sourceSha256": "8a05433a8c860e8d097e90ff7d5cee0df151e035dc340cb6005f9d57ff1ca89a",
         "portedSha256": "51bead7635f56c95a07dd3ebbbbc4a34ac3d6f3a428da27b90f7fc564d2ff357",
         "modulePathRewrites": 0,
@@ -225,7 +225,7 @@
       },
       {
         "source": "src/components/chat/composer/types.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/chat/composer/types.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/chat/composer/types.ts",
         "sourceSha256": "5c1871b4e31803edd62f1982d8f8a8478537ea793d309ec98764e8c766b712b5",
         "portedSha256": "806ce8ca70f445fd765f639fa3f602e4e280efa6b18df9d04b6f66a84392e92c",
         "modulePathRewrites": 1,
@@ -250,7 +250,7 @@
       },
       {
         "source": "src/lib/utils.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/uuid.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/lib/uuid.ts",
         "sourceSha256": "d4dfb81a4cd7f2e4206cec563fb3478ae731f16c7073c2e3cfa7e3e01cfc008c",
         "portedSha256": "41417bc24fa075dae9ba1f48d02b4068f22a688524fe0c1641ac98d635d6822d",
         "modulePathRewrites": 0,
@@ -265,7 +265,7 @@
       },
       {
         "source": "src/lib/adapters/ai-elements-adapter.test.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/adapters/ai-elements-adapter.test.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/lib/adapters/ai-elements-adapter.test.ts",
         "sourceSha256": "7bf8b2c971de9ccfa0a025e6265e5e0922b102cb8839f2e1101dd0d581e4c460",
         "portedSha256": "f6a3400199c4a18f62942d33df0468920f94b6f8f6bfb6a3c02e8808a1ed6f7c",
         "modulePathRewrites": 4,
@@ -293,7 +293,7 @@
     "files": [
       {
         "source": "src/components/message/plan-card.tsx",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/message/plan-card.tsx",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/message/plan-card.tsx",
         "sourceSha256": "4886b24f8286e99f796812ca5206d26c45bd92df192ef60967dbc9a6fae9166f",
         "portedSha256": "2cce18404ece2861a164f2acbe187656285dbc3f864f72bd725d6feb87bd38d2",
         "bodyUnchangedApartFromImports": true,
@@ -301,7 +301,7 @@
       },
       {
         "source": "src/components/message/plan-mode-card.tsx",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/message/plan-mode-card.tsx",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/message/plan-mode-card.tsx",
         "sourceSha256": "a86c28d77584a843b6452e64d8968438187b3a860665102bf4ab986a15991b2d",
         "portedSha256": "93eda500ae8bdc79eaa143662f34035c6d3b31ff9118b87ec3c96cd8b9adb7b5",
         "bodyUnchangedApartFromImports": true,
@@ -309,7 +309,7 @@
       },
       {
         "source": "src/components/message/goal-tool-call.tsx",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/message/goal-tool-call.tsx",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/message/goal-tool-call.tsx",
         "sourceSha256": "464265f3ae309c291df8bd28027253a601cba992aa10e924659c1ce017f616f2",
         "portedSha256": "7156d7aba0a1b2ba0ca0a4c1fcb2ebdeeb310adb7d27ef851609401e6f48f6e5",
         "bodyUnchangedApartFromImports": true,
@@ -317,7 +317,7 @@
       },
       {
         "source": "src/components/message/goal-control-context.tsx",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/message/goal-control-context.tsx",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/message/goal-control-context.tsx",
         "sourceSha256": "5e85a3db437a061f39452b4d5098d5bb6acb783c3719ba17019cc5f6eada9d21",
         "portedSha256": "377234369145ad67aacaeb69b6d8da39133ba0ec83bdb172edd3fcc3d4da8c50",
         "bodyUnchangedApartFromImports": true,
@@ -325,7 +325,7 @@
       },
       {
         "source": "src/hooks/use-collapsible-overflow.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/hooks/use-collapsible-overflow.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/hooks/use-collapsible-overflow.ts",
         "sourceSha256": "80610ac2275eb3fac46683f4704147aee14dd6f92fb42a0a6130ba41f17dd2fd",
         "portedSha256": "9aad40147ad25bc007a0cd784fac1e20b05f86e9bee602763b6be7c9867a3e66",
         "bodyUnchangedApartFromImports": true,
@@ -344,7 +344,7 @@
     "tailwindVersion": "4.1.18",
     "productionTailwindDependency": false,
     "noGlobalPreflight": true,
-    "scope": ".codeg-native-rich",
+    "scope": ".coaxi-native-rich",
     "files": [
       "ui/source-button.tsx",
       "ui/source-primitives.tsx",
@@ -369,7 +369,7 @@
     "version": "3.4.0",
     "license": "MIT",
     "integrity": "sha512-uSaO4gnW+b3Y2aWoWfFpX62vn2sR3skfhbjsEnaBI81WD1wBLlHZe5sWf0AqjksNdYTbGBEd0UasQMT3SNV15g==",
-    "sourceComponent": "Fixed Codeg cn class conflict resolution",
+    "sourceComponent": "Fixed Coaxi cn class conflict resolution",
     "sourceLock": "aff1e6c pnpm-lock.yaml",
     "addedPackages": [
       "tailwind-merge@3.4.0"
@@ -386,8 +386,8 @@
     "bundleSha256": "c04f70e24af55743473294f09f36126c6f7d74bc79006cbd2e46f3cb2dc0c6b4"
   },
   "hostSeams": [
-    "Rovai SafeMarkdown",
-    "Rovai interface language with exact selected source CN/EN copy",
+    "Coaxi SafeMarkdown",
+    "Coaxi interface language with exact selected source CN/EN copy",
     "native overflow-auto ScrollArea used by the selected readonly cards",
     "controlled disclosure without source exit-animation presence",
     "same source shimmer gradient via scoped CSS with reduced motion"
@@ -450,7 +450,7 @@
         },
         {
           "source": "src/components/ai-elements/code-block.tsx",
-          "mode": "source JSX/control declarations; existing Rovai syntax backend; unused language selector not ported",
+          "mode": "source JSX/control declarations; existing Coaxi syntax backend; unused language selector not ported",
           "sourceSha256": "f35f8ee99ab2cef0c9ec58dc0022d880ccf386b7b32d208248c37a9607ad84c1",
           "portedSha256": "dfb880c37a766f2da466678549a85e8c175cef15df03ed2f148406a3cf34f76e",
           "sourceGitBlob": "169cc6279007b389a53ecc17507ba6d4b215b882"
@@ -740,7 +740,7 @@
     "transitionalRouter": "NativeTool still dispatches generic values; complete ToolCallPart / ToolOutput / search / Diff and specialized cards remain mandatory",
     "sourceBodyOptimizations": [
       "collision-free JSON Pointer expansion identities",
-      "Rovai existing syntax backend instead of donor partial-content cache; full text is dependency identity",
+      "Coaxi existing syntax backend instead of donor partial-content cache; full text is dependency identity",
       "real ICU named/plural formatting",
       "original full instant-collapsible replaces earlier reduced disclosure"
     ],
@@ -753,7 +753,7 @@
     "files": [
       {
         "source": "src/components/ui/image-preview-dialog.tsx",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ui/image-preview-dialog.tsx",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/ui/image-preview-dialog.tsx",
         "sourceSha256": "506225d9649be077a7f00145de8fa06d4edddc4ec9582eefedc2399a515c9d24",
         "portedSha256": "b5daa874f17284c5b29a842f4af3526452474e137a6d8550577d2c60ebb6d420",
         "sourceGitBlob": "4387289fe3b86eeb12026abb4ffe26ed713c0de3",
@@ -761,7 +761,7 @@
       },
       {
         "source": "src/components/message/user-image-attachments.tsx",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/message/user-image-attachments.tsx",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/message/user-image-attachments.tsx",
         "sourceSha256": "c7fc804213903812bf962897d6589f70ec20a134af32ce21318c73673ee359bd",
         "portedSha256": "47102989cc94d14744be4345f4ec2accb0aae53185d04ae1f9406faf77b470b4",
         "sourceGitBlob": "18dd4e1927d36bb0169b62d509725c6676f417c6",
@@ -769,7 +769,7 @@
       },
       {
         "source": "src/components/message/generated-images-block.tsx",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/message/generated-images-block.tsx",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/message/generated-images-block.tsx",
         "sourceSha256": "b4e3ebff6d719996226b57d7c7effd9d0ba07573b89e101f9401cbffb3e1847d",
         "portedSha256": "e9ea4f80193e9f1958e46ca1ed1d5b6344b86ceee368d1214356ede476165081",
         "sourceGitBlob": "08cdd2767def4193e044208639ffd106d14db0c0",
@@ -777,7 +777,7 @@
       },
       {
         "source": "src/lib/token-format.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/token-format.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/lib/token-format.ts",
         "sourceSha256": "d466ce87c003f6afd6fdc8a69cb231752de3b05252d42d070b6b88f469753721",
         "portedSha256": "b3809cf0d961f4a03269b7ced26d64e895679f4f60ac5ee0ba2080542a69881b",
         "sourceGitBlob": "95acfbcb373d6da702f6314a1a02652aa948bbbf",
@@ -785,7 +785,7 @@
       },
       {
         "source": "src/lib/codex-visualize.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/codex-visualize.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/lib/codex-visualize.ts",
         "sourceSha256": "73785cdc6e167cdd81e7c8d64bca8e9b1f1d06ec39592b9aae9a9ebbf119ac8a",
         "portedSha256": "eb771ea9bcf70df635879463d47476929c450232ffebf66ca51c88d0b8825f03",
         "sourceGitBlob": "84ee630cddc58928abb74e243d611be4ec3b5c47",
@@ -793,7 +793,7 @@
       },
       {
         "source": "src/lib/codex-visualize.test.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/codex-visualize.test.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/lib/codex-visualize.test.ts",
         "sourceSha256": "695a089e1d40ea3f36cfeb9b86d6b56e193f566abca2485c6cfff327d287ee69",
         "portedSha256": "26bb1a31f374eda366f5d52d66d49f537acdb07c8e40398f901daf489b6e1a83",
         "sourceGitBlob": "8be812614bce974567a441fcfb030d19ef1811ab",
@@ -801,7 +801,7 @@
       },
       {
         "source": "src/components/message/turn-stats.tsx",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/message/turn-stats.tsx",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/message/turn-stats.tsx",
         "sourceSha256": "0aea39e463ed54080e0009b206ea52f5e3048b885b50b260355064346fe8dff7",
         "portedSha256": "8d23aef6553398090e9aca74495fdad5ddb78a050ac063218ff23ff674a8cd89",
         "sourceGitBlob": "d2234f0cd9fcf3316d8ef2567976303abbdd102e",
@@ -832,25 +832,25 @@
     ],
     "hostSeams": [
       "Next Image to strict data-URI img; no direct external resource fetch",
-      "original Rovai clipboard encoding and image context menu; actual Chromium decode, OS clipboard not asserted",
+      "original Coaxi clipboard encoding and image context menu; actual Chromium decode, OS clipboard not asserted",
       "existing Radix Dialog and Base UI Tooltip; portals follow exact reader/visibility lifetime and preserve parent Esc",
       "original message scroll adapter and raw model label fallback; no backend catalog invented",
-      "native Core-scoped file/image reads and original Rovai PinnedFilePreview / HtmlPreviewSite",
+      "native Core-scoped file/image reads and original Coaxi PinnedFilePreview / HtmlPreviewSite",
       "SourceMarkdownRenderer context avoids dependency cycle and confines the new parser seam to native sources"
     ],
     "readonlyTaskAction": "TurnStats hides create-task when its owning Thread write callback is unavailable; original onFork remains optional. Thread task/Mission flows remain owned by Core.",
     "style": {
-      "file": "apps/desktop/src/renderer/src/codeg-native-content/source-media.css",
+      "file": "apps/desktop/src/renderer/src/coaxi-native-content/source-media.css",
       "sha256": "203df27bb442601ec74cb1d391893bc8786c963e994ada6391bee5e12de8c380",
       "generator": "file/I04会话图片统计/build-style.mjs",
-      "scope": ".codeg-native-rich",
+      "scope": ".coaxi-native-rich",
       "noGlobalPreflight": true,
       "oldRichStyleUnchanged": true
     },
     "dependenciesChanged": false,
     "qualification": "actual native viewer and fixed original component references under declared host seams; synthetic ThreadClient/FilePreviewApi plus actual isolated HTML service; not full original App or Core/IPC/Web Host/provider qualification",
     "remaining": [
-      "原Codeg MarkdownLink文件徽标/上下文菜单/打开目标等完整操作与宿主路由衔接；当前沿Rovai原文件/HTTPS入口，不冒称完整原链接组件",
+      "原Coaxi MarkdownLink文件徽标/上下文菜单/打开目标等完整操作与宿主路由衔接；当前沿Coaxi原文件/HTTPS入口，不冒称完整原链接组件",
       "完整原HTML控制与完整供体App同场景运行对照；已有原生HTML入口和实际隔离HTML服务回归通过",
       "真实Core/Native/Web集中候选、授权/生命周期/长历史/规模/内存恢复；七种原图表代码已保留，实际本批图表运行验证为BarChart",
       "I04其他parser/home关联、Runtime并集、恢复、记忆、自动化；此前ANSI完整许可文件缺口仍归发布资格"
@@ -862,7 +862,7 @@
     "files": [
       {
         "source": "src/components/ai-elements/markdown-mask.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/markdown-mask.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/markdown-mask.ts",
         "sourceSha256": "e7d3e54697645b0005aca1a4d51e07d057eaa188c53ebb2751ed32ffb8c8e9a4",
         "portedSha256": "b6799c1b33ee2ad6e6a6b15e73dfa285f6b74b055741ecbb44de56ffe19d1129",
         "extraction": null,
@@ -872,7 +872,7 @@
       },
       {
         "source": "src/components/ai-elements/remark-cjk-autolink-tail.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/remark-cjk-autolink-tail.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/remark-cjk-autolink-tail.ts",
         "sourceSha256": "97929cf8fd4bb7ccdc1c09be614457d579efadf426082082cd5255d4edddf76d",
         "portedSha256": "4f1edfc89b4f63afad5e351a00f4e26fdf9540d1b0302181479ef46bd0b5d178",
         "extraction": null,
@@ -882,7 +882,7 @@
       },
       {
         "source": "src/components/ai-elements/remark-file-uri-links.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/remark-file-uri-links.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/remark-file-uri-links.ts",
         "sourceSha256": "1e8997a2525e1a9ab4cfac6e776cc39da691a8fc8f03f7aead7dd89253ee2184",
         "portedSha256": "e076c3e46b6ee10040e8467d07e44ee43093c4d540a22dd9c36c3af5852eb4e0",
         "extraction": null,
@@ -892,7 +892,7 @@
       },
       {
         "source": "src/components/ai-elements/remark-windows-paths.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/remark-windows-paths.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/remark-windows-paths.ts",
         "sourceSha256": "260b2f4dd86e699807db9f32a34886d2dba07c23b967228cf0b7645c70e82336",
         "portedSha256": "ed1199d66d2ac50ab8761ca2c1cd4ad936b0628dda29b4fca3e2890f6073d816",
         "extraction": null,
@@ -902,7 +902,7 @@
       },
       {
         "source": "src/components/ai-elements/remark-local-images.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/remark-local-images.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/remark-local-images.ts",
         "sourceSha256": "905ba3da3d5dc3792419f7a5f4efefd8a62ae352ae70b7fcacdfab245916264b",
         "portedSha256": "f46ee73c2ab357cb4ae4ec440e43b05271048ac7e9f48771eed569fe100665a1",
         "extraction": null,
@@ -911,8 +911,8 @@
         ]
       },
       {
-        "source": "src/components/ai-elements/rehype-allow-codeg.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/rehype-allow-codeg.ts",
+        "source": "src/components/ai-elements/rehype-allow-coaxi.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/rehype-allow-coaxi.ts",
         "sourceSha256": "6836aea2de95984257e09b44e5519311759d899c0c63ce2aef667b80ed6bb38e",
         "portedSha256": "a3f12597ddcfc2662d9e2f668805d13dc4220d3c340a11ef1e67a7f581a05f4a",
         "extraction": null,
@@ -922,7 +922,7 @@
       },
       {
         "source": "src/components/ai-elements/rehype-relative-file-links.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/rehype-relative-file-links.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/rehype-relative-file-links.ts",
         "sourceSha256": "39e5ca3927df8744ce73666847cf73cb3fefe5b74de0b553095be8a3d2c63049",
         "portedSha256": "8c653b11a191a54571b16df2e012d796027327c6f29af9b5a92293ee9ba5c164",
         "extraction": null,
@@ -932,7 +932,7 @@
       },
       {
         "source": "src/components/ai-elements/streamdown-plugins.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/streamdown-plugins.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/streamdown-plugins.ts",
         "sourceSha256": "09c974ac22203e589af8e0410a5f5534d6e25df31c8a1ad4d75c09e5911c5244",
         "portedSha256": "f0b66d900ed22b855709a8c939ad53c9b9cc75b8bf15f369e61c640849b05b1a",
         "extraction": null,
@@ -942,7 +942,7 @@
       },
       {
         "source": "src/components/ai-elements/mermaid-view.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/mermaid-view.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/mermaid-view.ts",
         "sourceSha256": "03957f93080d2aaee86cda58756397113a85192bfc291be6cbbacc3616335016",
         "portedSha256": "5cdb8d32673bad8c1f65c22f799fa5c04bf96fde340451f6b67fcfc52190c21f",
         "extraction": null,
@@ -952,7 +952,7 @@
       },
       {
         "source": "src/components/ai-elements/json-render-pre.tsx",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/json-render-pre.tsx",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/json-render-pre.tsx",
         "sourceSha256": "4fae70b3c008f292a4ac7fe3578f9e92b7b0e816870416daf934976c2a29857c",
         "portedSha256": "51114f767ac97d3f0a53e8fce411a9076967898ab89369d55bf472bee11faa58",
         "extraction": null,
@@ -962,7 +962,7 @@
       },
       {
         "source": "src/components/ai-elements/mermaid-block.tsx",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/mermaid-block.tsx",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/mermaid-block.tsx",
         "sourceSha256": "d2fb3510464651b2b0a57c1e240b73f3c53662d35d8b143e222ff4ca3b43aad1",
         "portedSha256": "33b072e1e5ca05b84682693ab89d22c5dcd59b4920e423a8592f1e91738f25e0",
         "extraction": null,
@@ -972,7 +972,7 @@
       },
       {
         "source": "src/components/message/json-render-block.tsx",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/message/json-render-block.tsx",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/message/json-render-block.tsx",
         "sourceSha256": "ed7ccdd7d1d613f2e25723447800be805773ca87967a84e24dda9005d12e710a",
         "portedSha256": "0dc587b39f137d2e297a8f90aa6061c3fd713b21e3059c919ffa7b01fd9f0365",
         "extraction": null,
@@ -982,7 +982,7 @@
       },
       {
         "source": "src/components/message/json-render-charts.tsx",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/message/json-render-charts.tsx",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/message/json-render-charts.tsx",
         "sourceSha256": "3443e02389e53471c2074eb273c9d05a5e7ef4e1c63b7540a59f86ef2b0b85d5",
         "portedSha256": "fcc9c2dd2bdec228e078e3d38fbd756796fbabe96f945744487fdf5f24ce03be",
         "extraction": null,
@@ -992,7 +992,7 @@
       },
       {
         "source": "src/components/ui/button.tsx",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ui/button.tsx",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/ui/button.tsx",
         "sourceSha256": "704cbe3b92f902b0b9b14c4c0852b29b102969d0d242cbc0295f6936748042c5",
         "portedSha256": "17dd5ec5fb08747676b892191b0be7155f9f05d64e4e113f36840f326b066bda",
         "extraction": null,
@@ -1002,7 +1002,7 @@
       },
       {
         "source": "src/components/ui/dialog.tsx",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ui/dialog.tsx",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/ui/dialog.tsx",
         "sourceSha256": "6577d31e246d646acbd7323d0524a6ca4d7aa257bce93d94d741cd8fa0d72a42",
         "portedSha256": "1ae8ed6bd5a3907a47810c92432c853cab30119d484c0f1217656be4c8b4fc6b",
         "extraction": null,
@@ -1012,7 +1012,7 @@
       },
       {
         "source": "src/components/ui/dropdown-menu.tsx",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ui/dropdown-menu.tsx",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/ui/dropdown-menu.tsx",
         "sourceSha256": "e6f14b7623f50c4bf42e98d886916a38042d9055676766d854a72df5c408c995",
         "portedSha256": "04508995f1a0b92b74e360c47ce8b6e782679dc9b9a85ff26a39156a09985b87",
         "extraction": null,
@@ -1022,7 +1022,7 @@
       },
       {
         "source": "src/components/ui/overlay-portal-container.tsx",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ui/overlay-portal-container.tsx",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/ui/overlay-portal-container.tsx",
         "sourceSha256": "e3956775c458d478bacd78aef8849f43a8bf955080efa807d7bf3d48a12caa55",
         "portedSha256": "c2cba79b60004422caa72b09874de6b619d0cb108efe51688ef33b195f4e7683",
         "extraction": null,
@@ -1032,17 +1032,17 @@
       },
       {
         "source": "src/components/ui/chart.tsx",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ui/chart.tsx",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/ui/chart.tsx",
         "sourceSha256": "03639ebf3196101417ff8cea5e7d04de32b0af09c3c4ecfc4997d5d7a9ef1002",
         "portedSha256": "70c6bf8cf8f64ed8b8332471204b808062a70e8f044986b88c1062d6c9a6f87d",
         "extraction": null,
         "bodyChanges": [
-          "theme selector matches original Rovai data-theme"
+          "theme selector matches original Coaxi data-theme"
         ]
       },
       {
         "source": "src/components/ui/skeleton.tsx",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ui/skeleton.tsx",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/ui/skeleton.tsx",
         "sourceSha256": "5983a7f85ec4d194bc66c6c5e2516bd082276411120821169c35e055e8e1df9a",
         "portedSha256": "ac93b18ba16ffe901f35e53594c29c468ae687769ddf2dcce1cfc5af3fab68e4",
         "extraction": null,
@@ -1052,7 +1052,7 @@
       },
       {
         "source": "src/hooks/use-nested-layer-dismiss-guard.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/hooks/use-nested-layer-dismiss-guard.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/hooks/use-nested-layer-dismiss-guard.ts",
         "sourceSha256": "f253f1ba2519ba1439b1265c5d7384eaf678df5e3853fb9a375c969b08d9409a",
         "portedSha256": "61dd487b5213a2010a3300a9a4239f58ab2e84981a2b057680d35ee86881cbbe",
         "extraction": null,
@@ -1062,7 +1062,7 @@
       },
       {
         "source": "src/lib/attach-ref.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/attach-ref.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/lib/attach-ref.ts",
         "sourceSha256": "dc2a2d5fcc6428bcbdb1ad803d7b4b62a9448ec9d21af9b0e1dcab7652382876",
         "portedSha256": "caa2041e5b8acd74bf52f8d70829a8b03937e261fea45a24148d52237a606247",
         "extraction": null,
@@ -1072,7 +1072,7 @@
       },
       {
         "source": "src/lib/mermaid-export.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/mermaid-export.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/lib/mermaid-export.ts",
         "sourceSha256": "a12e726e886c9bfa73dcf5bc11c51dcc477efec78068b74c62a9aca47c4451c1",
         "portedSha256": "d01e3348b1e283636794c2c82ea289dc038f48e9ef78f3033da47f1a35c3f870",
         "extraction": null,
@@ -1082,7 +1082,7 @@
       },
       {
         "source": "src/lib/json-render/catalog.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/json-render/catalog.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/lib/json-render/catalog.ts",
         "sourceSha256": "a3f59a1adf10a577d969221eff01efa9d9c605ec01651fd88807c1abc1230fa0",
         "portedSha256": "530c6aa03216eb3f5f43112112573759994608696632d202691dc508f98f7546",
         "extraction": null,
@@ -1092,7 +1092,7 @@
       },
       {
         "source": "src/lib/json-render/spec.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/json-render/spec.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/lib/json-render/spec.ts",
         "sourceSha256": "30ce537a1dfd21735182f17bdcaf1db42c28bf9ba0bc8613caf91107a5655909",
         "portedSha256": "9c291352d1f6272cf52d62cdfb073f16c940cd687a9ab75d4af9a82a632987da",
         "extraction": null,
@@ -1102,7 +1102,7 @@
       },
       {
         "source": "src/lib/json-render/charts.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/json-render/charts.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/lib/json-render/charts.ts",
         "sourceSha256": "8baa9175f05fb2ce5cfc16e9432f0dd0452f860efbedcdf76bfa54e297b28752",
         "portedSha256": "971c64f65b6b83d86afe60115533739f9c8fec3d8c1836da72a35250d6fc9ae6",
         "extraction": null,
@@ -1112,7 +1112,7 @@
       },
       {
         "source": "src/lib/json-render/chart-data.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/json-render/chart-data.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/lib/json-render/chart-data.ts",
         "sourceSha256": "31f0d58c2d3ce80d6a46231dd8e0d991e8c95c6c058b2dd0558ea97941ea449d",
         "portedSha256": "5099d78a30637b0b02bec94d3ae66a4f76690bfdb1145ab641cb0195992aadea",
         "extraction": null,
@@ -1122,7 +1122,7 @@
       },
       {
         "source": "src/components/ai-elements/remark-cjk-autolink-tail.test.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/remark-cjk-autolink-tail.test.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/remark-cjk-autolink-tail.test.ts",
         "sourceSha256": "6ed1b2308cd0fa658ab3e9a23c656ec7813eb514400c9b3aefd584efdb39ef91",
         "portedSha256": "01623be631d7322bdbfb11066fcade8fd09b6a06beb1ee9b7d74b9bed3ce8ec9",
         "extraction": null,
@@ -1132,7 +1132,7 @@
       },
       {
         "source": "src/components/ai-elements/remark-file-uri-links.test.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/remark-file-uri-links.test.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/remark-file-uri-links.test.ts",
         "sourceSha256": "d072f868e8b7cdb3dd05e3057339b8bebfad1af9abdd96790d25b65993916703",
         "portedSha256": "652b07590bbfb64737ad207101b621c25350999a9a8afaaa3343adae909fe4b8",
         "extraction": null,
@@ -1142,7 +1142,7 @@
       },
       {
         "source": "src/components/ai-elements/remark-windows-paths.test.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/remark-windows-paths.test.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/remark-windows-paths.test.ts",
         "sourceSha256": "b898298f54d691d23913e497ab2785a0cd25c565fc9696b58a4cfc2b83b305fc",
         "portedSha256": "54fd1828e00665cfd7e8c803417cec59236cf4841f4d6675b4f4695d4d3abb6f",
         "extraction": null,
@@ -1151,8 +1151,8 @@
         ]
       },
       {
-        "source": "src/components/ai-elements/rehype-allow-codeg.test.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/rehype-allow-codeg.test.ts",
+        "source": "src/components/ai-elements/rehype-allow-coaxi.test.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/rehype-allow-coaxi.test.ts",
         "sourceSha256": "c2d730d75f34382a54ec8b029376c997086cebd5566154122abb841a027f3422",
         "portedSha256": "d3fa25f5a333847e4329223853fcec2ef24681a78bc275e24548bae266bce485",
         "extraction": null,
@@ -1162,7 +1162,7 @@
       },
       {
         "source": "src/components/ai-elements/rehype-relative-file-links.test.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/rehype-relative-file-links.test.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/rehype-relative-file-links.test.ts",
         "sourceSha256": "b248d41b2454ff06a98bd8fe7458c8cf886c8104b2b2f2ff89372bb64610698e",
         "portedSha256": "798a1756828c89eed72eeaab8a1506c725cce6956e41d57890235305af0e0b6a",
         "extraction": null,
@@ -1172,7 +1172,7 @@
       },
       {
         "source": "src/components/ai-elements/math-delimiters.parse.test.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/math-delimiters.parse.test.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/math-delimiters.parse.test.ts",
         "sourceSha256": "7ef8dbebc7e3eb55946354256a383eb60bebf177738cdbb4582398b63d12313d",
         "portedSha256": "74fc14348810cf775f6c9b795fa703a712ff91a94ad636ea8def0f7d46f51b24",
         "extraction": null,
@@ -1182,7 +1182,7 @@
       },
       {
         "source": "src/components/ai-elements/math-fence-pad.katex.test.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/math-fence-pad.katex.test.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/math-fence-pad.katex.test.ts",
         "sourceSha256": "06d8fafe1df3f90de437fbffe85baf53e505f836142cff7a4ca50335115313a4",
         "portedSha256": "1031da508030e626f6f6103a1988d2a54bc96c0901a6b70484d5ea0719bed12f",
         "extraction": null,
@@ -1192,7 +1192,7 @@
       },
       {
         "source": "src/components/ai-elements/streamdown-plugins.test.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/streamdown-plugins.test.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/streamdown-plugins.test.ts",
         "sourceSha256": "9fe9eb8d0ac09ff323bb349e7b8647fe8715958e8cc6a1cf01ad1ecbd11e3e48",
         "portedSha256": "7b2434d4b1319b35c2ec4d5da7e1fe439d2fa29f7760e1e03892cd6282933655",
         "extraction": null,
@@ -1202,7 +1202,7 @@
       },
       {
         "source": "src/components/ai-elements/mermaid-view.test.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/mermaid-view.test.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/mermaid-view.test.ts",
         "sourceSha256": "d4f92257b294c08640dde2e3beb54192be037ee5b7c12e0c90d241f03f8200c2",
         "portedSha256": "9e0ad292421cf418372045ac0cd223fc3a8ea217de0c7e94cf3ee2faf720d3cc",
         "extraction": null,
@@ -1212,7 +1212,7 @@
       },
       {
         "source": "src/lib/json-render/spec.test.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/json-render/spec.test.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/lib/json-render/spec.test.ts",
         "sourceSha256": "19389a44ca8e6f3f9b0f43f91b5ad521b40d28b8325afa6db7e82cae81136454",
         "portedSha256": "d7a553e4ad5d2e43d4bcb285466b109e210af744aa0db9a1ec42234591aa8f75",
         "extraction": null,
@@ -1222,7 +1222,7 @@
       },
       {
         "source": "src/lib/json-render/chart-data.test.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/json-render/chart-data.test.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/lib/json-render/chart-data.test.ts",
         "sourceSha256": "0bdc223eb5c0bb8fb1d172f0573ee262e8c58d16352f14613a21bebe6227969f",
         "portedSha256": "b3bcb398dbecf0f6f04a709d97a939015e59a85f9b14821aa1d01ad1dc1fc1ff",
         "extraction": null,
@@ -1232,7 +1232,7 @@
       },
       {
         "source": "src/components/ai-elements/message.tsx",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/source-message-response.tsx",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/source-message-response.tsx",
         "sourceSha256": "f73b8f05e1bffc8aa639d40f6a52a8c9533ffddd0c27613d1d08e1fc91c227e6",
         "portedSha256": "c82f97ea4749bfb192ceaebff330a761b7f9f1e14a6ea945980028c4c6e1d354",
         "extraction": "complete MessageResponse and normalization closure from export type MessageResponseProps to EOF; unrelated message action/branch business widgets excluded",
@@ -1242,7 +1242,7 @@
       },
       {
         "source": "src/lib/markdown-local-image.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/markdown-local-image.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/lib/markdown-local-image.ts",
         "sourceSha256": "a23804d28766a9a965d5d6497b474db34d3d4f9a1e167516383f52eaa7b8d67f",
         "portedSha256": "a2fae5becf5e1267481130e53b680c837901a0da214f2a4f857e74fa9e35317f",
         "extraction": "exact localImagePath parser only, LF and single EOF newline; root resolution and IO stay Core-owned",
@@ -1255,7 +1255,7 @@
     "skillModulePorted": false,
     "scope": "完整原MessageResponse及归一化闭包、原插件/remark/rehype、Mermaid/缩放/全屏/三格式导出、助手正文spec本地状态及7种原图表组件；不含完整供体App或未移植的链接业务操作",
     "hostSeams": [
-      "Core精确readId的文件/本地图片与原Rovai文件、HTTPS入口",
+      "Core精确readId的文件/本地图片与原Coaxi文件、HTTPS入口",
       "既有Radix/主题/翻译/通知和DOM下载，门户随reader/visible回收",
       "cn沿原clsx对象/数组语义；不在共享primitives直接导入引擎，避免原模块循环",
       "DOM iframe层叠适配；原生浏览器遮挡租约仍属于I07，不将no-op称原生能力完成"
@@ -1275,49 +1275,49 @@
       }
     ],
     "style": {
-      "file": "apps/desktop/src/renderer/src/codeg-native-content/source-markdown.css",
+      "file": "apps/desktop/src/renderer/src/coaxi-native-content/source-markdown.css",
       "sha256": "0a70d57fa34b7c289ee2c10cc1f49eb6c62908e09fc0167e96db1e50a6f77dc4",
       "generator": "file/I04原版Markdown引擎/build-style.mjs",
       "source": {
         "files": [
-          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\components\\ai-elements\\markdown-mask.ts",
-          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\components\\ai-elements\\remark-cjk-autolink-tail.ts",
-          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\components\\ai-elements\\remark-file-uri-links.ts",
-          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\components\\ai-elements\\remark-windows-paths.ts",
-          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\components\\ai-elements\\remark-local-images.ts",
-          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\components\\ai-elements\\rehype-allow-codeg.ts",
-          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\components\\ai-elements\\rehype-relative-file-links.ts",
-          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\components\\ai-elements\\streamdown-plugins.ts",
-          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\components\\ai-elements\\mermaid-view.ts",
-          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\components\\ai-elements\\json-render-pre.tsx",
-          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\components\\ai-elements\\mermaid-block.tsx",
-          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\components\\message\\json-render-block.tsx",
-          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\components\\message\\json-render-charts.tsx",
-          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\components\\ui\\button.tsx",
-          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\components\\ui\\dialog.tsx",
-          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\components\\ui\\dropdown-menu.tsx",
-          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\components\\ui\\overlay-portal-container.tsx",
-          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\components\\ui\\chart.tsx",
-          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\components\\ui\\skeleton.tsx",
-          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\hooks\\use-nested-layer-dismiss-guard.ts",
-          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\lib\\attach-ref.ts",
-          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\lib\\mermaid-export.ts",
-          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\lib\\json-render\\catalog.ts",
-          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\lib\\json-render\\spec.ts",
-          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\lib\\json-render\\charts.ts",
-          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\lib\\json-render\\chart-data.ts",
-          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\components\\ai-elements\\source-message-response.tsx",
-          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\lib\\markdown-local-image.ts",
-          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\node_modules\\streamdown\\dist\\chunk-LPQFK2AO.js",
-          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\node_modules\\streamdown\\dist\\code-block-OCS4YCEC.js",
-          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\node_modules\\streamdown\\dist\\index.js",
-          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\node_modules\\streamdown\\dist\\mermaid-NOHMQCX5.js",
-          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\node_modules\\@json-render\\shadcn\\dist\\catalog.js",
-          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\node_modules\\@json-render\\shadcn\\dist\\catalog.mjs",
-          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\node_modules\\@json-render\\shadcn\\dist\\chunk-L37EOULD.mjs",
-          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\node_modules\\@json-render\\shadcn\\dist\\index.js",
-          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\node_modules\\@json-render\\shadcn\\dist\\index.mjs",
-          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\ui\\native-markdown.tsx"
+          "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\apps\\desktop\\src\\renderer\\src\\coaxi-native-content\\components\\ai-elements\\markdown-mask.ts",
+          "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\apps\\desktop\\src\\renderer\\src\\coaxi-native-content\\components\\ai-elements\\remark-cjk-autolink-tail.ts",
+          "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\apps\\desktop\\src\\renderer\\src\\coaxi-native-content\\components\\ai-elements\\remark-file-uri-links.ts",
+          "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\apps\\desktop\\src\\renderer\\src\\coaxi-native-content\\components\\ai-elements\\remark-windows-paths.ts",
+          "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\apps\\desktop\\src\\renderer\\src\\coaxi-native-content\\components\\ai-elements\\remark-local-images.ts",
+          "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\apps\\desktop\\src\\renderer\\src\\coaxi-native-content\\components\\ai-elements\\rehype-allow-coaxi.ts",
+          "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\apps\\desktop\\src\\renderer\\src\\coaxi-native-content\\components\\ai-elements\\rehype-relative-file-links.ts",
+          "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\apps\\desktop\\src\\renderer\\src\\coaxi-native-content\\components\\ai-elements\\streamdown-plugins.ts",
+          "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\apps\\desktop\\src\\renderer\\src\\coaxi-native-content\\components\\ai-elements\\mermaid-view.ts",
+          "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\apps\\desktop\\src\\renderer\\src\\coaxi-native-content\\components\\ai-elements\\json-render-pre.tsx",
+          "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\apps\\desktop\\src\\renderer\\src\\coaxi-native-content\\components\\ai-elements\\mermaid-block.tsx",
+          "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\apps\\desktop\\src\\renderer\\src\\coaxi-native-content\\components\\message\\json-render-block.tsx",
+          "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\apps\\desktop\\src\\renderer\\src\\coaxi-native-content\\components\\message\\json-render-charts.tsx",
+          "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\apps\\desktop\\src\\renderer\\src\\coaxi-native-content\\components\\ui\\button.tsx",
+          "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\apps\\desktop\\src\\renderer\\src\\coaxi-native-content\\components\\ui\\dialog.tsx",
+          "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\apps\\desktop\\src\\renderer\\src\\coaxi-native-content\\components\\ui\\dropdown-menu.tsx",
+          "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\apps\\desktop\\src\\renderer\\src\\coaxi-native-content\\components\\ui\\overlay-portal-container.tsx",
+          "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\apps\\desktop\\src\\renderer\\src\\coaxi-native-content\\components\\ui\\chart.tsx",
+          "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\apps\\desktop\\src\\renderer\\src\\coaxi-native-content\\components\\ui\\skeleton.tsx",
+          "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\apps\\desktop\\src\\renderer\\src\\coaxi-native-content\\hooks\\use-nested-layer-dismiss-guard.ts",
+          "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\apps\\desktop\\src\\renderer\\src\\coaxi-native-content\\lib\\attach-ref.ts",
+          "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\apps\\desktop\\src\\renderer\\src\\coaxi-native-content\\lib\\mermaid-export.ts",
+          "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\apps\\desktop\\src\\renderer\\src\\coaxi-native-content\\lib\\json-render\\catalog.ts",
+          "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\apps\\desktop\\src\\renderer\\src\\coaxi-native-content\\lib\\json-render\\spec.ts",
+          "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\apps\\desktop\\src\\renderer\\src\\coaxi-native-content\\lib\\json-render\\charts.ts",
+          "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\apps\\desktop\\src\\renderer\\src\\coaxi-native-content\\lib\\json-render\\chart-data.ts",
+          "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\apps\\desktop\\src\\renderer\\src\\coaxi-native-content\\components\\ai-elements\\source-message-response.tsx",
+          "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\apps\\desktop\\src\\renderer\\src\\coaxi-native-content\\lib\\markdown-local-image.ts",
+          "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\node_modules\\streamdown\\dist\\chunk-LPQFK2AO.js",
+          "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\node_modules\\streamdown\\dist\\code-block-OCS4YCEC.js",
+          "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\node_modules\\streamdown\\dist\\index.js",
+          "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\node_modules\\streamdown\\dist\\mermaid-NOHMQCX5.js",
+          "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\node_modules\\@json-render\\shadcn\\dist\\catalog.js",
+          "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\node_modules\\@json-render\\shadcn\\dist\\catalog.mjs",
+          "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\node_modules\\@json-render\\shadcn\\dist\\chunk-L37EOULD.mjs",
+          "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\node_modules\\@json-render\\shadcn\\dist\\index.js",
+          "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\node_modules\\@json-render\\shadcn\\dist\\index.mjs",
+          "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\apps\\desktop\\src\\renderer\\src\\coaxi-native-content\\ui\\native-markdown.tsx"
         ],
         "tokens": 2289,
         "bytes": 118201,
@@ -1417,7 +1417,7 @@
     "files": [
       {
         "source": "src/components/chat/composer/badges/reference-badge.tsx",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/chat/composer/badges/reference-badge.tsx",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/chat/composer/badges/reference-badge.tsx",
         "sourceSha256": "7c01ff446118e0c85f39b0adb0e800074066b83bb8d8c9c929f79dff6f0c87a4",
         "portedSha256": "69877e0c1b395e8b74fe06ba33ef9375257cd0403bb6b5ece4d89be3413aa5d4",
         "extraction": null,
@@ -1428,7 +1428,7 @@
       },
       {
         "source": "src/components/chat/composer/badges/reference-badge.test.tsx",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/chat/composer/badges/reference-badge.test.tsx",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/chat/composer/badges/reference-badge.test.tsx",
         "sourceSha256": "d91f60dcb0b411cc02454de59ebb69106d96fd56906095ce36aada8fe5cff6c1",
         "portedSha256": "54df5dfd9232a2f957119a89574e1dfef67e2b228a852f838d228b12d14e28e1",
         "extraction": null,
@@ -1440,7 +1440,7 @@
       },
       {
         "source": "src/components/chat/composer/reference-uri.test.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/chat/composer/reference-uri.test.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/chat/composer/reference-uri.test.ts",
         "sourceSha256": "d745ee30b18165ceba6da542977c601f44e8128528752d348ccf62c9ece9d95a",
         "portedSha256": "13f835944ce02e252cb0a75babcff2daa39d73868b549110b639c0a7637baafe",
         "extraction": null,
@@ -1451,7 +1451,7 @@
       },
       {
         "source": "src/lib/resource-kind.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/resource-kind.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/lib/resource-kind.ts",
         "sourceSha256": "3a8ab2a7ec09085276886b8c2ca48f678f4f4e9211cb67f519e0fa8fc200e04c",
         "portedSha256": "240412e6c6c2e9754a0547f8d8b9c49ab0f1110cfab9eaaacea3db9d7044c297",
         "extraction": null,
@@ -1462,7 +1462,7 @@
       },
       {
         "source": "src/lib/resource-kind.test.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/resource-kind.test.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/lib/resource-kind.test.ts",
         "sourceSha256": "eb3eeda10a5d021487988cfe63c5303fa5370c19cc4e3a2d4e44759ed6bbdfde",
         "portedSha256": "070a750e6f27e4411dc2dfe706861ff1401668ab7fe0796e33b5418c00248e0e",
         "extraction": null,
@@ -1473,7 +1473,7 @@
       },
       {
         "source": "src/components/ui/context-menu.tsx",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ui/context-menu.tsx",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/ui/context-menu.tsx",
         "sourceSha256": "208730cd12fcfa4fdd158c69225dd6026bc76a250615e9df5ffecca4d0851ce1",
         "portedSha256": "07e0d159e6d4a26ac7454e09ac5515c0f8ab3fcea7d1c2eafda8e3130f6037f8",
         "extraction": null,
@@ -1484,7 +1484,7 @@
       },
       {
         "source": "src/components/message/file-reference-actions.tsx",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/message/file-reference-actions.tsx",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/message/file-reference-actions.tsx",
         "sourceSha256": "04bdb5a003c05f65bccf6909fc254136272609e3156e546da8486cb138e5599f",
         "portedSha256": "41a471c566ae6a20cd92592642d922556b0058fa33f35cd6aa341a8f07e903b3",
         "extraction": "original systemFileManagerLabelKey, complete menu return JSX and complete FileReferenceActions wrapper; source root/path IO replaced by Core scope hook; added async loading/retry rows",
@@ -1498,7 +1498,7 @@
     "reused": [
       {
         "source": "src/components/chat/composer/types.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/chat/composer/types.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/chat/composer/types.ts",
         "sourceSha256": "5c1871b4e31803edd62f1982d8f8a8478537ea793d309ec98764e8c766b712b5",
         "portedSha256": "806ce8ca70f445fd765f639fa3f602e4e280efa6b18df9d04b6f66a84392e92c",
         "body": "existing exact original type declarations; unused REFERENCE_KINDS constant excluded by prior extraction; not rewritten",
@@ -1506,7 +1506,7 @@
       },
       {
         "source": "src/components/chat/composer/reference-uri.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/chat/composer/reference-uri.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/chat/composer/reference-uri.ts",
         "sourceSha256": "4ecba4dab6cc9fd01be9d5e21ddaa1a6cb75bc371e0f9f69fbd6d3c1a6bed666",
         "portedSha256": "e564e6ed3a27c25e2a56531c566404ff796dd9377e65647464627d5b951958a5",
         "body": "existing exact source AST after excluding documented import/header/EOL bindings; not rewritten",
@@ -1616,7 +1616,7 @@
     "files": [
       {
         "source": "src/lib/html-preview-inline.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/html-preview-inline.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/lib/html-preview-inline.ts",
         "sourceSha256": "189a3c995307aeb258e16c32dcbed96a9adbc642d512cdd1d6e41907a604ee3f",
         "portedSha256": "113dae96195e1b715443f54f801b47c2779f55af183b16cafb62e0747b492f01",
         "sourceGitBlob": "6372954d78e446d92c38caafc14a31474adda9a0",
@@ -1626,7 +1626,7 @@
       },
       {
         "source": "src/lib/html-preview-inline.test.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/html-preview-inline.test.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/lib/html-preview-inline.test.ts",
         "sourceSha256": "b1636d50053497e7920cd86a29096fec3a2b3f00b97c2bfa5e41fc2d4f35aa1e",
         "portedSha256": "43a7e203da353c623e0a4e48f1a605381aa8595507c795a9bd9636037c9b1d0d",
         "sourceGitBlob": "b173d07f287aa7b7954846ae5dc09158a33e4f6b",
@@ -1636,19 +1636,19 @@
       },
       {
         "source": "src/components/message/codex-visualize-card.tsx",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/message/codex-visualize-card.tsx",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/message/codex-visualize-card.tsx",
         "sourceSha256": "dead83ff7abb5f80190b0c611099a80a864822448d04e1bfab255e0dcba155fc",
         "portedSha256": "c5e8b98966fb460b12559180e7a6f4d3f0233715297ff633f8eb515803896a49",
         "sourceGitBlob": "a7fe683c17e98c57b6476669bd6c3ed66d6f2ebd",
         "bodyChanges": [
           "complete original pure document/fragment/CSP/size/theme/local-state builders and card JSX retained",
-          "Core scoped load and resource reader replace frontend home/root/Tauri IO; Core-owned reader identity and visibility in load key; current scope guards and original window HTML pool; resource concurrency 4 for shared host quotas; source theme values bind Rovai tokens without shadowing host variables",
+          "Core scoped load and resource reader replace frontend home/root/Tauri IO; Core-owned reader identity and visibility in load key; current scope guards and original window HTML pool; resource concurrency 4 for shared host quotas; source theme values bind Coaxi tokens without shadowing host variables",
           "original runtime plugin asset discovery excluded from this slice; original FALLBACK_ASSETS branch retained, authorized enhanced asset integration remains I08; not a full DocGuest/browser port"
         ]
       },
       {
         "source": "src/components/message/codex-visualize-card.test.tsx",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/message/codex-visualize-build.test.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/message/codex-visualize-build.test.ts",
         "sourceSha256": "50e58a3be59915a53c7c666aa0651e62a40de99f96db91b83a82376e5b92bcc8",
         "portedSha256": "c09f1645a734e4c6ec6c5805e6edc4309989e65449b93a0cfc6b16f6e5df2de5",
         "sourceGitBlob": "0337d52afe11603ee040736f9ba469efa4b7bcd0",
@@ -1658,7 +1658,7 @@
       },
       {
         "source": "src/components/message/html-file-previews.tsx",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/message/html-file-previews.tsx",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/message/html-file-previews.tsx",
         "sourceSha256": "4b25695300fd3d7fe0baa08e33f7f9363e67e9c3d9dfdde59dc1df710395f3d0",
         "portedSha256": "ed0e58297cc0cfc2370e944d68e6dec0ae6dd776e76c36bc963d599b5413b4a6",
         "sourceGitBlob": "35ca841d108d4da11513b3f1cca39833ce80ba07",
@@ -1686,7 +1686,7 @@
     "remaining": [
       "I04阶段编码集齐后集中核实真实Core/Native/Web、完整App/供体App同场景、授权/长历史/规模/内存与恢复；本批为生产卡片配声明运输替身的Chromium分项。",
       "插件增强CSS/kit/calendar保留原构造接口与缺资产fallback；实际安装包Core授权发现归I08，无任意home/Tauri读取。",
-      "完整DocGuest、网页/邮件/电话与内置/系统浏览器目标归I07；普通文件工作区继续Rovai原HTML服务。",
+      "完整DocGuest、网页/邮件/电话与内置/系统浏览器目标归I07；普通文件工作区继续Coaxi原HTML服务。",
       "I04原剩余Claude旧agent/parser/home关联、Qoder独立来源/明确导入、Grok修改意见与三Context模式、Runtime并集、恢复、记忆及自动化不减；ANSI完整许可继续发布资格。"
     ]
   }

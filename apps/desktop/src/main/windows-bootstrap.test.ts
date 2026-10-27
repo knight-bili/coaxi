@@ -8,8 +8,8 @@ import {
 } from './windows-data-root'
 
 const key = windowsBootstrapInstanceKey(null)
-const { core: _core, ...shell } = expectedWindowsDataRootLayout(`C:\\Users\\测试\\AppData\\Local\\Rovai AI Bootstrap\\${key}`)
-const formal = expectedWindowsDataRootLayout('D:\\Rovai fixture')
+const { core: _core, ...shell } = expectedWindowsDataRootLayout(`C:\\Users\\测试\\AppData\\Local\\Coaxi AI Bootstrap\\${key}`)
+const formal = expectedWindowsDataRootLayout('D:\\Coaxi fixture')
 
 function appFixture(primary = true) {
   const paths = new Map<string, string>()
@@ -46,7 +46,7 @@ describe('Windows pre-ready Bootstrap composition', () => {
         prepareAuthority: () => {
           if (fault === 'missing-localappdata') resolveWindowsDataRoot(null, undefined)
           if (fault === 'missing-core') throw new Error('Core binary was not found')
-          return prepareWindowsDataRoot('C:\\bin\\rovai-core.exe', formal.root, () => ({
+          return prepareWindowsDataRoot('C:\\bin\\coaxi-core.exe', formal.root, () => ({
             status: fault === 'malformed' ? 0 : null,
             signal: null,
             stdout: fault === 'malformed' ? 'invalid JSON' : '',
@@ -97,11 +97,11 @@ describe('Windows pre-ready Bootstrap composition', () => {
 
   it('accepts only a closed Core-free native bootstrap layout for the requested stable instance', () => {
     const prepare = vi.fn(() => ({ status: 0, signal: null, stdout: JSON.stringify(shell), stderr: '' }))
-    expect(prepareWindowsBootstrapRoot('C:\\bin\\rovai.exe', key, prepare)).toEqual(shell)
-    expect(prepare).toHaveBeenCalledWith('C:\\bin\\rovai.exe', ['--prepare-windows-bootstrap-root', key])
+    expect(prepareWindowsBootstrapRoot('C:\\bin\\coaxi.exe', key, prepare)).toEqual(shell)
+    expect(prepare).toHaveBeenCalledWith('C:\\bin\\coaxi.exe', ['--prepare-windows-bootstrap-root', key])
     prepare.mockReturnValueOnce({ status: 0, signal: null, stdout: JSON.stringify({ ...shell, core: formal.core }), stderr: '' })
-    expect(() => prepareWindowsBootstrapRoot('C:\\bin\\rovai.exe', key, prepare)).toThrow('unknown layout shape')
-    expect(windowsBootstrapInstanceKey('D:/Rovai fixture')).toBe(windowsBootstrapInstanceKey('d:\\rovai fixture'))
-    expect(windowsBootstrapInstanceKey('D:/Rovai fixture')).not.toBe(key)
+    expect(() => prepareWindowsBootstrapRoot('C:\\bin\\coaxi.exe', key, prepare)).toThrow('unknown layout shape')
+    expect(windowsBootstrapInstanceKey('D:/Coaxi fixture')).toBe(windowsBootstrapInstanceKey('d:\\coaxi fixture'))
+    expect(windowsBootstrapInstanceKey('D:/Coaxi fixture')).not.toBe(key)
   })
 })

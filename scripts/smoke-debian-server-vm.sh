@@ -31,7 +31,7 @@ ssh-keygen -q -t ed25519 -N '' -f "$fixture/key"
 cat > "$fixture/user-data" <<EOF
 #cloud-config
 users:
-  - name: rovai
+  - name: coaxi
     shell: /bin/bash
     lock_passwd: true
     ssh_authorized_keys:
@@ -39,7 +39,7 @@ users:
 ssh_pwauth: false
 disable_root: true
 EOF
-printf 'instance-id: rovai-linux-gate\nlocal-hostname: rovai-linux-gate\n' > "$fixture/meta-data"
+printf 'instance-id: coaxi-linux-gate\nlocal-hostname: coaxi-linux-gate\n' > "$fixture/meta-data"
 cloud-localds "$fixture/seed.img" "$fixture/user-data" "$fixture/meta-data"
 qemu-img resize "$fixture/$image_name" 5G
 port=$(python3 -c 'import socket; s=socket.socket(); s.bind(("127.0.0.1",0)); print(s.getsockname()[1]); s.close()')
@@ -53,16 +53,16 @@ vm_pid=$!
 ssh_options=(-i "$fixture/key" -o BatchMode=yes -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new -o "UserKnownHostsFile=$fixture/known_hosts")
 ready=0
 for attempt in $(seq 1 120); do
-  if ssh "${ssh_options[@]}" -p "$port" rovai@127.0.0.1 true 2>/dev/null; then ready=1; break; fi
+  if ssh "${ssh_options[@]}" -p "$port" coaxi@127.0.0.1 true 2>/dev/null; then ready=1; break; fi
   if ! kill -0 "$vm_pid" 2>/dev/null; then break; fi
   sleep 2
 done
 if [[ "$ready" != 1 ]]; then tail -80 "$fixture/console.log"; exit 1; fi
-scp "${ssh_options[@]}" -P "$port" -r "$assets" rovai@127.0.0.1:assets
-scp "${ssh_options[@]}" -P "$port" "$repository/scripts/install-server.sh" "$repository/scripts/smoke-linux-server.py" rovai@127.0.0.1:
+scp "${ssh_options[@]}" -P "$port" -r "$assets" coaxi@127.0.0.1:assets
+scp "${ssh_options[@]}" -P "$port" "$repository/scripts/install-server.sh" "$repository/scripts/smoke-linux-server.py" coaxi@127.0.0.1:
 version=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["version"])' "$repository/package.json")
 [[ "$version" =~ ^[0-9A-Za-z.+-]+$ && "$source_sha" =~ ^[0-9a-f]{40}$ ]]
-ssh "${ssh_options[@]}" -p "$port" rovai@127.0.0.1 \
-  "sh install-server.sh --version '$version' --from-dir /home/rovai/assets --no-modify-path && python3 smoke-linux-server.py /home/rovai/.local/share/rovai-server/current --expected-source '$source_sha' --startup-timeout 90 --output /home/rovai/debian-12.json"
+ssh "${ssh_options[@]}" -p "$port" coaxi@127.0.0.1 \
+  "sh install-server.sh --version '$version' --from-dir /home/coaxi/assets --no-modify-path && python3 smoke-linux-server.py /home/coaxi/.local/share/coaxi-server/current --expected-source '$source_sha' --startup-timeout 90 --output /home/coaxi/debian-12.json"
 mkdir -p "$(dirname "$output")"
-scp "${ssh_options[@]}" -P "$port" rovai@127.0.0.1:debian-12.json "$output"
+scp "${ssh_options[@]}" -P "$port" coaxi@127.0.0.1:debian-12.json "$output"

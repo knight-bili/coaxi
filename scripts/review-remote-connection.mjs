@@ -17,7 +17,7 @@ export async function buildRemoteConnectionReview(output = join(root, 'out/revie
     + css + '</style></head><body><div id="root"></div><script type="module">' + js.replaceAll('</script', '<\\/script') + '</script></body></html>'
   const productPath = join(output, 'remote-connection.html')
   await writeFile(productPath, product)
-  const viewer = `<!doctype html><html lang="zh-CN" data-theme="day"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Rovai AI · 远程连接设计稿</title><style>${css}
+  const viewer = `<!doctype html><html lang="zh-CN" data-theme="day"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Coaxi AI · 远程连接设计稿</title><style>${css}
   html,body{height:auto;overflow:auto;min-height:100%}body{background:var(--canvas)}
   .review-toolbar{display:flex;align-items:center;gap:12px 20px;flex-wrap:wrap;padding:16px 24px;border-bottom:1px solid var(--line);background:var(--surface);position:sticky;top:0;z-index:1}
   .review-toolbar strong{font-size:14px;font-weight:600;margin-right:8px}.review-toolbar label{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px}

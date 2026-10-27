@@ -299,7 +299,7 @@ export class ConsoleClient {
       pending: [...this.#pending.values()].map(({ operation, params, missionFiles }) => ({ operation, params, ...(missionFiles ? { missionFiles: { intent: missionFiles.intent } } : {}) })), uploads: [...this.#pendingUploads.values()].map(({ intent }) => intent) }))
   }
 
-  clearEditingRecovery(): void { this.#storage?.removeItem('rovai.web.edits.v1') }
+  clearEditingRecovery(): void { this.#storage?.removeItem('coaxi.web.edits.v1') }
 
   async login(administratorToken: string): Promise<void> {
     await this.#login('login', { administratorToken })
@@ -733,8 +733,8 @@ export class ConsoleClient {
     const value = response.headers.get('Content-Type')?.includes('application/json')
       ? await response.json() as FilePreviewOperationResult<never>
       : { ok: true as const, value: { blob: await response.blob(), mime: response.headers.get('Content-Type') ?? 'application/octet-stream',
-        contentGeneration: response.headers.get('x-rovai-content-generation') ?? '',
-        contentVersion: JSON.parse(response.headers.get('x-rovai-content-version') ?? 'null') as FilePreviewBinaryContent['contentVersion'],
+        contentGeneration: response.headers.get('x-coaxi-content-generation') ?? '',
+        contentVersion: JSON.parse(response.headers.get('x-coaxi-content-version') ?? 'null') as FilePreviewBinaryContent['contentVersion'],
         name: responseFileName(response) } }
     if (generation !== this.#generation) throw new DOMException('Connection replaced', 'AbortError')
     return value
@@ -831,7 +831,7 @@ export class ConsoleClient {
         const parts:ArrayBuffer[]=[],expected=receipt.byteSize!;let size=0
         try{for(;;){const value=await reader.read();if(value.done)break;size+=value.value.byteLength;if(size>expected)throw new Error('配置副本已变化。');parts.push(value.value.slice().buffer as ArrayBuffer)}}catch(error){await reader.cancel().catch(()=>undefined);throw error}finally{reader.releaseLock()}
         if(size!==expected)throw new Error('配置副本已变化。')
-        const file=new File(parts,'configuration.rovai-config',{type:'application/octet-stream'})
+        const file=new File(parts,'configuration.coaxi-config',{type:'application/octet-stream'})
         const digest=await fileDigest(file,this.#lifetime.signal)
         if(generation!==this.#generation||scope!==this.editingScope)throw new DOMException('Connection replaced','AbortError')
         if(`sha256:${digest}`!==receipt.encryptedDigest&&digest!==receipt.encryptedDigest)throw new Error('配置副本摘要不同。')

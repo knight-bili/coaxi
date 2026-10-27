@@ -21,7 +21,7 @@ provider = config["provider"][provider_id]
 assert provider["kind"] == "anthropic", "This controlled overflow fixture requires an Anthropic-compatible BYOK provider"
 upstream = urlsplit(provider["options"]["baseURL"])
 assert upstream.scheme == "https"
-fixture = Path(tempfile.mkdtemp(prefix="rovai-zcode-context-home-"))
+fixture = Path(tempfile.mkdtemp(prefix="coaxi-zcode-context-home-"))
 home = fixture / "home"
 config_path = home / ".zcode/cli/config.json"
 config_path.parent.mkdir(parents=True, mode=0o700)
@@ -43,7 +43,7 @@ class Handler(BaseHTTPRequestHandler):
             last_user = next((m for m in reversed(value.get("messages", [])) if m.get("role") == "user"), {})
             content = json.dumps(last_user.get("content", []))
             counts["providerRequests"] += 1
-            if "[ROVAI_BOOTSTRAP_REDELIVERY" in content:
+            if "[COAXI_BOOTSTRAP_REDELIVERY" in content:
                 counts["redeliveryRequests"] += 1
             if mode == "reactive" and counts["injectedOverflowCount"] == 0 and "TRIGGER_OVERFLOW_FIXTURE" in content:
                 counts["injectedOverflowCount"] += 1
@@ -87,7 +87,7 @@ try:
     with os.fdopen(os.open(config_path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600), "w") as stream:
         json.dump(config, stream)
     env = os.environ.copy()
-    env.update(HOME=str(home), USERPROFILE=str(home), ROVAI_ZCODE_CONTEXT_CASE=mode)
+    env.update(HOME=str(home), USERPROFILE=str(home), COAXI_ZCODE_CONTEXT_CASE=mode)
     result = subprocess.run([shutil.which("node"), "scripts/smoke-zcode-context.mjs"], env=env, timeout=1200)
     print(json.dumps({"mode": mode, **counts, "childExitCode": result.returncode}), flush=True)
     assert result.returncode == 0

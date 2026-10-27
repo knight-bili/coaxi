@@ -82,7 +82,7 @@ function makeWindow(page, lang, topic = '') {
   for (const name of ['docs-content.js', 'docs-details.js', 'docs-tutorials.js', 'docs-deployment.js']) {
     dom.window.eval(scripts[name])
   }
-  const { topics, groups } = dom.window.RovaiDocs
+  const { topics, groups } = dom.window.CoaxiDocs
   topics['agent-setup'] = agentSetup
   const agentGroup = groups.find(group => group.ids.includes('agents'))
   agentGroup.ids.splice(agentGroup.ids.indexOf('agents') + 1, 0, 'agent-setup')
@@ -95,7 +95,7 @@ function makeWindow(page, lang, topic = '') {
 function rewriteLinks(dom, lang, page) {
   const doc = dom.window.document
   const prefix = lang === 'zh' ? '/zh' : ''
-  const topicIds = new Set(Object.keys(dom.window.RovaiDocs?.topics || {}))
+  const topicIds = new Set(Object.keys(dom.window.CoaxiDocs?.topics || {}))
   for (const link of doc.querySelectorAll('a[href]')) {
     const original = link.getAttribute('href')
     if (original.startsWith('#')) {
@@ -138,7 +138,7 @@ async function generate(page, lang, topic = '') {
   const dom = makeWindow(page, lang, topic)
   rewriteLinks(dom, lang, page)
   const doc = dom.window.document
-  const data = dom.window.RovaiDocs
+  const data = dom.window.CoaxiDocs
   const localized = pair => pair?.[lang === 'zh' ? 1 : 0] || ''
   const topicData = topic ? data.topics[topic] : null
   const title = topicData ? localized(topicData.title) : page === 'home'
@@ -154,7 +154,7 @@ async function generate(page, lang, topic = '') {
   // innerHTML decodes them again before the outer whitespace removal runs.
   const contentHtml = app.innerHTML.replace(/<pre\b[^>]*>[\s\S]*?<\/pre>|\n/g,
     part => part === '\n' ? '' : part.replaceAll('\n', '&#10;'))
-  const content = `<div id="rovai-site">${contentHtml}</div>`
+  const content = `<div id="coaxi-site">${contentHtml}</div>`
   const prefix = lang === 'zh' ? 'zh/' : ''
   const path = page === 'home' ? `${prefix}index.md` : page === 'download' ? `${prefix}download/index.md`
     : topic ? `${prefix}docs/${topic}.md` : `${prefix}docs/index.md`
@@ -166,7 +166,7 @@ async function generate(page, lang, topic = '') {
 }
 
 const topicsWindow = makeWindow('docs', 'en')
-const topics = Object.keys(topicsWindow.window.RovaiDocs.topics)
+const topics = Object.keys(topicsWindow.window.CoaxiDocs.topics)
 topicsWindow.window.close()
 const written = []
 for (const lang of ['en', 'zh']) {

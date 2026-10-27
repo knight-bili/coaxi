@@ -13,7 +13,7 @@ it('rejects foreign windows, origins, generations, malformed envelopes and stale
   const messages:Record<string,unknown>[]=[];channel.subscribe(message=>messages.push(message))
   const detach=channel.attach(host as unknown as Window)
   const receive=(data:Record<string,unknown>, origin=preview.origin, source=frame):void=>{
-    const event=new Event('message');Object.assign(event,{data:{protocol:'rovai-html-preview-v1',previewId:'p1',generation:'g1',documentId:'d1',...data},origin,source});host.dispatchEvent(event)
+    const event=new Event('message');Object.assign(event,{data:{protocol:'coaxi-html-preview-v1',previewId:'p1',generation:'g1',documentId:'d1',...data},origin,source});host.dispatchEvent(event)
   }
   receive({type:'hello'},'http://attacker.localhost');receive({type:'hello'},preview.origin,{} as Window);receive({type:'hello',generation:'old'})
   expect(sent).toHaveLength(0)
@@ -52,7 +52,7 @@ it('binds trusted Web preview initialization and messages to the actual origin, 
   const detach = channel.attach(host as unknown as Window)
   const receive = (patch = {}, source = frame, origin = host.location.origin): void => {
     const event = new Event('message')
-    Object.assign(event, { origin, source, data: { protocol: 'rovai-html-preview-v1', previewId: 'p', generation: 'g', documentId: 'bootstrap', type: 'bootstrap-ready', ...patch } })
+    Object.assign(event, { origin, source, data: { protocol: 'coaxi-html-preview-v1', previewId: 'p', generation: 'g', documentId: 'bootstrap', type: 'bootstrap-ready', ...patch } })
     host.dispatchEvent(event)
   }
   receive({}, {} as Window); receive({}, frame, 'null'); receive({}, frame, 'https://elsewhere'); receive({ previewId: 'other' }); receive({ generation: 'old' })

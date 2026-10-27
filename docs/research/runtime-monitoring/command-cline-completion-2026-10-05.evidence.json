@@ -898,7 +898,7 @@
           "configDigest": "sha256:1fd4cd4c18a168dbd74f22bef1061a988fb3e036986be7ec99245e4f58ece652",
           "configStatus": "ready",
           "projectionMode": "additive_per_run",
-          "sameNamePolicy": "rovai_wins",
+          "sameNamePolicy": "coaxi_wins",
           "schemaVersion": 2,
           "servers": [],
           "warnings": []
@@ -1127,7 +1127,7 @@
           "configDigest": "sha256:76c92e75fe4629f804b1b01a3864602951b52b1b09cbdf25945f63b8be2da82c",
           "configStatus": "ready",
           "projectionMode": "additive_per_run",
-          "sameNamePolicy": "rovai_wins",
+          "sameNamePolicy": "coaxi_wins",
           "schemaVersion": 2,
           "servers": [
             {
@@ -1288,7 +1288,7 @@
           "configDigest": "sha256:76c92e75fe4629f804b1b01a3864602951b52b1b09cbdf25945f63b8be2da82c",
           "configStatus": "ready",
           "projectionMode": "additive_per_run",
-          "sameNamePolicy": "rovai_wins",
+          "sameNamePolicy": "coaxi_wins",
           "schemaVersion": 2,
           "servers": [
             {
@@ -2035,7 +2035,7 @@
           "configDigest": "sha256:113d10764661d92c2c9b63d61481082081ee4a3576af77576322fd2a04eec194",
           "configStatus": "ready",
           "projectionMode": "additive_per_run",
-          "sameNamePolicy": "rovai_wins",
+          "sameNamePolicy": "coaxi_wins",
           "schemaVersion": 2,
           "servers": [
             {
@@ -2113,7 +2113,7 @@
           "configDigest": "sha256:1fd4cd4c18a168dbd74f22bef1061a988fb3e036986be7ec99245e4f58ece652",
           "configStatus": "ready",
           "projectionMode": "additive_per_run",
-          "sameNamePolicy": "rovai_wins",
+          "sameNamePolicy": "coaxi_wins",
           "schemaVersion": 2,
           "servers": [],
           "warnings": []
@@ -2189,7 +2189,7 @@
           "configDigest": "sha256:1fd4cd4c18a168dbd74f22bef1061a988fb3e036986be7ec99245e4f58ece652",
           "configStatus": "ready",
           "projectionMode": "additive_per_run",
-          "sameNamePolicy": "rovai_wins",
+          "sameNamePolicy": "coaxi_wins",
           "schemaVersion": 2,
           "servers": [],
           "warnings": []
@@ -2265,7 +2265,7 @@
           "configDigest": "sha256:1fd4cd4c18a168dbd74f22bef1061a988fb3e036986be7ec99245e4f58ece652",
           "configStatus": "ready",
           "projectionMode": "additive_per_run",
-          "sameNamePolicy": "rovai_wins",
+          "sameNamePolicy": "coaxi_wins",
           "schemaVersion": 2,
           "servers": [],
           "warnings": []
@@ -2333,7 +2333,7 @@
           "configDigest": "sha256:1fd4cd4c18a168dbd74f22bef1061a988fb3e036986be7ec99245e4f58ece652",
           "configStatus": "ready",
           "projectionMode": "additive_per_run",
-          "sameNamePolicy": "rovai_wins",
+          "sameNamePolicy": "coaxi_wins",
           "schemaVersion": 2,
           "servers": [],
           "warnings": []
@@ -2407,7 +2407,7 @@
           "configDigest": "sha256:1fd4cd4c18a168dbd74f22bef1061a988fb3e036986be7ec99245e4f58ece652",
           "configStatus": "ready",
           "projectionMode": "additive_per_run",
-          "sameNamePolicy": "rovai_wins",
+          "sameNamePolicy": "coaxi_wins",
           "schemaVersion": 2,
           "servers": [],
           "warnings": []
@@ -2483,7 +2483,7 @@
           "configDigest": "sha256:1fd4cd4c18a168dbd74f22bef1061a988fb3e036986be7ec99245e4f58ece652",
           "configStatus": "ready",
           "projectionMode": "additive_per_run",
-          "sameNamePolicy": "rovai_wins",
+          "sameNamePolicy": "coaxi_wins",
           "schemaVersion": 2,
           "servers": [],
           "warnings": []
@@ -2561,7 +2561,7 @@
           "configDigest": "sha256:1fd4cd4c18a168dbd74f22bef1061a988fb3e036986be7ec99245e4f58ece652",
           "configStatus": "ready",
           "projectionMode": "additive_per_run",
-          "sameNamePolicy": "rovai_wins",
+          "sameNamePolicy": "coaxi_wins",
           "schemaVersion": 2,
           "servers": [],
           "warnings": []
@@ -2631,7 +2631,7 @@
           "configDigest": "sha256:1fd4cd4c18a168dbd74f22bef1061a988fb3e036986be7ec99245e4f58ece652",
           "configStatus": "ready",
           "projectionMode": "additive_per_run",
-          "sameNamePolicy": "rovai_wins",
+          "sameNamePolicy": "coaxi_wins",
           "schemaVersion": 2,
           "servers": [],
           "warnings": []
@@ -2729,7 +2729,7 @@
           "configDigest": "sha256:1fd4cd4c18a168dbd74f22bef1061a988fb3e036986be7ec99245e4f58ece652",
           "configStatus": "ready",
           "projectionMode": "additive_per_run",
-          "sameNamePolicy": "rovai_wins",
+          "sameNamePolicy": "coaxi_wins",
           "schemaVersion": 2,
           "servers": [],
           "warnings": []
@@ -2761,7 +2761,7 @@
           "configDigest": "sha256:1fd4cd4c18a168dbd74f22bef1061a988fb3e036986be7ec99245e4f58ece652",
           "configStatus": "ready",
           "projectionMode": "additive_per_run",
-          "sameNamePolicy": "rovai_wins",
+          "sameNamePolicy": "coaxi_wins",
           "schemaVersion": 2,
           "servers": [],
           "warnings": []
@@ -2785,7 +2785,7 @@
           "configDigest": "sha256:1fd4cd4c18a168dbd74f22bef1061a988fb3e036986be7ec99245e4f58ece652",
           "configStatus": "ready",
           "projectionMode": "additive_per_run",
-          "sameNamePolicy": "rovai_wins",
+          "sameNamePolicy": "coaxi_wins",
           "schemaVersion": 2,
           "servers": [],
           "warnings": []
@@ -2889,7 +2889,7 @@
           "configDigest": "sha256:1fd4cd4c18a168dbd74f22bef1061a988fb3e036986be7ec99245e4f58ece652",
           "configStatus": "ready",
           "projectionMode": "additive_per_run",
-          "sameNamePolicy": "rovai_wins",
+          "sameNamePolicy": "coaxi_wins",
           "schemaVersion": 2,
           "servers": [],
           "warnings": []
@@ -2937,7 +2937,7 @@
           "configDigest": "sha256:1fd4cd4c18a168dbd74f22bef1061a988fb3e036986be7ec99245e4f58ece652",
           "configStatus": "ready",
           "projectionMode": "additive_per_run",
-          "sameNamePolicy": "rovai_wins",
+          "sameNamePolicy": "coaxi_wins",
           "schemaVersion": 2,
           "servers": [],
           "warnings": []
@@ -3034,7 +3034,7 @@
           "configDigest": "sha256:1fd4cd4c18a168dbd74f22bef1061a988fb3e036986be7ec99245e4f58ece652",
           "configStatus": "ready",
           "projectionMode": "additive_per_run",
-          "sameNamePolicy": "rovai_wins",
+          "sameNamePolicy": "coaxi_wins",
           "schemaVersion": 2,
           "servers": [],
           "warnings": []

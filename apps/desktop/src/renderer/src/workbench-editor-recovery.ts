@@ -1,9 +1,9 @@
-import type { RovaiApi,WorkbenchEditorState } from '@contracts'
+import type { CoaxiApi,WorkbenchEditorState } from '@contracts'
 export interface EditorSaveRequest {operation:'save';scope:{threadId:string};editorId:string;workspaceRoot:string;expectedRevision:string|null;commandId:string;value:WorkbenchEditorState}
 export interface EditorRecoveryRecord {schemaVersion:1;key:string;editorId:string;workspaceRoot:string|null;revision:string|null;latest:WorkbenchEditorState|null;pending:EditorSaveRequest|null}
 export interface EditorRecoveryCopy {key:string;documentCount:number;paths:string[]}
-const DATABASE='codeg-rovai-workbench-editor-v1',STORE='records'
-type NativeRecovery=RovaiApi['workbenchEditorRecovery']
+const DATABASE='coaxi-editor-v1',STORE='records'
+type NativeRecovery=CoaxiApi['workbenchEditorRecovery']
 function record(value:unknown,key:string):EditorRecoveryRecord{
   const row=value as EditorRecoveryRecord
   if(!row||Object.keys(row).sort().join(',')!=='editorId,key,latest,pending,revision,schemaVersion,workspaceRoot'||row.schemaVersion!==1||row.key!==key||typeof row.editorId!=='string'||row.workspaceRoot!==null&&typeof row.workspaceRoot!=='string'||row.revision!==null&&typeof row.revision!=='string'||row.latest!==null&&(!row.latest||typeof row.latest!=='object')||row.pending!==null&&(!row.pending||typeof row.pending!=='object'))throw new Error('工程编辑恢复记录损坏，原记录仍保留。')

@@ -55,7 +55,7 @@ Rejected text.
 `;
 
 async function createFixtureRepo() {
-  const root = await mkdtemp(path.join(os.tmpdir(), "rovai-doc-decisions-"));
+  const root = await mkdtemp(path.join(os.tmpdir(), "coaxi-doc-decisions-"));
   for (const directory of [
     "docs/adr",
     "docs/architecture",

@@ -1,15 +1,15 @@
 import { writeFile } from 'node:fs/promises'
 
-const port = Number(process.env.ROVAI_DEBUG_PORT ?? 9223)
-const width = Number(process.env.ROVAI_CAPTURE_WIDTH ?? 1440)
-const height = Number(process.env.ROVAI_CAPTURE_HEIGHT ?? 920)
-const scale = Number(process.env.ROVAI_CAPTURE_SCALE ?? 1)
-const theme = process.env.ROVAI_CAPTURE_THEME ?? 'day'
-const createThread = process.env.ROVAI_ACCEPT_CREATE === '1'
-const enableOneClick = process.env.ROVAI_ACCEPT_ONE_CLICK === '1'
-const expectPreferenceFailure = process.env.ROVAI_ACCEPT_PREFERENCE_FAILURE === '1'
-const reducedMotion = process.env.ROVAI_REDUCED_MOTION === '1'
-const output = process.argv[2] ?? '/tmp/rovai-new-conversation.png'
+const port = Number(process.env.COAXI_DEBUG_PORT ?? 9223)
+const width = Number(process.env.COAXI_CAPTURE_WIDTH ?? 1440)
+const height = Number(process.env.COAXI_CAPTURE_HEIGHT ?? 920)
+const scale = Number(process.env.COAXI_CAPTURE_SCALE ?? 1)
+const theme = process.env.COAXI_CAPTURE_THEME ?? 'day'
+const createThread = process.env.COAXI_ACCEPT_CREATE === '1'
+const enableOneClick = process.env.COAXI_ACCEPT_ONE_CLICK === '1'
+const expectPreferenceFailure = process.env.COAXI_ACCEPT_PREFERENCE_FAILURE === '1'
+const reducedMotion = process.env.COAXI_REDUCED_MOTION === '1'
+const output = process.argv[2] ?? '/tmp/coaxi-new-conversation.png'
 
 if (!['day', 'night'].includes(theme)) throw new Error(`Unsupported theme: ${theme}`)
 if (!Number.isFinite(scale) || scale < 1) throw new Error(`Unsupported scale: ${scale}`)
@@ -17,7 +17,7 @@ if (!Number.isFinite(scale) || scale < 1) throw new Error(`Unsupported scale: ${
 const target = await waitForTarget(port)
 const cdp = await connectCdp(target.webSocketDebuggerUrl)
 try {
-  const originalPreferences = await evaluate(cdp, 'window.rovai.generalPreferences.get()')
+  const originalPreferences = await evaluate(cdp, 'window.coaxi.generalPreferences.get()')
   if (originalPreferences.oneClickNewConversationEnabled) throw new Error('Acceptance requires an isolated profile with one-click disabled')
   await cdp.send('Page.bringToFront')
   await cdp.send('Emulation.setDeviceMetricsOverride', {
@@ -33,7 +33,7 @@ try {
     }]
   })
   await cdp.send('Runtime.evaluate', {
-    expression: `window.rovai.appearance.setPreference(${JSON.stringify(theme)})`,
+    expression: `window.coaxi.appearance.setPreference(${JSON.stringify(theme)})`,
     awaitPromise: true,
     returnByValue: true
   })
@@ -318,7 +318,7 @@ try {
   if (enableOneClick) {
     await evaluate(cdp, `document.querySelector('.new-camp-quick-label input').click()`)
     await waitForExpression(cdp, `document.querySelector('.new-camp-quick-effective')?.textContent === '本次新建成功后生效'`, 5_000)
-    const beforeSubmit = await evaluate(cdp, 'window.rovai.generalPreferences.get()')
+    const beforeSubmit = await evaluate(cdp, 'window.coaxi.generalPreferences.get()')
     assertSamePreferences(beforeSubmit, originalPreferences, 'Checking alone must not save preferences')
   }
   await cdp.send('Page.bringToFront')
@@ -368,12 +368,12 @@ try {
     )
   }
 
-  const savedPreferences = await evaluate(cdp, 'window.rovai.generalPreferences.get()')
+  const savedPreferences = await evaluate(cdp, 'window.coaxi.generalPreferences.get()')
   if (createThread && enableOneClick && !expectPreferenceFailure) {
     const createdCamp = await evaluate(cdp, `(async () => {
       const target = document.querySelector('.camp-nav-row.selected')?.querySelector('[data-sidebar-menu-target]')?.dataset.sidebarMenuTarget
       if (!target?.startsWith('camp:')) throw new Error('Missing selected Camp identity')
-      return window.rovai.request('camps.open', { threadId: target.slice(5), traceId: crypto.randomUUID() })
+      return window.coaxi.request('camps.open', { threadId: target.slice(5), traceId: crypto.randomUUID() })
     })()`)
     if (savedPreferences.oneClickNewConversationEnabled !== true
       || savedPreferences.newConversationDefaultsRequireConfirmation !== false
@@ -394,7 +394,7 @@ try {
     await waitForExpression(cdp, `document.activeElement?.id === 'camp-message'`, 5_000)
     const nextCamp = await evaluate(cdp, `(async () => {
       const target = document.querySelector('.camp-nav-row.selected [data-sidebar-menu-target]').dataset.sidebarMenuTarget
-      return window.rovai.request('camps.open', { threadId: target.slice(5), traceId: crypto.randomUUID() })
+      return window.coaxi.request('camps.open', { threadId: target.slice(5), traceId: crypto.randomUUID() })
     })()`)
     if (nextCamp.messages.length !== 0 || nextCamp.agentRuns.length !== 0
       || nextCamp.thread.activationState !== 'pending'

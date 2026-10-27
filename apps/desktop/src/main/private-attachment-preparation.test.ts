@@ -10,7 +10,7 @@ const roots: string[] = []
 afterEach(async () => {
   for (const root of roots.splice(0)) {
     expect(dirname(root)).toBe(resolve(tmpdir()))
-    expect(basename(root)).toMatch(/^rovai-private-upload-test-/)
+    expect(basename(root)).toMatch(/^coaxi-private-upload-test-/)
     await rm(root, { recursive: true, force: true })
   }
 })
@@ -80,7 +80,7 @@ class Core {
   }
 }
 async function fixture() {
-  const root = resolve(await mkdtemp(join(tmpdir(), 'rovai-private-upload-test-')))
+  const root = resolve(await mkdtemp(join(tmpdir(), 'coaxi-private-upload-test-')))
   roots.push(root)
   const sourcePath = join(root, 'input.txt')
   await writeFile(sourcePath, 'input')

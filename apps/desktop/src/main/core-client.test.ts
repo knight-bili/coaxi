@@ -13,14 +13,14 @@ vi.mock('node:child_process', async (importOriginal) => ({
 vi.mock('electron', () => ({
   app: {
     isPackaged: false,
-    getPath: () => process.env.ROVAI_CORE_TEST_USER_DATA ?? tmpdir(),
+    getPath: () => process.env.COAXI_CORE_TEST_USER_DATA ?? tmpdir(),
     getAppPath: () => process.cwd()
   }
 }))
 
 import {
   CoreClient,
-  RovaiRequestError,
+  CoaxiRequestError,
   coreProcessHomeDirectory,
   coreStartupRetryDelay,
   coreLaunchArguments,
@@ -61,16 +61,16 @@ afterEach(() => {
   vi.useRealTimers()
   vi.restoreAllMocks()
   Object.defineProperty(process, 'platform', { configurable: true, value: originalPlatform })
-  delete process.env.ROVAI_CORE_BIN
-  delete process.env.ROVAI_CORE_TEST_USER_DATA
+  delete process.env.COAXI_CORE_BIN
+  delete process.env.COAXI_CORE_TEST_USER_DATA
   for (const root of temporaryRoots.splice(0)) rmSync(root, { recursive: true, force: true })
 })
 
 describe('CoreClient planned shutdown', () => {
   it('dispatches only channel operations without blocking Core replies and fences late callbacks after stop', async () => {
     useSupportedPosixHost()
-    const root = mkdtempSync(join(tmpdir(), 'rovai-channel-wire-')); temporaryRoots.push(root)
-    process.env.ROVAI_CORE_BIN = process.execPath
+    const root = mkdtempSync(join(tmpdir(), 'coaxi-channel-wire-')); temporaryRoots.push(root)
+    process.env.COAXI_CORE_BIN = process.execPath
     const child = Object.assign(new EventEmitter(), { stdin: new PassThrough(), stdout: new PassThrough(), stderr: new PassThrough(), kill: vi.fn(() => true), killed: false })
     vi.spyOn(childProcess, 'spawn').mockReturnValue(child as unknown as childProcess.ChildProcess)
     const frames: Array<{ id: number; method: string; params: unknown }> = []
@@ -123,7 +123,7 @@ describe('CoreClient planned shutdown', () => {
     { status: 'failed', authorityState: { kind: 'unknown' }, error: { code: 'authority_io_transient', message: 'Interrupted', retryable: true, details: { stage: 'database_admission' } } }
   ])('exhausts startup retries without consuming crash restarts or opening authority (%j)', async refusal => {
     useSupportedPosixHost()
-    const root = mkdtempSync(join(tmpdir(), 'rovai-core-startup-retry-'))
+    const root = mkdtempSync(join(tmpdir(), 'coaxi-core-startup-retry-'))
     temporaryRoots.push(root)
     const fakeCore = join(root, 'fake-core.sh')
     writeFileSync(fakeCore, `#!/bin/sh
@@ -131,7 +131,7 @@ printf '%s\\n' "$*" >> '${join(root, 'launches.txt')}'
 printf '%s\\n' '${JSON.stringify({ kind: 'core_startup', schemaVersion: 1, ...refusal })}'
 `)
     chmodSync(fakeCore, 0o700)
-    process.env.ROVAI_CORE_BIN = fakeCore
+    process.env.COAXI_CORE_BIN = fakeCore
     const client = new CoreClient(root)
     const snapshots: SupervisorSnapshot[] = []
     client.onSnapshot(snapshot => snapshots.push(snapshot))
@@ -155,9 +155,9 @@ printf '%s\\n' '${JSON.stringify({ kind: 'core_startup', schemaVersion: 1, ...re
     ['admitted', true], ['migration_required', true], ['confirmed_absent', false]
   ] as const)('retains the %s assessment across a later preparation failure', (kind, requiresExisting) => {
     useSupportedPosixHost()
-    const root = mkdtempSync(join(tmpdir(), 'rovai-core-preparation-fence-'))
+    const root = mkdtempSync(join(tmpdir(), 'coaxi-core-preparation-fence-'))
     temporaryRoots.push(root)
-    process.env.ROVAI_CORE_BIN = process.execPath
+    process.env.COAXI_CORE_BIN = process.execPath
     const children: Array<ReturnType<typeof fakeChild>> = []
     function fakeChild() {
       return Object.assign(new EventEmitter(), {
@@ -221,9 +221,9 @@ printf '%s\\n' '${JSON.stringify({ kind: 'core_startup', schemaVersion: 1, ...re
     expect(sidecarTargetKey('darwin', 'arm64')).toBe('macos-arm64')
     expect(sidecarTargetKey('darwin', 'x64')).toBe('macos-x64')
     expect(sidecarTargetKey('win32', 'x64')).toBe('windows-x64')
-    expect(() => sidecarTargetKey('win32', 'arm64')).toThrow('Unsupported Rovai sidecar host')
-    expect(sidecarExecutableName('rovai-core', 'darwin')).toBe('rovai-core')
-    expect(sidecarExecutableName('rovai-core', 'win32')).toBe('rovai-core.exe')
+    expect(() => sidecarTargetKey('win32', 'arm64')).toThrow('Unsupported Coaxi sidecar host')
+    expect(sidecarExecutableName('coaxi-core', 'darwin')).toBe('coaxi-core')
+    expect(sidecarExecutableName('coaxi-core', 'win32')).toBe('coaxi-core.exe')
   })
 
   it('passes an isolated Skill Library root to Core', () => {
@@ -238,25 +238,25 @@ printf '%s\\n' '${JSON.stringify({ kind: 'core_startup', schemaVersion: 1, ...re
     expect(coreProcessHomeDirectory('C:\\Users\\system', 'C:\\Temp\\home', 'win32')).toBe(
       'C:\\Users\\system'
     )
-    expect(desktopSkillLibraryRoot('/tmp/rovai-accept/user-data', true)).toBe(
-      join('/tmp/rovai-accept/user-data', 'managed-skill-library')
+    expect(desktopSkillLibraryRoot('/tmp/coaxi-accept/user-data', true)).toBe(
+      join('/tmp/coaxi-accept/user-data', 'managed-skill-library')
     )
     expect(desktopSkillLibraryRoot('/daily/user-data', false, 'darwin')).toBeNull()
     expect(desktopSkillLibraryRoot('C:\\Coaxi\\Core', false, 'win32')).toBe(
       'C:\\Coaxi\\Core\\managed-skill-library'
     )
     expect(coreLaunchArguments(
-      '/tmp/rovai-accept/user-data',
-      '/tmp/rovai-accept/runtime-files',
-      '/tmp/rovai-accept/user-data/managed-skill-library',
+      '/tmp/coaxi-accept/user-data',
+      '/tmp/coaxi-accept/runtime-files',
+      '/tmp/coaxi-accept/user-data/managed-skill-library',
       ['/tmp/removed-project']
     )).toEqual([
       '--data-dir',
-      '/tmp/rovai-accept/user-data',
+      '/tmp/coaxi-accept/user-data',
       '--runtime-camp-files-root',
-      '/tmp/rovai-accept/runtime-files',
+      '/tmp/coaxi-accept/runtime-files',
       '--skill-library-root',
-      '/tmp/rovai-accept/user-data/managed-skill-library',
+      '/tmp/coaxi-accept/user-data/managed-skill-library',
       '--removed-skill-project-root',
       '/tmp/removed-project'
     ])
@@ -273,12 +273,12 @@ printf '%s\\n' '${JSON.stringify({ kind: 'core_startup', schemaVersion: 1, ...re
       'win32'
     )).toBe('C:\\Coaxi\\Core\\runtime-files')
     const macRoot = runtimeThreadFilesRoot(
-      '/tmp/rovai-accept/user-data',
-      '/tmp/rovai-home',
+      '/tmp/coaxi-accept/user-data',
+      '/tmp/coaxi-home',
       'darwin'
     )
     expect(macRoot).toMatch(
-      /^\/tmp\/rovai-home\/\.rovai\/instances\/v1-[0-9a-f]{64}\/runtime-files$/
+      /^\/tmp\/coaxi-home\/\.coaxi\/instances\/v1-[0-9a-f]{64}\/runtime-files$/
     )
   })
 
@@ -286,7 +286,7 @@ printf '%s\\n' '${JSON.stringify({ kind: 'core_startup', schemaVersion: 1, ...re
     'reuses one Promise, keeps shutdown Main-only, and waits for the child exit',
     async () => {
       useSupportedPosixHost()
-      const root = mkdtempSync(join(tmpdir(), 'rovai-core-client-shutdown-'))
+      const root = mkdtempSync(join(tmpdir(), 'coaxi-core-client-shutdown-'))
       temporaryRoots.push(root)
       const fakeCore = join(root, 'fake-core.sh')
       writeFileSync(fakeCore, `#!/bin/sh
@@ -301,8 +301,8 @@ while IFS= read -r request; do
 done
 `)
       chmodSync(fakeCore, 0o700)
-      process.env.ROVAI_CORE_BIN = fakeCore
-      process.env.ROVAI_CORE_TEST_USER_DATA = root
+      process.env.COAXI_CORE_BIN = fakeCore
+      process.env.COAXI_CORE_TEST_USER_DATA = root
 
       const events: unknown[] = []
       const client = new CoreClient()
@@ -347,7 +347,7 @@ done
       useSupportedPosixHost()
       vi.useFakeTimers()
       vi.spyOn(console, 'error').mockImplementation(() => undefined)
-      const root = mkdtempSync(join(tmpdir(), 'rovai-core-client-sigterm-'))
+      const root = mkdtempSync(join(tmpdir(), 'coaxi-core-client-sigterm-'))
       temporaryRoots.push(root)
       const fakeCore = join(root, 'fake-core.sh')
       writeFileSync(fakeCore, `#!/bin/sh
@@ -360,8 +360,8 @@ while IFS= read -r request; do
 done
 `)
       chmodSync(fakeCore, 0o700)
-      process.env.ROVAI_CORE_BIN = fakeCore
-      process.env.ROVAI_CORE_TEST_USER_DATA = root
+      process.env.COAXI_CORE_BIN = fakeCore
+      process.env.COAXI_CORE_TEST_USER_DATA = root
 
       const client = new CoreClient()
       client.start()
@@ -384,7 +384,7 @@ done
       useSupportedPosixHost()
       vi.useFakeTimers()
       vi.spyOn(console, 'error').mockImplementation(() => undefined)
-      const root = mkdtempSync(join(tmpdir(), 'rovai-core-client-sigkill-'))
+      const root = mkdtempSync(join(tmpdir(), 'coaxi-core-client-sigkill-'))
       temporaryRoots.push(root)
       const fakeCore = join(root, 'fake-core.sh')
       writeFileSync(fakeCore, `#!/bin/sh
@@ -399,8 +399,8 @@ while IFS= read -r request; do
 done
 `)
       chmodSync(fakeCore, 0o700)
-      process.env.ROVAI_CORE_BIN = fakeCore
-      process.env.ROVAI_CORE_TEST_USER_DATA = root
+      process.env.COAXI_CORE_BIN = fakeCore
+      process.env.COAXI_CORE_TEST_USER_DATA = root
 
       const client = new CoreClient()
       const armed = new Promise<void>((resolve) => {
@@ -425,7 +425,7 @@ describe('CoreClient Supervisor protocol', () => {
     'caches the recovery boundary before readiness and orders suspend/resume controls',
     async () => {
       useSupportedPosixHost()
-      const root = mkdtempSync(join(tmpdir(), 'rovai-core-automation-resume-'))
+      const root = mkdtempSync(join(tmpdir(), 'coaxi-core-automation-resume-'))
       temporaryRoots.push(root)
       const launchPath = join(root, 'launch.txt')
       const requestPath = join(root, 'requests.jsonl')
@@ -445,8 +445,8 @@ printf '%s\n' '{"id":3,"result":{}}'
 while IFS= read -r request; do :; done
 `)
       chmodSync(fakeCore, 0o700)
-      process.env.ROVAI_CORE_BIN = fakeCore
-      process.env.ROVAI_CORE_TEST_USER_DATA = root
+      process.env.COAXI_CORE_BIN = fakeCore
+      process.env.COAXI_CORE_TEST_USER_DATA = root
 
       const client = new CoreClient(
         root,
@@ -493,7 +493,7 @@ while IFS= read -r request; do :; done
     'reuses the Desktop-owned recovery boundary when Core restarts',
     async () => {
       useSupportedPosixHost()
-      const root = mkdtempSync(join(tmpdir(), 'rovai-core-automation-restart-'))
+      const root = mkdtempSync(join(tmpdir(), 'coaxi-core-automation-restart-'))
       temporaryRoots.push(root)
       const launchPath = join(root, 'launches.txt')
       const fakeCore = join(root, 'fake-core.sh')
@@ -504,8 +504,8 @@ sleep 0.1
 exit 1
 `)
       chmodSync(fakeCore, 0o700)
-      process.env.ROVAI_CORE_BIN = fakeCore
-      process.env.ROVAI_CORE_TEST_USER_DATA = root
+      process.env.COAXI_CORE_BIN = fakeCore
+      process.env.COAXI_CORE_TEST_USER_DATA = root
 
       const client = new CoreClient(root, undefined, '2026-09-05T08:00:00.000Z')
       try {
@@ -532,10 +532,10 @@ exit 1
     'restarts a bootstrapping Core with a resume boundary that arrived before readiness',
     async () => {
       useSupportedPosixHost()
-      const root = mkdtempSync(join(tmpdir(), 'rovai-core-automation-bootstrap-resume-'))
+      const root = mkdtempSync(join(tmpdir(), 'coaxi-core-automation-bootstrap-resume-'))
       temporaryRoots.push(root)
-      process.env.ROVAI_CORE_BIN = process.execPath
-      process.env.ROVAI_CORE_TEST_USER_DATA = root
+      process.env.COAXI_CORE_BIN = process.execPath
+      process.env.COAXI_CORE_TEST_USER_DATA = root
       const children: Array<ReturnType<typeof fakeChild>> = []
       function fakeChild() {
         return Object.assign(new EventEmitter(), {
@@ -625,7 +625,7 @@ exit 1
     'publishes complete monotonic snapshots and enables authority only after ready',
     async () => {
       useSupportedPosixHost()
-      const root = mkdtempSync(join(tmpdir(), 'rovai-core-client-supervisor-'))
+      const root = mkdtempSync(join(tmpdir(), 'coaxi-core-client-supervisor-'))
       temporaryRoots.push(root)
       const fakeCore = join(root, 'fake-core.sh')
       writeFileSync(fakeCore, `#!/bin/sh
@@ -634,8 +634,8 @@ printf '%s\n' '{"kind":"core_startup","schemaVersion":1,"status":"ready","author
 while IFS= read -r request; do :; done
 `)
       chmodSync(fakeCore, 0o700)
-      process.env.ROVAI_CORE_BIN = fakeCore
-      process.env.ROVAI_CORE_TEST_USER_DATA = root
+      process.env.COAXI_CORE_BIN = fakeCore
+      process.env.COAXI_CORE_TEST_USER_DATA = root
 
       const client = new CoreClient()
       const snapshots: SupervisorSnapshot[] = []
@@ -665,7 +665,7 @@ while IFS= read -r request; do :; done
     'preserves domain rejection details across the Core boundary',
     async () => {
       useSupportedPosixHost()
-      const root = mkdtempSync(join(tmpdir(), 'rovai-core-client-domain-error-'))
+      const root = mkdtempSync(join(tmpdir(), 'coaxi-core-client-domain-error-'))
       temporaryRoots.push(root)
       const fakeCore = join(root, 'fake-core.sh')
       writeFileSync(fakeCore, `#!/bin/sh
@@ -675,8 +675,8 @@ while IFS= read -r request; do
 done
 `)
       chmodSync(fakeCore, 0o700)
-      process.env.ROVAI_CORE_BIN = fakeCore
-      process.env.ROVAI_CORE_TEST_USER_DATA = root
+      process.env.COAXI_CORE_BIN = fakeCore
+      process.env.COAXI_CORE_TEST_USER_DATA = root
 
       const client = new CoreClient()
       const ready = nextSnapshot(client, (snapshot) => snapshot.fullCoreState === 'ready')
@@ -684,7 +684,7 @@ done
       await ready
 
       const failure = await client.request('health.check').catch((error: unknown) => error)
-      expect(failure).toBeInstanceOf(RovaiRequestError)
+      expect(failure).toBeInstanceOf(CoaxiRequestError)
       expect(failure).toMatchObject({
         kind: 'domain_rejection',
         code: 'camp_not_open',
@@ -700,7 +700,7 @@ done
     'keeps authority ready with optional subsystem failures and clears them when Core stops',
     async () => {
       useSupportedPosixHost()
-      const root = mkdtempSync(join(tmpdir(), 'rovai-core-subsystems-'))
+      const root = mkdtempSync(join(tmpdir(), 'coaxi-core-subsystems-'))
       temporaryRoots.push(root)
       const fakeCore = join(root, 'fake-core.sh')
       writeFileSync(fakeCore, `#!/bin/sh
@@ -711,8 +711,8 @@ while IFS= read -r request; do
 done
 `)
       chmodSync(fakeCore, 0o700)
-      process.env.ROVAI_CORE_BIN = fakeCore
-      process.env.ROVAI_CORE_TEST_USER_DATA = root
+      process.env.COAXI_CORE_BIN = fakeCore
+      process.env.COAXI_CORE_TEST_USER_DATA = root
       const client = new CoreClient()
       try {
         const ready = nextSnapshot(client, (snapshot) => snapshot.fullCoreState === 'ready')
@@ -735,7 +735,7 @@ done
     'does not spend the crash budget on deterministic authority refusal',
     async () => {
       useSupportedPosixHost()
-      const root = mkdtempSync(join(tmpdir(), 'rovai-core-client-blocked-'))
+      const root = mkdtempSync(join(tmpdir(), 'coaxi-core-client-blocked-'))
       temporaryRoots.push(root)
       const fakeCore = join(root, 'fake-core.sh')
       writeFileSync(fakeCore, `#!/bin/sh
@@ -743,8 +743,8 @@ printf '%s\n' '{"kind":"core_startup","schemaVersion":1,"status":"blocked","phas
 sleep 0.2
 `)
       chmodSync(fakeCore, 0o700)
-      process.env.ROVAI_CORE_BIN = fakeCore
-      process.env.ROVAI_CORE_TEST_USER_DATA = root
+      process.env.COAXI_CORE_BIN = fakeCore
+      process.env.COAXI_CORE_TEST_USER_DATA = root
 
       const client = new CoreClient()
       const blocked = nextSnapshot(client, (snapshot) => snapshot.fullCoreState === 'blocked')

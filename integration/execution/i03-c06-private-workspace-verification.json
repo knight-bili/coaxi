@@ -67,7 +67,7 @@
         "status": "passed",
         "checks": [
           {
-            "name": "codeg_canvas_dock_viewport_keyboard_menus_and_minimap_toggle",
+            "name": "coaxi_canvas_dock_viewport_keyboard_menus_and_minimap_toggle",
             "passed": true
           },
           {
@@ -187,7 +187,7 @@
             "passed": true
           },
           {
-            "name": "real_creation_persists_one_empty_board_and_displays_codeg_canvas_chrome",
+            "name": "real_creation_persists_one_empty_board_and_displays_coaxi_canvas_chrome",
             "passed": true,
             "board_id": "75039751-7689-4577-aaf7-2b556f60739c"
           }
@@ -249,7 +249,7 @@
   "remaining": [
     "空私聊在恢复材料入口占位较多时仍有局部滚动；应按原内容布局继续核对空状态和恢复入口高度",
     "缩放/尺寸切换有ResizeObserver延迟通知，继续定位；功能断言通过不授予零控制台问题资格",
-    "Codeg列表真实缩略预览/节点数、日主题与完整八类创建/错误状态仍未取得全部资格",
+    "Coaxi列表真实缩略预览/节点数、日主题与完整八类创建/错误状态仍未取得全部资格",
     "C05同Thread多卡、焦点/编辑器/崩溃、规模与资源释放；本批只补了冷启动单卡及模式往返",
     "已准备Git工作区的真实Diff与PC01-PC24适用流程继续补证",
     "Mac/移动适用平台和真实模型流程仍按专用环境/身份/预算待办，最终MVP不豁免"

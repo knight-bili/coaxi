@@ -59,7 +59,7 @@ class Endpoint(BaseHTTPRequestHandler):
         self.wfile.write(body)
 
 
-with tempfile.TemporaryDirectory(prefix="rovai-claude-member-environment-") as directory:
+with tempfile.TemporaryDirectory(prefix="coaxi-claude-member-environment-") as directory:
     root = Path(directory).resolve()
     shared, home, workspace = [root / name for name in ("claude", "home", "workspace")]
     for path in (shared, home, workspace):

@@ -36,7 +36,7 @@ import type {
   MessageDeliveryView,
   NotificationActionView,
   NavigationSnapshot,
-  RovaiApi,
+  CoaxiApi,
   SupervisorSnapshot
 } from '@contracts'
 import {
@@ -335,7 +335,7 @@ describe('accepted Thread deletion tombstone', () => {
 describe('availability-first workspace gate', () => {
   it('covers the ordinary page frame with loading before the first Supervisor snapshot', () => {
     vi.stubGlobal('document', { documentElement: { dataset: {}, style: {} } })
-    vi.stubGlobal('window', { rovai: { platform: 'darwin' } })
+    vi.stubGlobal('window', { coaxi: { platform: 'darwin' } })
     try {
       const markup = renderToStaticMarkup(createElement(App))
       expect(markup).toContain('unified-sidebar')
@@ -627,7 +627,7 @@ describe('active Thread event invalidation', () => {
     expect(runningMarkup).toContain('status-running')
 
     const request = vi.fn()
-    const api: Pick<RovaiApi, 'request'> = {
+    const api: Pick<CoaxiApi, 'request'> = {
       async request<T>(method: CoreMethod, params?: unknown): Promise<T> {
         request(method, params)
         return projection('succeeded') as T
@@ -793,7 +793,7 @@ describe('Project directory selection', () => {
   })
 
   it('selects the Project without entering the new-conversation flow', async () => {
-    const workspace = { name: 'rovai-ai', projectPath: '/repo/rovai-ai' }
+    const workspace = { name: 'coaxi', projectPath: '/repo/coaxi' }
     const effects: unknown[] = []
 
     const outcome = await selectProjectDirectory(
@@ -804,8 +804,8 @@ describe('Project directory selection', () => {
 
     expect(outcome).toBe('selected')
     expect(effects).toEqual([
-      ['restore', '/repo/rovai-ai'],
-      ['select', { kind: 'directory', projectPath: '/repo/rovai-ai' }, workspace]
+      ['restore', '/repo/coaxi'],
+      ['select', { kind: 'directory', projectPath: '/repo/coaxi' }, workspace]
     ])
   })
 
@@ -1864,7 +1864,7 @@ describe('task event projections', () => {
       agentRuns: [run]
     } as unknown as ThreadSnapshot
     const request = vi.fn().mockResolvedValue(snapshot)
-    const client = { request } as Pick<RovaiApi, 'request'>
+    const client = { request } as Pick<CoaxiApi, 'request'>
 
     await expect(resolveNotificationAgentRun(client, 'thread-source', run.id, null)).resolves.toBe(run)
     expect(request).toHaveBeenCalledWith('threads.snapshot', { threadId: 'thread-source' })
@@ -3020,7 +3020,7 @@ describe('task event projections', () => {
         }]
       },
       projects: [{
-        projectKey: 'directory:/repo', name: 'rovai', projectPath: '/repo',
+        projectKey: 'directory:/repo', name: 'coaxi', projectPath: '/repo',
         lastActivityAt: '2026-07-22T00:00:01Z', lastActivityGlobalSequence: 10,
         totalCount: 1,
         recentThreads: [{
@@ -3073,7 +3073,7 @@ describe('task event projections', () => {
           }]
         },
         projects: [{
-          projectKey: 'directory:/repo', name: 'rovai-ai', projectPath: '/repo',
+          projectKey: 'directory:/repo', name: 'coaxi', projectPath: '/repo',
           lastActivityAt: '2026-07-22T00:00:01Z', lastActivityGlobalSequence: 12,
           totalCount: 1,
           recentThreads: [{
@@ -3129,15 +3129,15 @@ describe('task event projections', () => {
     expect(markup).toContain('M8.1 4.75h7.8c3.13 0 5.35 2.15 5.35 5.1')
     expect(markup).toContain('class="camp-unread-dot"')
     expect(markup).toContain('快速对话讨论')
-    expect(markup).toContain('rovai-ai')
+    expect(markup).toContain('coaxi')
     expect(markup).toContain(longTitle)
     expect(markup).toContain(`aria-label="【飞书话题】${longTitle}，有新回复"`)
     expect(markup).toContain(`title="【飞书话题】${longTitle} · 未读"`)
     expect(markup).toContain(`class="truncate">【飞书话题】${longTitle}</span>`)
     expect(markup).toContain('管理')
-    expect(markup).toContain('aria-label="管理项目“rovai-ai”"')
+    expect(markup).toContain('aria-label="管理项目“coaxi”"')
     expect(markup).toContain('aria-label="管理“快速对话讨论”"')
-    expect(markup).toContain('aria-label="在“rovai-ai”中新建对话"')
+    expect(markup).toContain('aria-label="在“coaxi”中新建对话"')
     expect(markup).toContain('aria-label="在“快速对话”中新建对话"')
     expect(markup).toContain('class="project-heading-row current-project"')
     expect(markup).toContain('class="project-select-row"')
@@ -3333,7 +3333,7 @@ describe('task event projections', () => {
         quickChat: { totalCount: 0, recentThreads: [] },
         projects: [{
           projectKey: 'directory:/repo',
-          name: 'rovai-ai',
+          name: 'coaxi',
           projectPath: '/repo',
           lastActivityAt: '2026-08-05T00:00:00Z',
           lastActivityGlobalSequence: 1,
@@ -3413,7 +3413,7 @@ describe('task event projections', () => {
         quickChat: { totalCount: 0, recentThreads: [] },
         projects: [{
           projectKey: 'directory:/repo',
-          name: 'rovai-ai',
+          name: 'coaxi',
           projectPath: '/repo',
           lastActivityAt: '2026-09-05T00:00:00Z',
           lastActivityGlobalSequence: 1,
@@ -4306,7 +4306,7 @@ describe('task event projections', () => {
     const workspaceProps: Parameters<typeof ThreadWorkspace>[0] = {
       snapshot: groupedSnapshot,
       executionPlacement: 'bottom',
-      projectName: 'Rovai',
+      projectName: 'Coaxi',
       agents: [profile],
       liveRuntimeEvents: [{
         id: 'live-2', agentRunId: 'run-muwa', eventType: 'agent.text.delta',
@@ -4508,7 +4508,7 @@ describe('task event projections', () => {
 
     const cachedPreviewMarkup = renderToStaticMarkup(createElement(ThreadWorkspace, {
       snapshot: groupedSnapshot,
-      projectName: 'Rovai',
+      projectName: 'Coaxi',
       agents: [profile],
       busy: false,
       onSend: async () => undefined,
@@ -4525,7 +4525,7 @@ describe('task event projections', () => {
 
     const inspectorMarkup = renderToStaticMarkup(createElement(ThreadWorkspace, {
       snapshot: groupedSnapshot,
-      projectName: 'Rovai',
+      projectName: 'Coaxi',
       agents: [profile],
       busy: false,
       onSend: async () => undefined,
@@ -4558,7 +4558,7 @@ describe('task event projections', () => {
           endedAt: run.endedAt ?? '2026-07-28T05:31:00Z'
         }))
       },
-      projectName: 'Rovai',
+      projectName: 'Coaxi',
       agents: [profile],
       busy: false,
       onSend: async () => undefined,
@@ -4575,7 +4575,7 @@ describe('task event projections', () => {
     const ordinaryInspectorMarkup = renderToStaticMarkup(createElement(ThreadWorkspace, {
       snapshot,
       executionPlacement: 'bottom',
-      projectName: 'Rovai',
+      projectName: 'Coaxi',
       agents: [profile],
       busy: false,
       onSend: async () => undefined,
@@ -4655,7 +4655,7 @@ describe('task event projections', () => {
           occurredAt: '2026-07-28T05:00:06Z'
         }]
       },
-      projectName: 'Rovai',
+      projectName: 'Coaxi',
       agents: [profile],
       liveRuntimeEvents: [],
       busy: false,
@@ -4675,7 +4675,7 @@ describe('task event projections', () => {
 
     const cancellingMarkup = renderToStaticMarkup(createElement(ThreadWorkspace, {
       snapshot,
-      projectName: 'Rovai',
+      projectName: 'Coaxi',
       agents: [profile],
       liveRuntimeEvents: [],
       busy: false,
@@ -4727,7 +4727,7 @@ describe('task event projections', () => {
           endedAt: '2026-07-28T05:02:00Z'
         }))
       },
-      projectName: 'Rovai',
+      projectName: 'Coaxi',
       agents: [profile],
       busy: false,
       onSend: async () => undefined,
@@ -4771,7 +4771,7 @@ describe('task event projections', () => {
           endedAt: '2026-07-28T05:02:00Z'
         }))
       },
-      projectName: 'Rovai',
+      projectName: 'Coaxi',
       agents: [profile],
       liveRuntimeEvents: [],
       busy: false,
@@ -4816,7 +4816,7 @@ describe('task event projections', () => {
           createdAt: '2026-07-28T05:00:05Z'
         }]
       },
-      projectName: 'Rovai',
+      projectName: 'Coaxi',
       agents: [profile],
       busy: false,
       onSend: async () => undefined,
@@ -4855,7 +4855,7 @@ describe('task event projections', () => {
         })),
         timeline: []
       },
-      projectName: 'Rovai',
+      projectName: 'Coaxi',
       agents: [profile],
       busy: false,
       onSend: async () => undefined,
@@ -6270,7 +6270,7 @@ describe('task event projections', () => {
     expect(markup).toContain('请稍后重试。')
     expect(markup).not.toContain('Claude Code 返回错误')
     expect(markup).not.toContain('请求受到速率限制')
-    expect(markup).not.toContain('Rovai 内部错误')
+    expect(markup).not.toContain('Coaxi 内部错误')
 
     const positionedMarkup = renderToStaticMarkup(createElement(RunExecutionDisclosure, {
       run,
@@ -6730,7 +6730,7 @@ describe('task event projections', () => {
       { iconKind: 'file-write' as const, activityDomain: 'file' },
       { iconKind: 'web' as const, activityDomain: 'tool' },
       { iconKind: 'tool' as const, activityDomain: 'tool' },
-      { iconKind: 'rovai' as const, activityDomain: 'tool' },
+      { iconKind: 'coaxi' as const, activityDomain: 'tool' },
       { iconKind: 'runtime' as const, activityDomain: 'runtime' },
       { iconKind: 'unknown' as const, activityDomain: 'unknown' }
     ]
@@ -6792,7 +6792,7 @@ describe('task event projections', () => {
       payload: {
         toolCallId: 'toolu-claude-bash', status: 'pending', kind: 'execute',
         toolName: 'Bash', title: 'Bash',
-        input: "printf '%s\\n' 'ROVAI_CLAUDE_EMPTY_OUTPUT_OK'"
+        input: "printf '%s\\n' 'COAXI_CLAUDE_EMPTY_OUTPUT_OK'"
       },
       canonical: canonicalActivity('toolu-claude-bash', {
         activityDomain: 'shell', semanticKind: 'shell.execute',
@@ -6804,7 +6804,7 @@ describe('task event projections', () => {
       payload: {
         toolCallId: 'toolu-claude-bash', status: 'completed', kind: 'execute',
         toolName: 'Bash', title: 'Bash',
-        input: "printf '%s\\n' 'ROVAI_CLAUDE_EMPTY_OUTPUT_OK'", output: null
+        input: "printf '%s\\n' 'COAXI_CLAUDE_EMPTY_OUTPUT_OK'", output: null
       },
       canonical: canonicalActivity('toolu-claude-bash', {
         activityDomain: 'shell', semanticKind: 'shell.execute',
@@ -6816,15 +6816,15 @@ describe('task event projections', () => {
     expect(progress.items[0]).toMatchObject({
       kind: 'tool',
       step: {
-        title: "printf '%s\\n' 'ROVAI_CLAUDE_EMPTY_OUTPUT_OK'",
-        publicCommand: "printf '%s\\n' 'ROVAI_CLAUDE_EMPTY_OUTPUT_OK'",
+        title: "printf '%s\\n' 'COAXI_CLAUDE_EMPTY_OUTPUT_OK'",
+        publicCommand: "printf '%s\\n' 'COAXI_CLAUDE_EMPTY_OUTPUT_OK'",
         status: 'completed'
       }
     })
     const item = progress.items[0]
     if (item.kind !== 'tool') throw new Error('Expected Claude Bash tool progress')
     expect(item.step.detail).toBe(
-      "$ printf '%s\\n' 'ROVAI_CLAUDE_EMPTY_OUTPUT_OK'"
+      "$ printf '%s\\n' 'COAXI_CLAUDE_EMPTY_OUTPUT_OK'"
     )
 
     const run: AgentRunView = {
@@ -6852,9 +6852,9 @@ describe('task event projections', () => {
     expect(markup).toContain('class="tool-call-state status-completed"')
     expect(markup).toContain('aria-label="成功"')
     expect(markup).not.toContain('tool-call-result-scroll')
-    expect(markup).not.toContain('ROVAI_CLAUDE_EMPTY_OUTPUT_OK</pre>')
+    expect(markup).not.toContain('COAXI_CLAUDE_EMPTY_OUTPUT_OK</pre>')
     expect(markup).toContain(
-      'class="tool-call-title" title="printf &#x27;%s\\n&#x27; &#x27;ROVAI_CLAUDE_EMPTY_OUTPUT_OK&#x27;"'
+      'class="tool-call-title" title="printf &#x27;%s\\n&#x27; &#x27;COAXI_CLAUDE_EMPTY_OUTPUT_OK&#x27;"'
     )
     expect(markup).not.toContain('tool-output-copy-button')
     expect(markup).not.toContain('>已完成<')
@@ -7045,7 +7045,7 @@ describe('task event projections', () => {
         runtimeFileOperation: {
           schemaVersion: 2,
           status: 'available', operationKind: 'write',
-          path: 'rovai-runtime-validation/qoder-cli.txt'
+          path: 'coaxi-runtime-validation/qoder-cli.txt'
         }
       },
       canonical: canonicalActivity('qoder-edit', {
@@ -7175,9 +7175,9 @@ describe('task event projections', () => {
         adapter: 'codex-cli',
         canonical: genericShell,
         payload: codexPayload(
-          "/bin/zsh -lc 'rovai camp read --help && rovai camp read --camp-id rvcamp_example'"
+          "/bin/zsh -lc 'coaxi camp read --help && coaxi camp read --camp-id rvcamp_example'"
         ),
-        expected: 'rovai camp read --help && rovai camp read --camp-id rvcamp_example'
+        expected: 'coaxi camp read --help && coaxi camp read --camp-id rvcamp_example'
       },
       { adapter: 'opencode-cli', canonical: { ...genericShell, presentationHint: 'Run fixed printf' }, payload: {}, expected: 'Run fixed printf' },
       { adapter: 'copilot-cli', canonical: { ...genericShell, presentationHint: 'Inspect attachment file' }, payload: {}, expected: 'Inspect attachment file' },
@@ -7264,26 +7264,26 @@ describe('task event projections', () => {
       }
     })
     expect(executionActivityTitle(genericShell, codexPayload(
-      `/bin/zsh -lc "rovai send --public-only --body 'TOP_SECRET_ARGUMENT'"`
-    ))).toBe("rovai send --public-only --body 'TOP_SECRET_ARGUMENT'")
+      `/bin/zsh -lc "coaxi send --public-only --body 'TOP_SECRET_ARGUMENT'"`
+    ))).toBe("coaxi send --public-only --body 'TOP_SECRET_ARGUMENT'")
     expect(executionActivityTitle(genericShell, codexPayload(
-      `/bin/zsh -lc 'rovai --help'`
-    ))).toBe('rovai --help')
+      `/bin/zsh -lc 'coaxi --help'`
+    ))).toBe('coaxi --help')
     expect(executionActivityTitle(genericShell, codexPayload(
-      `/bin/zsh -lc 'rovai send --help'`
-    ))).toBe('rovai send --help')
+      `/bin/zsh -lc 'coaxi send --help'`
+    ))).toBe('coaxi send --help')
     expect(executionActivityTitle(genericShell, codexPayload(
       `rg --help /private/project/path`
     ))).toBe('rg --help /private/project/path')
     expect(executionActivityTitle(genericShell, codexPayload(
-      `rovai send --body '--help'`
-    ))).toBe("rovai send --body '--help'")
+      `coaxi send --body '--help'`
+    ))).toBe("coaxi send --body '--help'")
     expect(executionActivityTitle(genericShell, codexPayload(
-      `rovai send 'TOP_SECRET_POSITIONAL_BODY'`
-    ))).toBe("rovai send 'TOP_SECRET_POSITIONAL_BODY'")
+      `coaxi send 'TOP_SECRET_POSITIONAL_BODY'`
+    ))).toBe("coaxi send 'TOP_SECRET_POSITIONAL_BODY'")
     expect(executionActivityTitle(genericShell, codexPayload(
-      `rovai camp TOP_SECRET_UNKNOWN_ACTION`
-    ))).toBe('rovai camp TOP_SECRET_UNKNOWN_ACTION')
+      `coaxi camp TOP_SECRET_UNKNOWN_ACTION`
+    ))).toBe('coaxi camp TOP_SECRET_UNKNOWN_ACTION')
     expect(executionActivityTitle(genericShell, codexPayload(
       `git status && git checkout feature/command-preview && git rebase main`
     ))).toBe('git status && git checkout feature/command-preview && git rebase main')
@@ -7322,17 +7322,17 @@ describe('task event projections', () => {
   })
 
   it('derives the converged icon from canonical identity instead of display text', () => {
-    expect(activityIconKind(canonicalActivity('shell-rovai', {
-      activityDomain: 'shell', semanticKind: 'shell.execute', toolName: 'rovai',
+    expect(activityIconKind(canonicalActivity('shell-coaxi', {
+      activityDomain: 'shell', semanticKind: 'shell.execute', toolName: 'coaxi',
       sourceAuthority: 'core', credibility: 'core_verified'
     }))).toBe('terminal')
     expect(activityIconKind(canonicalActivity('web', {
       activityDomain: 'tool', semanticKind: 'tool.web.search', toolName: 'web_search'
     }))).toBe('web')
-    expect(activityIconKind(canonicalActivity('rovai', {
+    expect(activityIconKind(canonicalActivity('coaxi', {
       activityDomain: 'tool', semanticKind: 'tool.call', toolName: 'thread.read',
       sourceAuthority: 'core', credibility: 'core_verified'
-    }))).toBe('rovai')
+    }))).toBe('coaxi')
     expect(activityIconKind(canonicalActivity('search', {
       activityDomain: 'tool', semanticKind: 'tool.search', toolName: 'search'
     }))).toBe('tool')
@@ -7475,7 +7475,7 @@ describe('task event projections', () => {
         schemaVersion: 2,
         status: 'available',
         operationKind: 'write',
-        path: 'rovai-runtime-validation/qoder-cli.txt'
+        path: 'coaxi-runtime-validation/qoder-cli.txt'
       }
     })).toBe('编辑 qoder-cli.txt')
     expect(executionActivityTitle(canonicalActivity('file-add', {
@@ -7757,7 +7757,7 @@ describe('task event projections', () => {
         aggregatedOutput: '\u001b[31mfull diff\u001b[0m\nsecond line',
         exitCode: 0
       },
-      _rovaiTruncated: true
+      _coaxiTruncated: true
     })).toBe('$ git diff\nfull diff\nsecond line')
     expect(executionEvidenceResultText('activity.completed', {
       item: {
@@ -8215,8 +8215,8 @@ describe('task event projections', () => {
     ['windows-x64', 'Windows x64']
   ] as const)('renders platform-aware product copy and checks on %s', (hostPlatform, platformLabel) => {
     const health: HealthStatus = {
-      core: { ok: true, version: '0.0.1', dataDir: '/tmp/rovai' },
-      database: { ok: true, path: '/tmp/rovai/rovai.db' },
+      core: { ok: true, version: '0.0.1', dataDir: '/tmp/coaxi' },
+      database: { ok: true, path: '/tmp/coaxi/coaxi.db' },
       git: { installed: true, version: 'git version 2.0' },
       hostPlatform,
       runtimeCatalog: [],
@@ -8276,7 +8276,7 @@ describe('task event projections', () => {
     expect(markup).toContain('Claude Code 返回错误')
     expect(markup).toContain('Claude Code 尚未登录')
     expect(markup).toContain('请先在终端完成 Claude Code 登录。')
-    expect(markup).not.toContain('Rovai 内部错误')
+    expect(markup).not.toContain('Coaxi 内部错误')
     expect(markup).toContain('未检测到')
     expect(markup).not.toContain('已找到')
     expect(markup).not.toContain('尚未检查')
@@ -8335,7 +8335,7 @@ describe('task event projections', () => {
   it('renders Windows not-qualified rows without machine checks or rescan actions', () => {
     const health: HealthStatus = {
       core: { ok: true, version: '0.0.1', dataDir: 'C:\\Users\\test\\AppData\\Local\\Coaxi' },
-      database: { ok: true, path: 'C:\\Users\\test\\AppData\\Local\\Coaxi\\Core\\rovai.db' },
+      database: { ok: true, path: 'C:\\Users\\test\\AppData\\Local\\Coaxi\\Core\\coaxi.db' },
       git: { installed: true, version: 'git version 2.0' },
       hostPlatform: 'windows-x64',
       runtimeCatalog: [],

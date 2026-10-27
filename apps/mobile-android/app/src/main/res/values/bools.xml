@@ -2,7 +2,7 @@
 <resources>
     <!-- Light system-bar icons (dark glyphs) over the light launch window. Overridden
          to false in values-night so the dark launch window gets light glyphs. Only
-         governs the brief launch frame; once Compose runs, CodegTheme drives the
+         governs the brief launch frame; once Compose runs, CoaxiTheme drives the
          system-bar contrast from the resolved in-app appearance. -->
     <bool name="window_light_system_bars">true</bool>
 </resources>

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "date": "2026-09-14",
-  "scope": "Upstream native CLI probes only; no Rovai Host or Server execution on DMIT yet",
+  "scope": "Upstream native CLI probes only; no Coaxi Host or Server execution on DMIT yet",
   "sourceCommit": "bda1ab832d48229a4b91c2530a599b32029827cc",
   "machine": {
     "provider": "DMIT",
@@ -66,7 +66,7 @@
         "turn.completed",
         "turn.started"
       ],
-      "rovaiIntegration": false,
+      "coaxiIntegration": false,
       "toolFileMarkerMatches": true,
       "exactTrailingNewline": true
     },
@@ -87,7 +87,7 @@
         "system",
         "user"
       ],
-      "rovaiIntegration": false,
+      "coaxiIntegration": false,
       "toolFileMarkerMatches": true,
       "exactTrailingNewline": true
     },
@@ -116,7 +116,7 @@
         "turn_end",
         "turn_start"
       ],
-      "rovaiIntegration": false,
+      "coaxiIntegration": false,
       "toolFileMarkerMatches": true,
       "exactTrailingNewline": true
     },
@@ -137,7 +137,7 @@
         "text",
         "tool_use"
       ],
-      "rovaiIntegration": false,
+      "coaxiIntegration": false,
       "toolFileMarkerMatches": true,
       "exactTrailingNewline": false
     },
@@ -171,7 +171,7 @@
         "tool.execution_start",
         "user.message"
       ],
-      "rovaiIntegration": false,
+      "coaxiIntegration": false,
       "toolFileMarkerMatches": true,
       "exactTrailingNewline": false
     },
@@ -192,7 +192,7 @@
         "stream_event",
         "system"
       ],
-      "rovaiIntegration": false,
+      "coaxiIntegration": false,
       "toolFileMarkerMatches": false,
       "exactTrailingNewline": false,
       "providerFailure": "MiniMax Chat Completions: HTTP 400 invalid params, function parameters is empty (2013). CLI incorrectly returned success; no tool file produced. Anthropic protocol has not been retested."

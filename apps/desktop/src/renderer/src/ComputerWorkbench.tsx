@@ -34,7 +34,7 @@ function LevelControl({value,onChange,disabled,label}:{value:Level;onChange(leve
   return <div className="workbench-share-level" role="group" aria-label={label}>{(['none','read','control'] as const).map(level=><button type="button" key={level} data-level={level} aria-pressed={value===level} disabled={disabled} onClick={()=>onChange(level)}>{t(level==='none'?'不共享':level==='read'?'可读取':'可操作')}</button>)}</div>
 }
 
-// Codeg ComputerWindowPicker: previews, process/app groups, level controls and bounded scrolling.
+// Coaxi ComputerWindowPicker: previews, process/app groups, level controls and bounded scrolling.
 // Each request still belongs to this thread's local computer service.
 export function ComputerWorkbench({threadId}:{threadId:string}):React.JSX.Element {
   const api=useThreadClient().computerWorkspace,t=useUiText(),bulkCancelled=useRef(false)

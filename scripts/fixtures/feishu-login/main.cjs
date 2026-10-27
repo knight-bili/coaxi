@@ -6,7 +6,7 @@ const [fixture] = process.argv.slice(2)
 assert.ok(isAbsolute(fixture))
 app.setPath('userData', join(fixture, 'user-data'))
 app.setPath('sessionData', join(fixture, 'session-data'))
-app.setName('Rovai Feishu Login Acceptance')
+app.setName('Coaxi Feishu Login Acceptance')
 const { ElectronFeishuDeveloperSessionService, FeishuLoginProtocol, FeishuSessionHttp, requestInFeishuSession } = require(join(fixture, 'service.cjs'))
 const calls = []
 const jars = []
@@ -86,7 +86,7 @@ app.whenReady().then(async () => {
   await service.disconnect()
   await restored.disconnect()
   let liveProbe = null
-  if (process.env.ROVAI_FEISHU_LIVE_PROBE === '1') {
+  if (process.env.COAXI_FEISHU_LIVE_PROBE === '1') {
     const jar = session.fromPartition('feishu-anonymous-live-probe', { cache: false })
     jar.protocol.unhandle('https')
     try {
@@ -100,7 +100,7 @@ app.whenReady().then(async () => {
     } finally { await jar.clearStorageData() }
   }
   parent = new BrowserWindow({ show: false, width: 1040, height: 700, useContentSize: true,
-    title: 'Rovai 飞书登录 · 自动验收（无需扫码）',
+    title: 'Coaxi 飞书登录 · 自动验收（无需扫码）',
     webPreferences: { sandbox: true, contextIsolation: true, nodeIntegration: false, backgroundThrottling: false } })
   await parent.loadFile(join(fixture, 'renderer/index.html'))
   const cases = await parent.webContents.executeJavaScript('window.feishuLoginTest.run(' + JSON.stringify(qr) + ')')

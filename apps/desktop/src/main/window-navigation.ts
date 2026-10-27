@@ -5,6 +5,6 @@ export function installWindowNavigation(window: BrowserWindow, platform: NodeJS.
   if (platform === 'darwin') window.on('swipe', (event, direction) => {
     if (direction !== 'right' && direction !== 'left') return
     event.preventDefault()
-    window.webContents.send('rovai:navigation-requested', direction === 'right' ? 'back' : 'forward')
+    window.webContents.send('coaxi:navigation-requested', direction === 'right' ? 'back' : 'forward')
   })
 }

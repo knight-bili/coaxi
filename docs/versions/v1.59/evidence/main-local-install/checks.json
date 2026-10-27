@@ -8,8 +8,8 @@
     {
       "command": "git pull --ff-only origin main",
       "status": "passed",
-      "checkout": "/Users/murray.xue/VSCodeProjects/opensource/rovai-ai",
-      "result": "Already up to date; merged origin/main into rovai/unified-rust-host without conflict"
+      "checkout": "/Users/murray.xue/VSCodeProjects/opensource/coaxi",
+      "result": "Already up to date; merged origin/main into coaxi/unified-rust-host without conflict"
     },
     {
       "command": "pnpm typecheck",
@@ -19,14 +19,14 @@
       "command": "pnpm test (first run)",
       "status": "failed",
       "failure": "evaluation-host.test.ts:93 polling for completed still received running during concurrent release compilation; 2023 other Vitest tests passed",
-      "log": "/tmp/rovai-main-install-tests-20260914.log"
+      "log": "/tmp/coaxi-main-install-tests-20260914.log"
     },
     {
       "command": "pnpm exec vitest run apps/desktop/src/main/evaluation-host.test.ts",
       "status": "passed",
       "passed": 4,
       "implementationOrAssertionChanged": false,
-      "log": "/tmp/rovai-main-install-evaluation-retry-20260914.log"
+      "log": "/tmp/coaxi-main-install-evaluation-retry-20260914.log"
     },
     {
       "command": "pnpm test (full retry)",
@@ -35,7 +35,7 @@
       "vitestPassed": 2024,
       "nodePassed": 317,
       "nodePlatformSkipped": 2,
-      "log": "/tmp/rovai-main-install-tests-retry-20260914.log"
+      "log": "/tmp/coaxi-main-install-tests-retry-20260914.log"
     },
     {
       "command": "pnpm package:mac:daily",
@@ -44,18 +44,18 @@
       "signature": "ad-hoc",
       "includes": [
         "App",
-        "rovai-host",
-        "rovai-core",
-        "rovai",
+        "coaxi-host",
+        "coaxi-core",
+        "coaxi",
         "138 Web files"
       ],
-      "log": "/tmp/rovai-main-install-package-20260914.log"
+      "log": "/tmp/coaxi-main-install-package-20260914.log"
     },
     {
-      "command": "node /tmp/rovai-main-install-acceptance-20260914.mjs",
+      "command": "node /tmp/coaxi-main-install-acceptance-20260914.mjs",
       "status": "passed",
       "evidence": "validation.json",
-      "log": "/tmp/rovai-main-install-acceptance-20260914.log"
+      "log": "/tmp/coaxi-main-install-acceptance-20260914.log"
     },
     {
       "command": "pnpm test:rust:pr",
@@ -64,12 +64,12 @@
       "coreExistingManualIgnored": 6,
       "cliPassed": 35,
       "slowIntegrationPassed": 310,
-      "log": "/tmp/rovai-main-install-rust-20260914.log"
+      "log": "/tmp/coaxi-main-install-rust-20260914.log"
     },
     {
       "command": "cargo clippy --workspace --all-targets -- -D warnings",
       "status": "passed",
-      "log": "/tmp/rovai-main-install-clippy-20260914.log"
+      "log": "/tmp/coaxi-main-install-clippy-20260914.log"
     },
     {
       "command": "cargo fmt --all -- --check",
@@ -83,18 +83,18 @@
     {
       "command": "pnpm docs:check",
       "status": "passed",
-      "log": "/tmp/rovai-main-install-docs-20260914.log"
+      "log": "/tmp/coaxi-main-install-docs-20260914.log"
     },
     {
       "command": "pnpm install:mac:daily --backup <recorded path>",
       "status": "passed",
       "evidence": "installation.json",
-      "log": "/tmp/rovai-main-install-promote-20260914.log"
+      "log": "/tmp/coaxi-main-install-promote-20260914.log"
     },
     {
       "command": "DOCS_BASE_REF=c9acdee3597a9f8beeee6b6fac51f5258a8fe574 pnpm docs:check:ci",
       "status": "passed",
-      "log": "/tmp/rovai-main-install-docs-ci-20260914.log"
+      "log": "/tmp/coaxi-main-install-docs-ci-20260914.log"
     }
   ],
   "limits": [

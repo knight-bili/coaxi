@@ -23,7 +23,7 @@ describe('interface language', () => {
     const { translateUi } = await import('./interface-language')
     expect(translateUi('en', '使用这台电脑上已安装的智能体，为{0}提供模型与工具。', 'Dingding'))
       .toBe('Choose an installed Agent to give Dingding access to models and tools.')
-    expect(translateUi('zh-CN', '欢迎来到 Rovai')).toBe('欢迎来到 Rovai')
+    expect(translateUi('zh-CN', '欢迎来到 Coaxi')).toBe('欢迎来到 Coaxi')
   })
 
   it('keeps the last saved choice after a newer save fails', async () => {

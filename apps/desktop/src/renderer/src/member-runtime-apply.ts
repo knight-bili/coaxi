@@ -1,5 +1,5 @@
 import type {
-  AgentProfile, HostPlatformKey, MemberRuntimeConfiguration, RovaiApi,
+  AgentProfile, HostPlatformKey, MemberRuntimeConfiguration, CoaxiApi,
   RuntimePlatformAdmission, StoredCommandResult
 } from '@contracts'
 import { persistedRuntimeConfigurationKey } from './member-runtime-conflict'
@@ -48,7 +48,7 @@ export function runtimeApplyEligibility(
 export async function applyRuntimeToMember(
   member: AgentProfile,
   configuration: MemberRuntimeConfiguration,
-  request: RovaiApi['request']
+  request: CoaxiApi['request']
 ): Promise<RuntimeApplyResult> {
   try {
     const command = {

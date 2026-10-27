@@ -71,7 +71,7 @@ jobs:
 
       - name: Run real Electron integration suite
         env:
-          ROVAI_REQUIRE_ELECTRON_INTEGRATION: '1'
+          COAXI_REQUIRE_ELECTRON_INTEGRATION: '1'
         run: xvfb-run -a pnpm test:desktop:integration
 
   desktop-windows:
@@ -95,15 +95,15 @@ jobs:
         run: pnpm exec vitest run apps/desktop/src/main/windows-window-close.test.ts apps/desktop/src/main/window-close-preferences.test.ts apps/desktop/src/main/window-close-ipc.test.ts apps/desktop/src/preload/window-close-api.test.ts apps/desktop/src/main/app-quit-coordinator.test.ts apps/desktop/src/main/app-updates.test.ts
       - name: Exercise Windows close choice and native tray
         env:
-          ROVAI_REQUIRE_ELECTRON_INTEGRATION: '1'
+          COAXI_REQUIRE_ELECTRON_INTEGRATION: '1'
         run: pnpm test:windows-close
       - name: Preserve standalone window close
         env:
-          ROVAI_REQUIRE_ELECTRON_INTEGRATION: '1'
+          COAXI_REQUIRE_ELECTRON_INTEGRATION: '1'
         run: pnpm test:window-close
       - name: Verify the isolated production bridge
         env:
-          ROVAI_REQUIRE_ELECTRON_INTEGRATION: '1'
+          COAXI_REQUIRE_ELECTRON_INTEGRATION: '1'
         run: pnpm test:desktop-bridge
 
   rust-full:
@@ -198,87 +198,87 @@ jobs:
 
       - name: Exercise Windows managed process ownership
         run: >-
-          cargo test -p rovai-core --lib
+          cargo test -p coaxi-core --lib
           --target x86_64-pc-windows-msvc
           managed_process
 
       - name: Exercise Windows Fleet cleanup receipts
         run: >-
-          cargo test -p rovai-core --lib --features extended-tests
+          cargo test -p coaxi-core --lib --features extended-tests
           --target x86_64-pc-windows-msvc runtime_fleet::tests::
 
       - name: Exercise Windows Codex release policy
         run: >-
-          cargo test -p rovai-core --lib --features extended-tests
+          cargo test -p coaxi-core --lib --features extended-tests
           --target x86_64-pc-windows-msvc codex::tests::
 
       - name: Exercise Windows Claude settings files and resume
         run: >-
-          cargo test -p rovai-core --lib --features extended-tests
+          cargo test -p coaxi-core --lib --features extended-tests
           --target x86_64-pc-windows-msvc claude::tests:: -- --test-threads=2
 
       - name: Exercise Windows OpenCode compaction plugin installation
         run: >-
-          cargo test -p rovai-core --lib --features extended-tests
+          cargo test -p coaxi-core --lib --features extended-tests
           --target x86_64-pc-windows-msvc acp::compaction_detector_tests::
 
       - name: Exercise Windows private storage admission
         run: >-
-          cargo test -p rovai-core --lib
+          cargo test -p coaxi-core --lib
           --target x86_64-pc-windows-msvc
           core_data_dir_lock
 
       - name: Exercise Windows data-root layout
         run: >-
-          cargo test -p rovai-core --all-targets
+          cargo test -p coaxi-core --all-targets
           --target x86_64-pc-windows-msvc
           windows_data_root
 
       - name: Exercise Core-independent Windows bootstrap storage
         run: >-
-          cargo test -p rovai-core --all-targets
+          cargo test -p coaxi-core --all-targets
           --target x86_64-pc-windows-msvc
           windows_bootstrap_root
 
       - name: Exercise Windows attachment traversal
         run: >-
-          cargo test -p rovai-core --lib
+          cargo test -p coaxi-core --lib
           --target x86_64-pc-windows-msvc
           windows_attachment
 
       - name: Exercise Windows CLI attachment snapshots
         run: >-
-          cargo test -p rovai-core --bin rovai
+          cargo test -p coaxi-core --bin coaxi
           --target x86_64-pc-windows-msvc
           send_attachments
 
       - name: Exercise Windows Skill Library
         run: >-
-          cargo test -p rovai-core --lib
+          cargo test -p coaxi-core --lib
           --target x86_64-pc-windows-msvc
           windows_skill_library
 
       - name: Exercise Windows Skill projection lifecycle
         run: >-
-          cargo test -p rovai-core --lib
+          cargo test -p coaxi-core --lib
           --target x86_64-pc-windows-msvc
           windows_skill_projection
 
       - name: Exercise Windows Named Pipe transport
         run: >-
-          cargo test -p rovai-core --all-targets
+          cargo test -p coaxi-core --all-targets
           --target x86_64-pc-windows-msvc
           windows_named_pipe
 
       - name: Exercise Windows private JSON replacement
         run: >-
-          cargo test -p rovai-core --lib
+          cargo test -p coaxi-core --lib
           --target x86_64-pc-windows-msvc
           private_json_replacement
 
       - name: Exercise Windows MCP configuration permissions
         run: >-
-          cargo test -p rovai-core --features slow-tests --lib
+          cargo test -p coaxi-core --features slow-tests --lib
           --target x86_64-pc-windows-msvc
           mcp::slow_tests::
 
@@ -303,13 +303,13 @@ jobs:
           key: server-${{ matrix.target }}
       - name: Verify credentials and content versions
         id: web_check
-        run: cargo test --locked -p rovai-web
+        run: cargo test --locked -p coaxi-web
       - name: Verify updater and process handoff
         if: ${{ !cancelled() && (steps.web_check.conclusion == 'success' || steps.web_check.conclusion == 'failure') }}
-        run: cargo test --locked -p rovai-host --lib server_updates
+        run: cargo test --locked -p coaxi-host --lib server_updates
       - name: Verify Windows resolved-file boundary
         if: ${{ matrix.target == 'windows-x64' && !cancelled() && (steps.web_check.conclusion == 'success' || steps.web_check.conclusion == 'failure') }}
-        run: cargo test --locked -p rovai-core --lib windows_attachment_directory_rejects_junctions_and_cleans_only_owned_tree
+        run: cargo test --locked -p coaxi-core --lib windows_attachment_directory_rejects_junctions_and_cleans_only_owned_tree
 
   server-native:
     name: Server preview / ${{ matrix.target }}
@@ -350,28 +350,28 @@ jobs:
         if: matrix.target == 'linux-x64'
         run: node --test scripts/lib/linux-server-abi.test.mjs
       - name: Verify credential state transitions
-        run: cargo test -p rovai-web
+        run: cargo test -p coaxi-web
       - name: Verify Server updater state transitions
-        run: cargo test -p rovai-host --lib server_updates
+        run: cargo test -p coaxi-host --lib server_updates
       - name: Verify native process and private storage seams
         run: |
-          cargo test -p rovai-core --lib managed_process
-          cargo test -p rovai-core --lib antigravity::tests::
-          cargo test -p rovai-core --lib codebuddy_launch_preserves_native_default_and_explicit_model_selection
+          cargo test -p coaxi-core --lib managed_process
+          cargo test -p coaxi-core --lib antigravity::tests::
+          cargo test -p coaxi-core --lib codebuddy_launch_preserves_native_default_and_explicit_model_selection
           node --test scripts/test-zcode-owner.mjs
-          cargo test -p rovai-core --lib core_data_dir_lock
-          cargo test -p rovai-core --lib storage_layout
+          cargo test -p coaxi-core --lib core_data_dir_lock
+          cargo test -p coaxi-core --lib storage_layout
       - name: Verify packaged Host and shared Web lifecycle
         env:
-          ROVAI_HOST_BIN: ${{ github.workspace }}/out/server/${{ matrix.target }}/rovai-host${{ matrix.target == 'windows-x64' && '.exe' || '' }}
-          ROVAI_SERVER_BIN: ${{ github.workspace }}/out/server/${{ matrix.target }}/rovai-server${{ matrix.target == 'windows-x64' && '.exe' || '' }}
-          ROVAI_SERVER_RELEASE_DIR: ${{ github.workspace }}/out/server/releases/${{ matrix.target }}
-          ROVAI_WEB_UI: ${{ github.workspace }}/out/server/${{ matrix.target }}/web-ui
+          COAXI_HOST_BIN: ${{ github.workspace }}/out/server/${{ matrix.target }}/coaxi-host${{ matrix.target == 'windows-x64' && '.exe' || '' }}
+          COAXI_SERVER_BIN: ${{ github.workspace }}/out/server/${{ matrix.target }}/coaxi-server${{ matrix.target == 'windows-x64' && '.exe' || '' }}
+          COAXI_SERVER_RELEASE_DIR: ${{ github.workspace }}/out/server/releases/${{ matrix.target }}
+          COAXI_WEB_UI: ${{ github.workspace }}/out/server/${{ matrix.target }}/web-ui
         run: node --test scripts/lib/host-lifecycle.test.mjs scripts/lib/host-web.test.mjs scripts/lib/host-web-channels.test.mjs scripts/lib/server-entry.test.mjs scripts/lib/server-install.test.mjs
       - name: Upload checksummed native archive
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: rovai-server-archive-${{ matrix.target }}-${{ github.sha }}
+          name: coaxi-server-archive-${{ matrix.target }}-${{ github.sha }}
           path: out/server/releases/${{ matrix.target }}/
           if-no-files-found: error
           retention-days: 1
@@ -380,13 +380,13 @@ jobs:
         # not a strong-isolation release gate. Workspace access must still work.
         run: |
           node -e "require('node:fs').mkdirSync('out/server-evidence', { recursive: true })"
-          cargo run --quiet -p rovai-core --example host_runtime_boundary_probe > out/server-evidence/${{ matrix.target }}.json
+          cargo run --quiet -p coaxi-core --example host_runtime_boundary_probe > out/server-evidence/${{ matrix.target }}.json
           node -e "const r=JSON.parse(require('node:fs').readFileSync('out/server-evidence/${{ matrix.target }}.json','utf8')); console.log(JSON.stringify(r)); if (!r.observation.authorizedWorkspaceWritable || !r.observation.descendant.authorizedWorkspaceWritable) process.exit(2)"
       - name: Upload native boundary observation
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: rovai-server-boundary-${{ matrix.target }}-${{ github.sha }}
+          name: coaxi-server-boundary-${{ matrix.target }}-${{ github.sha }}
           path: out/server-evidence/${{ matrix.target }}.json
           if-no-files-found: warn
           retention-days: 1
@@ -395,7 +395,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: rovai-server-preview-${{ matrix.target }}-${{ github.sha }}
+          name: coaxi-server-preview-${{ matrix.target }}-${{ github.sha }}
           path: out/server/${{ matrix.target }}/
           if-no-files-found: error
           retention-days: 1
@@ -416,18 +416,18 @@ jobs:
           persist-credentials: false
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
-          name: rovai-server-archive-linux-x64-${{ github.sha }}
+          name: coaxi-server-archive-linux-x64-${{ github.sha }}
           path: out/server-downloads
       - name: Install the unchanged Ubuntu 22.04 archive
         shell: bash
         run: |
           version=$(python3 -c 'import json; print(json.load(open("package.json"))["version"])')
-          sh scripts/install-server.sh --version "$version" --from-dir "$PWD/out/server-downloads" --prefix "$RUNNER_TEMP/rovai-linux" --bin-dir "$RUNNER_TEMP/rovai-linux-bin" --no-modify-path
+          sh scripts/install-server.sh --version "$version" --from-dir "$PWD/out/server-downloads" --prefix "$RUNNER_TEMP/coaxi-linux" --bin-dir "$RUNNER_TEMP/coaxi-linux-bin" --no-modify-path
       - name: Exercise Server with no development tools on its PATH
-        run: python3 scripts/smoke-linux-server.py "$RUNNER_TEMP/rovai-linux/current" --expected-source "$GITHUB_SHA" --output out/server-evidence/${{ matrix.os }}.json
+        run: python3 scripts/smoke-linux-server.py "$RUNNER_TEMP/coaxi-linux/current" --expected-source "$GITHUB_SHA" --output out/server-evidence/${{ matrix.os }}.json
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: rovai-server-os-${{ matrix.os }}-${{ github.sha }}
+          name: coaxi-server-os-${{ matrix.os }}-${{ github.sha }}
           path: out/server-evidence/${{ matrix.os }}.json
           if-no-files-found: error
           retention-days: 1
@@ -444,7 +444,7 @@ jobs:
           persist-credentials: false
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
-          name: rovai-server-archive-linux-x64-${{ github.sha }}
+          name: coaxi-server-archive-linux-x64-${{ github.sha }}
           path: out/server-downloads
       - name: Prepare Debian VM tooling
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends qemu-system-x86 qemu-utils cloud-image-utils
@@ -452,7 +452,7 @@ jobs:
         run: bash scripts/smoke-debian-server-vm.sh out/server-downloads "$GITHUB_SHA" out/server-evidence/debian-12.json
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: rovai-server-os-debian-12-${{ github.sha }}
+          name: coaxi-server-os-debian-12-${{ github.sha }}
           path: out/server-evidence/debian-12.json
           if-no-files-found: error
           retention-days: 1
@@ -479,7 +479,7 @@ jobs:
         run: pnpm install --frozen-lockfile
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
-          pattern: rovai-server-archive-*-${{ github.sha }}
+          pattern: coaxi-server-archive-*-${{ github.sha }}
           path: out/server-downloads
       - name: Check matched native archives and assemble checksums
         run: node scripts/prepare-server-release.mjs out/server-downloads out/server-release

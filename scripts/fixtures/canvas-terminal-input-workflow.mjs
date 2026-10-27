@@ -10,7 +10,7 @@ import { setTimeout as pause } from 'node:timers/promises'
 export function installTerminalInputIpc(ipcMain) {
  const register=ipcMain.handle,requests=[],faults=[];let target=null,registered=false
  ipcMain.handle=function(channel,handler){
-  if(channel!=='rovai:request')return register.call(this,channel,handler)
+  if(channel!=='coaxi:request')return register.call(this,channel,handler)
   registered=true
   return register.call(this,channel,async(event,method,params)=>{
    requests.push({method,target:params?.target??null})
@@ -138,7 +138,7 @@ export async function qualifyCanvasTerminalInput(window,{evaluate,wait,rpc,openC
   if(value.exists&&!value.cleanupComplete){
    if(await evaluate(`Boolean(document.querySelector('${button('展开终端')}'))`))await click(button('展开终端'))
    await wait(`Boolean(document.querySelector('${button('停止终端')}')&&!document.querySelector('${button('停止终端')}').disabled)`)
-   await click(button('停止终端'));await wait(`window.rovai.request('canvas.terminals.snapshot',{target:${JSON.stringify(target)}}).then(value=>value.cleanupComplete===true)`)
+   await click(button('停止终端'));await wait(`window.coaxi.request('canvas.terminals.snapshot',{target:${JSON.stringify(target)}}).then(value=>value.cleanupComplete===true)`)
   }
   report.final_terminal=await snapshot();assert.equal(report.final_terminal.cleanupComplete,true)
   record('native_input_test_stops_and_reaps_its_owned_terminal')

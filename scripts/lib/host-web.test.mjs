@@ -13,13 +13,13 @@ import { coreDataDirectoryArguments, removeEphemeralRuntimeCampFilesRoot } from 
 import { canvasTerminalProcessFixture } from './canvas-terminal-process.mjs'
 
 const repository = resolve(import.meta.dirname, '../..')
-const binary = process.env.ROVAI_HOST_BIN ?? join(repository, 'target/debug', process.platform === 'win32' ? 'rovai-host.exe' : 'rovai-host')
-const uiDirectory = process.env.ROVAI_WEB_UI ?? join(repository, 'out/web')
+const binary = process.env.COAXI_HOST_BIN ?? join(repository, 'target/debug', process.platform === 'win32' ? 'coaxi-host.exe' : 'coaxi-host')
+const uiDirectory = process.env.COAXI_WEB_UI ?? join(repository, 'out/web')
 
 // Owns the real Desktop pipe + HTTP + unique Core lifetime seam. It uses only
 // isolated directories and public record mutations, never a model or daily data.
 test('Desktop and Web share one Core while listener failure, revocation and stop stay local', { timeout: 180_000 }, async () => {
-  const fixture = await realpath(await mkdtemp(join(tmpdir(), 'rovai-host-web-')))
+  const fixture = await realpath(await mkdtemp(join(tmpdir(), 'coaxi-host-web-')))
   const builtUiDirectory = uiDirectory
   const ownedUiDirectory = join(fixture, 'web-ui')
   await cp(builtUiDirectory, ownedUiDirectory, { recursive: true })
@@ -45,8 +45,8 @@ test('Desktop and Web share one Core while listener failure, revocation and stop
     const authPath = join(dataDir, 'web-auth.json')
     let inheritedAcl
     const fixtureAcl = (script, sddl = '') => execFileSync('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command',
-      `$ErrorActionPreference='Stop'; $p=$env:ROVAI_AUTH_FIXTURE; ${script}`], {
-      encoding: 'utf8', windowsHide: true, env: { ...process.env, ROVAI_AUTH_FIXTURE: authPath, ROVAI_AUTH_SDDL: sddl }
+      `$ErrorActionPreference='Stop'; $p=$env:COAXI_AUTH_FIXTURE; ${script}`], {
+      encoding: 'utf8', windowsHide: true, env: { ...process.env, COAXI_AUTH_FIXTURE: authPath, COAXI_AUTH_SDDL: sddl }
     }).trim()
     let inheritedBytes
     if (process.platform === 'win32') {
@@ -62,7 +62,7 @@ test('Desktop and Web share one Core while listener failure, revocation and stop
       try {
         await assert.rejects(host.request('host.web.token'), { code: 'HOST_WEB_AUTH_READ_FAILED' })
       } finally {
-        fixtureAcl(`$acl=[IO.File]::GetAccessControl($p); $acl.SetSecurityDescriptorSddlForm($env:ROVAI_AUTH_SDDL,[Security.AccessControl.AccessControlSections]::Access); [IO.File]::SetAccessControl($p,$acl)`, originalAcl)
+        fixtureAcl(`$acl=[IO.File]::GetAccessControl($p); $acl.SetSecurityDescriptorSddlForm($env:COAXI_AUTH_SDDL,[Security.AccessControl.AccessControlSections]::Access); [IO.File]::SetAccessControl($p,$acl)`, originalAcl)
       }
       assert.equal(await readAssetFile(authPath, 'utf8'), inheritedBytes)
       // Inherited ACL + extra administrator read ACE + no WRITE_DAC for its
@@ -71,8 +71,8 @@ test('Desktop and Web share one Core while listener failure, revocation and stop
       inheritedAcl = fixtureAcl('([IO.File]::GetAccessControl($p)).Sddl')
     }
     const directoryAcl = (script, sddl = '') => execFileSync('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command',
-      `$ErrorActionPreference='Stop'; $p=$env:ROVAI_AUTH_FIXTURE; ${script}`], {
-      encoding: 'utf8', windowsHide: true, env: { ...process.env, ROVAI_AUTH_FIXTURE: dataDir, ROVAI_AUTH_SDDL: sddl }
+      `$ErrorActionPreference='Stop'; $p=$env:COAXI_AUTH_FIXTURE; ${script}`], {
+      encoding: 'utf8', windowsHide: true, env: { ...process.env, COAXI_AUTH_FIXTURE: dataDir, COAXI_AUTH_SDDL: sddl }
     }).trim()
     let originalDirectoryAcl
     if (process.platform === 'win32') {
@@ -85,7 +85,7 @@ test('Desktop and Web share one Core while listener failure, revocation and stop
       initialToken = (await host.request('host.web.token')).administratorToken
     }
     finally {
-      if (originalDirectoryAcl) directoryAcl(`$acl=[IO.Directory]::GetAccessControl($p); $acl.SetSecurityDescriptorSddlForm($env:ROVAI_AUTH_SDDL,[Security.AccessControl.AccessControlSections]::Access); [IO.Directory]::SetAccessControl($p,$acl)`, originalDirectoryAcl)
+      if (originalDirectoryAcl) directoryAcl(`$acl=[IO.Directory]::GetAccessControl($p); $acl.SetSecurityDescriptorSddlForm($env:COAXI_AUTH_SDDL,[Security.AccessControl.AccessControlSections]::Access); [IO.Directory]::SetAccessControl($p,$acl)`, originalDirectoryAcl)
     }
     if (process.platform === 'win32') {
       assert.equal(initialToken, 'a'.repeat(64))
@@ -301,7 +301,7 @@ test('Desktop and Web share one Core while listener failure, revocation and stop
     const input = new TextEncoder().encode('source ref from real HTTP upload')
     const sha256 = [...new Uint8Array(await crypto.subtle.digest('SHA-256', input))].map(value => value.toString(16).padStart(2, '0')).join('')
     const intent = { commandId: crypto.randomUUID(), threadId, expectedRevision: 1, displayName: '浏览器 source.txt', byteSize: input.length, sha256 }
-    const spools = async () => (await readdir(uploadScratch)).filter(name => name.startsWith('rovai-web-upload-'))
+    const spools = async () => (await readdir(uploadScratch)).filter(name => name.startsWith('coaxi-web-upload-'))
     const postUpload = body => request('uploads', { method: 'POST', headers: { Authorization: `Bearer ${first.token}` }, body })
     for (const scenario of ['digest', 'duplicate-file', 'too-large']) {
       const invalid = new FormData(); invalid.append('intent', JSON.stringify(intent))
@@ -331,7 +331,7 @@ test('Desktop and Web share one Core while listener failure, revocation and stop
       assert.deepEqual(await spools(), [], 'rejected multipart bytes must leave no unbound source')
     }
     const abort = new AbortController()
-    const boundary = 'rovai-upload-abort-fixture'
+    const boundary = 'coaxi-upload-abort-fixture'
     const partial = new ReadableStream({ start(controller) {
       controller.enqueue(new TextEncoder().encode(`--${boundary}\r\nContent-Disposition: form-data; name="file"; filename="partial"\r\nContent-Type: application/octet-stream\r\n\r\n`))
       controller.enqueue(new Uint8Array(64 * 1024))
@@ -436,7 +436,7 @@ test('Desktop and Web share one Core while listener failure, revocation and stop
     assert.equal(await historyFile.text(), new TextDecoder().decode(input))
     // Single Chat retains its Core-owned private pending edit lease.
     const pendingInputId = crypto.randomUUID()
-    const seed = new DatabaseSync(join(dataDir, 'rovai.sqlite'))
+    const seed = new DatabaseSync(join(dataDir, 'coaxi.sqlite'))
     seed.exec('PRAGMA busy_timeout=5000')
     const now = new Date().toISOString()
     try {
@@ -524,7 +524,7 @@ test('Desktop and Web share one Core while listener failure, revocation and stop
       if (binary && !response.headers.get('content-type').includes('application/json')) {
         assert.equal(response.status, 200)
         return { ok: true, value: { bytes: Buffer.from(await response.arrayBuffer()), mime: response.headers.get('content-type'),
-          contentGeneration: response.headers.get('x-rovai-content-generation'), contentVersion: JSON.parse(response.headers.get('x-rovai-content-version')) } }
+          contentGeneration: response.headers.get('x-coaxi-content-generation'), contentVersion: JSON.parse(response.headers.get('x-coaxi-content-version')) } }
       }
       assert.equal(response.status, 200)
       return response.json()
@@ -643,7 +643,7 @@ test('Desktop and Web share one Core while listener failure, revocation and stop
     assert.deepEqual((await call(first, 'commands.reconcile', { operation: 'notifications.preference.update', params: preferenceParams })).result, changedPreference)
     assert.equal((await call(first, 'notifications.inbox', { filter: 'unread', limit: 1 })).schemaVersion, 9)
     const exported = await call(first, 'diagnostics.export')
-    assert.equal(exported.format, 'rovai-diagnostics-v5')
+    assert.equal(exported.format, 'coaxi-diagnostics-v5')
     assert.equal(JSON.stringify(exported).includes(administrator), false)
     assert.equal(JSON.stringify(exported).includes(fixture), false)
     const temporary = await call(first, 'camps.create', { ...createParams, commandId: crypto.randomUUID(), name: 'Temporary remote management Camp' })
@@ -751,7 +751,7 @@ test('Desktop and Web share one Core while listener failure, revocation and stop
 // inputs. Pending/Run rows are never seeded and no message is sent to a Runtime.
 test('Host private composer binds canvas inputs and recovery to verified editors', { timeout: 120_000 }, async t => {
   const temporaryRoot = await realpath(tmpdir())
-  const fixture = await realpath(await mkdtemp(join(temporaryRoot, 'rovai-host-private-')))
+  const fixture = await realpath(await mkdtemp(join(temporaryRoot, 'coaxi-host-private-')))
   assert.equal(resolve(fixture, '..'), temporaryRoot)
   const dataDir = process.platform === 'win32'
     ? JSON.parse(execFileSync(binary, ['--prepare-windows-data-root', join(fixture, 'formal')], { encoding: 'utf8', windowsHide: true })).core
@@ -916,7 +916,7 @@ test('Host private composer binds canvas inputs and recovery to verified editors
       assert.deepEqual(await get(first), beforeFailure)
       assert.deepEqual(await mutate(first, receipts.get('甲').params), receipts.get('甲').result)
     })
-    const database = new DatabaseSync(join(dataDir, 'rovai.sqlite'), { readOnly: true })
+    const database = new DatabaseSync(join(dataDir, 'coaxi.sqlite'), { readOnly: true })
     try { assert.equal(database.prepare('SELECT COUNT(*) AS count FROM agent_run').get().count, 0) }
     finally { database.close() }
     report.status = report.cases.length === 5 ? 'passed' : 'failed'
@@ -931,7 +931,7 @@ test('Host private composer binds canvas inputs and recovery to verified editors
     report.finishedAt = new Date().toISOString()
     await writeFile(join(fixture, 'private-scope-result.json'), JSON.stringify(report, null, 2) + '\n')
     await removeEphemeralRuntimeCampFilesRoot(dataDir)
-    if (process.env.ROVAI_KEEP_HOST_PRIVATE_SCOPE_FIXTURE !== '1') {
+    if (process.env.COAXI_KEEP_HOST_PRIVATE_SCOPE_FIXTURE !== '1') {
       assert.equal(resolve(fixture, '..'), temporaryRoot)
       await rm(fixture, { recursive: true, force: true })
     }
@@ -941,7 +941,7 @@ test('Host private composer binds canvas inputs and recovery to verified editors
 })
 
 test('Host clock consumes scheduled occurrences with Web stopped and in standalone mode', { timeout: 180_000 }, async () => {
-  const fixture = await realpath(await mkdtemp(join(tmpdir(), 'rovai-host-clock-')))
+  const fixture = await realpath(await mkdtemp(join(tmpdir(), 'coaxi-host-clock-')))
   const dataDir = join(fixture, 'data')
   const args = [...coreDataDirectoryArguments(dataDir), '--skill-library-root', join(dataDir, 'skills'), '--mcp-config-path', join(dataDir, 'mcp.json')]
   console.log(JSON.stringify({ channel: 'automatic_acceptance', dataDir, skillLibraryRoot: join(dataDir, 'skills'), mcpConfigPath: join(dataDir, 'mcp.json'), runtime: false }))
@@ -991,7 +991,7 @@ test('Host clock consumes scheduled occurrences with Web stopped and in standalo
     const started = await desktop.request('host.web.start', { listen: '127.0.0.1:0', uiDirectory })
     await desktop.request('host.web.stop')
     await assert.rejects(fetch(started.origin, { signal: AbortSignal.timeout(1000) }))
-    database = new DatabaseSync(join(dataDir, 'rovai.sqlite'), { readOnly: true })
+    database = new DatabaseSync(join(dataDir, 'coaxi.sqlite'), { readOnly: true })
     const rows = id => database.prepare(`
       SELECT occurrence.status, occurrence.reason, occurrence.camp_id,
              occurrence.trigger_message_id, occurrence.trigger_delivery_id,

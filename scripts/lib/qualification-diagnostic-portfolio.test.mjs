@@ -25,7 +25,7 @@ test('persisted JSON materialization removes undefined fields before identity ha
 })
 
 test('Diagnostic Portfolio derives eight slots, stable outcomes, disagreement, and one completion', async () => {
-  const root = await temporaryRoot('rovai-portfolio-complete-')
+  const root = await temporaryRoot('coaxi-portfolio-complete-')
   try {
     const definition = fixtureDefinition()
     await retainDiagnosticPortfolioDefinition(root, definition)
@@ -65,7 +65,7 @@ test('Diagnostic Portfolio derives eight slots, stable outcomes, disagreement, a
 })
 
 test('Diagnostic Portfolio replacement is pre-dispatch only and partial state cannot complete', async () => {
-  const root = await temporaryRoot('rovai-portfolio-replacement-')
+  const root = await temporaryRoot('coaxi-portfolio-replacement-')
   try {
     const definition = fixtureDefinition()
     await retainDiagnosticPortfolioDefinition(root, definition)
@@ -116,8 +116,8 @@ test('Diagnostic Portfolio replacement is pre-dispatch only and partial state ca
 })
 
 test('Diagnostic non-leakage inspection detects sealed material and makes an accepted slot incomplete', async () => {
-  const evidenceRoot = await temporaryRoot('rovai-portfolio-leak-')
-  const portfolioRoot = await temporaryRoot('rovai-portfolio-leak-ledger-')
+  const evidenceRoot = await temporaryRoot('coaxi-portfolio-leak-')
+  const portfolioRoot = await temporaryRoot('coaxi-portfolio-leak-ledger-')
   try {
     const syntheticCanary = 'SCM-SYNTHETIC-0123456789abcdefghijklmnop'
     await writeFile(
@@ -168,7 +168,7 @@ test('Diagnostic non-leakage inspection detects sealed material and makes an acc
 })
 
 test('Diagnostic Portfolio Ledger rejects byte tampering and an undeclared third repeat', async () => {
-  const root = await temporaryRoot('rovai-portfolio-tamper-')
+  const root = await temporaryRoot('coaxi-portfolio-tamper-')
   try {
     const definition = fixtureDefinition()
     await retainDiagnosticPortfolioDefinition(root, definition)
@@ -229,7 +229,7 @@ test('Diagnostic Trial configuration gate binds exact identity, budget, members,
     caseRecords: fixtureCaseRecords(),
     teamMembers: memberInputs.map(({ member }) => member),
     executionFingerprints: {
-      core: { componentId: 'rovai-core', version: '0.36.0', digest: executableDigest },
+      core: { componentId: 'coaxi-core', version: '0.36.0', digest: executableDigest },
       runner: { componentId: 'qualification-runner', version: '0.36.0', digest: executableDigest },
       node: { componentId: 'node', version: process.version, digest: executableDigest },
       runtimes: memberInputs.map(({ member }) => ({
@@ -348,7 +348,7 @@ function fixtureDefinition() {
       member('agent_4', 'antigravity-app', 'gemini-3.6-flash-high')
     ],
     executionFingerprints: {
-      core: binary('rovai-core'),
+      core: binary('coaxi-core'),
       runner: binary('qualification-runner'),
       node: binary('node'),
       runtimes: [

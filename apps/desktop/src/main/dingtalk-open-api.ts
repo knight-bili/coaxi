@@ -3,7 +3,7 @@ import { randomUUID } from 'node:crypto'
 const DEFAULT_API_ORIGIN = 'https://api.dingtalk.com'
 const DEFAULT_OAPI_ORIGIN = 'https://oapi.dingtalk.com'
 export const DINGTALK_AI_CARD_TEMPLATE_ID = '382e4302-551d-4880-bf29-a30acfab2e71.schema'
-const DINGTALK_CARD_ACTION_PREFIX = 'rovai.v1.'
+const DINGTALK_CARD_ACTION_PREFIX = 'coaxi.v1.'
 const MAX_DINGTALK_CARD_ACTION_BYTES = 4_096
 export const MAX_DINGTALK_MEDIA_UPLOAD_BYTES = 20 * 1024 * 1024
 

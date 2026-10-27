@@ -16,13 +16,13 @@ export async function previewConfiguration(){
  const dataRoot=assertUserDataIsIsolated(join(directory,'user-data-v2')),home=join(directory,'isolation/home'),temporary=join(directory,'isolation/tmp')
  const electron=join(repositoryRoot,'node_modules/electron/dist/electron.exe');await access(electron)
  const env={};for(const key of ['SystemRoot','WINDIR','COMSPEC','PATHEXT'])if(process.env[key])env[key]=process.env[key]
- Object.assign(env,{PATH:[dirname(process.execPath),'E:/software/encoding/common/Git/bin',join(process.env.SystemRoot,'System32')].join(';'),HOME:home,USERPROFILE:home,APPDATA:join(home,'AppData/Roaming'),LOCALAPPDATA:join(home,'AppData/Local'),TEMP:temporary,TMP:temporary,SHELL:process.env.COMSPEC??join(process.env.SystemRoot,'System32/cmd.exe'),NODE_REPL_HISTORY:'',ROVAI_ALLOW_ISOLATED_INSTANCE:'1',ROVAI_DISABLE_AUTO_UPDATE_CHECKS:'1',ROVAI_HOST_BIN:join(app,'resources/bin/windows-x64/rovai-host.exe')})
+ Object.assign(env,{PATH:[dirname(process.execPath),'E:/software/encoding/common/Git/bin',join(process.env.SystemRoot,'System32')].join(';'),HOME:home,USERPROFILE:home,APPDATA:join(home,'AppData/Roaming'),LOCALAPPDATA:join(home,'AppData/Local'),TEMP:temporary,TMP:temporary,SHELL:process.env.COMSPEC??join(process.env.SystemRoot,'System32/cmd.exe'),NODE_REPL_HISTORY:'',COAXI_ALLOW_ISOLATED_INSTANCE:'1',COAXI_DISABLE_AUTO_UPDATE_CHECKS:'1',COAXI_HOST_BIN:join(app,'resources/bin/windows-x64/coaxi-host.exe')})
  return {candidate:manifest.candidate,repositoryRoot,app,electron,dataRoot,skillLibraryRoot:join(dataRoot,'Core/managed-skill-library'),mcpConfigPath:join(dataRoot,'Core/mcp.json'),args:[app,`--user-data-dir=${dataRoot}`],env,manifest}
 }
 
 export async function preparePreviewHome(config){
  // Chromium会在Main之前触碰显式目录，须先由原生helper创建受保护布局。
- const prepared=JSON.parse(execFileSync(config.env.ROVAI_HOST_BIN,['--prepare-windows-data-root',config.dataRoot],{env:config.env,encoding:'utf8',windowsHide:true}))
+ const prepared=JSON.parse(execFileSync(config.env.COAXI_HOST_BIN,['--prepare-windows-data-root',config.dataRoot],{env:config.env,encoding:'utf8',windowsHide:true}))
  if(resolve(prepared.root)!==resolve(config.dataRoot)||resolve(prepared.core)!==resolve(config.dataRoot,'Core'))throw Error('开发预览原生目录准备结果不匹配。')
  for(const path of [config.env.HOME,config.env.APPDATA,config.env.LOCALAPPDATA,config.env.TEMP])await mkdir(path,{recursive:true})
 }

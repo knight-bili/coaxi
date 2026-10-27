@@ -1,5 +1,5 @@
-/* Codeg aff1e6c: canvas-page, canvas-board-list, canvas-dock and CardFrame geometry.
-   Core controllers, permissions and conversation ownership remain the existing Rovai implementation. */
+/* Coaxi aff1e6c: canvas-page, canvas-board-list, canvas-dock and CardFrame geometry.
+   Core controllers, permissions and conversation ownership remain the existing Coaxi implementation. */
 .canvas-workspace, .canvas-board-dialog, .canvas-card-menu {
   --canvas: var(--canvas-board-background); --surface: var(--canvas-board-card); --surface-raised: var(--canvas-board-card);
   --input: var(--canvas-board-input); --ink: var(--canvas-board-ink); --muted: var(--canvas-board-muted);
@@ -238,7 +238,7 @@
 .content.canvas-content { display: flex; flex-direction: column; grid-row: 1 / -1; min-height: 0; padding: 0; overflow: hidden; }
 .content.canvas-content > * { max-width: none; margin: 0; }
 .window-drag-strip-canvas { display: none; }
-html[data-rovai-platform="darwin"] .navigation-collapsed .canvas-boards-toolbar { padding-left: 128px; }
+html[data-coaxi-platform="darwin"] .navigation-collapsed .canvas-boards-toolbar { padding-left: 128px; }
 .project-groups-list { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
 .project-groups-list > li { display: flex; align-items: center; gap: 8px; }
 .project-groups-list > li > span { flex: 1; min-width: 0; overflow-wrap: anywhere; }

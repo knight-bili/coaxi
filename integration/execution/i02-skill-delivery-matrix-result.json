@@ -4,7 +4,7 @@
   "baseline": "4aa7e51b6c2f815a88f47348269deef9030fff03",
   "branch": "phase/i02-skill-delivery",
   "source": {
-    "path": "crates/rovai-core/src/context.rs",
+    "path": "crates/coaxi-core/src/context.rs",
     "sha256": "3cc5ac1391dece1cad82f5dce7397723a6c99bd04cdea562568e17040e821fd9",
     "stagedBytesMatch": true,
     "productionLogicChanged": false
@@ -33,7 +33,7 @@
     "library": {
       "targets": [
         {
-          "target": "Running unittests src\\lib.rs (target\\debug\\deps\\rovai_core-c4f7c42457a4f192.exe)",
+          "target": "Running unittests src\\lib.rs (target\\debug\\deps\\coaxi_core-c4f7c42457a4f192.exe)",
           "result": {
             "passed": 454,
             "failed": 0,
@@ -48,7 +48,7 @@
     "workspace": {
       "targets": [
         {
-          "target": "Running unittests src\\lib.rs (target\\debug\\deps\\rovai_core-77fb358c18c89611.exe)",
+          "target": "Running unittests src\\lib.rs (target\\debug\\deps\\coaxi_core-77fb358c18c89611.exe)",
           "result": {
             "passed": 454,
             "failed": 0,
@@ -56,7 +56,7 @@
           }
         },
         {
-          "target": "Running unittests src\\bin\\rovai.rs (target\\debug\\deps\\rovai-b323072396ae6c88.exe)",
+          "target": "Running unittests src\\bin\\coaxi.rs (target\\debug\\deps\\coaxi-b323072396ae6c88.exe)",
           "result": {
             "passed": 33,
             "failed": 0,
@@ -64,7 +64,7 @@
           }
         },
         {
-          "target": "Running unittests src\\main.rs (target\\debug\\deps\\rovai_core-00beb36196cc8b4c.exe)",
+          "target": "Running unittests src\\main.rs (target\\debug\\deps\\coaxi_core-00beb36196cc8b4c.exe)",
           "result": {
             "passed": 0,
             "failed": 0,
@@ -72,7 +72,7 @@
           }
         },
         {
-          "target": "Running unittests src\\lib.rs (target\\debug\\deps\\rovai_host-3dd729d920b8aabe.exe)",
+          "target": "Running unittests src\\lib.rs (target\\debug\\deps\\coaxi_host-3dd729d920b8aabe.exe)",
           "result": {
             "passed": 3,
             "failed": 0,
@@ -80,7 +80,7 @@
           }
         },
         {
-          "target": "Running unittests src\\main.rs (target\\debug\\deps\\rovai_host-d2e0b1a537d16431.exe)",
+          "target": "Running unittests src\\main.rs (target\\debug\\deps\\coaxi_host-d2e0b1a537d16431.exe)",
           "result": {
             "passed": 0,
             "failed": 0,
@@ -88,7 +88,7 @@
           }
         },
         {
-          "target": "Running unittests src\\bin\\rovai-server.rs (target\\debug\\deps\\rovai_server-d86b94bf01930636.exe)",
+          "target": "Running unittests src\\bin\\coaxi-server.rs (target\\debug\\deps\\coaxi_server-d86b94bf01930636.exe)",
           "result": {
             "passed": 0,
             "failed": 0,
@@ -96,7 +96,7 @@
           }
         },
         {
-          "target": "Running unittests src\\lib.rs (target\\debug\\deps\\rovai_web-4927aa17ec9b1cf9.exe)",
+          "target": "Running unittests src\\lib.rs (target\\debug\\deps\\coaxi_web-4927aa17ec9b1cf9.exe)",
           "result": {
             "passed": 11,
             "failed": 0,
@@ -104,7 +104,7 @@
           }
         },
         {
-          "target": "Doc-tests rovai_core",
+          "target": "Doc-tests coaxi_core",
           "result": {
             "passed": 0,
             "failed": 0,
@@ -112,7 +112,7 @@
           }
         },
         {
-          "target": "Doc-tests rovai_host",
+          "target": "Doc-tests coaxi_host",
           "result": {
             "passed": 0,
             "failed": 0,
@@ -120,7 +120,7 @@
           }
         },
         {
-          "target": "Doc-tests rovai_web",
+          "target": "Doc-tests coaxi_web",
           "result": {
             "passed": 0,
             "failed": 0,

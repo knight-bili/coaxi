@@ -226,7 +226,7 @@ pub fn prompt_block_from_wire(item: &serde_json::Value) -> Option<PromptInputBlo
         Some("image") => Some(PromptInputBlock::Image {
             data: string(item, "data")?,
             // ACP requires `mimeType`; a record MISSING it is old enough that
-            // png was the only thing codeg ever pasted. A record that carries
+            // png was the only thing coaxi ever pasted. A record that carries
             // an empty one keeps it, which is what the typed reader sees.
             mime_type: mime(item).unwrap_or_else(|| "image/png".to_string()),
             uri: string(item, "uri"),

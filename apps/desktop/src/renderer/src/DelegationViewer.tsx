@@ -1,5 +1,5 @@
-// Codeg aff1e6c: message/{sub-agent-session-dialog,session-viewer-host,
-// delegated-sub-thread,delegation-card-row}.tsx. Apache-2.0: integration/licenses/codeg/LICENSE.
+// Coaxi aff1e6c: message/{sub-agent-session-dialog,session-viewer-host,
+// delegated-sub-thread,delegation-card-row}.tsx. Apache-2.0: integration/licenses/component-a/LICENSE.
 // Drawer owns presentation only; Core owns every child, Run, approval and answer.
 import { useCallback, useContext, useEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from 'react'
 import { Drawer } from '@base-ui/react/drawer'
@@ -11,7 +11,7 @@ import { SafeMarkdown } from './SafeMarkdown'
 import { SingleChatPanel, SingleChatRunHistory, singleChatEvidenceForRun } from './SingleChatPanel'
 import { ApprovalDock, type ThreadLeavePreparation } from './ThreadWorkspace'
 import { RuntimeInteractionDock } from './RuntimeInteractionDock'
-import { CodegRuntimeMark } from './CodegRuntimeMark'
+import { CoaxiRuntimeMark } from './CoaxiRuntimeMark'
 import { CoreDelegationCard } from './CoreDelegationCard'
 import { delegationActionController } from './delegation-action-controller'
 import type { DelegationActionMethod } from '../../shared/private-conversation-operations'
@@ -176,7 +176,7 @@ function DelegationDrawer({ target, open, visible, onOpenChange, onLeaveGuardCha
       finalFocus={() => returnFocus?.isConnected ? returnFocus : false}>
       <Drawer.Content className="delegation-drawer-content">
       <Drawer.Title className="sr-only">{t('独立帮手会话')}</Drawer.Title>
-      <header className="delegation-drawer-header" tabIndex={-1} ref={headingRef}><span className="delegation-drawer-avatar">{detail && <CodegRuntimeMark target={detail.agentType} size={16} />}</span>
+      <header className="delegation-drawer-header" tabIndex={-1} ref={headingRef}><span className="delegation-drawer-avatar">{detail && <CoaxiRuntimeMark target={detail.agentType} size={16} />}</span>
         <strong>{detail ? delegationRuntimeLabel(detail.agentType) : t('独立帮手会话')}</strong>
         {detail && <span className="delegation-status">{t(delegationStatus(detail))}</span>}
         <button type="button" className="delegation-icon-button" aria-label={t('刷新帮手会话')} onClick={() => void controller.refresh()}><RefreshCw size={15} /></button>

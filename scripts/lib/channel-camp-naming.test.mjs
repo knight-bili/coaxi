@@ -14,7 +14,7 @@ const root = resolve(import.meta.dirname, '../..')
 const source = join(root, 'scripts/fixtures/channel-camp-naming')
 test('channel Camp labels stay display-only through native rename input', { timeout: 60_000 }, async (t) => {
   if (!admitElectronIntegrationTest(t)) return
-  const fixture = await mkdtemp(join(tmpdir(), 'rovai-channel-naming-test-'))
+  const fixture = await mkdtemp(join(tmpdir(), 'coaxi-channel-naming-test-'))
   let child
   let closed
   try {
@@ -42,7 +42,7 @@ test('channel Camp labels stay display-only through native rename input', { time
       child.kill('SIGKILL')
       await closed
     }
-    if (process.env.ROVAI_KEEP_CHANNEL_NAMING_FIXTURE === '1') process.stdout.write(`Channel naming captures: ${fixture}\n`)
+    if (process.env.COAXI_KEEP_CHANNEL_NAMING_FIXTURE === '1') process.stdout.write(`Channel naming captures: ${fixture}\n`)
     else await rm(fixture, { recursive: true, force: true })
   }
 })

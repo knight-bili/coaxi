@@ -38,7 +38,7 @@ export const V3_NON_LEAKAGE_POLICY = Object.freeze({
 })
 
 const REPOSITORY_ROOT = resolve(import.meta.dirname, '../..')
-const CANARY_FILE = '.rovai-sealed-canary'
+const CANARY_FILE = '.coaxi-sealed-canary'
 const REQUIRED_FAULT_CLASSES = new Set([
   'public_overfit',
   'domain_edge',
@@ -50,7 +50,7 @@ export async function admitV3Case(contract) {
   await assertPrivateV3CasePack(contract)
   const challenge = await readChallengeManifest(contract)
   const canaries = await readSealedMaterialCanaries(contract, challenge)
-  const temporaryRoot = await makeTemporaryDirectory(`rovai-qualification-v3-${contract.manifest.id}-`)
+  const temporaryRoot = await makeTemporaryDirectory(`coaxi-qualification-v3-${contract.manifest.id}-`)
   try {
     const initial = await evaluatePair({
       contract,
@@ -429,8 +429,8 @@ async function validateVerificationPairs(contract, challenge) {
       throw new Error('each target public Check must bind one protected public assertion file')
     }
     const publicPath = resolveInsidePack(contract.fixturePath, publicLocators[0], 'public assertion file')
-    const begin = `// ROVAI-WITHHELD-BEGIN:${pair.requirementId}\n`
-    const end = `// ROVAI-WITHHELD-END:${pair.requirementId}`
+    const begin = `// COAXI-WITHHELD-BEGIN:${pair.requirementId}\n`
+    const end = `// COAXI-WITHHELD-END:${pair.requirementId}`
     const startIndex = verifierSource.indexOf(begin)
     const endIndex = verifierSource.indexOf(end, startIndex + begin.length)
     if (startIndex < 0 || endIndex < 0 || verifierSource.indexOf(begin, startIndex + 1) >= 0) {

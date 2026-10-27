@@ -1,4 +1,4 @@
-/* Codeg question / plan card geometry, using Rovai's existing semantic theme.
+/* Coaxi question / plan card geometry, using Coaxi's existing semantic theme.
  * Fixed source and Apache-2.0 notice: RuntimeInteractionDock.tsx. */
 .native-interaction-dock { flex: none; min-width: 0; max-width: 100%; color: var(--ink); font-size: 14px; }
 .native-interactions-group { min-height: 0; max-height: 70svh; overflow-y: auto; }

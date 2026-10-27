@@ -3,7 +3,7 @@ import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import { FolderOpen, Plus } from 'lucide-react'
 import { WorkspaceToolItems, workspaceTools, requestWorkspaceTool } from './WorkspaceToolMenu'
 import { useShortcutActions } from './useShortcutActions'
-import { NUMBERED_TAB_ACTION_IDS } from '../../shared/codeg-keyboard-shortcuts'
+import { NUMBERED_TAB_ACTION_IDS } from '../../shared/coaxi-keyboard-shortcuts'
 import type { ShortcutActions } from './shortcut-action-driver'
 import { prefersReducedMotion } from './reduced-motion'
 import { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react'
@@ -381,7 +381,7 @@ export function FilePreviewTabs({ compact = false }: { compact?: boolean } = {})
         const index = tabs.findIndex((tab) => tab.id === menu.tabId)
         const tab = tabs[index]
         if (!tab) return null
-        const platform = document.documentElement.dataset.rovaiPlatform
+        const platform = document.documentElement.dataset.coaxiPlatform
         const revealLabel = platform === 'win32' ? uiAttribute('在文件资源管理器中显示') : uiAttribute('在 Finder 中显示')
         const closeRight = tabs.slice(index + 1).map((entry) => entry.id)
         const closeOthers = tabs.filter((entry) => entry.id !== tab.id).map((entry) => entry.id)

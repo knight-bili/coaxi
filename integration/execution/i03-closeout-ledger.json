@@ -435,7 +435,7 @@
       ],
       "latest_partial_verification": "i03-r09-source-ui-progress.json",
       "implemented_source": [
-        "Codeg14px元信息/6px活动点/左右紧凑页脚；四行标题不变",
+        "Coaxi14px元信息/6px活动点/左右紧凑页脚；四行标题不变",
         "精确active成员的明确模型配置；默认模型与缺失观测不生成名称",
         "已有四并发worktree读取的精确分支；失败/旧字段/游离HEAD/缺失均保留未知",
         "Core只读公开活动计数和精确私聊活动，原同一目录事务与失效合并，不增加逐卡轮询",
@@ -445,13 +445,13 @@
       "source_dependency": {
         "source_feature": "C08",
         "planned_stage": "I04",
-        "work": "Codeg真实父子会话/异步委派完成后补child_count画布投影和回归，不能拿私聊数量替代；功能仍在完整一期"
+        "work": "Coaxi真实父子会话/异步委派完成后补child_count画布投影和回归，不能拿私聊数量替代；功能仍在完整一期"
       },
       "verified_native_card_checks": 25,
       "verified_native_board_checks": 6,
       "pending_core_repair": {
         "status": "native_verified_rc25",
-        "source_file": "crates/rovai-core/src/read_model/canvas_references.rs",
+        "source_file": "crates/coaxi-core/src/read_model/canvas_references.rs",
         "source_sha256": "d78cee9719072b8cc00158f0f0bf142c6b58d5566ecea2c20280a496675064cf",
         "defect": "真实single_chat运行通过camp_turn归属原Thread，直接camp_id为null；PRIVATE_SQL漏计活动，RUN_MODELS原有轮次关联正确。",
         "repair": "活动投影沿原camp_turn核对归属，保留直接Thread归属优先及跨Thread拒绝；不改模型输入、数据库或API。",

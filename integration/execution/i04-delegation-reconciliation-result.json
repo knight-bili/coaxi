@@ -105,73 +105,73 @@
   },
   "source_files": [
     {
-      "path": "crates/rovai-core/src/application.rs",
+      "path": "crates/coaxi-core/src/application.rs",
       "git_blob": "407486fd6c0f36cd161ab339d373fb208d186905",
       "bytes": 1413315,
       "sha256": "cb81139ddc07b81a2b63eb7fe6ce9b9e3f0cb0010419746e81c02b8b26d56ebe"
     },
     {
-      "path": "crates/rovai-core/src/builtin_tool_evidence_projection.rs",
+      "path": "crates/coaxi-core/src/builtin_tool_evidence_projection.rs",
       "git_blob": "4bf81adeecadbbdda30698c9fb4043b065a00dda",
       "bytes": 65224,
       "sha256": "12348a20f005bf48b4ade592e07441f2e6c8fc6d2df35d677743114856024363"
     },
     {
-      "path": "crates/rovai-core/src/builtin_tool_runtime.rs",
+      "path": "crates/coaxi-core/src/builtin_tool_runtime.rs",
       "git_blob": "b1cb95588c42a26a6b78c44d8504c4fcbed85105",
       "bytes": 46521,
       "sha256": "9670b2137d4f4bf6b2e1f813cfb4cd6e08fa9cfd945d591c70038dcbd605bf6a"
     },
     {
-      "path": "crates/rovai-core/src/command.rs",
+      "path": "crates/coaxi-core/src/command.rs",
       "git_blob": "b2a1334067fac5b3de8d769078c101c579d64f51",
       "bytes": 42960,
       "sha256": "88456aa99147760594b3282715b0dd6114a0379926775032194b1caf985c69c3"
     },
     {
-      "path": "crates/rovai-core/src/context/delegation_context_tests.rs",
+      "path": "crates/coaxi-core/src/context/delegation_context_tests.rs",
       "git_blob": "b03f31843605989a7e788216a1a801303add0701",
       "bytes": 26352,
       "sha256": "f6cb9617fe9c9c055ba4ce8d979bfda21bcf41bb5c9ff5f45c713d1ce9733f75"
     },
     {
-      "path": "crates/rovai-core/src/context/delegation_evidence_tests.rs",
+      "path": "crates/coaxi-core/src/context/delegation_evidence_tests.rs",
       "git_blob": "a3c810d868697c3c21c44b425d4fa49de2102e2a",
       "bytes": 22981,
       "sha256": "67ebfc4f0c0937721f23c350eedb1294b412f84b9e3da49e7966fea66912abfd"
     },
     {
-      "path": "crates/rovai-core/src/delegation_dispatch.rs",
+      "path": "crates/coaxi-core/src/delegation_dispatch.rs",
       "git_blob": "256b6b3b8d7a7444665993614b39ec0a67cdf807",
       "bytes": 25966,
       "sha256": "228a4873e36f6b0b78b9be8b3900d1632142f35abc9c2bb2f42e3110856f0afb"
     },
     {
-      "path": "crates/rovai-core/src/delegation_dispatch/evidence.rs",
+      "path": "crates/coaxi-core/src/delegation_dispatch/evidence.rs",
       "git_blob": "61689ece03e27a7b957538aa5cd8b34b3ea3b734",
       "bytes": 4814,
       "sha256": "a4c151ace764e60857409abb561026c7dc24bc15d8208931f87f12156215a02c"
     },
     {
-      "path": "crates/rovai-core/src/delegation_dispatch/recovery.rs",
+      "path": "crates/coaxi-core/src/delegation_dispatch/recovery.rs",
       "git_blob": "0fb6222d081a0ba14e940cd60aee96c1bc194a4d",
       "bytes": 7550,
       "sha256": "64f175e4f1867232a4297ad1abe5a23b04953163a61eaf4de5cd4c19025ec5d9"
     },
     {
-      "path": "crates/rovai-core/src/delegation_model_command.rs",
+      "path": "crates/coaxi-core/src/delegation_model_command.rs",
       "git_blob": "e69477a5efcca8138a5f92e7f12febfa0bcc4aed",
       "bytes": 22556,
       "sha256": "e3f1ff05f404c33f37f0be9660883dceaa5f9126d5da878aeeaed2f424fd72e2"
     },
     {
-      "path": "crates/rovai-core/src/delegation_start.rs",
+      "path": "crates/coaxi-core/src/delegation_start.rs",
       "git_blob": "0ca807ef87427fd6886107f7c5c53fa9a6a6ec3b",
       "bytes": 9907,
       "sha256": "7be520fbffff22fecf4c0fb2dfbe0e10a68854d0770909cb2b1c09426aade41c"
     },
     {
-      "path": "crates/rovai-core/src/execution_evidence.rs",
+      "path": "crates/coaxi-core/src/execution_evidence.rs",
       "git_blob": "854e8517aadd9881a617654994673456a18ad59f",
       "bytes": 251438,
       "sha256": "11db113ec8a65043655a5ab7dbcbe3ee2af61b10f34016ed2c15b1e1c18ff7ff"
@@ -197,234 +197,234 @@
   ],
   "logs": [
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-compile-01.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\logs\\delegation-reconciliation-compile-01.log",
       "bytes": 1985,
       "sha256": "145522c06f5d393eac6ebb2321373fba06e0f8d86f0ba98153697f413f35129d"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-compile-02.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\logs\\delegation-reconciliation-compile-02.log",
       "bytes": 2225,
       "sha256": "93af068aca3a434471c0bb7eb055c80fb0a7f5811b412fd75432e39fcae1bb51"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-compile-03.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\logs\\delegation-reconciliation-compile-03.log",
       "bytes": 2225,
       "sha256": "cd55b11871e065ca73de4ed5136ed10a6f485bf2109343feade14968bfcee85e"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-compile-04.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\logs\\delegation-reconciliation-compile-04.log",
       "bytes": 2225,
       "sha256": "cc671bdd9f6fb263c8afcc3090472ff9b09753ff99f7a87a03273a557f389e93"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-compile-05.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\logs\\delegation-reconciliation-compile-05.log",
       "bytes": 2225,
       "sha256": "23aa8d6b51ffb3ac132b889008662e8cf615ac6caffacff568e58d90412ab59f"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-compile-06.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\logs\\delegation-reconciliation-compile-06.log",
       "bytes": 2225,
       "sha256": "5a57def776758873654c0e86572592322fe9e59eb456d9bb8289ac13e8671fa4"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-compile-07.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\logs\\delegation-reconciliation-compile-07.log",
       "bytes": 2225,
       "sha256": "c1bbaac690f9a2184345c4905e67fc7a7556f3b0e08bbf7b1a0ca24c93c1e6fb"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-context-01.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\logs\\delegation-reconciliation-context-01.log",
       "bytes": 951,
       "sha256": "171edcf1e82e278e6e8d6dffc4ac28d10963b5f3433d7c002a4186b251d7277a"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-context-02.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\logs\\delegation-reconciliation-context-02.log",
       "bytes": 933,
       "sha256": "2be53f4db240cdb20508ff3159da73b9431bc833a5ad7449216f98822b2f8f12"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-context-03.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\logs\\delegation-reconciliation-context-03.log",
       "bytes": 2001,
       "sha256": "0361294b06c4dc0a739f1d204f6868696c0effb75266ee5cc275d6639cb8c0f1"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-context-04.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\logs\\delegation-reconciliation-context-04.log",
       "bytes": 2937,
       "sha256": "f1c7863df411313a6811a99ad9c09dfac3c5849434c1035c53f4903c9bb6853a"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-context-05.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\logs\\delegation-reconciliation-context-05.log",
       "bytes": 610,
       "sha256": "8ac113bdca1eb76489f2bb1eae79b63bf8efc4854ef63140e80c998591167056"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-context-final.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\logs\\delegation-reconciliation-context-final.log",
       "bytes": 610,
       "sha256": "b8f5cd398690a14526193e2b7f1cfd939146f30a059f4b98b094eb01986ca616"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-context-list-01.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\logs\\delegation-reconciliation-context-list-01.log",
       "bytes": 125,
       "sha256": "8d7c39b86e00e4e7eee958d5210fe31c3224cf0ebf2bba69b1e95c305acee56d"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-diagnosis-02.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\logs\\delegation-reconciliation-diagnosis-02.log",
       "bytes": 355,
       "sha256": "915966c89c144d410dc023486e6daf9aa15d44dbc92cbfc9ac0498174fdf9f7a"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-diagnosis-03.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\logs\\delegation-reconciliation-diagnosis-03.log",
       "bytes": 344,
       "sha256": "485ab153745619450d3a2fb73192ad56e63dbc09dd921aec1699011250cc670b"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-diff-final.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\logs\\delegation-reconciliation-diff-final.log",
       "bytes": 250,
       "sha256": "2a58200b15a2f8892f47424b7d7192f554710c940524d1806bfdf5b2d7d91840"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-doc-governance-01.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\logs\\delegation-reconciliation-doc-governance-01.log",
       "bytes": 170,
       "sha256": "bd57f1c3a9c4155f59e96b05b1d0fc29d3306585b8defa7e026134bc90302c0a"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-doc-tests-01.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\logs\\delegation-reconciliation-doc-tests-01.log",
       "bytes": 924,
       "sha256": "1ceb409df3dfbcbd9d746bd9d545789434678d5f419e9918ef983e080b809dd6"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-doc-version-01.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\logs\\delegation-reconciliation-doc-version-01.log",
       "bytes": 79,
       "sha256": "18aa44bf0cc0d653a3fc97fcc383a104185a97ec97dc4060f0a3b6270bc8d335"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-evidence-01.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\logs\\delegation-reconciliation-evidence-01.log",
       "bytes": 229,
       "sha256": "91e1c625f481ded56d73bbbd3e4bb2313487006d39f069ae8506e94864269b59"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-evidence-final.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\logs\\delegation-reconciliation-evidence-final.log",
       "bytes": 229,
       "sha256": "afbe8f168a5ef9f42633aba6f0bd74883fcfcd8be1433796e056f85bbfa96931"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-evidence-list-01.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\logs\\delegation-reconciliation-evidence-list-01.log",
       "bytes": 127,
       "sha256": "2243c3743bf782c20fc3e5a551c6f514248ff0b0d1bc82cbbe2b77402cdb7825"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-fmt-01.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\logs\\delegation-reconciliation-fmt-01.log",
       "bytes": 44,
       "sha256": "83cee69214da2175b5033379ed8853ff7990d883aa32a0acf6b28bef6f404b66"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-helper-fmt-final.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\logs\\delegation-reconciliation-helper-fmt-final.log",
       "bytes": 0,
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-normalizer-01.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\logs\\delegation-reconciliation-normalizer-01.log",
       "bytes": 237,
       "sha256": "023febb105d18930e31d2761b5f4943275fac44fb106961ffdd7a0af26289eb0"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-normalizer-final.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\logs\\delegation-reconciliation-normalizer-final.log",
       "bytes": 237,
       "sha256": "023febb105d18930e31d2761b5f4943275fac44fb106961ffdd7a0af26289eb0"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-normalizer-list-01.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\logs\\delegation-reconciliation-normalizer-list-01.log",
       "bytes": 135,
       "sha256": "4f03e0eaa7ac52165190dab1051fce3b13d0b90da33b0d7d98f87cb2da5ddfa5"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-projection-01.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\logs\\delegation-reconciliation-projection-01.log",
       "bytes": 1785,
       "sha256": "882ffe199ea7ab27e14ab5b660f5e5dac2c54550eeb0220826d75801ae8a6ef9"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-projection-current.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\logs\\delegation-reconciliation-projection-current.log",
       "bytes": 1785,
       "sha256": "ba41343e4c9460d77f0f38e28bd23093fa8ca1e9968ae69c11d0b894f3a719fc"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-projection-final.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\logs\\delegation-reconciliation-projection-final.log",
       "bytes": 1785,
       "sha256": "5d5709587210a91781d107323c77ca48f3ceb392bb8817b823af2f32cccc2805"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-projection-list-01.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\logs\\delegation-reconciliation-projection-list-01.log",
       "bytes": 1604,
       "sha256": "935d14deeb4b1d1cc4b6f5c3fc272762bc162b56a25aaac5e48816908970d4a3"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-sync-01.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\logs\\delegation-reconciliation-sync-01.log",
       "bytes": 351,
       "sha256": "306a1bcfc2e95f9932f9ef46136190dfb77ebf22c5f24d0eca0798a59258b69d"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-sync-02.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\logs\\delegation-reconciliation-sync-02.log",
       "bytes": 88,
       "sha256": "4b5e6457c82b34383f70240f2de6ba2c4356069cd254d5755442097468fb99ef"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-sync-03.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\logs\\delegation-reconciliation-sync-03.log",
       "bytes": 88,
       "sha256": "4b5e6457c82b34383f70240f2de6ba2c4356069cd254d5755442097468fb99ef"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-sync-04.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\logs\\delegation-reconciliation-sync-04.log",
       "bytes": 88,
       "sha256": "4b5e6457c82b34383f70240f2de6ba2c4356069cd254d5755442097468fb99ef"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-sync-final.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\logs\\delegation-reconciliation-sync-final.log",
       "bytes": 250,
       "sha256": "a7d634028462a25d1b77c62790ee7e82ea91fcaf216d95a8aa47b44bb4fbbbf1"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-tmp-01.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\logs\\delegation-reconciliation-tmp-01.log",
       "bytes": 309,
       "sha256": "ca0fc0364f8c1378497a0906aeaca583cdbb1829fdaf8c9639c1fe881a696101"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-tmp-final.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\logs\\delegation-reconciliation-tmp-final.log",
       "bytes": 309,
       "sha256": "0678385d15acfd6c73bd9a821c18a0d0f1cf7031844ef2515f485e8290bc03d1"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-tmp-list-01.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\logs\\delegation-reconciliation-tmp-list-01.log",
       "bytes": 201,
       "sha256": "2b2f1572212c6df3c3129b3692a5ad67e050efeb774ae7975fe0172d0fe6d86d"
     }
   ],
   "approved_files_verified_unchanged": [
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\proposals\\native-delegation-r1.md",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\integration\\proposals\\native-delegation-r1.md",
       "bytes": 44061,
       "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\proposals\\native-delegation-r1-contract.json",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\integration\\proposals\\native-delegation-r1-contract.json",
       "bytes": 117977,
       "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\I04_队员怎样叫来独立帮手_客户确认版_r1.docx",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\outputs\\I04_独立帮手_r1\\final\\I04_队员怎样叫来独立帮手_客户确认版_r1.docx",
       "bytes": 67619,
       "sha256": "b3a318110460df2c95fc7132f4f3a985f0e59c6e506161fa1b8ceee3d70c0192"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\I04_队员怎样叫来独立帮手_客户确认版_r1.pdf",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\outputs\\I04_独立帮手_r1\\final\\I04_队员怎样叫来独立帮手_客户确认版_r1.pdf",
       "bytes": 809962,
       "sha256": "79af957b4e2f3e2a77311b72093188289f193d1c36d49218d99e1d9cb2446340"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\native-delegation-r1-contract.json",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\outputs\\I04_独立帮手_r1\\final\\native-delegation-r1-contract.json",
       "bytes": 117977,
       "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\native-delegation-r1.md",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\outputs\\I04_独立帮手_r1\\final\\native-delegation-r1.md",
       "bytes": 44061,
       "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
     }

@@ -51,7 +51,7 @@ Skill Library view 的 `managementPolicy` 来自 bundled official manifest，而
 `cli-operations` 与 `memory-stewardship` 为 `system_required`：bundled install 以 DB-only 事务恢复 enabled
 与全部当前 Skill Delivery Groups 的 Assignment，命令边界拒绝修改；其余七项 official Skill 为
 `user_managed`。当前 inventory 为九项，名称、固定来源、默认启用值和管理策略由
-[`BUNDLED_SKILLS`](../../crates/rovai-core/src/skill.rs)统一声明。该策略只决定 Library desired
+[`BUNDLED_SKILLS`](../../crates/coaxi-core/src/skill.rs)统一声明。该策略只决定 Library desired
 state，不改变 projection ownership、preflight、Snapshot 或 Runtime load 证明。
 
 两项 `system_required` Skill 首次内置安装时默认启用。其余七项 `user_managed` Skill，即

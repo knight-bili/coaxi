@@ -11,9 +11,9 @@ last_updated: 2026-09-24
 
 ## 实施前已核对的现状
 
-- 不带 `--before` 的 `rovai camp read --limit N` 从调用时最新的**可见**消息中选 N 条，`items` 按 sequence 从旧到新返回；`--before` 只读取更早的页。[Core 读取入口](../../crates/rovai-core/src/camp_history.rs)每次查询目标 Camp 的当前 sequence，不受本 Run 的 ContextManifest 历史上界限制。这一边界在 v10 保持不变。
+- 不带 `--before` 的 `rovai camp read --limit N` 从调用时最新的**可见**消息中选 N 条，`items` 按 sequence 从旧到新返回；`--before` 只读取更早的页。[Core 读取入口](../../crates/coaxi-core/src/camp_history.rs)每次查询目标 Camp 的当前 sequence，不受本 Run 的 ContextManifest 历史上界限制。这一边界在 v10 保持不变。
 - v9 的 `camp.read`、`camp.search` 和 `history.search` 查询都过滤仍可撤回的消息、已撤回消息，以及当前队员自己尚未领取的 Delivery。已撤回消息按 ID 读取返回 `message.withdrawn` 错误，时间线没有对应项。
-- [撤回事务](../../crates/rovai-core/src/collaboration.rs)以 `recall_state = recallable`、消息版本及所有 Delivery 仍为 `waiting` 为条件；成功后取消等待中的 Delivery，清空正文、结构化内容、引用、附件关系和回复关联，保留消息 ID、sequence 与撤回状态。`camp.read` 本身不执行 claim。
+- [撤回事务](../../crates/coaxi-core/src/collaboration.rs)以 `recall_state = recallable`、消息版本及所有 Delivery 仍为 `waiting` 为条件；成功后取消等待中的 Delivery，清空正文、结构化内容、引用、附件关系和回复关联，保留消息 ID、sequence 与撤回状态。`camp.read` 本身不执行 claim。
 
 因此，v9 的“读不到最新”主要是可见性过滤，不是无游标读取的上界停在旧 Run。
 

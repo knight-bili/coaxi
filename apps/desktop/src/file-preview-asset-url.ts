@@ -54,7 +54,7 @@ export function filePreviewAssetUrl(
   }
   if (resolved.length === 0) return null
   const encoded = resolved.map((segment) => encodeURIComponent(segment)).join('/')
-  return `rovai-preview://asset/${encodeURIComponent(tabToken)}/${encoded}${suffix}`
+  return `coaxi-preview://asset/${encodeURIComponent(tabToken)}/${encoded}${suffix}`
 }
 
 export interface ParsedFilePreviewAssetUrl {
@@ -69,7 +69,7 @@ export function parseFilePreviewAssetUrl(value: string): ParsedFilePreviewAssetU
   } catch {
     return null
   }
-  if (url.protocol !== 'rovai-preview:' || url.hostname !== 'asset' || url.username || url.password || url.port) {
+  if (url.protocol !== 'coaxi-preview:' || url.hostname !== 'asset' || url.username || url.password || url.port) {
     return null
   }
   const encoded = url.pathname.split('/').filter(Boolean)

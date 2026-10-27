@@ -17,16 +17,16 @@ const requiredSkills = readdirSync(skillsRoot, { withFileTypes: true })
 mkdirSync(output, { recursive: true })
 const sums = []
 for (const target of ['macos-arm64', 'macos-x64', 'windows-x64', 'linux-x64']) {
-  const asset = `rovai-server-${version}-${target}.${target === 'windows-x64' ? 'zip' : 'tar.gz'}`
-  const directories = readdirSync(artifacts).filter(name => name === `rovai-server-archive-${target}-${process.env.GITHUB_SHA}`)
+  const asset = `coaxi-server-${version}-${target}.${target === 'windows-x64' ? 'zip' : 'tar.gz'}`
+  const directories = readdirSync(artifacts).filter(name => name === `coaxi-server-archive-${target}-${process.env.GITHUB_SHA}`)
   if (directories.length !== 1) throw new Error(`Missing native archive: ${target}`)
   const directory = join(artifacts, directories[0]), archive = join(directory, asset)
   const digest = createHash('sha256').update(readFileSync(archive)).digest('hex')
   if (readFileSync(join(directory, 'SHA256SUMS'), 'utf8') !== `${digest}  ${asset}\n`) throw new Error(`Checksum mismatch: ${target}`)
   const manifest = JSON.parse(target === 'windows-x64'
-    ? execFileSync('unzip', ['-p', archive, 'rovai-server/manifest.json'], { encoding: 'utf8' })
-    : execFileSync('tar', ['-xzOf', archive, 'rovai-server/manifest.json'], { encoding: 'utf8' }))
-  if (manifest.schemaVersion !== 1 || manifest.productId !== 'codeg-rovai-workbench' || manifest.version !== version || manifest.commit !== process.env.GITHUB_SHA || manifest.dirty || manifest.profile !== 'release' || manifest.target !== target) throw new Error(`Package provenance mismatch: ${target}`)
+    ? execFileSync('unzip', ['-p', archive, 'coaxi-server/manifest.json'], { encoding: 'utf8' })
+    : execFileSync('tar', ['-xzOf', archive, 'coaxi-server/manifest.json'], { encoding: 'utf8' }))
+  if (manifest.schemaVersion !== 1 || manifest.productId !== 'coaxi' || manifest.version !== version || manifest.commit !== process.env.GITHUB_SHA || manifest.dirty || manifest.profile !== 'release' || manifest.target !== target) throw new Error(`Package provenance mismatch: ${target}`)
   for (const name of requiredSkills) {
     const path = `skills/${name}/SKILL.md`
     const sourceDigest = createHash('sha256').update(readFileSync(join(skillsRoot, name, 'SKILL.md'))).digest('hex')

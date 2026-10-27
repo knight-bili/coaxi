@@ -16,7 +16,7 @@ import { systemInterfaceLanguage } from '../../desktop/src/shared/interface-lang
 export function browserPreferences(scope: string, transport: ConsoleClient): {
   preferences: BusinessEnvironment['preferences']; profile: CurrentUserProfileApi
 } {
-  const key = `rovai.presentation:${scope}`
+  const key = `coaxi.presentation:${scope}`
   const read = <T>(name: string, fallback: T): T => {
     try { return JSON.parse(localStorage.getItem(`${key}:${name}`) ?? 'null') as T ?? fallback }
     catch { return fallback }

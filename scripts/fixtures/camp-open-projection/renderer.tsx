@@ -247,7 +247,7 @@ function installAttachmentSurfaceState(result: FixtureImageResult): void {
     attachmentFile('user-notes', '展示规则.md', 'text/markdown'),
     attachmentFile(
       'user-long-html',
-      'rovai-file-reference-and-tab-icons-md-doc-code-larger.html',
+      'coaxi-file-reference-and-tab-icons-md-doc-code-larger.html',
       'text/html'
     ),
     attachmentFile('user-image-three', '交付样式.svg', 'image/svg+xml', { previewKind: 'image' }),
@@ -255,7 +255,7 @@ function installAttachmentSurfaceState(result: FixtureImageResult): void {
     attachmentFile('user-archive', '参考素材.zip', 'application/zip')
   ]
   const agentFiles = [
-    attachmentFile('agent-web', 'rovai-file-surfaces.html', 'text/html'),
+    attachmentFile('agent-web', 'coaxi-file-surfaces.html', 'text/html'),
     attachmentFile('agent-code', 'file-icon-map.ts', 'text/typescript'),
     attachmentFile('agent-notes', 'implementation-notes.md', 'text/markdown'),
     attachmentFile('agent-pdf', 'attachment-spec.pdf', 'application/pdf'),
@@ -319,7 +319,7 @@ function installAttachmentSurfaceState(result: FixtureImageResult): void {
 if (attachmentReviewMode) installAttachmentSurfaceState(reviewImages[0])
 let copiedPublicText = ''
 
-Object.assign(window, { rovai: {
+Object.assign(window, { coaxi: {
   platform: 'darwin', onEvent: () => () => {},
   clipboard: { write: async ({ text }: { text: string }) => { copiedPublicText = text } },
   request: async (method: string, params?: {
@@ -454,7 +454,7 @@ const navigation: NavigationSnapshot = {
     ]
   },
   projects: [{
-    projectKey: 'directory:/fixture/workspace', projectPath: '/fixture/workspace', name: 'rovai-ai',
+    projectKey: 'directory:/fixture/workspace', projectPath: '/fixture/workspace', name: 'coaxi',
     lastActivityAt: now, lastActivityGlobalSequence: 102, totalCount: 3,
     recentThreads: [
       activeNavigationCamp,
@@ -493,7 +493,7 @@ function Fixture({ executionPlacement = 'bottom', windowed = false, entryPreview
       contextLabel={attachmentReviewMode ? 'Mock Camp · 无 Core / LLM' : '隔离验收'} thread={snapshot}
       detailEntryHostRef={setEntryHost} onFocusApprovals={() => {}} />
     <main className="content task-content">
-      <ThreadWorkspace snapshot={snapshot} projectName="rovai-ai" agents={agents} busy={false} stopping={false}
+      <ThreadWorkspace snapshot={snapshot} projectName="coaxi" agents={agents} busy={false} stopping={false}
         initialComposerDraft={draft.attachments.length > 0 ? draft : null}
         messageHistory={messageHistory}
         onLoadEarlierMessages={async () => {
@@ -850,7 +850,7 @@ Object.assign(window, { campOpenTest: {
     const agentFiles = agent.querySelector('.agent-output-files')!
     const imageTile = user.querySelector<HTMLElement>('.image-tile-preview')!
     const userFileCards = Array.from(user.querySelectorAll<HTMLElement>('.user-timeline'))
-    const longUserFileCard = userFileCards.find((card) => card.textContent?.includes('rovai-file-reference'))
+    const longUserFileCard = userFileCards.find((card) => card.textContent?.includes('coaxi-file-reference'))
     const longUserFileName = longUserFileCard?.querySelector<HTMLElement>('.attachment-title-line strong')
     const composerCards = Array.from(document.querySelectorAll<HTMLElement>('.composer-attachment-card'))
     const composerFileCards = composerCards.filter(card => !card.classList.contains('composer-image-attachment'))

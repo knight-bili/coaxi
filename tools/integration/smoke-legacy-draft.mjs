@@ -8,7 +8,7 @@ import { launchAcceptanceBrowser } from '../../scripts/lib/host-web-browser.mjs'
 import { coreDataDirectoryArguments } from '../../scripts/lib/runtime-camp-files-root.mjs'
 
 const root = path.resolve(import.meta.dirname, '../..')
-const { ROVAI_HOST_BIN: binary, ROVAI_WEB_UI: ui, WORKBENCH_BROWSER_BIN: chrome, WORKBENCH_EVIDENCE_ROOT: evidenceRoot, WORKBENCH_LEGACY_FIXTURE: source } = process.env
+const { COAXI_HOST_BIN: binary, COAXI_WEB_UI: ui, WORKBENCH_BROWSER_BIN: chrome, WORKBENCH_EVIDENCE_ROOT: evidenceRoot, WORKBENCH_LEGACY_FIXTURE: source } = process.env
 assert([binary, ui, chrome, evidenceRoot, source].every(value => value && path.isAbsolute(value)))
 const allowed = await realpath(evidenceRoot), fixture = await realpath(source)
 assert.equal(path.dirname(fixture), allowed)
@@ -47,8 +47,8 @@ try {
   if (await browser.evaluate(`document.querySelector('.quick-chat-continue-row') !== null`)) await browser.click(`document.querySelector('.quick-chat-continue-row')`)
   const editor = `document.querySelector('.conversation-controls [contenteditable=true]')`
   await browser.wait(`Boolean(${editor}) && document.querySelector('.legacy-draft-recovery button') !== null`)
-  assert.equal(await browser.evaluate('typeof window.rovai'), 'undefined')
-  const legacyKeys = await browser.evaluate(`Object.keys(localStorage).filter(key=>key.startsWith('rovai.camp-composer-draft.v1:'))`)
+  assert.equal(await browser.evaluate('typeof window.coaxi'), 'undefined')
+  const legacyKeys = await browser.evaluate(`Object.keys(localStorage).filter(key=>key.startsWith('coaxi.camp-composer-draft.v1:'))`)
   assert.equal(legacyKeys.length, 1)
   const key = legacyKeys[0]
   const original = await browser.evaluate(`localStorage.getItem(${JSON.stringify(key)})`)
@@ -73,7 +73,7 @@ try {
   await browser.click(`document.querySelector('.legacy-draft-recovery button')`)
   await browser.wait(`${editor}.textContent === 'I02_TAB_A_UNSENT'`)
   assert.equal(await browser.evaluate(`localStorage.getItem(${JSON.stringify(key)})`), original)
-  const scoped = await browser.evaluate(`Object.keys(localStorage).filter(key=>key.startsWith('rovai.web.thread-drafts.v1:')).map(key=>JSON.parse(localStorage.getItem(key)).entries[${JSON.stringify(key)}]?.value).find(value=>value?.includes('I02_TAB_A_UNSENT'))`)
+  const scoped = await browser.evaluate(`Object.keys(localStorage).filter(key=>key.startsWith('coaxi.web.thread-drafts.v1:')).map(key=>JSON.parse(localStorage.getItem(key)).entries[${JSON.stringify(key)}]?.value).find(value=>value?.includes('I02_TAB_A_UNSENT'))`)
   assert.equal(JSON.parse(scoped).body, 'I02_TAB_A_UNSENT')
   record('explicit_restore_copies_to_verified_editor_and_preserves_original_bytes')
   await browser.reload()
@@ -93,7 +93,7 @@ try {
 } finally {
   if (browser) await browser.close()
   if (host) await host.close()
-  const db = new DatabaseSync(path.join(data, 'rovai.sqlite'), { readOnly: true })
+  const db = new DatabaseSync(path.join(data, 'coaxi.sqlite'), { readOnly: true })
   try { assert.equal(db.prepare('select count(*) n from agent_run').get().n, 0); assert.equal(Object.values(db.prepare('pragma integrity_check').get())[0], 'ok') }
   finally { db.close() }
   if (result) {

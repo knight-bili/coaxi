@@ -15,7 +15,7 @@
     "bootstrapModSha256": "315dd6da39163e341af2c93d9cd6088e0ca8b35df1708fc6454d2a78b37e8bbd",
     "model": "sub2api/gpt-6-sol",
     "permissionMode": "bypass",
-    "prompt": "Use the MCP tool issue_receipt on server rovai_delivery64 to request one fresh receipt. If necessary, call search_tools once to load its schema, then invoke the target tool once with {}. Do not use shell, filesystem, web, other tools, or additional searches. Reply only with the receipt returned by this invocation. If the target tool is unavailable, reply UNAVAILABLE. Never invent a result.",
+    "prompt": "Use the MCP tool issue_receipt on server coaxi_delivery64 to request one fresh receipt. If necessary, call search_tools once to load its schema, then invoke the target tool once with {}. Do not use shell, filesystem, web, other tools, or additional searches. Reply only with the receipt returned by this invocation. If the target tool is unavailable, reply UNAVAILABLE. Never invent a result.",
     "bootstrap": "You are an isolated MCP delivery acceptance session. Follow the user request and report the actual tool result accurately.",
     "cwd": "shared empty isolated workspace",
     "observation": "Loopback proxy forwards original request JSON and provider response bytes; no header, endpoint, full prompt or argument logging"
@@ -1867,7 +1867,7 @@
     "receipt": "RCP_5bcc0e3e-d0f7-4480-9fa4-c31cec9a3a62",
     "modelReturnedReceipt": true,
     "providerRequests": 2,
-    "scope": "Diagnostic provider/MCP client, not Command ACP or Rovai AgentRun; direct request contains the actual schema, auto tool choice, one tool.",
+    "scope": "Diagnostic provider/MCP client, not Command ACP or Coaxi AgentRun; direct request contains the actual schema, auto tool choice, one tool.",
     "events": [
       {
         "time": "2026-10-06T14:47:59.308Z",
@@ -1897,7 +1897,7 @@
         "stream": true,
         "tools": [
           {
-            "name": "mcp__rovai_delivery64__issue_receipt",
+            "name": "mcp__coaxi_delivery64__issue_receipt",
             "schemaSha256": "ff1b2d8857c8e4a2cd87b566a798c5d1cd937fe8a13363e59a51231b4b328939",
             "schemaType": "object",
             "properties": [],
@@ -1920,7 +1920,7 @@
         "toolCalls": [
           {
             "id": "call_b1aTVfQmD5E4LbcqmYel05ow",
-            "name": "mcp__rovai_delivery64__issue_receipt",
+            "name": "mcp__coaxi_delivery64__issue_receipt",
             "argumentsSha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
             "emptyArguments": true
           }
@@ -1955,7 +1955,7 @@
         "stream": true,
         "tools": [
           {
-            "name": "mcp__rovai_delivery64__issue_receipt",
+            "name": "mcp__coaxi_delivery64__issue_receipt",
             "schemaSha256": "ff1b2d8857c8e4a2cd87b566a798c5d1cd937fe8a13363e59a51231b4b328939",
             "schemaType": "object",
             "properties": [],

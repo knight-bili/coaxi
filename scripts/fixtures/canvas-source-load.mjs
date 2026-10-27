@@ -45,7 +45,7 @@ export async function qualifyCanvasSourceLoad({request,fixture,dataDir,evidence,
  record('real_directory_and_large_file_observations_exhaust_bounded_worker_capacity_without_blocking_an_independent_database_commit')
  for(const row of busy)await attach(contexts[row.index],row.index<4?tree:large,'R08 material '+row.index)
  for(const context of contexts.slice(0,8)){const snapshot=await request('singleChat.get',{conversationId:context.conversationId});assert.equal(snapshot.draft.attachments.length,1);assert.deepEqual(snapshot.agentRuns,[])}
- const database=new DatabaseSync(join(dataDir,'rovai.sqlite'),{readOnly:true})
+ const database=new DatabaseSync(join(dataDir,'coaxi.sqlite'),{readOnly:true})
  try{
   const observations=contexts.slice(0,8).map(context=>({conversationId:context.conversationId,rows:database.prepare('SELECT observation_json FROM single_chat_source_observation WHERE conversation_id=?').all(context.conversationId).map(row=>JSON.parse(row.observation_json))}))
   for(const [n,item] of observations.entries()){

@@ -1,0 +1,217 @@
+package app.coaxi.android.feature.main
+
+import android.content.Context
+import android.net.Uri
+import dagger.hilt.android.qualifiers.ApplicationContext
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import app.coaxi.android.core.data.ServerRepository
+import app.coaxi.android.core.datastore.ServerProfile
+import app.coaxi.android.core.network.*
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.serialization.json.*
+import java.util.UUID
+import javax.inject.Inject
+
+fun JsonElement?.coreObject():JsonObject=this as? JsonObject?:buildJsonObject{}
+fun JsonElement?.coreArray():List<JsonObject> =(this as? JsonArray)?.mapNotNull{it as? JsonObject}?:emptyList()
+fun JsonObject.coreText(key:String):String=(get(key) as? JsonPrimitive)?.contentOrNull?:""
+fun JsonObject.coreLong(key:String):Long=(get(key) as? JsonPrimitive)?.longOrNull?:0
+data class CoaxiWorkspaceState(val resourceVersion:Long=0,val connected:Boolean=false,val busy:Boolean=false,val error:String?=null,val navigation:JsonObject=buildJsonObject{},val members:List<JsonObject> =emptyList(),val missions:List<JsonObject> =emptyList(),val boards:List<JsonObject> =emptyList(),val boardSummaries:List<JsonObject> =emptyList(),val selectedThread:String?=null,val thread:JsonObject?=null,val pending:JsonObject?=null,val lastResult:JsonElement?=null,val lastCompletedOperation:String?=null,val publicSources:List<JsonObject> =emptyList(),val publicSourcesReady:Boolean=false,val lastInputOwner:String?=null,val lastInputBody:String?=null)
+
+@HiltViewModel
+class CoaxiWorkspaceViewModel @Inject constructor(private val servers:ServerRepository,@ApplicationContext private val appContext:Context):ViewModel(){
+    private val mutable=MutableStateFlow(CoaxiWorkspaceState());val state=mutable.asStateFlow()
+    private var profile:ServerProfile?=null;private var client:CoaxiHostClient?=null;private var lifetime=0L;private var eventGeneration=0L;private var events:Job?=null;private var active=true
+    private data class RefreshRun(val epoch:Long,val id:Long)
+    private val refreshStateLock=Any();private var refreshRun:RefreshRun?=null;private var refreshAgainEpoch:Long?=null;private var refreshRunSequence=0L;@Volatile private var refreshEpoch=0L
+    private val writeGate=Mutex();private val bodyGate=Mutex();private val bodyCache=mutableMapOf<String,String>()
+    fun bind(next:ServerProfile?){if(profile==next)return;eventGeneration++;events?.cancel();lifetime++;synchronized(refreshStateLock){refreshEpoch++;refreshAgainEpoch=null};bodyCache.clear();profile=next;client=null;mutable.value=CoaxiWorkspaceState();if(next!=null)viewModelScope.launch{try{val generation=lifetime;val current=servers.coaxiClient(next)?:throw CoaxiHostFailure("缺少服务器凭据");if(generation!=lifetime)return@launch;client=current;val pending=servers.loadCoaxiPending(next);mutable.update{it.copy(pending=pending)};current.connect();if(generation==lifetime){mutable.update{it.copy(connected=true)};refresh();listen()}}catch(cancelled:CancellationException){throw cancelled}catch(error:Exception){mutable.update{it.copy(error=error.message)}}}}
+    fun authenticate(){viewModelScope.launch{try{val generation=lifetime;val current=client?:profile?.let{servers.coaxiClient(it)}?:return@launch;mutable.update{it.copy(busy=true,error=null)};current.connect(authenticate=true);if(generation!=lifetime)return@launch;client=current;mutable.update{it.copy(connected=true)};refresh();listen()}catch(cancelled:CancellationException){throw cancelled}catch(error:Exception){mutable.update{it.copy(error=error.message,connected=false)}}finally{mutable.update{it.copy(busy=false)}}}}
+    fun foreground(value:Boolean){if(active!=value)synchronized(refreshStateLock){refreshEpoch++;refreshAgainEpoch=null};active=value;if(!value){eventGeneration++;events?.cancel();return};if(state.value.connected){viewModelScope.launch{refresh();listen()}}}
+    private fun listen(){
+        val previous=events
+        previous?.cancel()
+        if(!active)return
+        val current=client?:return
+        val generation=lifetime
+        val listener=++eventGeneration
+        events=viewModelScope.launch {
+            previous?.join()
+            if(listener!=eventGeneration||generation!=lifetime||!active||client!==current||!state.value.connected)return@launch
+            var retryDelayMillis=500L
+            while(isActive&&listener==eventGeneration&&generation==lifetime&&active&&client===current&&state.value.connected){
+                var openedAt:Long?=null
+                try{
+                    current.invalidations().conflate().collect{
+                        if(listener!=eventGeneration||generation!=lifetime||!active||client!==current||!state.value.connected)return@collect
+                        if(openedAt==null)openedAt=System.nanoTime()
+                        mutable.update{it.copy(resourceVersion=it.resourceVersion+1)}
+                        delay(250)
+                        if(listener==eventGeneration&&generation==lifetime&&active&&client===current&&state.value.connected)refresh()
+                    }
+                }catch(cancelled:CancellationException){throw cancelled}
+                catch(error:Exception){
+                    if(!isActive||listener!=eventGeneration||generation!=lifetime||!active||client!==current)return@launch
+                    if(error is CoaxiHostFailure&&error.code in setOf("host.unauthorized","host.login_required")){
+                        mutable.update{it.copy(error=error.message,connected=false)}
+                        return@launch
+                    }
+                    mutable.update{it.copy(error=error.message)}
+                }
+                if(!isActive||listener!=eventGeneration||generation!=lifetime||!active||client!==current||!state.value.connected)return@launch
+                openedAt?.let{if(System.nanoTime()-it>=30_000_000_000L)retryDelayMillis=500L}
+                delay(retryDelayMillis)
+                retryDelayMillis=(retryDelayMillis*2).coerceAtMost(30_000L)
+            }
+        }
+    }
+    suspend fun refresh(){
+        val current=client?:return
+        val generation=lifetime
+        val refreshLifetime=refreshEpoch
+        if(!active)return
+        val runId=synchronized(refreshStateLock){
+            if(generation!=lifetime||refreshLifetime!=refreshEpoch||!active||current!==client)return
+            if(refreshRun?.epoch==refreshLifetime){refreshAgainEpoch=refreshLifetime;return}
+            (++refreshRunSequence).also{refreshRun=RefreshRun(refreshLifetime,it)}
+        }
+        val owner=RefreshRun(refreshLifetime,runId)
+        val coroutineContext=currentCoroutineContext()
+        try{
+            while(generation==lifetime&&refreshLifetime==refreshEpoch&&active&&coroutineContext.isActive&&current===client){
+                synchronized(refreshStateLock){if(refreshRun==owner&&refreshAgainEpoch==refreshLifetime)refreshAgainEpoch=null}
+                val selected=state.value.selectedThread
+                try{
+                    coroutineScope{
+                        val navigation=async{current.request(CoaxiOperation.NAVIGATION_SNAPSHOT).coreObject()};val members=async{current.request(CoaxiOperation.MEMBERS_LIST).coreArray()};val missions=async{current.request(CoaxiOperation.MISSIONS_LIST).coreArray()};val boards=async{current.request(CoaxiOperation.CANVAS_BOARDS_LIST).coreObject()};val thread=async{selected?.let{current.request(CoaxiOperation.THREADS_OPEN,buildJsonObject{put("threadId",it);put("traceId",UUID.randomUUID().toString())}).coreObject()}}
+                        val navValue=navigation.await();val memberValue=members.await();val missionValue=missions.await();val boardValue=boards.await();val threadValue=thread.await()
+                        coroutineContext.ensureActive()
+                        if(generation==lifetime&&refreshLifetime==refreshEpoch&&active&&current===client)mutable.update{it.copy(navigation=navValue,members=memberValue,missions=missionValue,boards=boardValue["boards"].coreArray(),boardSummaries=boardValue["summaries"].coreArray(),thread=if(it.selectedThread==selected)threadValue else it.thread,error=null)}
+                    }
+                }catch(cancelled:CancellationException){throw cancelled}catch(error:Exception){if(generation==lifetime&&refreshLifetime==refreshEpoch&&active&&current===client)mutable.update{it.copy(error=error.message)}}
+                coroutineContext.ensureActive()
+                val repeat=synchronized(refreshStateLock){
+                    if(refreshRun!=owner)false
+                    else if(refreshAgainEpoch==refreshLifetime&&generation==lifetime&&refreshLifetime==refreshEpoch&&active&&coroutineContext.isActive&&current===client){refreshAgainEpoch=null;true}
+                    else{refreshRun=null;if(refreshAgainEpoch==refreshLifetime)refreshAgainEpoch=null;false}
+                }
+                if(!repeat)return
+            }
+        }finally{
+            synchronized(refreshStateLock){if(refreshRun==owner){refreshRun=null;if(refreshAgainEpoch==refreshLifetime)refreshAgainEpoch=null}}
+        }
+    }
+    private val missionReaders=mutableMapOf<String,Int>()
+    fun retainMissionDiff(id:String):()->Unit{val generation=lifetime;val key="$generation:$id";missionReaders[key]=(missionReaders[key]?:0)+1;var released=false;return release@{if(released)return@release;released=true;missionReaders[key]=((missionReaders[key]?:1)-1).coerceAtLeast(0);viewModelScope.launch{yield();if(missionReaders[key]==0){missionReaders.remove(key);if(generation==lifetime)runCatching{query(CoaxiOperation.MISSIONS_DIFFSESSION_RELEASE,buildJsonObject{put("missionId",id)})}}}}}
+    fun refreshNow(){viewModelScope.launch{refresh()}}
+    fun openThread(id:String?){mutable.update{it.copy(selectedThread=id,thread=null,publicSources=emptyList(),publicSourcesReady=false)};if(id!=null){viewModelScope.launch{try{val sources=readPublicSources(id);if(state.value.selectedThread==id)mutable.update{it.copy(publicSources=sources,publicSourcesReady=true)};refresh()}catch(error:Exception){mutable.update{it.copy(error=error.message)}}}}}
+    private suspend fun readPublicSources(threadId:String,selected:ServerProfile?=profile):List<JsonObject>{val current=selected?:throw CoaxiHostFailure("尚未连接");val raw=servers.readCoaxiBody(current,"public-attachments:$threadId");return if(raw.isEmpty())emptyList()else Json.parseToJsonElement(raw).coreArray()}
+    private suspend fun savePublicSources(threadId:String,sources:List<JsonObject>,selected:ServerProfile,generation:Long){require(sources.size<=32){"待发送附件超过32个，请先发送或移除"};servers.saveCoaxiBody(selected,"public-attachments:$threadId",if(sources.isEmpty())""else JsonArray(sources).toString());if(generation==lifetime&&state.value.selectedThread==threadId)mutable.update{it.copy(publicSources=sources,publicSourcesReady=true)}}
+    fun removePublicSource(id:String){if(state.value.pending!=null)return;val thread=state.value.selectedThread?:return;val selected=profile?:return;val generation=lifetime;viewModelScope.launch{try{bodyGate.withLock{savePublicSources(thread,readPublicSources(thread,selected).filter{it.coreText("id")!=id},selected,generation)}}catch(error:Exception){if(generation==lifetime)mutable.update{it.copy(error=error.message)}}}}
+    private suspend fun settlePublicSend(pending:JsonObject,result:JsonElement,selected:ServerProfile,generation:Long){if(pending.coreText("operation")!=CoaxiOperation.THREAD_MESSAGES_SEND.wire)return;val receipt=result.coreObject()["commandResult"].coreObject().ifEmpty{result.coreObject()};if(receipt.coreText("status")=="rejected")return;require(receipt.coreText("status") in listOf("applied","accepted")){"发送结果尚未确定"};val params=pending["params"].coreObject();val sent=params["sourceAttachments"].coreArray().map{it.coreText("id")}.toSet();val thread=params.coreText("threadId");bodyGate.withLock{savePublicSources(thread,readPublicSources(thread,selected).filter{it.coreText("id") !in sent},selected,generation)}}
+    suspend fun query(operation:CoaxiOperation,params:JsonElement=buildJsonObject{}):JsonElement=(client?:throw CoaxiHostFailure("尚未连接")).request(operation,params)
+    suspend fun privateConfiguration(action:String,params:JsonObject):JsonObject{val generation=lifetime;val result=(client?:throw CoaxiHostFailure("尚未连接")).privateConfiguration(action,params);if(generation!=lifetime)throw CancellationException("工作区已切换");return result}
+    suspend fun configurationArchive(metadata:JsonObject,file:java.io.File):JsonObject{val generation=lifetime;val result=(client?:throw CoaxiHostFailure("尚未连接")).configurationArchive(metadata,file);if(generation!=lifetime)throw CancellationException("工作区已切换");return result}
+    suspend fun downloadConfigurationExport(receipt:JsonObject,destination:java.io.File){val generation=lifetime;(client?:throw CoaxiHostFailure("尚未连接")).downloadConfigurationExport(receipt,destination);if(generation!=lifetime)throw CancellationException("工作区已切换")}
+    suspend fun presentationIdentity():String{val generation=lifetime;val session=(client?:throw CoaxiHostFailure("尚未连接")).connect();require(generation==lifetime){"工作区已切换"};return JsonArray(listOf(JsonPrimitive(session.ownerId),JsonPrimitive(session.clientId))).toString()}
+    suspend fun files(action:String,params:JsonObject):JsonObject{val generation=lifetime;val result=(client?:throw CoaxiHostFailure("尚未连接")).files(action,params);if(generation!=lifetime)throw CancellationException("工作区已切换");return result}
+    fun officePreviewUrl(port:Int,cap:String):String=(client?:throw CoaxiHostFailure("尚未连接")).officePreviewUrl(port,cap)
+    suspend fun fileBytes(action:String,params:JsonObject):CoaxiFileBytes{val generation=lifetime;val result=(client?:throw CoaxiHostFailure("尚未连接")).fileBytes(action,params);if(generation!=lifetime)throw CancellationException("工作区已切换");return result}
+    suspend fun readBody(owner:String):String {bodyCache[owner]?.let{return it};val selected=profile?:throw CoaxiHostFailure("尚未连接");val generation=lifetime;val body=servers.readCoaxiBody(selected,owner);if(generation!=lifetime)throw CancellationException("工作区已切换");return body}
+    suspend fun saveBody(owner:String,body:String)=bodyGate.withLock{val selected=profile?:throw CoaxiHostFailure("尚未连接");val generation=lifetime;servers.saveCoaxiBody(selected,owner,body);if(generation==lifetime&&bodyCache[owner]==null)bodyCache[owner]=body;if(generation!=lifetime)throw CancellationException("工作区已切换")}
+    suspend fun clearBodyIfMatches(owner:String,expectedBody:String,expectedGeneration:Long):Boolean=bodyGate.withLock{
+        require(expectedGeneration==lifetime){"工作区已切换，保留原记录"};val selected=profile?:throw CoaxiHostFailure("尚未连接");val body=servers.readCoaxiBody(selected,owner);require(expectedGeneration==lifetime){"工作区已切换，保留原记录"};if(body!=expectedBody)return@withLock false
+        servers.saveCoaxiBody(selected,owner,"");if(expectedGeneration==lifetime)bodyCache[owner]="";true
+    }
+    fun rememberBody(owner:String,body:String){val selected=profile?:return;val generation=lifetime;bodyCache[owner]=body;viewModelScope.launch{try{bodyGate.withLock{servers.saveCoaxiBody(selected,owner,body)}}catch(cancelled:CancellationException){throw cancelled}catch(error:Exception){if(generation==lifetime)mutable.update{it.copy(error=error.message)}}}}
+    val connectionGeneration:Long get()=lifetime
+    fun upload(uri:Uri,threadId:String,target:JsonObject,revision:Long,expectedHostGeneration:Long=lifetime){
+        if(expectedHostGeneration!=lifetime){mutable.update{it.copy(error="工作区已切换，请重新选择附件")};return}
+        if(state.value.pending!=null||state.value.busy)return
+        viewModelScope.launch{val generation=lifetime;mutable.update{it.copy(busy=true,error=null)};try{val prepared=CoaxiUploadSource.prepare(appContext,uri,threadId,target,revision);if(generation!=lifetime){CoaxiUploadSource.remove(appContext,prepared);return@launch};submit(buildJsonObject{put("operation","__host.upload");put("params",prepared)})}catch(cancelled:CancellationException){throw cancelled}catch(error:Exception){if(generation==lifetime)mutable.update{it.copy(error=error.message)}}finally{if(generation==lifetime)mutable.update{it.copy(busy=false)}}}
+    }
+    suspend fun prepareMissionFile(uri:Uri):JsonObject {val generation=lifetime;val value=CoaxiMissionBatch.prepare(appContext,uri);if(generation!=lifetime){CoaxiUploadSource.remove(appContext,value);throw CancellationException("工作区已切换")};return value}
+    suspend fun removeMissionFile(source:JsonObject){CoaxiUploadSource.remove(appContext,source)}
+    fun executeMissionBatch(operation:CoaxiOperation,commandId:String,command:JsonObject,kept:List<String>,sources:List<JsonObject>,owner:String,body:String){
+        if(state.value.pending!=null||state.value.busy)return
+        val intent=CoaxiMissionBatch.intent(operation,commandId,command,kept,sources)
+        submit(buildJsonObject{put("operation","__host.mission");putJsonObject("params"){put("intent",intent);put("sources",JsonArray(sources));put("attempted",false)};putJsonObject("nativeBody"){put("owner",owner);put("expectedBody",body);put("replace",false)}})
+    }
+    private suspend fun completeMissionBatch(pending:JsonObject,result:JsonElement,selected:ServerProfile,current:CoaxiHostClient,generation:Long){
+        val receipt=result.coreObject();require(receipt.coreText("status")in listOf("applied","accepted","rejected")){"原使命结果尚未确定"}
+        settlePrivate(pending,receipt,selected,current)
+        if(receipt.coreText("status")!="rejected")pending["params"].coreObject()["sources"].coreArray().forEach{CoaxiUploadSource.remove(appContext,it)}
+        servers.saveCoaxiPending(selected,null);if(generation!=lifetime)return
+        mutable.update{it.copy(pending=null,lastResult=receipt,lastCompletedOperation=pending["params"].coreObject()["intent"].coreObject().coreText("operation"),lastInputOwner=pending["nativeBody"].coreObject().coreText("owner"),lastInputBody=pending["nativeBody"].coreObject().coreText("expectedBody"),error=if(receipt.coreText("status")=="rejected")receipt.coreText("code")else null)};refresh()
+    }
+    private suspend fun dispatchMissionBatch(pending:JsonObject,current:CoaxiHostClient,selected:ServerProfile,generation:Long){
+        val params=pending["params"].coreObject();val intent=params["intent"].coreObject();val operation=CoaxiOperation.entries.first{it.wire==intent.coreText("operation")}
+        val input=buildJsonObject{put("commandId",intent.coreText("commandId"));put("command",intent["command"]!!)}
+        if(params["attempted"]==JsonPrimitive(true)){val status=current.reconcile(operation,input).coreObject();if(status.coreText("state")=="recorded"){completeMissionBatch(pending,status["result"]!!,selected,current,generation);return}}
+        val attempted=JsonObject(pending.toMutableMap().apply{put("params",JsonObject(params.toMutableMap().apply{put("attempted",JsonPrimitive(true))}))})
+        val files=CoaxiMissionBatch.files(appContext,params["sources"].coreArray());servers.saveCoaxiPending(selected,attempted);if(generation!=lifetime)throw CancellationException("工作区已切换");mutable.update{it.copy(pending=attempted)}
+        val reply=current.uploadMissionBatch(intent,files)
+        if(reply["error"]!=null&&reply["error"]!=JsonNull)throw CoaxiHostFailure(reply["error"].coreObject().coreText("message"),unknownResult=true)
+        completeMissionBatch(attempted,reply["result"]?:JsonNull,selected,current,generation)
+    }
+    private suspend fun completeUpload(pending:JsonObject,result:JsonObject,selected:ServerProfile,generation:Long){
+        require(result["draft"]!=null&&result["draft"]!=JsonNull||result["receipt"]!=null){"上传结果尚未确定，请核对原上传"}
+        val intent=pending["params"].coreObject()["intent"].coreObject();if(intent["target"].coreObject().coreText("kind")=="camp"&&result["draft"] is JsonObject){val thread=intent.coreText("threadId");val source=result["draft"]!!.jsonObject;require(source.coreText("id").isNotBlank()){ "上传来源回执不完整" };bodyGate.withLock{savePublicSources(thread,(readPublicSources(thread,selected)+source).distinctBy{it.coreText("id")},selected,generation)}}
+        servers.saveCoaxiPending(selected,null);runCatching{CoaxiUploadSource.remove(appContext,pending["params"]!!.jsonObject)}
+        if(generation!=lifetime)return
+        mutable.update{it.copy(pending=null,lastResult=result,lastCompletedOperation="__host.upload",error=if(result["receipt"].coreObject().coreText("status")=="rejected")result["receipt"].coreObject().coreText("code")else null)};refresh()
+    }
+    private suspend fun dispatchUpload(pending:JsonObject,current:CoaxiHostClient,selected:ServerProfile,generation:Long){
+        val params=pending["params"]!!.jsonObject;val intent=params["intent"]!!.jsonObject
+        if(params["attempted"]==JsonPrimitive(true)){
+            val action=if(intent["target"].coreObject().coreText("kind")=="camp")"reconcile" else "retry"
+            val status=current.uploadStatus(intent,action)
+            if(status["draft"]!=null||status.coreText("state")=="recorded"){completeUpload(pending,status,selected,generation);return}
+            require(status.coreText("state") in listOf("unknown","needs_source")){"原上传仍待核对"}
+        }
+        val marked=buildJsonObject{pending.forEach{(key,value)->put(key,value)};put("params",buildJsonObject{params.forEach{(key,value)->put(key,value)};put("attempted",true)})}
+        servers.saveCoaxiPending(selected,marked);if(generation==lifetime)mutable.update{it.copy(pending=marked)}
+        val bytes=CoaxiUploadSource.bytes(appContext,params);completeUpload(marked,current.upload(intent,bytes),selected,generation)
+    }
+    /** Retain the original closed Host request shape, including flat commands such as tasks.update. */
+    fun executeOwned(operation:CoaxiOperation,params:JsonObject,owner:String,body:String){
+        if(state.value.pending!=null)return
+        submit(buildJsonObject{put("operation",operation.wire);put("params",params);putJsonObject("nativeBody"){put("owner",owner);put("expectedBody",body);put("replace",false)}})
+    }
+    fun executePrivate(operation:CoaxiOperation,command:JsonObject,owner:String,body:String,replace:Boolean=false){
+        if(state.value.pending!=null)return
+        submit(buildJsonObject{put("operation",operation.wire);putJsonObject("params"){put("commandId",UUID.randomUUID().toString());put("command",command)};putJsonObject("nativeBody"){put("owner",owner);put("expectedBody",body);put("replace",replace)}})
+    }
+    private suspend fun settlePrivate(pending:JsonObject,result:JsonElement,selected:ServerProfile,current:CoaxiHostClient){
+        val local=pending["nativeBody"] as? JsonObject?:return;val receipt=result.coreObject()["commandResult"].coreObject().ifEmpty{result.coreObject()};if(receipt.coreText("status")=="rejected")return
+        require(receipt.coreText("status") in listOf("applied","accepted")){"私聊操作结果尚未确定"}
+        val payload=receipt["payload"].coreObject();val replace=(local["replace"] as? JsonPrimitive)?.booleanOrNull==true
+        if(replace&&payload.coreText("placement")=="retained")return
+        var replacement=""
+        if(replace){val draft=payload["draft"].coreObject();require(draft.coreLong("scopeVersion")==1L&&draft.coreText("scopeKey").isEmpty()&&draft["composerScope"]==JsonNull){"私聊材料归属发生变化"};replacement=(payload["body"] as? JsonPrimitive)?.contentOrNull?:throw IllegalStateException("私聊恢复正文缺失")
+            val command=pending["params"].coreObject()["command"].coreObject();val operation=if(pending.coreText("operation").startsWith("delegations."))CoaxiOperation.DELEGATIONS_CONVERSATION_GET else CoaxiOperation.SINGLECHAT_GET
+            val snapshot=current.request(operation,buildJsonObject{put("conversationId",command.coreText("conversationId"));put("composerScope",JsonNull)}).coreObject();require(snapshot["draft"].coreObject().coreLong("revision")==draft.coreLong("revision")){"材料版本已变化，请先核对原操作"}
+        }
+        bodyGate.withLock{val saved=servers.readCoaxiBody(selected,local.coreText("owner"));if(!replace&&saved!=local.coreText("expectedBody"))return@withLock;require(saved==local.coreText("expectedBody")||saved==replacement){"输入内容已变化，已保留当前草稿和原请求"};servers.saveCoaxiBody(selected,local.coreText("owner"),replacement);if(selected==profile&&current===client)bodyCache[local.coreText("owner")]=replacement}
+    }
+    fun execute(operation:CoaxiOperation,params:JsonObject){if(state.value.pending!=null)return;val pending=buildJsonObject{put("operation",operation.wire);put("params",params)};submit(pending)}
+    private fun submit(pending:JsonObject){viewModelScope.launch{if(!writeGate.tryLock())return@launch;val current=client;val selected=profile;val generation=lifetime;try{if(current==null||selected==null)return@launch;mutable.update{it.copy(pending=pending,busy=true,error=null)};servers.saveCoaxiPending(selected,pending);if(pending.coreText("operation")=="__host.mission"){dispatchMissionBatch(pending,current,selected,generation);return@launch};if(pending.coreText("operation")=="__host.upload"){dispatchUpload(pending,current,selected,generation);return@launch};val operation=CoaxiOperation.entries.first{it.wire==pending.coreText("operation")};val result=current.request(operation,pending["params"]?:JsonNull);settlePrivate(pending,result,selected,current);settlePublicSend(pending,result,selected,generation);servers.saveCoaxiPending(selected,null);if(generation!=lifetime)return@launch;mutable.update{it.copy(pending=null,lastResult=result,lastCompletedOperation=operation.wire,lastInputOwner=pending["nativeBody"].coreObject().coreText("owner").takeIf{it.isNotEmpty()},lastInputBody=pending["nativeBody"].coreObject().coreText("expectedBody"))};val receipt=result.coreObject()["commandResult"].coreObject().ifEmpty{result.coreObject()};if(receipt.coreText("status")=="rejected")mutable.update{it.copy(error=receipt.coreText("code"))};refresh()}catch(cancelled:CancellationException){throw cancelled}catch(error:Exception){if(generation==lifetime)mutable.update{it.copy(error=error.message)}}finally{if(generation==lifetime)mutable.update{it.copy(busy=false)};writeGate.unlock()}}}
+    fun retry(){state.value.pending?.let(::submit)}
+    fun reconcile(){val pending=state.value.pending?:return;viewModelScope.launch{val current=client?:return@launch;val selected=profile?:return@launch;val generation=lifetime;try{if(pending.coreText("operation")=="__host.mission"){val intent=pending["params"].coreObject()["intent"].coreObject();val operation=CoaxiOperation.entries.first{it.wire==intent.coreText("operation")};val status=current.reconcile(operation,buildJsonObject{put("commandId",intent.coreText("commandId"));put("command",intent["command"]!!)}).coreObject();if(status.coreText("state")=="recorded")completeMissionBatch(pending,status["result"]!!,selected,current,generation)else mutable.update{it.copy(error="原使命结果仍未知；保留完整请求与原附件")};return@launch};if(pending.coreText("operation")=="__host.upload"){val value=current.uploadStatus(pending["params"]!!.jsonObject["intent"]!!.jsonObject);completeUpload(pending,value,selected,generation);return@launch};val operation=CoaxiOperation.entries.first{it.wire==pending.coreText("operation")};val value=current.reconcile(operation,pending["params"]?:JsonNull).coreObject();if(generation!=lifetime)return@launch;if(value.coreText("state")=="recorded"){settlePrivate(pending,value["result"]?:JsonNull,selected,current);settlePublicSend(pending,value["result"]?:JsonNull,selected,generation);servers.saveCoaxiPending(selected,null);mutable.update{it.copy(pending=null,lastResult=value["result"],lastCompletedOperation=operation.wire,lastInputOwner=pending["nativeBody"].coreObject().coreText("owner").takeIf{it.isNotEmpty()},lastInputBody=pending["nativeBody"].coreObject().coreText("expectedBody"),error=null)};refresh()}else mutable.update{it.copy(error="原操作结果尚不明确，请稍后核对或重试原操作。")}}catch(cancelled:CancellationException){throw cancelled}catch(error:Exception){if(generation==lifetime)mutable.update{it.copy(error=error.message)}}}}
+    fun publicBody(text:String,recipients:Set<String>,revision:Long,reply:JsonObject?=null,quotes:List<JsonObject> =emptyList()):String=buildJsonObject{put("version",1);put("text",text);put("recipients",JsonArray(recipients.map(::JsonPrimitive)));put("revision",revision);put("reply",reply?:JsonNull);put("quotes",JsonArray(quotes))}.toString()
+    fun send(text:String,recipients:Set<String>,document:String,expectedThreadId:String){
+        val threadId=state.value.selectedThread?:return;if(threadId!=expectedThreadId||text.isBlank()||state.value.pending!=null||state.value.busy)return
+        val body=Json.parseToJsonElement(document).coreObject();require(body.coreText("text")==text&&(body["recipients"] as? JsonArray)?.mapNotNull{(it as? JsonPrimitive)?.contentOrNull}?.toSet()==recipients){"输入草稿发生变化"}
+        val params=buildJsonObject{put("commandId",UUID.randomUUID().toString());put("threadId",threadId);putJsonObject("content"){put("version",2);putJsonArray("segments"){recipients.forEach{id->add(buildJsonObject{put("kind","atom");putJsonObject("atom"){put("type","member");put("agentId",id)}})};add(buildJsonObject{put("kind","text");put("text",text)})}};put("sourceAttachments",JsonArray(state.value.publicSources));put("quotes",body["quotes"]?:JsonArray(emptyList()));put("replyToThreadMessageId",body["reply"].coreObject()["id"]?:JsonNull);putJsonObject("execution"){put("taskId",JsonNull);put("purpose",text.trim());put("completionRole","required")}}
+        submit(buildJsonObject{put("operation",CoaxiOperation.THREAD_MESSAGES_SEND.wire);put("params",params);putJsonObject("nativeBody"){put("owner","public:$threadId");put("expectedBody",document);put("replace",false)}})
+    }
+
+    fun command(operation:CoaxiOperation,command:JsonObject){execute(operation,buildJsonObject{put("commandId",UUID.randomUUID().toString());put("command",command)})}
+    fun logout(){viewModelScope.launch{events?.cancel();try{client?.logout();mutable.update{it.copy(connected=false)}}catch(error:Exception){mutable.update{it.copy(error=error.message)}}}}
+    override fun onCleared(){events?.cancel();super.onCleared()}
+}

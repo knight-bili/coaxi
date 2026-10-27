@@ -1,12 +1,12 @@
 export { createFileFindDomIndex } from '../../../../../packages/html-preview/src/find-dom'
 
 export function paintFileFindRanges(ranges: Range[], current: Range | null): void {
-  CSS.highlights.set('rovai-file-find-match', new Highlight(...ranges))
-  CSS.highlights.set('rovai-file-find-current', new Highlight(...(current ? [current] : [])))
+  CSS.highlights.set('coaxi-file-find-match', new Highlight(...ranges))
+  CSS.highlights.set('coaxi-file-find-current', new Highlight(...(current ? [current] : [])))
 }
 export function clearFileFindRanges(): void {
-  CSS.highlights.delete('rovai-file-find-match')
-  CSS.highlights.delete('rovai-file-find-current')
+  CSS.highlights.delete('coaxi-file-find-match')
+  CSS.highlights.delete('coaxi-file-find-current')
 }
 export function scrollFileFindRange(range: Range, root: HTMLElement, clearance: number): void {
   const bounds = range.getBoundingClientRect()

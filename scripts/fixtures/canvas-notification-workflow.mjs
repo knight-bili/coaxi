@@ -7,7 +7,7 @@ import { setTimeout as pause } from 'node:timers/promises'
 // 只旁路记录原Main请求与真实Core回执；不替换通知事实、可见性或确认结果。
 export function installNotificationIpc(ipcMain) {
  const original=ipcMain.handle.bind(ipcMain),calls=[]
- ipcMain.handle=(channel,handler)=>original(channel,channel==='rovai:request'?async(event,method,params)=>{
+ ipcMain.handle=(channel,handler)=>original(channel,channel==='coaxi:request'?async(event,method,params)=>{
   const entry={method,params,enteredAt:Date.now()}
   if(method.startsWith('notifications.')||method.includes('reader'))calls.push(entry)
   try{const result=await handler(event,method,params);entry.returnedAt=Date.now();entry.result=result;return result}

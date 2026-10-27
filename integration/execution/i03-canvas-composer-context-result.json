@@ -16,7 +16,7 @@
     "path": "src/components/canvas/canvas-conversation-surface.tsx",
     "draft_line": 786,
     "attachment_line": 791,
-    "meaning": "Codeg每卡contextKey独立草稿和附件scope；同卡inline/drawer复用，消息和执行共享Core。保留历史证据，不缩减多卡完整输入。"
+    "meaning": "Coaxi每卡contextKey独立草稿和附件scope；同卡inline/drawer复用，消息和执行共享Core。保留历史证据，不缩减多卡完整输入。"
   },
   "source_files": [
     {
@@ -167,7 +167,7 @@
       "exit_code": 0
     },
     {
-      "name": "pinned_Codeg_and_unchanged_transport",
+      "name": "pinned_Coaxi_and_unchanged_transport",
       "path": "../i03/canvas-context-source-proof.json",
       "sha256": "61b053df27782fdf01ae8ababb5082d6588a3b4ad9bda15bb09f3699edb0fee3"
     }

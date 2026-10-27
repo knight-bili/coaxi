@@ -4,7 +4,7 @@ import { chmod, lstat, readFile, readdir, rm, rmdir } from 'node:fs/promises'
 import { homedir, tmpdir } from 'node:os'
 import { dirname, isAbsolute, join, relative, resolve, sep, win32 } from 'node:path'
 
-const INSTANCE_KEY_DOMAIN = 'rovai-runtime-camp-files-instance-v1\0'
+const INSTANCE_KEY_DOMAIN = 'coaxi-runtime-camp-files-instance-v1\0'
 
 function instanceKey(canonicalDataDirectory) {
   return `v1-${createHash('sha256')
@@ -36,7 +36,7 @@ export function runtimeCampFilesRootForDataDirectory(
   const key = instanceKey(canonicalDataDirectory)
   return join(
     canonicalPath(homeDirectory, platform),
-    '.rovai',
+    '.coaxi',
     'instances',
     key,
     'runtime-files'

@@ -45,7 +45,7 @@
     "original_source_audit": [
       {
         "source": "src/components/ai-elements/markdown-mask.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/markdown-mask.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/markdown-mask.ts",
         "sourceSha256": "e7d3e54697645b0005aca1a4d51e07d057eaa188c53ebb2751ed32ffb8c8e9a4",
         "portedSha256": "b6799c1b33ee2ad6e6a6b15e73dfa285f6b74b055741ecbb44de56ffe19d1129",
         "extraction": null,
@@ -55,7 +55,7 @@
       },
       {
         "source": "src/components/ai-elements/remark-cjk-autolink-tail.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/remark-cjk-autolink-tail.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/remark-cjk-autolink-tail.ts",
         "sourceSha256": "97929cf8fd4bb7ccdc1c09be614457d579efadf426082082cd5255d4edddf76d",
         "portedSha256": "4f1edfc89b4f63afad5e351a00f4e26fdf9540d1b0302181479ef46bd0b5d178",
         "extraction": null,
@@ -65,7 +65,7 @@
       },
       {
         "source": "src/components/ai-elements/remark-file-uri-links.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/remark-file-uri-links.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/remark-file-uri-links.ts",
         "sourceSha256": "1e8997a2525e1a9ab4cfac6e776cc39da691a8fc8f03f7aead7dd89253ee2184",
         "portedSha256": "e076c3e46b6ee10040e8467d07e44ee43093c4d540a22dd9c36c3af5852eb4e0",
         "extraction": null,
@@ -75,7 +75,7 @@
       },
       {
         "source": "src/components/ai-elements/remark-windows-paths.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/remark-windows-paths.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/remark-windows-paths.ts",
         "sourceSha256": "260b2f4dd86e699807db9f32a34886d2dba07c23b967228cf0b7645c70e82336",
         "portedSha256": "ed1199d66d2ac50ab8761ca2c1cd4ad936b0628dda29b4fca3e2890f6073d816",
         "extraction": null,
@@ -85,7 +85,7 @@
       },
       {
         "source": "src/components/ai-elements/remark-local-images.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/remark-local-images.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/remark-local-images.ts",
         "sourceSha256": "905ba3da3d5dc3792419f7a5f4efefd8a62ae352ae70b7fcacdfab245916264b",
         "portedSha256": "f46ee73c2ab357cb4ae4ec440e43b05271048ac7e9f48771eed569fe100665a1",
         "extraction": null,
@@ -94,8 +94,8 @@
         ]
       },
       {
-        "source": "src/components/ai-elements/rehype-allow-codeg.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/rehype-allow-codeg.ts",
+        "source": "src/components/ai-elements/rehype-allow-coaxi.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/rehype-allow-coaxi.ts",
         "sourceSha256": "6836aea2de95984257e09b44e5519311759d899c0c63ce2aef667b80ed6bb38e",
         "portedSha256": "a3f12597ddcfc2662d9e2f668805d13dc4220d3c340a11ef1e67a7f581a05f4a",
         "extraction": null,
@@ -105,7 +105,7 @@
       },
       {
         "source": "src/components/ai-elements/rehype-relative-file-links.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/rehype-relative-file-links.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/rehype-relative-file-links.ts",
         "sourceSha256": "39e5ca3927df8744ce73666847cf73cb3fefe5b74de0b553095be8a3d2c63049",
         "portedSha256": "8c653b11a191a54571b16df2e012d796027327c6f29af9b5a92293ee9ba5c164",
         "extraction": null,
@@ -115,7 +115,7 @@
       },
       {
         "source": "src/components/ai-elements/streamdown-plugins.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/streamdown-plugins.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/streamdown-plugins.ts",
         "sourceSha256": "09c974ac22203e589af8e0410a5f5534d6e25df31c8a1ad4d75c09e5911c5244",
         "portedSha256": "f0b66d900ed22b855709a8c939ad53c9b9cc75b8bf15f369e61c640849b05b1a",
         "extraction": null,
@@ -125,7 +125,7 @@
       },
       {
         "source": "src/components/ai-elements/mermaid-view.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/mermaid-view.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/mermaid-view.ts",
         "sourceSha256": "03957f93080d2aaee86cda58756397113a85192bfc291be6cbbacc3616335016",
         "portedSha256": "5cdb8d32673bad8c1f65c22f799fa5c04bf96fde340451f6b67fcfc52190c21f",
         "extraction": null,
@@ -135,7 +135,7 @@
       },
       {
         "source": "src/components/ai-elements/json-render-pre.tsx",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/json-render-pre.tsx",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/json-render-pre.tsx",
         "sourceSha256": "4fae70b3c008f292a4ac7fe3578f9e92b7b0e816870416daf934976c2a29857c",
         "portedSha256": "51114f767ac97d3f0a53e8fce411a9076967898ab89369d55bf472bee11faa58",
         "extraction": null,
@@ -145,7 +145,7 @@
       },
       {
         "source": "src/components/ai-elements/mermaid-block.tsx",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/mermaid-block.tsx",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/mermaid-block.tsx",
         "sourceSha256": "d2fb3510464651b2b0a57c1e240b73f3c53662d35d8b143e222ff4ca3b43aad1",
         "portedSha256": "33b072e1e5ca05b84682693ab89d22c5dcd59b4920e423a8592f1e91738f25e0",
         "extraction": null,
@@ -155,7 +155,7 @@
       },
       {
         "source": "src/components/message/json-render-block.tsx",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/message/json-render-block.tsx",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/message/json-render-block.tsx",
         "sourceSha256": "ed7ccdd7d1d613f2e25723447800be805773ca87967a84e24dda9005d12e710a",
         "portedSha256": "0dc587b39f137d2e297a8f90aa6061c3fd713b21e3059c919ffa7b01fd9f0365",
         "extraction": null,
@@ -165,7 +165,7 @@
       },
       {
         "source": "src/components/message/json-render-charts.tsx",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/message/json-render-charts.tsx",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/message/json-render-charts.tsx",
         "sourceSha256": "3443e02389e53471c2074eb273c9d05a5e7ef4e1c63b7540a59f86ef2b0b85d5",
         "portedSha256": "fcc9c2dd2bdec228e078e3d38fbd756796fbabe96f945744487fdf5f24ce03be",
         "extraction": null,
@@ -175,7 +175,7 @@
       },
       {
         "source": "src/components/ui/button.tsx",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ui/button.tsx",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/ui/button.tsx",
         "sourceSha256": "704cbe3b92f902b0b9b14c4c0852b29b102969d0d242cbc0295f6936748042c5",
         "portedSha256": "17dd5ec5fb08747676b892191b0be7155f9f05d64e4e113f36840f326b066bda",
         "extraction": null,
@@ -185,7 +185,7 @@
       },
       {
         "source": "src/components/ui/dialog.tsx",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ui/dialog.tsx",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/ui/dialog.tsx",
         "sourceSha256": "6577d31e246d646acbd7323d0524a6ca4d7aa257bce93d94d741cd8fa0d72a42",
         "portedSha256": "1ae8ed6bd5a3907a47810c92432c853cab30119d484c0f1217656be4c8b4fc6b",
         "extraction": null,
@@ -195,7 +195,7 @@
       },
       {
         "source": "src/components/ui/dropdown-menu.tsx",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ui/dropdown-menu.tsx",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/ui/dropdown-menu.tsx",
         "sourceSha256": "e6f14b7623f50c4bf42e98d886916a38042d9055676766d854a72df5c408c995",
         "portedSha256": "04508995f1a0b92b74e360c47ce8b6e782679dc9b9a85ff26a39156a09985b87",
         "extraction": null,
@@ -205,7 +205,7 @@
       },
       {
         "source": "src/components/ui/overlay-portal-container.tsx",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ui/overlay-portal-container.tsx",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/ui/overlay-portal-container.tsx",
         "sourceSha256": "e3956775c458d478bacd78aef8849f43a8bf955080efa807d7bf3d48a12caa55",
         "portedSha256": "c2cba79b60004422caa72b09874de6b619d0cb108efe51688ef33b195f4e7683",
         "extraction": null,
@@ -215,17 +215,17 @@
       },
       {
         "source": "src/components/ui/chart.tsx",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ui/chart.tsx",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/ui/chart.tsx",
         "sourceSha256": "03639ebf3196101417ff8cea5e7d04de32b0af09c3c4ecfc4997d5d7a9ef1002",
         "portedSha256": "70c6bf8cf8f64ed8b8332471204b808062a70e8f044986b88c1062d6c9a6f87d",
         "extraction": null,
         "bodyChanges": [
-          "theme selector matches original Rovai data-theme"
+          "theme selector matches original Coaxi data-theme"
         ]
       },
       {
         "source": "src/components/ui/skeleton.tsx",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ui/skeleton.tsx",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/ui/skeleton.tsx",
         "sourceSha256": "5983a7f85ec4d194bc66c6c5e2516bd082276411120821169c35e055e8e1df9a",
         "portedSha256": "ac93b18ba16ffe901f35e53594c29c468ae687769ddf2dcce1cfc5af3fab68e4",
         "extraction": null,
@@ -235,7 +235,7 @@
       },
       {
         "source": "src/hooks/use-nested-layer-dismiss-guard.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/hooks/use-nested-layer-dismiss-guard.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/hooks/use-nested-layer-dismiss-guard.ts",
         "sourceSha256": "f253f1ba2519ba1439b1265c5d7384eaf678df5e3853fb9a375c969b08d9409a",
         "portedSha256": "61dd487b5213a2010a3300a9a4239f58ab2e84981a2b057680d35ee86881cbbe",
         "extraction": null,
@@ -245,7 +245,7 @@
       },
       {
         "source": "src/lib/attach-ref.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/attach-ref.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/lib/attach-ref.ts",
         "sourceSha256": "dc2a2d5fcc6428bcbdb1ad803d7b4b62a9448ec9d21af9b0e1dcab7652382876",
         "portedSha256": "caa2041e5b8acd74bf52f8d70829a8b03937e261fea45a24148d52237a606247",
         "extraction": null,
@@ -255,7 +255,7 @@
       },
       {
         "source": "src/lib/mermaid-export.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/mermaid-export.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/lib/mermaid-export.ts",
         "sourceSha256": "a12e726e886c9bfa73dcf5bc11c51dcc477efec78068b74c62a9aca47c4451c1",
         "portedSha256": "d01e3348b1e283636794c2c82ea289dc038f48e9ef78f3033da47f1a35c3f870",
         "extraction": null,
@@ -265,7 +265,7 @@
       },
       {
         "source": "src/lib/json-render/catalog.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/json-render/catalog.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/lib/json-render/catalog.ts",
         "sourceSha256": "a3f59a1adf10a577d969221eff01efa9d9c605ec01651fd88807c1abc1230fa0",
         "portedSha256": "530c6aa03216eb3f5f43112112573759994608696632d202691dc508f98f7546",
         "extraction": null,
@@ -275,7 +275,7 @@
       },
       {
         "source": "src/lib/json-render/spec.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/json-render/spec.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/lib/json-render/spec.ts",
         "sourceSha256": "30ce537a1dfd21735182f17bdcaf1db42c28bf9ba0bc8613caf91107a5655909",
         "portedSha256": "9c291352d1f6272cf52d62cdfb073f16c940cd687a9ab75d4af9a82a632987da",
         "extraction": null,
@@ -285,7 +285,7 @@
       },
       {
         "source": "src/lib/json-render/charts.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/json-render/charts.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/lib/json-render/charts.ts",
         "sourceSha256": "8baa9175f05fb2ce5cfc16e9432f0dd0452f860efbedcdf76bfa54e297b28752",
         "portedSha256": "971c64f65b6b83d86afe60115533739f9c8fec3d8c1836da72a35250d6fc9ae6",
         "extraction": null,
@@ -295,7 +295,7 @@
       },
       {
         "source": "src/lib/json-render/chart-data.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/json-render/chart-data.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/lib/json-render/chart-data.ts",
         "sourceSha256": "31f0d58c2d3ce80d6a46231dd8e0d991e8c95c6c058b2dd0558ea97941ea449d",
         "portedSha256": "5099d78a30637b0b02bec94d3ae66a4f76690bfdb1145ab641cb0195992aadea",
         "extraction": null,
@@ -305,7 +305,7 @@
       },
       {
         "source": "src/components/ai-elements/remark-cjk-autolink-tail.test.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/remark-cjk-autolink-tail.test.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/remark-cjk-autolink-tail.test.ts",
         "sourceSha256": "6ed1b2308cd0fa658ab3e9a23c656ec7813eb514400c9b3aefd584efdb39ef91",
         "portedSha256": "01623be631d7322bdbfb11066fcade8fd09b6a06beb1ee9b7d74b9bed3ce8ec9",
         "extraction": null,
@@ -315,7 +315,7 @@
       },
       {
         "source": "src/components/ai-elements/remark-file-uri-links.test.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/remark-file-uri-links.test.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/remark-file-uri-links.test.ts",
         "sourceSha256": "d072f868e8b7cdb3dd05e3057339b8bebfad1af9abdd96790d25b65993916703",
         "portedSha256": "652b07590bbfb64737ad207101b621c25350999a9a8afaaa3343adae909fe4b8",
         "extraction": null,
@@ -325,7 +325,7 @@
       },
       {
         "source": "src/components/ai-elements/remark-windows-paths.test.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/remark-windows-paths.test.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/remark-windows-paths.test.ts",
         "sourceSha256": "b898298f54d691d23913e497ab2785a0cd25c565fc9696b58a4cfc2b83b305fc",
         "portedSha256": "54fd1828e00665cfd7e8c803417cec59236cf4841f4d6675b4f4695d4d3abb6f",
         "extraction": null,
@@ -334,8 +334,8 @@
         ]
       },
       {
-        "source": "src/components/ai-elements/rehype-allow-codeg.test.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/rehype-allow-codeg.test.ts",
+        "source": "src/components/ai-elements/rehype-allow-coaxi.test.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/rehype-allow-coaxi.test.ts",
         "sourceSha256": "c2d730d75f34382a54ec8b029376c997086cebd5566154122abb841a027f3422",
         "portedSha256": "d3fa25f5a333847e4329223853fcec2ef24681a78bc275e24548bae266bce485",
         "extraction": null,
@@ -345,7 +345,7 @@
       },
       {
         "source": "src/components/ai-elements/rehype-relative-file-links.test.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/rehype-relative-file-links.test.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/rehype-relative-file-links.test.ts",
         "sourceSha256": "b248d41b2454ff06a98bd8fe7458c8cf886c8104b2b2f2ff89372bb64610698e",
         "portedSha256": "798a1756828c89eed72eeaab8a1506c725cce6956e41d57890235305af0e0b6a",
         "extraction": null,
@@ -355,7 +355,7 @@
       },
       {
         "source": "src/components/ai-elements/math-delimiters.parse.test.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/math-delimiters.parse.test.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/math-delimiters.parse.test.ts",
         "sourceSha256": "7ef8dbebc7e3eb55946354256a383eb60bebf177738cdbb4582398b63d12313d",
         "portedSha256": "74fc14348810cf775f6c9b795fa703a712ff91a94ad636ea8def0f7d46f51b24",
         "extraction": null,
@@ -365,7 +365,7 @@
       },
       {
         "source": "src/components/ai-elements/math-fence-pad.katex.test.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/math-fence-pad.katex.test.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/math-fence-pad.katex.test.ts",
         "sourceSha256": "06d8fafe1df3f90de437fbffe85baf53e505f836142cff7a4ca50335115313a4",
         "portedSha256": "1031da508030e626f6f6103a1988d2a54bc96c0901a6b70484d5ea0719bed12f",
         "extraction": null,
@@ -375,7 +375,7 @@
       },
       {
         "source": "src/components/ai-elements/streamdown-plugins.test.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/streamdown-plugins.test.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/streamdown-plugins.test.ts",
         "sourceSha256": "9fe9eb8d0ac09ff323bb349e7b8647fe8715958e8cc6a1cf01ad1ecbd11e3e48",
         "portedSha256": "7b2434d4b1319b35c2ec4d5da7e1fe439d2fa29f7760e1e03892cd6282933655",
         "extraction": null,
@@ -385,7 +385,7 @@
       },
       {
         "source": "src/components/ai-elements/mermaid-view.test.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/mermaid-view.test.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/mermaid-view.test.ts",
         "sourceSha256": "d4f92257b294c08640dde2e3beb54192be037ee5b7c12e0c90d241f03f8200c2",
         "portedSha256": "9e0ad292421cf418372045ac0cd223fc3a8ea217de0c7e94cf3ee2faf720d3cc",
         "extraction": null,
@@ -395,7 +395,7 @@
       },
       {
         "source": "src/lib/json-render/spec.test.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/json-render/spec.test.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/lib/json-render/spec.test.ts",
         "sourceSha256": "19389a44ca8e6f3f9b0f43f91b5ad521b40d28b8325afa6db7e82cae81136454",
         "portedSha256": "d7a553e4ad5d2e43d4bcb285466b109e210af744aa0db9a1ec42234591aa8f75",
         "extraction": null,
@@ -405,7 +405,7 @@
       },
       {
         "source": "src/lib/json-render/chart-data.test.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/json-render/chart-data.test.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/lib/json-render/chart-data.test.ts",
         "sourceSha256": "0bdc223eb5c0bb8fb1d172f0573ee262e8c58d16352f14613a21bebe6227969f",
         "portedSha256": "b3bcb398dbecf0f6f04a709d97a939015e59a85f9b14821aa1d01ad1dc1fc1ff",
         "extraction": null,
@@ -415,7 +415,7 @@
       },
       {
         "source": "src/components/ai-elements/message.tsx",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/source-message-response.tsx",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/source-message-response.tsx",
         "sourceSha256": "f73b8f05e1bffc8aa639d40f6a52a8c9533ffddd0c27613d1d08e1fc91c227e6",
         "portedSha256": "c82f97ea4749bfb192ceaebff330a761b7f9f1e14a6ea945980028c4c6e1d354",
         "extraction": "complete MessageResponse and normalization closure from export type MessageResponseProps to EOF; unrelated message action/branch business widgets excluded",
@@ -425,7 +425,7 @@
       },
       {
         "source": "src/lib/markdown-local-image.ts",
-        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/markdown-local-image.ts",
+        "destination": "apps/desktop/src/renderer/src/coaxi-native-content/lib/markdown-local-image.ts",
         "sourceSha256": "a23804d28766a9a965d5d6497b474db34d3d4f9a1e167516383f52eaa7b8d67f",
         "portedSha256": "a2fae5becf5e1267481130e53b680c837901a0da214f2a4f857e74fa9e35317f",
         "extraction": "exact localImagePath parser only, LF and single EOF newline; root resolution and IO stay Core-owned",
@@ -489,7 +489,7 @@
     "new_stage_formal_cases_passed": 0
   },
   "remaining": [
-    "原Codeg MarkdownLink文件徽标/上下文菜单/打开目标等完整操作与宿主路由衔接；当前沿Rovai原文件/HTTPS入口，不冒称完整原链接组件",
+    "原Coaxi MarkdownLink文件徽标/上下文菜单/打开目标等完整操作与宿主路由衔接；当前沿Coaxi原文件/HTTPS入口，不冒称完整原链接组件",
     "完整原HTML控制与完整供体App同场景运行对照；已有原生HTML入口和实际隔离HTML服务回归通过",
     "真实Core/Native/Web集中候选、授权/生命周期/长历史/规模/内存恢复；七种原图表代码已保留，实际本批图表运行验证为BarChart",
     "I04其他parser/home关联、Runtime并集、恢复、记忆、自动化；此前ANSI完整许可文件缺口仍归发布资格"
@@ -534,17 +534,17 @@
       "git_blob_with_filters": "ce99d87ad2e0484a907c7bdbf79f893a46f6e19b"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/native-markdown.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/ui/native-markdown.tsx",
       "sha256": "8cea0682ec9c399bd092f8190dd83acee433defeaccb71540f46e0ef89aac712",
       "git_blob_with_filters": "75c4b8fd44e023a5d4297fa903ab14ea0e69c0fd"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/source-copy.json",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/ui/source-copy.json",
       "sha256": "9edc75e72b4aaf7dc59f41df135b608f78886f4c21785b19bf2fc24e51d5aee4",
       "git_blob_with_filters": "69bd146c6579d9572c355cea7f088fcfd629f5ac"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/source-primitives.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/ui/source-primitives.tsx",
       "sha256": "93a5e9a0a76d439698292e467be5194bea60217a2273d937cc65bc136e315b14",
       "git_blob_with_filters": "e821b1b4e6e05ce3c154272fb30f9d0e49490885"
     },
@@ -584,227 +584,227 @@
       "git_blob_with_filters": "424af320485e2840b4860dcfa54d94f0ac3d0099"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/json-render-pre.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/json-render-pre.tsx",
       "sha256": "51114f767ac97d3f0a53e8fce411a9076967898ab89369d55bf472bee11faa58",
       "git_blob_with_filters": "7d747abd763825617cb3442bcad194b42d6cf07d"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/markdown-mask.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/markdown-mask.ts",
       "sha256": "b6799c1b33ee2ad6e6a6b15e73dfa285f6b74b055741ecbb44de56ffe19d1129",
       "git_blob_with_filters": "829ed744a8261b73d7e2f37c212643b263eea6ec"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/math-delimiters.parse.test.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/math-delimiters.parse.test.ts",
       "sha256": "74fc14348810cf775f6c9b795fa703a712ff91a94ad636ea8def0f7d46f51b24",
       "git_blob_with_filters": "d03d6a645078d84d9848f5d2edb1c25f3c922bcd"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/math-fence-pad.katex.test.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/math-fence-pad.katex.test.ts",
       "sha256": "1031da508030e626f6f6103a1988d2a54bc96c0901a6b70484d5ea0719bed12f",
       "git_blob_with_filters": "1fd5eafed37c0c69725563db0374eca0d6a75791"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/mermaid-block.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/mermaid-block.tsx",
       "sha256": "33b072e1e5ca05b84682693ab89d22c5dcd59b4920e423a8592f1e91738f25e0",
       "git_blob_with_filters": "7ce36aa4e1b31e6d6cb073e635b49d8e947a2c85"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/mermaid-view.test.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/mermaid-view.test.ts",
       "sha256": "9e0ad292421cf418372045ac0cd223fc3a8ea217de0c7e94cf3ee2faf720d3cc",
       "git_blob_with_filters": "46ee4114f35cc1c9d0e16f6ae202afe34f57c079"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/mermaid-view.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/mermaid-view.ts",
       "sha256": "5cdb8d32673bad8c1f65c22f799fa5c04bf96fde340451f6b67fcfc52190c21f",
       "git_blob_with_filters": "5769b4a82e1c428609873befab55b3f27be57e77"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/rehype-allow-codeg.test.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/rehype-allow-coaxi.test.ts",
       "sha256": "d3fa25f5a333847e4329223853fcec2ef24681a78bc275e24548bae266bce485",
       "git_blob_with_filters": "a3b70891376cbc0947cba1a38bfb0e26a1c5a154"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/rehype-allow-codeg.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/rehype-allow-coaxi.ts",
       "sha256": "a3f12597ddcfc2662d9e2f668805d13dc4220d3c340a11ef1e67a7f581a05f4a",
       "git_blob_with_filters": "ca0de1ff6ea3669db21a89c39ee67313c280b1fa"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/rehype-relative-file-links.test.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/rehype-relative-file-links.test.ts",
       "sha256": "798a1756828c89eed72eeaab8a1506c725cce6956e41d57890235305af0e0b6a",
       "git_blob_with_filters": "39cdbe6026257f35aa279ef83ba9d199fa1f5488"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/rehype-relative-file-links.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/rehype-relative-file-links.ts",
       "sha256": "8c653b11a191a54571b16df2e012d796027327c6f29af9b5a92293ee9ba5c164",
       "git_blob_with_filters": "2b6be402d4ebff3febdf36401f52ec86c6df33b3"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/remark-cjk-autolink-tail.test.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/remark-cjk-autolink-tail.test.ts",
       "sha256": "01623be631d7322bdbfb11066fcade8fd09b6a06beb1ee9b7d74b9bed3ce8ec9",
       "git_blob_with_filters": "da794fa9349269b08371aa3067fc3e4875650d76"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/remark-cjk-autolink-tail.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/remark-cjk-autolink-tail.ts",
       "sha256": "4f1edfc89b4f63afad5e351a00f4e26fdf9540d1b0302181479ef46bd0b5d178",
       "git_blob_with_filters": "9020a96981e9613d7cbe33a0665eea4b7de66d35"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/remark-file-uri-links.test.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/remark-file-uri-links.test.ts",
       "sha256": "652b07590bbfb64737ad207101b621c25350999a9a8afaaa3343adae909fe4b8",
       "git_blob_with_filters": "546542788d4d5f7027eb8941b98b64a0854985e3"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/remark-file-uri-links.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/remark-file-uri-links.ts",
       "sha256": "e076c3e46b6ee10040e8467d07e44ee43093c4d540a22dd9c36c3af5852eb4e0",
       "git_blob_with_filters": "d1d35fdaf7871def78b28fdb1f2c02bb8bc1145d"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/remark-local-images.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/remark-local-images.ts",
       "sha256": "f46ee73c2ab357cb4ae4ec440e43b05271048ac7e9f48771eed569fe100665a1",
       "git_blob_with_filters": "2982e470aaefc2fc952f21d2eafb91bba9125628"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/remark-windows-paths.test.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/remark-windows-paths.test.ts",
       "sha256": "54fd1828e00665cfd7e8c803417cec59236cf4841f4d6675b4f4695d4d3abb6f",
       "git_blob_with_filters": "ef6886b1cf92da4a300d6fb9005a80c03ffd9ffa"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/remark-windows-paths.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/remark-windows-paths.ts",
       "sha256": "ed1199d66d2ac50ab8761ca2c1cd4ad936b0628dda29b4fca3e2890f6073d816",
       "git_blob_with_filters": "2c075fa59625b7943a4e88dbf90a51eb6bf008e4"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/source-message-math.test.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/source-message-math.test.tsx",
       "sha256": "95a4ced5ed0000fb14f24f27b8fd77b7fa38a5abdf1e0ac1176caceb44d4d353",
       "git_blob_with_filters": "e555cf6cb8381201ee68ded15a39c94618da31b5"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/source-message-response.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/source-message-response.tsx",
       "sha256": "c82f97ea4749bfb192ceaebff330a761b7f9f1e14a6ea945980028c4c6e1d354",
       "git_blob_with_filters": "6fb67ed5e848a20b2f9d01a9c48b8d4e63610bd2"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/streamdown-plugins.test.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/streamdown-plugins.test.ts",
       "sha256": "7b2434d4b1319b35c2ec4d5da7e1fe439d2fa29f7760e1e03892cd6282933655",
       "git_blob_with_filters": "6774fa1980f12daa6c416764b4c74becc9a34a95"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/streamdown-plugins.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/ai-elements/streamdown-plugins.ts",
       "sha256": "f0b66d900ed22b855709a8c939ad53c9b9cc75b8bf15f369e61c640849b05b1a",
       "git_blob_with_filters": "1300433b4473f445a530bc99bc80291311601e38"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/json-render-block.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/message/json-render-block.tsx",
       "sha256": "0dc587b39f137d2e297a8f90aa6061c3fd713b21e3059c919ffa7b01fd9f0365",
       "git_blob_with_filters": "f059e5dd2d46ef2eb0f2d307cb41b3f220aef534"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/json-render-charts.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/message/json-render-charts.tsx",
       "sha256": "fcc9c2dd2bdec228e078e3d38fbd756796fbabe96f945744487fdf5f24ce03be",
       "git_blob_with_filters": "3765d4b64549dd07a8ae38fa64ec59f91a31ed2d"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/ui/button.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/ui/button.tsx",
       "sha256": "17dd5ec5fb08747676b892191b0be7155f9f05d64e4e113f36840f326b066bda",
       "git_blob_with_filters": "d9ae533ebe6b816ae5c64371f905f94e13611e57"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/ui/chart.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/ui/chart.tsx",
       "sha256": "70c6bf8cf8f64ed8b8332471204b808062a70e8f044986b88c1062d6c9a6f87d",
       "git_blob_with_filters": "e9b8dbf81ed8680722b7f01cdec42e9fb57ee4a3"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/ui/dialog.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/ui/dialog.tsx",
       "sha256": "1ae8ed6bd5a3907a47810c92432c853cab30119d484c0f1217656be4c8b4fc6b",
       "git_blob_with_filters": "7a888f00f59f23698a3c03f77c600b7a55e628f9"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/ui/dropdown-menu.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/ui/dropdown-menu.tsx",
       "sha256": "04508995f1a0b92b74e360c47ce8b6e782679dc9b9a85ff26a39156a09985b87",
       "git_blob_with_filters": "79b9cb792181b2e1447c2eda2ea64bbe5215b289"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/ui/overlay-portal-container.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/ui/overlay-portal-container.tsx",
       "sha256": "c2cba79b60004422caa72b09874de6b619d0cb108efe51688ef33b195f4e7683",
       "git_blob_with_filters": "0050753efb8498b62e1cd3039d89a26ee69478bf"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/ui/skeleton.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/ui/skeleton.tsx",
       "sha256": "ac93b18ba16ffe901f35e53594c29c468ae687769ddf2dcce1cfc5af3fab68e4",
       "git_blob_with_filters": "f3f78a239dc4dae809c2d545d37dfe139fe4fb58"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/hooks/use-nested-layer-dismiss-guard.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/hooks/use-nested-layer-dismiss-guard.ts",
       "sha256": "61dd487b5213a2010a3300a9a4239f58ab2e84981a2b057680d35ee86881cbbe",
       "git_blob_with_filters": "c3c0b9997e0ae39b07b9ce83ee6545d54fedb387"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/attach-ref.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/lib/attach-ref.ts",
       "sha256": "caa2041e5b8acd74bf52f8d70829a8b03937e261fea45a24148d52237a606247",
       "git_blob_with_filters": "f907b56c7589714c567415bc0e10bb27cb7aefaf"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/json-render/catalog.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/lib/json-render/catalog.ts",
       "sha256": "530c6aa03216eb3f5f43112112573759994608696632d202691dc508f98f7546",
       "git_blob_with_filters": "aa3f29d109af01b1221e936fa783546e2d59d509"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/json-render/chart-data.test.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/lib/json-render/chart-data.test.ts",
       "sha256": "b3bcb398dbecf0f6f04a709d97a939015e59a85f9b14821aa1d01ad1dc1fc1ff",
       "git_blob_with_filters": "ae0f25a37e1c5b34a591b7d59684f1249a25ab07"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/json-render/chart-data.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/lib/json-render/chart-data.ts",
       "sha256": "5099d78a30637b0b02bec94d3ae66a4f76690bfdb1145ab641cb0195992aadea",
       "git_blob_with_filters": "3d92037e1f19129819a7d76a6291328d894ddfbf"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/json-render/charts.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/lib/json-render/charts.ts",
       "sha256": "971c64f65b6b83d86afe60115533739f9c8fec3d8c1836da72a35250d6fc9ae6",
       "git_blob_with_filters": "4a651f93bfa19d9a405ac742cac536b859205450"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/json-render/spec.test.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/lib/json-render/spec.test.ts",
       "sha256": "d7a553e4ad5d2e43d4bcb285466b109e210af744aa0db9a1ec42234591aa8f75",
       "git_blob_with_filters": "0f073cb45d413d838dd2181a24dbea4acc00057f"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/json-render/spec.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/lib/json-render/spec.ts",
       "sha256": "9c291352d1f6272cf52d62cdfb073f16c940cd687a9ab75d4af9a82a632987da",
       "git_blob_with_filters": "31ad2f5613192175380f57c4f1043c20cf0dd594"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/markdown-local-image.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/lib/markdown-local-image.ts",
       "sha256": "a2fae5becf5e1267481130e53b680c837901a0da214f2a4f857e74fa9e35317f",
       "git_blob_with_filters": "4da1d59f38d3daf2c8dad1520d04d0f505f24abe"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/mermaid-export.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/lib/mermaid-export.ts",
       "sha256": "d01e3348b1e283636794c2c82ea289dc038f48e9ef78f3033da47f1a35c3f870",
       "git_blob_with_filters": "10b01b73165cbdbdee165523160a4ba21872721d"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/source-markdown.css",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/source-markdown.css",
       "sha256": "0a70d57fa34b7c289ee2c10cc1f49eb6c62908e09fc0167e96db1e50a6f77dc4",
       "git_blob_with_filters": "583fd915da77b24078de3aea51e7b39cf826341b"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/native-markdown-context.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/ui/native-markdown-context.tsx",
       "sha256": "277fe8d490addd3b7ec1548b2c16b6e131ec96977035c2d3f36cae1f57374047",
       "git_blob_with_filters": "1c79225e793090a6ecc48b71f752fe33884ee305"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/native-markdown-host.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/ui/native-markdown-host.tsx",
       "sha256": "f2e233ddea9a2a58af191549e49c8b60c18c38bae9c14b2ba04ae05ee42790a2",
       "git_blob_with_filters": "dda7f0dbe8a71b7f562da4c851d65762fd8bb219"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/native-markdown-links.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/ui/native-markdown-links.tsx",
       "sha256": "8c8b5e2b8204f68c9007b01688ca18dbc20fba4074d69cd42d9d1e595b7255a7",
       "git_blob_with_filters": "35373a9cf72252bef825933f2efeb1752024bc15"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/native-math-hydration.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/ui/native-math-hydration.ts",
       "sha256": "f7e6d1bc0eb6114b5291e2e0f3aabf429738b79ccc3bbadfbc98627c94acedbf",
       "git_blob_with_filters": "b19b0838b07184628457045fa84e4356144adaae"
     },

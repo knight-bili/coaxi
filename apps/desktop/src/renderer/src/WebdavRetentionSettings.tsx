@@ -7,7 +7,7 @@ import {newCommandId} from '../../shared/command-id'
 type Snapshot={id:string;createdAt:string;sha256:string;bytes:number;kind:string}
 type Plan={commandId:string;plan:{delete:Snapshot[];remaining:number};unknown?:boolean}
 type Cleanup={snapshot:Snapshot;removedAt:string}
-// Source Codeg BackupSettings preview/confirmation; existing Coaxi forms/dialog.
+// Source Coaxi BackupSettings preview/confirmation; existing Coaxi forms/dialog.
 export function WebdavRetentionSettings({accountRevision,disabled,onChanged}:{accountRevision:string;disabled:boolean;onChanged:()=>Promise<void>}):React.JSX.Element{
   const native=useThreadClient().webdavWorkspace,t=useUiText()
   const [keepBackups,setKeepBackups]=useState(10),[keepConfigurations,setKeepConfigurations]=useState(20),[busy,setBusy]=useState(false),[error,setError]=useState<string|null>(null),[message,setMessage]=useState<string|null>(null)

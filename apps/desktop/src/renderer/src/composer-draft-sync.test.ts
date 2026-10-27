@@ -12,7 +12,7 @@ import { ComposerAtomNode } from './ComposerAtomNode'
 import {
   ComposerDraftSync,
   COMPOSER_DRAFT_RETRY_DELAYS_MS,
-  ROVAI_ATOM_PRESENTATION_TAG,
+  COAXI_ATOM_PRESENTATION_TAG,
   StaleComposerSyncEpochError
 } from './composer-draft-sync'
 import {
@@ -221,7 +221,7 @@ describe('ComposerDraftSync', () => {
     editor.update(() => {
       const atom = $getRoot().getFirstDescendant()
       if ($isTextNode(atom)) atom.markDirty()
-    }, { discrete: true, tag: ROVAI_ATOM_PRESENTATION_TAG })
+    }, { discrete: true, tag: COAXI_ATOM_PRESENTATION_TAG })
 
     expect(statuses).toEqual([false, true])
     expect(sync.getLocalVersion()).toBe(0)

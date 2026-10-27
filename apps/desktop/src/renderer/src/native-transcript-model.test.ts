@@ -50,7 +50,7 @@ describe('native source metadata stays separate from native read authority', () 
     expect(nativeToolChildren(undefined, orphan)).toEqual(['saved-child'])
     expect(nativeToolChildren(undefined, undefined)).toEqual([])
   })
-  it('uses Codeg live metadata, saved stats and UUID collab rules as candidates without reading arbitrary input strings', () => {
+  it('uses Coaxi live metadata, saved stats and UUID collab rules as candidates without reading arbitrary input strings', () => {
     const uuid = '00000000-0000-4000-8000-000000000001'
     const use: Extract<NativeTranscriptBlock, { type: 'tool_use' }> = { type: 'tool_use', tool_use_id: 'call', tool_name: 'collab_agent',
       input_preview: JSON.stringify({ senderThreadId: 'parent', receiverThreadIds: [uuid], agentsStates: { [uuid]: { status: 'running' }, 'named-agent': { status: 'completed' } } }),

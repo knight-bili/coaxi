@@ -8,7 +8,7 @@ import shlex
 options=p.configure(managed=True)
 REPO=options.repo.resolve(strict=True)
 NODE=str(Path(shutil.which('node')).resolve(strict=True))
-CORE=REPO/'target/debug/rovai-core'
+CORE=REPO/'target/debug/coaxi-core'
 results=[]
 
 async def run(kind, with_mcp=False):
@@ -48,8 +48,8 @@ use_memories = true
         p.put(cwd/'CLAUDE.md',p.RULE)
     args=[str(CORE),'--data-dir',str(data),'--skill-library-root',str(case/'skills'),
           '--mcp-config-path',str(data/'mcp.json')]
-    key='v1-'+hashlib.sha256(b'rovai-runtime-camp-files-instance-v1\0'+str(data).encode()).hexdigest()
-    args+=['--runtime-camp-files-root',str(host/'.rovai/instances'/key/'runtime-files')]
+    key='v1-'+hashlib.sha256(b'coaxi-runtime-camp-files-instance-v1\0'+str(data).encode()).hexdigest()
+    args+=['--runtime-camp-files-root',str(host/'.coaxi/instances'/key/'runtime-files')]
     async def start(cold=False):
         launch=args.copy()
         if options.old_core and not cold: launch[0]=str(options.old_core.resolve(strict=True))
@@ -64,8 +64,8 @@ use_memories = true
                     if 'initializing' not in str(error): raise
                     await asyncio.sleep(.1)
             definition={'mcpServers':{'fixture_echo':{'command':NODE,
-                        'args':[str(REPO/'crates/rovai-core/tests/fixtures/mcp-smoke-server.mjs')],
-                        'env':{'ROVAI_MCP_SMOKE_SOURCE':'fixture-mcp','ROVAI_MCP_SMOKE_CALL_MARKER':str(case/'mcp-calls')}}}}
+                        'args':[str(REPO/'crates/coaxi-core/tests/fixtures/mcp-smoke-server.mjs')],
+                        'env':{'COAXI_MCP_SMOKE_SOURCE':'fixture-mcp','COAXI_MCP_SMOKE_CALL_MARKER':str(case/'mcp-calls')}}}}
             if not config['servers']:
                 result=await rpc.call('mcp.servers.create',{'expectedConfigDigest':config['configDigest'],'definitionJson':json.dumps(definition)})
                 assert result['status']=='ok',result['status']
@@ -98,11 +98,11 @@ use_memories = true
         p.put(helper,'''import subprocess,json,uuid
 from pathlib import Path
 def call(args):
-    out=subprocess.run(['rovai']+args,capture_output=True,text=True)
+    out=subprocess.run(['coaxi']+args,capture_output=True,text=True)
     if out.returncode: raise RuntimeError(out.stdout or out.stderr)
     return json.loads(out.stdout)
 request=Path(__file__).parent/'write.json'
-request.write_text(json.dumps({'action':'add','scope':'companion','kind':'lesson','body':'SYNTHETIC_ROVAI_MEMORY: inspect receipts before reporting success.','retrievalKeys':['fixture memory']}))
+request.write_text(json.dumps({'action':'add','scope':'companion','kind':'lesson','body':'SYNTHETIC_COAXI_MEMORY: inspect receipts before reporting success.','retrievalKeys':['fixture memory']}))
 state=Path(__file__).parent/'memory-state.json'
 if state.exists(): written=json.loads(state.read_text())
 else:
@@ -113,7 +113,7 @@ request.write_text(json.dumps({'memoryIds':[written['memoryId']]}))
 read=call(['memory','read','--input-file',str(request)])
 searched=call(['memory','search','--query','fixture memory'])
 sent=call(['send','--public-only','--body','MEMORY_TOOLS_VERIFIED'])
-result={'writeEffective':written.get('outcome')=='effective','readContainsBody':'SYNTHETIC_ROVAI_MEMORY' in json.dumps(read),'searchFound':written['memoryId'] in json.dumps(searched),'sendCommitted':bool(sent)}
+result={'writeEffective':written.get('outcome')=='effective','readContainsBody':'SYNTHETIC_COAXI_MEMORY' in json.dumps(read),'searchFound':written['memoryId'] in json.dumps(searched),'sendCommitted':bool(sent)}
 (Path(__file__).parent/('tool-receipt-'+uuid.uuid4().hex+'.json')).write_text(json.dumps(result))
 print(json.dumps(result))
 ''')
@@ -144,7 +144,7 @@ print(json.dumps(result))
                 await asyncio.sleep(.5)
             assert run,'no AgentRun'
             seen.add(run['id'])
-            with closing(sqlite3.connect(data/'rovai.sqlite')) as db:
+            with closing(sqlite3.connect(data/'coaxi.sqlite')) as db:
                 binding=db.execute('select native_session_id,native_binding_id,native_binding_generation from conversation where id=?',(run['conversationId'],)).fetchone()
             receipts=[json.loads(f.read_text()) for f in case.glob('tool-receipt-*.json')]
             manifest=next((m for m in snapshot.get('contextManifests',[]) if m.get('agentRunId')==run['id']),{})

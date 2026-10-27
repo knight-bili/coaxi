@@ -7,16 +7,16 @@
     "base_commit": "95a40646",
     "kind": "exact_worktree_file_hashes_before_local_commit",
     "files": {
-      "crates/rovai-core/src/db.rs": "f3c47fb73a8a42978da45920c9ce82507005e5a237fdc345927d0303c48e1628",
-      "crates/rovai-core/src/db_private_composer_scope.rs": "a4775f9a5760d92d3a73f7c61d6c5b7ede2a45e71539ffc9f66abb1769aec250",
-      "crates/rovai-core/src/db_private_source_observation.rs": "68a921dd267cb7f26ce87580f87c8f0575a731c3d8c1cc7391c05df3680cb540",
-      "crates/rovai-core/src/lib.rs": "ddd2844755da2e93ab7578049fd026f63b0eea341a8eebf568c62e95f911e109",
-      "crates/rovai-core/src/local_attachment_snapshot.rs": "77141c47a8e9e466cffc0627c1be2e3c035ac06051e5026077f3a6681591ee1c",
-      "crates/rovai-core/src/private_source_observation.rs": "878f46c369d477e6b3c80726decbb3861f9b3708a72611ab76daa13402b156c2",
-      "crates/rovai-core/src/single_chat.rs": "a674f9e3e4c383cf031f67c89d56b4941cb61e30e66bd67dfa6b6599fd0efda1",
-      "crates/rovai-core/src/single_chat_composer.rs": "d40d86f063828cc1bced4d90ff98cf6b8e0c84728148ceada5134e143d3c9fec",
-      "crates/rovai-core/src/single_chat_composer_tests.rs": "f26b8665c1c8414d01bb1be3665a7b315129ddca60f5653390d4156f476af649",
-      "crates/rovai-core/src/web_upload.rs": "b7604f0b3b57677e8810804e8e727ae8d26de264e22d3969f0fbb6c4a3cfdb27",
+      "crates/coaxi-core/src/db.rs": "f3c47fb73a8a42978da45920c9ce82507005e5a237fdc345927d0303c48e1628",
+      "crates/coaxi-core/src/db_private_composer_scope.rs": "a4775f9a5760d92d3a73f7c61d6c5b7ede2a45e71539ffc9f66abb1769aec250",
+      "crates/coaxi-core/src/db_private_source_observation.rs": "68a921dd267cb7f26ce87580f87c8f0575a731c3d8c1cc7391c05df3680cb540",
+      "crates/coaxi-core/src/lib.rs": "ddd2844755da2e93ab7578049fd026f63b0eea341a8eebf568c62e95f911e109",
+      "crates/coaxi-core/src/local_attachment_snapshot.rs": "77141c47a8e9e466cffc0627c1be2e3c035ac06051e5026077f3a6681591ee1c",
+      "crates/coaxi-core/src/private_source_observation.rs": "878f46c369d477e6b3c80726decbb3861f9b3708a72611ab76daa13402b156c2",
+      "crates/coaxi-core/src/single_chat.rs": "a674f9e3e4c383cf031f67c89d56b4941cb61e30e66bd67dfa6b6599fd0efda1",
+      "crates/coaxi-core/src/single_chat_composer.rs": "d40d86f063828cc1bced4d90ff98cf6b8e0c84728148ceada5134e143d3c9fec",
+      "crates/coaxi-core/src/single_chat_composer_tests.rs": "f26b8665c1c8414d01bb1be3665a7b315129ddca60f5653390d4156f476af649",
+      "crates/coaxi-core/src/web_upload.rs": "b7604f0b3b57677e8810804e8e727ae8d26de264e22d3969f0fbb6c4a3cfdb27",
       "docs/architecture/canvas.md": "2f1a1fc149b414a75af9a072b16dcf97579e6d869bb592011f6bd0c635697422",
       "docs/contracts/domain-command-result-v1.md": "e03b07f57a02ed425a2945a591e8aab72f15859ba69e2db48f6b58762adb4423",
       "docs/contracts/single-chat-composer-scope-v1.md": "befb3147360e2a591c6626467bb52e5791dcaa50cfa15e96fce429c2a9fbb1d4",
@@ -72,10 +72,10 @@
     "Actual platform/model/full PC01-PC24 and formal324 qualification remain not_run"
   ],
   "preserved_authorities": {
-    "crates/rovai-core/src/local_attachment_source.rs": "8830581e72fc103b2f359be17a0072c5ee0cedc6eb5fe58b179ae3d255dbc1ca",
-    "crates/rovai-core/src/context.rs": "329144f38675ebedeaf5652858d457d42369455eb26c6159af61d19c02218784",
-    "crates/rovai-core/src/message_quote.rs": "efb6e962946b85c089483bb1120fe92f32458bb3b3b5e5eb668e26f8aa96481e",
-    "crates/rovai-core/src/command.rs": "22258f81dc5b76040cd0fdba20074321b5be7104e648a8278412c0736ef0d85a"
+    "crates/coaxi-core/src/local_attachment_source.rs": "8830581e72fc103b2f359be17a0072c5ee0cedc6eb5fe58b179ae3d255dbc1ca",
+    "crates/coaxi-core/src/context.rs": "329144f38675ebedeaf5652858d457d42369455eb26c6159af61d19c02218784",
+    "crates/coaxi-core/src/message_quote.rs": "efb6e962946b85c089483bb1120fe92f32458bb3b3b5e5eb668e26f8aa96481e",
+    "crates/coaxi-core/src/command.rs": "22258f81dc5b76040cd0fdba20074321b5be7104e648a8278412c0736ef0d85a"
   },
   "public_snapshot_primitives_tail_unchanged": true,
   "approved_r1_files": {

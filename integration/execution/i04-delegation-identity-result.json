@@ -89,81 +89,81 @@
   },
   "source_files": [
     {
-      "path": "crates/rovai-core/src/delegation.rs",
+      "path": "crates/coaxi-core/src/delegation.rs",
       "sha256": "4259799436b6f5498e5324d2ec430ea248aaddc8d1335321f187ee439ca054f4"
     },
     {
-      "path": "crates/rovai-core/src/delegation_schema.sql",
+      "path": "crates/coaxi-core/src/delegation_schema.sql",
       "sha256": "4934816c7a8d3982c71a77e83912bad9a38d7e965785c0808341d42e1f89a66e"
     },
     {
-      "path": "crates/rovai-core/src/db_delegation.rs",
+      "path": "crates/coaxi-core/src/db_delegation.rs",
       "sha256": "c010b3028bc06b6c3f22051624eb60ff2b5326c84efae174c65d69e24862c5fb"
     },
     {
-      "path": "crates/rovai-core/src/delegation_tests.rs",
+      "path": "crates/coaxi-core/src/delegation_tests.rs",
       "sha256": "6c4bcebf3510dd9bd46a13513c1d3a7102415d41259863e8d20f93f4254d7374"
     },
     {
-      "path": "crates/rovai-core/src/db.rs",
+      "path": "crates/coaxi-core/src/db.rs",
       "sha256": "533f820ddb6c16af0322b03a793e3100bc047b92b485976a57fb6dc8f1746de7"
     },
     {
-      "path": "crates/rovai-core/src/lib.rs",
+      "path": "crates/coaxi-core/src/lib.rs",
       "sha256": "96c240998f28c2812a26826b1ebca1cdaf9768b303972c228e1ecf447ccc485d"
     }
   ],
   "logs": [
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-identity-codegraph.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\logs\\delegation-identity-codegraph.log",
       "sha256": "a2d9e4ab42b28cf7fb5d4917a8d643e0cc780b72c58718fc4c02cb54659da0c2"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-identity-diff.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\logs\\delegation-identity-diff.log",
       "sha256": "aac21e13160434c57f666455c95cc12b61fb1462b7ffe4a1323c5cfe280af91f"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-identity-doc-decisions.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\logs\\delegation-identity-doc-decisions.log",
       "sha256": "bd57f1c3a9c4155f59e96b05b1d0fc29d3306585b8defa7e026134bc90302c0a"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-identity-doc-version.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\logs\\delegation-identity-doc-version.log",
       "sha256": "18aa44bf0cc0d653a3fc97fcc383a104185a97ec97dc4060f0a3b6270bc8d335"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-identity-format.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\logs\\delegation-identity-format.log",
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-identity-list-final.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\logs\\delegation-identity-list-final.log",
       "sha256": "e9203d77beaf54a7cdd0a082869f2d6ac1b5e41cb2125298e7083b5e63f6cc49"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-identity-list-reviewed.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\logs\\delegation-identity-list-reviewed.log",
       "sha256": "e726aa8f6e7f8cf47d49aa6a670300afcec4e9fb6b73c906fd4357dc92426e06"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-identity-list.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\logs\\delegation-identity-list.log",
       "sha256": "dadb42a25a69456ebf3edcc0da23e78c6390f588fbe53f87ae9f95dbfd3f47ae"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-identity-protocol.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\logs\\delegation-identity-protocol.log",
       "sha256": "044569df112d191be31ea876439bd2bd3294beb8d9fa469452c1bcc1ea893695"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-identity-scope.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\logs\\delegation-identity-scope.log",
       "sha256": "899dab604ac7f85562aab489b6c0f0730065bba54b60543d95ce3bcc2cd9765a"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-identity-tests-final.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\logs\\delegation-identity-tests-final.log",
       "sha256": "ac7c986001e53d1bbebf768323a1e69137090202b645a966593eea68c5e20589"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-identity-tests-initial.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\logs\\delegation-identity-tests-initial.log",
       "sha256": "08647944a0c5790e3049638e7d934f9d0ddf7ea26dcb63b6c3c16c14890d653f"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-identity-tests-reviewed.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i04\\logs\\delegation-identity-tests-reviewed.log",
       "sha256": "69b7fc268803d9f1e5e09139c8886403aa24dfa0f53e5045256b9e4c7a997cd1"
     }
   ],

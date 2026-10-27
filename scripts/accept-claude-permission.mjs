@@ -10,10 +10,10 @@ import { assertDevelopmentUserDataIsIsolated, seedCompletedOnboardingForAcceptan
 import { removeEphemeralRuntimeCampFilesRoot } from './lib/runtime-camp-files-root.mjs'
 
 const root = resolve(import.meta.dirname, '..')
-const fixture = await realpath(await mkdtemp(join(tmpdir(), 'rovai-claude-desktop-')))
+const fixture = await realpath(await mkdtemp(join(tmpdir(), 'coaxi-claude-desktop-')))
 const userData = assertDevelopmentUserDataIsIsolated(join(fixture, 'user-data'))
 const project = join(fixture, 'project')
-const output = resolve(process.env.ROVAI_CLAUDE_DESKTOP_OUTPUT ?? join(fixture, 'evidence'))
+const output = resolve(process.env.COAXI_CLAUDE_DESKTOP_OUTPUT ?? join(fixture, 'evidence'))
 const port = await availablePort()
 let app, cdp, dataDirectory
 const log = []
@@ -22,14 +22,14 @@ try {
   await mkdir(project)
   await mkdir(output, { recursive: true })
   await writeFile(join(project, 'README.md'), '# Claude native approval Desktop acceptance\n')
-  for (const args of [['init', '-b', 'main'], ['config', 'user.name', 'Rovai Acceptance'],
-    ['config', 'user.email', 'acceptance@rovai.local'], ['add', 'README.md'], ['commit', '-m', 'fixture']]) {
+  for (const args of [['init', '-b', 'main'], ['config', 'user.name', 'Coaxi Acceptance'],
+    ['config', 'user.email', 'acceptance@coaxi.local'], ['add', 'README.md'], ['commit', '-m', 'fixture']]) {
     await run('git', args, project)
   }
   seedCompletedOnboardingForAcceptance(userData)
   // The repository launcher owns isolated Desktop/Core/Skill/MCP startup.
   app = spawn('pnpm', ['dev'], { cwd: root, detached: true, stdio: ['ignore', 'pipe', 'pipe'],
-    env: { ...process.env, ROVAI_DEV_USER_DATA_DIR: userData, REMOTE_DEBUGGING_PORT: String(port) } })
+    env: { ...process.env, COAXI_DEV_USER_DATA_DIR: userData, REMOTE_DEBUGGING_PORT: String(port) } })
   for (const stream of [app.stdout, app.stderr]) stream.on('data', value => log.push(String(value)))
   const target = await waitFor(async () => {
     if (app.exitCode !== null) throw new Error('Isolated development Desktop exited before becoming ready')
@@ -37,11 +37,11 @@ try {
   }, 'Desktop DevTools', 180000)
   cdp = await connect(target.webSocketDebuggerUrl)
   await cdp.send('Page.bringToFront')
-  await waitFor(() => evaluate('Boolean(window.rovai && document.querySelector(".app-shell"))'), 'Desktop shell')
-  await evaluate(`window.__claudeApprovalSessions = []; window.rovai.onEvent(event => {
+  await waitFor(() => evaluate('Boolean(window.coaxi && document.querySelector(".app-shell"))'), 'Desktop shell')
+  await evaluate(`window.__claudeApprovalSessions = []; window.coaxi.onEvent(event => {
     if (event.method === 'agent_run.native_session_bound') window.__claudeApprovalSessions.push(event.params)
   }); true`)
-  const request = (method, params = {}) => evaluate(`window.rovai.request(${JSON.stringify(method)}, ${JSON.stringify(params)})`, true)
+  const request = (method, params = {}) => evaluate(`window.coaxi.request(${JSON.stringify(method)}, ${JSON.stringify(params)})`, true)
   const health = await waitFor(async () => { try { return await request('health.check') } catch { return null } }, 'Desktop Core')
   if (!health.database.path.startsWith(`${userData}/`)) throw new Error('Desktop opened a database outside the isolated userData')
   dataDirectory = dirname(health.database.path)
@@ -54,8 +54,8 @@ try {
   } })
   if (configured.status !== 'applied') throw new Error('Could not freeze acceptEdits for the isolated member')
   const workspace = await request('workspaces.inspect', { path: project })
-  const marker = `ROVAI_CLAUDE_DESKTOP_${crypto.randomUUID()}`
-  const command = `rovai send --public-only --body "${marker}"`
+  const marker = `COAXI_CLAUDE_DESKTOP_${crypto.randomUUID()}`
+  const command = `coaxi send --public-only --body "${marker}"`
   const prompt = `Use Bash exactly once to run this exact command: ${command}. If denied, do not retry and finish with DENIED. If it succeeds, finish with DONE.`
   const intake = await createConfiguredCampAndSend(request, { commandId: crypto.randomUUID(), workspace,
     memberAgentIds: ['agent_1'], defaultLeadAgentId: 'agent_1', body: prompt, purpose: 'Actual Desktop native approval click acceptance' })
@@ -169,7 +169,7 @@ try {
   }
   await writeFile(join(output, 'desktop-launch.log'), log.join(''), { mode: 0o600 })
   if (dataDirectory) await removeEphemeralRuntimeCampFilesRoot(dataDirectory)
-  if (process.env.ROVAI_KEEP_CLAUDE_DESKTOP_FIXTURE !== '1' && !output.startsWith(`${fixture}/`)) await rm(fixture, { recursive: true, force: true })
+  if (process.env.COAXI_KEEP_CLAUDE_DESKTOP_FIXTURE !== '1' && !output.startsWith(`${fixture}/`)) await rm(fixture, { recursive: true, force: true })
   else console.error(`Retained isolated Desktop fixture: ${fixture}`)
 }
 

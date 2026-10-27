@@ -11,7 +11,7 @@ import { removeEphemeralRuntimeCampFilesRoot } from './lib/runtime-camp-files-ro
 // Explicit real-model acceptance only. Caller supplies an isolated HOME with
 // official .zcode BYOK config; ordinary product checks never invoke this script.
 const repo = resolve(import.meta.dirname, '..')
-const root = await mkdtemp(join(tmpdir(), 'rovai-zcode-background-smoke-'))
+const root = await mkdtemp(join(tmpdir(), 'coaxi-zcode-background-smoke-'))
 const data = join(root, 'data')
 const project = join(root, 'project')
 const trace = join(root, 'native-methods.jsonl')
@@ -22,7 +22,7 @@ let core, threadId, passed = false
 let report = {}
 await mkdir(project)
 await writeFile(join(project, 'README.md'), '# Isolated background acceptance\n')
-for (const args of [['init', '-b', 'main'], ['add', '.'], ['-c', 'user.name=Smoke', '-c', 'user.email=smoke@rovai.local', 'commit', '-m', 'fixture']]) execFileSync('git', args, { cwd: project, stdio: 'ignore' })
+for (const args of [['init', '-b', 'main'], ['add', '.'], ['-c', 'user.name=Smoke', '-c', 'user.email=smoke@coaxi.local', 'commit', '-m', 'fixture']]) execFileSync('git', args, { cwd: project, stdio: 'ignore' })
 // Observe method names and selected non-secret control fields only. Intercept
 // emit instead of consuming stdin early; the official parser owns stream flow.
 await writeFile(hook, `if(process.argv.some(a=>a.endsWith('/zcode.cjs'))&&process.argv.includes('app-server')){
@@ -36,7 +36,7 @@ const write=process.stdout.write;let out='';process.stdout.write=function(chunk,
 process.env.NODE_OPTIONS = `${process.env.NODE_OPTIONS ?? ''} --require=${hook}`.trim()
 console.log(JSON.stringify({ stage: 'fixture', dataDirectory: data, skillLibrary: join(data, 'managed-skill-library'), nativeHome: process.env.HOME }))
 try {
-  core = startQualificationCore({ coreExecutable: join(repo, 'target/debug/rovai-core'), dataDirectory: data, workingDirectory: repo,
+  core = startQualificationCore({ coreExecutable: join(repo, 'target/debug/coaxi-core'), dataDirectory: data, workingDirectory: repo,
     runtimeCacheDirectory: join(root, 'cache'), mcpConfigPath: join(data, 'mcp.json'), onNotification: (event) => events.push(event) })
   const workspace = await core.request('workspaces.inspect', { path: project })
   const installation = await configureProductRuntime(core.request, 'zcode-app', ['agent_2', 'agent_3'])
@@ -59,7 +59,7 @@ try {
   const cliTrigger = join(project, 'request-old-cli')
   const cliInitial = join(project, 'cli-initial')
   const cliLate = join(project, 'cli-late')
-  const command = `echo $$ > '${pidFile}'; "$ROVAI_AGENT_CLI" camp list > '${cliInitial}.json'; echo $? > '${cliInitial}.status'; while [ ! -f '${stop}' ]; do if [ -f '${cliTrigger}' ] && [ ! -f '${cliLate}.status' ]; then "$ROVAI_AGENT_CLI" camp list > '${cliLate}.json'; echo $? > '${cliLate}.status'; fi; sleep 0.2; done; printf BACKGROUND_EXIT; exit 7`
+  const command = `echo $$ > '${pidFile}'; "$COAXI_AGENT_CLI" camp list > '${cliInitial}.json'; echo $? > '${cliInitial}.status'; while [ ! -f '${stop}' ]; do if [ -f '${cliTrigger}' ] && [ ! -f '${cliLate}.status' ]; then "$COAXI_AGENT_CLI" camp list > '${cliLate}.json'; echo $? > '${cliLate}.status'; fi; sleep 0.2; done; printf BACKGROUND_EXIT; exit 7`
   const begin = Date.now()
   const sent = await createConfiguredCampAndSend(core.request, { commandId: crypto.randomUUID(), workspace,
     body: `This is an explicit isolated lifecycle test. Call Bash once with run_in_background=true and command exactly: ${command}\nAfter it reports backgrounded, send the final answer BACKGROUND_READY immediately. Do not wait, poll, stop or read the task.`,
@@ -82,7 +82,7 @@ try {
   assert.notEqual(start(other).hostInstanceId, start(original).hostInstanceId)
   assert.equal(Number(await readFile(`${cliInitial}.status`, 'utf8')), 0, 'Original active Run must allow its CLI call')
   const cliNext = join(project, 'cli-next')
-  const next = await follow('agent_2', `Do not inspect or wait for background tasks. Call Bash in foreground with command: "$ROVAI_AGENT_CLI" camp list > '${cliNext}.json'; echo $? > '${cliNext}.status'; sleep 5. Then send the final answer SAME_SESSION.`)
+  const next = await follow('agent_2', `Do not inspect or wait for background tasks. Call Bash in foreground with command: "$COAXI_AGENT_CLI" camp list > '${cliNext}.json'; echo $? > '${cliNext}.status'; sleep 5. Then send the final answer SAME_SESSION.`)
   await until(async () => { await approve(next); return Boolean(start(next)) }, 90000)
   await writeFile(cliTrigger, 'audit\n')
   await until(() => readFile(`${cliLate}.status`, 'utf8').then(() => true, () => false), 10000)
@@ -114,7 +114,7 @@ try {
   console.log(JSON.stringify({ stage: 'cancel-scope-passed', agentRunId: cancelled }))
   // Default exceeds the old 300-second gate; reduced duration is an explicitly
   // partial development pass, and is recorded as such in evidence.
-  const retentionMs = Number(process.env.ROVAI_ZCODE_BACKGROUND_RETENTION_MS ?? 310000)
+  const retentionMs = Number(process.env.COAXI_ZCODE_BACKGROUND_RETENTION_MS ?? 310000)
   // Start the retention clock after the answer, where the old 300-second
   // settlement gate began. Model latency must not count toward this proof.
   await until(() => Date.now() - foregroundFinishedAt >= retentionMs, retentionMs + 1000)
@@ -158,7 +158,7 @@ try {
   }
 }
 async function traces() { return (await readFile(trace, 'utf8')).trim().split('\n').map(JSON.parse) }
-function query(sql) { return JSON.parse(execFileSync('sqlite3', ['-json', join(data, 'rovai.sqlite'), sql], { encoding: 'utf8' }) || '[]') }
+function query(sql) { return JSON.parse(execFileSync('sqlite3', ['-json', join(data, 'coaxi.sqlite'), sql], { encoding: 'utf8' }) || '[]') }
 function start(id) { return events.find((e) => e.method === 'agent_run.started' && e.params?.agentRunId === id)?.params }
 async function until(check, timeout) { const end = Date.now() + timeout; while (Date.now() < end) { if (await check()) return; await wait(250) } throw new Error('ZCode background acceptance timed out') }
 async function follow(agentId, body) {

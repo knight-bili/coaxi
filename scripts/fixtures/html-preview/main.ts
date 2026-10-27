@@ -37,17 +37,17 @@ app.whenReady().then(async () => {
   await window.loadFile(renderer)
   const run = (code: string) => window.webContents.executeJavaScript(code).catch(error => { throw new Error(`HTML acceptance step failed: ${code}`, { cause: error }) })
   for (let n = 0; n < 50 && !await run('Boolean(window.previewAcceptance)'); n++) await new Promise(resolve => setTimeout(resolve, 40))
-  if (process.env.ROVAI_HTML_PREVIEW_SCENARIO === 'navigation') {
+  if (process.env.COAXI_HTML_PREVIEW_SCENARIO === 'navigation') {
     const cases = await navigationAcceptance(window, userData)
     console.log(JSON.stringify({ htmlPreviewAcceptance: true, ok: cases.every(result => result.ok), cases, errors }))
     await service.closeAll(); window.destroy(); app.exit(cases.every(result => result.ok) ? 0 : 1); return
   }
-  if (process.env.ROVAI_HTML_PREVIEW_SCENARIO === 'lifecycle') {
+  if (process.env.COAXI_HTML_PREVIEW_SCENARIO === 'lifecycle') {
     const cases = await lifecycleAcceptance(window, userData)
     console.log(JSON.stringify({ htmlPreviewAcceptance: true, ok: cases.every(result => result.ok), cases, errors }))
     await service.closeAll(); window.destroy(); app.exit(cases.every(result => result.ok) ? 0 : 1); return
   }
-  if (process.env.ROVAI_HTML_PREVIEW_SCENARIO === 'policy') {
+  if (process.env.COAXI_HTML_PREVIEW_SCENARIO === 'policy') {
     const cases = await policyAcceptance(window, userData, root)
     console.log(JSON.stringify({ htmlPreviewAcceptance: true, ok: cases.every(result => result.ok), cases, errors }))
     await service.closeAll(); window.destroy(); app.exit(cases.every(result => result.ok) ? 0 : 1); return
@@ -168,7 +168,7 @@ app.whenReady().then(async () => {
   const rawSource=await readFile(join(root,'history.html'),'utf8')
   await run(`Array.from(document.querySelectorAll('.file-preview-tab-panel:not([hidden]) .file-preview-html-source-toggle')).find(button=>button.textContent==='交互预览').click()`)
   const retained=await historyFrame.executeJavaScript('window.fixtureKept')
-  cases.push({name:'author source and preserved interactive document',ok:sourceText.trim()===rawSource.trim() && !sourceText.includes('data-rovai-preview-diagnostic') && retained===73,evidence:{exactSource:sourceText.trim()===rawSource.trim(),retained}})
+  cases.push({name:'author source and preserved interactive document',ok:sourceText.trim()===rawSource.trim() && !sourceText.includes('data-coaxi-preview-diagnostic') && retained===73,evidence:{exactSource:sourceText.trim()===rawSource.trim(),retained}})
   cases.push(...await feedbackAcceptance(window, userData, root))
   await run(`window.previewAcceptance.activate(window.previewAcceptance.tabs.find(tab=>tab.file?.fileName==='history.html').id)`)
   for(let count=0;count<100 && !await run(`window.previewAcceptance.activeTab?.file?.fileName==='history.html'`);count++) await new Promise(resolve=>setTimeout(resolve,20))

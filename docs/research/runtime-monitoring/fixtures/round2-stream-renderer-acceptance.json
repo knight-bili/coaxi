@@ -4,7 +4,7 @@
   "mode": "controlled-execution-metrics-live-renderer",
   "app": "isolated packaged macOS App with its own Core and data directory",
   "runtimeFixture": "scripts/fixtures/streaming-acp-runtime.mjs",
-  "runtimeFixtureScope": "Controlled ACP frames through a temporary ROVAI_QWEN_BIN override; not evidence of Qwen Provider Usage or Context support",
+  "runtimeFixtureScope": "Controlled ACP frames through a temporary COAXI_QWEN_BIN override; not evidence of Qwen Provider Usage or Context support",
   "run": {
     "adapterKind": "qwen-code",
     "reportedVersion": "0.24.5",
@@ -111,5 +111,5 @@
     ]
   },
   "lateUsageMethod": "After the real controlled Run reached succeeded, the acceptance script updated its existing empty runtime_usage_run_summary row. The App stayed open and its monitoring.execution terminal poll read the row. This tests the read and Renderer race, not native Qwen Usage emission.",
-  "command": "ROVAI_RUNTIME_ACTIVITY_ACCEPT_METRICS_STREAM_ONLY=1 pnpm accept:runtime-activity-ui"
+  "command": "COAXI_RUNTIME_ACTIVITY_ACCEPT_METRICS_STREAM_ONLY=1 pnpm accept:runtime-activity-ui"
 }

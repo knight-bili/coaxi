@@ -21,7 +21,7 @@ Bootstrap 的二次确认。
 ## 变更前
 
 所有 Camp 的 Built-in CLI Charter 都来自未修改的
-[`charter-rovai-cli.md`](../../../crates/rovai-core/resources/charter-rovai-cli.md)，没有渠道文件交付提示。
+[`charter-rovai-cli.md`](../../../crates/coaxi-core/resources/charter-coaxi-cli.md)，没有渠道文件交付提示。
 它在 Session Charter 中位于既有 Authority boundaries 后、Adapter 专用指导前。
 
 ```rust

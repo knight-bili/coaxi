@@ -10,10 +10,10 @@ import {
 } from './runtime-camp-files-root.mjs'
 
 const repository = resolve(import.meta.dirname, '../..')
-const binary = process.env.ROVAI_HOST_BIN ?? join(repository, 'target/debug', process.platform === 'win32' ? 'rovai-host.exe' : 'rovai-host')
+const binary = process.env.COAXI_HOST_BIN ?? join(repository, 'target/debug', process.platform === 'win32' ? 'coaxi-host.exe' : 'coaxi-host')
 
 test('Host prepare creates only a new private authority directory and preserves existing contents', async () => {
-  const fixture = await realpath(await mkdtemp(join(tmpdir(), 'rovai-host-prepare-')))
+  const fixture = await realpath(await mkdtemp(join(tmpdir(), 'coaxi-host-prepare-')))
   try {
     const dataDir = join(fixture, 'data')
     const prepared = JSON.parse(execFileSync(binary, ['prepare', '--data-dir', dataDir], { encoding: 'utf8' }))
@@ -25,7 +25,7 @@ test('Host prepare creates only a new private authority directory and preserves 
     assert.ok(prepared.runArguments.includes('--runtime-camp-files-root'))
     assert.equal(prepared.runArguments[prepared.runArguments.indexOf('--runtime-camp-files-root') + 1], prepared.runtimeCampFilesRoot)
     if (process.platform !== 'win32') assert.equal((await stat(dataDir)).mode & 0o777, 0o700)
-    await assert.rejects(access(join(dataDir, 'rovai.sqlite')), { code: 'ENOENT' })
+    await assert.rejects(access(join(dataDir, 'coaxi.sqlite')), { code: 'ENOENT' })
     const marker = join(dataDir, 'existing-work')
     await writeFile(marker, 'preserve me')
     assert.throws(() => execFileSync(binary, ['prepare', '--data-dir', dataDir], { stdio: 'pipe' }))
@@ -43,7 +43,7 @@ test('Headless Host refuses missing or occupied authority and settles before pro
   timeout: 90_000,
   skip: process.platform === 'win32' ? 'Windows console events require native console acceptance' : false
 }, async () => {
-  const fixture = await realpath(await mkdtemp(join(tmpdir(), 'rovai-host-lifecycle-')))
+  const fixture = await realpath(await mkdtemp(join(tmpdir(), 'coaxi-host-lifecycle-')))
   const dataDir = join(fixture, 'data')
   const args = [
     'run',
@@ -61,7 +61,7 @@ test('Headless Host refuses missing or occupied authority and settles before pro
     const absent = start()
     assert.equal((await within(absent.closed)).code, 1, absent.output())
     assert.match(absent.output(), /authority_required_existing_missing/)
-    await assert.rejects(access(join(dataDir, 'rovai.sqlite')), { code: 'ENOENT' })
+    await assert.rejects(access(join(dataDir, 'coaxi.sqlite')), { code: 'ENOENT' })
 
     const first = start(['--initialize'])
     await within(first.ready)
@@ -74,7 +74,7 @@ test('Headless Host refuses missing or occupied authority and settles before pro
     const stopped = await within(first.closed)
     assert.deepEqual(stopped, { code: 0, signal: null }, first.output())
     assert.match(first.output(), /Host Core stopped after durable settlement/)
-    await access(join(dataDir, 'rovai.sqlite'))
+    await access(join(dataDir, 'coaxi.sqlite'))
 
     const reopened = start()
     await within(reopened.ready)

@@ -14,7 +14,7 @@ test('native window close waits for Draft preparation, retries failure, and leav
 }, async (t) => {
   if (!admitElectronIntegrationTest(t)) return
   const root = resolve(import.meta.dirname, '../..')
-  const fixture = await mkdtemp(join(tmpdir(), 'rovai-window-close-test-'))
+  const fixture = await mkdtemp(join(tmpdir(), 'coaxi-window-close-test-'))
   let child
   let closed
   try {

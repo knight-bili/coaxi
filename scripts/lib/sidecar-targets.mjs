@@ -34,7 +34,7 @@ const TARGETS = Object.freeze({
 export function sidecarTarget(targetKey) {
   const target = TARGETS[targetKey]
   if (!target || target.serverOnly) {
-    throw new Error(`Unsupported Rovai sidecar target: ${targetKey}`)
+    throw new Error(`Unsupported Coaxi sidecar target: ${targetKey}`)
   }
   return target
 }
@@ -44,7 +44,7 @@ export function hostSidecarTargetKey(platform = process.platform, arch = process
     (candidate) => !candidate.serverOnly && candidate.platform === platform && candidate.arch === arch
   )
   if (!target) {
-    throw new Error(`Unsupported Rovai sidecar host: ${platform}-${arch}`)
+    throw new Error(`Unsupported Coaxi sidecar host: ${platform}-${arch}`)
   }
   return target.key
 }
@@ -52,13 +52,13 @@ export function hostSidecarTargetKey(platform = process.platform, arch = process
 /** Server and Desktop builds share the explicit shipped target directory table. */
 export function serverTarget(targetKey) {
   const target = TARGETS[targetKey]
-  if (!target) throw new Error(`Unsupported Rovai Server target: ${targetKey}`)
+  if (!target) throw new Error(`Unsupported Coaxi Server target: ${targetKey}`)
   return target
 }
 
 export function hostServerTargetKey(platform = process.platform, arch = process.arch) {
   const target = Object.values(TARGETS).find((candidate) => candidate.platform === platform && candidate.arch === arch)
-  if (!target) throw new Error(`Unsupported Rovai Server host: ${platform}-${arch}`)
+  if (!target) throw new Error(`Unsupported Coaxi Server host: ${platform}-${arch}`)
   return target.key
 }
 

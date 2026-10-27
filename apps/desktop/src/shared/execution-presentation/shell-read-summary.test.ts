@@ -2,10 +2,10 @@ import { describe, expect, it } from 'vitest'
 import { buildLiveExecutionProgress, shellReadSummary, type LiveRuntimeEvent } from './index'
 
 const repeatedReadCommand = [
-  "sed -n '4170,4335p' crates/rovai-core/src/acp.rs",
-  "sed -n '3060,3280p' crates/rovai-core/src/acp.rs",
-  "sed -n '760,815p' crates/rovai-core/src/agent_runtime_adapter.rs",
-  "sed -n '2320,2370p' crates/rovai-core/src/agent_runtime_adapter.rs"
+  "sed -n '4170,4335p' crates/coaxi-core/src/acp.rs",
+  "sed -n '3060,3280p' crates/coaxi-core/src/acp.rs",
+  "sed -n '760,815p' crates/coaxi-core/src/agent_runtime_adapter.rs",
+  "sed -n '2320,2370p' crates/coaxi-core/src/agent_runtime_adapter.rs"
 ].join(' ; ')
 
 describe('shellReadSummary', () => {
@@ -13,17 +13,17 @@ describe('shellReadSummary', () => {
     expect(shellReadSummary({
       item: {
         commandActions: [
-          { type: 'read', path: 'crates/rovai-core/src/acp.rs' },
-          { type: 'read', path: 'crates/rovai-core/src/acp.rs' },
-          { type: 'read', path: 'crates/rovai-core/src/agent_runtime_adapter.rs' },
-          { type: 'read', path: 'crates/rovai-core/src/acp.rs' }
+          { type: 'read', path: 'crates/coaxi-core/src/acp.rs' },
+          { type: 'read', path: 'crates/coaxi-core/src/acp.rs' },
+          { type: 'read', path: 'crates/coaxi-core/src/agent_runtime_adapter.rs' },
+          { type: 'read', path: 'crates/coaxi-core/src/acp.rs' }
         ]
       }
     })).toEqual({
       title: '阅读 acp.rs，agent_runtime_adapter.rs',
       paths: [
-        'crates/rovai-core/src/acp.rs',
-        'crates/rovai-core/src/agent_runtime_adapter.rs'
+        'crates/coaxi-core/src/acp.rs',
+        'crates/coaxi-core/src/agent_runtime_adapter.rs'
       ],
       displayPaths: ['acp.rs', 'agent_runtime_adapter.rs']
     })
@@ -66,8 +66,8 @@ describe('shellReadSummary', () => {
       item: {
         command: repeatedReadCommand,
         commandActions: [
-          { type: 'read', path: 'crates/rovai-core/src/acp.rs' },
-          { type: 'search', path: 'crates/rovai-core/src' }
+          { type: 'read', path: 'crates/coaxi-core/src/acp.rs' },
+          { type: 'search', path: 'crates/coaxi-core/src' }
         ]
       }
     })).toBeNull()

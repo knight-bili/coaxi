@@ -1,6 +1,6 @@
-// Interaction adapted from Codeg aff1e6c278453ed8d0b96a5f664edcdca621aa3f
+// Interaction adapted from Coaxi aff1e6c278453ed8d0b96a5f664edcdca621aa3f
 // canvas-conversation-surface.tsx / canvas-conversation-drawer.tsx (Apache-2.0).
-// Conversation, draft and Runtime authority remain in Rovai's existing workspace.
+// Conversation, draft and Runtime authority remain in Coaxi's existing workspace.
 import type { CanvasConversationRef, CanvasNode, CanvasNodeMutation, MissionRecord, SingleChatSnapshot, ThreadSnapshot } from '@contracts'
 import { canvasReferenceKey, DETAIL_CARD_HEIGHT, DETAIL_CARD_WIDTH, type CanvasRect, type CanvasSize } from './canvas-layout'
 import { uiAttribute } from './interface-language'

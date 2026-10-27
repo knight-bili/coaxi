@@ -21,17 +21,17 @@ import { createConfiguredCampAndSend } from './lib/create-configured-camp.mjs'
  * secret/transient rejection, and cross-Camp recall.
  *
  * Environment:
- *   ROVAI_MEMORY_CAMP_ADAPTER=<AdapterKind>
- *   ROVAI_MEMORY_CAMP_MODE=preflight|natural|stewarded|both (default: both)
- *   ROVAI_MEMORY_CAMP_SUITE=capture|probe|quick|full     (default: probe)
- *   ROVAI_MEMORY_CAMP_STRICT=1                          fail on quality gates
- *   ROVAI_MEMORY_CAMP_KEEP=1                            preserve successful fixture
- *   ROVAI_MEMORY_CAMP_SHARED_DATA_DIR=<absolute path>    append to an isolated fixture
- *   ROVAI_MEMORY_CAMP_REPORT=/absolute/or/relative.json write JSON report
- *   ROVAI_MEMORY_CAMP_MODEL_<ADAPTER_SLUG>=<model-id>   select an explicit model
- *   ROVAI_MEMORY_CAMP_CLAUDE_MODEL=<model-alias>         ANTHROPIC_MODEL (default: sonnet)
- *   ROVAI_MEMORY_CAMP_RUN_TIMEOUT_MS=<milliseconds>      per-AgentRun timeout
- *   ROVAI_MEMORY_CAMP_DELIVERY_UNKNOWN_GRACE_MS=<ms>     fail-fast grace (default: 5000)
+ *   COAXI_MEMORY_CAMP_ADAPTER=<AdapterKind>
+ *   COAXI_MEMORY_CAMP_MODE=preflight|natural|stewarded|both (default: both)
+ *   COAXI_MEMORY_CAMP_SUITE=capture|probe|quick|full     (default: probe)
+ *   COAXI_MEMORY_CAMP_STRICT=1                          fail on quality gates
+ *   COAXI_MEMORY_CAMP_KEEP=1                            preserve successful fixture
+ *   COAXI_MEMORY_CAMP_SHARED_DATA_DIR=<absolute path>    append to an isolated fixture
+ *   COAXI_MEMORY_CAMP_REPORT=/absolute/or/relative.json write JSON report
+ *   COAXI_MEMORY_CAMP_MODEL_<ADAPTER_SLUG>=<model-id>   select an explicit model
+ *   COAXI_MEMORY_CAMP_CLAUDE_MODEL=<model-alias>         ANTHROPIC_MODEL (default: sonnet)
+ *   COAXI_MEMORY_CAMP_RUN_TIMEOUT_MS=<milliseconds>      per-AgentRun timeout
+ *   COAXI_MEMORY_CAMP_DELIVERY_UNKNOWN_GRACE_MS=<ms>     fail-fast grace (default: 5000)
  */
 
 const root = resolve(import.meta.dirname, '..')
@@ -47,36 +47,36 @@ const allAdapterKinds = [
   'qwen-code',
   'trae-cn-cli'
 ]
-const adapterKind = process.env.ROVAI_MEMORY_CAMP_ADAPTER ?? 'codex-cli'
-const mode = process.env.ROVAI_MEMORY_CAMP_MODE ?? 'both'
-const suite = process.env.ROVAI_MEMORY_CAMP_SUITE ?? 'probe'
-const strict = process.env.ROVAI_MEMORY_CAMP_STRICT === '1'
-const keepFixture = process.env.ROVAI_MEMORY_CAMP_KEEP === '1'
-const sharedDataDir = process.env.ROVAI_MEMORY_CAMP_SHARED_DATA_DIR
-  ? resolve(process.env.ROVAI_MEMORY_CAMP_SHARED_DATA_DIR)
+const adapterKind = process.env.COAXI_MEMORY_CAMP_ADAPTER ?? 'codex-cli'
+const mode = process.env.COAXI_MEMORY_CAMP_MODE ?? 'both'
+const suite = process.env.COAXI_MEMORY_CAMP_SUITE ?? 'probe'
+const strict = process.env.COAXI_MEMORY_CAMP_STRICT === '1'
+const keepFixture = process.env.COAXI_MEMORY_CAMP_KEEP === '1'
+const sharedDataDir = process.env.COAXI_MEMORY_CAMP_SHARED_DATA_DIR
+  ? resolve(process.env.COAXI_MEMORY_CAMP_SHARED_DATA_DIR)
   : null
 const runTimeoutMs = positiveInteger(
-  process.env.ROVAI_MEMORY_CAMP_RUN_TIMEOUT_MS ?? '480000',
-  'ROVAI_MEMORY_CAMP_RUN_TIMEOUT_MS'
+  process.env.COAXI_MEMORY_CAMP_RUN_TIMEOUT_MS ?? '480000',
+  'COAXI_MEMORY_CAMP_RUN_TIMEOUT_MS'
 )
 const deliveryUnknownGraceMs = positiveInteger(
-  process.env.ROVAI_MEMORY_CAMP_DELIVERY_UNKNOWN_GRACE_MS ?? '5000',
-  'ROVAI_MEMORY_CAMP_DELIVERY_UNKNOWN_GRACE_MS'
+  process.env.COAXI_MEMORY_CAMP_DELIVERY_UNKNOWN_GRACE_MS ?? '5000',
+  'COAXI_MEMORY_CAMP_DELIVERY_UNKNOWN_GRACE_MS'
 )
-const reportPath = process.env.ROVAI_MEMORY_CAMP_REPORT
-  ? resolve(process.env.ROVAI_MEMORY_CAMP_REPORT)
+const reportPath = process.env.COAXI_MEMORY_CAMP_REPORT
+  ? resolve(process.env.COAXI_MEMORY_CAMP_REPORT)
   : null
 
 assert(allAdapterKinds.includes(adapterKind),
-  `Unsupported ROVAI_MEMORY_CAMP_ADAPTER: ${adapterKind}`)
+  `Unsupported COAXI_MEMORY_CAMP_ADAPTER: ${adapterKind}`)
 assert(['preflight', 'natural', 'stewarded', 'both'].includes(mode),
-  `Unsupported ROVAI_MEMORY_CAMP_MODE: ${mode}`)
+  `Unsupported COAXI_MEMORY_CAMP_MODE: ${mode}`)
 assert(['capture', 'probe', 'quick', 'full'].includes(suite),
-  `Unsupported ROVAI_MEMORY_CAMP_SUITE: ${suite}`)
+  `Unsupported COAXI_MEMORY_CAMP_SUITE: ${suite}`)
 
 const fixtureRoot = sharedDataDir
   ? dirname(sharedDataDir)
-  : await mkdtemp(join(tmpdir(), `rovai-memory-camp-${adapterKind}-`))
+  : await mkdtemp(join(tmpdir(), `coaxi-memory-camp-${adapterKind}-`))
 const dataDir = sharedDataDir ?? join(fixtureRoot, 'data')
 const projectRoot = sharedDataDir
   ? join(fixtureRoot, `project-${adapterKind}-${crypto.randomUUID()}`)
@@ -779,7 +779,7 @@ function runSummary(run) {
 }
 
 function startCore(dataDirectory, environment = {}) {
-  const child = spawn(join(root, 'target', 'debug', 'rovai-core'), [
+  const child = spawn(join(root, 'target', 'debug', 'coaxi-core'), [
     '--data-dir', dataDirectory,
     '--skill-library-root', join(dataDirectory, 'managed-skill-library')
   ], {
@@ -787,7 +787,7 @@ function startCore(dataDirectory, environment = {}) {
     env: { ...process.env, ...environment },
     stdio: ['pipe', 'pipe', 'pipe']
   })
-  if (process.env.ROVAI_MEMORY_CAMP_VERBOSE_CORE === '1') {
+  if (process.env.COAXI_MEMORY_CAMP_VERBOSE_CORE === '1') {
     child.stderr.on('data', (chunk) => process.stderr.write(redact(String(chunk))))
   } else {
     child.stderr.resume()
@@ -807,7 +807,7 @@ function startCore(dataDirectory, environment = {}) {
   child.once('error', rejectPending)
   child.once('close', (code, signal) => {
     if (!stopped) {
-      rejectPending(new Error(`rovai-core exited early (code=${code}, signal=${signal})`))
+      rejectPending(new Error(`coaxi-core exited early (code=${code}, signal=${signal})`))
     }
   })
   createInterface({ input: child.stdout }).on('line', (line) => {
@@ -815,7 +815,7 @@ function startCore(dataDirectory, environment = {}) {
     try {
       message = JSON.parse(line)
     } catch (error) {
-      rejectPending(new Error(`rovai-core emitted invalid JSON: ${safeError(error).message}`))
+      rejectPending(new Error(`coaxi-core emitted invalid JSON: ${safeError(error).message}`))
       return
     }
     if (message.method) {
@@ -885,8 +885,8 @@ async function prepareProject() {
     ''
   ].join('\n'))
   await runCommand('git', ['init', '-b', 'main'], projectRoot)
-  await runCommand('git', ['config', 'user.name', 'Rovai Memory Diagnostic'], projectRoot)
-  await runCommand('git', ['config', 'user.email', 'memory-diagnostic@rovai.local'], projectRoot)
+  await runCommand('git', ['config', 'user.name', 'Coaxi Memory Diagnostic'], projectRoot)
+  await runCommand('git', ['config', 'user.email', 'memory-diagnostic@coaxi.local'], projectRoot)
   await runCommand('git', ['add', 'README.md'], projectRoot)
   await runCommand('git', ['commit', '-m', 'fixture'], projectRoot)
 }
@@ -962,7 +962,7 @@ async function persistReport() {
 function runtimeEnvironment(kind) {
   if (kind !== 'claude-code-cli') return {}
   return {
-    ANTHROPIC_MODEL: process.env.ROVAI_MEMORY_CAMP_CLAUDE_MODEL?.trim() || 'sonnet'
+    ANTHROPIC_MODEL: process.env.COAXI_MEMORY_CAMP_CLAUDE_MODEL?.trim() || 'sonnet'
   }
 }
 
@@ -973,7 +973,7 @@ async function configureDiagnosticModel(request, installation, configuredAgents)
     return adapterKind === 'claude-code-cli'
       ? {
           ...configured,
-          environmentModel: process.env.ROVAI_MEMORY_CAMP_CLAUDE_MODEL?.trim() || 'sonnet'
+          environmentModel: process.env.COAXI_MEMORY_CAMP_CLAUDE_MODEL?.trim() || 'sonnet'
         }
       : configured
   }
@@ -1005,7 +1005,7 @@ async function configureDiagnosticModel(request, installation, configuredAgents)
 }
 
 function diagnosticModel(kind) {
-  const overrideKey = `ROVAI_MEMORY_CAMP_MODEL_${kind.replace(/[^A-Za-z0-9]/g, '_').toUpperCase()}`
+  const overrideKey = `COAXI_MEMORY_CAMP_MODEL_${kind.replace(/[^A-Za-z0-9]/g, '_').toUpperCase()}`
   const override = process.env[overrideKey]?.trim()
   if (override) return override
   return ({

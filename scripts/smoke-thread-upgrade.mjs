@@ -27,8 +27,8 @@ c=sqlite3.connect(p.as_uri()+'?mode=ro&immutable=1',uri=True)
 tables=['camp','conversation','event_log','context_manifest','agent_run_input','native_session_bootstrap_evidence','native_session_platform_skills_evidence']
 existing={r[0] for r in c.execute("SELECT name FROM sqlite_master WHERE type='table'")}
 rows={t:c.execute('SELECT * FROM '+t+' ORDER BY rowid').fetchall() for t in tables if t in existing}
-print(json.dumps({'schema':c.execute('SELECT projection_schema_version FROM rovai_data_contract').fetchone()[0], 'digest':hashlib.sha256(json.dumps(rows,ensure_ascii=False,separators=(',',':'),default=str).encode()).hexdigest(),'counts':{t:len(v) for t,v in rows.items()}}))
-`, join(data, 'rovai.sqlite')])).stdout)
+print(json.dumps({'schema':c.execute('SELECT projection_schema_version FROM coaxi_data_contract').fetchone()[0], 'digest':hashlib.sha256(json.dumps(rows,ensure_ascii=False,separators=(',',':'),default=str).encode()).hexdigest(),'counts':{t:len(v) for t,v in rows.items()}}))
+`, join(data, 'coaxi.sqlite')])).stdout)
 let core
 const start = executable => startQualificationCore({ coreExecutable: executable, dataDirectory: data, workingDirectory: root, runtimeCacheDirectory: join(root, 'cache'), mcpConfigPath: mcp })
 const skill = join(data, 'skills', 'cli-operations', 'SKILL.md')
@@ -40,7 +40,7 @@ async function waitForSkill(word) {
   throw new Error(`Bundled Skill did not synchronize at its original path: ${word}`)
 }
 try {
-  delete process.env.ROVAI_BUNDLED_SKILLS_ROOT
+  delete process.env.COAXI_BUNDLED_SKILLS_ROOT
   core = start(options['--baseline'])
   await core.request('health.check')
   const preflight = await core.request('camps.creationPreflight')

@@ -24,7 +24,7 @@ function restoredEnvironmentText(inspection:CustomRuntimeInspection):string{
   }
 }
 
-/** Codeg add-custom-agent-dialog 的字段分组；复用 Rovai 原生设置行、列表与弹窗。 */
+/** Coaxi add-custom-agent-dialog 的字段分组；复用 Coaxi 原生设置行、列表与弹窗。 */
 export function CustomRuntimeSettings():React.JSX.Element{
   const client=useThreadClient(),t=useUiText(),generation=useRef(0)
   const [page,setPage]=useState<CustomRuntimeDefinitionPage>({items:[],next:null}),[search,setSearch]=useState(''),[busy,setBusy]=useState(false),[error,setError]=useState('')

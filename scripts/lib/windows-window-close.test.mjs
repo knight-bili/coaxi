@@ -14,7 +14,7 @@ const root = resolve(import.meta.dirname, '../..')
 const source = join(root, 'scripts/fixtures/windows-window-close')
 test('Windows close choice uses production Main, preload and UI; hide preserves the original window and normal quit', { timeout: 120_000 }, async t => {
   if (!admitElectronIntegrationTest(t)) return
-  const fixture = await mkdtemp(join(tmpdir(), 'rovai-windows-close-'))
+  const fixture = await mkdtemp(join(tmpdir(), 'coaxi-windows-close-'))
   let child, closed
   try {
     await build({ configFile: false, root: source, base: './', logLevel: 'error', plugins: [react()],
@@ -46,7 +46,7 @@ test('Windows close choice uses production Main, preload and UI; hide preserves 
     } finally { clearTimeout(timer) }
   } finally {
     if (child && child.exitCode === null && child.signalCode === null) { child.kill('SIGKILL'); await closed }
-    if (process.env.ROVAI_KEEP_WINDOWS_CLOSE_FIXTURE === '1') process.stdout.write(`Window close evidence: ${fixture}\n`)
+    if (process.env.COAXI_KEEP_WINDOWS_CLOSE_FIXTURE === '1') process.stdout.write(`Window close evidence: ${fixture}\n`)
     else await rm(fixture, { recursive: true, force: true })
   }
 })

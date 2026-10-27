@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schemas.rovai.invalid/v0.36/diagnostic-portfolio-definition.schema.json",
-  "title": "Rovai v0.36 Diagnostic Portfolio Definition",
+  "$id": "https://schemas.coaxi.invalid/v0.36/diagnostic-portfolio-definition.schema.json",
+  "title": "Coaxi v0.36 Diagnostic Portfolio Definition",
   "type": "object",
   "additionalProperties": false,
   "required": [

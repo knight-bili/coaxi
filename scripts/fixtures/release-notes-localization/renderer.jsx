@@ -7,7 +7,7 @@ import { ThreadClientProvider } from '@renderer/camp-client'
 import '@renderer/styles.css'
 import '../../../apps/web/src/mobile.css'
 
-const notes = (version, label) => `# Rovai AI v${version}
+const notes = (version, label) => `# Coaxi AI v${version}
 
 <!-- lang:en -->
 
@@ -29,8 +29,8 @@ ${label} 中文说明
 `
 const base = {
   currentVersion: '0.0.2', status: 'available',
-  currentRelease: { version: '0.0.2', releaseName: 'Rovai AI v0.0.2', releaseDate: null, releaseNotes: notes('0.0.2', 'Installed') },
-  availableRelease: { version: '0.0.3', releaseName: 'Rovai AI v0.0.3', releaseDate: null, releaseNotes: notes('0.0.3', 'Candidate') },
+  currentRelease: { version: '0.0.2', releaseName: 'Coaxi AI v0.0.2', releaseDate: null, releaseNotes: notes('0.0.2', 'Installed') },
+  availableRelease: { version: '0.0.3', releaseName: 'Coaxi AI v0.0.3', releaseDate: null, releaseNotes: notes('0.0.3', 'Candidate') },
   lastCheckSource: null, checkedAt: null, lastSuccessfulCheckAt: null,
   downloadPercent: null, transferredBytes: null, totalBytes: null, bytesPerSecond: null,
   failureReason: null, pendingPrompt: null

@@ -45,7 +45,7 @@ export function renderToolkitArchitecture() {
     + card(380, 371, 314, 72, 'grill-duo', '', P.peer, 20)
     + card(46, 460, 310, 66, 'cli-operations', '', P.peer, 20)
     + card(380, 460, 314, 66, 'memory-stewardship', '', P.peer, 20)
-    + area(764, 295, 722, 259, 'Rovai CLI · 平台动作', P.toolkit, '固定命令 · 精确 --help')
+    + area(764, 295, 722, 259, 'Coaxi CLI · 平台动作', P.toolkit, '固定命令 · 精确 --help')
     + ['send', 'mission', 'task', 'camp / history', 'memory', 'member', 'automation', 'single-chat'].map((name, i) =>
       chip(792 + i % 4 * 169, 376 + Math.floor(i / 4) * 78, 155, name, P.toolkit, name.length > 12 ? 16 : 18)).join('')
     + connection('M221 290 V228', P.peer, { width: 2.3 })
@@ -62,7 +62,7 @@ export function renderToolkitArchitecture() {
     + label(914, 714, '调用 / 返回', 17, { color: P.muted, anchor: 'end' });
 
   const core =
-    area(18, 734, 1468, 367, 'Rovai Core', P.context, '按会话模式与操作资格开放能力')
+    area(18, 734, 1468, 367, 'Coaxi Core', P.context, '按会话模式与操作资格开放能力')
     + rect(47, 807, 1410, 71, '#fff', P.context.border, 10)
     + label(69, 852, 'BuiltinToolRouter', 25, { color: P.context.main, weight: 600 })
     + label(1429, 852, 'Run · Lease · Native Binding → 领域服务', 22, { color: P.context.main, anchor: 'end' })
@@ -98,7 +98,7 @@ export function renderTechnologyStack() {
     + label(602, 566, 'NDJSON / stdio', 20, { color: P.access.main });
 
   const core =
-    area(18, 594, 1120, 249, 'rovai-core · Rust / Tokio', P.context)
+    area(18, 594, 1120, 249, 'coaxi-core · Rust / Tokio', P.context)
     + card(45, 674, 337, 136, '领域服务', ['Serde · Typed Commands', 'Domain Command Gateway'], P.context, 24)
     + card(409, 674, 337, 136, '异步执行', ['Tokio · Scheduler', 'Runtime Fleet'], P.context, 24)
     + card(773, 674, 337, 136, '输入与本地服务', ['Context · Memory', 'Local IPC · BuiltinToolRouter'], P.context, 23)

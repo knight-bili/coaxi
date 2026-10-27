@@ -8,7 +8,7 @@ import type {
 } from '@contracts'
 import type { EditingRecovery } from './camp-client'
 
-export const THREAD_COMPOSER_STORAGE_PREFIX = 'rovai.camp-composer-draft.v1:'
+export const THREAD_COMPOSER_STORAGE_PREFIX = 'coaxi.camp-composer-draft.v1:'
 const MAX_STORED_DRAFT_BYTES = 4 * 1024 * 1024
 const MAX_SEGMENTS = 4_096
 export const MAX_COMPOSER_ATTACHMENTS = 10

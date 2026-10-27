@@ -13,19 +13,19 @@ const adapters = process.argv.slice(2)
 if (!adapters.length || adapters.some(kind => !['codex-cli', 'copilot-cli', 'claude-code-cli', 'pi'].includes(kind))) {
   throw Error('Pass one or more runtime kinds: codex-cli copilot-cli claude-code-cli pi')
 }
-const fixture = await realpath(await mkdtemp(join(tmpdir(), 'rovai-runtime-thinking-')))
+const fixture = await realpath(await mkdtemp(join(tmpdir(), 'coaxi-runtime-thinking-')))
 const data = join(fixture, 'data'), skills = join(fixture, 'skills'), project = join(fixture, 'project')
 await Promise.all([data, skills, project].map(path => mkdir(path)))
 await writeFile(join(project, 'input.txt'), 'Numbers: 9 14 17 22 27 31 35 41 46 53 58 64 69 73 81 87\nTarget: 219\n')
 await writeFile(join(project, 'check.txt'), 'Check exactly seven distinct numbers and sum 219.\n')
 for (const args of [['init', '-b', 'main'], ['config', 'user.name', 'Runtime Thinking Probe'],
-  ['config', 'user.email', 'probe@rovai.local'], ['add', '.'], ['commit', '-m', 'isolated fixture']]) {
+  ['config', 'user.email', 'probe@coaxi.local'], ['add', '.'], ['commit', '-m', 'isolated fixture']]) {
   execFileSync('git', args, { cwd: project, stdio: 'ignore' })
 }
 const report = { channel: 'automatic_acceptance', fixture, userData: data, skillLibrary: skills,
   privateFrames: 0, stderrBytes: 0, samples: [] }
 console.log(JSON.stringify({ channel: report.channel, fixture, userData: data, skillLibrary: skills }))
-const core = spawn(join(root, 'target/debug/rovai-core'), [...coreDataDirectoryArguments(data),
+const core = spawn(join(root, 'target/debug/coaxi-core'), [...coreDataDirectoryArguments(data),
   '--skill-library-root', skills, '--mcp-config-path', join(data, 'mcp.json')], {
   cwd: root, stdio: ['pipe', 'pipe', 'pipe']
 })
@@ -57,8 +57,8 @@ async function configureRuntime(adapterKind) {
     const profile = await request('members.get', { agentId: 'agent_1' })
     const configured = await request('members.runtime.set', { commandId: crypto.randomUUID(), command: {
       agentId: 'agent_1', expectedVersion: profile.version, adapterKind,
-      model: adapterKind === 'pi' && process.env.ROVAI_THINKING_PI_MODEL
-        ? { mode: 'explicit', modelId: process.env.ROVAI_THINKING_PI_MODEL, options: { thinking_level: 'high' } }
+      model: adapterKind === 'pi' && process.env.COAXI_THINKING_PI_MODEL
+        ? { mode: 'explicit', modelId: process.env.COAXI_THINKING_PI_MODEL, options: { thinking_level: 'high' } }
         : installation.memberRuntimeDefaults.model,
       permissions: installation.memberRuntimeDefaults.permissions
     } })

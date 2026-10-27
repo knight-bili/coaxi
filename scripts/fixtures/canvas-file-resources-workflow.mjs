@@ -11,7 +11,7 @@ export async function qualifyCanvasFileResources(window,{evaluate,wait,rpc,openC
   const root=resolve(config.file_fixture_directory),phase=config.file_phase
   const owned=path=>{const suffix=relative(root,resolve(path));assert.ok(suffix&&!isAbsolute(suffix)&&suffix!=='..'&&!suffix.startsWith('..\\')&&!suffix.startsWith('../'));return path}
   const sha=bytes=>createHash('sha256').update(bytes).digest('hex')
-  const fp=(method,params)=>evaluate(`window.rovai.filePreview.${method}(${JSON.stringify(params)})`)
+  const fp=(method,params)=>evaluate(`window.coaxi.filePreview.${method}(${JSON.stringify(params)})`)
   const card=id=>`document.querySelector('[data-id="${id}"] .canvas-card')`
   const fit=()=>click(`document.querySelector('.canvas-dock-panel button[aria-label="查看全部"]')`)
   const click=async expression=>{
@@ -21,14 +21,14 @@ export async function qualifyCanvasFileResources(window,{evaluate,wait,rpc,openC
     for(const type of ['mouseMove','mouseDown','mouseUp'])window.webContents.sendInputEvent({type,...point,...(type==='mouseMove'?{}:{button:'left',clickCount:1})})
   }
   const corePid=()=>{
-    const rows=JSON.parse(execFileSync(join(process.env.SystemRoot,'System32/WindowsPowerShell/v1.0/powershell.exe'),['-NoProfile','-NonInteractive','-Command',`$rows=@(Get-CimInstance Win32_Process -Filter 'ParentProcessId = ${process.pid}' | Where-Object {$_.Name -eq 'rovai-host.exe'} | Select-Object ProcessId,ExecutablePath,CommandLine);ConvertTo-Json -InputObject $rows -Compress`],{encoding:'utf8',windowsHide:true}))
-    assert.equal(rows.length,1);assert.equal(resolve(rows[0].ExecutablePath).toLowerCase(),resolve(process.env.ROVAI_HOST_BIN).toLowerCase())
+    const rows=JSON.parse(execFileSync(join(process.env.SystemRoot,'System32/WindowsPowerShell/v1.0/powershell.exe'),['-NoProfile','-NonInteractive','-Command',`$rows=@(Get-CimInstance Win32_Process -Filter 'ParentProcessId = ${process.pid}' | Where-Object {$_.Name -eq 'coaxi-host.exe'} | Select-Object ProcessId,ExecutablePath,CommandLine);ConvertTo-Json -InputObject $rows -Compress`],{encoding:'utf8',windowsHide:true}))
+    assert.equal(rows.length,1);assert.equal(resolve(rows[0].ExecutablePath).toLowerCase(),resolve(process.env.COAXI_HOST_BIN).toLowerCase())
     assert.ok(rows[0].CommandLine.toLowerCase().includes(join(config.data_root,'Core').toLowerCase()));return rows[0].ProcessId
   }
   const capture=async name=>{const path=join(config.evidence,name+'.png');await writeFile(path,(await window.webContents.capturePage()).toPNG());(report.screenshots??=[]).push(path)}
   const rows=()=>seam.since(0)
   const openedFile=path=>rows().filter(row=>row.result?.ok&&row.result.value?.kind==='file_preview'&&row.args[0]?.rawReference===pathToFileURL(path).href).at(-1)?.result.value.file
-  const siteFor=file=>rows().filter(row=>row.channel==='rovai:file-preview-prepare-html-site'&&row.args[0]?.handleId===file.handleId&&row.result?.ok).at(-1)?.result.value
+  const siteFor=file=>rows().filter(row=>row.channel==='coaxi:file-preview-prepare-html-site'&&row.args[0]?.handleId===file.handleId&&row.result?.ok).at(-1)?.result.value
   const inspectHtml=async(id,identity)=>{
     await wait(`${card(id)}?.querySelector('.file-preview-html-stage')?.dataset.documentState==='loaded'&&${card(id)}.querySelector('.file-preview-html-stage').dataset.channelState==='connected'`,30000)
     const src=await evaluate(`${card(id)}.querySelector('iframe.file-preview-html').src`),origin=new URL(src).origin
@@ -42,7 +42,7 @@ export async function qualifyCanvasFileResources(window,{evaluate,wait,rpc,openC
       await pause(50)
       for(const frame of candidates){
         try{
-          const doc=await bounded(frame.executeJavaScript(`({matched:window.__r06FrameProbe===${JSON.stringify(probe)},identity:document.querySelector('#identity')?.textContent,bridge:typeof window.rovai,node:typeof window.require,csp:document.querySelector('meta[http-equiv="Content-Security-Policy"]')?.content})`))
+          const doc=await bounded(frame.executeJavaScript(`({matched:window.__r06FrameProbe===${JSON.stringify(probe)},identity:document.querySelector('#identity')?.textContent,bridge:typeof window.coaxi,node:typeof window.require,csp:document.querySelector('meta[http-equiv="Content-Security-Policy"]')?.content})`))
           if(!doc?.matched||doc.identity!==identity)continue
           assert.equal(doc.bridge,'undefined');assert.equal(doc.node,'undefined');assert.equal(doc.csp,config.file_author_csp)
           found={origin,frameId:frame.frameTreeNodeId,...doc};break
@@ -117,10 +117,10 @@ export async function qualifyCanvasFileResources(window,{evaluate,wait,rpc,openC
     await click(`[...${card(html[4].nodeId)}.querySelectorAll('[role="alert"] button')].find(node=>node.textContent==='重试')`)
     await inspectHtml(html[4].nodeId,html[4].identity)
     const releaseDeadline=Date.now()+20000
-    while(Date.now()<releaseDeadline&&!rows().some(row=>row.channel==='rovai:file-preview-release-html-site'&&row.args[0]?.previewId===html[0].site.previewId&&row.result?.released===true))await pause(50)
-    assert.ok(rows().some(row=>row.channel==='rovai:file-preview-release-html-site'&&row.args[0]?.previewId===html[0].site.previewId&&row.result?.released===true),'original HTML site was not released')
+    while(Date.now()<releaseDeadline&&!rows().some(row=>row.channel==='coaxi:file-preview-release-html-site'&&row.args[0]?.previewId===html[0].site.previewId&&row.result?.released===true))await pause(50)
+    assert.ok(rows().some(row=>row.channel==='coaxi:file-preview-release-html-site'&&row.args[0]?.previewId===html[0].site.previewId&&row.result?.released===true),'original HTML site was not released')
     assert.ok(!window.webContents.mainFrame.framesInSubtree.some(frame=>frame.frameTreeNodeId===documents[0].frameId),'removed author document is still alive')
-    const retained=rows().filter(row=>row.channel==='rovai:file-preview-retention').at(-1)?.args[0]
+    const retained=rows().filter(row=>row.channel==='coaxi:file-preview-retention').at(-1)?.args[0]
     assert.ok(retained&&retained.handles.length<=64)
     const cached=retained.handles.find(row=>row.handleId===html[0].handle.handleId)
     if(cached)assert.equal(cached.visible,false)
@@ -141,7 +141,7 @@ export async function qualifyCanvasFileResources(window,{evaluate,wait,rpc,openC
     const mark=seam.mark();await remove(context.mirrorIds[0])
     await wait(`${card(context.mirrorIds[4])}?.querySelector('iframe.file-preview-html')&&document.querySelectorAll('iframe.file-preview-html').length===4`)
     assert.equal((await fp('readText',{handleId:html[1].handle.handleId,expectedGeneration:html[1].handle.contentGeneration})).ok,true)
-    assert.ok(!seam.since(mark).some(row=>row.channel==='rovai:file-preview-release'&&row.args[0]?.handleId===html[1].handle.handleId))
+    assert.ok(!seam.since(mark).some(row=>row.channel==='coaxi:file-preview-release'&&row.args[0]?.handleId===html[1].handle.handleId))
     record('closing_one_same_source_mirror_admits_the_waiting_presentation_without_releasing_its_other_readers')
     context.savedNodes=(await rpc('canvas.nodes.snapshot',{boardId})).nodes.map(node=>({id:node.id,data:node.data}))
     context.oldHandles=rows().flatMap(row=>row.result?.ok&&row.result.value?.kind==='file_preview'?[row.result.value.file]:[])

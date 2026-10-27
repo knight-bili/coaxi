@@ -12,7 +12,7 @@ import { prepareIsolatedPiAgentDir } from './lib/pi-smoke-config.mjs'
 
 const root = resolve(import.meta.dirname, '..')
 const builtinTransportSource = await readFile(
-  join(root, 'crates', 'rovai-core', 'src', 'builtin_tool_transport.rs'),
+  join(root, 'crates', 'coaxi-core', 'src', 'builtin_tool_transport.rs'),
   'utf8'
 )
 const builtinCliContractVersion = builtinTransportSource.match(
@@ -28,22 +28,22 @@ if (!builtinCliContractVersion || !builtinCliIpcVersion || !builtinCliCapability
   throw new Error('Current Built-in CLI transport constants were not found')
 }
 const coreExecutable = resolve(
-  process.env.ROVAI_BUILTIN_CLI_CORE_EXECUTABLE ?? join(root, 'target', 'debug', 'rovai-core')
+  process.env.COAXI_BUILTIN_CLI_CORE_EXECUTABLE ?? join(root, 'target', 'debug', 'coaxi-core')
 )
 const cliExecutable = resolve(
-  process.env.ROVAI_BUILTIN_CLI_EXECUTABLE ?? join(root, 'target', 'debug', 'rovai')
+  process.env.COAXI_BUILTIN_CLI_EXECUTABLE ?? join(root, 'target', 'debug', 'coaxi')
 )
-const fixtureRoot = await realpath(await mkdtemp(join(tmpdir(), 'rovai-builtin-cli-smoke-')))
+const fixtureRoot = await realpath(await mkdtemp(join(tmpdir(), 'coaxi-builtin-cli-smoke-')))
 const projectRoot = join(fixtureRoot, 'project')
 const dataDir = join(fixtureRoot, 'data')
 const skillLibraryRoot = join(fixtureRoot, 'skill-library')
 const bashExecutable = process.platform === 'win32'
-  ? (process.env.ROVAI_BASH_BIN ?? 'C:\\Program Files\\Git\\bin\\bash.exe')
+  ? (process.env.COAXI_BASH_BIN ?? 'C:\\Program Files\\Git\\bin\\bash.exe')
   : '/bin/bash'
-const historyMarker = 'ROVAI_BUILTIN_HISTORY_V1'
-const historyPublicA2aMarker = 'ROVAI_BUILTIN_HISTORY_PUBLIC_A2A_V1'
-const historyAttachmentMarker = 'ROVAI_BUILTIN_HISTORY_ATTACHMENT_V1'
-const historySeedCompletionMarker = 'ROVAI_BUILTIN_HISTORY_SEED_OK'
+const historyMarker = 'COAXI_BUILTIN_HISTORY_V1'
+const historyPublicA2aMarker = 'COAXI_BUILTIN_HISTORY_PUBLIC_A2A_V1'
+const historyAttachmentMarker = 'COAXI_BUILTIN_HISTORY_ATTACHMENT_V1'
+const historySeedCompletionMarker = 'COAXI_BUILTIN_HISTORY_SEED_OK'
 const expectedOperations = [
   'automation.close',
   'automation.create',
@@ -86,7 +86,7 @@ const allRuntimeSpecifications = [
   ['zcode-app', 'ZCode']
 ].map(([adapterKind, label]) => ({ adapterKind, label, slug: adapterKind.replaceAll('-', '_') }))
 const defaultRuntimeSpecifications = allRuntimeSpecifications
-const selectedAdapters = new Set((process.env.ROVAI_BUILTIN_CLI_ADAPTERS
+const selectedAdapters = new Set((process.env.COAXI_BUILTIN_CLI_ADAPTERS
   ?? defaultRuntimeSpecifications.map((value) => value.adapterKind).join(','))
   .split(',')
   .map((value) => value.trim())
@@ -95,14 +95,14 @@ const unknownAdapters = [...selectedAdapters].filter((adapterKind) =>
   !allRuntimeSpecifications.some((value) => value.adapterKind === adapterKind)
 )
 if (unknownAdapters.length) {
-  throw new Error(`Unknown ROVAI_BUILTIN_CLI_ADAPTERS: ${unknownAdapters.join(', ')}`)
+  throw new Error(`Unknown COAXI_BUILTIN_CLI_ADAPTERS: ${unknownAdapters.join(', ')}`)
 }
 const runtimeSpecifications = allRuntimeSpecifications.filter((value) =>
   selectedAdapters.has(value.adapterKind)
 )
 
 let core = null
-let keepFixture = process.env.ROVAI_KEEP_BUILTIN_CLI_FIXTURE === '1'
+let keepFixture = process.env.COAXI_KEEP_BUILTIN_CLI_FIXTURE === '1'
 let piAgentDir = null
 
 try {
@@ -112,8 +112,8 @@ try {
   await mkdir(projectRoot)
   await writeFile(join(projectRoot, 'README.md'), '# Built-in CLI Runtime Qualification\n')
   await runCapture('git', ['init', '-b', 'main'], { cwd: projectRoot, expectedCode: 0 })
-  await runCapture('git', ['config', 'user.name', 'Rovai Built-in CLI Smoke'], { cwd: projectRoot, expectedCode: 0 })
-  await runCapture('git', ['config', 'user.email', 'builtin-cli@rovai.local'], { cwd: projectRoot, expectedCode: 0 })
+  await runCapture('git', ['config', 'user.name', 'Coaxi Built-in CLI Smoke'], { cwd: projectRoot, expectedCode: 0 })
+  await runCapture('git', ['config', 'user.email', 'builtin-cli@coaxi.local'], { cwd: projectRoot, expectedCode: 0 })
   await runCapture('git', ['add', 'README.md'], { cwd: projectRoot, expectedCode: 0 })
   await runCapture('git', ['commit', '-m', 'fixture'], { cwd: projectRoot, expectedCode: 0 })
 
@@ -136,11 +136,11 @@ try {
       [specification.agentId, specification.recipientProfileId]
     )
     const explicitModel = specification.adapterKind === 'codex-cli'
-      ? process.env.ROVAI_BUILTIN_CLI_CODEX_MODEL?.trim()
+      ? process.env.COAXI_BUILTIN_CLI_CODEX_MODEL?.trim()
       : specification.adapterKind === 'opencode-cli'
-        ? process.env.ROVAI_BUILTIN_CLI_OPENCODE_MODEL?.trim()
+        ? process.env.COAXI_BUILTIN_CLI_OPENCODE_MODEL?.trim()
       : specification.adapterKind === 'codebuddy-cli'
-        ? process.env.ROVAI_BUILTIN_CLI_CODEBUDDY_MODEL?.trim()
+        ? process.env.COAXI_BUILTIN_CLI_CODEBUDDY_MODEL?.trim()
         : null
     if (explicitModel) {
       for (const agentId of [
@@ -214,10 +214,10 @@ try {
   })
 
   for (const specification of runtimeSpecifications) {
-    specification.currentMarker = `ROVAI_CURRENT_${specification.slug.toUpperCase()}_V1`
-    specification.successMarker = `ROVAI_BUILTIN_CLI_${specification.slug.toUpperCase()}_OK`
-    specification.resumeMarker = `ROVAI_BUILTIN_CLI_${specification.slug.toUpperCase()}_RESUME_OK`
-    specification.gatherMarker = `ROVAI_GATHER_${specification.slug.toUpperCase()}_DIRECTED_DELIVERY_OBSERVED`
+    specification.currentMarker = `COAXI_CURRENT_${specification.slug.toUpperCase()}_V1`
+    specification.successMarker = `COAXI_BUILTIN_CLI_${specification.slug.toUpperCase()}_OK`
+    specification.resumeMarker = `COAXI_BUILTIN_CLI_${specification.slug.toUpperCase()}_RESUME_OK`
+    specification.gatherMarker = `COAXI_GATHER_${specification.slug.toUpperCase()}_DIRECTED_DELIVERY_OBSERVED`
     specification.contextPathFile = join(projectRoot, `.context-path-${specification.slug}`)
     specification.resumeContextPathFile = join(projectRoot, `.resume-context-path-${specification.slug}`)
     specification.resumeCompletionFile = join(projectRoot, `.resume-complete-${specification.slug}`)
@@ -602,7 +602,7 @@ async function seedHistoricalPublicA2a(coreClient, input) {
     agentId: input.specification.agentId,
     body: [
       'Run the generated historical Public A2A seed script with your native shell tool.',
-      'The Runtime process already has the real ROVAI_AGENT_CLI, ROVAI_CLI_CONTEXT, and ROVAI_RUN_TMP lease environment.',
+      'The Runtime process already has the real COAXI_AGENT_CLI, COAXI_CLI_CONTEXT, and COAXI_RUN_TMP lease environment.',
       'Do not modify or replace the script.',
       runtimeShellCommand(input.scriptPath),
       `After it exits 0, reply with exactly ${input.completionMarker}.`
@@ -715,7 +715,7 @@ async function startVerificationRun(coreClient, specification, resumed) {
       ].join('\n')
     : [
         'Run the local repository Built-in CLI transport qualification.',
-        'The script was generated by this test and the Runtime process already has ROVAI_AGENT_CLI, ROVAI_CLI_CONTEXT, and ROVAI_RUN_TMP injected.',
+        'The script was generated by this test and the Runtime process already has COAXI_AGENT_CLI, COAXI_CLI_CONTEXT, and COAXI_RUN_TMP injected.',
         ...confirmedMemberCard,
         'You may inspect the script if your Runtime requires that before execution; do not modify or replace it.',
         'Use your native bash/shell tool to run:',
@@ -1060,7 +1060,7 @@ async function assertFencedContext(contextPath, adapterKind, phase) {
   let lastResult = null
   for (let attempt = 0; attempt < 60; attempt += 1) {
     const result = await runCapture(cliExecutable, ['camp', 'list'], {
-      env: { ...process.env, ROVAI_CLI_CONTEXT: contextPath },
+      env: { ...process.env, COAXI_CLI_CONTEXT: contextPath },
       expectedCodes: [0, 2]
     })
     lastResult = result
@@ -1122,11 +1122,11 @@ function verificationScript(input) {
     action: 'add',
     scope: 'hearth',
     kind: 'lesson',
-    body: `The ${input.adapterKind} Runtime can invoke Rovai built-ins only through the local CLI.`,
+    body: `The ${input.adapterKind} Runtime can invoke Coaxi built-ins only through the local CLI.`,
     retrievalKeys: [`hearth-${input.slug.slice(0, 14)}`]
   })
   const publicSend = JSON.stringify({
-    body: `Publish exactly one important-result notification with rovai send --public-only --to-principal --body 'ROVAI_PUBLIC_A2A_${input.slug.toUpperCase()}_RESULT', then finish. Do not route to any Agent.`,
+    body: `Publish exactly one important-result notification with coaxi send --public-only --to-principal --body 'COAXI_PUBLIC_A2A_${input.slug.toUpperCase()}_RESULT', then finish. Do not route to any Agent.`,
     to: [input.recipientProfileId]
   })
   return `#!/bin/bash
@@ -1203,9 +1203,9 @@ printf '%s\n' "$send_help" | grep -Fq -- ${shellQuote('For multiline, Markdown, 
 printf '%s\n' "$send_help" | grep -Fq -- ${shellQuote('Input: direct flags, or --input-file <path> with send flags except --body.')}
 printf '%s\n' "$send_help" | grep -Fq -- ${shellQuote('  Write reply.md:')}
 printf '%s\n' "$send_help" | grep -Fq -- ${shellQuote('  After the write succeeds:')}
-printf '%s\n' "$send_help" | grep -Fq -- ${shellQuote('    rovai send --public-only --input-file reply.md')}
-printf '%s\n' "$send_help" | grep -Fq -- "rovai send --to agent_5 --body 'Please reproduce on the previous client build and return the version and result.'"
-printf '%s\n' "$send_help" | grep -Fq -- "rovai send --public-only --to-principal --body 'Please choose whether to roll back the client or continue the token investigation.'"
+printf '%s\n' "$send_help" | grep -Fq -- ${shellQuote('    coaxi send --public-only --input-file reply.md')}
+printf '%s\n' "$send_help" | grep -Fq -- "coaxi send --to agent_5 --body 'Please reproduce on the previous client build and return the version and result.'"
+printf '%s\n' "$send_help" | grep -Fq -- "coaxi send --public-only --to-principal --body 'Please choose whether to roll back the client or continue the token investigation.'"
 gather_help="$("$CLI" gather --help)"
 printf '%s\n' "$gather_help" | grep -Eq -- '--to[[:space:]]+field=to type=array repeatable'
 printf '%s\n' "$gather_help" | grep -Fq -- 'Gather is asynchronous.'
@@ -1215,17 +1215,17 @@ printf '%s\n' "$member_help" | grep -Fq -- '--creation-key'
 printf '%s\n' "$member_help" | grep -Fq -- '--avatar-file'
 printf '%s\n' "$member_help" | grep -Fq -- 'user explicitly confirms'
 camp_search_help="$("$CLI" camp search --help)"
-printf '%s\n' "$camp_search_help" | grep -Fq -- "rovai thread search --query 'amount'"
-printf '%s\n' "$camp_search_help" | grep -Fq -- "rovai thread search --thread-id '<thread-id>' --query 'amount'"
+printf '%s\n' "$camp_search_help" | grep -Fq -- "coaxi thread search --query 'amount'"
+printf '%s\n' "$camp_search_help" | grep -Fq -- "coaxi thread search --thread-id '<thread-id>' --query 'amount'"
 camp_read_help="$("$CLI" camp read --help)"
-printf '%s\n' "$camp_read_help" | grep -Fq -- 'rovai thread read --limit 20'
-printf '%s\n' "$camp_read_help" | grep -Fq -- 'rovai thread read --before 123'
-printf '%s\n' "$camp_read_help" | grep -Fq -- "rovai thread read --message-id '<message-id>'"
-printf '%s\n' "$camp_read_help" | grep -Fq -- "rovai thread read --reply-chain '<message-id>' --limit 20"
+printf '%s\n' "$camp_read_help" | grep -Fq -- 'coaxi thread read --limit 20'
+printf '%s\n' "$camp_read_help" | grep -Fq -- 'coaxi thread read --before 123'
+printf '%s\n' "$camp_read_help" | grep -Fq -- "coaxi thread read --message-id '<message-id>'"
+printf '%s\n' "$camp_read_help" | grep -Fq -- "coaxi thread read --reply-chain '<message-id>' --limit 20"
 ! printf '%s\n' "$camp_read_help" | grep -Fq -- '--mode'
 ! printf '%s\n' "$camp_read_help" | grep -Fq -- '--direction'
 history_search_help="$("$CLI" history search --help)"
-printf '%s\n' "$history_search_help" | grep -Fq -- "rovai history search --query 'amount'"
+printf '%s\n' "$history_search_help" | grep -Fq -- "coaxi history search --query 'amount'"
 set +e
 family_help="$("$CLI" camp --help 2>"$RUN_TMP/family-help.err")"
 family_help_status=$?
@@ -1340,9 +1340,9 @@ printf '%s\n' "$automation_delete" | "$JQ" -e --arg automationId "$automation_id
   .automationId == $automationId and .deleted == true
 ' >/dev/null
 
-cat > "$RUN_TMP/task-create.json" <<'ROVAI_JSON'
+cat > "$RUN_TMP/task-create.json" <<'COAXI_JSON'
 ${taskCreate}
-ROVAI_JSON
+COAXI_JSON
 STEP=task_create
 task_create_status=1
 for task_create_attempt in 1 2 3; do
@@ -1367,9 +1367,9 @@ assert_success "$task_get" 'team.get_task'
 printf '%s\n' "$task_get" | "$JQ" -e --arg taskId "$task_id" '.taskId == $taskId and .description != null' >/dev/null
 
 STEP=task_list
-task_list="$("$CLI" task list <<'ROVAI_JSON'
+task_list="$("$CLI" task list <<'COAXI_JSON'
 {"statuses":["pending"],"limit":10}
-ROVAI_JSON
+COAXI_JSON
 )"
 assert_success "$task_list" 'team.list_tasks'
 printf '%s\n' "$task_list" | "$JQ" -e --arg taskId "$task_id" '.tasks | any(.taskId == $taskId)' >/dev/null
@@ -1419,9 +1419,9 @@ STEP=camp_read_default_stdin
 camp_read_default_stdin="$(printf '%s\n' ${shellQuote(JSON.stringify({ threadId: input.threadId, limit: 5 }))} | "$CLI" camp read)"
 assert_success "$camp_read_default_stdin" 'thread.read'
 printf '%s\n' "$camp_read_default_stdin" | "$JQ" -e '.mode == "timeline" and .direction == "before"' >/dev/null
-cat > "$RUN_TMP/camp-read-default.json" <<'ROVAI_JSON'
+cat > "$RUN_TMP/camp-read-default.json" <<'COAXI_JSON'
 ${JSON.stringify({ threadId: input.threadId, limit: 5 })}
-ROVAI_JSON
+COAXI_JSON
 STEP=camp_read_default_input_file
 camp_read_default_input_file="$("$CLI" camp read --input-file "$RUN_TMP_NATIVE/camp-read-default.json")"
 assert_success "$camp_read_default_input_file" 'thread.read'
@@ -1486,9 +1486,9 @@ printf '%s\n' "$camp_read_historical_attachment" | "$JQ" -e \
   and .items[0].attachments[0].mediaType == "application/octet-stream"
 ' >/dev/null
 
-cat > "$RUN_TMP/public-send.json" <<'ROVAI_JSON'
+cat > "$RUN_TMP/public-send.json" <<'COAXI_JSON'
 ${publicSend}
-ROVAI_JSON
+COAXI_JSON
 STEP=camp_message_send
 public_send="$("$CLI" send --input-file "$RUN_TMP_NATIVE/public-send.json")"
 assert_success "$public_send" 'thread.message.send'
@@ -1503,7 +1503,7 @@ public_message_id="$(printf '%s\n' "$public_send" | "$JQ" -er '.messageId')"
 STEP=team_gather
 gather_result="$("$CLI" gather \
   --to ${shellQuote(input.recipientProfileId)} \
-  --body ${shellQuote(`Report this substantive transport finding to ${input.agentId} with exactly one command: rovai send --to ${input.agentId} --body 'Built-in CLI Gather finding: ${input.gatherMarker}. The delegated recipient received the requested work and can execute the Core-owned directed send.' Then finish. Because RUN_FACTS.gather.returnTarget is the current input source, this directed result is captured by Gather and does not schedule new work. This is a requested finding, not an acknowledgement or courtesy reply.`)})"
+  --body ${shellQuote(`Report this substantive transport finding to ${input.agentId} with exactly one command: coaxi send --to ${input.agentId} --body 'Built-in CLI Gather finding: ${input.gatherMarker}. The delegated recipient received the requested work and can execute the Core-owned directed send.' Then finish. Because RUN_FACTS.gather.returnTarget is the current input source, this directed result is captured by Gather and does not schedule new work. This is a requested finding, not an acknowledgement or courtesy reply.`)})"
 assert_success "$gather_result" 'team.gather'
 printf '%s\n' "$gather_result" | "$JQ" -e --arg recipient ${shellQuote(input.recipientProfileId)} '
   (keys | sort) == ["completion", "effectiveRecipients", "gatherId", "requestMessageId"]
@@ -1542,9 +1542,9 @@ STEP=freeze_send_locators
   '{publicMessageId:$publicMessageId,directUserOnlyMessageId:$directUserOnlyMessageId,stdinUserOnlyMessageId:$stdinUserOnlyMessageId,gatherId:$gatherId}' \
   > ${shellQuote(shellPath(input.sendEvidencePath))}
 
-cat > "$RUN_TMP/memory-write.json" <<'ROVAI_JSON'
+cat > "$RUN_TMP/memory-write.json" <<'COAXI_JSON'
 ${memoryWrite}
-ROVAI_JSON
+COAXI_JSON
 STEP=memory_write
 memory_write="$("$CLI" memory write --input-file "$RUN_TMP_NATIVE/memory-write.json")"
 assert_success "$memory_write" 'memory.write'
@@ -1586,9 +1586,9 @@ printf '%s\n' "$memory_read" | "$JQ" -e --arg memoryId "$memory_id" '
     and .agentCanRevise == true)
 ' >/dev/null
 
-cat > "$RUN_TMP/hearth.json" <<'ROVAI_JSON'
+cat > "$RUN_TMP/hearth.json" <<'COAXI_JSON'
 ${hearth}
-ROVAI_JSON
+COAXI_JSON
 STEP=memory_write_hearth
 hearth_result="$("$CLI" memory write --input-file "$RUN_TMP_NATIVE/hearth.json")"
 assert_success "$hearth_result" 'memory.write'
@@ -1670,7 +1670,7 @@ function windowsCommandPath(value) {
     .replace(/^([A-Za-z]):[\\/]Program Files[\\/]/i, '$1:/Progra~1/')
     .replaceAll('\\', '/')
   if (/\s/.test(command)) {
-    throw new Error(`ROVAI_BASH_BIN must have a space-free Windows command path: ${command}`)
+    throw new Error(`COAXI_BASH_BIN must have a space-free Windows command path: ${command}`)
   }
   return command
 }
@@ -1685,22 +1685,22 @@ function shellPath(value) {
 
 function shellLeasePrelude(includeRunTmp) {
   const lines = [
-    'CLI="\${ROVAI_AGENT_CLI:?ROVAI_AGENT_CLI is required}"',
-    'CONTEXT="\${ROVAI_CLI_CONTEXT:?ROVAI_CLI_CONTEXT is required}"'
+    'CLI="\${COAXI_AGENT_CLI:?COAXI_AGENT_CLI is required}"',
+    'CONTEXT="\${COAXI_CLI_CONTEXT:?COAXI_CLI_CONTEXT is required}"'
   ]
-  if (includeRunTmp) lines.push('RUN_TMP="\${ROVAI_RUN_TMP:?ROVAI_RUN_TMP is required}"')
+  if (includeRunTmp) lines.push('RUN_TMP="\${COAXI_RUN_TMP:?COAXI_RUN_TMP is required}"')
   if (process.platform === 'win32') {
     lines.push('CLI="$(cygpath -u "$CLI")"')
     lines.push('CONTEXT_FILE="$(cygpath -u "$CONTEXT")"')
     if (includeRunTmp) {
       lines.push('RUN_TMP="$(cygpath -u "$RUN_TMP")"')
       // Git Bash needs the POSIX path for redirection, while the native
-      // rovai.exe must receive a Win32 --input-file path. CodeBuddy exports
+      // coaxi.exe must receive a Win32 --input-file path. CodeBuddy exports
       // MSYS2_ARG_CONV_EXCL=*, so relying on implicit MSYS argv conversion
       // makes every input-file operation fail after the first flag-only step.
       lines.push('RUN_TMP_NATIVE="$(cygpath -w "$RUN_TMP")"')
     }
-    // Every executable used below (rovai.exe and jq.exe) is native Windows.
+    // Every executable used below (coaxi.exe and jq.exe) is native Windows.
     // Pass the explicit Win32 paths above without ambient MSYS rewriting.
     lines.push("export MSYS2_ARG_CONV_EXCL='*'")
   } else {
@@ -1756,7 +1756,7 @@ function startCore(dataDirectory) {
   child.once('error', rejectPending)
   child.once('close', (code, signal) => {
     if (!stopping) {
-      rejectPending(new Error(`rovai-core exited early (code=${code}, signal=${signal}): ${stderr.slice(-10).join('')}`))
+      rejectPending(new Error(`coaxi-core exited early (code=${code}, signal=${signal}): ${stderr.slice(-10).join('')}`))
     }
   })
   createInterface({ input: child.stdout }).on('line', (line) => {

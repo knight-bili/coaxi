@@ -1,5 +1,5 @@
 import type { NativeTranscriptBlock, NativeTranscriptTurn } from './native-child-reader'
-import { isCodexCollabInput, isCodexThreadId, parseCollabToolInput } from './codeg-collab-tool'
+import { isCodexCollabInput, isCodexThreadId, parseCollabToolInput } from './coaxi-collab-tool'
 
 type Use = Extract<NativeTranscriptBlock, { type: 'tool_use' }>
 type Result = Extract<NativeTranscriptBlock, { type: 'tool_result' }>
@@ -18,7 +18,7 @@ export function nativeToolPairs(turns: NativeTranscriptTurn[]): { results: Map<U
   return { results, paired }
 }
 const object = (value: unknown): Record<string, unknown> | null => value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : null
-/** Codeg agent-tool-call::parseChildSessionId and collab-tool input rules.
+/** Coaxi agent-tool-call::parseChildSessionId and collab-tool input rules.
  * These are candidate display links only; reader.child must find the signed
  * Core-verified reference before any of them becomes an actionable target. */
 export function nativeToolChildren(use?: Use, result?: Result): string[] {

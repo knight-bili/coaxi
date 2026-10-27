@@ -530,7 +530,7 @@ export class ElectronFeishuDeveloperSessionService implements FeishuDeveloperPor
 }
 
 function freshSession(brand: OpenPlatformDomains['brand'], purpose: string): Session {
-  return electronSession.fromPartition(`rovai-${brand}-developer-${purpose}-${randomUUID()}`, { cache: false })
+  return electronSession.fromPartition(`coaxi-${brand}-developer-${purpose}-${randomUUID()}`, { cache: false })
 }
 
 function requirePortalResponse(response: Response): void {

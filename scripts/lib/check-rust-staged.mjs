@@ -1,5 +1,5 @@
-const CORE_SOURCE_PREFIX = "crates/rovai-core/src/";
-const CLI_SOURCE = CORE_SOURCE_PREFIX + "bin/rovai.rs";
+const CORE_SOURCE_PREFIX = "crates/coaxi-core/src/";
+const CLI_SOURCE = CORE_SOURCE_PREFIX + "bin/coaxi.rs";
 const LIB_ROOT = CORE_SOURCE_PREFIX + "lib.rs";
 const MAIN_ROOT = CORE_SOURCE_PREFIX + "main.rs";
 

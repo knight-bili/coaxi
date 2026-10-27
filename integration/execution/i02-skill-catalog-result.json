@@ -9,7 +9,7 @@
     "commit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
     "filesVerified": 160,
     "bytes": 1875625,
-    "manifest": "crates/rovai-core/resources/codeg-skill-packs/manifest.json",
+    "manifest": "crates/coaxi-core/resources/coaxi-skill-packs/manifest.json",
     "upstreamExpertLicenseAudit": {
       "repository": "https://github.com/obra/superpowers",
       "tag": "v6.3.0",
@@ -19,7 +19,7 @@
       "differences": [
         {
           "path": "experts/skills/writing-skills/package.json",
-          "codegBlob": "3dbc1ca591c0557e35b6004aeba250e6a70b56e3",
+          "coaxiBlob": "3dbc1ca591c0557e35b6004aeba250e6a70b56e3",
           "upstreamBlob": null
         }
       ],
@@ -33,19 +33,19 @@
     },
     "implementationFiles": [
       {
-        "file": "crates/rovai-core/src/codeg_skill_catalog.rs",
+        "file": "crates/coaxi-core/src/coaxi_skill_catalog.rs",
         "sha256": "4fb00df838a1460e296888dbc62c2165a071f99d97610b1753a549efaaf2bd7f"
       },
       {
-        "file": "crates/rovai-core/src/application.rs",
+        "file": "crates/coaxi-core/src/application.rs",
         "sha256": "f245572e0001029d9995121086c8ddb3ce866b31b1eeeb87af56b09b3af9c71b"
       },
       {
-        "file": "crates/rovai-core/src/lib.rs",
+        "file": "crates/coaxi-core/src/lib.rs",
         "sha256": "5a4c1ab7dcb6e71eb59bd1372d4048fe5570ad5642bff9c7355e4accfe466af0"
       },
       {
-        "file": "crates/rovai-web/src/operations.rs",
+        "file": "crates/coaxi-web/src/operations.rs",
         "sha256": "559c88816dde41a033efc37896440e975bb50884d661e79e58a310a49dd0b207"
       },
       {
@@ -53,7 +53,7 @@
         "sha256": "2dbabb7ca820b33f54ad7ecaa4c0398d3d0497510c30068eeb2dd0f59732a3d7"
       },
       {
-        "file": "tools/integration/import-codeg-skill-catalog.mjs",
+        "file": "tools/integration/import-coaxi-skill-catalog.mjs",
         "sha256": "14a2995c9c13566bb15430359fee4086e1737abdb9e4d07ac5be41cf513d4adf"
       },
       {
@@ -61,7 +61,7 @@
         "sha256": "c9a74c2749fcc5017a6384b3819d63dd918d16445130cd451e2d9d12b122e635"
       },
       {
-        "file": "docs/contracts/codeg-skill-packs-v1.md",
+        "file": "docs/contracts/coaxi-skill-packs-v1.md",
         "sha256": "c08b4bc6f24f2e4b5bb4c9b086647742b4c0c471a152a53eb7f7ed0ac8416ae0"
       }
     ]

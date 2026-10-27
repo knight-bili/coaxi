@@ -10,7 +10,7 @@ import {
 } from './lib/runtime-camp-files-root.mjs'
 
 const root = resolve(import.meta.dirname, '..')
-const fixtureRoot = await mkdtemp(join(tmpdir(), 'rovai-camp-attachment-smoke-'))
+const fixtureRoot = await mkdtemp(join(tmpdir(), 'coaxi-camp-attachment-smoke-'))
 const dataDir = join(fixtureRoot, 'data')
 const sourcePath = join(fixtureRoot, 'public-attachment.txt')
 const token = `PUBLIC_ATTACHMENT_TOKEN_${crypto.randomUUID().replaceAll('-', '').toUpperCase()}`
@@ -20,7 +20,7 @@ let core = null
 
 try {
   await writeFile(sourcePath, [
-    'Rovai-ai Camp Attachment Runtime acceptance fixture.',
+    'Coaxi Camp Attachment Runtime acceptance fixture.',
     `TOKEN=${token}`,
     'The correct response is the exact value after TOKEN=.'
   ].join('\n'), { mode: 0o600 })
@@ -167,7 +167,7 @@ function failOnTerminalError(runs, snapshot) {
 }
 
 function startCore(dataDirectory) {
-  const child = spawn(join(root, 'target', 'debug', 'rovai-core'), [
+  const child = spawn(join(root, 'target', 'debug', 'coaxi-core'), [
     ...coreDataDirectoryArguments(dataDirectory),
     '--skill-library-root', join(dataDirectory, 'managed-skill-library')
   ], {
@@ -188,7 +188,7 @@ function startCore(dataDirectory) {
   child.once('error', rejectPending)
   child.once('close', (code, signal) => {
     if (!stopped) {
-      rejectPending(new Error(`rovai-core exited early (code=${code}, signal=${signal})`))
+      rejectPending(new Error(`coaxi-core exited early (code=${code}, signal=${signal})`))
     }
   })
   createInterface({ input: child.stdout }).on('line', (line) => {

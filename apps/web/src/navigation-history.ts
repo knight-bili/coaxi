@@ -4,7 +4,7 @@ import { isProjectPath } from '../../desktop/src/shared/navigation-preferences-m
 // The browser owns traversal. This is a projection for button availability,
 // refresh and guarded popstate recovery, never a second independently moving stack.
 export function createBrowserNavigationHistory(scope: string, host: Window = window): NavigationHistory {
-  const key = `rovai.web.history.v1:${scope}`
+  const key = `coaxi.web.history.v1:${scope}`
   const parse = (value: unknown): NavigationState | null => {
     if (!value || typeof value !== 'object') return null
     const source = value as NavigationState
@@ -17,7 +17,7 @@ export function createBrowserNavigationHistory(scope: string, host: Window = win
   let ids: string[] = []
   try { const saved = JSON.parse(host.sessionStorage.getItem(key) ?? 'null'); stored = parse(saved?.snapshot); ids = Array.isArray(saved?.ids) ? saved.ids : [] } catch { /* Invalid old presentation state is discarded. */ }
   const marker = () => {
-    const value = host.history.state?.rovai as { scope?: string; id?: string; target?: unknown } | undefined
+    const value = host.history.state?.coaxi as { scope?: string; id?: string; target?: unknown } | undefined
     return value ? { ...value, target: normalizeTarget(value.target) } : undefined
   }
   const initialMarker = marker()
@@ -25,7 +25,7 @@ export function createBrowserNavigationHistory(scope: string, host: Window = win
   else if (initialMarker?.scope && initialMarker.scope !== scope && isTarget(initialMarker.target)) {
     // A copied tab inherits its current page, but starts a separate editor/history scope.
     stored = { entries: [initialMarker.target], index: 0 }; ids = [newId()]
-    host.history.replaceState({ rovai: { scope, id: ids[0], target: initialMarker.target } }, '')
+    host.history.replaceState({ coaxi: { scope, id: ids[0], target: initialMarker.target } }, '')
   } else { stored = null; ids = [] }
   let committed = stored
   let physicalIndex = stored?.index ?? 0
@@ -51,7 +51,7 @@ export function createBrowserNavigationHistory(scope: string, host: Window = win
     if (request !== sequence) return
     if (accepted) {
       committed = accepted
-      host.history.replaceState({ rovai: { scope, id: ids[accepted.index], target: accepted.entries[accepted.index] } }, '')
+      host.history.replaceState({ coaxi: { scope, id: ids[accepted.index], target: accepted.entries[accepted.index] } }, '')
       persist(); finish(true)
     }
     else {
@@ -66,7 +66,7 @@ export function createBrowserNavigationHistory(scope: string, host: Window = win
       if (mode === 'repair') {
         // Repair the displayed entry without cancelling an in-flight native traversal.
         committed = next
-        if (physicalIndex === next.index) host.history.replaceState({ rovai: { scope, id: ids[next.index], target: next.entries[next.index] } }, '')
+        if (physicalIndex === next.index) host.history.replaceState({ coaxi: { scope, id: ids[next.index], target: next.entries[next.index] } }, '')
         persist()
         return next
       }
@@ -78,7 +78,7 @@ export function createBrowserNavigationHistory(scope: string, host: Window = win
       }
       if (mode === 'push' && committed) ids = [...ids.slice(0, physicalIndex + 1), newId()].slice(-next.entries.length)
       else if (!committed) ids = next.entries.map(() => newId())
-      const state = { rovai: { scope, id: ids[next.index], target: next.entries[next.index] } }
+      const state = { coaxi: { scope, id: ids[next.index], target: next.entries[next.index] } }
       if (mode === 'push' && committed) host.history.pushState(state, '')
       else host.history.replaceState(state, '')
       committed = next; physicalIndex = next.index; persist()

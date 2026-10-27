@@ -359,7 +359,7 @@
     "mcp": {
       "ok": true,
       "modelSource": "scripted MCP-only acceptance fixture; no provider generation",
-      "semantics": "Runtime-native config is preserved; Codex skips collisions, Grok skips active native collisions and adds distinct per-Run servers, while other additive adapters give Rovai the whole-definition precedence",
+      "semantics": "Runtime-native config is preserved; Codex skips collisions, Grok skips active native collisions and adds distinct per-Run servers, while other additive adapters give Coaxi the whole-definition precedence",
       "results": [
         {
           "adapterKind": "deepseek-harness",
@@ -387,14 +387,14 @@
           "reportedVersion": "0.1.5-rc.2",
           "modelId": "runtime_default",
           "runtimeNames": [
-            "rovai_smoke",
-            "rovai_smoke_http",
-            "rovai_smoke_stdio"
+            "coaxi_smoke",
+            "coaxi_smoke_http",
+            "coaxi_smoke_stdio"
           ],
           "results": [
-            "rovai-projection:deepseek_harness",
-            "rovai-projection-http:deepseek_harness-http",
-            "rovai-projection-stdio:deepseek_harness-stdio"
+            "coaxi-projection:deepseek_harness",
+            "coaxi-projection-http:deepseek_harness-http",
+            "coaxi-projection-stdio:deepseek_harness-stdio"
           ],
           "agentRunId": "b97de246-95d0-46d6-8927-7e1df88e8923",
           "durationMs": 57692
@@ -502,10 +502,10 @@
           "model": "deepseek-harness://runtime-default",
           "hostInstanceId": "4171aefb-74f1-49e9-9643-c3521dd6510a",
           "nativeSessionId": "1387ae3a-c8ba-488b-a58e-12120382f991",
-          "output": "ROVAI_DSH_ACP_OK",
+          "output": "COAXI_DSH_ACP_OK",
           "commandOutput": {
-            "marker": "ROVAI_DEEPSEEK_HARNESS_PRINTF_OK",
-            "output": "ROVAI_DEEPSEEK_HARNESS_PRINTF_OK\n",
+            "marker": "COAXI_DEEPSEEK_HARNESS_PRINTF_OK",
+            "output": "COAXI_DEEPSEEK_HARNESS_PRINTF_OK\n",
             "outcome": "succeeded",
             "rawOutputDigest": "383c89538e5870fbe191e1ab91cd76b3b01e0733bf10388c7958702a03fa3283",
             "approvalCount": 0,
@@ -698,7 +698,7 @@
     "mcp": {
       "ok": true,
       "modelSource": "native provider",
-      "semantics": "Runtime-native config is preserved; Codex skips collisions, Grok skips active native collisions and adds distinct per-Run servers, while other additive adapters give Rovai the whole-definition precedence",
+      "semantics": "Runtime-native config is preserved; Codex skips collisions, Grok skips active native collisions and adds distinct per-Run servers, while other additive adapters give Coaxi the whole-definition precedence",
       "results": [
         {
           "adapterKind": "deepseek-harness",
@@ -726,14 +726,14 @@
           "reportedVersion": "0.1.5-rc.2",
           "modelId": "runtime_default",
           "runtimeNames": [
-            "rovai_smoke",
-            "rovai_smoke_http",
-            "rovai_smoke_stdio"
+            "coaxi_smoke",
+            "coaxi_smoke_http",
+            "coaxi_smoke_stdio"
           ],
           "results": [
-            "rovai-projection:deepseek_harness",
-            "rovai-projection-http:deepseek_harness-http",
-            "rovai-projection-stdio:deepseek_harness-stdio"
+            "coaxi-projection:deepseek_harness",
+            "coaxi-projection-http:deepseek_harness-http",
+            "coaxi-projection-stdio:deepseek_harness-stdio"
           ],
           "agentRunId": "dfbf1c64-0089-4962-b698-ba6085f4d684",
           "durationMs": 139428
@@ -820,10 +820,10 @@
           "model": "[\"minimax-smoke\",\"MiniMax-M3\"]",
           "hostInstanceId": "fd741fde-4eb2-4dd1-99b1-58853d7471b7",
           "nativeSessionId": "3efc0349-427f-4ac4-9f29-97c8fb9d8259",
-          "output": "ROVAI_DSH_ACP_OK",
+          "output": "COAXI_DSH_ACP_OK",
           "commandOutput": {
-            "marker": "ROVAI_DEEPSEEK_HARNESS_SECOND_TURN_OK",
-            "output": "ROVAI_DEEPSEEK_HARNESS_SECOND_TURN_OK",
+            "marker": "COAXI_DEEPSEEK_HARNESS_SECOND_TURN_OK",
+            "output": "COAXI_DEEPSEEK_HARNESS_SECOND_TURN_OK",
             "outcome": "succeeded",
             "rawOutputDigest": null,
             "approvalCount": 0,

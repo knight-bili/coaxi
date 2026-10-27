@@ -5,81 +5,81 @@
   "schemas": [
     {
       "file": "case-admission-v3.schema.json",
-      "schemaUri": "https://schemas.rovai.invalid/v0.36/case-admission-v3.schema.json",
+      "schemaUri": "https://schemas.coaxi.invalid/v0.36/case-admission-v3.schema.json",
       "schemaVersion": "1.0.0",
-      "digest": "sha256:56f2eafbb8402a85aed11455f511ff527ee337618979dae9333dd7948d19e4ca"
+      "digest": "sha256:6e84a29743365f796b22a0232e3ac89e217f08095ccba5a85e3700e9751919d9"
     },
     {
       "file": "challenge-manifest.schema.json",
-      "schemaUri": "https://schemas.rovai.invalid/v0.36/challenge-manifest.schema.json",
+      "schemaUri": "https://schemas.coaxi.invalid/v0.36/challenge-manifest.schema.json",
       "schemaVersion": "1.0.0",
-      "digest": "sha256:bd07f637346c63eaf9a7febae4a5d3c14620590ce1e5e9ee82546ac3011b112f"
+      "digest": "sha256:a5a82f292db9ab3dbe628ddcef08fd259c4081925fbce0d8fe190cc4fe03ff21"
     },
     {
       "file": "common.schema.json",
-      "schemaUri": "https://schemas.rovai.invalid/v0.36/common.schema.json",
+      "schemaUri": "https://schemas.coaxi.invalid/v0.36/common.schema.json",
       "schemaVersion": "1.0.0",
-      "digest": "sha256:10c1dc860e4046326205598fc9859e0679b29ccdff47b45a26efce13cbfa2540"
+      "digest": "sha256:7ffaee429e889264c40d90fce445b9908518d5c65ee934b23e5b19f9e389249b"
     },
     {
       "file": "diagnostic-case-public-catalog.schema.json",
-      "schemaUri": "https://schemas.rovai.invalid/v0.36/diagnostic-case-public-catalog.schema.json",
+      "schemaUri": "https://schemas.coaxi.invalid/v0.36/diagnostic-case-public-catalog.schema.json",
       "schemaVersion": "1.0.0",
-      "digest": "sha256:1d54f096b1869e2254a796976a611966d6371574e0cb4ee1367fc1de7f610e29"
+      "digest": "sha256:e490dabfad930e6e010906e7c9260f61acb9b6989c19ca74eb62c7f16ff06caa"
     },
     {
       "file": "diagnostic-portfolio-completion.schema.json",
-      "schemaUri": "https://schemas.rovai.invalid/v0.36/diagnostic-portfolio-completion.schema.json",
+      "schemaUri": "https://schemas.coaxi.invalid/v0.36/diagnostic-portfolio-completion.schema.json",
       "schemaVersion": "1.0.0",
-      "digest": "sha256:67d4dae3ab69603f6ec4fe1a33100acde7d7018eb06dce59586b44632b3d6498"
+      "digest": "sha256:95a1ee7cdd4a7b472b51d830525109b1fb07a8e40ffa62eb465ca1e3c4558f5f"
     },
     {
       "file": "diagnostic-portfolio-definition.schema.json",
-      "schemaUri": "https://schemas.rovai.invalid/v0.36/diagnostic-portfolio-definition.schema.json",
+      "schemaUri": "https://schemas.coaxi.invalid/v0.36/diagnostic-portfolio-definition.schema.json",
       "schemaVersion": "1.0.0",
-      "digest": "sha256:c5f22a5df28d3a3e0942344a5748b95f7a49e79391362d66de6d8e5ca72df453"
+      "digest": "sha256:0b66cb17c766ddf93754b82a3399288fbaf511c58986236f8f9a06dd9a430687"
     },
     {
       "file": "diagnostic-portfolio-ledger-event.schema.json",
-      "schemaUri": "https://schemas.rovai.invalid/v0.36/diagnostic-portfolio-ledger-event.schema.json",
+      "schemaUri": "https://schemas.coaxi.invalid/v0.36/diagnostic-portfolio-ledger-event.schema.json",
       "schemaVersion": "1.0.0",
-      "digest": "sha256:baf752b5cec510e8e1718c731b13b20a93695bafabe7f72610ad35d06b813764"
+      "digest": "sha256:9bd7591c85e8d3584fbe773437005f1f8b24873e9e9bbf2cc5e3b4c30fb80f1b"
     },
     {
       "file": "diagnostic-portfolio-public-report.schema.json",
-      "schemaUri": "https://schemas.rovai.invalid/v0.36/diagnostic-portfolio-public-report.schema.json",
+      "schemaUri": "https://schemas.coaxi.invalid/v0.36/diagnostic-portfolio-public-report.schema.json",
       "schemaVersion": "1.0.0",
-      "digest": "sha256:7c3b9b4aa2ea48966cf987bc040e1f571736afe747a91406770b92a3732fac3a"
+      "digest": "sha256:6c0fcb2b76ce1bc73150ff83bbd4c27fb9ff785c5fc387ccd252c82d2e3cf254"
     },
     {
       "file": "hard-outcome-fingerprint.schema.json",
-      "schemaUri": "https://schemas.rovai.invalid/v0.36/hard-outcome-fingerprint.schema.json",
+      "schemaUri": "https://schemas.coaxi.invalid/v0.36/hard-outcome-fingerprint.schema.json",
       "schemaVersion": "1.0.0",
-      "digest": "sha256:62b94f0ceba977bf4d860d6f093790b5785431c1b8cbd4bf05d6ac1df7e022ae"
+      "digest": "sha256:e42ee3ef568020cb1c52420f16ba970684545b0f8f20485673403d744b2a4feb"
     },
     {
       "file": "non-leakage-report.schema.json",
-      "schemaUri": "https://schemas.rovai.invalid/v0.36/non-leakage-report.schema.json",
+      "schemaUri": "https://schemas.coaxi.invalid/v0.36/non-leakage-report.schema.json",
       "schemaVersion": "1.0.0",
-      "digest": "sha256:027929f654659d25c5af27476d8adf56297b22b1e445e97ce3c58e16b7059b90"
+      "digest": "sha256:37217f1a6d6174631748fa2a1ef6fe1b5f020bc2406bf4b0ef4cb872ccdf5685"
     },
     {
       "file": "qualification-case-v1.1.schema.json",
-      "schemaUri": "https://schemas.rovai.invalid/v0.36/qualification-case-v1.1.schema.json",
+      "schemaUri": "https://schemas.coaxi.invalid/v0.36/qualification-case-v1.1.schema.json",
       "schemaVersion": "1.1.0",
-      "digest": "sha256:5f02e7b15eb6bcca8688db385551f2eee6faace24116dbb054b256607a43d046"
+      "digest": "sha256:277ed0bdd08abb181256fda6b96f9e0ac89b1d6b4db25563acd397ef69939ddb"
     },
     {
       "file": "qualification-case-manifest-v3.schema.json",
-      "schemaUri": "https://schemas.rovai.invalid/v0.36/qualification-case-manifest-v3.schema.json",
+      "schemaUri": "https://schemas.coaxi.invalid/v0.36/qualification-case-manifest-v3.schema.json",
       "schemaVersion": "1.0.0",
-      "digest": "sha256:e9c6872a5797bffbd45e8d48eeb71e8a36c68d29a8eb474d21fd3ae0ea9162cd"
+      "digest": "sha256:ba2e29b88048b1ba1f487010417ed602f8fe291e00b699937e669de48a3e9537"
     },
     {
       "file": "verification-catalog-v1.2.schema.json",
-      "schemaUri": "https://schemas.rovai.invalid/v0.36/verification-catalog-v1.2.schema.json",
+      "schemaUri": "https://schemas.coaxi.invalid/v0.36/verification-catalog-v1.2.schema.json",
       "schemaVersion": "1.2.0",
-      "digest": "sha256:fd5caab9999a493a9c1cf5e20e1b8bd70022d8e2ca767c134b03ebaffc77ac0a"
+      "digest": "sha256:3b14fcb2a49715219c0e45a53451d9eb370f49d2872c120427c0f7bfb664c8a9"
     }
   ]
 }

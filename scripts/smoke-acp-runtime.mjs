@@ -16,21 +16,21 @@ import {
 } from './lib/runtime-camp-files-root.mjs'
 
 const root = resolve(import.meta.dirname, '..')
-const fixtureRoot = await realpath(process.env.ROVAI_ACP_SMOKE_FIXTURE_ROOT
-  ?? await mkdtemp(join(tmpdir(), 'rovai-acp-runtime-smoke-')))
+const fixtureRoot = await realpath(process.env.COAXI_ACP_SMOKE_FIXTURE_ROOT
+  ?? await mkdtemp(join(tmpdir(), 'coaxi-acp-runtime-smoke-')))
 const projectRoot = join(fixtureRoot, 'project')
 const dataDir = join(fixtureRoot, 'data')
-const commandOutputOnly = process.env.ROVAI_ACP_COMMAND_OUTPUT_ONLY === '1'
-const keepFixture = process.env.ROVAI_KEEP_ACP_RUNTIME_FIXTURE === '1'
-const fullCommandOutputMatrix = process.env.ROVAI_ACP_FULL_COMMAND_MATRIX === '1'
-const fileOperationMatrix = process.env.ROVAI_ACP_FILE_OPERATION_MATRIX === '1'
-const useProductPermissionDefaults = process.env.ROVAI_ACP_USE_PRODUCT_PERMISSION_DEFAULTS === '1'
-const plainTwoTurn = process.env.ROVAI_ACP_PLAIN_TWO_TURN === '1'
-const metricsOneTurn = process.env.ROVAI_ACP_METRICS_ONE_TURN === '1'
-const cancelRunningTool = process.env.ROVAI_ACP_CANCEL_RUNNING_TOOL === '1'
-const cancelNativeChild = process.env.ROVAI_ACP_CANCEL_NATIVE_CHILD === '1'
-const grokCompactionAcceptance = process.env.ROVAI_GROK_COMPACTION_ACCEPTANCE === '1'
-const zcodeCompactionAcceptance = process.env.ROVAI_ZCODE_COMPACTION_ACCEPTANCE === '1'
+const commandOutputOnly = process.env.COAXI_ACP_COMMAND_OUTPUT_ONLY === '1'
+const keepFixture = process.env.COAXI_KEEP_ACP_RUNTIME_FIXTURE === '1'
+const fullCommandOutputMatrix = process.env.COAXI_ACP_FULL_COMMAND_MATRIX === '1'
+const fileOperationMatrix = process.env.COAXI_ACP_FILE_OPERATION_MATRIX === '1'
+const useProductPermissionDefaults = process.env.COAXI_ACP_USE_PRODUCT_PERMISSION_DEFAULTS === '1'
+const plainTwoTurn = process.env.COAXI_ACP_PLAIN_TWO_TURN === '1'
+const metricsOneTurn = process.env.COAXI_ACP_METRICS_ONE_TURN === '1'
+const cancelRunningTool = process.env.COAXI_ACP_CANCEL_RUNNING_TOOL === '1'
+const cancelNativeChild = process.env.COAXI_ACP_CANCEL_NATIVE_CHILD === '1'
+const grokCompactionAcceptance = process.env.COAXI_GROK_COMPACTION_ACCEPTANCE === '1'
+const zcodeCompactionAcceptance = process.env.COAXI_ZCODE_COMPACTION_ACCEPTANCE === '1'
 const compactionAcceptance = grokCompactionAcceptance || zcodeCompactionAcceptance
 const compactionAdapter = zcodeCompactionAcceptance ? 'zcode-app' : 'grok-build'
 const compactionSignal = zcodeCompactionAcceptance ? 'zcode.session.compaction.completed.v1' : 'grok.acp.auto_compact_completed.v1'
@@ -41,12 +41,12 @@ try {
   await mkdir(projectRoot)
   await writeFile(join(projectRoot, 'README.md'), '# ACP Runtime fixture\n')
   await run('git', ['init', '-b', 'main'], projectRoot)
-  await run('git', ['config', 'user.name', 'Rovai-ai ACP Runtime Smoke'], projectRoot)
-  await run('git', ['config', 'user.email', 'acp-runtime@rovai.local'], projectRoot)
+  await run('git', ['config', 'user.name', 'Coaxi ACP Runtime Smoke'], projectRoot)
+  await run('git', ['config', 'user.email', 'acp-runtime@coaxi.local'], projectRoot)
   await run('git', ['add', 'README.md'], projectRoot)
   await run('git', ['commit', '-m', 'fixture'], projectRoot)
 
-  core = spawn(join(root, 'target', 'debug', 'rovai-core'), [
+  core = spawn(join(root, 'target', 'debug', 'coaxi-core'), [
     ...coreDataDirectoryArguments(dataDir),
     '--skill-library-root', join(dataDir, 'managed-skill-library'),
     '--mcp-config-path', join(dataDir, 'mcp.json')
@@ -55,9 +55,9 @@ try {
     stdio: ['pipe', 'pipe', 'pipe'],
     env: {
       ...process.env,
-      ...(zcodeCompactionAcceptance ? { ROVAI_INTERNAL_ZCODE_COMPACTION_ACCEPTANCE: '1' } : {}),
+      ...(zcodeCompactionAcceptance ? { COAXI_INTERNAL_ZCODE_COMPACTION_ACCEPTANCE: '1' } : {}),
       ...(grokCompactionAcceptance
-        ? { ROVAI_INTERNAL_GROK_COMPACTION_ACCEPTANCE: '1' }
+        ? { COAXI_INTERNAL_GROK_COMPACTION_ACCEPTANCE: '1' }
         : {})
     }
   })
@@ -74,7 +74,7 @@ try {
   }
   core.once('error', rejectPending)
   core.once('close', (code, signal) => {
-    if (!shuttingDown) rejectPending(new Error(`rovai-core exited early (code=${code}, signal=${signal})`))
+    if (!shuttingDown) rejectPending(new Error(`coaxi-core exited early (code=${code}, signal=${signal})`))
   })
   const lines = createInterface({ input: core.stdout })
   lines.on('line', (line) => {
@@ -116,72 +116,72 @@ try {
     {
       adapterKind: 'codex-cli',
       permissionValues: { sandbox_mode: 'danger-full-access', approval_policy: 'never' },
-      token: 'ROVAI_CODEX_TWO_TURN_OK'
+      token: 'COAXI_CODEX_TWO_TURN_OK'
     },
     {
       adapterKind: 'opencode-cli',
-      permissionValues: { permission: process.env.ROVAI_OPENCODE_PERMISSION ?? 'ask' },
-      token: 'ROVAI_OPENCODE_ACP_OK'
+      permissionValues: { permission: process.env.COAXI_OPENCODE_PERMISSION ?? 'ask' },
+      token: 'COAXI_OPENCODE_ACP_OK'
     },
     {
       adapterKind: 'copilot-cli',
-      permissionValues: { allow_all: process.env.ROVAI_COPILOT_ALLOW_ALL ?? 'off' },
-      token: 'ROVAI_COPILOT_ACP_OK'
+      permissionValues: { allow_all: process.env.COAXI_COPILOT_ALLOW_ALL ?? 'off' },
+      token: 'COAXI_COPILOT_ACP_OK'
     },
     {
       adapterKind: 'claude-code-cli',
       permissionValues: { permission_mode: 'bypassPermissions' },
-      token: 'ROVAI_CLAUDE_TWO_TURN_OK'
+      token: 'COAXI_CLAUDE_TWO_TURN_OK'
     },
     {
       adapterKind: 'kiro-cli',
-      permissionValues: { trust_all_tools: process.env.ROVAI_KIRO_TRUST_ALL_TOOLS ?? 'off' },
-      token: 'ROVAI_KIRO_ACP_OK'
+      permissionValues: { trust_all_tools: process.env.COAXI_KIRO_TRUST_ALL_TOOLS ?? 'off' },
+      token: 'COAXI_KIRO_ACP_OK'
     },
     {
       adapterKind: 'qoder-cli',
-      permissionValues: { permission_mode: process.env.ROVAI_QODER_PERMISSION_MODE ?? 'default' },
-      token: 'ROVAI_QODER_ACP_OK'
+      permissionValues: { permission_mode: process.env.COAXI_QODER_PERMISSION_MODE ?? 'default' },
+      token: 'COAXI_QODER_ACP_OK'
     },
     {
       adapterKind: 'codebuddy-cli',
-      permissionValues: { permission_mode: process.env.ROVAI_CODEBUDDY_PERMISSION_MODE ?? 'default' },
-      token: 'ROVAI_CODEBUDDY_ACP_OK'
+      permissionValues: { permission_mode: process.env.COAXI_CODEBUDDY_PERMISSION_MODE ?? 'default' },
+      token: 'COAXI_CODEBUDDY_ACP_OK'
     },
     {
       adapterKind: 'qwen-code',
-      permissionValues: { approval_mode: process.env.ROVAI_QWEN_APPROVAL_MODE ?? 'default' },
-      token: 'ROVAI_QWEN_ACP_OK'
+      permissionValues: { approval_mode: process.env.COAXI_QWEN_APPROVAL_MODE ?? 'default' },
+      token: 'COAXI_QWEN_ACP_OK'
     },
     {
       adapterKind: 'trae-cn-cli',
-      permissionValues: { permission_mode: process.env.ROVAI_TRAE_PERMISSION_MODE ?? 'default' },
-      token: 'ROVAI_TRAE_ACP_OK'
+      permissionValues: { permission_mode: process.env.COAXI_TRAE_PERMISSION_MODE ?? 'default' },
+      token: 'COAXI_TRAE_ACP_OK'
     },
     {
       adapterKind: 'cursor-agent',
       permissionValues: { execution_mode: 'agent', approval_policy: 'force' },
-      token: 'ROVAI_CURSOR_TWO_TURN_OK'
+      token: 'COAXI_CURSOR_TWO_TURN_OK'
     },
     {
       adapterKind: 'kimi-code-cli',
-      permissionValues: { permission_mode: process.env.ROVAI_KIMI_PERMISSION_MODE ?? 'default' },
-      token: 'ROVAI_KIMI_ACP_OK'
+      permissionValues: { permission_mode: process.env.COAXI_KIMI_PERMISSION_MODE ?? 'default' },
+      token: 'COAXI_KIMI_ACP_OK'
     },
     {
       adapterKind: 'zcode-app',
-      permissionValues: { permission_mode: process.env.ROVAI_ZCODE_PERMISSION_MODE ?? 'yolo' },
-      token: 'ROVAI_ZCODE_NATIVE_OK'
+      permissionValues: { permission_mode: process.env.COAXI_ZCODE_PERMISSION_MODE ?? 'yolo' },
+      token: 'COAXI_ZCODE_NATIVE_OK'
     },
     {
       adapterKind: 'grok-build',
-      permissionValues: { permission_mode: process.env.ROVAI_GROK_PERMISSION_MODE ?? 'default' },
-      token: 'ROVAI_GROK_ACP_OK'
+      permissionValues: { permission_mode: process.env.COAXI_GROK_PERMISSION_MODE ?? 'default' },
+      token: 'COAXI_GROK_ACP_OK'
     },
     {
       adapterKind: 'deepseek-harness',
-      permissionValues: { sandbox_mode: 'danger-full-access', approval_policy: process.env.ROVAI_DSH_APPROVAL_POLICY ?? 'ask' },
-      token: 'ROVAI_DSH_ACP_OK'
+      permissionValues: { sandbox_mode: 'danger-full-access', approval_policy: process.env.COAXI_DSH_APPROVAL_POLICY ?? 'ask' },
+      token: 'COAXI_DSH_ACP_OK'
     },
     {
       adapterKind: 'antigravity-app',
@@ -190,9 +190,9 @@ try {
         sandbox: 'off',
         dangerously_skip_permissions: 'on'
       },
-      token: 'ROVAI_ANTIGRAVITY_TWO_TURN_OK'
+      token: 'COAXI_ANTIGRAVITY_TWO_TURN_OK'
     }
-  ].filter((specification) => !process.env.ROVAI_ACP_SMOKE_ADAPTER || specification.adapterKind === process.env.ROVAI_ACP_SMOKE_ADAPTER)
+  ].filter((specification) => !process.env.COAXI_ACP_SMOKE_ADAPTER || specification.adapterKind === process.env.COAXI_ACP_SMOKE_ADAPTER)
   if (compactionAcceptance
       && (specifications.length !== 1
         || specifications[0].adapterKind !== compactionAdapter
@@ -225,11 +225,11 @@ try {
 
     let profile = await request('members.get', { agentId })
     const explicitModelId = specification.adapterKind === 'codebuddy-cli'
-      ? process.env.ROVAI_CODEBUDDY_MODEL?.trim()
+      ? process.env.COAXI_CODEBUDDY_MODEL?.trim()
       : specification.adapterKind === 'deepseek-harness'
-        ? process.env.ROVAI_DSH_MODEL?.trim()
+        ? process.env.COAXI_DSH_MODEL?.trim()
       : specification.adapterKind === 'zcode-app'
-        ? process.env.ROVAI_ZCODE_MODEL?.trim()
+        ? process.env.COAXI_ZCODE_MODEL?.trim()
       : null
     const permissionsConfigured = await request('members.runtime.set', {
       commandId: crypto.randomUUID(),
@@ -375,8 +375,8 @@ try {
     }
 
     if (specifications.some(({ adapterKind }) => adapterKind === specification.adapterKind)) {
-      const commandMarker = `ROVAI_${specification.adapterKind.replaceAll('-', '_').toUpperCase()}_PRINTF_OK`
-      const secondTurnToken = `ROVAI_${specification.adapterKind.replaceAll('-', '_').toUpperCase()}_SECOND_TURN_OK`
+      const commandMarker = `COAXI_${specification.adapterKind.replaceAll('-', '_').toUpperCase()}_PRINTF_OK`
+      const secondTurnToken = `COAXI_${specification.adapterKind.replaceAll('-', '_').toUpperCase()}_SECOND_TURN_OK`
       const commandRequest = await sendExistingCampMessage(
         request,
         camp.id,
@@ -502,7 +502,7 @@ try {
           '-noheader',
           '-separator',
           '|',
-          join(dataDir, 'rovai.sqlite'),
+          join(dataDir, 'coaxi.sqlite'),
           `
             SELECT 'delivery', status,
                    CAST(bootstrap_redelivery_present AS TEXT),
@@ -574,7 +574,7 @@ try {
       }
       if (commandOutputOnly) continue
 
-      const writeToken = 'ROVAI_ACP_APPROVED_WRITE'
+      const writeToken = 'COAXI_ACP_APPROVED_WRITE'
       const adapterFileStem = ({
         'opencode-cli': 'OPENCODE',
         'copilot-cli': 'COPILOT',
@@ -728,7 +728,7 @@ try {
         // interpret a file or payload literally named DENIED as an instruction
         // not to issue the tool request, which bypasses the approval boundary
         // this branch is intended to exercise. Core still performs the denial.
-        const deniedWriteToken = 'ROVAI_ACP_SECOND_WRITE'
+        const deniedWriteToken = 'COAXI_ACP_SECOND_WRITE'
         const deniedPath = join(projectRoot, `ACP_SECOND_${adapterFileStem}.txt`)
         const deniedBody = specification.adapterKind === 'kimi-code-cli'
           ? `Use the Bash tool exactly once to run this command and do not use any other tool: touch '${deniedPath}'. Do not simulate or explain the tool call. Then briefly report the concrete result.`
@@ -810,7 +810,7 @@ try {
           throw new Error(`ACP denial did not fail closed: ${JSON.stringify({ deniedRun, deniedActions, deniedApprovals: deniedApprovals.size, deniedFileExists })}`)
         }
         results.at(-1).denial = {
-          path: explicitDenial ? 'rovai_approval_denied' : 'runtime_refused_before_tool',
+          path: explicitDenial ? 'coaxi_approval_denied' : 'runtime_refused_before_tool',
           resolved: deniedApprovals.size,
           actionStatuses: deniedActions.map((action) => action.status),
           fileCreated: deniedFileExists
@@ -924,7 +924,7 @@ async function waitForMessageRun(request, threadId, messageId) {
 }
 
 function verifyBootstrapEvidenceReused(dataDir, firstRunId, secondRunId) {
-  const database = new DatabaseSync(join(dataDir, 'rovai.sqlite'), { readOnly: true })
+  const database = new DatabaseSync(join(dataDir, 'coaxi.sqlite'), { readOnly: true })
   try {
     const rows = database.prepare(`
       SELECT delivery.agent_run_id AS runId, delivery.status,
@@ -1328,21 +1328,21 @@ async function runCommandOutputMatrix({ request, events, threadId, adapterKind }
   const cases = process.platform === 'win32' ? [
     {
       name: 'stdout',
-      command: `Write-Output 'ROVAI_${stem}_STDOUT_OK'`,
+      command: `Write-Output 'COAXI_${stem}_STDOUT_OK'`,
       status: 'completed',
-      markers: [`ROVAI_${stem}_STDOUT_OK`]
+      markers: [`COAXI_${stem}_STDOUT_OK`]
     },
     {
       name: 'stderr',
-      command: `[Console]::Error.WriteLine('ROVAI_${stem}_STDERR_OK')`,
+      command: `[Console]::Error.WriteLine('COAXI_${stem}_STDERR_OK')`,
       status: 'completed',
-      markers: [`ROVAI_${stem}_STDERR_OK`]
+      markers: [`COAXI_${stem}_STDERR_OK`]
     },
     {
       name: 'mixed',
-      command: `Write-Output 'ROVAI_${stem}_MIXED_STDOUT_OK'; [Console]::Error.WriteLine('ROVAI_${stem}_MIXED_STDERR_OK')`,
+      command: `Write-Output 'COAXI_${stem}_MIXED_STDOUT_OK'; [Console]::Error.WriteLine('COAXI_${stem}_MIXED_STDERR_OK')`,
       status: 'completed',
-      markers: [`ROVAI_${stem}_MIXED_STDOUT_OK`, `ROVAI_${stem}_MIXED_STDERR_OK`]
+      markers: [`COAXI_${stem}_MIXED_STDOUT_OK`, `COAXI_${stem}_MIXED_STDERR_OK`]
     },
     {
       name: 'empty',
@@ -1352,34 +1352,34 @@ async function runCommandOutputMatrix({ request, events, threadId, adapterKind }
     },
     {
       name: 'nonzero',
-      command: `[Console]::Error.WriteLine('ROVAI_${stem}_NONZERO_OK'); exit 7`,
+      command: `[Console]::Error.WriteLine('COAXI_${stem}_NONZERO_OK'); exit 7`,
       status: 'failed',
-      markers: [`ROVAI_${stem}_NONZERO_OK`]
+      markers: [`COAXI_${stem}_NONZERO_OK`]
     },
     {
       name: 'large',
-      command: `Write-Output 'ROVAI_${stem}_LARGE_BEGIN'; [Console]::Out.Write(('ROVAI_${stem}_LARGE_BEGIN:0123456789abcdef' * 4096))`,
+      command: `Write-Output 'COAXI_${stem}_LARGE_BEGIN'; [Console]::Out.Write(('COAXI_${stem}_LARGE_BEGIN:0123456789abcdef' * 4096))`,
       status: 'completed',
-      markers: [`ROVAI_${stem}_LARGE_BEGIN`]
+      markers: [`COAXI_${stem}_LARGE_BEGIN`]
     }
   ] : [
     {
       name: 'stdout',
-      command: `printf '%s\\n' 'ROVAI_${stem}_STDOUT_OK'`,
+      command: `printf '%s\\n' 'COAXI_${stem}_STDOUT_OK'`,
       status: 'completed',
-      markers: [`ROVAI_${stem}_STDOUT_OK`]
+      markers: [`COAXI_${stem}_STDOUT_OK`]
     },
     {
       name: 'stderr',
-      command: `printf '%s\\n' 'ROVAI_${stem}_STDERR_OK' >&2`,
+      command: `printf '%s\\n' 'COAXI_${stem}_STDERR_OK' >&2`,
       status: 'completed',
-      markers: [`ROVAI_${stem}_STDERR_OK`]
+      markers: [`COAXI_${stem}_STDERR_OK`]
     },
     {
       name: 'mixed',
-      command: `printf '%s\\n' 'ROVAI_${stem}_MIXED_STDOUT_OK'; printf '%s\\n' 'ROVAI_${stem}_MIXED_STDERR_OK' >&2`,
+      command: `printf '%s\\n' 'COAXI_${stem}_MIXED_STDOUT_OK'; printf '%s\\n' 'COAXI_${stem}_MIXED_STDERR_OK' >&2`,
       status: 'completed',
-      markers: [`ROVAI_${stem}_MIXED_STDOUT_OK`, `ROVAI_${stem}_MIXED_STDERR_OK`]
+      markers: [`COAXI_${stem}_MIXED_STDOUT_OK`, `COAXI_${stem}_MIXED_STDERR_OK`]
     },
     {
       name: 'empty',
@@ -1389,15 +1389,15 @@ async function runCommandOutputMatrix({ request, events, threadId, adapterKind }
     },
     {
       name: 'nonzero',
-      command: `printf '%s\\n' 'ROVAI_${stem}_NONZERO_OK' >&2; exit 7`,
+      command: `printf '%s\\n' 'COAXI_${stem}_NONZERO_OK' >&2; exit 7`,
       status: 'failed',
-      markers: [`ROVAI_${stem}_NONZERO_OK`]
+      markers: [`COAXI_${stem}_NONZERO_OK`]
     },
     {
       name: 'large',
-      command: `printf '%s\\n' 'ROVAI_${stem}_LARGE_BEGIN'; /usr/bin/yes 'ROVAI_${stem}_LARGE_BEGIN:0123456789abcdef' | /usr/bin/head -c 131072`,
+      command: `printf '%s\\n' 'COAXI_${stem}_LARGE_BEGIN'; /usr/bin/yes 'COAXI_${stem}_LARGE_BEGIN:0123456789abcdef' | /usr/bin/head -c 131072`,
       status: 'completed',
-      markers: [`ROVAI_${stem}_LARGE_BEGIN`]
+      markers: [`COAXI_${stem}_LARGE_BEGIN`]
     }
   ]
   const results = []
@@ -1487,7 +1487,7 @@ async function runCommandOutputMatrix({ request, events, threadId, adapterKind }
       toolCallId: [...toolCallIds][0],
       approvalCount: resolvedApprovals.size,
       outputBytes: Buffer.byteLength(output),
-      projectionTruncated: terminal.params.payload._rovaiTruncated === true
+      projectionTruncated: terminal.params.payload._coaxiTruncated === true
     })
   }
   return results

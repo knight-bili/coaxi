@@ -16,15 +16,15 @@ if (process.platform !== 'darwin') {
 }
 
 const root = resolve(import.meta.dirname, '..')
-const traceEnabled = process.env.ROVAI_PI_SMOKE_TRACE === '1'
-const fileOperationMatrix = process.env.ROVAI_PI_FILE_OPERATION_MATRIX === '1'
-const metricsOneTurn = process.env.ROVAI_PI_METRICS_ONE_TURN === '1'
-const fixtureRoot = await realpath(await mkdtemp(join(tmpdir(), 'rovai-pi-runtime-')))
+const traceEnabled = process.env.COAXI_PI_SMOKE_TRACE === '1'
+const fileOperationMatrix = process.env.COAXI_PI_FILE_OPERATION_MATRIX === '1'
+const metricsOneTurn = process.env.COAXI_PI_METRICS_ONE_TURN === '1'
+const fixtureRoot = await realpath(await mkdtemp(join(tmpdir(), 'coaxi-pi-runtime-')))
 const projectRoot = join(fixtureRoot, 'project')
 const dataDir = join(fixtureRoot, 'data')
 const piAgentDir = join(fixtureRoot, 'pi-agent')
-const piConfigSource = resolve(process.env.ROVAI_PI_CONFIG_SOURCE ?? join(homedir(), '.pi', 'agent'))
-const piBinary = await resolvePiBinary(process.env.ROVAI_PI_BIN)
+const piConfigSource = resolve(process.env.COAXI_PI_CONFIG_SOURCE ?? join(homedir(), '.pi', 'agent'))
+const piBinary = await resolvePiBinary(process.env.COAXI_PI_BIN)
 const piVersion = (await runCapture(piBinary, ['--version'], root)).trim()
 if (!piVersionAtLeast(piVersion, [0, 84, 4])) {
   throw new Error(`Pi Runtime smoke requires Pi >= 0.84.4; found ${JSON.stringify(piVersion)}`)
@@ -77,8 +77,8 @@ try {
   await mkdir(projectRoot)
   await writeFile(join(projectRoot, 'README.md'), '# Pi Runtime qualification fixture\n')
   await run('git', ['init', '-b', 'main'], projectRoot)
-  await run('git', ['config', 'user.name', 'Rovai Pi Runtime Smoke'], projectRoot)
-  await run('git', ['config', 'user.email', 'pi-runtime@rovai.local'], projectRoot)
+  await run('git', ['config', 'user.name', 'Coaxi Pi Runtime Smoke'], projectRoot)
+  await run('git', ['config', 'user.email', 'pi-runtime@coaxi.local'], projectRoot)
   await run('git', ['add', 'README.md'], projectRoot)
   await run('git', ['commit', '-m', 'fixture'], projectRoot)
 
@@ -359,7 +359,7 @@ try {
   }
 
   const publicTrace = JSON.stringify({ events: client.events, stderr: client.stderr })
-  for (const forbidden of ['ROVAI_PI_MINIMAX_API_KEY', 'ANTHROPIC_AUTH_TOKEN', '.claude/settings.json']) {
+  for (const forbidden of ['COAXI_PI_MINIMAX_API_KEY', 'ANTHROPIC_AUTH_TOKEN', '.claude/settings.json']) {
     if (publicTrace.includes(forbidden)) {
       throw new Error(`Pi public trace exposed private provider configuration: ${forbidden}`)
     }
@@ -455,7 +455,7 @@ try {
 } finally {
   await client?.stop()
   await removeEphemeralRuntimeCampFilesRoot(dataDir)
-  if (process.env.ROVAI_KEEP_PI_RUNTIME_FIXTURE !== '1') {
+  if (process.env.COAXI_KEEP_PI_RUNTIME_FIXTURE !== '1') {
     await rm(fixtureRoot, { recursive: true, force: true })
   }
 }
@@ -665,7 +665,7 @@ function startCore(dataDirectory, isolatedPiAgentDir, resolvedPiBinary) {
   const pending = new Map()
   let nextId = 1
   let stopping = false
-  const child = spawn(join(root, 'target', 'debug', 'rovai-core'), [
+  const child = spawn(join(root, 'target', 'debug', 'coaxi-core'), [
     ...coreDataDirectoryArguments(dataDirectory),
     '--skill-library-root', join(dataDirectory, 'managed-skill-library'),
     '--mcp-config-path', join(dataDirectory, 'mcp.json')
@@ -675,7 +675,7 @@ function startCore(dataDirectory, isolatedPiAgentDir, resolvedPiBinary) {
     env: {
       ...process.env,
       PI_CODING_AGENT_DIR: isolatedPiAgentDir,
-      ROVAI_PI_BIN: resolvedPiBinary
+      COAXI_PI_BIN: resolvedPiBinary
     }
   })
   child.stderr.on('data', (chunk) => {
@@ -691,7 +691,7 @@ function startCore(dataDirectory, isolatedPiAgentDir, resolvedPiBinary) {
   }
   child.once('error', rejectPending)
   child.once('close', (code, signal) => {
-    if (!stopping) rejectPending(new Error(`rovai-core exited early (code=${code}, signal=${signal})`))
+    if (!stopping) rejectPending(new Error(`coaxi-core exited early (code=${code}, signal=${signal})`))
   })
   const lines = createInterface({ input: child.stdout })
   lines.on('line', (line) => {
@@ -807,7 +807,7 @@ async function waitForRun(client, threadId, agentRunId) {
     const actions = actionsForRun(snapshot, agentRunId)
     const approvals = approvalsForRun(snapshot, agentRunId)
     if (approvals.length > 0) {
-      throw new Error(`Native Pi execution unexpectedly created Rovai Approval state: ${JSON.stringify(approvals)}`)
+      throw new Error(`Native Pi execution unexpectedly created Coaxi Approval state: ${JSON.stringify(approvals)}`)
     }
     run = snapshot.agentRuns.find((candidate) => candidate.id === agentRunId)
     if (run && ['succeeded', 'failed', 'cancelled'].includes(run.status)) {
@@ -825,7 +825,7 @@ async function cancelRunningTool(client, threadId, agentRunId) {
     const snapshot = await client.request('threads.snapshot', { threadId })
     const approvals = approvalsForRun(snapshot, agentRunId)
     if (approvals.length > 0) {
-      throw new Error(`Native Pi cancellation unexpectedly created Rovai Approval state: ${JSON.stringify(approvals)}`)
+      throw new Error(`Native Pi cancellation unexpectedly created Coaxi Approval state: ${JSON.stringify(approvals)}`)
     }
     const run = snapshot.agentRuns.find((candidate) => candidate.id === agentRunId)
     if (!cancellationRequested && run && ['cancelled', 'failed', 'succeeded'].includes(run.status)) {
@@ -928,7 +928,7 @@ async function assertBashOutputMatrix(client, result, threadId, agentRunId, test
     }
     const terminalEvent = terminals[0]
     let terminal = terminalEvent.params.payload
-    if (terminal._rovaiTruncated === true) {
+    if (terminal._coaxiTruncated === true) {
       const evidence = evidenceById.get(terminalEvent.params.evidenceId)
       if (!evidence?.isTruncated || !evidence.contentBlobId) {
         failures.push(`${testCase.name}: truncated preview has no managed evidence Blob`)
@@ -1091,7 +1091,7 @@ async function resolvePiBinary(configured) {
       return realpath(candidate)
     } catch {}
   }
-  throw new Error('Pi executable was not found; set ROVAI_PI_BIN to a Pi >= 0.84.4 executable')
+  throw new Error('Pi executable was not found; set COAXI_PI_BIN to a Pi >= 0.84.4 executable')
 }
 
 function piVersionAtLeast(value, minimum) {

@@ -10,9 +10,9 @@
       "apps/desktop/src/main/index.ts": "d2975f6725b4ec49e59032e70f942bad0ea2a5c2e67f20416bf391c6986d7526",
       "apps/web/src/client.ts": "c9a3ab4554b4c03ae5c31b6184232aae4f67d2bb5d9bb51e03d3ec08c8bf030a",
       "apps/web/src/client.test.ts": "507c3f2767c51f7555206a9c6861819f73067410170ecb646a48fd35af689bed",
-      "crates/rovai-core/src/web_upload.rs": "7baae062f8ff8e8be20128382472a8e0eec3c38673faa415f9f9f7ec4db9dabc",
-      "crates/rovai-core/src/single_chat_composer.rs": "5a0884cbc166be6949d16d020e3e16f92f4a8938b402fb10a19bb445971d2582",
-      "crates/rovai-core/src/single_chat_composer_tests.rs": "9286476e4dc2084cd799c0a315314542ebf8df0bdeb11760606010a3aff259ce",
+      "crates/coaxi-core/src/web_upload.rs": "7baae062f8ff8e8be20128382472a8e0eec3c38673faa415f9f9f7ec4db9dabc",
+      "crates/coaxi-core/src/single_chat_composer.rs": "5a0884cbc166be6949d16d020e3e16f92f4a8938b402fb10a19bb445971d2582",
+      "crates/coaxi-core/src/single_chat_composer_tests.rs": "9286476e4dc2084cd799c0a315314542ebf8df0bdeb11760606010a3aff259ce",
       "docs/contracts/single-chat-composer-scope-v1.md": "c22281cc4d1088abfcd3b29d57c41c82a1e48467b9c1ef18a8e9e54382fe126a",
       "docs/development/testing.md": "8c65bd92a4f12fd750ca7e5c6dc46e48e7d69b473c76ce6149cf480821bf1d3a",
       "docs/versions/v1.72/README.md": "376ddea3f32c882e17201417cc1d3f6b29aa423cc510fd07fa88675be73cb291"
@@ -55,11 +55,11 @@
     "Legacy material adoption, orphan recovery and the other I03 closeout groups"
   ],
   "preserved_authorities": {
-    "crates/rovai-core/src/local_attachment_source.rs": "8830581e72fc103b2f359be17a0072c5ee0cedc6eb5fe58b179ae3d255dbc1ca",
-    "crates/rovai-core/src/single_chat.rs": "69c1dbb56c56181bbd0e90ef0239a855894b4a9e864119155d1a2da4de6c2569",
-    "crates/rovai-core/src/context.rs": "329144f38675ebedeaf5652858d457d42369455eb26c6159af61d19c02218784",
-    "crates/rovai-core/src/message_quote.rs": "efb6e962946b85c089483bb1120fe92f32458bb3b3b5e5eb668e26f8aa96481e",
-    "crates/rovai-core/src/command.rs": "22258f81dc5b76040cd0fdba20074321b5be7104e648a8278412c0736ef0d85a"
+    "crates/coaxi-core/src/local_attachment_source.rs": "8830581e72fc103b2f359be17a0072c5ee0cedc6eb5fe58b179ae3d255dbc1ca",
+    "crates/coaxi-core/src/single_chat.rs": "69c1dbb56c56181bbd0e90ef0239a855894b4a9e864119155d1a2da4de6c2569",
+    "crates/coaxi-core/src/context.rs": "329144f38675ebedeaf5652858d457d42369455eb26c6159af61d19c02218784",
+    "crates/coaxi-core/src/message_quote.rs": "efb6e962946b85c089483bb1120fe92f32458bb3b3b5e5eb668e26f8aa96481e",
+    "crates/coaxi-core/src/command.rs": "22258f81dc5b76040cd0fdba20074321b5be7104e648a8278412c0736ef0d85a"
   },
   "artifacts": {
     "i03\\private-upload-web-owners.log": "a6338c667fb9fd582de05a0b8caef0768e52b41664e219d8e1bacb9f660d95a1",

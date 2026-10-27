@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schemas.rovai.invalid/v0.34/judge-replica-result.schema.json",
-  "title": "Rovai v0.34 Judge Replica Result",
+  "$id": "https://schemas.coaxi.invalid/v0.34/judge-replica-result.schema.json",
+  "title": "Coaxi v0.34 Judge Replica Result",
   "$defs": {
     "verdict": {
       "enum": [
@@ -106,7 +106,7 @@
   ],
   "properties": {
     "artifactId": { "$ref": "artifact-envelope.schema.json#/$defs/stableId" },
-    "schemaId": { "const": "rovai.qualification.judge-replica-result" },
+    "schemaId": { "const": "coaxi.qualification.judge-replica-result" },
     "schemaVersion": { "const": "1.0.0" },
     "producer": { "$ref": "artifact-envelope.schema.json#/$defs/producer" },
     "binding": { "$ref": "artifact-envelope.schema.json#/$defs/binding" },

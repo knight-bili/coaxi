@@ -14,7 +14,7 @@ describe('source preview languages', () => {
     expect(sourceLanguageForFilename('Component.tsx')?.name).toBe('TSX')
     expect(sourceLanguageForFilename('main.rs')?.name).toBe('Rust')
     expect(sourceLanguageForFilename('script.py')?.name).toBe('Python')
-    expect(sourceLanguageForFilename('notes.unknownrovai')).toBeNull()
+    expect(sourceLanguageForFilename('notes.unknowncoaxi')).toBeNull()
     expect(sourceLanguageForName('tsx')?.name).toBe('TSX')
     expect(sourceLanguageForName('madeup')).toBeNull()
   })
@@ -40,7 +40,7 @@ describe('source preview real line coordinates', () => {
     expect(sourceTargetLocalLines(95, 8, { line: 20, endLine: 30 })).toBeNull()
   })
 
-  it('maps the resolved Rovai theme directly to the CodeMirror base theme', () => {
+  it('maps the resolved Coaxi theme directly to the CodeMirror base theme', () => {
     expect(sourceCodeMirrorTheme('day')).toBe('light')
     expect(sourceCodeMirrorTheme('night')).toBe('dark')
   })

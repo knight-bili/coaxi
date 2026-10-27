@@ -10,7 +10,7 @@ const packageMetadata = JSON.parse(readFileSync(
 describe('desktop package metadata', () => {
   it('keeps the unified product identity aligned with the Electron bundle metadata', () => {
     expect(PRODUCT_NAME).toBe('Coaxi')
-    expect(PRODUCT_APPLICATION_ID).toBe('app.codegrovai.workbench.desktop')
+    expect(PRODUCT_APPLICATION_ID).toBe('app.coaxi.desktop')
     expect(packageMetadata.productName).toBe(PRODUCT_NAME)
     expect(packageMetadata.version).toBe('0.4.8')
     expect(packageMetadata.build.appId).toBe(PRODUCT_APPLICATION_ID)
@@ -39,7 +39,7 @@ describe('desktop package metadata', () => {
     const localDailyCommand = packageMetadata.scripts['package:mac:daily']
     expect(localDailyCommand).toContain('CSC_IDENTITY_AUTO_DISCOVERY=false')
     expect(localDailyCommand).toContain('identity=-')
-    expect(localDailyCommand).not.toContain('Rovai Release Signing')
+    expect(localDailyCommand).not.toContain('Coaxi Release Signing')
     expect(localDailyCommand).not.toContain('forceCodeSigning')
     expect(localDailyCommand).toContain('scripts/verify-macos-app.mjs arm64')
 
@@ -50,7 +50,7 @@ describe('desktop package metadata', () => {
     for (const command of developerIdReleaseCommands) {
       expect(command).toContain('-c.forceCodeSigning=true')
       expect(command).toContain('-c.mac.notarize=true')
-      expect(command).not.toContain('Rovai Release Signing')
+      expect(command).not.toContain('Coaxi Release Signing')
       expect(command).not.toContain('identity=-')
     }
     expect(packageMetadata.scripts['install:mac:daily']).toContain(
@@ -74,22 +74,22 @@ describe('desktop package metadata', () => {
   it('packages target-specific sidecars and required release assets', () => {
     expect(packageMetadata.build.mac.extraResources).toEqual([
       {
-        from: 'resources/bin/macos-${arch}/rovai-core',
-        to: 'bin/rovai-core'
+        from: 'resources/bin/macos-${arch}/coaxi-core',
+        to: 'bin/coaxi-core'
       },
-      { from: 'resources/bin/macos-${arch}/rovai-host', to: 'bin/rovai-host' },
+      { from: 'resources/bin/macos-${arch}/coaxi-host', to: 'bin/coaxi-host' },
       {
-        from: 'resources/bin/macos-${arch}/rovai',
-        to: 'bin/rovai'
+        from: 'resources/bin/macos-${arch}/coaxi',
+        to: 'bin/coaxi'
       },
       { from: 'out/web', to: 'web-ui' },
       { from: 'skills', to: 'skills' },
       {
-        from: 'resources/bin/macos-${arch}/rovai-native-history',
-        to: 'bin/rovai-native-history'
+        from: 'resources/bin/macos-${arch}/coaxi-native-history',
+        to: 'bin/coaxi-native-history'
       },
       { from: 'helpers/native-history/LICENSE', to: 'licenses/native-history-LICENSE' },
-      { from: 'LICENSE', to: 'licenses/rovai-LICENSE' },
+      { from: 'LICENSE', to: 'licenses/coaxi-LICENSE' },
       { from: 'THIRD_PARTY_NOTICES.md', to: 'licenses/THIRD_PARTY_NOTICES.md' },
       { from: 'integration/licenses', to: 'licenses/integration' },
       { from: 'legal/licenses', to: 'licenses/dependencies' },
@@ -98,26 +98,26 @@ describe('desktop package metadata', () => {
     ])
     expect(packageMetadata.build.win.extraResources).toEqual([
       {
-        from: 'resources/bin/windows-x64/rovai-core.exe',
-        to: 'bin/rovai-core.exe'
+        from: 'resources/bin/windows-x64/coaxi-core.exe',
+        to: 'bin/coaxi-core.exe'
       },
-      { from: 'resources/bin/windows-x64/rovai-host.exe', to: 'bin/rovai-host.exe' },
+      { from: 'resources/bin/windows-x64/coaxi-host.exe', to: 'bin/coaxi-host.exe' },
       {
-        from: 'resources/bin/windows-x64/rovai.exe',
-        to: 'bin/rovai.exe'
+        from: 'resources/bin/windows-x64/coaxi.exe',
+        to: 'bin/coaxi.exe'
       },
       {
-        from: 'resources/bin/windows-x64/rovai-computer-helper.exe',
-        to: 'bin/rovai-computer-helper.exe'
+        from: 'resources/bin/windows-x64/coaxi-computer-helper.exe',
+        to: 'bin/coaxi-computer-helper.exe'
       },
       { from: 'out/web', to: 'web-ui' },
       { from: 'skills', to: 'skills' },
       {
-        from: 'resources/bin/windows-x64/rovai-native-history.exe',
-        to: 'bin/rovai-native-history.exe'
+        from: 'resources/bin/windows-x64/coaxi-native-history.exe',
+        to: 'bin/coaxi-native-history.exe'
       },
       { from: 'helpers/native-history/LICENSE', to: 'licenses/native-history-LICENSE' },
-      { from: 'LICENSE', to: 'licenses/rovai-LICENSE' },
+      { from: 'LICENSE', to: 'licenses/coaxi-LICENSE' },
       { from: 'THIRD_PARTY_NOTICES.md', to: 'licenses/THIRD_PARTY_NOTICES.md' },
       { from: 'integration/licenses', to: 'licenses/integration' },
       { from: 'legal/licenses', to: 'licenses/dependencies' },
@@ -126,10 +126,10 @@ describe('desktop package metadata', () => {
     ])
     expect(packageMetadata.build).not.toHaveProperty('extraResources')
     expect(packageMetadata.build.mac.binaries).toEqual([
-      'Contents/Resources/bin/rovai-core',
-      'Contents/Resources/bin/rovai-host',
-      'Contents/Resources/bin/rovai',
-      'Contents/Resources/bin/rovai-native-history'
+      'Contents/Resources/bin/coaxi-core',
+      'Contents/Resources/bin/coaxi-host',
+      'Contents/Resources/bin/coaxi',
+      'Contents/Resources/bin/coaxi-native-history'
     ])
     expect(JSON.stringify(packageMetadata.build)).not.toMatch(/dws/iu)
     expect(Object.keys(packageMetadata.scripts).some((name) => name.startsWith('dws:'))).toBe(false)

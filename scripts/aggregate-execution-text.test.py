@@ -15,13 +15,13 @@ spec.loader.exec_module(module)
 class Boundaries(unittest.TestCase):
     def test_in_place_lock_refuses_live_core_and_can_be_reacquired(self):
         with tempfile.TemporaryDirectory() as directory:
-            database = Path(directory) / "rovai.sqlite"
+            database = Path(directory) / "coaxi.sqlite"
             with module.offline_core_lock(database):
                 with self.assertRaises(BlockingIOError):
                     with module.offline_core_lock(database):
                         self.fail("must not acquire a live Core lock")
             with module.offline_core_lock(database):
-                self.assertTrue(database.with_name(".rovai-core-instance.lock").is_file())
+                self.assertTrue(database.with_name(".coaxi-core-instance.lock").is_file())
 
     def test_backup_is_readable_while_source_retains_exclusive_sqlite_lock(self):
         with tempfile.TemporaryDirectory() as directory:

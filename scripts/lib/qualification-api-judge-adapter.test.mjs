@@ -3,7 +3,7 @@ import test from 'node:test'
 import { createAdapter, capabilities } from './qualification-api-judge-adapter.mjs'
 
 test('API adapter disables model tools, checks snapshot/finish and never falls back after refusal', async () => {
-  const keyName = 'ROVAI_JUDGE_TEST_KEY'
+  const keyName = 'COAXI_JUDGE_TEST_KEY'
   const previous = process.env[keyName]; process.env[keyName] = 'local-test-value'
   try {
     for (const timeout of [undefined, null]) {

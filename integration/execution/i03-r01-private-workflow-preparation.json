@@ -29,7 +29,7 @@
     "direct_business_table_writes": 0
   },
   "fixture_source_reuse": {
-    "executed_snapshot": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\r01-private-workflow-preflight-r2\\private-workflow.mjs",
+    "executed_snapshot": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\r01-private-workflow-preflight-r2\\private-workflow.mjs",
     "executed_sha256": "6e30ff9daa29288a7ddb337e1108f31c91752eda8859f0abae8bda276971424f",
     "current_sha256": "75bfcf63c06b0d1e7d339ea8cbccef46d578763acc47196d8bd5ad515b146cf0",
     "core_exports_prefix_sha256": "13539036f4788a4b5e8c8be35a713dbe34831e3d405287f7fea1a6b2a61e582b",
@@ -79,7 +79,7 @@
       "resolution": "r2不预建技能库；声明独立空路径并由生产私有目录创建器按需管理，Core/runtime-files实际保护与所有者复核通过"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\r01-private-workflow-preflight-r2\\isolation-acl-initial-incomplete.json",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\r01-private-workflow-preflight-r2\\isolation-acl-initial-incomplete.json",
       "reason": "首个ACL采集未严格处理尚未创建的空技能库路径；不作通过证据。最终采集明确记录exists=false及受保护父目录"
     }
   ],
@@ -117,83 +117,83 @@
   ],
   "artifacts": [
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\r01-private-workflow-preflight-r2\\manifest.json",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\r01-private-workflow-preflight-r2\\manifest.json",
       "sha256": "21aac0a8f48b6765b421015a5df4a3f190ff3ea935931f8057de6de24537b72c"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\r01-private-workflow-preflight-r2\\driver.mjs",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\r01-private-workflow-preflight-r2\\driver.mjs",
       "sha256": "6316c732825389f1a70102ae0b2e7fd61c489fb34f751d8c98ad5382c44af47d"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\r01-private-workflow-preflight-r2\\private-workflow.mjs",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\r01-private-workflow-preflight-r2\\private-workflow.mjs",
       "sha256": "6e30ff9daa29288a7ddb337e1108f31c91752eda8859f0abae8bda276971424f"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\r01-private-workflow-preflight-r2\\controlled-acp.mjs",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\r01-private-workflow-preflight-r2\\controlled-acp.mjs",
       "sha256": "9d724adbb896a11aefc433612e71ed995c351257cc2210861cc96babb34f4fd7"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\r01-private-workflow-preflight-r2\\controlled-runtime-input.jsonl",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\r01-private-workflow-preflight-r2\\controlled-runtime-input.jsonl",
       "sha256": "6793f1e4685cef1ec9c4d8e05717358887bfb2533878c717b908c175b0fdba90"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\r01-private-workflow-preflight-r2\\result.json",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\r01-private-workflow-preflight-r2\\result.json",
       "sha256": "5186882f3001dabaeab0de1a35522d233d0a06d565b2c03cbeddc69840389d56"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\r01-private-workflow-preflight-r2\\host-stderr.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\r01-private-workflow-preflight-r2\\host-stderr.log",
       "sha256": "8a566806b813c97a657906dba63032595d74e5047c22761b1a4b31138088a469"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\r01-private-workflow-preflight-r2\\process-final.json",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\r01-private-workflow-preflight-r2\\process-final.json",
       "sha256": "5876363831bda49c5d7778e67874274b1fccd38e7bfbf075295ee0d808697600"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\r01-private-workflow-preflight-r2\\isolation-acl-final.json",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\r01-private-workflow-preflight-r2\\isolation-acl-final.json",
       "sha256": "62c1b4754e55135c3831229c54b6863b042a34c29a39dfcda4dd173068fe9683"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\r01-private-workflow-preflight-r2\\native-module-syntax.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\r01-private-workflow-preflight-r2\\native-module-syntax.log",
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\r01-private-workflow-preflight-r2\\native-owner-syntax.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\r01-private-workflow-preflight-r2\\native-owner-syntax.log",
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\r01-private-workflow-preflight-r1\\manifest.json",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\r01-private-workflow-preflight-r1\\manifest.json",
       "sha256": "0dbd70d8d8e209dfee54f214914f6714ca39f178866b793a0feab8afffefacf8"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\r01-private-workflow-preflight-r1\\driver.mjs",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\r01-private-workflow-preflight-r1\\driver.mjs",
       "sha256": "7759c981aea844dbc4c771b058322fe06d727d488530c1af636f27bf174c7fe9"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\r01-private-workflow-preflight-r1\\private-workflow.mjs",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\r01-private-workflow-preflight-r1\\private-workflow.mjs",
       "sha256": "6e30ff9daa29288a7ddb337e1108f31c91752eda8859f0abae8bda276971424f"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\r01-private-workflow-preflight-r1\\controlled-acp.mjs",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\r01-private-workflow-preflight-r1\\controlled-acp.mjs",
       "sha256": "9d724adbb896a11aefc433612e71ed995c351257cc2210861cc96babb34f4fd7"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\r01-private-workflow-preflight-r1\\result.json",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\r01-private-workflow-preflight-r1\\result.json",
       "sha256": "a1a2279effa25b56bc3dda33607e7218afee64c14077f6e922b0f0741543a399"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\r01-private-workflow-preflight-r1\\host-stderr.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\r01-private-workflow-preflight-r1\\host-stderr.log",
       "sha256": "103aa4db8514f3bd6ce0400c2975f68fc3d9d5b2908a4ce114f77b85c6b945cc"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\r01-private-workflow-preflight-r2\\docs-test.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\r01-private-workflow-preflight-r2\\docs-test.log",
       "sha256": "2a9422fd2705834e829a7617fef006654e6904c56c147563a03f06854ef86b5a"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\r01-private-workflow-preflight-r2\\docs-check.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\r01-private-workflow-preflight-r2\\docs-check.log",
       "sha256": "7e54a2eb2e65eba06e11bac67a5deed3c8842ffdfc06f6a077e61bfa432f0c90"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\r01-private-workflow-preflight-r2\\codegraph-sync.log",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\r01-private-workflow-preflight-r2\\codegraph-sync.log",
       "sha256": "4b5e6457c82b34383f70240f2de6ba2c4356069cd254d5755442097468fb99ef"
     }
   ],
@@ -207,7 +207,7 @@
     "full_i03_passed": false
   },
   "before_snapshot": {
-    "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\r01-before-37a9e5eb",
+    "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\r01-before-37a9e5eb",
     "manifest_sha256": "75da696bf34f4a10ed97497f728a34c9a2defa81aab18119b5af9a3fe11cd54a"
   },
   "validation": {

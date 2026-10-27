@@ -3,7 +3,7 @@
 <desc id="figure-description">叮叮向芝士发送方案评审请求；Core 保存公共消息并定向投递。芝士继续委托咕咕复现，咕咕将记录返回芝士，芝士再将评审结论返回叮叮。所有 A2A 均经 Core 路由。</desc>
 <rect width="1608" height="1190" fill="#fcfdfc"/>
 <g font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif" fill="#253c31">
-<text x="48" y="40" fill="#708078" font-size="12" font-weight="600" letter-spacing="2">ROVAI AI / ARCHITECTURE</text>
+<text x="48" y="40" fill="#708078" font-size="12" font-weight="600" letter-spacing="2">COAXI AI / ARCHITECTURE</text>
 <text x="1560" y="40" fill="#708078" font-size="13" text-anchor="end">图 04</text>
 <text x="48" y="94" font-size="34" font-weight="600">A2A：把工作交给同伴，把成果交回</text>
 

@@ -51,7 +51,7 @@ const emitChange = (indexChanged: boolean) => {
 const requests: string[] = []
 const indexBodyMounted: boolean[] = []
 const earlierCursors: number[] = []
-Object.assign(window, { rovai: {
+Object.assign(window, { coaxi: {
   platform: 'darwin', onEvent: (listener: (event: unknown) => void) => { events.add(listener); return () => events.delete(listener) }, clipboard: { write: async () => {} },
   request: async (method: string, params?: { messageId: string }) => {
     requests.push(method)
@@ -93,11 +93,11 @@ function Fixture(): React.JSX.Element {
   updateWidth = setPaneWidth
   updateHistory = setHistory
   return <div className="app-shell app-shell-camp">
-    <aside style={{ gridRow: '1 / -1', padding: '48px 24px', background: 'var(--rail)' }}>Rovai AI</aside>
-    <AppHeader threadTitle={snapshot.thread.title} contextLabel="rovai-ai" thread={snapshot}
+    <aside style={{ gridRow: '1 / -1', padding: '48px 24px', background: 'var(--rail)' }}>Coaxi AI</aside>
+    <AppHeader threadTitle={snapshot.thread.title} contextLabel="coaxi" thread={snapshot}
       detailEntryHostRef={setEntryHost} onFocusApprovals={() => {}} />
     <main className="content task-content" style={{ width: paneWidth }}>
-      <ThreadWorkspace workspaceEntrySnapshotReady={bodyReady} snapshot={snapshot} projectName="rovai-ai" agents={[agent]} busy={false} stopping={false}
+      <ThreadWorkspace workspaceEntrySnapshotReady={bodyReady} snapshot={snapshot} projectName="coaxi" agents={[agent]} busy={false} stopping={false}
         onSend={async () => {}} onChangeLead={async () => {}} onTasksChanged={async () => {}}
         onResolveApproval={() => {}} worldMapEnabled={false} detailEntryHost={entryHost}
         messageHistory={history} onLoadEarlierMessages={async () => {

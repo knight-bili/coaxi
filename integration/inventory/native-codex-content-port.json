@@ -93,7 +93,7 @@
     "Further original-format corpus and complete source App comparisons remain outside the31 controlled component fixtures",
     "Legacy agent-*.jsonl with explicit native lineage and old unrecorded origins",
     "Complete bounded content, signed snapshots/descendant references, cancellable background initial discovery/hash and resource lifecycle",
-    "User-only Native/Web and original Codeg readonly UI, same-scenario full App/Host/Runtime/platform validation"
+    "User-only Native/Web and original Coaxi readonly UI, same-scenario full App/Host/Runtime/platform validation"
   ],
   "excluded_from_readonly_port": [
     "Source app filesystem/environment/list-index discovery",

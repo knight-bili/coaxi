@@ -7,12 +7,12 @@
     "commit": "2b88131f1fe1db78dc48c2655c2e00e762919d0e",
     "branch": "develop/V1.0.0",
     "files": {
-      "crates/rovai-core/src/context_contract.rs": "63d76e9074fbfd55b078a250fbe5b25932fb71a7f5d232e99b52f6aa64b62150",
-      "crates/rovai-core/src/context.rs": "508756018afb55bba7731b11f5901a4f9a042c6827a55d0b64d09703cf068035",
-      "crates/rovai-core/src/mcp_projection.rs": "88ce43d76e6f2bc13b311dcc8e003d8b7f7407945b7b479c09d9e508ede3b7e0",
-      "crates/rovai-core/src/builtin_tool_transport.rs": "f96b510959398316c3ae37c884415179ede44e682f0571666206ea39048be2d0",
-      "apps/desktop/src/renderer/src/codeg-native-content/lib/json-render/catalog.ts": "530c6aa03216eb3f5f43112112573759994608696632d202691dc508f98f7546",
-      "apps/desktop/src/renderer/src/codeg-native-content/components/message/json-render-block.tsx": "0dc587b39f137d2e297a8f90aa6061c3fd713b21e3059c919ffa7b01fd9f0365"
+      "crates/coaxi-core/src/context_contract.rs": "63d76e9074fbfd55b078a250fbe5b25932fb71a7f5d232e99b52f6aa64b62150",
+      "crates/coaxi-core/src/context.rs": "508756018afb55bba7731b11f5901a4f9a042c6827a55d0b64d09703cf068035",
+      "crates/coaxi-core/src/mcp_projection.rs": "88ce43d76e6f2bc13b311dcc8e003d8b7f7407945b7b479c09d9e508ede3b7e0",
+      "crates/coaxi-core/src/builtin_tool_transport.rs": "f96b510959398316c3ae37c884415179ede44e682f0571666206ea39048be2d0",
+      "apps/desktop/src/renderer/src/coaxi-native-content/lib/json-render/catalog.ts": "530c6aa03216eb3f5f43112112573759994608696632d202691dc508f98f7546",
+      "apps/desktop/src/renderer/src/coaxi-native-content/components/message/json-render-block.tsx": "0dc587b39f137d2e297a8f90aa6061c3fd713b21e3059c919ffa7b01fd9f0365"
     },
     "donorRevision": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
     "donorUiSkillSha256": "46bc09a16dc1f2d09f21004f0891a630ff5010f642b975d82f82be113330daff"
@@ -23,7 +23,7 @@
     "feedbackSubmission": null
   },
   "after": {
-    "serverName": "rovai-ui-feedback",
+    "serverName": "coaxi-ui-feedback",
     "featureDefault": false,
     "tool": {
       "name": "check_user_feedback",

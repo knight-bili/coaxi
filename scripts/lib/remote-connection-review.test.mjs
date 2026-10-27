@@ -10,13 +10,13 @@ import { buildRemoteConnectionReview } from '../review-remote-connection.mjs'
 import { launchAcceptanceBrowser, pause } from './host-web-browser.mjs'
 
 const root = resolve(import.meta.dirname, '../..')
-const chrome = process.env.ROVAI_REVIEW_CHROME ?? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+const chrome = process.env.COAXI_REVIEW_CHROME ?? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
 test('remote connection design preserves production settings geometry, keyboard validation and reversible decisions', { timeout: 120_000 }, async t => {
   try { await access(chrome) } catch { t.skip('A local Chrome binary is required; no visual verification claimed.'); return }
-  const fixture = await realpath(await mkdtemp(join(tmpdir(), 'rovai-remote-connection-review-')))
-  const output = process.env.ROVAI_REMOTE_REVIEW_OUTPUT ?? join(fixture, 'screenshots')
-  const artifact = process.env.ROVAI_REMOTE_REVIEW_ROOT
-    ? { productPath: join(process.env.ROVAI_REMOTE_REVIEW_ROOT, 'remote-connection.html'), viewerPath: join(process.env.ROVAI_REMOTE_REVIEW_ROOT, 'remote-connection-review.html') }
+  const fixture = await realpath(await mkdtemp(join(tmpdir(), 'coaxi-remote-connection-review-')))
+  const output = process.env.COAXI_REMOTE_REVIEW_OUTPUT ?? join(fixture, 'screenshots')
+  const artifact = process.env.COAXI_REMOTE_REVIEW_ROOT
+    ? { productPath: join(process.env.COAXI_REMOTE_REVIEW_ROOT, 'remote-connection.html'), viewerPath: join(process.env.COAXI_REMOTE_REVIEW_ROOT, 'remote-connection-review.html') }
     : await buildRemoteConnectionReview(join(fixture, 'artifact'))
   await mkdir(output, { recursive: true })
   console.log(JSON.stringify({ channel: 'automatic_acceptance', userData: join(fixture, 'chrome-profile'), core: false, runtime: false }))
@@ -64,7 +64,7 @@ test('remote connection design preserves production settings geometry, keyboard 
       await browser.wait(`document.querySelector('[role="dialog"]')===null`)
       await browser.wait(`document.activeElement.getAttribute('aria-label')===${JSON.stringify(label+'二维码')}`)
     }
-    const geometry = () => browser.evaluate(`(()=>{const rail=document.querySelector('.unified-sidebar'),header=document.querySelector('.settings-page-heading'), title=header.querySelector('h1');return {rail:rail.getBoundingClientRect().width,top:document.querySelector('.window-drag-strip').getBoundingClientRect().height,titleSize:getComputedStyle(title).fontSize,titleWeight:getComputedStyle(title).fontWeight,titleX:title.getBoundingClientRect().x,titleY:title.getBoundingClientRect().y,railColor:getComputedStyle(rail).backgroundColor,canvas:getComputedStyle(document.querySelector('.settings-panel')).backgroundColor,overflow:document.documentElement.scrollWidth>innerWidth||[...document.querySelectorAll('.settings-panel')].some(e=>e.scrollWidth>e.clientWidth+1),nativeBridge:typeof window.rovai}})()`)
+    const geometry = () => browser.evaluate(`(()=>{const rail=document.querySelector('.unified-sidebar'),header=document.querySelector('.settings-page-heading'), title=header.querySelector('h1');return {rail:rail.getBoundingClientRect().width,top:document.querySelector('.window-drag-strip').getBoundingClientRect().height,titleSize:getComputedStyle(title).fontSize,titleWeight:getComputedStyle(title).fontWeight,titleX:title.getBoundingClientRect().x,titleY:title.getBoundingClientRect().y,railColor:getComputedStyle(rail).backgroundColor,canvas:getComputedStyle(document.querySelector('.settings-panel')).backgroundColor,overflow:document.documentElement.scrollWidth>innerWidth||[...document.querySelectorAll('.settings-panel')].some(e=>e.scrollWidth>e.clientWidth+1),nativeBridge:typeof window.coaxi}})()`)
     for (const theme of ['day', 'night']) {
       await open('desktop', theme, 'enabled', 'general')
       const baseline = await geometry()

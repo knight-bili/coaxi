@@ -16,7 +16,7 @@ it('reads non-image HTML resources through exact authenticated download grants w
   const transport = new ConsoleClient('http://127.0.0.1:8766', async (url, options) => {
     if (String(url).endsWith('/login')) return Response.json({ protocolVersion: 4, token: 'a'.repeat(64), clientId: 'd'.repeat(64), editorProof: 'e'.repeat(64), ownerId: 'local_user' })
     requests.push({ url: String(url), body: JSON.parse(String(options?.body)), headers: options?.headers })
-    return new Response(bytes, { headers: { 'Content-Type': 'application/octet-stream', 'x-rovai-content-generation': 'exact-version', 'x-rovai-content-version': JSON.stringify(version) } })
+    return new Response(bytes, { headers: { 'Content-Type': 'application/octet-stream', 'x-coaxi-content-generation': 'exact-version', 'x-coaxi-content-version': JSON.stringify(version) } })
   })
   await transport.login('b'.repeat(64))
   const files = createThreadAdapter(transport, async () => null).environment.files
@@ -323,7 +323,7 @@ it('confirms uploaded image bindings before reusing local bytes and falls back f
     })
     if (action === 'readBinary') {
       expect(String(url)).toMatch(/\/files\/bytes$/)
-      return new Response(new Uint8Array([137, 80, 78, 71]), { headers: { 'Content-Type': 'image/png', 'x-rovai-content-generation': 'c'.repeat(64), 'x-rovai-content-version': '{"size":4,"mtimeMs":1}' } })
+      return new Response(new Uint8Array([137, 80, 78, 71]), { headers: { 'Content-Type': 'image/png', 'x-coaxi-content-generation': 'c'.repeat(64), 'x-coaxi-content-version': '{"size":4,"mtimeMs":1}' } })
     }
     return Response.json({ released: true })
   })

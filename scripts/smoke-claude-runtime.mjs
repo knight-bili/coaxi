@@ -12,7 +12,7 @@ import {
 } from './lib/runtime-camp-files-root.mjs'
 
 const root = resolve(import.meta.dirname, '..')
-const fixtureRoot = await realpath(await mkdtemp(join(tmpdir(), 'rovai-claude-runtime-smoke-')))
+const fixtureRoot = await realpath(await mkdtemp(join(tmpdir(), 'coaxi-claude-runtime-smoke-')))
 const projectRoot = join(fixtureRoot, 'project')
 const dataDir = join(fixtureRoot, 'data')
 console.error(`Isolated Claude Core acceptance: data=${dataDir}; skills=${join(dataDir, 'managed-skill-library')}; MCP=${join(dataDir, 'mcp.json')}`)
@@ -26,8 +26,8 @@ try {
     'export const enabled = false\n'
   )
   await run('git', ['init', '-b', 'main'], projectRoot)
-  await run('git', ['config', 'user.name', 'Rovai-ai Claude Runtime Smoke'], projectRoot)
-  await run('git', ['config', 'user.email', 'claude-runtime@rovai.local'], projectRoot)
+  await run('git', ['config', 'user.name', 'Coaxi Claude Runtime Smoke'], projectRoot)
+  await run('git', ['config', 'user.email', 'claude-runtime@coaxi.local'], projectRoot)
   await run('git', ['add', 'README.md', 'CLAUDE_EDIT_FIXTURE.ts'], projectRoot)
   await run('git', ['commit', '-m', 'fixture'], projectRoot)
 
@@ -51,7 +51,7 @@ try {
     throw new Error(`Claude Code capability snapshot is invalid: ${JSON.stringify(snapshot)}`)
   }
 
-  if (process.env.ROVAI_CLAUDE_APPROVAL_ONLY === '1') {
+  if (process.env.COAXI_CLAUDE_APPROVAL_ONLY === '1') {
     const profile = await core.request('members.get', { agentId: 'agent_1' })
     await core.request('members.runtime.set', { commandId: crypto.randomUUID(), command: {
       agentId: profile.agentId, expectedVersion: profile.version, adapterKind: 'claude-code-cli', model: profile.runtimeConfiguration.model,
@@ -90,7 +90,7 @@ try {
   const first = await createConfiguredCampAndSend(core.request, {
     commandId: crypto.randomUUID(),
     workspace,
-    body: 'Reply with exactly ROVAI_CLAUDE_RUN_ONE and nothing else. Do not call tools.',
+    body: 'Reply with exactly COAXI_CLAUDE_RUN_ONE and nothing else. Do not call tools.',
     purpose: 'Verify Claude Code CLI execution.',
   })
   if (first.status !== 'accepted') {
@@ -102,14 +102,14 @@ try {
     const run = value.agentRuns[0]
     return run?.status === 'succeeded'
       && value.messages.some((message) =>
-        message.sourceAgentRunId === run.id && message.body.includes('ROVAI_CLAUDE_RUN_ONE')
+        message.sourceAgentRunId === run.id && message.body.includes('COAXI_CLAUDE_RUN_ONE')
       )
       ? value
       : null
   }, 'first Claude Code AgentRun')
   const firstRun = camp.agentRuns[0]
   const firstNarration = runtimeNarration(core.events, firstRun.id)
-  if (!firstNarration.includes('ROVAI_CLAUDE_RUN_ONE')) {
+  if (!firstNarration.includes('COAXI_CLAUDE_RUN_ONE')) {
     throw new Error(`Claude Code first final text was not projected as narration: ${JSON.stringify({
       firstRun,
       firstNarration,
@@ -135,7 +135,7 @@ try {
   const followUp = await sendThreadMessage(
     core.request,
     threadId,
-    'Reply with exactly ROVAI_CLAUDE_RUN_TWO and nothing else. Do not call tools.',
+    'Reply with exactly COAXI_CLAUDE_RUN_TWO and nothing else. Do not call tools.',
     {
       taskId: null,
       purpose: 'Verify Claude Code Native Session resume.',
@@ -149,7 +149,7 @@ try {
     const value = await core.request('threads.snapshot', { threadId })
     const response = value.messages.find((message) =>
       message.sourceAgentRunId
-        && message.body.includes('ROVAI_CLAUDE_RUN_TWO')
+        && message.body.includes('COAXI_CLAUDE_RUN_TWO')
     )
     return value.agentRuns.length === 2
       && value.agentRuns.every((agentRun) => agentRun.status === 'succeeded')
@@ -159,7 +159,7 @@ try {
   }, 'resumed Claude Code AgentRun')
   const secondResponse = camp.messages.find((message) =>
     message.sourceAgentRunId
-      && message.body.includes('ROVAI_CLAUDE_RUN_TWO')
+      && message.body.includes('COAXI_CLAUDE_RUN_TWO')
   )
   const secondRun = camp.agentRuns.find((agentRun) =>
     agentRun.id === secondResponse?.sourceAgentRunId
@@ -168,7 +168,7 @@ try {
     throw new Error(`Claude Code follow-up AgentRun was not found: ${JSON.stringify(camp)}`)
   }
   const secondNarration = runtimeNarration(core.events, secondRun.id)
-  if (!secondNarration.includes('ROVAI_CLAUDE_RUN_TWO')) {
+  if (!secondNarration.includes('COAXI_CLAUDE_RUN_TWO')) {
     throw new Error(`Claude Code resumed final text was not projected as narration: ${JSON.stringify({
       secondRun,
       secondNarration,
@@ -189,11 +189,11 @@ try {
     })}`)
   }
 
-  const commandMarker = 'ROVAI_CLAUDE_PRINTF_OK'
+  const commandMarker = 'COAXI_CLAUDE_PRINTF_OK'
   const commandRequest = await sendThreadMessage(
     core.request,
     threadId,
-    `Use the Bash tool exactly once to run this command without changing files: printf '%s\\n' '${commandMarker}'. Do not call any other tool. Then immediately reply exactly ROVAI_CLAUDE_COMMAND_OUTPUT_OK.`,
+    `Use the Bash tool exactly once to run this command without changing files: printf '%s\\n' '${commandMarker}'. Do not call any other tool. Then immediately reply exactly COAXI_CLAUDE_COMMAND_OUTPUT_OK.`,
     {
       taskId: null,
       purpose: 'Verify Claude Code Bash output projection.',
@@ -249,7 +249,7 @@ try {
   const editRequest = await sendThreadMessage(
     core.request,
     threadId,
-    'Use the Edit tool exactly once on CLAUDE_EDIT_FIXTURE.ts. Replace the exact text `export const enabled = false` with `export const enabled = true`. Do not call Read, Write, Bash, NotebookEdit, ApplyPatch, or any other tool. Then immediately reply exactly ROVAI_CLAUDE_EDIT_OK.',
+    'Use the Edit tool exactly once on CLAUDE_EDIT_FIXTURE.ts. Replace the exact text `export const enabled = false` with `export const enabled = true`. Do not call Read, Write, Bash, NotebookEdit, ApplyPatch, or any other tool. Then immediately reply exactly COAXI_CLAUDE_EDIT_OK.',
     {
       taskId: null,
       purpose: 'Verify Claude Code native Edit exact-mutation Evidence.',
@@ -310,8 +310,8 @@ try {
 
   const cancellationPath = join(projectRoot, 'CLAUDE_CANCEL_SHOULD_NOT_EXIST.txt')
   const cancellationScriptName = process.platform === 'win32'
-    ? 'rovai-cancel-probe.ps1'
-    : 'rovai-cancel-probe.sh'
+    ? 'coaxi-cancel-probe.ps1'
+    : 'coaxi-cancel-probe.sh'
   await writeFile(
     join(projectRoot, cancellationScriptName),
     process.platform === 'win32'
@@ -404,7 +404,7 @@ try {
   }
 
   let approvalSmoke = null
-  if (process.env.ROVAI_CLAUDE_APPROVAL_SMOKE === '1') {
+  if (process.env.COAXI_CLAUDE_APPROVAL_SMOKE === '1') {
     profile = await core.request('members.get', { agentId: 'agent_1' })
     const interactivePermissions = await core.request('members.runtime.set', {
       commandId: crypto.randomUUID(),
@@ -470,13 +470,13 @@ try {
 }
 
 async function runClaudeApprovalScenario(core, workspace, decision) {
-  const marker = `ROVAI_CLAUDE_APPROVAL_${decision}_${crypto.randomUUID()}`
+  const marker = `COAXI_CLAUDE_APPROVAL_${decision}_${crypto.randomUUID()}`
   const intake = await createConfiguredCampAndSend(core.request, {
     commandId: crypto.randomUUID(),
     workspace,
     memberAgentIds: ['agent_1'],
     defaultLeadAgentId: 'agent_1',
-    body: `Use the Bash tool exactly once to run this exact command: rovai send --public-only --body "${marker}". If permission is denied, do not retry. Then report the result.`,
+    body: `Use the Bash tool exactly once to run this exact command: coaxi send --public-only --body "${marker}". If permission is denied, do not retry. Then report the result.`,
     purpose: `Verify Claude Code ${decision} permission callback.`
   })
   const threadId = intake.payload?.threadId
@@ -551,7 +551,7 @@ async function runClaudeApprovalScenario(core, workspace, decision) {
 }
 
 function startCore(dataDirectory) {
-  const child = spawn(join(root, 'target', 'debug', 'rovai-core'), [
+  const child = spawn(join(root, 'target', 'debug', 'coaxi-core'), [
     ...coreDataDirectoryArguments(dataDirectory),
     '--skill-library-root', join(dataDirectory, 'managed-skill-library'),
     '--mcp-config-path', join(dataDirectory, 'mcp.json')

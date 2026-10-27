@@ -13,7 +13,7 @@ function decode(value:unknown):Original|null{
   if(typeof row.commandId!=='string'||!/^[0-9a-f-]{36}$/.test(row.commandId)||row.schemaVersion!==1||!Number.isSafeInteger(row.expectedRevision)||!Array.isArray(row.members)||row.members.length>4096||row.members.some(member=>!member||typeof member.agentId!=='string'||typeof member.enabled!=='boolean'))return null
   return row as Original
 }
-/** 复用原 Rovai 队员设置行及私有编辑器恢复目录，不另造设置外观。 */
+/** 复用原 Coaxi 队员设置行及私有编辑器恢复目录，不另造设置外观。 */
 export function MemberNativeSteerSettings({agentId,disabled=false}:{agentId:string;disabled?:boolean}):React.JSX.Element{
   const client=useThreadClient(),t=useUiText(),generation=useRef(0),busyRef=useRef(false)
   const [base,setBase]=useState<NativeSteerPolicy|null>(null),[enabled,setEnabled]=useState(false),[pending,setPending]=useState<Original|null>(null),[ready,setReady]=useState(false),[busy,setBusy]=useState(false),[error,setError]=useState('')

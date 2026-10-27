@@ -49,7 +49,7 @@ describe('CJK URL tail repair', () => {
     '```\nhttps://x.com/a）。\n```',
     '[README.md](README.md)',
     '[file:///tmp/a）。](file:///tmp/a）。)',
-    '[file](#rovai-file-reference=a.ts)',
+    '[file](#coaxi-file-reference=a.ts)',
     'https://x.com/a?value=%EF%BC%89&b=1'
   ])('leaves an ordinary or deliberately labelled link untouched: %s', (source) => {
     const tree = parser.parse(source)

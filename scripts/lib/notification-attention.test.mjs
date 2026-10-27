@@ -15,7 +15,7 @@ const source = join(root, 'scripts/fixtures/notification-attention')
 
 test('notification cards preserve source identity, quiet current Camps, queues and paused lifetime', { timeout: 90_000 }, async (t) => {
   if (!admitElectronIntegrationTest(t)) return
-  const fixture = await mkdtemp(join(tmpdir(), 'rovai-notification-attention-test-'))
+  const fixture = await mkdtemp(join(tmpdir(), 'coaxi-notification-attention-test-'))
   let child
   let closed
   try {
@@ -38,7 +38,7 @@ test('notification cards preserve source identity, quiet current Camps, queues a
     assert.equal(JSON.parse(output.split('\n').find(line => line.startsWith('{'))).ok, true)
   } finally {
     if (child && child.exitCode === null && child.signalCode === null) { child.kill('SIGKILL'); await closed }
-    if (process.env.ROVAI_KEEP_NOTIFICATION_FIXTURE === '1') process.stdout.write(`Notification screenshots: ${fixture}\n`)
+    if (process.env.COAXI_KEEP_NOTIFICATION_FIXTURE === '1') process.stdout.write(`Notification screenshots: ${fixture}\n`)
     else await rm(fixture, { recursive: true, force: true })
   }
 })
@@ -46,7 +46,7 @@ test('notification cards preserve source identity, quiet current Camps, queues a
 test('AgentRun notifications observe and focus the right-side execution Portal', { timeout: 90_000 }, async (t) => {
   if (!admitElectronIntegrationTest(t)) return
   const source = join(root, 'scripts/fixtures/execution-avatar-rail')
-  const fixture = await mkdtemp(join(tmpdir(), 'rovai-notification-agent-run-test-'))
+  const fixture = await mkdtemp(join(tmpdir(), 'coaxi-notification-agent-run-test-'))
   let child
   let closed
   try {
@@ -69,7 +69,7 @@ test('AgentRun notifications observe and focus the right-side execution Portal',
     assert.equal(JSON.parse(output.split('\n').find(line => line.startsWith('{'))).ok, true)
   } finally {
     if (child && child.exitCode === null && child.signalCode === null) { child.kill('SIGKILL'); await closed }
-    if (process.env.ROVAI_KEEP_NOTIFICATION_FIXTURE === '1') process.stdout.write(`Notification AgentRun fixture: ${fixture}\n`)
+    if (process.env.COAXI_KEEP_NOTIFICATION_FIXTURE === '1') process.stdout.write(`Notification AgentRun fixture: ${fixture}\n`)
     else await rm(fixture, { recursive: true, force: true })
   }
 })

@@ -1,6 +1,6 @@
 {
   "kind": "source_storage_snapshot_and_mapping_design_not_a_deployed_migration",
-  "sourceCodegCommit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
+  "sourceCoaxiCommit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
   "coreBuildCommit": "9d1ad55eeb18c0bc359d6f575afe9a9936055040",
   "coreContract": "v1.72",
   "coreSchema": 146,

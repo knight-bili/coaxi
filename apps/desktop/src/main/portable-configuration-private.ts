@@ -37,12 +37,12 @@ export class PortableConfigurationPrivate{
       if(Object.keys(value).length!==1||typeof value.operationId!=='string')throw new Error('configuration.export_input_invalid')
       const result=await this.core.request<{artifactPath:string;encryptedDigest:string;byteSize:number;state:string}>('configuration.export.read',input)
       if(result.state!=='ready'||typeof result.artifactPath!=='string'||result.byteSize>64*1024*1024)throw new Error('configuration.export_not_ready')
-      const selected=await dialog.showSaveDialog(owner,{title:'保存完整配置加密副本',defaultPath:'configuration.rovai-config',filters:[{name:'加密配置',extensions:['rovai-config']}]})
+      const selected=await dialog.showSaveDialog(owner,{title:'保存完整配置加密副本',defaultPath:'configuration.coaxi-config',filters:[{name:'加密配置',extensions:['coaxi-config']}]})
       if(selected.canceled||!selected.filePath)return {saved:false}
       const original=await lstat(result.artifactPath)
       if(!original.isFile()||original.isSymbolicLink()||original.size!==result.byteSize)throw new Error('configuration.export_changed')
       const source=await open(result.artifactPath,constants.O_RDONLY|(constants.O_NOFOLLOW??0))
-      const temporary=join(dirname(selected.filePath),`.rovai-export-${randomUUID()}.tmp`)
+      const temporary=join(dirname(selected.filePath),`.coaxi-export-${randomUUID()}.tmp`)
       let output:Awaited<ReturnType<typeof open>>|null=null
       try{
         const observed=await source.stat();if(observed.ino!==original.ino||observed.dev!==original.dev||observed.size!==original.size)throw new Error('configuration.export_changed')
@@ -55,7 +55,7 @@ export class PortableConfigurationPrivate{
     }
     if(operation==='select'){
       if(Object.keys(value).length||this.selections.size>=128)throw new Error('configuration.selection_limit')
-      const chosen=await dialog.showOpenDialog(owner,{title:'选择原来的模型和设置配置文件',properties:['openFile'],filters:[{name:'配置文件',extensions:['json','codeg-config','rovai-config']}]})
+      const chosen=await dialog.showOpenDialog(owner,{title:'选择原来的模型和设置配置文件',properties:['openFile'],filters:[{name:'配置文件',extensions:['json','coaxi-config','coaxi-config']}]})
       if(chosen.canceled||!chosen.filePaths[0])return null
       const path=chosen.filePaths[0],before=await lstat(path)
       if(!before.isFile()||before.isSymbolicLink()||before.size>64*1024*1024)throw new Error('configuration.source_invalid')

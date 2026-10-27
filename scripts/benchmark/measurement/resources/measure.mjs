@@ -5,7 +5,7 @@ import {
   validateResourceMeasurementProfile
 } from './profile.mjs'
 
-export const RESOURCE_MEASUREMENT_SCHEMA_ID = 'rovai.benchmark.resource-measurement'
+export const RESOURCE_MEASUREMENT_SCHEMA_ID = 'coaxi.benchmark.resource-measurement'
 export const RESOURCE_MEASUREMENT_SCHEMA_VERSION = '1.0.0'
 
 const SUPPORTED_METRICS = new Set([

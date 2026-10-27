@@ -13,12 +13,12 @@ import { startQualificationCore } from './lib/qualification-core.mjs'
 import { composerDocumentForAddress } from './lib/create-configured-camp.mjs'
 
 const repository = resolve(import.meta.dirname, '..')
-const root = await realpath(await mkdtemp(join(tmpdir(), 'rovai-continuation-real-')))
+const root = await realpath(await mkdtemp(join(tmpdir(), 'coaxi-continuation-real-')))
 const data = join(root, 'data')
 const workspace = join(root, 'workspace')
 const skillLibraryRoot = join(data, 'managed-skill-library')
 const mcpConfigPath = join(data, 'mcp.json')
-const executable = resolve(process.env.ROVAI_CONTINUATION_CORE ?? join(repository, 'target/debug/rovai-core'))
+const executable = resolve(process.env.COAXI_CONTINUATION_CORE ?? join(repository, 'target/debug/coaxi-core'))
 const executableHash = createHash('sha256')
 for await (const chunk of createReadStream(executable)) executableHash.update(chunk)
 for (const directory of [data, workspace, skillLibraryRoot]) await mkdir(directory, { recursive: true, mode: 0o700 })
@@ -36,7 +36,7 @@ let core, threadId, withheld
 const terminal = new Set(['succeeded', 'failed', 'cancelled'])
 const pause = ms => new Promise(resolveWait => setTimeout(resolveWait, ms))
 const sql = (query, ...params) => {
-  const db = new DatabaseSync(join(data, 'rovai.sqlite'), { readOnly: true })
+  const db = new DatabaseSync(join(data, 'coaxi.sqlite'), { readOnly: true })
   try { return db.prepare(query).all(...params) } finally { db.close() }
 }
 const one = (query, ...params) => sql(query, ...params)[0]
@@ -135,7 +135,7 @@ async function hideSessionFile(id) {
   const first = JSON.parse((await readFile(original, 'utf8')).split('\n')[0])
   assert.equal(first.payload.id, id)
   assert.equal(await realpath(first.payload.cwd), workspace, 'only a session created by this fixture may be withheld')
-  const held = `${original}.rovai-continuation-withheld`
+  const held = `${original}.coaxi-continuation-withheld`
   withheld = { original, held }
   await writeFile(join(root, 'native-file-restore.json'), JSON.stringify(withheld), { mode: 0o600 })
   await rename(original, held)

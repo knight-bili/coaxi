@@ -3,22 +3,22 @@
 // CSP and the parent iframe grant the same preview capabilities.
 // Only its actual parent may supply the bytes it read through the authenticated API.
 (() => {
-  if (location.hash.startsWith('#codeg.')) {
-    // Opaque bootstrap for Codeg cards. The inner document keeps the source
+  if (location.hash.startsWith('#coaxi.')) {
+    // Opaque bootstrap for Coaxi cards. The inner document keeps the source
     // sandbox and CSP, including an empty sandbox when scripts are disabled.
     const id = location.hash.slice(7), hostOrigin = new URL(location.href).origin;
     if (parent === window || !/^[a-f0-9-]{36}$/.test(id)) return;
     let frame = null;
-    const ready = () => parent.postMessage({ protocol: 'rovai-codeg-preview-v1', id, type: 'ready' }, hostOrigin);
+    const ready = () => parent.postMessage({ protocol: 'coaxi-preview-v1', id, type: 'ready' }, hostOrigin);
     addEventListener('message', event => {
       const data = event.data;
       if (frame && event.source === frame.contentWindow) {
-        if (data && data.type === 'codeg-visualize:size' && typeof data.height === 'number' && Number.isFinite(data.height))
-          parent.postMessage({ type: 'codeg-visualize:size', height: data.height }, hostOrigin);
+        if (data && data.type === 'coaxi-visualize:size' && typeof data.height === 'number' && Number.isFinite(data.height))
+          parent.postMessage({ type: 'coaxi-visualize:size', height: data.height }, hostOrigin);
         return;
       }
       if (event.source !== parent || event.origin !== hostOrigin || !data || typeof data !== 'object'
-        || data.protocol !== 'rovai-codeg-preview-v1' || data.id !== id || frame) return;
+        || data.protocol !== 'coaxi-preview-v1' || data.id !== id || frame) return;
       if (data.type === 'connect') { ready(); return; }
       if (data.type !== 'initialize' || typeof data.html !== 'string' || data.html.length > 96 * 1024 * 1024 || typeof data.scripts !== 'boolean') return;
       document.documentElement.style.cssText = 'height:100%;background:transparent';
@@ -34,11 +34,11 @@
   const [previewId, generation] = location.hash.slice(1).split('.');
   const hostOrigin = new URL(location.href).origin;
   if (parent === window || !previewId || !generation) return;
-  const ready = () => parent.postMessage({ protocol: 'rovai-html-preview-v1', type: 'bootstrap-ready', previewId, generation, documentId: 'bootstrap' }, hostOrigin);
+  const ready = () => parent.postMessage({ protocol: 'coaxi-html-preview-v1', type: 'bootstrap-ready', previewId, generation, documentId: 'bootstrap' }, hostOrigin);
   const receive = event => {
     const data = event.data;
     if (event.source !== parent || event.origin !== hostOrigin || !data || typeof data !== 'object'
-      || data.protocol !== 'rovai-html-preview-v1' || data.previewId !== previewId || data.generation !== generation) return;
+      || data.protocol !== 'coaxi-html-preview-v1' || data.previewId !== previewId || data.generation !== generation) return;
     if (data.type === 'connect') { ready(); return; }
     if (data.type !== 'initialize' || typeof data.html !== 'string' || data.html.length > 24 * 1024 * 1024) return;
     removeEventListener('message', receive);

@@ -23,7 +23,7 @@ const layout = JSON.parse(execFileSync(values.host, ['--prepare-windows-data-roo
 const root = layout.core;
 const project = path.join(root, 'project');
 await mkdir(project);
-await writeFile(path.join(root, 'fixture.json'), JSON.stringify({ purpose: 'rovai-openclaw-metadata-only' }));
+await writeFile(path.join(root, 'fixture.json'), JSON.stringify({ purpose: 'coaxi-openclaw-metadata-only' }));
 const requests = [];
 const server = createServer((request, response) => {
   requests.push({ method: request.method, url: request.url });
@@ -38,9 +38,9 @@ await writeFile(path.join(root, 'native.json'), JSON.stringify({
 }, null, 2));
 const authoredConfiguration = await readFile(path.join(root, 'native.json'));
 const env = { ...process.env,
-  ROVAI_OPENCLAW_SMOKE_ROOT: root, ROVAI_OPENCLAW_SMOKE_BIN: values['openclaw-bin'], ROVAI_OPENCLAW_SMOKE_NODE_DIR: values['node-dir'],
+  COAXI_OPENCLAW_SMOKE_ROOT: root, COAXI_OPENCLAW_SMOKE_BIN: values['openclaw-bin'], COAXI_OPENCLAW_SMOKE_NODE_DIR: values['node-dir'],
 };
-const command = `& '${values['cargo-wrapper'].replaceAll("'", "''")}' test -p rovai-core --features extended-tests --lib openclaw_gateway::managed_native_gateway_freezes_routes_and_reaps_its_process_tree -- --exact --ignored --nocapture`;
+const command = `& '${values['cargo-wrapper'].replaceAll("'", "''")}' test -p coaxi-core --features extended-tests --lib openclaw_gateway::managed_native_gateway_freezes_routes_and_reaps_its_process_tree -- --exact --ignored --nocapture`;
 const child = spawn('pwsh', ['-NoProfile', '-Command', command], { cwd: repository, env, windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'] });
 let output = '';
 child.stdout.on('data', data => { output += data; });

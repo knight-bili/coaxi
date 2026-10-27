@@ -16,8 +16,8 @@ import { prepareIsolatedPiAgentDir } from './lib/pi-smoke-config.mjs'
 
 const root = resolve(import.meta.dirname, '..')
 const coreExecutable = resolve(
-  process.env.ROVAI_MISSING_SEND_RECOVERY_CORE_EXECUTABLE
-    ?? join(root, 'target', 'debug', 'rovai-core')
+  process.env.COAXI_MISSING_SEND_RECOVERY_CORE_EXECUTABLE
+    ?? join(root, 'target', 'debug', 'coaxi-core')
 )
 const allSpecifications = [
   ['codex-cli', 'Codex'],
@@ -47,13 +47,13 @@ const unknown = [...selected].filter((adapterKind) =>
   !allSpecifications.some((specification) => specification.adapterKind === adapterKind)
 )
 if (unknown.length) {
-  throw new Error(`Unknown ROVAI_MISSING_SEND_RECOVERY_ADAPTERS: ${unknown.join(', ')}`)
+  throw new Error(`Unknown COAXI_MISSING_SEND_RECOVERY_ADAPTERS: ${unknown.join(', ')}`)
 }
 if (!specifications.length) throw new Error('At least one Runtime must be selected')
 
 const reportDirectory = resolve(
-  process.env.ROVAI_MISSING_SEND_RECOVERY_REPORT_DIR
-    ?? join(tmpdir(), `rovai-missing-send-recovery-report-${Date.now()}`)
+  process.env.COAXI_MISSING_SEND_RECOVERY_REPORT_DIR
+    ?? join(tmpdir(), `coaxi-missing-send-recovery-report-${Date.now()}`)
 )
 await mkdir(reportDirectory, { recursive: true })
 const reportPath = join(reportDirectory, 'report.json')
@@ -69,19 +69,19 @@ await persistReport()
 for (const specification of specifications) {
   process.stderr.write(`\n[missing-send-recovery] ${specification.adapterKind}: isolated real Runtime acceptance\n`)
   const fixtureRoot = await realpath(
-    await mkdtemp(join(tmpdir(), `rovai-missing-send-${specification.slug}-`))
+    await mkdtemp(join(tmpdir(), `coaxi-missing-send-${specification.slug}-`))
   )
   const projectRoot = join(fixtureRoot, 'project')
   const dataDir = join(fixtureRoot, 'data')
-  const databasePath = join(dataDir, 'rovai.sqlite')
+  const databasePath = join(dataDir, 'coaxi.sqlite')
   let core = null
   let failed = true
   try {
     await mkdir(projectRoot)
-    const toolFixtureToken = `ROVAI_RECOVERY_TOOL_${crypto.randomUUID().replaceAll('-', '').toUpperCase()}`
-    const zeroMarker = `ROVAI_MISSING_SEND_ZERO_${specification.slug.toUpperCase()}`
-    const progressMarker = `ROVAI_MISSING_SEND_PROGRESS_${specification.slug.toUpperCase()}`
-    const privateFinalMarker = `ROVAI_MISSING_SEND_PRIVATE_FINAL_${specification.slug.toUpperCase()}`
+    const toolFixtureToken = `COAXI_RECOVERY_TOOL_${crypto.randomUUID().replaceAll('-', '').toUpperCase()}`
+    const zeroMarker = `COAXI_MISSING_SEND_ZERO_${specification.slug.toUpperCase()}`
+    const progressMarker = `COAXI_MISSING_SEND_PROGRESS_${specification.slug.toUpperCase()}`
+    const privateFinalMarker = `COAXI_MISSING_SEND_PRIVATE_FINAL_${specification.slug.toUpperCase()}`
     await writeFile(join(projectRoot, 'README.md'), `# ${specification.label} missing-send recovery fixture\n`)
     await writeFile(join(projectRoot, 'RECOVERY_TOOL_FIXTURE.txt'), `${toolFixtureToken}\n`)
     await gitFixture(projectRoot, specification.label)
@@ -225,7 +225,7 @@ for (const specification of specifications) {
     throw error
   } finally {
     if (core) await core.stop()
-    if (!failed && process.env.ROVAI_KEEP_MISSING_SEND_RECOVERY_FIXTURE !== '1') {
+    if (!failed && process.env.COAXI_KEEP_MISSING_SEND_RECOVERY_FIXTURE !== '1') {
       await removeEphemeralRuntimeCampFilesRoot(dataDir)
       await rm(fixtureRoot, { recursive: true, force: true })
     } else {
@@ -253,13 +253,13 @@ console.log(JSON.stringify({
 }, null, 2))
 
 function selectedAdapters() {
-  const raw = process.env.ROVAI_MISSING_SEND_RECOVERY_ADAPTERS ?? 'all'
+  const raw = process.env.COAXI_MISSING_SEND_RECOVERY_ADAPTERS ?? 'all'
   if (raw.trim() === 'all') return new Set(allSpecifications.map(({ adapterKind }) => adapterKind))
   return new Set(raw.split(',').map((value) => value.trim()).filter(Boolean))
 }
 
 function selectedModelOverride(specification) {
-  const key = `ROVAI_MISSING_SEND_RECOVERY_MODEL_${specification.slug.toUpperCase()}`
+  const key = `COAXI_MISSING_SEND_RECOVERY_MODEL_${specification.slug.toUpperCase()}`
   const value = process.env[key]
   return value?.trim() || null
 }
@@ -267,7 +267,7 @@ function selectedModelOverride(specification) {
 function zeroSendPrompt(marker) {
   return [
     'This is a controlled missing-send recovery acceptance case.',
-    'Do not call rovai, rovai send, shell, MCP, or any other tool.',
+    'Do not call coaxi, coaxi send, shell, MCP, or any other tool.',
     'This Runtime response is intentionally private execution output; Core recovery is the behavior under test.',
     `Return exactly ${marker} and no other text.`
   ].join(' ')
@@ -279,18 +279,18 @@ function suppressionPrompt(adapterKind, progressMarker, privateFinalMarker) {
       // Qwen and TRAE reliably expose direct cmd execution, while nested
       // PowerShell quoting can be treated as optional prose or rejected before
       // ACP permission projection. The qualification path is space-free.
-      ? `cmd.exe /d /s /c %ROVAI_AGENT_CLI% send --body ${progressMarker}`
+      ? `cmd.exe /d /s /c %COAXI_AGENT_CLI% send --body ${progressMarker}`
       // ACP Bash implementations must not expand PowerShell's `$env` before
       // powershell.exe receives it. The marker is generated from a closed
       // alphanumeric adapter slug and is safe inside the inner double quotes.
-      : `powershell.exe -NoProfile -Command '& $env:ROVAI_AGENT_CLI send --body "${progressMarker}"'`
-    : `"$ROVAI_AGENT_CLI" send --body ${shellQuote(progressMarker)}`
+      : `powershell.exe -NoProfile -Command '& $env:COAXI_AGENT_CLI send --body "${progressMarker}"'`
+    : `"$COAXI_AGENT_CLI" send --body ${shellQuote(progressMarker)}`
   return [
     'Publish one progress update to the current Camp, then report completion to me.',
-    'The local Rovai Built-in CLI path is available in ROVAI_AGENT_CLI and its current-Run lease is available in ROVAI_CLI_CONTEXT.',
+    'The local Coaxi Built-in CLI path is available in COAXI_AGENT_CLI and its current-Run lease is available in COAXI_CLI_CONTEXT.',
     'You must use your native terminal/shell tool exactly once to run this command. Do not simulate, skip, or answer before the tool completes:',
     sendCommand,
-    'Do not call any other rovai command and do not send a second message.',
+    'Do not call any other coaxi command and do not send a second message.',
     `After that command succeeds, reply with exactly ${privateFinalMarker} and no other text. Do not publish that completion token.`
   ].join('\n')
 }
@@ -300,7 +300,7 @@ function toolThenFinalPrompt(specification) {
     `This is a controlled ${specification.acp ? 'ACP' : 'Pi native'} tool-boundary acceptance case.`,
     'Use your native file-reading tool (not shell) to read RECOVERY_TOOL_FIXTURE.txt from the current workspace.',
     'The file contains one unpredictable token that is not included in this request; do not guess it.',
-    'Do not call rovai or rovai send.',
+    'Do not call coaxi or coaxi send.',
     'After the tool completes, return exactly the one-line token read from the file and no other text.'
   ].join(' ')
 }
@@ -358,7 +358,7 @@ function acceptedRunId(sent, knownCampId = null) {
 }
 
 async function waitForTerminalRun(core, threadId, agentRunId, label) {
-  const deadline = Date.now() + Number(process.env.ROVAI_MISSING_SEND_RECOVERY_TIMEOUT_MS ?? 480_000)
+  const deadline = Date.now() + Number(process.env.COAXI_MISSING_SEND_RECOVERY_TIMEOUT_MS ?? 480_000)
   const resolvedApprovals = new Set()
   while (Date.now() < deadline) {
     const snapshot = await core.request('camps.snapshot', { threadId })
@@ -620,7 +620,7 @@ function startCore(dataDirectory, piAgentDir = null) {
   child.once('error', rejectPending)
   child.once('close', (code, signal) => {
     if (!stopping) {
-      rejectPending(new Error(`rovai-core exited early (code=${code}, signal=${signal}): ${stderr.slice(-10).join('')}`))
+      rejectPending(new Error(`coaxi-core exited early (code=${code}, signal=${signal}): ${stderr.slice(-10).join('')}`))
     }
   })
   createInterface({ input: child.stdout }).on('line', (line) => {
@@ -672,8 +672,8 @@ function shellQuote(value) {
 
 async function gitFixture(projectRoot, label) {
   await runCapture('git', ['init', '-b', 'main'], { cwd: projectRoot })
-  await runCapture('git', ['config', 'user.name', `Rovai ${label} Missing-Send Smoke`], { cwd: projectRoot })
-  await runCapture('git', ['config', 'user.email', `${basename(projectRoot)}@rovai.local`], { cwd: projectRoot })
+  await runCapture('git', ['config', 'user.name', `Coaxi ${label} Missing-Send Smoke`], { cwd: projectRoot })
+  await runCapture('git', ['config', 'user.email', `${basename(projectRoot)}@coaxi.local`], { cwd: projectRoot })
   await runCapture('git', ['add', 'README.md', 'RECOVERY_TOOL_FIXTURE.txt'], { cwd: projectRoot })
   await runCapture('git', ['commit', '-m', 'fixture'], { cwd: projectRoot })
 }

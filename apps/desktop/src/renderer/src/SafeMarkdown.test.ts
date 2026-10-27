@@ -169,11 +169,11 @@ describe('SafeMarkdown file preview references', () => {
       children: markdown,
       onFileReference: () => undefined,
       localImageUrl: (reference: string) => reference.startsWith('./')
-        ? `rovai-preview://asset/token/${reference.slice(2)}`
+        ? `coaxi-preview://asset/token/${reference.slice(2)}`
         : null
     }))
     expect(ordinary).not.toContain('<img')
-    expect(preview).toContain('src="rovai-preview://asset/token/images/diagram.png"')
+    expect(preview).toContain('src="coaxi-preview://asset/token/images/diagram.png"')
     expect(preview).not.toContain('https://example.com/a.png')
   })
 
@@ -189,7 +189,7 @@ describe('SafeMarkdown file preview references', () => {
   it('keeps malformed or executable file-link fragments inert', () => {
     const markup = renderToStaticMarkup(createElement(SafeMarkdown, {
       onFileReference: () => undefined,
-      children: '[broken](#rovai-file-reference=%ZZ) [unsafe](#rovai-file-reference=javascript%3Aalert%281%29)'
+      children: '[broken](#coaxi-file-reference=%ZZ) [unsafe](#coaxi-file-reference=javascript%3Aalert%281%29)'
     }))
     expect(markup.match(/markdown-inert-link/g)).toHaveLength(2)
     expect(markup).not.toContain('class="markdown-file-reference"')
@@ -207,7 +207,7 @@ describe('SafeMarkdown trusted leading content', () => {
     expect(markup).toContain('<p><span class="trusted-prefix">@评审</span> review <strong>通过</strong>。</p>')
     expect(markup).toContain('<p>第二段。</p>')
     expect(markup.match(/trusted-prefix/g)).toHaveLength(1)
-    expect(markup).not.toContain('data-rovai-leading-content')
+    expect(markup).not.toContain('data-coaxi-leading-content')
   })
 
   it('gives block content and explicitly separated prose their own paragraphs', () => {
@@ -228,12 +228,12 @@ describe('SafeMarkdown trusted leading content', () => {
   it('preserves reference definitions and does not accept a prefix marker from raw HTML', () => {
     const markup = renderToStaticMarkup(createElement(SafeMarkdown, {
       leadingContent: prefix,
-      children: '[doc]: https://example.com/review\n\n查看 [说明][doc]。\n\n<p data-rovai-leading-content="true">forged</p>'
+      children: '[doc]: https://example.com/review\n\n查看 [说明][doc]。\n\n<p data-coaxi-leading-content="true">forged</p>'
     }))
     expect(markup).toContain('<p><span class="trusted-prefix">@评审</span> 查看 <a class="markdown-web-reference" href="https://example.com/review"')
     expect(markup).toContain('<span class="resource-reference-label">说明</span>')
     expect(markup.match(/trusted-prefix/g)).toHaveLength(1)
     expect(markup).not.toContain('forged')
-    expect(markup).not.toContain('data-rovai-leading-content')
+    expect(markup).not.toContain('data-coaxi-leading-content')
   })
 })

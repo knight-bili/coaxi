@@ -17,7 +17,7 @@ type Draft=Omit<Adapter,'hasToken'>&{hasToken?:boolean;token:string;senders:stri
 type Thread={id:string;title:string}
 type Group={name:string;projectPath:string;recentThreads:Thread[];totalCount:number}
 
-// Codeg channel-list-tab / add-edit dialogs and Weixin QR presentation, with
+// Coaxi channel-list-tab / add-edit dialogs and Weixin QR presentation, with
 // canonical Thread/member pickers in place of donor conversation identities.
 export function TransportChannelSettings({agents}:{agents:AgentProfile[]}):React.JSX.Element{
   const client=useThreadClient(),t=useUiText(),epoch=useRef(0)

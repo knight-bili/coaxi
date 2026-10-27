@@ -5,7 +5,7 @@ import { useOptionalFilePreview } from './FilePreviewContext'
 import { loadSourceLanguageForFilename, sourceCodeMirrorTheme } from './source-preview'
 import { useUiText } from './interface-language'
 
-/** Editable counterpart of Rovai's existing ReadonlyCodeViewer. */
+/** Editable counterpart of Coaxi's existing ReadonlyCodeViewer. */
 export function WorkspaceCodeEditor({ path, text, onChange, onSave, readonly = false, visible = true,line }: {
   path: string; text: string; onChange?(text: string): void; onSave?(): void; readonly?: boolean; visible?: boolean;line?:number
 }): React.JSX.Element {

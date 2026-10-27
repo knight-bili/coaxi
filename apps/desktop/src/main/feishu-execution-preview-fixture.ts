@@ -40,34 +40,34 @@ export function feishuExecutionPreviewFixture(
     }
     switch ((index - 1) % 10) {
       case 0:
-        command(`sed -n '1,20p' .rovai-preview/step-${label}.txt`, `step ${label}\npreview input loaded\nready`)
+        command(`sed -n '1,20p' .coaxi-preview/step-${label}.txt`, `step ${label}\npreview input loaded\nready`)
         break
       case 1:
-        command(`rg -n 'terminal_sealed|execution_console_page' .rovai-preview/step-${label}.ts`, '12: terminal_sealed\n28: execution_console_page')
+        command(`rg -n 'terminal_sealed|execution_console_page' .coaxi-preview/step-${label}.ts`, '12: terminal_sealed\n28: execution_console_page')
         break
       case 2:
-        command(`pnpm exec vitest run .rovai-preview/case-${label}.test.ts`, `✓ case-${label}\nTest Files  1 passed (1)\nTests       3 passed (3)`)
+        command(`pnpm exec vitest run .coaxi-preview/case-${label}.test.ts`, `✓ case-${label}\nTest Files  1 passed (1)\nTests       3 passed (3)`)
         break
       case 3:
-        command(`git diff --stat -- .rovai-preview/step-${label}.ts`, `step-${label}.ts | 6 ++++--\n1 file changed, 4 insertions(+), 2 deletions(-)`)
+        command(`git diff --stat -- .coaxi-preview/step-${label}.ts`, `step-${label}.ts | 6 ++++--\n1 file changed, 4 insertions(+), 2 deletions(-)`)
         break
       case 4:
-        command(`sed -n '1,210p' .rovai-preview/output-${label}.txt`, Array.from({ length: 210 }, (_, line) => `line ${line + 1}`).join('\n'))
+        command(`sed -n '1,210p' .coaxi-preview/output-${label}.txt`, Array.from({ length: 210 }, (_, line) => `line ${line + 1}`).join('\n'))
         break
       case 5:
-        command(`sed -n '5p;15p' .rovai-preview/step-${label}.txt`, '05  first selected line\n15  second selected line')
+        command(`sed -n '5p;15p' .coaxi-preview/step-${label}.txt`, '05  first selected line\n15  second selected line')
         break
       case 6:
-        command(`cargo test -p rovai-core preview_case_${label} -- --exact`, `running 1 test\ntest preview_case_${label} ... ok\ntest result: ok. 1 passed; 0 failed`)
+        command(`cargo test -p coaxi-core preview_case_${label} -- --exact`, `running 1 test\ntest preview_case_${label} ... ok\ntest result: ok. 1 passed; 0 failed`)
         break
       case 7:
-        command("rovai send --public-only --body '这段测试正文保留原值'", 'message sent')
+        command("coaxi send --public-only --body '这段测试正文保留原值'", 'message sent')
         break
       case 8:
         command(`API_TOKEN=preview-only-secret-${label} curl --header 'Authorization: Bearer preview-only-token-${label}' https://example.test/health`, `Authorization: Bearer preview-only-token-${label}\nCookie: session=preview-only-cookie-${label}\nstatus: ok`)
         break
       case 9:
-        command(`git diff --check -- .rovai-preview/step-${label}.ts`)
+        command(`git diff --check -- .coaxi-preview/step-${label}.ts`)
         break
     }
   }

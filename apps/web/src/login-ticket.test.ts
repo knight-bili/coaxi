@@ -2,7 +2,7 @@ import { expect, it, vi } from 'vitest'
 import { takeLoginTicket } from './login-ticket'
 
 it('erases a scan fragment before validating it and preserves only existing route state', () => {
-  const state = { rovai: { id: 'locator' } }
+  const state = { coaxi: { id: 'locator' } }
   const history = { state, replaceState: vi.fn() }
   const location = { hash: '#login-ticket=' + 'a'.repeat(64), pathname: '/', search: '' }
   expect(takeLoginTicket(location, history)).toBe('a'.repeat(64))

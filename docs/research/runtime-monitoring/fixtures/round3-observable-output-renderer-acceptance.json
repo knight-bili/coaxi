@@ -108,7 +108,7 @@
     "resumed": "execution-metrics-stream-resumed.png",
     "terminal": "execution-metrics-stream-late-usage.png"
   },
-  "screenshotDirectoryAtRun": "/private/var/folders/pm/zmpfxggd0glcm8vx3p3y3mmr0000gq/T/rovai-runtime-activity-ui-captures-bHczDr",
-  "command": "ROVAI_RUNTIME_ACTIVITY_ACCEPT_METRICS_STREAM_ONLY=1 pnpm accept:runtime-activity-ui",
+  "screenshotDirectoryAtRun": "/private/var/folders/pm/zmpfxggd0glcm8vx3p3y3mmr0000gq/T/coaxi-runtime-activity-ui-captures-bHczDr",
+  "command": "COAXI_RUNTIME_ACTIVITY_ACCEPT_METRICS_STREAM_ONLY=1 pnpm accept:runtime-activity-ui",
   "lateUsageMethod": "After the controlled Run reached succeeded, the script updated its existing empty runtime_usage_run_summary row. This verifies readback and Renderer polling, not native Qwen Usage emission."
 }

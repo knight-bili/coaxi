@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { adaptNativeMessages, nativeAdapterTurns, nativeTurnStats } from './native-content-adapter'
 import type { NativeTranscriptTurn, NativeTranscriptBlock } from './native-child-reader'
-import type { AdaptedContentPart } from './codeg-native-content/lib/adapters/ai-elements-adapter'
+import type { AdaptedContentPart } from './coaxi-native-content/lib/adapters/ai-elements-adapter'
 
 const turn = (blocks: NativeTranscriptBlock[], id = 'turn'): NativeTranscriptTurn => ({ id, role: 'assistant', timestamp: '2026-10-18T00:00:00Z', blocks })
 const use = (id: string): NativeTranscriptBlock => ({ type: 'tool_use', tool_use_id: id, tool_name: 'read_file', input_preview: '{"path":"src/保留.ts"}', meta: { untouched: id } })
@@ -19,7 +19,7 @@ function calls(parts: AdaptedContentPart[]): Array<Extract<AdaptedContentPart, {
   return parts.flatMap(part => part.type === 'tool-call' ? [part] : part.type === 'tool-group' ? part.items : part.type === 'goal-run' ? calls([part.start, ...part.items, ...(part.end ? [part.end] : [])]) : [])
 }
 
-describe('native snapshot to original Codeg adapter boundary', () => {
+describe('native snapshot to original Coaxi adapter boundary', () => {
   it('keeps arrival-order matches for reused IDs and later-turn results without mutating frozen input', () => {
     const input = [turn([use('same'), use('same'), result('same', '第一份')], 'a'), turn([result('same', '第二份'), result('orphan', '独立结果')], 'b')]
     const before = JSON.stringify(input), output = adaptNativeMessages(input, false, text)

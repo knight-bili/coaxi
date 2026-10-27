@@ -46,7 +46,7 @@
       "log": "work/i02/skill-delivery-context-staged-verified.log",
       "route": {
         "route": "full",
-        "reason": "Rust source cannot be classified safely: crates/rovai-core/src/db_skill_pack_context.rs",
+        "reason": "Rust source cannot be classified safely: crates/coaxi-core/src/db_skill_pack_context.rs",
         "scripts": [
           "test:rust:workspace-default"
         ]
@@ -92,18 +92,18 @@
       "apps/desktop/src/renderer/src/StructuredMentionComposer.tsx": "12719a6eb63cb3ae39ea1ac9d876b10d17cee61aa7365a6ec1f3f37c33c23517",
       "apps/desktop/src/renderer/src/composer-skill-picker.ts": "01e4cc0216edc4582cb531d2d57071d7b28ffb6a6b49b3cdd0ce420ccb76422f",
       "apps/desktop/src/renderer/src/locales/en.json": "ff2006a11834b956730c39dc065eb1ca11e976612c1585ff4d0e61add69cb89f",
-      "crates/rovai-core/src/application.rs": "141713374848832b7ddc5b51a934cd4757acf235154d433c1a1e7a9db7759679",
-      "crates/rovai-core/src/canvas_board.rs": "3c5b04d216032c5ef2826b36f6422d2436ffb11d4f13b2ff19084d9542977375",
-      "crates/rovai-core/src/context.rs": "3e8a0b091f0b5f3f9beb65996eb2458bcfad53ea754ac407cd550f0c9c4e4761",
-      "crates/rovai-core/src/context_contract.rs": "d69fc337182fdab43feb84435c852ca92bf9a4ae57b9e532cb73ad350ccd736c",
-      "crates/rovai-core/src/current_input_skill.rs": "12e1b93c340dcc715cc0f8f911f8ff210e47e2d6c8aa051abd3f2c2c261fca71",
-      "crates/rovai-core/src/db.rs": "7a2d5701c932f0d6ce580219334836636aa6debf07fb93f3c7fa02a05951f76b",
-      "crates/rovai-core/src/db_skill_pack_context.rs": "f26a5a1400c8238552035fbff6170dfe446193ea812eb1171aaaa750ed985dd2",
-      "crates/rovai-core/src/delivery_queue.rs": "8d7ddc35d9ee164b68188c89fcb41093d2681979080e1cb3614cc166270ce27d",
-      "crates/rovai-core/src/file_preview_authority.rs": "85f7898d5c4f6a3dd3f324b3b6c86130c20d69e36ec8725ecad6d741c21d0e5a",
-      "crates/rovai-core/src/skill_pack_delivery.rs": "f029148f6a488547a14691144f73015c1aa24057f55a59098b235c7823ba7690",
-      "crates/rovai-core/src/skill_pack_installation.rs": "87e431eb3e89a3dcb4c5c19b8c74d54ec7e71565cbd1af951842ff302de07d0b",
-      "crates/rovai-core/src/skill_pack_members.rs": "cd07c1ded1f4db364f3a8897ee9ac6de5565a6db5fd86986a669019ddbd0d9e6",
+      "crates/coaxi-core/src/application.rs": "141713374848832b7ddc5b51a934cd4757acf235154d433c1a1e7a9db7759679",
+      "crates/coaxi-core/src/canvas_board.rs": "3c5b04d216032c5ef2826b36f6422d2436ffb11d4f13b2ff19084d9542977375",
+      "crates/coaxi-core/src/context.rs": "3e8a0b091f0b5f3f9beb65996eb2458bcfad53ea754ac407cd550f0c9c4e4761",
+      "crates/coaxi-core/src/context_contract.rs": "d69fc337182fdab43feb84435c852ca92bf9a4ae57b9e532cb73ad350ccd736c",
+      "crates/coaxi-core/src/current_input_skill.rs": "12e1b93c340dcc715cc0f8f911f8ff210e47e2d6c8aa051abd3f2c2c261fca71",
+      "crates/coaxi-core/src/db.rs": "7a2d5701c932f0d6ce580219334836636aa6debf07fb93f3c7fa02a05951f76b",
+      "crates/coaxi-core/src/db_skill_pack_context.rs": "f26a5a1400c8238552035fbff6170dfe446193ea812eb1171aaaa750ed985dd2",
+      "crates/coaxi-core/src/delivery_queue.rs": "8d7ddc35d9ee164b68188c89fcb41093d2681979080e1cb3614cc166270ce27d",
+      "crates/coaxi-core/src/file_preview_authority.rs": "85f7898d5c4f6a3dd3f324b3b6c86130c20d69e36ec8725ecad6d741c21d0e5a",
+      "crates/coaxi-core/src/skill_pack_delivery.rs": "f029148f6a488547a14691144f73015c1aa24057f55a59098b235c7823ba7690",
+      "crates/coaxi-core/src/skill_pack_installation.rs": "87e431eb3e89a3dcb4c5c19b8c74d54ec7e71565cbd1af951842ff302de07d0b",
+      "crates/coaxi-core/src/skill_pack_members.rs": "cd07c1ded1f4db364f3a8897ee9ac6de5565a6db5fd86986a669019ddbd0d9e6",
       "docs/README.md": "5d749880f159d088ce881e8b2c6cc6b750d7449087d8861c681b91dce3fe8f94",
       "docs/architecture/skills.md": "a189b40f257b72f111927b2b7dcb270ae469d44bad9e5e8ff3fcbb087d1fbc24",
       "docs/contracts/README.md": "6da8ea2eeb899d990b8a365821ded961ea6eac677fe84933c23a2a1f2d45853e",
@@ -118,7 +118,7 @@
   },
   "artifact": {
     "sha256": "772f23fa681e436da036ad54a783328122ae4027b63b6a4c6f1baf77c2238666",
-    "path": "work/i02/native-artifacts/core153-skill-delivery-772f23fa681e/rovai-host.exe"
+    "path": "work/i02/native-artifacts/core153-skill-delivery-772f23fa681e/coaxi-host.exe"
   },
   "selfReview": {
     "checks": [

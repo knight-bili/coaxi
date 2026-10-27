@@ -58,7 +58,7 @@ describe('DingTalk Web Session developer gateway', () => {
     expect(f.request.mock.calls.map(([path]) => path)).not.toContain('/innerApp/getAppAccount')
   })
 
-  it('normalizes names/descriptions before the single create, including Rovai middle dots and Chinese semicolons', async () => {
+  it('normalizes names/descriptions before the single create, including Coaxi middle dots and Chinese semicolons', async () => {
     const f = fixture()
     f.request.mockResolvedValueOnce({ unifiedAppId: 'u-app' })
     await f.gateway.execute({ operation: 'app.create', expectedIdentity: owner,

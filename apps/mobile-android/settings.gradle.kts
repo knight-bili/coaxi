@@ -20,5 +20,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "CodegAndroid"
+rootProject.name = "CoaxiAndroid"
 include(":app")

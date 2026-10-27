@@ -22,9 +22,9 @@ import type {
 } from '@contracts'
 
 export const USER_AUTOMATION_CONTRACT_VERSION = 1
-export const USER_AUTOMATION_CONTEXT_ENV = 'ROVAI_APP_AUTOMATION_CONTEXT'
+export const USER_AUTOMATION_CONTEXT_ENV = 'COAXI_APP_AUTOMATION_CONTEXT'
 export const WINDOWS_USER_AUTOMATION_QUALIFICATION_ENV =
-  'ROVAI_WINDOWS_USER_AUTOMATION_QUALIFICATION'
+  'COAXI_WINDOWS_USER_AUTOMATION_QUALIFICATION'
 const MAX_FRAME_BYTES = 4 * 1024 * 1024
 const REQUEST_TIMEOUT_MILLISECONDS = 60_000
 
@@ -317,7 +317,7 @@ type StartableUserAutomationServer = {
 export async function startUserAutomationOptional<T extends StartableUserAutomationServer>(
   create: () => T,
   reportUnavailable: (error: unknown) => void = () => {
-    console.error('[rovai] User Automation is unavailable; Desktop will continue.')
+    console.error('[coaxi] User Automation is unavailable; Desktop will continue.')
   }
 ): Promise<T | null> {
   let server: T | null = null
@@ -539,7 +539,7 @@ function responseError(error: unknown): { code: string; message: string } {
   if (error instanceof UserAutomationError) {
     return { code: error.code, message: error.message }
   }
-  console.error('[rovai] User Automation request failed.', error)
+  console.error('[coaxi] User Automation request failed.', error)
   return {
     code: 'automation_internal_error',
     message: 'The User Automation request could not be completed.'
@@ -582,7 +582,7 @@ export class UserAutomationServer {
       await chmod(this.rootPath, 0o700)
     }
     const endpointPath = process.platform === 'win32'
-      ? `\\\\.\\pipe\\rovai-ai-${process.pid}-${randomUUID()}`
+      ? `\\\\.\\pipe\\coaxi-${process.pid}-${randomUUID()}`
       : join(this.rootPath, 'app.sock')
     if (process.platform !== 'win32') await removeStaleSocket(endpointPath)
     const context: AutomationContext = {

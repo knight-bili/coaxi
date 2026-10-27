@@ -8,7 +8,7 @@ import type { ComposerSkillOption } from './composer-skill-picker'
 
 export const COMPOSER_DOCUMENT_VERSION = 2 as const
 export const MAX_TYPEAHEAD_QUERY_LENGTH = 128
-export const ROVAI_COMPOSER_CLIPBOARD_MIME = 'application/x-rovai-composer+json'
+export const COAXI_COMPOSER_CLIPBOARD_MIME = 'application/x-coaxi-composer+json'
 
 const MAX_COMPOSER_SEGMENTS = 4_096
 const MAX_COMPOSER_TEXT_LENGTH = 1_048_576

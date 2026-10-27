@@ -2,7 +2,7 @@
   "schema_version": 1,
   "recorded_at": "2026-10-18T22:39:08+08:00",
   "status": "completed_all_developed_commits_consolidated_old_branches_retired_local_origin_synchronized_development_paused",
-  "repository": "knight-bili/codeg-rovai-workbench",
+  "repository": "knight-bili/coaxi",
   "development_branch": "develop/V1.0.0",
   "upstream": "origin/develop/V1.0.0",
   "previous_development_head": "39899099fe44da7f96eab7c047aeee4f292c4f99",
@@ -278,9 +278,9 @@
     "checker_and_all_relevant_inputs_identical_to_previous_head": [
       "tools/integration/verify-foundation.mjs",
       "integration/foundation/current-protocol.json",
-      "crates/rovai-core/src/db.rs",
-      "crates/rovai-web/src/lib.rs",
-      "crates/rovai-web/src/operations.rs"
+      "crates/coaxi-core/src/db.rs",
+      "crates/coaxi-web/src/lib.rs",
+      "crates/coaxi-web/src/operations.rs"
     ],
     "introduced_by_branch_unification": false,
     "action": "retain as engineering todo for resumed development; no checker weakening or feature repair while paused"

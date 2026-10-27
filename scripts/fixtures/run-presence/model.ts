@@ -103,7 +103,7 @@ const later = (fn: () => void, ms: number) => { const id = setTimeout(() => { ti
 
 function snapshot() {
   const s = state.stage, kind = state.scenario
-  const value: any = { ...structuredClone(initial), thread: { ...initial.thread, title: '队员在会话中的占位', projectPath: '/prototype/rovai-ai', defaultLeadAgentId: aid(0) },
+  const value: any = { ...structuredClone(initial), thread: { ...initial.thread, title: '队员在会话中的占位', projectPath: '/prototype/coaxi', defaultLeadAgentId: aid(0) },
     members: profiles.map((p, i) => ({ agentId: p.agentId, displayName: p.displayName, avatarRef: null, teamRole: p.teamRole,
       accent: p.accent, membershipStatus: 'active', profilePresence: 'present', memberOrder: i, isDefaultLead: i === 0, version: 1, leaveRequestedAt: null })),
     messages: [makeMessage('history-user', 1, '消息发出去以后，我想在会话里直接知道队员有没有接到。'),

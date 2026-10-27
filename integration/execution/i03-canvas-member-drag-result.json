@@ -44,7 +44,7 @@
       "sha256": "dd1fd21d4a18ceb944d4f606aa2357c9d9a403b05cc35bef2dae84450dd1c850"
     },
     {
-      "path": "crates/rovai-core/src/canvas_node.rs",
+      "path": "crates/coaxi-core/src/canvas_node.rs",
       "sha256": "75a59dc670136575fe65cd708c7d45911c74b3b238728b22f59f384709660f7f"
     },
     {
@@ -164,7 +164,7 @@
     "member_transfer_version": 1
   },
   "next": [
-    "继续原地展开与侧抽屉，复用Rovai消息/权限/审批/停止/草稿附件及既有输入治理；不另建会话或模型权威。",
+    "继续原地展开与侧抽屉，复用Coaxi消息/权限/审批/停止/草稿附件及既有输入治理；不另建会话或模型权威。",
     "随后Mission/Task/Thread/Diff、授权文件、真实临时PTY和Desktop冷启动；I02剩余SP/真实Gate与I04–I12/BUF不减。"
   ],
   "execution": {

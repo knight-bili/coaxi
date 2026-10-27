@@ -12,11 +12,11 @@ export interface AuthStorage {
   write(session: BrowserSession, expectedToken?: string, current?: () => boolean): Promise<void>
   remove(token: string): Promise<void>
 }
-export const TAB_AUTH_KEY = 'rovai.web.auth.v1'
+export const TAB_AUTH_KEY = 'coaxi.web.auth.v1'
 
 let database: Promise<IDBDatabase> | undefined
 const openBrowserDatabase = () => database ??= new Promise<IDBDatabase>((resolve, reject) => {
-  const request = indexedDB.open('rovai-web-auth-v1', 1)
+  const request = indexedDB.open('coaxi-web-auth-v1', 1)
   request.onupgradeneeded = () => request.result.createObjectStore('sessions')
   request.onsuccess = () => resolve(request.result)
   request.onerror = () => { database = undefined; reject(new Error('无法打开浏览器登录存储。')) }

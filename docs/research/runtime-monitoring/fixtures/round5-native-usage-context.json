@@ -1658,7 +1658,7 @@
               "raw": {
                 "type": "extension_ui_request",
                 "method": "setStatus",
-                "statusKey": "rovai-managed-context-usage",
+                "statusKey": "coaxi-managed-context-usage",
                 "numericStatus": {
                   "usedTokens": 8124,
                   "windowTokens": 1050000,
@@ -1675,7 +1675,7 @@
               "raw": {
                 "type": "extension_ui_request",
                 "method": "setStatus",
-                "statusKey": "rovai-managed-context-usage",
+                "statusKey": "coaxi-managed-context-usage",
                 "numericStatus": {
                   "usedTokens": 9206,
                   "windowTokens": 1050000,
@@ -1692,7 +1692,7 @@
               "raw": {
                 "type": "extension_ui_request",
                 "method": "setStatus",
-                "statusKey": "rovai-managed-context-usage",
+                "statusKey": "coaxi-managed-context-usage",
                 "numericStatus": {
                   "usedTokens": 9142,
                   "windowTokens": 1050000,
@@ -1709,7 +1709,7 @@
               "raw": {
                 "type": "extension_ui_request",
                 "method": "setStatus",
-                "statusKey": "rovai-managed-context-usage",
+                "statusKey": "coaxi-managed-context-usage",
                 "numericStatus": {
                   "usedTokens": 9211,
                   "windowTokens": 1050000,
@@ -1829,7 +1829,7 @@
               "raw": {
                 "type": "extension_ui_request",
                 "method": "setStatus",
-                "statusKey": "rovai-managed-context-usage",
+                "statusKey": "coaxi-managed-context-usage",
                 "numericStatus": {
                   "usedTokens": 9925,
                   "windowTokens": 1050000,
@@ -1846,7 +1846,7 @@
               "raw": {
                 "type": "extension_ui_request",
                 "method": "setStatus",
-                "statusKey": "rovai-managed-context-usage",
+                "statusKey": "coaxi-managed-context-usage",
                 "numericStatus": {
                   "usedTokens": 10100,
                   "windowTokens": 1050000,
@@ -1863,7 +1863,7 @@
               "raw": {
                 "type": "extension_ui_request",
                 "method": "setStatus",
-                "statusKey": "rovai-managed-context-usage",
+                "statusKey": "coaxi-managed-context-usage",
                 "numericStatus": {
                   "usedTokens": 10165,
                   "windowTokens": 1050000,

@@ -14,11 +14,11 @@ test('Runtime selectors preserve defaults and support native search, keyboard, I
   if (!admitElectronIntegrationTest(t)) return
   const root = resolve(import.meta.dirname, '../..'), source = join(root, 'scripts/fixtures/runtime-model-picker')
   const temporaryRoot = await realpath(tmpdir())
-  const fixture = process.env.ROVAI_RUNTIME_PICKER_FIXTURE
-    ? await realpath(process.env.ROVAI_RUNTIME_PICKER_FIXTURE)
-    : await mkdtemp(join(temporaryRoot, 'rovai-runtime-picker-'))
+  const fixture = process.env.COAXI_RUNTIME_PICKER_FIXTURE
+    ? await realpath(process.env.COAXI_RUNTIME_PICKER_FIXTURE)
+    : await mkdtemp(join(temporaryRoot, 'coaxi-runtime-picker-'))
   assert.equal(dirname(fixture), temporaryRoot)
-  assert(basename(fixture).startsWith('rovai-runtime-picker-'))
+  assert(basename(fixture).startsWith('coaxi-runtime-picker-'))
   let child, closed
   try {
     await build({ configFile: false, root: source, base: './', logLevel: 'error', plugins: [react()], resolve: { alias: { '@contracts': join(root, 'packages/contracts/src/index.ts') } }, build: { outDir: join(fixture, 'renderer'), minify: false } })
@@ -34,10 +34,10 @@ test('Runtime selectors preserve defaults and support native search, keyboard, I
     process.stdout.write(output.split('\n').filter(line => line.startsWith('{')).join('\n') + '\n')
   } finally {
     if (child && child.exitCode === null && child.signalCode === null) { child.kill('SIGKILL'); await closed }
-    if (process.env.ROVAI_KEEP_RUNTIME_PICKER_FIXTURE === '1') process.stdout.write(`Runtime picker fixture: ${fixture}\n`)
+    if (process.env.COAXI_KEEP_RUNTIME_PICKER_FIXTURE === '1') process.stdout.write(`Runtime picker fixture: ${fixture}\n`)
     else {
       const target = await realpath(fixture)
-      assert.equal(dirname(target), temporaryRoot); assert(basename(target).startsWith('rovai-runtime-picker-'))
+      assert.equal(dirname(target), temporaryRoot); assert(basename(target).startsWith('coaxi-runtime-picker-'))
       await rm(target, { recursive: true, force: true })
     }
   }

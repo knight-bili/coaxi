@@ -254,7 +254,7 @@ function localizedAgentRunWaitDetail(waitReason: string | null): string | null {
 
 const NON_TERMINAL_RUNS = new Set(['queued', 'running', 'waiting'])
 const EXECUTION_EVIDENCE_PAGE_LIMIT = 1_000
-const EXECUTION_DRAWER_HEIGHT_STORAGE_KEY = 'rovai.execution-drawer-height.v1'
+const EXECUTION_DRAWER_HEIGHT_STORAGE_KEY = 'coaxi.execution-drawer-height.v1'
 const EXECUTION_DRAWER_HARD_MIN_HEIGHT = 48
 const EXECUTION_DRAWER_PREFERRED_MIN_HEIGHT = 160
 const EXECUTION_DRAWER_MAX_HEIGHT = 520
@@ -262,14 +262,14 @@ const EXECUTION_DRAWER_MAX_VIEWPORT_RATIO = 0.6
 const EXECUTION_DRAWER_MIN_TIMELINE_HEIGHT = 112
 const EXECUTION_DRAWER_KEYBOARD_STEP = 24
 const EXECUTION_DRAWER_KEYBOARD_PAGE_STEP = 80
-const CAMP_CONVERSATION_VIEW_STORAGE_KEY = 'rovai.camp-conversation-view.v1'
+const CAMP_CONVERSATION_VIEW_STORAGE_KEY = 'coaxi.camp-conversation-view.v1'
 const CAMP_HISTORY_AUTOLOAD_THRESHOLD_PX = 120
 const CAMP_TIMELINE_READING_POSITION_LIMIT = 50
 const campTimelineReadingPositions = new Map<string, ThreadTimelineReadingPosition>()
 
 if (typeof window !== 'undefined') {
   try {
-    window.localStorage.removeItem('rovai.camp-timeline-reading-positions.v2')
+    window.localStorage.removeItem('coaxi.camp-timeline-reading-positions.v2')
   } catch {
     // Legacy cleanup is best effort; reading positions now live only in Renderer memory.
   }
@@ -1904,7 +1904,7 @@ function ThreadWorkspaceContent({
   useEffect(() => {
     if (!client.editingRecovery?.draftCopies) return
     const changed = (event: StorageEvent): void => {
-      if (event.storageArea === window.localStorage && event.key?.startsWith('rovai.web.thread-drafts.v1:')) setDraftCopyRevision(value => value + 1)
+      if (event.storageArea === window.localStorage && event.key?.startsWith('coaxi.web.thread-drafts.v1:')) setDraftCopyRevision(value => value + 1)
     }
     window.addEventListener('storage', changed)
     return () => window.removeEventListener('storage', changed)
@@ -3735,13 +3735,13 @@ function ThreadWorkspaceContent({
     const layout = timelineLayoutAnchorRef.current
     const width = timelineViewportWidth(scroll)
     if (layout?.threadId === threadId && (
-      layout.hidden || layout.width !== width || !scroll.clientHeight
+      layout.hidden || Math.abs(layout.width - width) > 1 || !scroll.clientHeight
       || (Math.abs(layout.scrollTop - scroll.scrollTop) <= 1
         && timelineReadingPosition.current?.position.followingLatest === false)
     )) return
     if (width > 0 && scroll.clientHeight > 0 && (
       !layout || layout.threadId !== threadId
-      || (!layout.hidden && layout.width === width && Math.abs(layout.scrollTop - scroll.scrollTop) > 1)
+      || (!layout.hidden && Math.abs(layout.width - width) <= 1 && Math.abs(layout.scrollTop - scroll.scrollTop) > 1)
     )) {
       timelineLayoutAnchorRef.current = {
         threadId, width, hidden: false, scrollTop: scroll.scrollTop,
@@ -3818,7 +3818,7 @@ function ThreadWorkspaceContent({
     const followingLatest = current?.threadId !== threadId || current.position.followingLatest !== false
     if (followingLatest) {
       scroll.scrollTop = scroll.scrollHeight
-    } else if (saved?.threadId === threadId && (saved.hidden || saved.width !== width)) {
+    } else if (saved?.threadId === threadId && (saved.hidden || Math.abs(saved.width - width) > 1)) {
       restoreTimelineReadingAnchor(scroll, saved.anchor)
     }
     timelineLayoutAnchorRef.current = {
@@ -5929,7 +5929,7 @@ function ThreadWorkspaceContent({
           <ConversationQuestionsDock key={`questions:${snapshot.thread.id}`} scope={{threadId:snapshot.thread.id,conversationId:null,scopeKind:'public'}} members={snapshot.members}/>
           <ConversationSources open={sourcesToolsOpen} onOpenChange={setSourcesToolsOpen} key={`sources:${snapshot.thread.id}`} scope={{threadId:snapshot.thread.id,conversationId:null,scopeKind:'public'}} disabled={composerInteractionDisabled} onInsert={async source=>{
             const handle=composerHandleRef.current;if(!handle||composerInteractionDisabled)throw new Error(uiAttribute('当前输入尚未就绪，资料授权记录已保留。'));
-            const before=await handle.flush();if(!JSON.stringify(before.document).includes(`rovai-source:${source.sourceSessionId}`)&&!handle.appendText(conversationSourceReference(source)))throw new Error(uiAttribute('当前输入已锁定，资料授权记录已保留。'));
+            const before=await handle.flush();if(!JSON.stringify(before.document).includes(`coaxi-source:${source.sourceSessionId}`)&&!handle.appendText(conversationSourceReference(source)))throw new Error(uiAttribute('当前输入已锁定，资料授权记录已保留。'));
             await handle.flush();handle.focus('end');
           }}/>
           </div>

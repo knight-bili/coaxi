@@ -114,7 +114,7 @@ describe('first-run provisioning', () => {
         displayName: 'Xingli',
         teamRole: 'Traveling Scholar',
         personalityTraits: ['Curious', 'Adaptable', 'Diligent'],
-        avatarRef: 'rovai://member-avatar/builtin/luoke/v1'
+        avatarRef: 'coaxi://member-avatar/builtin/luoke/v1'
       }
     })
     expect(harness.requests.filter(({ method }) => method === 'members.create')).toHaveLength(1)

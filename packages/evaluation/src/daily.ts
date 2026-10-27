@@ -83,7 +83,7 @@ function runtimeVersions(runs: ObjectValue[]): ObjectValue {
   }
   return { population: 'selected_runs_in_export_not_only_new_runs', denominator: runs.length, unknownRuntime, unknownModel,
     groups: [...groups].sort(([a], [b]) => a.localeCompare(b)).map(([, value]) => value),
-    perRunRovaiBuild: 'unavailable' }
+    perRunCoaxiBuild: 'unavailable' }
 }
 
 function versionPreview(value?: ObjectValue | null): ObjectValue | null {
@@ -186,7 +186,7 @@ export async function runDaily(options: DailyOptions): Promise<{ directory: stri
       asOf: trace?.asOf ?? null, sourceDigest: point.sourceDigest, exporter: trace?.exporter ?? null,
       runtimeVersions: point.runtimeVersions ?? null,
       coverage, metrics: point.metrics, semanticAnalysis: { status: trace ? 'pending' : 'unavailable', completionRecord: 'analysis-status.json', policy: DAILY_ANALYSIS_POLICY },
-      limits: ['Run/tool success is not task success.', 'Origin is unknown beyond explicit exclusions.', 'Historical Rovai build per Run is unavailable.', 'Current states are as of export, not reconstructed midnight.', 'Memory counters await memory governance; unknown is not zero.']
+      limits: ['Run/tool success is not task success.', 'Origin is unknown beyond explicit exclusions.', 'Historical Coaxi build per Run is unavailable.', 'Current states are as of export, not reconstructed midnight.', 'Memory counters await memory governance; unknown is not zero.']
     }
     const changes = metricChanges(point, comparable)
     const previousVersions = comparable.at(-1)?.runtimeVersions ?? null

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 root="$GITHUB_WORKSPACE"
-role=codeg-ios
+role=coaxi-ios
 evidence="$FOUNDATION_CI_EVIDENCE"
 mkdir -p "$evidence"
 stage=toolchain
@@ -12,16 +12,16 @@ export DEVELOPER_DIR=/Applications/Xcode_26.6.app/Contents/Developer
 brew install xcodegen > "$evidence/xcodegen-install.log" 2>&1
 xcodegen --version >> "$evidence/toolchain.txt"
 mark passed
-cd "$RUNNER_TEMP/codeg-ios"
+cd "$RUNNER_TEMP/coaxi-ios"
 cp foundation-source.json "$evidence/source.json"
 stage=compile_simulator
 xcodegen generate > "$evidence/project.log" 2>&1
-xcodebuild -project CodegiOS.xcodeproj -scheme CodegiOS -configuration Debug -sdk iphonesimulator \
-  -destination 'generic/platform=iOS Simulator' -derivedDataPath "$RUNNER_TEMP/codeg-ios-derived" \
+xcodebuild -project CoaxiiOS.xcodeproj -scheme CoaxiiOS -configuration Debug -sdk iphonesimulator \
+  -destination 'generic/platform=iOS Simulator' -derivedDataPath "$RUNNER_TEMP/coaxi-ios-derived" \
   CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY= build > "$evidence/compile.log" 2>&1
-app="$RUNNER_TEMP/codeg-ios-derived/Build/Products/Debug-iphonesimulator/Codeg.app"
+app="$RUNNER_TEMP/coaxi-ios-derived/Build/Products/Debug-iphonesimulator/Coaxi.app"
 test -d "$app"
-ditto -c -k --sequesterRsrc --keepParent "$app" "$evidence/codeg-simulator.app.zip"
+ditto -c -k --sequesterRsrc --keepParent "$app" "$evidence/coaxi-simulator.app.zip"
 mark passed
 stage=simulator_launch
 xcrun simctl list devices available --json > "$evidence/simulators.json"
@@ -37,9 +37,9 @@ trap 'xcrun simctl shutdown "$udid" >/dev/null 2>&1 || true' EXIT
 xcrun simctl boot "$udid"
 xcrun simctl bootstatus "$udid" -b > "$evidence/boot.log" 2>&1
 xcrun simctl install "$udid" "$app"
-xcrun simctl launch "$udid" app.codeg.ios > "$evidence/launch.txt"
+xcrun simctl launch "$udid" app.coaxi.ios > "$evidence/launch.txt"
 sleep 5
 xcrun simctl spawn "$udid" launchctl list > "$evidence/processes.txt"
-grep -F app.codeg.ios "$evidence/processes.txt" > "$evidence/app-process.txt"
+grep -F app.coaxi.ios "$evidence/processes.txt" > "$evidence/app-process.txt"
 xcrun simctl io "$udid" screenshot "$evidence/startup.png"
 mark passed

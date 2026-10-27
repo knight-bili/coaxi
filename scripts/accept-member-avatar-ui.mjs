@@ -17,12 +17,12 @@ const root = resolve(import.meta.dirname, '..')
 const appPath = resolve(
   process.argv[2] ?? join(root, 'dist', 'mac-arm64', 'Coaxi.app')
 )
-const dataDir = process.env.ROVAI_MEMBER_AVATAR_ACCEPT_DATA_DIR
-  ?? await mkdtemp(join(tmpdir(), 'rovai-member-avatar-ui-accept-'))
-const outputDir = process.env.ROVAI_MEMBER_AVATAR_ACCEPT_OUTPUT_DIR
-  ?? await mkdtemp(join(tmpdir(), 'rovai-member-avatar-ui-captures-'))
-const firstPort = Number(process.env.ROVAI_MEMBER_AVATAR_ACCEPT_DEBUG_PORT ?? 9451)
-const databasePath = join(dataDir, 'rovai.sqlite')
+const dataDir = process.env.COAXI_MEMBER_AVATAR_ACCEPT_DATA_DIR
+  ?? await mkdtemp(join(tmpdir(), 'coaxi-member-avatar-ui-accept-'))
+const outputDir = process.env.COAXI_MEMBER_AVATAR_ACCEPT_OUTPUT_DIR
+  ?? await mkdtemp(join(tmpdir(), 'coaxi-member-avatar-ui-captures-'))
+const firstPort = Number(process.env.COAXI_MEMBER_AVATAR_ACCEPT_DEBUG_PORT ?? 9451)
+const databasePath = join(dataDir, 'coaxi.sqlite')
 const customDisplayName = '自定义像素伙伴'
 const acceptanceExecutablePath = '/usr/bin/true'
 const acceptanceExecutableFingerprint = `sha256:${createHash('sha256')
@@ -138,7 +138,7 @@ try {
   presetCopy = (await request(first.cdp, 'members.list'))
     .find((profile) => profile.displayName === '叮叮副本')
   assert(
-    presetCopy?.avatarRef === 'rovai://member-avatar/builtin/luoke/v1',
+    presetCopy?.avatarRef === 'coaxi://member-avatar/builtin/luoke/v1',
     `Independent built-in appearance save failed: ${JSON.stringify(presetCopy)}`
   )
   const canonicalLuoke = (await request(first.cdp, 'members.list'))
@@ -174,7 +174,7 @@ try {
   assert(
     upgradedQilu?.displayName === '小兔自定义'
       && upgradedQilu.presence === 'away'
-      && upgradedQilu.avatarRef === 'rovai://member-avatar/builtin/qilu/v1',
+      && upgradedQilu.avatarRef === 'coaxi://member-avatar/builtin/qilu/v1',
     `Migration v25 changed non-avatar Profile fields: ${JSON.stringify(upgradedQilu)}`
   )
   assert(
@@ -316,7 +316,7 @@ async function assertCanonicalSeedAvatars(cdp, context) {
   for (const [profileId, role] of [['agent_1', 'luoke'], ['agent_2', 'muwa'], ['agent_3', 'mianzhi'], ['agent_4', 'qilu']]) {
     const profile = profiles.find((candidate) => candidate.agentId === profileId)
     assert(
-      profile?.avatarRef === `rovai://member-avatar/builtin/${role}/v1`,
+      profile?.avatarRef === `coaxi://member-avatar/builtin/${role}/v1`,
       `${context} has an unexpected ${role} avatarRef: ${JSON.stringify(profile)}`
     )
   }
@@ -410,7 +410,7 @@ async function saveManagedAvatar(cdp, sourceColor, iconColor) {
         canvas.toBlob((value) => value ? resolve(value) : reject(new Error('PNG encode failed')), 'image/png'))
       return new Uint8Array(await blob.arrayBuffer())
     }
-    const summary = await window.rovai.memberAvatars.save({
+    const summary = await window.coaxi.memberAvatars.save({
       sourcePng: await png(512, ${JSON.stringify(sourceColor)}),
       iconPng: await png(192, ${JSON.stringify(iconColor)}),
       sourceWidth: 512,
@@ -541,7 +541,7 @@ async function openMembers(cdp) {
 async function reloadRenderer(cdp) {
   await cdp.send('Page.reload', { ignoreCache: true })
   await waitForExpression(cdp,
-    `Boolean(window.rovai && document.querySelector('.app-shell'))`, 45_000)
+    `Boolean(window.coaxi && document.querySelector('.app-shell'))`, 45_000)
   await waitForExpression(cdp,
     `Boolean(document.querySelector('.unified-sidebar button[aria-label="队员"]:not(:disabled)'))`,
     45_000)
@@ -710,7 +710,7 @@ async function assertPrivateAssetDirectory(directory) {
 async function request(cdp, method, params = {}) {
   return evaluate(
     cdp,
-    `window.rovai.request(${JSON.stringify(method)}, ${JSON.stringify(params)})`,
+    `window.coaxi.request(${JSON.stringify(method)}, ${JSON.stringify(params)})`,
     true
   )
 }
@@ -718,7 +718,7 @@ async function request(cdp, method, params = {}) {
 async function setTheme(cdp, preference) {
   await evaluate(
     cdp,
-    `window.rovai.appearance.setPreference(${JSON.stringify(preference)})`,
+    `window.coaxi.appearance.setPreference(${JSON.stringify(preference)})`,
     true
   )
   const expectedTheme = preference === 'night' ? 'night' : 'day'
@@ -750,7 +750,7 @@ async function launchApp(port, width, height) {
     mobile: false
   })
   await waitForExpression(cdp,
-    `Boolean(window.rovai && document.querySelector('.app-shell'))`, 45_000)
+    `Boolean(window.coaxi && document.querySelector('.app-shell'))`, 45_000)
   await waitForExpression(cdp,
     `Boolean(document.querySelector('.unified-sidebar button[aria-label="队员"]:not(:disabled)'))`,
     45_000)

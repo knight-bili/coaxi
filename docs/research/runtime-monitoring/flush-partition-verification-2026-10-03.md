@@ -17,7 +17,7 @@ Flush 只把已归一的字段加到 summary/hourly。Delta 临时 checkpoint �
 
 ## 回放结果
 
-[可执行 fixture](../../../crates/rovai-core/tests/fixtures/runtime-usage/flush-partitions.json)
+[可执行 fixture](../../../crates/coaxi-core/tests/fixtures/runtime-usage/flush-partitions.json)
 保存输入的原始数值字段、scope/counter mode/input semantics 和最终预期列。
 8 组、24 种 Flush 分区均经 `observe_run → normalize → buffer → SQLite → summary/hourly`：
 

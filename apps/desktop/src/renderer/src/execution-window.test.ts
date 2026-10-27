@@ -152,7 +152,7 @@ function delegationSource() {
   const primary: Evidence = { ...evidence(3), eventType: 'runtime.action', kind: 'tool_call',
     payload: { sourceAuthority: 'core', canonicalTool: 'delegation.start' }, canonical: canonical(3, true) }
   const support: Evidence = { ...evidence(1), eventType: 'activity.completed', kind: 'command',
-    payload: { executionWindowBuiltinOperation: 'delegation.start', item: { type: 'commandExecution', command: 'rovai delegation start --task fixture' } },
+    payload: { executionWindowBuiltinOperation: 'delegation.start', item: { type: 'commandExecution', command: 'coaxi delegation start --task fixture' } },
     canonical: canonical(1, false) }
   const item: AgentRunDelegationBlock = { ...block(primary), projectionVersion: 4, changeSequence: 5, supportingEvidence: [support] }
   const page: AgentRunDelegationBlockPage = { schemaVersion: 4, delegationBlocksVersion: 4, threadId: 'camp', agentRunId: 'run',

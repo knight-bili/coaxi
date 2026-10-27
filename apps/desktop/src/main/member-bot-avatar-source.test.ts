@@ -17,7 +17,7 @@ describe('controlled member Bot avatar source resolver', () => {
     const resolver = new ControlledMemberBotAvatarSourceResolver(managed, readBuiltin)
 
     await expect(resolver.resolve(
-      'rovai://member-avatar/builtin/luoke/v1'
+      'coaxi://member-avatar/builtin/luoke/v1'
     )).resolves.toEqual({
       pngBytes: PNG_192,
       width: 192,
@@ -39,7 +39,7 @@ describe('controlled member Bot avatar source resolver', () => {
       }))
     }
     const resolver = new ControlledMemberBotAvatarSourceResolver(managed, vi.fn())
-    const avatarRef = 'rovai://member-avatar/managed/2b945f3f-4b45-4ae5-92b2-739fce600338'
+    const avatarRef = 'coaxi://member-avatar/managed/2b945f3f-4b45-4ae5-92b2-739fce600338'
 
     await expect(resolver.resolve(avatarRef)).resolves.toEqual({
       pngBytes: bytes,
@@ -49,7 +49,7 @@ describe('controlled member Bot avatar source resolver', () => {
     expect(managed.read).toHaveBeenCalledWith(avatarRef, 'icon')
   })
 
-  it('uses the Rovai fallback only when the member has no avatar reference', async () => {
+  it('uses the Coaxi fallback only when the member has no avatar reference', async () => {
     const resolver = new ControlledMemberBotAvatarSourceResolver(
       { read: vi.fn() },
       vi.fn()
@@ -67,7 +67,7 @@ describe('controlled member Bot avatar source resolver', () => {
     )
 
     await expect(resolver.resolve(
-      'rovai://member-avatar/managed/2b945f3f-4b45-4ae5-92b2-739fce600338'
+      'coaxi://member-avatar/managed/2b945f3f-4b45-4ae5-92b2-739fce600338'
     )).rejects.toThrow('feishu_member_bot_avatar_unavailable')
   })
 
@@ -78,7 +78,7 @@ describe('controlled member Bot avatar source resolver', () => {
     )
 
     await expect(resolver.resolve(
-      'rovai://member-avatar/builtin/luoke/v1'
+      'coaxi://member-avatar/builtin/luoke/v1'
     )).rejects.toThrow('feishu_member_bot_avatar_unavailable')
   })
 })

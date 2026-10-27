@@ -138,8 +138,8 @@
       "human_reply": "确认，按私聊材料隔离 r1 实施",
       "governance": "docs/development/model-context-change-governance.md:49-56",
       "outputs": [
-        "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I03_私聊材料隔离_r1\\final\\I03_私聊材料怎么分开用_客户确认版_r1.docx",
-        "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I03_私聊材料隔离_r1\\final\\I03_私聊材料怎么分开用_客户确认版_r1.pdf"
+        "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\outputs\\I03_私聊材料隔离_r1\\final\\I03_私聊材料怎么分开用_客户确认版_r1.docx",
+        "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\outputs\\I03_私聊材料隔离_r1\\final\\I03_私聊材料怎么分开用_客户确认版_r1.pdf"
       ],
       "software_workaround": "r1已确认，按阶段批量验证规则继续本地实现；真实模型身份/预算与设备仍另补，不自动付费"
     },
@@ -153,12 +153,12 @@
       "evidence": "integration/execution/i04-delegation-proposal-result.json",
       "artifacts": [
         {
-          "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\I04_队员怎样叫来独立帮手_客户确认版_r1.docx",
+          "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\outputs\\I04_独立帮手_r1\\final\\I04_队员怎样叫来独立帮手_客户确认版_r1.docx",
           "bytes": 67619,
           "sha256": "b3a318110460df2c95fc7132f4f3a985f0e59c6e506161fa1b8ceee3d70c0192"
         },
         {
-          "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\I04_队员怎样叫来独立帮手_客户确认版_r1.pdf",
+          "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\outputs\\I04_独立帮手_r1\\final\\I04_队员怎样叫来独立帮手_客户确认版_r1.pdf",
           "bytes": 809962,
           "sha256": "79af957b4e2f3e2a77311b72093188289f193d1c36d49218d99e1d9cb2446340"
         }

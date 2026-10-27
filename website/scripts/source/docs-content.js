@@ -1,4 +1,4 @@
-// Bilingual, practical guides for the Rovai website.
+// Bilingual, practical guides for the Coaxi website.
 // Keep release-specific claims aligned with the published desktop packages.
 (() => {
   const steps = (en, zh, enItems, zhItems, image) => ({
@@ -29,7 +29,7 @@
 
   const topics = {
     installation: guide('Download and install', '下载与安装',
-      'Choose the package for your processor and install Rovai before setting up an Agent.',
+      'Choose the package for your processor and install Coaxi before setting up an Agent.',
       '先按系统与处理器选择安装包，安装后再配置智能体。',
       ['Open Download and choose the asset for macOS Apple Silicon, macOS Intel, or Windows x64.',
        'On macOS, open the DMG and drag Coaxi into Applications. On Windows, run the per-user installer.',
@@ -286,7 +286,7 @@
       'Reach a teammate through Feishu, Lark, or DingTalk while work runs on the connected host.',
       '通过飞书、Lark 或钉钉联系队员，执行仍在连接的主机上进行。',
       ['Open Settings → Channels and choose the provider that matches your organization.',
-       'Follow that provider’s account, app, and bot setup shown in Rovai. Configure a teammate bot and finish the provider’s publication step.',
+       'Follow that provider’s account, app, and bot setup shown in Coaxi. Configure a teammate bot and finish the provider’s publication step.',
        'Check that the bot is published and connected, then send a small test message in the intended external chat.'],
       ['打开“设置 → 渠道”，选择组织实际使用的飞书、Lark 或钉钉。',
        '按页面指引完成对应平台的账号、应用和 Bot 设置，为队员配置 Bot 并完成平台发布步骤。',
@@ -300,10 +300,10 @@
       '从浏览器访问同一工作台，应用和智能体仍在主机上运行。',
       ['On the host, open Settings → Remote connection and enable the service.',
        'Use the address shown there on another browser. Complete the sign-in step before opening a conversation.',
-       'Keep the host and Rovai running. For another network, first arrange a private network or HTTPS entry that can reach the host.'],
+       'Keep the host and Coaxi running. For another network, first arrange a private network or HTTPS entry that can reach the host.'],
       ['在主机上打开“设置 → 远程连接”并启用服务。',
        '在另一台设备的浏览器打开页面给出的地址，完成登录后进入会话。',
-       '保持主机与 Rovai 运行。跨网络访问前，先配置能到达主机的私有网络或 HTTPS 入口。'],
+       '保持主机与 Coaxi 运行。跨网络访问前，先配置能到达主机的私有网络或 HTTPS 入口。'],
       'Try opening an existing conversation and reading a reply. Project files and Agent execution remain on the host; a browser connection does not move them.',
       '尝试打开已有会话并查看回复。项目文件和智能体执行仍在主机上，浏览器连接不会把它们迁到访问设备。',
       'remote-en.png'),
@@ -358,5 +358,5 @@
       '缺失数据表示未知，不等于零。这里显示的成本也可能与服务商最终账单不同。')
   };
 
-  window.RovaiDocs = { groups, topics };
+  window.CoaxiDocs = { groups, topics };
 })();

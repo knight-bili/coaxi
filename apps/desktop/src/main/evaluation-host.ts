@@ -101,7 +101,7 @@ export class EvaluationHostService {
       if (this.#live.size) throw new Error('Wait for the active evaluation before changing its installation')
       const params = input(value, ['source', 'node'])
       const source = await realpath(absolute(params.source)), node = await realpath(absolute(params.node))
-      if (!['coaxi', 'codeg-rovai-workbench', 'rovai-ai'].includes(JSON.parse(await readFile(join(source, 'package.json'), 'utf8')).name)) throw new Error('Expected a Coaxi or compatible Rovai developer checkout')
+      if (!['coaxi', 'coaxi', 'coaxi'].includes(JSON.parse(await readFile(join(source, 'package.json'), 'utf8')).name)) throw new Error('Expected a Coaxi or compatible Coaxi developer checkout')
       if (!(await lstat(join(source, 'scripts/eval-host.mjs'))).isFile()) throw new Error('Evaluation Host entry is missing')
       const version = await exec(node, ['--version'], { timeout: 5000, maxBuffer: 1024 })
       if (!/^v(2[4-9]|[3-9]\d)\./.test(version.stdout.trim())) throw new Error('Evaluation requires Node >=24')
@@ -262,7 +262,7 @@ export class EvaluationHostService {
     await mkdir(jobDirectory, { mode: 0o700 })
     await this.#publish(job)
     const env: NodeJS.ProcessEnv = { ...process.env, PATH: `${dirname(engine.node)}${sep === '/' ? ':' : ';'}${process.env.PATH ?? ''}` }
-    delete env.ROVAI_APP_AUTOMATION_CONTEXT
+    delete env.COAXI_APP_AUTOMATION_CONTEXT
     const child = spawn(engine.node, [join(engine.source, 'scripts/eval-host.mjs'), '--job', join(jobDirectory, 'job.json'), '--parent', String(process.pid)], { cwd: engine.source, env, stdio: ['ignore', 'pipe', 'pipe', 'ipc'] })
     let log = ''
     child.stdout?.on('data', chunk => { log = (log + String(chunk)).slice(-65536) })

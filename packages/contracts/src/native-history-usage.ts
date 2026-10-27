@@ -1,4 +1,4 @@
-// Fixed Codeg aff1e6c source DTOs; native history statistics only.
+// Fixed Coaxi aff1e6c source DTOs; native history statistics only.
 export type TokenUsageBucket = "day" | "week" | "month"
 
 export interface TokenUsageFilter {

@@ -11,7 +11,7 @@ import {
 
 export const BENCHMARK_PROTOCOL_SCHEMA_VERSION = 3
 export const BENCHMARK_PROTOCOL_VERSION = '3.0.0'
-export const BENCHMARK_RUN_SCHEMA_ID = 'rovai.benchmark.run'
+export const BENCHMARK_RUN_SCHEMA_ID = 'coaxi.benchmark.run'
 export const BENCHMARK_RUNNER_VERSION = '0.53.0'
 
 const TOP_LEVEL_FIELDS = new Set([
@@ -78,7 +78,7 @@ export function createBenchmarkRunV3(input) {
 export function computeBenchmarkIntegrity(value) {
   const payload = withoutIntegrity(value)
   return {
-    canonicalization: 'rovai-canonical-json-v1',
+    canonicalization: 'coaxi-canonical-json-v1',
     contentIdentityDigest: digestJson(contentIdentityView(payload)),
     payloadDigest: digestJson(payload)
   }

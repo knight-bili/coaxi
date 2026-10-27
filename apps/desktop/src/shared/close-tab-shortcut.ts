@@ -1,8 +1,8 @@
 import type { IpcRenderer, WebContents } from 'electron'
-import { matchShortcutEvent } from './codeg-keyboard-shortcuts'
+import { matchShortcutEvent } from './coaxi-keyboard-shortcuts'
 
-const CLOSE_TAB_CHANNEL = 'rovai:close-tab-requested'
-const CLOSE_WINDOW_CHANNEL = 'rovai:close-window-shortcut'
+const CLOSE_TAB_CHANNEL = 'coaxi:close-tab-requested'
+const CLOSE_WINDOW_CHANNEL = 'coaxi:close-window-shortcut'
 
 export function installCloseTabShortcut(contents: WebContents, platform: NodeJS.Platform, closeWindow: () => void,configured?:()=>{binding:string;recording:boolean}): void {
   contents.on('before-input-event', (event, input) => {
@@ -13,7 +13,7 @@ export function installCloseTabShortcut(contents: WebContents, platform: NodeJS.
       const legacy=(platform==='darwin'?input.meta&&!input.control:input.control&&!input.meta)&&!input.alt&&!input.shift&&input.key.toLowerCase()==='w'
       if(!matched&&!legacy)return
       event.preventDefault();if(input.isAutoRepeat)return
-      if(matched)contents.send(CLOSE_TAB_CHANNEL);else contents.send('rovai:keyboard-input',fields)
+      if(matched)contents.send(CLOSE_TAB_CHANNEL);else contents.send('coaxi:keyboard-input',fields)
       return
     }
     if (input.type !== 'keyDown' || input.isComposing || input.alt || input.shift) return

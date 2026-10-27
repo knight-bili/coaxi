@@ -28,7 +28,10 @@ export async function validateV034AcceptanceRegistry({
         || entry.selector.length < 8) {
       throw new Error(`v0.34 acceptance registry entry is malformed: ${entry.id}`)
     }
-    const source = resolve(root, entry.source)
+    // The registry bytes are a retained historical input; resolve its renamed crate here.
+    const sourceName = entry.source === 'crates/rovai-core/src/team_tool.rs'
+      ? 'crates/coaxi-core/src/team_tool.rs' : entry.source
+    const source = resolve(root, sourceName)
     if (source !== root && !source.startsWith(`${root}${sep}`)) {
       throw new Error(`v0.34 acceptance source escapes the repository: ${entry.id}`)
     }

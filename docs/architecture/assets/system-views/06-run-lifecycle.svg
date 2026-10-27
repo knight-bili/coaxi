@@ -3,7 +3,7 @@
 <desc id="figure-description">咕咕的 A2A 请求经收件人 FIFO 队列、Dispatch Pump 与 Scheduler 进入执行。Runtime Fleet 取得兼容的 Warm Host 或冷启动 Host，绑定本轮 Lease，再准备会话和动态输入。执行结束后，静默且可复用的常驻 Host 回到 IdleWarm，后续 Run 重新 acquire；Native Session 按自身兼容条件接续。</desc>
 <rect width="1608" height="1880" fill="#fcfdfc"/>
 <g font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif" fill="#253c31">
-<text x="48" y="40" fill="#708078" font-size="12" font-weight="600" letter-spacing="2">ROVAI AI / ARCHITECTURE</text>
+<text x="48" y="40" fill="#708078" font-size="12" font-weight="600" letter-spacing="2">COAXI AI / ARCHITECTURE</text>
 <text x="1560" y="40" fill="#708078" font-size="13" text-anchor="end">图 06</text>
 <text x="48" y="94" font-size="34" font-weight="600">一次 AgentRun 的加载与执行</text>
 

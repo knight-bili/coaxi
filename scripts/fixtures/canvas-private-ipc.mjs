@@ -14,11 +14,11 @@ export function installCanvasPrivateIpc(ipcMain) {
   const register = ipcMain.handle, wrapped = new Set(), requests = [], faults = [], gates = []
   let conflict = null, lostSwap = null, upload = null, send = null
   ipcMain.handle = function (channel, handler) {
-    if (!['rovai:request', 'rovai:private-attachment-prepare'].includes(channel)) return register.call(this, channel, handler)
+    if (!['coaxi:request', 'coaxi:private-attachment-prepare'].includes(channel)) return register.call(this, channel, handler)
     wrapped.add(channel)
     return register.call(this, channel, async (event, ...args) => {
-      const method = channel === 'rovai:request' ? args[0] : channel
-      const params = channel === 'rovai:request' ? args[1] : args[0]
+      const method = channel === 'coaxi:request' ? args[0] : channel
+      const params = channel === 'coaxi:request' ? args[1] : args[0]
       const command = params?.command
       const entry = { method, commandId: params?.commandId ?? null,
         lookupCommandId: method === 'commands.reconcile' ? params?.params?.commandId ?? null : null,
@@ -45,15 +45,15 @@ export function installCanvasPrivateIpc(ipcMain) {
         faults.push({ kind: 'swap_not_dispatched', commandId: params.commandId })
         return lostReply
       }
-      const hold = upload && channel === 'rovai:private-attachment-prepare'
+      const hold = upload && channel === 'coaxi:private-attachment-prepare'
         && matches({ conversationId: params?.target?.conversationId, composerScope: params?.target?.composerScope }, upload)
       const gate = hold ? upload : null
       if (hold) upload = null
       const sendGate = send && method === 'singleChat.send' && matches(command, send) ? send : null
       if (sendGate) send = null
       const result = await handler(event, ...args)
-      entry.status = channel === 'rovai:request' ? result.value?.status ?? result.kind : result.state
-      entry.code = channel === 'rovai:request' ? result.value?.code ?? result.failure?.code ?? null : result.receipt?.code ?? null
+      entry.status = channel === 'coaxi:request' ? result.value?.status ?? result.kind : result.state
+      entry.code = channel === 'coaxi:request' ? result.value?.code ?? result.failure?.code ?? null : result.receipt?.code ?? null
       if (sendGate) {
         sendGate.observed = { params: structuredClone(params), result: structuredClone(result) }
         faults.push({ kind: 'held_send_reply', commandId: params.commandId })
@@ -75,7 +75,7 @@ export function installCanvasPrivateIpc(ipcMain) {
   return {
     finishRegistration() {
       ipcMain.handle = register
-      assert.ok(wrapped.has('rovai:request') && wrapped.has('rovai:private-attachment-prepare'))
+      assert.ok(wrapped.has('coaxi:request') && wrapped.has('coaxi:private-attachment-prepare'))
     },
     mark: () => requests.length,
     since: mark => structuredClone(requests.slice(mark)),

@@ -7,18 +7,18 @@ import { coreDataDirectoryArguments, removeEphemeralRuntimeCampFilesRoot } from 
 import { launchAcceptanceBrowser, pause } from './lib/host-web-browser.mjs'
 
 const root = resolve(import.meta.dirname, '..')
-const fixture = await realpath(await mkdtemp(join(tmpdir(), 'rovai-web-recovery-')))
+const fixture = await realpath(await mkdtemp(join(tmpdir(), 'coaxi-web-recovery-')))
 const data = join(fixture, 'data'), skills = join(fixture, 'skills')
-const output = resolve(process.env.ROVAI_RECOVERY_OUTPUT ?? join(fixture, 'evidence'))
+const output = resolve(process.env.COAXI_RECOVERY_OUTPUT ?? join(fixture, 'evidence'))
 await mkdir(skills); await mkdir(output, { recursive: true })
 console.log(JSON.stringify({ channel: 'automatic_acceptance', dataDir: data, skillLibraryRoot: skills, mcpConfigPath: join(data, 'mcp.json'), runtime: false }))
-const launch = () => launchHost(join(root, 'target/debug/rovai-host'), [...coreDataDirectoryArguments(data), '--skill-library-root', skills, '--mcp-config-path', join(data, 'mcp.json')], { cwd: fixture })
+const launch = () => launchHost(join(root, 'target/debug/coaxi-host'), [...coreDataDirectoryArguments(data), '--skill-library-root', skills, '--mcp-config-path', join(data, 'mcp.json')], { cwd: fixture })
 let host = launch()
 let browser, stage = 'startup'
 const ready = `document.querySelector('.unified-sidebar')!==null && document.querySelector('.web-login-overlay')===null`
 const composer = `document.querySelector('#camp-message')`
 const choose = name => `[...document.querySelectorAll('.camp-nav-open')].find(e=>e.title===${JSON.stringify(name)})`
-const session = `JSON.parse(sessionStorage.getItem('rovai.web.session.v1'))`
+const session = `JSON.parse(sessionStorage.getItem('coaxi.web.session.v1'))`
 const selected = name => `document.querySelector('.camp-nav-row.selected .camp-nav-open')?.title===${JSON.stringify(name)}`
 const reload = async () => {
   const previous = await browser.evaluate('performance.timeOrigin')
@@ -49,9 +49,9 @@ try {
   stage = 'unsaved composer reload'
   await browser.click(composer)
   await browser.send('Input.insertText', { text: 'Before autosave — 刷新仍保留' })
-  console.log('before reload', await browser.evaluate(`({text:${composer}.innerText,recovery:sessionStorage.getItem('rovai.web.edits.v1')!==null})`))
+  console.log('before reload', await browser.evaluate(`({text:${composer}.innerText,recovery:sessionStorage.getItem('coaxi.web.edits.v1')!==null})`))
   await reload()
-  console.log('after reload', await browser.evaluate(`({sameEditor:${session}.editor.clientId===${JSON.stringify(clientId)},recovery:sessionStorage.getItem('rovai.web.edits.v1')!==null})`))
+  console.log('after reload', await browser.evaluate(`({sameEditor:${session}.editor.clientId===${JSON.stringify(clientId)},recovery:sessionStorage.getItem('coaxi.web.edits.v1')!==null})`))
   await browser.wait(`${selected('Refresh A')} && ${composer}?.innerText.includes('刷新仍保留')`)
   assert.equal(await browser.evaluate(`${session}.editor.clientId`), clientId)
   assert.equal(await browser.evaluate(`document.body.innerText.includes('已连接 Host')`), false)
@@ -72,7 +72,7 @@ try {
   await browser.wait(`[...window.copiedTab.document.querySelectorAll('.camp-nav-open')].some(e=>e.title==='Refresh A')`)
   await browser.evaluate(`[...window.copiedTab.document.querySelectorAll('.camp-nav-open')].find(e=>e.title==='Refresh A').click();true`)
   await browser.wait(`window.copiedTab.document.querySelector('#camp-message')?.getAttribute('contenteditable')==='true'`)
-  assert.equal(await browser.evaluate(`JSON.parse(window.copiedTab.sessionStorage.getItem('rovai.web.session.v1')).editor.clientId !== ${session}.editor.clientId`), true)
+  assert.equal(await browser.evaluate(`JSON.parse(window.copiedTab.sessionStorage.getItem('coaxi.web.session.v1')).editor.clientId !== ${session}.editor.clientId`), true)
   assert.equal(await browser.evaluate(`window.copiedTab.document.querySelector('#camp-message').innerText.trim()`), '')
   assert.equal(await browser.evaluate(`${composer}.innerText.includes('刷新仍保留')`), true)
   await browser.evaluate(`(()=>{window.copiedTab.document.querySelector('#camp-message').focus();window.copiedTab.document.execCommand('insertText',false,'独立标签页草稿');return true})()`)
@@ -87,7 +87,7 @@ try {
   await reload(); await browser.wait(`${selected('Refresh A')} && ${composer}?.innerText.includes('刷新仍保留')`)
   assert.equal(await browser.evaluate(`${session}.editor.clientId`), clientId)
   assert.equal((await host.request('host.web.status')).enabled, true)
-  assert.equal(await browser.evaluate(`(()=>{const s=${session},auth=JSON.parse(sessionStorage.getItem('rovai.web.auth.v1'));return Object.values(localStorage).some(value=>value.includes(auth.token)||value.includes(s.editor.proof))})()`), false)
+  assert.equal(await browser.evaluate(`(()=>{const s=${session},auth=JSON.parse(sessionStorage.getItem('coaxi.web.auth.v1'));return Object.values(localStorage).some(value=>value.includes(auth.token)||value.includes(s.editor.proof))})()`), false)
   await browser.evaluate(`document.documentElement.dataset.theme='night'`)
   await browser.capture(join(output, 'web-recovery-night.png'))
   assert.deepEqual(browser.errors, [])
@@ -98,7 +98,7 @@ try {
   assert.equal(expired.status, 401)
   assert.equal((await expired.json()).error.code, 'login_ticket_invalid')
   stage = 'normal Host restart'
-  const bearer = await browser.evaluate(`JSON.parse(sessionStorage.getItem('rovai.web.auth.v1')).token`)
+  const bearer = await browser.evaluate(`JSON.parse(sessionStorage.getItem('coaxi.web.auth.v1')).token`)
   const longToken = web.administratorToken
   const listen = web.listen
   await host.request('core.shutdown', { protocolVersion: 3, deadlineMs: 10000 })
@@ -108,7 +108,7 @@ try {
   assert.equal(web.administratorToken, longToken)
   await reload()
   await browser.wait(`${selected('Refresh A')} && ${composer}?.innerText.includes('刷新仍保留')`)
-  assert.equal(await browser.evaluate(`JSON.parse(sessionStorage.getItem('rovai.web.auth.v1')).token`), bearer)
+  assert.equal(await browser.evaluate(`JSON.parse(sessionStorage.getItem('coaxi.web.auth.v1')).token`), bearer)
   assert.equal(await browser.evaluate(`${session}.editor.clientId`), clientId)
   stage = 'browser process reopen with persisted ordinary Session'
   await browser.close()

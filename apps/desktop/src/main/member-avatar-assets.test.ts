@@ -81,7 +81,7 @@ describe('managed member avatar asset service', () => {
       crop: { centerX: 0.5, centerY: 0.5, size: 0.75 }
     })
     expect(summary.avatarRef).toMatch(
-      /^rovai:\/\/member-avatar\/managed\/[0-9a-f-]{36}$/
+      /^coaxi:\/\/member-avatar\/managed\/[0-9a-f-]{36}$/
     )
 
     const icon = await service.read(summary.avatarRef, 'icon')
@@ -127,7 +127,7 @@ describe('managed member avatar asset service', () => {
     expect(await service.read('file:///tmp/avatar.png', 'icon')).toBeNull()
     expect(
       await service.read(
-        'rovai://member-avatar/managed/../../outside',
+        'coaxi://member-avatar/managed/../../outside',
         'portrait'
       )
     ).toBeNull()
@@ -184,7 +184,7 @@ describe('managed member avatar asset service', () => {
 })
 
 async function temporaryDirectory(): Promise<string> {
-  const directory = join(tmpdir(), `rovai-member-avatar-test-${randomUUID()}`)
+  const directory = join(tmpdir(), `coaxi-member-avatar-test-${randomUUID()}`)
   await mkdir(directory, { recursive: true })
   temporaryDirectories.push(directory)
   return directory

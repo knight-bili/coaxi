@@ -15,7 +15,7 @@ const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="720" height="360"><r
 const encoded = btoa(String.fromCharCode(...new TextEncoder().encode(svg)))
 let scenarioRuntimeResult: { mediaType: string; data: string } | null | 'throw' = { mediaType: 'image/svg+xml', data: encoded }
 let scenarioAttachmentResult: { mediaType: string; data: string } | null | 'throw' = { mediaType: 'image/svg+xml', data: encoded }
-Object.assign(window, { rovai: {
+Object.assign(window, { coaxi: {
   platform: 'darwin',
   request: async (method: string, params: { imageId: string }) => {
     calls.push({ method, params })
@@ -110,7 +110,7 @@ Object.assign(window, { imageGalleryTest: {
   }),
   showRuntimeResults: (results: { displayName: string; mediaType: string; data: string }[]) => {
     const sequence = ++realResultSequence
-    window.rovai.request = async (_method: string, params: { imageId: string }) => results[Number(params.imageId)]
+    window.coaxi.request = async (_method: string, params: { imageId: string }) => results[Number(params.imageId)]
     root.render(<main style={{ maxWidth: 880, margin: '32px auto', padding: '0 24px' }}>
       <ImageGallery key={sequence} images={results.map((result, index) => ({
         kind: 'runtime', threadId: `runtime-acceptance-${sequence}`, image: {

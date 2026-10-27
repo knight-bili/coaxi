@@ -7,11 +7,11 @@ import { setTimeout as pause } from 'node:timers/promises'
 
 // 只用实际Core命令、事件投影和原组件。ACP为隔离的固定本地协议进程，不连接模型服务。
 export async function qualifyCanvasSourceUi(window, { evaluate, wait, rpc, openCanvasBoard, config, report, record }) {
-  for (const [name, expected] of [['ROVAI_QWEN_BIN', config.controlled_launcher], ['ROVAI_ACCEPTANCE_SCRIPT', config.controlled_script]]) {
+  for (const [name, expected] of [['COAXI_QWEN_BIN', config.controlled_launcher], ['COAXI_ACCEPTANCE_SCRIPT', config.controlled_script]]) {
     assert.equal(process.env[name], expected.path)
     assert.equal(createHash('sha256').update(await readFile(expected.path)).digest('hex'), expected.sha256)
   }
-  assert.equal(process.env.ROVAI_SKILL_RECOVERY_CAPTURE, config.runtime_capture)
+  assert.equal(process.env.COAXI_SKILL_RECOVERY_CAPTURE, config.runtime_capture)
   assert.equal(createHash('sha256').update(await readFile(new URL(config.runtime_configure_module))).digest('hex'), config.runtime_configure_sha256)
   const mcp = await rpc('mcp.config.get')
   assert.ok(mcp.exists && !mcp.permissionIssue && mcp.fileIssue == null); assert.deepEqual(mcp.servers, [])
@@ -63,7 +63,7 @@ export async function qualifyCanvasSourceUi(window, { evaluate, wait, rpc, openC
     report.summary.states.push({ label, projected, flags, through: page.throughGlobalSequence }); await checkpoint()
   }
   const sendHeld = async c => {
-    const before = await view(c), body = 'ROVAI_SKILL_RECOVERY_HELD_INPUT R09 摘要 ' + randomUUID()
+    const before = await view(c), body = 'COAXI_SKILL_RECOVERY_HELD_INPUT R09 摘要 ' + randomUUID()
     const result = c.conversationId ? await rpc('singleChat.send', { commandId: randomUUID(), command: { threadId: c.threadId, conversationId: c.conversationId, body, draftRevision: before.draft.revision } }) : await rpc('thread.messages.send', { commandId: randomUUID(), threadId: c.threadId, content: { version: 2, segments: [{ kind: 'text', text: body }] }, sourceAttachments: [], quotes: [], replyToThreadMessageId: null, execution: { taskId: null, purpose: '固定本地摘要工程验证', completionRole: 'required' } })
     assert.equal((result.commandResult ?? result).status, 'accepted', JSON.stringify(result))
     const after = await until(async () => { const v = await view(c); const runs = activeRuns(v).filter(run => !before.agentRuns.some(old => old.id === run.id)); return runs.length === 1 && runs[0].status === 'running' ? runs[0] : false })
@@ -93,10 +93,10 @@ export async function qualifyCanvasSourceUi(window, { evaluate, wait, rpc, openC
     for (const c of contexts.slice(0, 3)) await wait(`document.querySelector('${node(c)} .canvas-summary-kind')?.textContent.includes('最近：fixture-model')`)
     report.summary.models = await evaluate(`${JSON.stringify(contexts.map(c => node(c)))}.map(s=>({label:document.querySelector(s+' .canvas-summary-kind')?.textContent,title:document.querySelector(s+' .canvas-summary-kind')?.title}))`)
     record('actual_frozen_run_model_stays_distinct_from_changed_current_configuration_and_private_without_run_has_no_foreign_history')
-    const preference = await evaluate('window.rovai.appearance.get()')
+    const preference = await evaluate('window.coaxi.appearance.get()')
     try {
       for (const [theme, size, zoom] of [['day', [1440, 920], 100], ['night', [1040, 702], 83], ['day', [1040, 702], 120]]) {
-        await evaluate(`window.rovai.appearance.setPreference(${JSON.stringify(theme)})`); await wait(`document.documentElement.dataset.theme===${JSON.stringify(theme)}`); window.setContentSize(...size)
+        await evaluate(`window.coaxi.appearance.setPreference(${JSON.stringify(theme)})`); await wait(`document.documentElement.dataset.theme===${JSON.stringify(theme)}`); window.setContentSize(...size)
         const zoomButton = '.canvas-viewport-panel button[aria-label="恢复到 100%"]'; await click(zoomButton); await pause(200)
         if (zoom !== 100) await click(`.canvas-viewport-panel button[aria-label="${zoom > 100 ? '放大画布' : '缩小画布'}"]`)
         await wait(`document.querySelector('.canvas-zoom-readout')?.textContent===${JSON.stringify(zoom+'%')}`)
@@ -105,7 +105,7 @@ export async function qualifyCanvasSourceUi(window, { evaluate, wait, rpc, openC
         report.summary.visuals.push(metrics); await checkpoint(); assert.equal(metrics.outerX, 0); assert.equal(metrics.outerY, 0); assert.ok(metrics.cards.every(c => c.clamp === '4'))
         const path = join(config.evidence, `summary-${theme}-${zoom}.png`); await writeFile(path, (await window.webContents.capturePage()).toPNG()); (report.screenshots ??= []).push(path)
       }
-    } finally { await evaluate(`window.rovai.appearance.setPreference(${JSON.stringify(preference.preference)})`) }
+    } finally { await evaluate(`window.coaxi.appearance.setPreference(${JSON.stringify(preference.preference)})`) }
     record('original_four_line_long_title_and_metadata_keep_local_canvas_layout_across_day_night_small_window_and_original_83_120_zoom_steps')
     window.setContentSize(1440, 920); await click('.canvas-dock-panel button[aria-label="查看全部"]'); await pause(450)
     await click(`${node(contexts[0])} button[aria-label="展开对话"]`)

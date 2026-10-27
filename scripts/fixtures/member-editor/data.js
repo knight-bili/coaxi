@@ -163,7 +163,7 @@ const camp = (id, title, projectBindingKind = 'project') => ({
   title,
   activationState: 'active',
   projectBindingKind,
-  projectPath: '/Users/demo/Projects/rovai-ai',
+  projectPath: '/Users/demo/Projects/coaxi',
   defaultLead: null,
   marker: 'idle',
   lastActivityAt: time,
@@ -177,8 +177,8 @@ export const navigation = {
   projects: [
     {
       projectKey: 'prototype-project',
-      name: 'rovai-ai',
-      projectPath: '/Users/demo/Projects/rovai-ai',
+      name: 'coaxi',
+      projectPath: '/Users/demo/Projects/coaxi',
       lastActivityAt: time,
       lastActivityGlobalSequence: 1,
       totalCount: 3,

@@ -24,7 +24,7 @@ export type CanvasWorkspaceProps = Omit<CanvasSurfaceProps, 'boardId' | 'scope' 
 }
 const NO_BOARDS: CanvasBoard[] = []
 
-// Codeg canvas-board-list.tsx BoardCard: silhouette, compact copy, count, edit time and a separate menu.
+// Coaxi canvas-board-list.tsx BoardCard: silhouette, compact copy, count, edit time and a separate menu.
 function BoardCard({ board, summary, name, now, blocked, onOpen, onEdit, onDelete }: {
   board: CanvasBoard; summary?: CanvasBoardSummary; name: string; now: number; blocked: boolean
   onOpen(): void; onEdit(): void; onDelete(): void
@@ -204,7 +204,7 @@ function CanvasWorkspaceContent({ scope, identityIssue, onRetryIdentity, onLeave
   const selectBoard = (id: string) => { void transition(() => { setSelectedId(id); setShowBoards(false); setIssue(null) }, id !== selectedId || showBoards) }
   const boardName = (board: CanvasBoard) => board.name || uiAttribute('未命名画布')
   const visibleBoards = boards.filter(board => `${boardName(board)}\n${board.description ?? ''}`.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()))
-  // Codeg canvas-page / canvas-board-list, adapted to the existing Core controller and leave transaction.
+  // Coaxi canvas-page / canvas-board-list, adapted to the existing Core controller and leave transaction.
   return <section className="canvas-workspace" aria-label={uiAttribute('画板工作区')}>
     <header className="canvas-boards-toolbar">
       <button className="canvas-breadcrumb-root" type="button" disabled={blocked} onClick={() => { void transition(() => setShowBoards(true)) }}><MapIcon size={16} /><UiText zh="无限画布" /></button>

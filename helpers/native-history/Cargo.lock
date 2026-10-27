@@ -229,6 +229,32 @@ dependencies = [
 ]
 
 [[package]]
+name = "coaxi-native-history"
+version = "1.0.0"
+dependencies = [
+ "anyhow",
+ "base64",
+ "chrono",
+ "dirs",
+ "percent-encoding",
+ "prost",
+ "regex",
+ "rusqlite",
+ "sea-orm",
+ "serde",
+ "serde_json",
+ "sha2",
+ "thiserror",
+ "tokio",
+ "toml",
+ "tracing",
+ "urlencoding",
+ "uuid",
+ "walkdir",
+ "zstd",
+]
+
+[[package]]
 name = "const-oid"
 version = "0.9.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1400,32 +1426,6 @@ dependencies = [
  "libc",
  "untrusted",
  "windows-sys 0.52.0",
-]
-
-[[package]]
-name = "rovai-native-history"
-version = "1.0.0"
-dependencies = [
- "anyhow",
- "base64",
- "chrono",
- "dirs",
- "percent-encoding",
- "prost",
- "regex",
- "rusqlite",
- "sea-orm",
- "serde",
- "serde_json",
- "sha2",
- "thiserror",
- "tokio",
- "toml",
- "tracing",
- "urlencoding",
- "uuid",
- "walkdir",
- "zstd",
 ]
 
 [[package]]

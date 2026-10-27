@@ -1,0 +1,58 @@
+package app.coaxi.android.feature.main
+
+import androidx.compose.ui.res.stringResource
+import app.coaxi.android.R
+
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import app.coaxi.android.core.designsystem.component.GlassRow
+import app.coaxi.android.core.designsystem.theme.CoaxiTheme
+import app.coaxi.android.core.network.CoaxiOperation
+import kotlinx.coroutines.*
+import kotlinx.serialization.json.*
+import java.util.UUID
+
+/** Mission writing plane with original Core fields; one atomic command owns all chosen files. */
+@Composable fun CoaxiMissionCreator(model:CoaxiWorkspaceViewModel,onClose:()->Unit){
+    val state=model.state.collectAsState().value;val scope=rememberCoroutineScope();val generation=model.connectionGeneration;val owner="mission-create-draft"
+    var name by remember{mutableStateOf("")};var description by remember{mutableStateOf("")};var path by remember{mutableStateOf("")};var tags by remember{mutableStateOf("")}
+    var ids by remember{mutableStateOf<Set<String>>(emptySet())};var mentions by remember{mutableStateOf<Set<String>>(emptySet())};var lead by remember{mutableStateOf("")};var sources by remember{mutableStateOf<List<JsonObject>>(emptyList())}
+    var descriptionContent by remember{mutableStateOf(JsonArray(listOf(buildJsonObject{put("kind","text");put("text","")})))}
+    var commandId by remember{mutableStateOf<String?>(null)};var ready by remember{mutableStateOf(false)};var preparing by remember{mutableStateOf(false)};var issue by remember{mutableStateOf<String?>(null)}
+    val locked=!ready||preparing||state.busy||state.pending!=null
+    fun document()=buildJsonObject{put("version",1);put("name",name);put("description",description);put("structuredDescription",descriptionContent);put("path",path);put("tags",tags);put("ids",JsonArray(ids.sorted().map(::JsonPrimitive)));put("mentions",JsonArray(mentions.sorted().map(::JsonPrimitive)));put("lead",lead);put("sources",JsonArray(sources));put("commandId",commandId?.let(::JsonPrimitive)?:JsonNull)}.toString()
+    fun rememberDraft(){if(ready)model.rememberBody(owner,document())}
+    fun close(){if(preparing)return;val result=model.state.value.lastResult.coreObject();if(model.state.value.lastInputOwner==owner&&result.coreText("commandId")==commandId&&result.coreText("status")in listOf("applied","accepted")){onClose();return};val frozen=document();scope.launch{try{if(ready)model.saveBody(owner,frozen);onClose()}catch(error:Exception){issue=error.message}}}
+    val picker=rememberLauncherForActivityResult(ActivityResultContracts.OpenMultipleDocuments()){uris->if(uris.isNotEmpty()&&!locked){if(uris.size+sources.size>10)issue="使命最多保留10份附件"else{preparing=true;val original=sources;scope.launch{val added=mutableListOf<JsonObject>();try{for(uri in uris){added+=model.prepareMissionFile(uri);require(generation==model.connectionGeneration){"工作区已切换"}};sources=original+added;model.saveBody(owner,document())}catch(cancelled:CancellationException){added.forEach{model.removeMissionFile(it)};throw cancelled}catch(error:Exception){added.forEach{model.removeMissionFile(it)};sources=original;issue=error.message}finally{preparing=false}}}}}
+    LaunchedEffect(generation){try{val raw=model.readBody(owner);if(raw.isNotBlank()){val value=Json.parseToJsonElement(raw).coreObject();require(value.coreLong("version")==1L){"原使命草稿格式无法读取，原记录保留"};name=value.coreText("name");description=value.coreText("description");path=value.coreText("path");tags=value.coreText("tags");ids=(value["ids"]as?JsonArray)?.mapNotNull{(it as?JsonPrimitive)?.contentOrNull}?.toSet().orEmpty();mentions=(value["mentions"]as?JsonArray)?.mapNotNull{(it as?JsonPrimitive)?.contentOrNull}?.toSet().orEmpty();lead=value.coreText("lead");sources=value["sources"].coreArray();commandId=(value["commandId"]as?JsonPrimitive)?.contentOrNull;descriptionContent=(value["structuredDescription"]as?JsonArray)?:JsonArray(buildList{add(buildJsonObject{put("kind","text");put("text",description)});mentions.sorted().forEach{id->add(buildJsonObject{put("kind","text");put("text","\n")});add(buildJsonObject{put("kind","member_mention");put("agentId",id)})}})};ready=true}catch(cancelled:CancellationException){throw cancelled}catch(error:Exception){issue=error.message}}
+    LaunchedEffect(state.lastResult){val result=state.lastResult.coreObject();if(state.lastCompletedOperation==CoaxiOperation.MISSIONS_CREATE.wire&&state.lastInputOwner==owner&&result.coreText("commandId")==commandId){if(result.coreText("status")in listOf("applied","accepted")){onClose()}else if(result.coreText("status")=="rejected"){commandId=null;issue=result.coreText("code");rememberDraft()}}}
+    val members=state.members.filter{it.coreText("presence")=="present"};val available=members.map{it.coreText("agentId")}.toSet()
+    val parsedTags=tags.split(Regex("[,，\\n]")).map(String::trim).filter(String::isNotEmpty).distinct()
+    val valid=name.isNotBlank()&&name.codePointCount(0,name.length)<=200&&description.codePointCount(0,description.length)<=12000&&ids.isNotEmpty()&&lead in ids&&ids.all{it in available}&&mentions.all{it in ids}&&parsedTags.size<=30&&parsedTags.all{it.codePointCount(0,it.length)<=24}
+    Dialog(onDismissRequest={close()},properties=DialogProperties(usePlatformDefaultWidth=false,dismissOnBackPress=!preparing,dismissOnClickOutside=false)){Surface(Modifier.fillMaxSize(),color=CoaxiTheme.colors.bgElevated){Column(Modifier.fillMaxSize()){
+        Row(Modifier.fillMaxWidth().padding(12.dp)){Text(stringResource(R.string.coaxi_fusion_b4675bdfbf24074a),Modifier.weight(1f),style=MaterialTheme.typography.titleMedium);TextButton(enabled=!preparing,onClick={close()}){Text(stringResource(R.string.coaxi_fusion_6deb10821f4a69df))}}
+        LazyColumn(Modifier.weight(1f),contentPadding=PaddingValues(16.dp),verticalArrangement=Arrangement.spacedBy(12.dp)){
+            item{issue?.let{Text(it,color=CoaxiTheme.colors.danger)};if(state.pending!=null)Text(stringResource(R.string.coaxi_fusion_b5e3f26719c5946d),color=CoaxiTheme.colors.textSecondary)}
+            item{OutlinedTextField(name,{name=it;rememberDraft()},Modifier.fillMaxWidth(),label={Text(stringResource(R.string.coaxi_fusion_d44e9b3d3b31d37b))},enabled=!locked,singleLine=true);CoaxiMissionDescriptionInput(descriptionContent,state.members,locked){content->descriptionContent=content;description=missionDescriptionDisplay(content,state.members);mentions=missionDescriptionMemberIds(content);ids=ids+mentions;if(lead !in ids)lead=ids.sorted().firstOrNull().orEmpty();rememberDraft()};OutlinedTextField(tags,{tags=it;rememberDraft()},Modifier.fillMaxWidth(),label={Text(stringResource(R.string.coaxi_fusion_d4ed5f32246247d7))},enabled=!locked)}
+            item{CoaxiMissionTemplatePicker(model,locked,ids.size,sources.map{source->source["intent"].coreObject().coreText("commandId") to source["intent"].coreObject().coreText("displayName")},onChooseMaterials={picker.launch(arrayOf("*/*"))}){title,body->name=title;description=body;descriptionContent=JsonArray(listOf(buildJsonObject{put("kind","text");put("text",body)}));mentions=emptySet();rememberDraft()}}
+            item{Text(stringResource(R.string.coaxi_fusion_3db7b06b5f6de0e0),style=MaterialTheme.typography.titleSmall);TextButton(enabled=!locked,onClick={path="";rememberDraft()}){Text(if(path.isEmpty())"✓ 快速对话" else "快速对话")}}
+            items(state.navigation["projects"].coreArray(),key={it.coreText("projectPath")}){project->TextButton(enabled=!locked,onClick={path=project.coreText("projectPath");rememberDraft()}){Text((if(path==project.coreText("projectPath"))"✓ " else "")+project.coreText("name"))}}
+            if(path.isNotEmpty()&&state.navigation["projects"].coreArray().none{it.coreText("projectPath")==path})item{Text(stringResource(R.string.coaxi_fusion_4360b13e7e8c5bc0),color=CoaxiTheme.colors.danger)}
+            item{Text(stringResource(R.string.coaxi_fusion_eec1f8f154144e4f),style=MaterialTheme.typography.titleSmall)}
+            items(members,key={it.coreText("agentId")}){member->val id=member.coreText("agentId");GlassRow{Row{Checkbox(id in ids,{selected->if(selected)ids=ids+id else{ids=ids-id;mentions=mentions-id;descriptionContent=JsonArray(descriptionContent.filter{it.coreObject().coreText("kind")!="member_mention"||it.coreObject().coreText("agentId")!=id});description=missionDescriptionDisplay(descriptionContent,state.members)};if(lead !in ids)lead=ids.firstOrNull().orEmpty();rememberDraft()},enabled=!locked);Text(member.coreText("displayName"),Modifier.weight(1f));TextButton(enabled=!locked&&id in ids,onClick={lead=id;rememberDraft()}){Text(if(lead==id)"负责人" else "设为负责人")}}}}
+            (ids-available).forEach{id->item{Row{Text(stringResource(R.string.coaxi_fusion_1f6f058d030f244e),Modifier.weight(1f),color=CoaxiTheme.colors.danger);TextButton(enabled=!locked,onClick={ids=ids-id;mentions=mentions-id;descriptionContent=JsonArray(descriptionContent.filter{it.coreObject().coreText("kind")!="member_mention"||it.coreObject().coreText("agentId")!=id});description=missionDescriptionDisplay(descriptionContent,state.members);if(lead==id)lead=ids.firstOrNull().orEmpty();rememberDraft()}){Text(stringResource(R.string.coaxi_fusion_6135d4159e892541))}}}}
+            item{Row{Text("附件 · ${sources.size}/10",Modifier.weight(1f),style=MaterialTheme.typography.titleSmall);TextButton(enabled=!locked&&sources.size<10,onClick={picker.launch(arrayOf("*/*"))}){Text(if(preparing)"正在保存…" else "添加附件")}}}
+            items(sources,key={it["intent"].coreObject().coreText("commandId")}){source->Row{Text(source["intent"].coreObject().coreText("displayName"),Modifier.weight(1f));TextButton(enabled=!locked,onClick={scope.launch{try{val original=sources;sources=sources.filter{it!=source};try{model.saveBody(owner,document())}catch(error:Exception){sources=original;throw error};model.removeMissionFile(source)}catch(error:Exception){issue=error.message}}}){Text(stringResource(R.string.coaxi_fusion_6135d4159e892541))}}}
+        }
+        Button(enabled=!locked&&valid,modifier=Modifier.fillMaxWidth().padding(12.dp),onClick={val id=commandId?:UUID.randomUUID().toString();commandId=id;val command=buildJsonObject{put("title",name.trim());put("description",description);put("descriptionContent",descriptionContent);put("projectPath",path);put("projectBindingKind",if(path.isEmpty())"quick_chat" else "directory");put("memberAgentIds",JsonArray(ids.sorted().map(::JsonPrimitive)));put("defaultLeadAgentId",lead);put("tags",JsonArray(parsedTags.map(::JsonPrimitive)))};val saved=document();scope.launch{try{model.saveBody(owner,saved);require(generation==model.connectionGeneration);model.executeMissionBatch(CoaxiOperation.MISSIONS_CREATE,id,command,emptyList(),sources,owner,saved)}catch(error:Exception){issue=error.message}}}){Text(stringResource(R.string.coaxi_fusion_61dc1cd95f0b74a7))}
+    }}}
+}

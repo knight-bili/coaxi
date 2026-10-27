@@ -9,12 +9,12 @@ const roots: string[] = [], services: FilePreviewService[] = []
 afterEach(async () => {
   await Promise.all(services.splice(0).map(service => service.closeAll()))
   for (const root of roots.splice(0)) {
-    if (!isAbsolute(root) || resolve(root) !== root || !root.startsWith(join(tmpdir(), 'rovai-native-reference-'))) throw new Error('unexpected test cleanup path')
+    if (!isAbsolute(root) || resolve(root) !== root || !root.startsWith(join(tmpdir(), 'coaxi-native-reference-'))) throw new Error('unexpected test cleanup path')
     await rm(root, { recursive: true, force: true })
   }
 })
 async function fixture() {
-  const root = await mkdtemp(join(tmpdir(), 'rovai-native-reference-')); roots.push(root)
+  const root = await mkdtemp(join(tmpdir(), 'coaxi-native-reference-')); roots.push(root)
   await mkdir(join(root, 'src')); await writeFile(join(root, 'src/a.ts'), 'first\nsecond\n')
   let active = true
   const authority: FilePreviewSourceAuthority = { async resolve(request) {
@@ -61,7 +61,7 @@ describe('native reader root relative presentation', () => {
     expect(native.openPath).not.toHaveBeenCalled(); expect(service.handleCount).toBe(0)
   })
   it('rejects outside directories and symlink escapes without offering a new root or launching a bundle', async () => {
-    const { root, service, native, request } = await fixture(), outside = await mkdtemp(join(tmpdir(), 'rovai-native-reference-')); roots.push(outside)
+    const { root, service, native, request } = await fixture(), outside = await mkdtemp(join(tmpdir(), 'coaxi-native-reference-')); roots.push(outside)
     await symlink(outside, join(root, 'escape.app'), 'junction')
     for (const raw of ['..', outside, 'escape.app']) expect(await service.nativeReference(1, { source: request(raw), action: 'reveal' })).toMatchObject({ ok: false, error: { code: 'outside_authorized_root' } })
     await mkdir(join(root, 'contained.app'))

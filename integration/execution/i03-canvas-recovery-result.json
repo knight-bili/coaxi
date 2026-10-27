@@ -86,7 +86,7 @@
     }
   ],
   "implementation": [
-    "CanvasConversationRecovery按Host/Owner+Core+Board保存规范卡片上下文；只保存精确引用，drawer位置和ACP/Runtime存活不恢复。没有正文、私有证明或执行token；旧本项目scoped expandedCards只经过有效图映射，未分后端的原Codeg key不采用。",
+    "CanvasConversationRecovery按Host/Owner+Core+Board保存规范卡片上下文；只保存精确引用，drawer位置和ACP/Runtime存活不恢复。没有正文、私有证明或执行token；旧本项目scoped expandedCards只经过有效图映射，未分后端的原Coaxi key不采用。",
     "实际hook/Controller/CanvasSurface/CanvasWorkspace已接：等待完整有效图后匹配节点和引用，核对Core dataDir，私有引用先读原Conversation；每Thread首次恢复refresh、镜像共享owner。失败/换绑/缺失/结束私聊保留原记录，不创建替代，不enter或启动Runtime。",
     "suspend切页/切板保留展开意图，明确收起才删除该上下文；quota失败保留内存、读取失败或未来格式拒绝覆盖。恢复显示实际完成数量、可停止与显式重试，取消后迟到结果受代次限制。",
     "编辑画板/分组对话框返回和后续导航失败可请求恢复已存展开及草稿；App quit后续检查失败也请求resume。现阶段会卸载/重建编辑器，不宣称原撤销栈及整个离开事务已保留。",
@@ -210,83 +210,83 @@
     },
     "artifacts": [
       {
-        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\canvas-recovery-owners-initial.log",
+        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\canvas-recovery-owners-initial.log",
         "sha256": "2dd8558a2f05f97ed8c87856b50a9d0d211d9141bbbabb0f30ee06df766e0c8b"
       },
       {
-        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\canvas-recovery-owners-second.log",
+        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\canvas-recovery-owners-second.log",
         "sha256": "28999d3a40acf6b71a7f7843226cfb11ba3edda7e3c6599380c92ea9aa375648"
       },
       {
-        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\canvas-recovery-owners-final.log",
+        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\canvas-recovery-owners-final.log",
         "sha256": "b848ed8f6e0f95c0f0dc27fb6d22d2081c9f97fc85739631fe047fd533c96e39"
       },
       {
-        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\canvas-recovery-types-initial.log",
+        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\canvas-recovery-types-initial.log",
         "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
       },
       {
-        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\canvas-recovery-types-final.log",
+        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\canvas-recovery-types-final.log",
         "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
       },
       {
-        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\canvas-recovery-copy.log",
+        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\canvas-recovery-copy.log",
         "sha256": "10c82e5a4aa35363d76038119db88cea051e5981de74196e29cc4184dc5ed078"
       },
       {
-        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\canvas-recovery-diff.log",
+        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\canvas-recovery-diff.log",
         "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
       },
       {
-        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\canvas-recovery-doc-version.log",
+        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\canvas-recovery-doc-version.log",
         "sha256": "01dbc9daf44dff0600954e17b82ec917ad4998a3eb5eefa32505c4ca15a8552d"
       },
       {
-        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\canvas-recovery-doc-decisions.log",
+        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\canvas-recovery-doc-decisions.log",
         "sha256": "d58168f462b9dd5bd281a72af820169f9a7e92d02aa34b1c51c5aef9e29aa77e"
       },
       {
-        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\canvas-recovery-doc-policy.log",
+        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\canvas-recovery-doc-policy.log",
         "sha256": "62ddb4d35b69151ca3b6adc5ab36630125f2415ac09c6800e00bba0ed9eeaf63"
       },
       {
-        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\canvas-recovery-source-proof.json",
+        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\canvas-recovery-source-proof.json",
         "sha256": "18869550e6684efbb1ee2d4231ae3851e90d30257451d42b2ddcfd5bcaa84e32"
       },
       {
-        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\canvas-recovery-source-proof.log",
+        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\canvas-recovery-source-proof.log",
         "sha256": "7a8c559638e7e129791d381e1ba08c93ef5008a985d7cee45e04de1d14b011c8"
       },
       {
-        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\canvas-recovery-source-proof-initial.log",
+        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\canvas-recovery-source-proof-initial.log",
         "sha256": "ab9ed7e031fb48791d953a5e8b692ac240d92749dfac17620d342b54930821cb"
       },
       {
-        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\canvas-recovery-browser-witness.json",
+        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\canvas-recovery-browser-witness.json",
         "sha256": "f3398265864ceeecedc475c6a16bbafa4aae8ee0934cca4399e7c95c5c71b961"
       },
       {
-        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\canvas-recovery-browser-witness-initial-mode.json",
+        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\canvas-recovery-browser-witness-initial-mode.json",
         "sha256": "878554f4597cb53f860d184f479622e4cc03a6b42cd9d680f5dee0e4cb6ffee4"
       },
       {
-        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\canvas-recovery-browser-initial-errors.json",
+        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\canvas-recovery-browser-initial-errors.json",
         "sha256": "b12d63802a6c8c3f6ba302ae1aa8f8cbf5b8f4ebac275295e817c00a6c86bd14"
       },
       {
-        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\canvas-recovery-restored.jpg",
+        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\canvas-recovery-restored.jpg",
         "sha256": "ce9a179c4c2055aa84e7f96a2379aa40c87e72bd6d11dfd1527144f4abcb065c"
       },
       {
-        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\canvas-recovery-fixture\\entry.tsx",
+        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\canvas-recovery-fixture\\entry.tsx",
         "sha256": "caec41c91ef2cc845064d2dfd44e55a91898274a316a0cb931cf861227923459"
       },
       {
-        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\canvas-recovery-fixture\\server.mjs",
+        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\canvas-recovery-fixture\\server.mjs",
         "sha256": "ce6844156e124a74d461a196c5b7a9667dd0845fc4012fed59d7e3f076602fda"
       },
       {
-        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\canvas-recovery-fixture\\index.html",
+        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i03\\canvas-recovery-fixture\\index.html",
         "sha256": "23f89bab590317547eb4c96ff607b4fd2728ba27ea1c10e403d25d081205e2fb"
       }
     ]

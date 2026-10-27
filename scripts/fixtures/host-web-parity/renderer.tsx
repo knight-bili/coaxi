@@ -26,7 +26,7 @@ document.documentElement.dataset.theme = theme
 document.documentElement.dataset.platform = 'darwin'
 const model = createReviewModel(surface, scenario)
 if (scenario === 'continuation') Object.assign(window, { continuationFixture: model })
-const selectedWorkspace: WorkspaceSelection = { projectPath: workspacePath, name: 'rovai-workspace' }
+const selectedWorkspace: WorkspaceSelection = { projectPath: workspacePath, name: 'coaxi-workspace' }
 
 function FileScenario() {
   const preview = useFilePreview()
@@ -72,11 +72,11 @@ function Review() {
   const outsideScope = (path: string) => model.note(`${path} 未纳入本次可点击稿，请对照差异表；没有伪造成功。`)
 
   useEffect(() => {
-    parent.postMessage({ type: 'rovai-parity-status', surface, note: state.note, offline: state.offline }, '*')
+    parent.postMessage({ type: 'coaxi-parity-status', surface, note: state.note, offline: state.offline }, '*')
   }, [state.note, state.offline])
   useEffect(() => {
     const receive = (event: MessageEvent) => {
-      if (event.source !== parent || event.data?.type !== 'rovai-parity-offline') return
+      if (event.source !== parent || event.data?.type !== 'coaxi-parity-offline') return
       model.setOffline(event.data.offline === true)
     }
     window.addEventListener('message', receive)
@@ -97,11 +97,11 @@ function Review() {
         onThread={() => setView('camp')} onRemoveProject={async () => outsideScope('移除项目')}
         onDelete={async () => outsideScope('删除 Camp')} onRename={async (_, title) => model.rename(title)}
         onError={error => model.note(String(error))} />
-      {view === 'camp' && <AppHeader threadTitle={state.snapshot.thread.title} contextLabel="rovai-workspace"
+      {view === 'camp' && <AppHeader threadTitle={state.snapshot.thread.title} contextLabel="coaxi-workspace"
         thread={state.snapshot} detailEntryHostRef={setDetailHost} onBack={mobile ? () => outsideScope('返回列表') : undefined}
         onFocusApprovals={() => document.querySelector<HTMLElement>('.approval-dock')?.scrollIntoView({ block: 'nearest' })} />}
       <main className={`content ${view === 'camp' ? 'task-content camp-content' : 'members-content'}`}>
-        {view === 'camp' ? <ThreadWorkspace key={state.snapshot.thread.id} snapshot={state.snapshot} projectName="rovai-workspace"
+        {view === 'camp' ? <ThreadWorkspace key={state.snapshot.thread.id} snapshot={state.snapshot} projectName="coaxi-workspace"
           openCoverage={openCoverage}
           agents={state.agents} installations={installations as AdapterInstallation[]} initialComposerDraft={state.draft}
           busy={state.busy} onSend={model.send} onChangeLead={async () => outsideScope('更换默认负责人')}
@@ -129,7 +129,7 @@ function Review() {
         <AppDialogContent className="app-dialog">
           <AppDialogHeader description="固定示例目录，不访问本机文件系统。" title={surface === 'web' ? '选择允许的工作区' : '本机目录选择 · 模拟'} />
           <AppDialogBody><p>{surface === 'web' ? '此处模拟 Host 已授权的目录清单，不接受浏览器提交任意本机路径。' : '本稿用固定选项替代操作系统目录选择窗口。'}</p>
-            <button className="quiet-button" onClick={() => { workspaceResolver?.(selectedWorkspace); setWorkspace(selectedWorkspace); setWorkspaceResolver(null) }}>rovai-workspace · {workspacePath}</button>
+            <button className="quiet-button" onClick={() => { workspaceResolver?.(selectedWorkspace); setWorkspace(selectedWorkspace); setWorkspaceResolver(null) }}>coaxi-workspace · {workspacePath}</button>
           </AppDialogBody>
           <AppDialogFooter><button className="quiet-button" onClick={() => { workspaceResolver?.(null); setWorkspaceResolver(null) }}>取消</button></AppDialogFooter>
         </AppDialogContent>

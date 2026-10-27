@@ -1,11 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1608" height="1521" viewBox="0 0 1608 1521" role="img" aria-labelledby="figure-title figure-description">
-<title id="figure-title">Rovai AI 技术栈架构</title>
+<title id="figure-title">Coaxi AI 技术栈架构</title>
 <desc id="figure-description">React Renderer、Electron Main、Rust Core、Native Agent Runtime 与本地存储分层协作；图中标注前端依赖、进程协议、原生 Runtime 适配、构建验证与发布工具。</desc>
 <rect width="1608" height="1521" fill="#fcfdfc"/>
 <g font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif" fill="#253c31">
-<text x="48" y="40" fill="#708078" font-size="12" font-weight="600" letter-spacing="2">ROVAI AI / ARCHITECTURE</text>
+<text x="48" y="40" fill="#708078" font-size="12" font-weight="600" letter-spacing="2">COAXI AI / ARCHITECTURE</text>
 <text x="1560" y="40" fill="#708078" font-size="13" text-anchor="end">图 11</text>
-<text x="48" y="94" font-size="34" font-weight="600">Rovai AI 技术栈架构</text>
+<text x="48" y="94" font-size="34" font-weight="600">Coaxi AI 技术栈架构</text>
 
 <path d="M48 111 H1560" stroke="#dce5df" stroke-width="1"/>
 </g>

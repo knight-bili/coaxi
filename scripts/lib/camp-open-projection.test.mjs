@@ -32,7 +32,7 @@ test('image menus copy full image pixels, save original bytes and work in the li
 
 async function runFixture(t, mode = '--camp-open') {
   if (!admitElectronIntegrationTest(t)) return
-  const fixture = await mkdtemp(join(tmpdir(), 'rovai-camp-open-projection-test-'))
+  const fixture = await mkdtemp(join(tmpdir(), 'coaxi-camp-open-projection-test-'))
   let child
   let closed
   try {
@@ -48,7 +48,7 @@ async function runFixture(t, mode = '--camp-open') {
       join(fixtureSource, 'main.cjs'), join(fixture, 'renderer/index.html'), join(fixture, 'user-data'),
       mode,
       ...(process.platform === 'linux'
-        || process.env.ROVAI_CAMP_OPEN_ACCEPT_NO_SANDBOX === '1'
+        || process.env.COAXI_CAMP_OPEN_ACCEPT_NO_SANDBOX === '1'
         ? ['--no-sandbox']
         : [])
     ], { env: environment, stdio: ['ignore', 'pipe', 'pipe'] })
@@ -70,7 +70,7 @@ async function runFixture(t, mode = '--camp-open') {
       child.kill('SIGKILL')
       await closed
     }
-    if (process.env.ROVAI_KEEP_CAMP_OPEN_FIXTURE === '1') {
+    if (process.env.COAXI_KEEP_CAMP_OPEN_FIXTURE === '1') {
       process.stdout.write(`CampOpen fixture: ${fixture}\n`)
     } else {
       await rm(fixture, { recursive: true, force: true })

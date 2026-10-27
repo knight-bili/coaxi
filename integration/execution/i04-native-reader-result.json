@@ -66,7 +66,7 @@
       {
         "kind": "source",
         "filter": "runtime_subagent_session::source::tests::lineage_sources_keep_exact_rollouts_and_lossless_stable_chunks",
-        "binary": "D:\\soft\\codex\\build-cache\\codeg-rovai\\debug\\deps\\rovai_core-b5007fee303b1e92.exe",
+        "binary": "D:\\soft\\codex\\build-cache\\coaxi-coaxi\\debug\\deps\\coaxi_core-b5007fee303b1e92.exe",
         "compile_log": "combined-compile-02.log",
         "listed": 1,
         "exit": 0,
@@ -78,7 +78,7 @@
       {
         "kind": "web-projection",
         "filter": "operations::tests::public_projection_excludes_mcp_credentials_and_desktop_mutation_actions",
-        "binary": "D:\\soft\\codex\\build-cache\\codeg-rovai\\debug\\deps\\rovai_web-499056e2e2023954.exe",
+        "binary": "D:\\soft\\codex\\build-cache\\coaxi-coaxi\\debug\\deps\\coaxi_web-499056e2e2023954.exe",
         "compile_log": "combined-compile-02.log",
         "listed": 1,
         "exit": 0,
@@ -120,7 +120,7 @@
     "No compile/test failure. First successful source revision was superseded after self-review found non-durable fallback time. Pre-time-fix source hashes and both old pass logs are preserved; final compile02/owners02 prove current Rust."
   ],
   "remaining": [
-    "Implement fixed Codeg original readonly viewer and controller on these four methods; preserve nesting, refresh, hidden/close behavior, read position and source style.",
+    "Implement fixed Coaxi original readonly viewer and controller on these four methods; preserve nesting, refresh, hidden/close behavior, read position and source style.",
     "Run actual Core/Native/Web/Host and original-app same-scene checks together at the integrated candidate; do not infer them from method lists or controlled worker tests.",
     "Retain Claude full parser/producer/Core association, Qoder independent sources, explicit legacy-origin import, Grok r1 feedback/handoff and all other I04 packages/84 formal cases."
   ],
@@ -134,166 +134,166 @@
   ],
   "fixed_donors": [
     {
-      "name": "codeg",
+      "name": "coaxi",
       "commit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
       "license": "Apache-2.0"
     },
     {
-      "name": "rovai-ai",
+      "name": "coaxi",
       "commit": "cc465dda562536b94f23787759e3206324baa29e",
       "license": "MIT"
     }
   ],
   "source_files": [
     {
-      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\main\\index.ts",
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\apps\\desktop\\src\\main\\index.ts",
       "bytes": 105705,
       "sha256": "ee88ff90130e6d42d3acf1285846117c112079da71c37e989ca01340cb4a104b",
       "repo_path": "apps/desktop/src/main/index.ts",
       "git_blob": "b118aea6566f259e016984898ac24f0337a53bc3"
     },
     {
-      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\main\\runtime-core-methods.test.ts",
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\apps\\desktop\\src\\main\\runtime-core-methods.test.ts",
       "bytes": 3743,
       "sha256": "d4375a8af94db73cb2de60641de44038a164eafb9378756e8cbd7662e6c88c47",
       "repo_path": "apps/desktop/src/main/runtime-core-methods.test.ts",
       "git_blob": "c86f1df70b7cb882c03454e7e76437e93304e993"
     },
     {
-      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\web\\src\\client.test.ts",
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\apps\\web\\src\\client.test.ts",
       "bytes": 50249,
       "sha256": "b60e4fc56fabfe3065f39b53e0af5dd1d7dc7be096dcc6640926291567393d2c",
       "repo_path": "apps/web/src/client.test.ts",
       "git_blob": "bd701cbfc66fc4e3c596cd93adb9260b07d55a63"
     },
     {
-      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\web\\src\\client.ts",
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\apps\\web\\src\\client.ts",
       "bytes": 51710,
       "sha256": "b1171c32af7ca4224f4299b4be591beb9745d675c0b6589f129e2f3c5cfc1389",
       "repo_path": "apps/web/src/client.ts",
       "git_blob": "8f003ac1d3be066bd77bc927748960e1667751b3"
     },
     {
-      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\crates\\rovai-core\\src\\application.rs",
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\crates\\coaxi-core\\src\\application.rs",
       "bytes": 1417572,
       "sha256": "988fbffd9e258982e25dd2aacc9996fcc1bfcf6abea9988b497da56e46ac5035",
-      "repo_path": "crates/rovai-core/src/application.rs",
+      "repo_path": "crates/coaxi-core/src/application.rs",
       "git_blob": "ee793927b2a2ba5d7072ea121522402fcb48d703"
     },
     {
-      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\crates\\rovai-core\\src\\application\\native_child_reads.rs",
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\crates\\coaxi-core\\src\\application\\native_child_reads.rs",
       "bytes": 3999,
       "sha256": "e8d633316ea831964a346a16e39ec5f6f0b28b81c4d963f74e8f7b9fb96b5985",
-      "repo_path": "crates/rovai-core/src/application/native_child_reads.rs",
+      "repo_path": "crates/coaxi-core/src/application/native_child_reads.rs",
       "git_blob": "6c147c975b389a59630946ad866f4e0b3a387297"
     },
     {
-      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\crates\\rovai-core\\src\\runtime_subagent_session.rs",
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\crates\\coaxi-core\\src\\runtime_subagent_session.rs",
       "bytes": 13379,
       "sha256": "5e624c549fa7bc1d3fd10471d766859701e26dda2b197890246b51883a9144d2",
-      "repo_path": "crates/rovai-core/src/runtime_subagent_session.rs",
+      "repo_path": "crates/coaxi-core/src/runtime_subagent_session.rs",
       "git_blob": "d207cf58d4172bded9a34e5227b508c25ad9d4f8"
     },
     {
-      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\crates\\rovai-core\\src\\runtime_subagent_session\\reader.rs",
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\crates\\coaxi-core\\src\\runtime_subagent_session\\reader.rs",
       "bytes": 13809,
       "sha256": "c271d7ec995646443a89c9fc8d5d6f9d93db746c9eb023cd7409a21134c20dd2",
-      "repo_path": "crates/rovai-core/src/runtime_subagent_session/reader.rs",
+      "repo_path": "crates/coaxi-core/src/runtime_subagent_session/reader.rs",
       "git_blob": "60f311a45796b2b18328503e48a847ef1d1c41f4"
     },
     {
-      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\crates\\rovai-core\\src\\runtime_subagent_session\\reader_tests.rs",
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\crates\\coaxi-core\\src\\runtime_subagent_session\\reader_tests.rs",
       "bytes": 13908,
       "sha256": "b0b67b1ffe63b9c5945902eeb456d2404d145d671fc01a7f08bd24a0f60f95b6",
-      "repo_path": "crates/rovai-core/src/runtime_subagent_session/reader_tests.rs",
+      "repo_path": "crates/coaxi-core/src/runtime_subagent_session/reader_tests.rs",
       "git_blob": "00a66030f7ecb3a68e96758bc13e86f8436c0778"
     },
     {
-      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\crates\\rovai-core\\src\\runtime_subagent_session\\snapshot.rs",
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\crates\\coaxi-core\\src\\runtime_subagent_session\\snapshot.rs",
       "bytes": 12336,
       "sha256": "f6ae619a9953b0e284c5e4340caca088939ef1ef014f06bcbe0c11fe33f976e8",
-      "repo_path": "crates/rovai-core/src/runtime_subagent_session/snapshot.rs",
+      "repo_path": "crates/coaxi-core/src/runtime_subagent_session/snapshot.rs",
       "git_blob": "9f512680b97bad3a5fccb96b5e1b8befc01882d0"
     },
     {
-      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\crates\\rovai-core\\src\\runtime_subagent_session\\source\\snapshot_tests.rs",
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\crates\\coaxi-core\\src\\runtime_subagent_session\\source\\snapshot_tests.rs",
       "bytes": 4801,
       "sha256": "6419776d6c8d751452c18c49439a5c38d1f4cefb3e7b14c5308f70a520c58126",
-      "repo_path": "crates/rovai-core/src/runtime_subagent_session/source/snapshot_tests.rs",
+      "repo_path": "crates/coaxi-core/src/runtime_subagent_session/source/snapshot_tests.rs",
       "git_blob": "6399feeb58d0bfc45129f92e27553fa50f0a159c"
     },
     {
-      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\crates\\rovai-web\\src\\operations.rs",
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\crates\\coaxi-web\\src\\operations.rs",
       "bytes": 43708,
       "sha256": "159bc2f0b1f7b3f25765c97ea4ac9f6fc41140b4733036102db864617c440add",
-      "repo_path": "crates/rovai-web/src/operations.rs",
+      "repo_path": "crates/coaxi-web/src/operations.rs",
       "git_blob": "89210ff8ced1e679bdc2a77658e3a95680dbc054"
     },
     {
-      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\docs\\architecture\\delegation.md",
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\docs\\architecture\\delegation.md",
       "bytes": 12214,
       "sha256": "d5ed600c8f6923ecbb93a2a75e9eabee640d4fc7b22429b769f38364cb35359f",
       "repo_path": "docs/architecture/delegation.md",
       "git_blob": "36063868b3fefa91a3989a204c89287790618734"
     },
     {
-      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\docs\\contracts\\delegation-v1.md",
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\docs\\contracts\\delegation-v1.md",
       "bytes": 54889,
       "sha256": "dd800d525fefa7fe21844945597a919a260eee00c2dcb9dd7b81545e26608c52",
       "repo_path": "docs/contracts/delegation-v1.md",
       "git_blob": "d071c069db87fac611226278256b19d559cbe9c2"
     },
     {
-      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\docs\\development\\testing.md",
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\docs\\development\\testing.md",
       "bytes": 254960,
       "sha256": "342a8dc01013aac6e9df5abfdb487fef509b16bd41bd4c3a9aab4ca2026fad68",
       "repo_path": "docs/development/testing.md",
       "git_blob": "db0ab903fecb3eb0c36e802920f10c4963371dac"
     },
     {
-      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\docs\\versions\\v1.73\\README.md",
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\docs\\versions\\v1.73\\README.md",
       "bytes": 12722,
       "sha256": "8bd27934b8059e56639d548f1219541f8a3274af92d47693095553121724578d",
       "repo_path": "docs/versions/v1.73/README.md",
       "git_blob": "72ef2185fe1ee85e240b6d3d4c905024ad2ab71a"
     },
     {
-      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\docs\\versions\\v1.73\\implementation-plan.md",
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\docs\\versions\\v1.73\\implementation-plan.md",
       "bytes": 28661,
       "sha256": "7d263a8ed899777294de56c9efa16216354caabf707304a12c842bdca0fc4ec8",
       "repo_path": "docs/versions/v1.73/implementation-plan.md",
       "git_blob": "743e2f1d73b340fbd46491c31dc3bb93eece08d2"
     },
     {
-      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\README.md",
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\integration\\README.md",
       "bytes": 17199,
       "sha256": "d71b9a7d435365af2d41d69eac2525eed090d524735f75ba33ac3ef538c71e7f",
       "repo_path": "integration/README.md",
       "git_blob": "adccbe884c1e7e36295c13fe9bf968d1dadc5de2"
     },
     {
-      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\execution\\goal-state.json",
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\integration\\execution\\goal-state.json",
       "bytes": 21677,
       "sha256": "c7c9cccce664e6789338178533e881c441c816f6fb77f2e559204b95c883f4a1",
       "repo_path": "integration/execution/goal-state.json",
       "git_blob": "117f695fcb6dbcd3be08faee23d20d686aca899e"
     },
     {
-      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\inventory\\native-subagent-viewer-reference.md",
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\integration\\inventory\\native-subagent-viewer-reference.md",
       "bytes": 12173,
       "sha256": "8b642b1d075b6d788361981bf5ee2ae2c0a37e3b366132415aea720694cb4c1f",
       "repo_path": "integration/inventory/native-subagent-viewer-reference.md",
       "git_blob": "1796e9e045208e1f81948bd885e786acb7ca0d88"
     },
     {
-      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\packages\\contracts\\src\\index.ts",
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\packages\\contracts\\src\\index.ts",
       "bytes": 152787,
       "sha256": "2e6f5cb1dca025b721b8d832750e4ab5b65b013ee9a00c12d340761dc6828d1b",
       "repo_path": "packages/contracts/src/index.ts",
       "git_blob": "a620027be3143d79c7e528c3ea629dd8c1a5471d"
     },
     {
-      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\packages\\contracts\\src\\native-child-reads.ts",
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\packages\\contracts\\src\\native-child-reads.ts",
       "bytes": 1062,
       "sha256": "e5878820183445197a17abfb7c95200fd1566f2867e965bc09b10ab1ca3e0f7b",
       "repo_path": "packages/contracts/src/native-child-reads.ts",
@@ -302,195 +302,195 @@
   ],
   "artifacts": [
     {
-      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生会话后台读取\\logs\\codegraph-sync.log",
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\file\\I04原生会话后台读取\\logs\\codegraph-sync.log",
       "bytes": 88,
       "sha256": "4b5e6457c82b34383f70240f2de6ba2c4356069cd254d5755442097468fb99ef"
     },
     {
-      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生会话后台读取\\logs\\combined-compile-01.log",
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\file\\I04原生会话后台读取\\logs\\combined-compile-01.log",
       "bytes": 8549,
       "sha256": "979eb06e75f4c8f12763a0cf7f45de34c6e1b1d140947f35a7f0145892c47ddf"
     },
     {
-      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生会话后台读取\\logs\\combined-compile-02.log",
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\file\\I04原生会话后台读取\\logs\\combined-compile-02.log",
       "bytes": 5857,
       "sha256": "d7366402adc5637960e92f184966175e833e723d9f73b08d380f2cf5368ba5a2"
     },
     {
-      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生会话后台读取\\logs\\diff-check.log",
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\file\\I04原生会话后台读取\\logs\\diff-check.log",
       "bytes": 103,
       "sha256": "afba22755ea132062b918a7e330c42c4b1a2018f69682d0de942eef3c507db1e"
     },
     {
-      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生会话后台读取\\logs\\docs-base.log",
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\file\\I04原生会话后台读取\\logs\\docs-base.log",
       "bytes": 170,
       "sha256": "bd57f1c3a9c4155f59e96b05b1d0fc29d3306585b8defa7e026134bc90302c0a"
     },
     {
-      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生会话后台读取\\logs\\docs-checks.json",
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\file\\I04原生会话后台读取\\logs\\docs-checks.json",
       "bytes": 275,
       "sha256": "a2ffeb32ca5c9902f1e2c4c097b3d2e4c7f34e716d14380fb50e144e197823e4"
     },
     {
-      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生会话后台读取\\logs\\docs-tests.log",
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\file\\I04原生会话后台读取\\logs\\docs-tests.log",
       "bytes": 922,
       "sha256": "a658a189071d720d41e03ca9a1af1bb8a157cb339954acf2dc2cad2ff8cb69f8"
     },
     {
-      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生会话后台读取\\logs\\docs-version.log",
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\file\\I04原生会话后台读取\\logs\\docs-version.log",
       "bytes": 79,
       "sha256": "18aa44bf0cc0d653a3fc97fcc383a104185a97ec97dc4060f0a3b6270bc8d335"
     },
     {
-      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生会话后台读取\\logs\\pre-time-fix-source.json",
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\file\\I04原生会话后台读取\\logs\\pre-time-fix-source.json",
       "bytes": 692,
       "sha256": "5e122556cca58cb2842dcc4361b60025f4f482e04f6cc91d210ce8f52e97365e"
     },
     {
-      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生会话后台读取\\logs\\rust-results-01.json",
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\file\\I04原生会话后台读取\\logs\\rust-results-01.json",
       "bytes": 836,
       "sha256": "fc5ba79e4bcd187ebffeaafb5b296e007bd2b31ac68ebc8b62502d7d23d4c5a0"
     },
     {
-      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生会话后台读取\\logs\\rust-results-02.json",
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\file\\I04原生会话后台读取\\logs\\rust-results-02.json",
       "bytes": 836,
       "sha256": "78e1f6c1b9a52accea561deb01ad11026a89023347157dcabb6b3e8da9e07168"
     },
     {
-      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生会话后台读取\\logs\\rustfmt.log",
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\file\\I04原生会话后台读取\\logs\\rustfmt.log",
       "bytes": 0,
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     {
-      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生会话后台读取\\logs\\source-01.log",
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\file\\I04原生会话后台读取\\logs\\source-01.log",
       "bytes": 236,
       "sha256": "85deae339dcd533cda8fd41210feba33c5ee78147791bea8c2ae016f82ca5555"
     },
     {
-      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生会话后台读取\\logs\\source-02.log",
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\file\\I04原生会话后台读取\\logs\\source-02.log",
       "bytes": 236,
       "sha256": "670ec25bcef1e4b7629092387a0dbbc4eecd5d8d6fb5c161f0138911ffadc76e"
     },
     {
-      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生会话后台读取\\logs\\source-list-01.log",
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\file\\I04原生会话后台读取\\logs\\source-list-01.log",
       "bytes": 135,
       "sha256": "b526a13549a40c0288fb51d06ed416244e04f8abe79716b3dc5cba37754d3b89"
     },
     {
-      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生会话后台读取\\logs\\source-list-02.log",
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\file\\I04原生会话后台读取\\logs\\source-list-02.log",
       "bytes": 135,
       "sha256": "b526a13549a40c0288fb51d06ed416244e04f8abe79716b3dc5cba37754d3b89"
     },
     {
-      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生会话后台读取\\logs\\space-checkpoints.jsonl",
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\file\\I04原生会话后台读取\\logs\\space-checkpoints.jsonl",
       "bytes": 445,
       "sha256": "d8a3f41a4654de1d4d04a06ddc9693de9603d11570a339688d6c56cd432128c8"
     },
     {
-      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生会话后台读取\\logs\\transport-vitest.log",
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\file\\I04原生会话后台读取\\logs\\transport-vitest.log",
       "bytes": 274,
       "sha256": "dd8fc2a8f9e45cd368c3aee2cbfbef4247abe7997f373193ce312a94f88fd998"
     },
     {
-      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生会话后台读取\\logs\\typecheck-result.json",
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\file\\I04原生会话后台读取\\logs\\typecheck-result.json",
       "bytes": 1842,
       "sha256": "4753ceabb87d33b779efa948dbc2cc744082edffb283975b81fe271f03755620"
     },
     {
-      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生会话后台读取\\logs\\typecheck.log",
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\file\\I04原生会话后台读取\\logs\\typecheck.log",
       "bytes": 0,
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     {
-      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生会话后台读取\\logs\\web-projection-01.log",
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\file\\I04原生会话后台读取\\logs\\web-projection-01.log",
       "bytes": 222,
       "sha256": "1ff7eab8d1d03957113c01363ffee903dab3bc75ed5abbe21f9e39a4edbb44cc"
     },
     {
-      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生会话后台读取\\logs\\web-projection-02.log",
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\file\\I04原生会话后台读取\\logs\\web-projection-02.log",
       "bytes": 222,
       "sha256": "1ff7eab8d1d03957113c01363ffee903dab3bc75ed5abbe21f9e39a4edbb44cc"
     },
     {
-      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生会话后台读取\\logs\\web-projection-list-01.log",
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\file\\I04原生会话后台读取\\logs\\web-projection-list-01.log",
       "bytes": 122,
       "sha256": "12b33d7dff39abc5e17f62036d4b5b6b5a59cb87114540e8e20bf9fc0b079ddd"
     },
     {
-      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生会话后台读取\\logs\\web-projection-list-02.log",
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\file\\I04原生会话后台读取\\logs\\web-projection-list-02.log",
       "bytes": 122,
       "sha256": "12b33d7dff39abc5e17f62036d4b5b6b5a59cb87114540e8e20bf9fc0b079ddd"
     },
     {
-      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生会话后台读取\\compile.ps1",
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\file\\I04原生会话后台读取\\compile.ps1",
       "bytes": 1594,
       "sha256": "d053ff4b3895b89c70ff5ac9af6980d84ee5ffb91dabc5274f6559a68b52bdaa"
     },
     {
-      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生会话后台读取\\check-rust.ps1",
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\file\\I04原生会话后台读取\\check-rust.ps1",
       "bytes": 3291,
       "sha256": "5091fa81e045f9ddb5d19c07859b6645c8342c19e328e7d57e9dbc989ebb9385"
     },
     {
-      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生会话后台读取\\verify-docs.ps1",
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\file\\I04原生会话后台读取\\verify-docs.ps1",
       "bytes": 1438,
       "sha256": "67319d8d4ea748f428344639426eda597a492c581cf33bfdacf5a8b522e1d3a9"
     },
     {
-      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生会话后台读取\\update-docs.py",
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\file\\I04原生会话后台读取\\update-docs.py",
       "bytes": 9339,
       "sha256": "c04e1c049567fb30e6010af9a99748efb412477d34139338380732084acbc265"
     },
     {
-      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生会话后台读取\\record-result.py",
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\file\\I04原生会话后台读取\\record-result.py",
       "bytes": 10865,
       "sha256": "98cde9cfdc3891bc87741e0b0140c9b005caebe0279c02ee71186f57bc9d466a"
     },
     {
-      "path": "D:\\soft\\codex\\build-cache\\codeg-rovai\\debug\\deps\\rovai_core-b5007fee303b1e92.exe",
+      "path": "D:\\soft\\codex\\build-cache\\coaxi-coaxi\\debug\\deps\\coaxi_core-b5007fee303b1e92.exe",
       "bytes": 99463680,
       "sha256": "f3a8a6ec811863361b7a3647c582e8348660317409da287f2f02ba8928338cd6"
     },
     {
-      "path": "D:\\soft\\codex\\build-cache\\codeg-rovai\\debug\\deps\\rovai_web-499056e2e2023954.exe",
+      "path": "D:\\soft\\codex\\build-cache\\coaxi-coaxi\\debug\\deps\\coaxi_web-499056e2e2023954.exe",
       "bytes": 5860352,
       "sha256": "4eb731f2f1ca5926ca9ab493d0db8eb202de76241158afbaf8d5a5777af1a816"
     }
   ],
   "approved_r1_artifacts": [
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\proposals\\native-delegation-r1.md",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\integration\\proposals\\native-delegation-r1.md",
       "bytes": 44061,
       "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\proposals\\native-delegation-r1-contract.json",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\integration\\proposals\\native-delegation-r1-contract.json",
       "bytes": 117977,
       "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\I04_队员怎样叫来独立帮手_客户确认版_r1.docx",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\outputs\\I04_独立帮手_r1\\final\\I04_队员怎样叫来独立帮手_客户确认版_r1.docx",
       "bytes": 67619,
       "sha256": "b3a318110460df2c95fc7132f4f3a985f0e59c6e506161fa1b8ceee3d70c0192"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\I04_队员怎样叫来独立帮手_客户确认版_r1.pdf",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\outputs\\I04_独立帮手_r1\\final\\I04_队员怎样叫来独立帮手_客户确认版_r1.pdf",
       "bytes": 809962,
       "sha256": "79af957b4e2f3e2a77311b72093188289f193d1c36d49218d99e1d9cb2446340"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\native-delegation-r1-contract.json",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\outputs\\I04_独立帮手_r1\\final\\native-delegation-r1-contract.json",
       "bytes": 117977,
       "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
     },
     {
-      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\native-delegation-r1.md",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\outputs\\I04_独立帮手_r1\\final\\native-delegation-r1.md",
       "bytes": 44061,
       "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
     }
   ],
   "external_migration_rule": {
-    "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\AGENTS.md",
+    "path": "D:\\soft\\codex\\home\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\AGENTS.md",
     "bytes": 6371,
     "sha256": "38ab74dc7dc68bb61097ec4f0684e3d8fcc11a9abaf5c56d6ee14132ca81043d"
   }

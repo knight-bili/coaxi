@@ -15,7 +15,7 @@ const source = join(root, 'scripts/fixtures/approval-dock')
 
 test('production approvals preserve decision identity, safe focus and readable reasons across desktop and phone layouts', { timeout: 90_000 }, async (t) => {
   if (!admitElectronIntegrationTest(t)) return
-  const fixture = await mkdtemp(join(tmpdir(), 'rovai-approval-dock-test-'))
+  const fixture = await mkdtemp(join(tmpdir(), 'coaxi-approval-dock-test-'))
   let child
   let closed
   try {
@@ -38,7 +38,7 @@ test('production approvals preserve decision identity, safe focus and readable r
     assert.equal(JSON.parse(output.split('\n').find(line => line.startsWith('{'))).ok, true)
   } finally {
     if (child && child.exitCode === null && child.signalCode === null) { child.kill('SIGKILL'); await closed }
-    if (process.env.ROVAI_KEEP_APPROVAL_FIXTURE === '1') process.stdout.write(`Approval screenshots: ${fixture}\n`)
+    if (process.env.COAXI_KEEP_APPROVAL_FIXTURE === '1') process.stdout.write(`Approval screenshots: ${fixture}\n`)
     else await rm(fixture, { recursive: true, force: true })
   }
 })

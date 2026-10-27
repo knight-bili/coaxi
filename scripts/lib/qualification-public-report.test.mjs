@@ -140,7 +140,7 @@ test('Invalid preflight produces diagnostic unavailable layers without fabricati
 function passingResult(evidenceIndex) {
   const artifactPointer = (name, version = '1.0.0') => ({
     artifactId: `${name}:public-id`,
-    schemaId: `rovai.qualification.${name}`,
+    schemaId: `coaxi.qualification.${name}`,
     schemaVersion: version,
     payloadDigest: `sha256:${'b'.repeat(64)}`,
     locator: `private/${name}.json`

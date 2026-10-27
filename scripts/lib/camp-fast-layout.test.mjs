@@ -13,11 +13,11 @@ import { admitElectronIntegrationTest } from './electron-sandbox-capability.mjs'
 const root = resolve(import.meta.dirname, '../..')
 const fixtureSource = join(root, 'scripts/fixtures/camp-fast-layout')
 
-test(process.env.ROVAI_FAST_CHECK_ONLY === '1'
+test(process.env.COAXI_FAST_CHECK_ONLY === '1'
   ? 'production Camp Fast preferences and observations require no qualification probes'
   : 'production Camp Fast keeps scope, focus and Composer access through native input', { timeout: 60_000 }, async (t) => {
   if (!admitElectronIntegrationTest(t)) return
-  const fixture = await mkdtemp(join(tmpdir(), 'rovai-camp-fast-layout-test-'))
+  const fixture = await mkdtemp(join(tmpdir(), 'coaxi-camp-fast-layout-test-'))
   let child
   let closed
   try {
@@ -47,7 +47,7 @@ test(process.env.ROVAI_FAST_CHECK_ONLY === '1'
       child.kill('SIGKILL')
       await closed
     }
-    if (process.env.ROVAI_KEEP_FAST_FIXTURE === '1') {
+    if (process.env.COAXI_KEEP_FAST_FIXTURE === '1') {
       process.stdout.write(`Camp Fast fixture: ${fixture}\n`)
     } else {
       await rm(fixture, { recursive: true, force: true })

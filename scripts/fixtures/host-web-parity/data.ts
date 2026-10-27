@@ -12,7 +12,7 @@ export const availability: ProductRuntimeAvailability[] = legacyAvailability.map
 }))
 export const now = '2026-09-12T02:30:00Z'
 export const threadId = 'rvcamp_01m0wzxbb8e1ht984tsbjmysfe'
-export const workspacePath = '/review/rovai-workspace'
+export const workspacePath = '/review/coaxi-workspace'
 export const agents: AgentProfile[] = initialMembers().slice(0, 2).map((agent: AgentProfile, i: number) => ({
   ...agent, agentId: `review-member-${i}`, displayName: i === 0 ? '洛可' : '木瓦',
   professionalResponsibilities: i === 0 ? '梳理当前页面与交互，落实已确认的修改。' : '复核实现与验证证据。',
@@ -77,7 +77,7 @@ export function navigation(snapshot: ThreadSnapshot): NavigationSnapshot {
     activationState: snapshot.thread.activationState, marker: 'none' as const, lastActivityAt: now,
     lastActivityGlobalSequence: 3, latestCompletionGlobalSequence: 0, version: snapshot.thread.version }
   return { schemaVersion: 3, throughGlobalSequence: snapshot.throughGlobalSequence,
-    projects: snapshot.thread.projectBindingKind === 'directory' ? [{ projectKey: 'review-project', name: 'rovai-workspace', projectPath: workspacePath,
+    projects: snapshot.thread.projectBindingKind === 'directory' ? [{ projectKey: 'review-project', name: 'coaxi-workspace', projectPath: workspacePath,
       lastActivityAt: now, lastActivityGlobalSequence: 3, totalCount: 1, recentThreads: [item] }] : [],
     quickChat: { totalCount: snapshot.thread.projectBindingKind === 'quick_chat' ? 1 : 0,
       recentThreads: snapshot.thread.projectBindingKind === 'quick_chat' ? [item] : [] } }

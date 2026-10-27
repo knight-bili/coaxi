@@ -164,7 +164,7 @@ App，以受控本机 API 和时钟验证首帧画布、就绪交接与 authorit
 - Rust workspace 与共享构建 profile：[`Cargo.toml`](../../Cargo.toml)；当前没有最低 Rust 版本或
   `rust-toolchain.toml`，文档不得自行补造。
 - 正式 Runtime 产品目录：Core 的
-  [`AdapterKind::ALL`](../../crates/rovai-core/src/agent_profile.rs)。
+  [`AdapterKind::ALL`](../../crates/coaxi-core/src/agent_profile.rs)。
 - Runtime 实测兼容性：
   [`runtime-compatibility.md`](../runtime-compatibility.md)。
 - 当前版本验收口径：当前版本的 `implementation-plan.md`。

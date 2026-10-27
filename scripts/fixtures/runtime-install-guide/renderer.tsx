@@ -23,8 +23,8 @@ function snapshot(runtimeKind: AdapterKind, status: ProductRuntimeAvailability['
 }
 function health(): HealthStatus {
   return {
-    core: { ok: true, version: 'fixture', dataDir: '/tmp/rovai-runtime-install-guide-fixture' },
-    database: { ok: true, path: '/tmp/rovai-runtime-install-guide-fixture/unused.db' },
+    core: { ok: true, version: 'fixture', dataDir: '/tmp/coaxi-runtime-install-guide-fixture' },
+    database: { ok: true, path: '/tmp/coaxi-runtime-install-guide-fixture/unused.db' },
     git: { installed: true, version: 'fixture' }, hostPlatform: platform, runtimeCatalog: [],
     runtimePlatformAdmission: kinds.map(runtimeKind => ({ runtimeKind, platform, status: admissionStatus, reasonCode: admissionStatus === 'qualified' ? null : 'runtime_platform.qualification_evidence_missing', evidenceRevision: admissionStatus === 'qualified' ? 'fixture' : null })),
     runtimeAvailability: [...availability.values()],
@@ -32,7 +32,7 @@ function health(): HealthStatus {
       shell: { status: 'captured', interactive: true, shellName: 'fixture', entryCount: 0, elapsedMillis: 0 } }
   }
 }
-window.rovai = {
+window.coaxi = {
   clipboard: { async write({ text }: { text: string }) { calls.push(`copy: ${text}`); await navigator.clipboard.writeText(text) } },
   async request(method: string, args: { runtimeKind?: AdapterKind } = {}) {
     calls.push(`${method}${args.runtimeKind ? `: ${args.runtimeKind}` : ''}`)
@@ -46,7 +46,7 @@ window.rovai = {
     }
     throw new Error(`Unexpected fixture request: ${method}`)
   }
-} as unknown as Window['rovai']
+} as unknown as Window['coaxi']
 
 function Fixture(): React.JSX.Element {
   const [current, setCurrent] = useState(health)

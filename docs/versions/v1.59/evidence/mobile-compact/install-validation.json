@@ -1,46 +1,46 @@
 {
   "sourceCommit": "85c7519c5736c5cc06afd5518dd5c3e4e30d6eb6",
-  "source": "/Users/murray.xue/VSCodeProjects/opensource/rovai-ai-web-recovery/dist/mac-arm64/Rovai AI.app",
-  "target": "/Applications/Rovai AI.app",
-  "backup": "/Applications/Rovai AI.backup-before-mobile-85c7519c-20260914T140721Z.app",
+  "source": "/Users/murray.xue/VSCodeProjects/opensource/coaxi-web-recovery/dist/mac-arm64/Coaxi AI.app",
+  "target": "/Applications/Coaxi AI.app",
+  "backup": "/Applications/Coaxi AI.backup-before-mobile-85c7519c-20260914T140721Z.app",
   "beforeProcesses": [
     {
       "pid": 30709,
       "started": "Mon Sep 14 22:06:32 2026",
-      "executable": "/Applications/Rovai AI.app/Contents/Frameworks/Rovai AI Helper (Renderer).app/Contents/MacOS/Rovai AI Helper (Renderer)"
+      "executable": "/Applications/Coaxi AI.app/Contents/Frameworks/Coaxi AI Helper (Renderer).app/Contents/MacOS/Coaxi AI Helper (Renderer)"
     },
     {
       "pid": 75855,
       "started": "Mon Sep 14 19:55:19 2026",
-      "executable": "/Applications/Rovai AI.app/Contents/MacOS/Rovai AI"
+      "executable": "/Applications/Coaxi AI.app/Contents/MacOS/Coaxi AI"
     },
     {
       "pid": 75864,
       "started": "Mon Sep 14 19:55:21 2026",
-      "executable": "/Applications/Rovai AI.app/Contents/Frameworks/Rovai AI Helper.app/Contents/MacOS/Rovai AI Helper"
+      "executable": "/Applications/Coaxi AI.app/Contents/Frameworks/Coaxi AI Helper.app/Contents/MacOS/Coaxi AI Helper"
     },
     {
       "pid": 75865,
       "started": "Mon Sep 14 19:55:21 2026",
-      "executable": "/Applications/Rovai AI.app/Contents/Frameworks/Rovai AI Helper.app/Contents/MacOS/Rovai AI Helper"
+      "executable": "/Applications/Coaxi AI.app/Contents/Frameworks/Coaxi AI Helper.app/Contents/MacOS/Coaxi AI Helper"
     },
     {
       "pid": 75885,
       "started": "Mon Sep 14 19:55:23 2026",
-      "executable": "/Applications/Rovai AI.app/Contents/Frameworks/Rovai AI Helper (Renderer).app/Contents/MacOS/Rovai AI Helper (Renderer)"
+      "executable": "/Applications/Coaxi AI.app/Contents/Frameworks/Coaxi AI Helper (Renderer).app/Contents/MacOS/Coaxi AI Helper (Renderer)"
     },
     {
       "pid": 75891,
       "started": "Mon Sep 14 19:55:24 2026",
-      "executable": "/Applications/Rovai AI.app/Contents/Resources/bin/rovai-host"
+      "executable": "/Applications/Coaxi AI.app/Contents/Resources/bin/coaxi-host"
     }
   ],
   "sourceManifest": {
-    "Contents/MacOS/Rovai AI": "dc3f79a99b6ebfcd3ea328eda7b7d829e35b1d4b3c782cd722bf2b16318f4db5",
+    "Contents/MacOS/Coaxi AI": "dc3f79a99b6ebfcd3ea328eda7b7d829e35b1d4b3c782cd722bf2b16318f4db5",
     "Contents/Resources/app.asar": "ca0c472c50a0923a77cd5437095c2d797f10dfd147c459f254650e9688d47379",
-    "Contents/Resources/bin/rovai-host": "0df63d5dbb49364afadc724196490f37300c446d6dbe8aa0aa1a69561b0bf5db",
-    "Contents/Resources/bin/rovai-core": "95c5fe0b5ff8a501d64c63194bda72d4acd9874949326d0796de1ddb6753b8da",
-    "Contents/Resources/bin/rovai": "b5eef0949c9a8c8594790a04a88d1109d59eaf185a1241a4fec2500cc71ba570",
+    "Contents/Resources/bin/coaxi-host": "0df63d5dbb49364afadc724196490f37300c446d6dbe8aa0aa1a69561b0bf5db",
+    "Contents/Resources/bin/coaxi-core": "95c5fe0b5ff8a501d64c63194bda72d4acd9874949326d0796de1ddb6753b8da",
+    "Contents/Resources/bin/coaxi": "b5eef0949c9a8c8594790a04a88d1109d59eaf185a1241a4fec2500cc71ba570",
     "Contents/Resources/web-ui/asset-cache.json": "61f143a0c2e0cfa3b17c2101355dd442ce4fb935f566bc90e990358dea14f31f",
     "Contents/Resources/web-ui/assets/antigravity-color-DgAQAdn3.svg": "652128cf55a28bb958563ee372d0bd00208d9e6fd446f523f77aafd811eef8ca",
     "Contents/Resources/web-ui/assets/apl-B4CMkyY2.js": "f242eda34c4a72bd8e51c278934ec62fe4804f129733e27d0441e1dc8bbc07a9",
@@ -192,37 +192,37 @@
     {
       "pid": 31416,
       "started": "Mon Sep 14 22:08:20 2026",
-      "executable": "/Applications/Rovai AI.app/Contents/Frameworks/Rovai AI Helper (Renderer).app/Contents/MacOS/Rovai AI Helper (Renderer)"
+      "executable": "/Applications/Coaxi AI.app/Contents/Frameworks/Coaxi AI Helper (Renderer).app/Contents/MacOS/Coaxi AI Helper (Renderer)"
     },
     {
       "pid": 31454,
       "started": "Mon Sep 14 22:08:26 2026",
-      "executable": "/Applications/Rovai AI.app/Contents/Frameworks/Rovai AI Helper (Renderer).app/Contents/MacOS/Rovai AI Helper (Renderer)"
+      "executable": "/Applications/Coaxi AI.app/Contents/Frameworks/Coaxi AI Helper (Renderer).app/Contents/MacOS/Coaxi AI Helper (Renderer)"
     },
     {
       "pid": 75855,
       "started": "Mon Sep 14 19:55:19 2026",
-      "executable": "/Applications/Rovai AI.app/Contents/MacOS/Rovai AI"
+      "executable": "/Applications/Coaxi AI.app/Contents/MacOS/Coaxi AI"
     },
     {
       "pid": 75864,
       "started": "Mon Sep 14 19:55:21 2026",
-      "executable": "/Applications/Rovai AI.app/Contents/Frameworks/Rovai AI Helper.app/Contents/MacOS/Rovai AI Helper"
+      "executable": "/Applications/Coaxi AI.app/Contents/Frameworks/Coaxi AI Helper.app/Contents/MacOS/Coaxi AI Helper"
     },
     {
       "pid": 75865,
       "started": "Mon Sep 14 19:55:21 2026",
-      "executable": "/Applications/Rovai AI.app/Contents/Frameworks/Rovai AI Helper.app/Contents/MacOS/Rovai AI Helper"
+      "executable": "/Applications/Coaxi AI.app/Contents/Frameworks/Coaxi AI Helper.app/Contents/MacOS/Coaxi AI Helper"
     },
     {
       "pid": 75885,
       "started": "Mon Sep 14 19:55:23 2026",
-      "executable": "/Applications/Rovai AI.app/Contents/Frameworks/Rovai AI Helper (Renderer).app/Contents/MacOS/Rovai AI Helper (Renderer)"
+      "executable": "/Applications/Coaxi AI.app/Contents/Frameworks/Coaxi AI Helper (Renderer).app/Contents/MacOS/Coaxi AI Helper (Renderer)"
     },
     {
       "pid": 75891,
       "started": "Mon Sep 14 19:55:24 2026",
-      "executable": "/Applications/Rovai AI.app/Contents/Resources/bin/rovai-host"
+      "executable": "/Applications/Coaxi AI.app/Contents/Resources/bin/coaxi-host"
     }
   ],
   "verifiedWebFiles": 139,

@@ -34,16 +34,16 @@ export async function buildProduct(repository, directory, { timeoutMs = 30 * 60_
   repository = resolve(repository); directory = resolve(directory)
   await mkdir(directory, { mode: 0o700 })
   const before = await sourceFingerprint(repository)
-  const command = ['cargo', 'build', '--locked', '-p', 'rovai-core', '--bin', 'rovai-core', '--bin', 'rovai', '--target-dir', join(repository, 'target')]
+  const command = ['cargo', 'build', '--locked', '-p', 'coaxi-core', '--bin', 'coaxi-core', '--bin', 'coaxi', '--target-dir', join(repository, 'target')]
   const execution = await runCaptured(command[0], command.slice(1), { cwd: repository, timeoutMs, maxOutputBytes: 16 * 1024 * 1024 })
   await writePrivateJsonExclusive(join(directory, 'build-execution.json'), execution)
   if (execution.code !== 0 || execution.timedOut || execution.outputOverflow) throw new Error('Product build did not complete; build evidence retained')
   const after = await sourceFingerprint(repository)
   if (digestJson(before) !== digestJson(after)) throw new Error('Source changed while building')
   const extension = process.platform === 'win32' ? '.exe' : ''
-  const core = join(directory, `rovai-core${extension}`), cli = join(directory, `rovai${extension}`)
-  await copyFile(join(repository, 'target', 'debug', `rovai-core${extension}`), core)
-  await copyFile(join(repository, 'target', 'debug', `rovai${extension}`), cli)
+  const core = join(directory, `coaxi-core${extension}`), cli = join(directory, `coaxi${extension}`)
+  await copyFile(join(repository, 'target', 'debug', `coaxi-core${extension}`), core)
+  await copyFile(join(repository, 'target', 'debug', `coaxi${extension}`), cli)
   const manifest = { schemaVersion: 1, repository, core, cli, source: after, coreDigest: await digestFile(core), cliDigest: await digestFile(cli), builtAt: new Date().toISOString(), command, profile: 'debug' }
   await writePrivateJsonExclusive(join(directory, 'product.json'), manifest)
   return manifest

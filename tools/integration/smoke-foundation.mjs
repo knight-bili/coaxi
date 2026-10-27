@@ -8,7 +8,7 @@ import { launchHost, within } from '../../scripts/lib/host-test-client.mjs';
 import { coreDataDirectoryArguments } from '../../scripts/lib/runtime-camp-files-root.mjs';
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
-const binary=process.env.ROVAI_HOST_BIN, ui=process.env.ROVAI_WEB_UI;
+const binary=process.env.COAXI_HOST_BIN, ui=process.env.COAXI_WEB_UI;
 assert(binary && path.isAbsolute(binary) && ui && path.isAbsolute(ui), '须提供绝对Host和WebUI产物路径');
 const evidenceRoot=path.resolve(process.env.FOUNDATION_EVIDENCE_ROOT ?? path.join(root,'integration/local/foundation'));
 await mkdir(evidenceRoot,{recursive:true});
@@ -42,9 +42,9 @@ try {
   const chunk=await within(reader.read());assert.match(new TextDecoder().decode(chunk.value),/event:\s*resync/);
   await reader.cancel();results.push({id:'first_event_requires_resync',status:'passed'});
   await host.close();stopped=true;
-  const dbPath=path.join(dataDir,'rovai.sqlite');
+  const dbPath=path.join(dataDir,'coaxi.sqlite');
   const db=new DatabaseSync(dbPath,{readOnly:true});
-  const marker=db.prepare('SELECT contract_version,projection_schema_version FROM rovai_data_contract WHERE singleton=1').get();
+  const marker=db.prepare('SELECT contract_version,projection_schema_version FROM coaxi_data_contract WHERE singleton=1').get();
   const integrity=db.prepare('PRAGMA integrity_check').get();
   assert.equal(marker.contract_version,'v1.72');assert.equal(marker.projection_schema_version,146);
   assert.equal(Object.values(integrity)[0],'ok');db.close();

@@ -2,7 +2,7 @@ import { basename, join, resolve } from 'node:path'
 import { spawn } from 'node:child_process'
 import { createInterface } from 'node:readline'
 import { dispatchQualificationPrompt } from '../../lib/qualification-common.mjs'
-import { findCompetingRovaiProcesses } from '../../lib/qualification-core.mjs'
+import { findCompetingCoaxiProcesses } from '../../lib/qualification-core.mjs'
 import { coreDataDirectoryArguments } from '../../lib/runtime-camp-files-root.mjs'
 
 const repositoryRoot = resolve(import.meta.dirname, '../../..')
@@ -15,9 +15,9 @@ export async function importBenchmarkReviewCamps({
   trialReviews = [],
   legacyTrialCamps = false
 }) {
-  const competing = await findCompetingRovaiProcesses()
+  const competing = await findCompetingCoaxiProcesses()
   if (competing.length > 0) {
-    throw new Error(`Rovai App/Core must be stopped before import: ${competing.map((item) => item.pid).join(',')}`)
+    throw new Error(`Coaxi App/Core must be stopped before import: ${competing.map((item) => item.pid).join(',')}`)
   }
   const core = startCore(coreExecutable, dataDirectory)
   try {
@@ -25,7 +25,7 @@ export async function importBenchmarkReviewCamps({
     const workspace = await core.request('workspaces.inspect', { path: projectPath })
     const preflight = await core.request('camps.creationPreflight')
     if (!preflight.admissible || !preflight.initialLeadAgentId || preflight.presentMembers.length === 0) {
-      throw new Error(`local Rovai profile cannot create benchmark Review Camp: ${JSON.stringify(preflight)}`)
+      throw new Error(`local Coaxi profile cannot create benchmark Review Camp: ${JSON.stringify(preflight)}`)
     }
     const members = preflight.presentMembers.map((member) => member.agentId)
     const defaultLead = preflight.initialLeadAgentId
@@ -121,7 +121,7 @@ function startCore(executable, dataDirectory) {
   const closePromise = new Promise((resolveClose) => child.once('close', (code, signal) => {
     closeResult = { code, signal }
     resolveClose(closeResult)
-    if (!stopping) rejectPending(new Error(`rovai-core exited early: ${stderrTail}`))
+    if (!stopping) rejectPending(new Error(`coaxi-core exited early: ${stderrTail}`))
   }))
   child.stderr.on('data', (chunk) => { stderrTail = `${stderrTail}${chunk.toString('utf8')}`.slice(-16_384) })
   child.once('error', rejectPending)
@@ -170,8 +170,8 @@ function startCore(executable, dataDirectory) {
       await Promise.race([closePromise, delay(5_000)])
       if (child.exitCode === null) child.kill('SIGKILL')
       await closePromise
-      rejectPending(new Error('rovai-core stopped'))
-      if (closeResult?.code !== 0) throw new Error(`rovai-core import shutdown failed: ${stderrTail}`)
+      rejectPending(new Error('coaxi-core stopped'))
+      if (closeResult?.code !== 0) throw new Error(`coaxi-core import shutdown failed: ${stderrTail}`)
     }
   }
 }

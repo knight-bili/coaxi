@@ -5,8 +5,8 @@ import {AppDialogContent,AppDialogHeader,AppDialogBody,AppDialogFooter} from './
 import {readErrorMessage} from './error-message'
 import {useUiText} from './interface-language'
 import {newCommandId} from '../../shared/command-id'
-import * as Shadcn from './codeg-project-boot/shadcn-constants'
-import {HYPERFRAMES_RESOLUTION_OPTIONS} from './codeg-project-boot/hyperframes-constants'
+import * as Shadcn from './coaxi-project-boot/shadcn-constants'
+import {HYPERFRAMES_RESOLUTION_OPTIONS} from './coaxi-project-boot/hyperframes-constants'
 import './project-launcher.css'
 
 type Plan={planId:string;arguments:string[];name:string;parent:string;kind:string}

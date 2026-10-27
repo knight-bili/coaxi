@@ -1,4 +1,4 @@
-// Adapted from Codeg canvas-dock.tsx at aff1e6c; Apache-2.0: integration/licenses/codeg/LICENSE.
+// Adapted from Codeg canvas-dock.tsx at aff1e6c; Apache-2.0: integration/licenses/component-a/LICENSE.
 import { useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { MiniMap, Panel, useReactFlow, useViewport } from '@xyflow/react'
 import { CircleMinus, CirclePlus, Map as MapIcon } from 'lucide-react'

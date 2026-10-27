@@ -1,7 +1,7 @@
 from pathlib import Path
 import argparse, hashlib, json, re, shutil, subprocess
 
-arguments=argparse.ArgumentParser(description="Prepare unchanged fixed Codeg parser components for readonly differential fixtures")
+arguments=argparse.ArgumentParser(description="Prepare unchanged fixed Coaxi parser components for readonly differential fixtures")
 arguments.add_argument("--source-root",type=Path,required=True)
 arguments.add_argument("--output",type=Path,required=True)
 args=arguments.parse_args()

@@ -8,7 +8,7 @@ import { uiAttribute } from './interface-language'
 // refresh, one resubmission. The original command (and expectedVersion) is frozen.
 export async function submitMemberRuntimeConfiguration(
   command: { adapterKind: AdapterKind },
-  request: import('@contracts').RovaiApi['request'] = desktopThreadClient.request
+  request: import('@contracts').CoaxiApi['request'] = desktopThreadClient.request
 ): Promise<StoredCommandResult> {
   const submit = async (): Promise<StoredCommandResult> => {
     try {

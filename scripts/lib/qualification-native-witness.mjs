@@ -13,7 +13,7 @@ export const NATIVE_WITNESS_POLICY = 'bound-native-command-witness-v1'
 export const PARALLEL_WITNESS_POLICY = 'bound-native-command-witness-v2'
 const LIMIT = 200_000
 const processText = /review-duo|cli-operations|\bagent_\d+\b|SKILL\.md/
-const rovaiCommand = /(?:^|[\s;&|('\"])(?:[^\s]*\/)?rovai(?:['\"])?(?:\s|$)/
+const coaxiCommand = /(?:^|[\s;&|('\"])(?:[^\s]*\/)?coaxi(?:['\"])?(?:\s|$)/
 
 // Same public field projection as Core's command Execution Evidence. Admission
 // requires equality with an already persisted Core payload digest, not trust in
@@ -30,14 +30,14 @@ export function nativeOutputProjection(command, output, terminalOutput, policy =
   let projection = 'whole_command'
   // A narrow public-help suffix is separable only when the native terminal
   // output includes that exact suffix and the full result ends in it.
-  const help = command.match(/\n(rovai(?: [a-z][a-z-]*)+) --help\s*$/)
+  const help = command.match(/\n(coaxi(?: [a-z][a-z-]*)+) --help\s*$/)
   const helpStart = help ? output.startsWith(`${help[1]}\n`) ? 0 : output.lastIndexOf(`\n${help[1]}\n`) + 1 : -1
   if (help && helpStart > 0 && terminalOutput?.endsWith(output.slice(helpStart))) {
     command = command.slice(0, help.index)
     output = output.slice(0, helpStart)
     projection = 'verification_prefix_before_readonly_cli_help'
   }
-  if (rovaiCommand.test(command) || processText.test(command + '\n' + output)
+  if (coaxiCommand.test(command) || processText.test(command + '\n' + output)
       || !(policy === PARALLEL_WITNESS_POLICY && /\b(?:git\s+(?:status|diff)\b|shasum\b|sha256sum\b)/.test(command)) && !/(?:\b(?:npm|pnpm|yarn|bun)\s+(?:run\s+)?test\b|\bgit\b[^\n]*\bdiff\b[^\n]*--check\b|\b(?:node|python3?|jq)\b)/.test(command)) return null
   return { command, output, projection,
     outputTruncated: /Warning: truncated output|\b(?:tokens|characters) truncated\b|Output truncated/i.test(output) }
@@ -134,7 +134,7 @@ async function nativeCommandItems(executable, threadIds, cwd) {
   let timer
   try {
     return await Promise.race([(async () => {
-      await rpc('initialize', { clientInfo: { name: 'rovai-evaluation-native-witness', version: '1' }, capabilities: { experimentalApi: true } })
+      await rpc('initialize', { clientInfo: { name: 'coaxi-evaluation-native-witness', version: '1' }, capabilities: { experimentalApi: true } })
       child.stdin.write(JSON.stringify({ method: 'initialized', params: {} }) + '\n')
       const items = new Map()
       for (const id of threadIds) {

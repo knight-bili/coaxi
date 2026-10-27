@@ -7,8 +7,8 @@ import { tmpdir } from 'node:os'
 import { join, toNamespacedPath } from 'node:path'
 
 test('ZCode version metadata succeeds without creating an execution watcher', { skip: process.platform === 'win32' }, async () => {
-  const root = await mkdtemp(join(tmpdir(), 'rovai-zcode-version-'))
-  const companion = await readFile(new URL('../crates/rovai-core/src/zcode/stdio-owner.cjs', import.meta.url), 'utf8')
+  const root = await mkdtemp(join(tmpdir(), 'coaxi-zcode-version-'))
+  const companion = await readFile(new URL('../crates/coaxi-core/src/zcode/stdio-owner.cjs', import.meta.url), 'utf8')
   const preload = join(root, 'no-child.cjs'), kernel = join(root, 'kernel.cjs')
   await writeFile(preload, "require('node:child_process').spawn = () => { throw new Error('metadata must not need an execution watcher') }")
   await writeFile(kernel, "if (process.argv[2] !== '--version') process.exit(64); console.log('0.16.5')")
@@ -26,15 +26,15 @@ test('ZCode version metadata succeeds without creating an execution watcher', { 
 // Windows Job membership is owned by the Rust OS-boundary test. This separate
 // seam checks the real Node prelude's request lease and argv/cwd projection.
 test('Windows ZCode freezes async CLI leases and preserves MCP cwd and arguments', { skip: process.platform !== 'win32' }, async () => {
-  const root = await mkdtemp(join(tmpdir(), 'rovai-zcode-windows-'))
-  const companion = await readFile(new URL('../crates/rovai-core/src/zcode/stdio-owner.cjs', import.meta.url), 'utf8')
-  const launcher = await readFile(new URL('../crates/rovai-core/src/zcode/mcp-cwd.cjs', import.meta.url), 'utf8')
+  const root = await mkdtemp(join(tmpdir(), 'coaxi-zcode-windows-'))
+  const companion = await readFile(new URL('../crates/coaxi-core/src/zcode/stdio-owner.cjs', import.meta.url), 'utf8')
+  const launcher = await readFile(new URL('../crates/coaxi-core/src/zcode/mcp-cwd.cjs', import.meta.url), 'utf8')
   const context = join(root, 'context.json')
   const kernel = join(root, 'kernel.cjs')
   const late = join(root, 'late.json')
   const unscoped = join(root, 'unscoped.json')
   const release = join(root, 'release')
-  const writeContext = `require('node:fs').copyFileSync(process.env.ROVAI_CLI_CONTEXT, process.argv[1])`
+  const writeContext = `require('node:fs').copyFileSync(process.env.COAXI_CLI_CONTEXT, process.argv[1])`
   await writeFile(context, JSON.stringify({ lease: { leaseId: 'original' } }))
   await writeFile(kernel, `const {spawn}=require('node:child_process');
     const fs=require('node:fs');
@@ -50,7 +50,7 @@ test('Windows ZCode freezes async CLI leases and preserves MCP cwd and arguments
     });`)
   const host = spawn(process.execPath, ['--eval', companion, toNamespacedPath(kernel)], {
     windowsHide: true,
-    env: { ...process.env, ROVAI_CLI_CONTEXT: context, ROVAI_ZCODE_CLI_CONTEXT_DIR: join(root, 'contexts') },
+    env: { ...process.env, COAXI_CLI_CONTEXT: context, COAXI_ZCODE_CLI_CONTEXT_DIR: join(root, 'contexts') },
     stdio: ['pipe', 'pipe', 'pipe']
   })
   const closed = once(host, 'close')
@@ -83,26 +83,26 @@ test('Windows ZCode freezes async CLI leases and preserves MCP cwd and arguments
 // Process-boundary regression: the shell closes all stdio and exits before its
 // descendant. A direct-child unit mock cannot establish process-group ownership.
 test('ZCode retains closed-shell groups until descendants exit or Host closes', { skip: process.platform === 'win32' }, async () => {
-  const root = await mkdtemp(join(tmpdir(), 'rovai-zcode-owner-'))
-  const companion = await readFile(new URL('../crates/rovai-core/src/zcode/stdio-owner.cjs', import.meta.url), 'utf8')
+  const root = await mkdtemp(join(tmpdir(), 'coaxi-zcode-owner-'))
+  const companion = await readFile(new URL('../crates/coaxi-core/src/zcode/stdio-owner.cjs', import.meta.url), 'utf8')
   const report = join(root, 'owner-cleanup.json')
   const kernel = join(root, 'kernel.cjs')
   const context = join(root, 'host-context.json')
   const childContext = join(root, 'child-context-path')
   await writeFile(context, JSON.stringify({ lease: { leaseId: 'original-run' } }), { mode: 0o600 })
   await writeFile(kernel, `const {spawn}=require('node:child_process');
-    spawn('/bin/sh',['-c','cat "$ROVAI_CLI_CONTEXT" > "$1"','fixture',${JSON.stringify(join(root, 'unscoped-context.json'))}],{stdio:'ignore'});
+    spawn('/bin/sh',['-c','cat "$COAXI_CLI_CONTEXT" > "$1"','fixture',${JSON.stringify(join(root, 'unscoped-context.json'))}],{stdio:'ignore'});
     process.stdin.once('data',()=>{
-    const child=spawn('/bin/sh',['-c','printf %s "$ROVAI_CLI_CONTEXT" > "$2"; sleep 600 >/dev/null 2>&1 & echo $! > "$1"', 'fixture', ${JSON.stringify(join(root, 'descendant'))}, ${JSON.stringify(childContext)}],{detached:true,stdio:'ignore'});
+    const child=spawn('/bin/sh',['-c','printf %s "$COAXI_CLI_CONTEXT" > "$2"; sleep 600 >/dev/null 2>&1 & echo $! > "$1"', 'fixture', ${JSON.stringify(join(root, 'descendant'))}, ${JSON.stringify(childContext)}],{detached:true,stdio:'ignore'});
     child.once('close',()=>process.stdout.write('closed\\n'));
     const timer=setInterval(()=>{if(!require('node:fs').existsSync(${JSON.stringify(join(root, 'release-delayed'))}))return;
-      clearInterval(timer); const late=spawn('/bin/sh',['-c','cat "$ROVAI_CLI_CONTEXT" > "$1"','fixture',${JSON.stringify(join(root, 'delayed-context.json'))}],{stdio:'ignore'});
+      clearInterval(timer); const late=spawn('/bin/sh',['-c','cat "$COAXI_CLI_CONTEXT" > "$1"','fixture',${JSON.stringify(join(root, 'delayed-context.json'))}],{stdio:'ignore'});
       late.once('close',()=>process.stdout.write('delayed\\n'));
     },25);
     });
     process.stdin.resume();`)
   const unrelated = spawn('/bin/sleep', ['600'], { detached: true, stdio: 'ignore' })
-  const host = spawn(process.execPath, ['--eval', companion, kernel], { detached: true, env: { ...process.env, ROVAI_ZCODE_OWNER_REPORT: report, ROVAI_CLI_CONTEXT: context, ROVAI_ZCODE_CLI_CONTEXT_DIR: join(root, 'contexts') }, stdio: ['pipe', 'pipe', 'pipe'] })
+  const host = spawn(process.execPath, ['--eval', companion, kernel], { detached: true, env: { ...process.env, COAXI_ZCODE_OWNER_REPORT: report, COAXI_CLI_CONTEXT: context, COAXI_ZCODE_CLI_CONTEXT_DIR: join(root, 'contexts') }, stdio: ['pipe', 'pipe', 'pipe'] })
   const hostClosed = once(host, 'close')
   let descendant
   try {

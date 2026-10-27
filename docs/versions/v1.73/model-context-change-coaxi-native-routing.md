@@ -79,7 +79,7 @@ capabilities 必须正好含上述 11 项，每项一次。assigned/frozen/disco
 
 ## 实际实现与证据边界（2026-10-27）
 
-- 精确目录落在 [旧目录](../../../crates/rovai-core/src/interaction_tools/catalog-v1.json)、[新目录](../../../crates/rovai-core/src/interaction_tools/catalog.json)；[诊断定义](../../../crates/rovai-core/src/interaction_tools/diagnostic-tool.json)与 [CLI Skill](../../../skills/cli-operations/SKILL.md)保存批准的替换文本。旧工具名称、顺序及参数不变。
+- 精确目录落在 [旧目录](../../../crates/coaxi-core/src/interaction_tools/catalog-legacy-v1.json)、[新目录](../../../crates/coaxi-core/src/interaction_tools/catalog-legacy-v2.json)；[诊断定义](../../../crates/coaxi-core/src/interaction_tools/diagnostic-legacy-v1.json)与 [CLI Skill](../../../skills/cli-operations/SKILL.md)保存批准的替换文本。旧工具名称、顺序及参数不变。
 - 目录选择按 Run 私有保存；旧 manifest 沿 v1 目录／协议，新 Run 使用 v2 诊断协议。没有数据库迁移、权限扩大、历史重发或 Bootstrap／Dynamic Context 修改。
 - 三项交互能力按本轮身份核实开关、连接、目录发现、成功业务结果及资源授权；任务、自动化、会话信息、提问核实全局／队员开关和冻结状态，调用发现与成功证据缺失时保留 null。反馈、父子委派、队员调度、队员查询尚无统一证据源，诊断如实返回 unknown/null，不由“已配置”推断“已成功”。
 - 成功证据不接受业务 error、未知动作 effect、unknown/unsatisfied 核验；缺失或过期桌面连接立即拒绝普通工具，不入队等待超时。只读页面的 eval 先要求 control，再要求本次代码审批。

@@ -1,6 +1,6 @@
 import { spawnSync } from 'node:child_process'
 
-export const ELECTRON_INTEGRATION_REQUIRED_ENV = 'ROVAI_REQUIRE_ELECTRON_INTEGRATION'
+export const ELECTRON_INTEGRATION_REQUIRED_ENV = 'COAXI_REQUIRE_ELECTRON_INTEGRATION'
 
 const MACOS_SANDBOX_EXECUTABLE = '/usr/bin/sandbox-exec'
 const MACOS_SANDBOX_PROFILE = '(version 1) (allow default)'

@@ -12,7 +12,7 @@ import {
 } from './qualification-tool-measurement-spec.mjs'
 
 test('measurement pack seals opportunities, fixture and oracle and materializes fresh symbolic identities', async () => {
-  const root = await mkdtemp(join(tmpdir(), 'rovai-tool-measurement-pack-'))
+  const root = await mkdtemp(join(tmpdir(), 'coaxi-tool-measurement-pack-'))
   try {
     const caseRecord = fakeCaseRecord()
     await writePack(root, caseRecord)
@@ -86,7 +86,7 @@ test('measurement pack seals opportunities, fixture and oracle and materializes 
 })
 
 test('measurement pack verification fails closed after private fixture drift', async () => {
-  const root = await mkdtemp(join(tmpdir(), 'rovai-tool-measurement-tamper-'))
+  const root = await mkdtemp(join(tmpdir(), 'coaxi-tool-measurement-tamper-'))
   try {
     const caseRecord = fakeCaseRecord()
     await writePack(root, caseRecord)
@@ -104,7 +104,7 @@ test('measurement pack verification fails closed after private fixture drift', a
 })
 
 test('measurement pack rejects post-hoc opportunities and unknown fixture symbols', async () => {
-  const root = await mkdtemp(join(tmpdir(), 'rovai-tool-measurement-invalid-'))
+  const root = await mkdtemp(join(tmpdir(), 'coaxi-tool-measurement-invalid-'))
   try {
     const caseRecord = fakeCaseRecord()
     await writePack(root, caseRecord)
@@ -130,7 +130,7 @@ function fakeCaseRecord() {
 async function writePack(root, caseRecord) {
   await mkdir(root, { recursive: true })
   await writeJson(join(root, 'measurement-spec.json'), {
-    schemaId: 'rovai.qualification.tool-measurement-spec',
+    schemaId: 'coaxi.qualification.tool-measurement-spec',
     schemaVersion: '2.0.0',
     specificationId: 'tool-spec:DC-901:1',
     case: { caseId: 'DC-901', caseSeal: `sha256:${caseRecord.seal}` },

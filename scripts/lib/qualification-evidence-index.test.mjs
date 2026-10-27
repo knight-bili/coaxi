@@ -10,7 +10,7 @@ test('Evidence Index creates stable resolvable records across all deterministic 
   const first = buildEvidenceIndex(fixture())
   const second = buildEvidenceIndex(fixture())
   assert.deepEqual(first, second)
-  assert.equal(first.artifact.schemaId, 'rovai.qualification.evidence-index')
+  assert.equal(first.artifact.schemaId, 'coaxi.qualification.evidence-index')
   assert.equal(first.artifact.schemaVersion, '1.0.0')
   assert.equal(first.artifact.payloadDigest, `sha256:${digestJson(first.artifact.payload)}`)
   assert.equal(first.artifact.producer.digest, `sha256:${'a'.repeat(64)}`)

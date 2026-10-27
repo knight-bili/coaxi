@@ -5,54 +5,54 @@ import { dirname, join } from 'node:path'
 import { createInterface } from 'node:readline'
 import { fileURLToPath } from 'node:url'
 
-const executable = process.env.ROVAI_GROK_BIN?.trim() || 'grok'
-const modelId = process.env.ROVAI_GROK_MODEL_ID?.trim()
-const baseUrl = process.env.ROVAI_GROK_MODEL_BASE_URL?.trim()
-const apiKey = process.env.ROVAI_GROK_MODEL_API_KEY?.trim()
-const apiBackend = process.env.ROVAI_GROK_MODEL_API_BACKEND?.trim() || 'chat_completions'
-const contextWindow = Number(process.env.ROVAI_GROK_MODEL_CONTEXT_WINDOW || 204800)
-const keepFixture = process.env.ROVAI_KEEP_GROK_PROBE_FIXTURE === '1'
-const environmentOnly = process.env.ROVAI_GROK_ENV_ONLY === '1'
-const extendedProbe = process.env.ROVAI_GROK_EXTENDED_PROBE === '1'
-const noLeader = process.env.ROVAI_GROK_NO_LEADER === '1'
-const processPlugin = process.env.ROVAI_GROK_PROCESS_PLUGIN === '1'
-const collisionProbe = process.env.ROVAI_GROK_MCP_COLLISION_PROBE === '1'
-const productionPluginShape = process.env.ROVAI_GROK_MCP_PRODUCTION_SHAPE === '1'
-const pluginWithoutVersion = process.env.ROVAI_GROK_PLUGIN_WITHOUT_VERSION === '1'
-const pluginServerName = process.env.ROVAI_GROK_PLUGIN_SERVER_NAME?.trim() || 'rovai-plugin-probe'
-const pluginManifestName = process.env.ROVAI_GROK_PLUGIN_MANIFEST_NAME?.trim()
-  || 'rovai-session-plugin'
-const productionPluginPath = process.env.ROVAI_GROK_PLUGIN_PRODUCTION_PATH === '1'
-const managedSandbox = process.env.ROVAI_GROK_MANAGED_SANDBOX === '1'
-const setModelOption = process.env.ROVAI_GROK_SET_MODEL_OPTION === '1'
-const setModelMethod = process.env.ROVAI_GROK_SET_MODEL_METHOD === '1'
-const omitSessionMeta = process.env.ROVAI_GROK_OMIT_SESSION_META === '1'
-const managedProcessGroup = process.env.ROVAI_GROK_MANAGED_PROCESS_GROUP === '1'
-const permissionMode = process.env.ROVAI_GROK_PERMISSION_MODE?.trim()
-const compactionProbe = process.env.ROVAI_GROK_COMPACTION_PROBE === '1'
+const executable = process.env.COAXI_GROK_BIN?.trim() || 'grok'
+const modelId = process.env.COAXI_GROK_MODEL_ID?.trim()
+const baseUrl = process.env.COAXI_GROK_MODEL_BASE_URL?.trim()
+const apiKey = process.env.COAXI_GROK_MODEL_API_KEY?.trim()
+const apiBackend = process.env.COAXI_GROK_MODEL_API_BACKEND?.trim() || 'chat_completions'
+const contextWindow = Number(process.env.COAXI_GROK_MODEL_CONTEXT_WINDOW || 204800)
+const keepFixture = process.env.COAXI_KEEP_GROK_PROBE_FIXTURE === '1'
+const environmentOnly = process.env.COAXI_GROK_ENV_ONLY === '1'
+const extendedProbe = process.env.COAXI_GROK_EXTENDED_PROBE === '1'
+const noLeader = process.env.COAXI_GROK_NO_LEADER === '1'
+const processPlugin = process.env.COAXI_GROK_PROCESS_PLUGIN === '1'
+const collisionProbe = process.env.COAXI_GROK_MCP_COLLISION_PROBE === '1'
+const productionPluginShape = process.env.COAXI_GROK_MCP_PRODUCTION_SHAPE === '1'
+const pluginWithoutVersion = process.env.COAXI_GROK_PLUGIN_WITHOUT_VERSION === '1'
+const pluginServerName = process.env.COAXI_GROK_PLUGIN_SERVER_NAME?.trim() || 'coaxi-plugin-probe'
+const pluginManifestName = process.env.COAXI_GROK_PLUGIN_MANIFEST_NAME?.trim()
+  || 'coaxi-session-plugin'
+const productionPluginPath = process.env.COAXI_GROK_PLUGIN_PRODUCTION_PATH === '1'
+const managedSandbox = process.env.COAXI_GROK_MANAGED_SANDBOX === '1'
+const setModelOption = process.env.COAXI_GROK_SET_MODEL_OPTION === '1'
+const setModelMethod = process.env.COAXI_GROK_SET_MODEL_METHOD === '1'
+const omitSessionMeta = process.env.COAXI_GROK_OMIT_SESSION_META === '1'
+const managedProcessGroup = process.env.COAXI_GROK_MANAGED_PROCESS_GROUP === '1'
+const permissionMode = process.env.COAXI_GROK_PERMISSION_MODE?.trim()
+const compactionProbe = process.env.COAXI_GROK_COMPACTION_PROBE === '1'
 
 if (!modelId || !baseUrl || !apiKey) {
   throw new Error(
-    'ROVAI_GROK_MODEL_ID, ROVAI_GROK_MODEL_BASE_URL and ROVAI_GROK_MODEL_API_KEY are required'
+    'COAXI_GROK_MODEL_ID, COAXI_GROK_MODEL_BASE_URL and COAXI_GROK_MODEL_API_KEY are required'
   )
 }
 if (!['chat_completions', 'responses', 'messages'].includes(apiBackend)) {
   throw new Error(`Unsupported Grok custom-model API backend: ${apiBackend}`)
 }
 if (!Number.isSafeInteger(contextWindow) || contextWindow <= 0) {
-  throw new Error('ROVAI_GROK_MODEL_CONTEXT_WINDOW must be a positive integer')
+  throw new Error('COAXI_GROK_MODEL_CONTEXT_WINDOW must be a positive integer')
 }
 
-const fixtureRoot = await mkdtemp(join(tmpdir(), 'rovai-grok-runtime-probe-'))
+const fixtureRoot = await mkdtemp(join(tmpdir(), 'coaxi-grok-runtime-probe-'))
 const grokHome = join(fixtureRoot, 'grok-home')
 const projectRoot = join(fixtureRoot, 'project')
 const pluginRoot = productionPluginPath
   ? join(fixtureRoot, 'data', 'runtime', 'grok-build', 'external-mcp', 'grok-mcp-plugin-probe')
-  : join(fixtureRoot, 'rovai-session-plugin')
-const providerAlias = 'rovai-private-provider'
-const pluginResultPrefix = `rovai-grok-plugin-${process.pid}-${Date.now()}`
-const pluginCollisionPrefix = `rovai-grok-plugin-collision-${process.pid}-${Date.now()}`
-const nativeCollisionPrefix = `rovai-grok-native-collision-${process.pid}-${Date.now()}`
+  : join(fixtureRoot, 'coaxi-session-plugin')
+const providerAlias = 'coaxi-private-provider'
+const pluginResultPrefix = `coaxi-grok-plugin-${process.pid}-${Date.now()}`
+const pluginCollisionPrefix = `coaxi-grok-plugin-collision-${process.pid}-${Date.now()}`
+const nativeCollisionPrefix = `coaxi-grok-native-collision-${process.pid}-${Date.now()}`
 const pluginStartupMarker = join(fixtureRoot, 'plugin-started')
 const pluginCollisionStartupMarker = join(fixtureRoot, 'plugin-collision-started')
 const nativeCollisionStartupMarker = join(fixtureRoot, 'native-collision-started')
@@ -69,7 +69,7 @@ try {
       dirname(fileURLToPath(import.meta.url)),
       '..',
       'crates',
-      'rovai-core',
+      'coaxi-core',
       'tests',
       'fixtures',
       'mcp-smoke-server.mjs'
@@ -85,18 +85,18 @@ try {
         command: process.execPath,
         args: [fixtureServer],
         env: {
-          ROVAI_MCP_SMOKE_SOURCE: pluginResultPrefix,
-          ROVAI_MCP_SMOKE_STARTUP_MARKER: pluginStartupMarker
+          COAXI_MCP_SMOKE_SOURCE: pluginResultPrefix,
+          COAXI_MCP_SMOKE_STARTUP_MARKER: pluginStartupMarker
         }
       }
     }
     if (collisionProbe) {
-      pluginMcpServers['rovai-collision-probe'] = {
+      pluginMcpServers['coaxi-collision-probe'] = {
         command: process.execPath,
         args: [fixtureServer],
         env: {
-          ROVAI_MCP_SMOKE_SOURCE: pluginCollisionPrefix,
-          ROVAI_MCP_SMOKE_STARTUP_MARKER: pluginCollisionStartupMarker
+          COAXI_MCP_SMOKE_SOURCE: pluginCollisionPrefix,
+          COAXI_MCP_SMOKE_STARTUP_MARKER: pluginCollisionStartupMarker
         }
       }
     }
@@ -113,8 +113,8 @@ try {
       `[model.${tomlString(providerAlias)}]`,
       `model = ${tomlString(modelId)}`,
       `base_url = ${tomlString(baseUrl)}`,
-      'name = "Rovai private provider"',
-      'env_key = "ROVAI_GROK_MODEL_API_KEY"',
+      'name = "Coaxi private provider"',
+      'env_key = "COAXI_GROK_MODEL_API_KEY"',
       `api_backend = ${tomlString(apiBackend)}`,
       `context_window = ${contextWindow}`,
       'supports_backend_search = false',
@@ -123,18 +123,18 @@ try {
     ]
     if (collisionProbe) {
       configLines.push(
-        '[mcp_servers.rovai-collision-probe]',
+        '[mcp_servers.coaxi-collision-probe]',
         `command = ${tomlString(process.execPath)}`,
         `args = [${tomlString(join(
           dirname(fileURLToPath(import.meta.url)),
           '..',
           'crates',
-          'rovai-core',
+          'coaxi-core',
           'tests',
           'fixtures',
           'mcp-smoke-server.mjs'
         ))}]`,
-        `env = { ROVAI_MCP_SMOKE_SOURCE = ${tomlString(nativeCollisionPrefix)}, ROVAI_MCP_SMOKE_STARTUP_MARKER = ${tomlString(nativeCollisionStartupMarker)} }`,
+        `env = { COAXI_MCP_SMOKE_SOURCE = ${tomlString(nativeCollisionPrefix)}, COAXI_MCP_SMOKE_STARTUP_MARKER = ${tomlString(nativeCollisionStartupMarker)} }`,
         '',
       )
     }
@@ -176,7 +176,7 @@ try {
       GROK_HOME: grokHome,
       GROK_DEFAULT_MODEL: environmentOnly ? modelId : providerAlias,
       GROK_DISABLE_AUTOUPDATER: '1',
-      ROVAI_GROK_MODEL_API_KEY: apiKey,
+      COAXI_GROK_MODEL_API_KEY: apiKey,
       XAI_API_KEY: apiKey,
       ...(environmentOnly ? { GROK_MODELS_BASE_URL: baseUrl } : {})
     },
@@ -288,8 +288,8 @@ try {
       terminal: false
     },
     clientInfo: {
-      name: 'rovai_probe',
-      title: 'Rovai-ai Grok Runtime Probe',
+      name: 'coaxi_probe',
+      title: 'Coaxi Grok Runtime Probe',
       version: '1'
     }
   })
@@ -316,7 +316,7 @@ try {
   if (extendedProbe) {
     try {
       await request('session/resume', {
-        sessionId: 'rovai-probe-deliberately-missing-session',
+        sessionId: 'coaxi-probe-deliberately-missing-session',
         cwd: projectRoot,
         mcpServers: []
       }, 30_000)
@@ -336,8 +336,8 @@ try {
     ...(extendedProbe && !omitSessionMeta ? {
       _meta: {
         rules: [
-          'When a user message contains ROVAI_NATIVE_RULES_TRIGGER,',
-          'reply with exactly ROVAI_GROK_NATIVE_RULES_OK and nothing else.'
+          'When a user message contains COAXI_NATIVE_RULES_TRIGGER,',
+          'reply with exactly COAXI_GROK_NATIVE_RULES_OK and nothing else.'
         ].join(' '),
         ...(!processPlugin ? { pluginDirs: [pluginRoot] } : {}),
         yoloMode: true
@@ -369,8 +369,8 @@ try {
     prompt: [{
       type: 'text',
       text: extendedProbe
-        ? 'ROVAI_NATIVE_RULES_TRIGGER. Reply with the word WRONG.'
-        : 'Reply with exactly ROVAI_GROK_PROBE_OK and nothing else.'
+        ? 'COAXI_NATIVE_RULES_TRIGGER. Reply with the word WRONG.'
+        : 'Reply with exactly COAXI_GROK_PROBE_OK and nothing else.'
     }]
   }, 180_000)
   await waitForQuiet(assistantText, 2, 200)
@@ -384,7 +384,7 @@ try {
       sessionId,
       prompt: [{
         type: 'text',
-        text: 'After compaction, reply with exactly ROVAI_GROK_COMPACTION_OK and nothing else.'
+        text: 'After compaction, reply with exactly COAXI_GROK_COMPACTION_OK and nothing else.'
       }]
     }, 300_000)
     await waitForQuiet(assistantText, 2, 200)
@@ -393,7 +393,7 @@ try {
       armed: true,
       armResponseKeys: armed && typeof armed === 'object' ? Object.keys(armed).sort() : [],
       stopReason: compactionTerminal.stopReason ?? null,
-      expectedMarkerObserved: compactionOutput.includes('ROVAI_GROK_COMPACTION_OK'),
+      expectedMarkerObserved: compactionOutput.includes('COAXI_GROK_COMPACTION_OK'),
       events: compactionEvents
     }
   }
@@ -427,7 +427,7 @@ try {
         prompt: [{
           type: 'text',
           text: [
-            'Use the MCP echo tool from the rovai-collision-probe server exactly once.',
+            'Use the MCP echo tool from the coaxi-collision-probe server exactly once.',
             'Pass the exact argument text "collision".',
             'Then reply with exactly the tool result and nothing else.'
           ].join(' ')
@@ -478,7 +478,7 @@ try {
     prompt: {
       stopReason: terminal.stopReason ?? null,
       expectedMarkerObserved: firstOutput.includes(
-        extendedProbe ? 'ROVAI_GROK_NATIVE_RULES_OK' : 'ROVAI_GROK_PROBE_OK'
+        extendedProbe ? 'COAXI_GROK_NATIVE_RULES_OK' : 'COAXI_GROK_PROBE_OK'
       ),
       thinkingTextObserved: firstOutput.includes('<think>'),
       notificationShapes: notifications

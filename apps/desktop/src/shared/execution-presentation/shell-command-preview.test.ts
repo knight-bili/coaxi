@@ -12,8 +12,8 @@ const shell: CanonicalRuntimeActivityView = {
   firstEvidenceSequence: 1, lastEvidenceSequence: 2, revision: 1
 }
 
-const command = 'cargo fmt --all -- --check; cargo check -p rovai-core'
-const displayed = 'cargo fmt --all -- --check ; cargo check -p rovai-core'
+const command = 'cargo fmt --all -- --check; cargo check -p coaxi-core'
+const displayed = 'cargo fmt --all -- --check ; cargo check -p coaxi-core'
 const runtimePath = String.raw`C:\Users\test\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.exe`
 
 describe('PowerShell command presentation', () => {

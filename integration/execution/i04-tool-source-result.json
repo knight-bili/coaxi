@@ -28,13 +28,13 @@
   "verification": {
     "rust_owners": [
       {
-        "executable": "D:\\soft\\codex\\build-cache\\codeg-rovai\\debug\\deps\\rovai_core-ca977d36cd3fbfc1.exe",
+        "executable": "D:\\soft\\codex\\build-cache\\coaxi-coaxi\\debug\\deps\\coaxi_core-ca977d36cd3fbfc1.exe",
         "owner": "context::slow_tests::delivery_unknown_never_consumes_a_redelivery_requirement",
         "exact_list": true,
         "binary_sha256": "2a7eeea0e9656e6a1e4a52e7687c8b7bbbb9cd0d8e58741a2c18d331581f941c"
       },
       {
-        "executable": "D:\\soft\\codex\\build-cache\\codeg-rovai\\debug\\deps\\rovai_web-311f613b2b5f850c.exe",
+        "executable": "D:\\soft\\codex\\build-cache\\coaxi-coaxi\\debug\\deps\\coaxi_web-311f613b2b5f850c.exe",
         "owner": "operations::tests::public_projection_excludes_mcp_credentials_and_desktop_mutation_actions",
         "exact_list": true,
         "binary_sha256": "6b346f7edf537fd1932dedc39c39b21651d005cb019bbf474cacd0bd73ecb2bc"
@@ -155,37 +155,37 @@
       "git_blob_with_filters": "a734da5c3bf62ceb2bf15ba2a350e5cb75902de9"
     },
     {
-      "path": "crates/rovai-core/src/application.rs",
+      "path": "crates/coaxi-core/src/application.rs",
       "sha256": "24618125f5896e25bd47b1121ccf18a35c649b137452450ff09830f23ec65301",
       "git_blob_with_filters": "9eebeebd131049009e87df96daef7022ef34e215"
     },
     {
-      "path": "crates/rovai-core/src/application/delegation_queries.rs",
+      "path": "crates/coaxi-core/src/application/delegation_queries.rs",
       "sha256": "c398ef18bd0eaba8c7ce609940d80d5b02c7f0e34162d60d7ca0144c3a3e2b14",
       "git_blob_with_filters": "d9f9b7e874e8d0aeaeb4148e35111591000aba02"
     },
     {
-      "path": "crates/rovai-core/src/context/delegation_dispatch_tests.rs",
+      "path": "crates/coaxi-core/src/context/delegation_dispatch_tests.rs",
       "sha256": "7110024ccb9f31037a2befaf57e0d3e403b18c445355a7613405daecc7235dd3",
       "git_blob_with_filters": "6005074c346a98d1372628bde6bd267caeca22f9"
     },
     {
-      "path": "crates/rovai-core/src/context/delegation_evidence_tests.rs",
+      "path": "crates/coaxi-core/src/context/delegation_evidence_tests.rs",
       "sha256": "3bd4043553c06329cc42e9fb78cffa9fa68c3d4b1034091342fad562f36a642d",
       "git_blob_with_filters": "ec3563ab4e300c5e97eae261b07d9964a88b017f"
     },
     {
-      "path": "crates/rovai-core/src/delegation_dispatch/recovery.rs",
+      "path": "crates/coaxi-core/src/delegation_dispatch/recovery.rs",
       "sha256": "a180f2df7bbfb63db8a19fdbc98cafa00984755dd50a88fead806dd371980b00",
       "git_blob_with_filters": "b109bf650a7a42917f9b027ff36889683e07e2eb"
     },
     {
-      "path": "crates/rovai-core/src/delegation_user_query.rs",
+      "path": "crates/coaxi-core/src/delegation_user_query.rs",
       "sha256": "b742e342f8a216d52bb5ad4a329d57098a6d4c280ffb988599ee57ae18910f45",
       "git_blob_with_filters": "d8aa09f3250894008c4c0b39ef30988b178d3654"
     },
     {
-      "path": "crates/rovai-web/src/operations.rs",
+      "path": "crates/coaxi-web/src/operations.rs",
       "sha256": "0776b567afc8167dcac7f48ad1b7370024de1215965a2b1b598bcd177b7ab159",
       "git_blob_with_filters": "124575a31806a21532d9942558fe827fc674e250"
     },
@@ -215,7 +215,7 @@
       "git_blob_with_filters": "f35afb537f0f1cbd24b5d4fd10e551e4b725c31a"
     },
     {
-      "path": "crates/rovai-core/src/delegation_user_tool_source.rs",
+      "path": "crates/coaxi-core/src/delegation_user_tool_source.rs",
       "sha256": "9ea9370f8b0fc8307276b9461e77b4b2bf344183c108fdafc96b9dbe476fb257",
       "git_blob_with_filters": "51be0dfccd56f9eb7682414d3ae5e1303767a201"
     },

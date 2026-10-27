@@ -36,9 +36,9 @@ export function renderLayeredContext() {
   const s = sketch();
   const bootstrap =
     label(21, 34, 'Session Bootstrap · 稳定会话引导', 27, { color: T.green.main, weight: 600 })
-    + contextLayer(s, 58, '会话约定', 'Session Charter', '协作约定 · Rovai CLI 入口与使用方式', T.green,
+    + contextLayer(s, 58, '会话约定', 'Session Charter', '协作约定 · Coaxi CLI 入口与使用方式', T.green,
       book(s, 790, 86, 78, 60, T.green)
-      + pill(895, 95, 140, 'rovai --help', T.green, 18))
+      + pill(895, 95, 140, 'coaxi --help', T.green, 18))
     + contextLayer(s, 186, '队员身份', 'MEMBER_IDENTITY', '自身身份 · 专业职责 · 工作准则 · 成长课题', T.gugu,
       avatar(s, 'gugu', 806, 242, 33)
       + box(s, 872, 207, 180, 66, '#fff', T.gugu.border, false, 9)

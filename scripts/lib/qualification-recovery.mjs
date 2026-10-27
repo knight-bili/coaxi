@@ -345,7 +345,7 @@ export async function recoverQualificationEvaluation({
       }
     }
 
-    temporaryRoot = await makeTemporaryDirectory('rovai-qualification-evaluation-recovery-')
+    temporaryRoot = await makeTemporaryDirectory('coaxi-qualification-evaluation-recovery-')
     const verifierWorkspace = join(temporaryRoot, 'workspace')
     await copyFixture(validation.snapshotPath, verifierWorkspace)
     const attemptId = randomUUID()

@@ -17,34 +17,34 @@ const root = resolve(import.meta.dirname, '..')
 const appPath = resolve(process.argv[2] ?? join(root, 'dist', 'mac-arm64', 'Coaxi.app'))
 const previewOnly = process.argv.includes('--preview')
 const fixtureRoot = await realpath(
-  process.env.ROVAI_RUNTIME_ACTIVITY_ACCEPT_FIXTURE_ROOT
-    ?? await mkdtemp(join(tmpdir(), 'rovai-runtime-activity-ui-accept-'))
+  process.env.COAXI_RUNTIME_ACTIVITY_ACCEPT_FIXTURE_ROOT
+    ?? await mkdtemp(join(tmpdir(), 'coaxi-runtime-activity-ui-accept-'))
 )
 const dataDir = join(fixtureRoot, 'user-data')
-const runtimeTempDir = process.env.ROVAI_RUNTIME_ACTIVITY_ACCEPT_RUNTIME_TMP
+const runtimeTempDir = process.env.COAXI_RUNTIME_ACTIVITY_ACCEPT_RUNTIME_TMP
   ?? tmpdir()
 const outputDir = await realpath(
-  process.env.ROVAI_RUNTIME_ACTIVITY_ACCEPT_OUTPUT_DIR
-    ?? await mkdtemp(join(tmpdir(), 'rovai-runtime-activity-ui-captures-'))
+  process.env.COAXI_RUNTIME_ACTIVITY_ACCEPT_OUTPUT_DIR
+    ?? await mkdtemp(join(tmpdir(), 'coaxi-runtime-activity-ui-captures-'))
 )
-const recoveryBlockerOnly = process.env.ROVAI_RUNTIME_ACTIVITY_ACCEPT_RECOVERY_BLOCKER_ONLY === '1'
-const conversationDropZoneOnly = process.env.ROVAI_RUNTIME_ACTIVITY_ACCEPT_DROP_ZONE_ONLY === '1'
-const worldMapOnly = process.env.ROVAI_RUNTIME_ACTIVITY_ACCEPT_WORLD_MAP_ONLY === '1'
-const runtimeModelOnly = process.env.ROVAI_RUNTIME_ACTIVITY_ACCEPT_MODEL_ONLY === '1'
-const webSearchOnly = process.env.ROVAI_RUNTIME_ACTIVITY_ACCEPT_WEB_SEARCH_ONLY === '1'
-const webSearchAfterResponsiveOnly = process.env.ROVAI_RUNTIME_ACTIVITY_ACCEPT_WEB_SEARCH_AFTER_RESPONSIVE_ONLY === '1'
-const toolDetailsOnly = process.env.ROVAI_RUNTIME_ACTIVITY_ACCEPT_TOOL_DETAILS_ONLY === '1'
-const completeToolOnly = process.env.ROVAI_RUNTIME_ACTIVITY_ACCEPT_COMPLETE_TOOL_ONLY === '1'
-const executionAutoFollowOnly = process.env.ROVAI_RUNTIME_ACTIVITY_ACCEPT_AUTO_FOLLOW_ONLY === '1'
-const executionMetricsOnly = process.env.ROVAI_RUNTIME_ACTIVITY_ACCEPT_METRICS_ONLY === '1'
-const metricsRealRuntime = process.env.ROVAI_RUNTIME_ACTIVITY_ACCEPT_METRICS_REAL === '1'
-const executionMetricsStreamOnly = process.env.ROVAI_RUNTIME_ACTIVITY_ACCEPT_METRICS_STREAM_ONLY === '1'
+const recoveryBlockerOnly = process.env.COAXI_RUNTIME_ACTIVITY_ACCEPT_RECOVERY_BLOCKER_ONLY === '1'
+const conversationDropZoneOnly = process.env.COAXI_RUNTIME_ACTIVITY_ACCEPT_DROP_ZONE_ONLY === '1'
+const worldMapOnly = process.env.COAXI_RUNTIME_ACTIVITY_ACCEPT_WORLD_MAP_ONLY === '1'
+const runtimeModelOnly = process.env.COAXI_RUNTIME_ACTIVITY_ACCEPT_MODEL_ONLY === '1'
+const webSearchOnly = process.env.COAXI_RUNTIME_ACTIVITY_ACCEPT_WEB_SEARCH_ONLY === '1'
+const webSearchAfterResponsiveOnly = process.env.COAXI_RUNTIME_ACTIVITY_ACCEPT_WEB_SEARCH_AFTER_RESPONSIVE_ONLY === '1'
+const toolDetailsOnly = process.env.COAXI_RUNTIME_ACTIVITY_ACCEPT_TOOL_DETAILS_ONLY === '1'
+const completeToolOnly = process.env.COAXI_RUNTIME_ACTIVITY_ACCEPT_COMPLETE_TOOL_ONLY === '1'
+const executionAutoFollowOnly = process.env.COAXI_RUNTIME_ACTIVITY_ACCEPT_AUTO_FOLLOW_ONLY === '1'
+const executionMetricsOnly = process.env.COAXI_RUNTIME_ACTIVITY_ACCEPT_METRICS_ONLY === '1'
+const metricsRealRuntime = process.env.COAXI_RUNTIME_ACTIVITY_ACCEPT_METRICS_REAL === '1'
+const executionMetricsStreamOnly = process.env.COAXI_RUNTIME_ACTIVITY_ACCEPT_METRICS_STREAM_ONLY === '1'
   || metricsRealRuntime
-const placementRestartOnly = process.env.ROVAI_RUNTIME_ACTIVITY_ACCEPT_PLACEMENT_RESTART_ONLY === '1'
-const withdrawalOnly = process.env.ROVAI_RUNTIME_ACTIVITY_ACCEPT_WITHDRAWAL_ONLY === '1'
-const databasePath = join(dataDir, 'rovai.sqlite')
-const debugPort = process.env.ROVAI_RUNTIME_ACTIVITY_ACCEPT_DEBUG_PORT
-  ? Number(process.env.ROVAI_RUNTIME_ACTIVITY_ACCEPT_DEBUG_PORT)
+const placementRestartOnly = process.env.COAXI_RUNTIME_ACTIVITY_ACCEPT_PLACEMENT_RESTART_ONLY === '1'
+const withdrawalOnly = process.env.COAXI_RUNTIME_ACTIVITY_ACCEPT_WITHDRAWAL_ONLY === '1'
+const databasePath = join(dataDir, 'coaxi.sqlite')
+const debugPort = process.env.COAXI_RUNTIME_ACTIVITY_ACCEPT_DEBUG_PORT
+  ? Number(process.env.COAXI_RUNTIME_ACTIVITY_ACCEPT_DEBUG_PORT)
   : await availableLoopbackPort()
 const threadId = 'rvcamp_01h47kvsy5fk1shh6w1g60eec0'
 const threadTitle = previewOnly ? '执行背景分层验收 · 模拟数据' : 'v0.55 Agent 执行过程验收'
@@ -61,9 +61,9 @@ const activeRunId = 'run-codex'
 const historicalRunId = 'run-codex-history'
 const recoveryBlockedAgentId = 'agent_103'
 const recoveryBlockedRunId = 'run-copilot'
-const longToolOutputFirstMarker = 'ROVAI_LONG_TOOL_OUTPUT_BEGIN'
-const longToolOutputMiddleMarker = 'ROVAI_LONG_TOOL_OUTPUT_MIDDLE'
-const longToolOutputLastMarker = 'ROVAI_LONG_TOOL_OUTPUT_END'
+const longToolOutputFirstMarker = 'COAXI_LONG_TOOL_OUTPUT_BEGIN'
+const longToolOutputMiddleMarker = 'COAXI_LONG_TOOL_OUTPUT_MIDDLE'
+const longToolOutputLastMarker = 'COAXI_LONG_TOOL_OUTPUT_END'
 const persistedToolOutputByteLimit = 7_680
 const originalLongToolOutput = Array.from({ length: 1_000 }, (_, index) => {
   if (index === 0) return `${longToolOutputFirstMarker} · line 1`
@@ -79,8 +79,8 @@ if (Buffer.byteLength(longToolOutput) !== persistedToolOutputByteLimit
 }
 const directoryAttachmentSource = join(fixtureRoot, '项目资料')
 const fixtureExecutionRoot = join(fixtureRoot, 'workspace')
-const codexExpectedCommand = 'rovai camp read --limit 20'
-const claudeExpectedCommand = "printf '%s\\n' 'ROVAI_CLAUDE_EMPTY_OUTPUT_OK'"
+const codexExpectedCommand = 'coaxi camp read --limit 20'
+const claudeExpectedCommand = "printf '%s\\n' 'COAXI_CLAUDE_EMPTY_OUTPUT_OK'"
 const webSearchQueries = ['password=公开验收词 token=保持原样', '第二项公开查询']
 const fixtureContextManifestVersion = 33
 const fixtureContextDeliveryProfile = {
@@ -94,7 +94,7 @@ const runtimes = [
     evidenceKind: 'command', eventType: 'activity.completed', payload: {
       item: {
         id: 'op-codex', type: 'commandExecution', status: 'completed', title: null,
-        command: '/bin/zsh -lc "rovai camp read --limit 20"',
+        command: '/bin/zsh -lc "coaxi camp read --limit 20"',
         commandActions: [{ type: 'unknown', name: null, path: null }],
         output: longToolOutput
       }
@@ -143,10 +143,10 @@ const runtimes = [
     protocol: 'claude-stream-json', domain: 'shell', semantic: 'shell.execute',
     evidenceKind: 'runtime.action', eventType: 'runtime.action', payload: {
       toolCallId: 'toolu-claude-bash', status: 'completed', kind: 'execute',
-      toolName: 'Bash', title: 'Bash', input: "printf '%s\\n' 'ROVAI_CLAUDE_EMPTY_OUTPUT_OK'", output: null
+      toolName: 'Bash', title: 'Bash', input: "printf '%s\\n' 'COAXI_CLAUDE_EMPTY_OUTPUT_OK'", output: null
     }
   }),
-  runtime('antigravity', 'antigravity-app', 'Antigravity', 'rovai send', {
+  runtime('antigravity', 'antigravity-app', 'Antigravity', 'coaxi send', {
     protocol: 'antigravity-log', domain: 'tool', semantic: 'tool.call',
     evidenceKind: 'runtime.action', eventType: 'runtime.action', sourceAuthority: 'core',
     credibility: 'core_verified', payload: {
@@ -158,10 +158,10 @@ const runtimes = [
 ]
 
 await mkdir(dataDir, { recursive: true })
-if (executionMetricsStreamOnly && (!metricsRealRuntime || process.env.ROVAI_METRICS_HELD_FINAL === '1')) {
+if (executionMetricsStreamOnly && (!metricsRealRuntime || process.env.COAXI_METRICS_HELD_FINAL === '1')) {
   const runtime = join(root, 'scripts', 'fixtures', 'streaming-acp-runtime.mjs')
   await chmod(runtime, 0o755)
-  process.env[process.env.ROVAI_STREAMING_ACP_KIND === 'copilot-cli' ? 'ROVAI_COPILOT_BIN' : 'ROVAI_QWEN_BIN'] = runtime
+  process.env[process.env.COAXI_STREAMING_ACP_KIND === 'copilot-cli' ? 'COAXI_COPILOT_BIN' : 'COAXI_QWEN_BIN'] = runtime
 }
 seedCompletedOnboardingForAcceptance(dataDir)
 await writeFile(join(dataDir, 'general-preferences.json'), `${JSON.stringify({
@@ -1025,7 +1025,7 @@ try {
       completeToolOutput,
       webSearchPresentation,
       claudeCommandDisclosure,
-      antigravityCoreToolCatalogName: observed.find((row) => row.agentId === runtimes.find(entry => entry.key === 'antigravity').agentId)?.toolTitles[0] === 'rovai send',
+      antigravityCoreToolCatalogName: observed.find((row) => row.agentId === runtimes.find(entry => entry.key === 'antigravity').agentId)?.toolTitles[0] === 'coaxi send',
       conversationPresentation,
       timelineFollowLatest,
       messageAuthorProfileTriggers,
@@ -1132,7 +1132,7 @@ function fixtureIconKind(details) {
   if (details.domain === 'tool' && details.semantic === 'tool.web.search') return 'web'
   if (details.domain === 'tool'
     && details.sourceAuthority === 'core'
-    && details.credibility === 'core_verified') return 'rovai'
+    && details.credibility === 'core_verified') return 'coaxi'
   if (details.domain === 'tool') return 'tool'
   if (details.domain === 'runtime') return 'runtime'
   return 'unknown'
@@ -1290,8 +1290,8 @@ async function verifyExecutionMetricsRenderer(app, capturesRoot, onRestart) {
 async function verifyStreamingExecutionMetricsRenderer(app, capturesRoot) {
   if (metricsRealRuntime) return verifyRealRuntimeExecutionMetrics(app, capturesRoot)
   const request = (method, params = {}) => evaluate(app.cdp,
-    `window.rovai.request(${JSON.stringify(method)}, ${JSON.stringify(params)})`, true)
-  const controlledCopilot = process.env.ROVAI_STREAMING_ACP_KIND === 'copilot-cli'
+    `window.coaxi.request(${JSON.stringify(method)}, ${JSON.stringify(params)})`, true)
+  const controlledCopilot = process.env.COAXI_STREAMING_ACP_KIND === 'copilot-cli'
   const agentId = runtimes.find((entry) => entry.key === (controlledCopilot ? 'copilot' : 'qwen'))?.agentId
   assert(agentId, 'The streaming fixture has no selected member')
   await configureProductRuntime(request, controlledCopilot ? 'copilot-cli' : 'qwen-code', [agentId])
@@ -1303,7 +1303,7 @@ async function verifyStreamingExecutionMetricsRenderer(app, capturesRoot) {
     memberAgentIds: [agentId],
     defaultLeadAgentId: agentId,
     address: { mode: 'explicit', agentIds: [agentId] },
-    body: 'ROVAI_STREAM_FAST_SETUP',
+    body: 'COAXI_STREAM_FAST_SETUP',
     purpose: 'Seed one completed Run for switching cards'
   })
   assert(setup.status === 'accepted' && setup.payload?.threadId && setup.payload?.threadMessageId,
@@ -1315,10 +1315,10 @@ async function verifyStreamingExecutionMetricsRenderer(app, capturesRoot) {
   await openCamp(app.cdp, streamCampId)
   await selectCampConversationView(app.cdp, 'conversation')
   await waitForExpression(app.cdp,
-    `document.body.innerText.includes('ROVAI_STREAM_FAST_READY')`, 20_000)
+    `document.body.innerText.includes('COAXI_STREAM_FAST_READY')`, 20_000)
   await evaluate(app.cdp, `(() => {
     window.__privateThoughtIpcLeaks = 0
-    window.__privateThoughtIpcUnsubscribe = window.rovai.onEvent(event => {
+    window.__privateThoughtIpcUnsubscribe = window.coaxi.onEvent(event => {
       if (JSON.stringify(event).includes('V3_PRIVATE_REASONING_FIXTURE')) window.__privateThoughtIpcLeaks++
     })
   })()`)
@@ -1447,24 +1447,24 @@ async function verifyStreamingExecutionMetricsRenderer(app, capturesRoot) {
 
 async function verifyRealRuntimeExecutionMetrics(app, capturesRoot) {
   const request = (method, params = {}) => evaluate(app.cdp,
-    `window.rovai.request(${JSON.stringify(method)}, ${JSON.stringify(params)})
+    `window.coaxi.request(${JSON.stringify(method)}, ${JSON.stringify(params)})
       .catch(error => { throw new Error(${JSON.stringify(method)} + ': ' + (error?.message ?? error?.code ?? String(error))) })`, true)
-  const runtimeKind = process.env.ROVAI_METRICS_RUNTIME ?? 'codex-cli'
-  const liveContextMode = process.env.ROVAI_METRICS_VERIFY_LIVE_CONTEXT
+  const runtimeKind = process.env.COAXI_METRICS_RUNTIME ?? 'codex-cli'
+  const liveContextMode = process.env.COAXI_METRICS_VERIFY_LIVE_CONTEXT
   assert(liveContextMode == null || ['1', 'used-only'].includes(liveContextMode),
     'Live Context verification accepts 1 or used-only')
   const isCount = value => Number.isSafeInteger(value) && value >= 0
   const metricK = value => value == null ? '—' : `${(value / 1000).toFixed(1).replace(/\.0$/, '')}k`
   const agentId = runtimes.find((entry) => entry.key === 'codex').agentId
   const installation = await configureProductRuntime(request, runtimeKind, [agentId])
-  const modelId = process.env.ROVAI_METRICS_MODEL ?? (runtimeKind === 'codex-cli' ? 'gpt-6.1-sol' : null)
+  const modelId = process.env.COAXI_METRICS_MODEL ?? (runtimeKind === 'codex-cli' ? 'gpt-6.1-sol' : null)
   if (modelId) {
     const profile = await request('members.get', { agentId })
     const selection = await request('members.runtime.set', { commandId: crypto.randomUUID(), command: {
       agentId, expectedVersion: profile.version, adapterKind: runtimeKind,
       permissions: profile.runtimeConfiguration.permissions,
       model: { mode: 'explicit', modelId,
-        options: process.env.ROVAI_METRICS_MODEL_OPTIONS ? JSON.parse(process.env.ROVAI_METRICS_MODEL_OPTIONS)
+        options: process.env.COAXI_METRICS_MODEL_OPTIONS ? JSON.parse(process.env.COAXI_METRICS_MODEL_OPTIONS)
           : runtimeKind === 'codex-cli' ? { reasoning_effort: 'high' } : {} }
     } })
     assert(selection.status === 'applied', 'Real Runtime acceptance model was not applied')
@@ -1473,18 +1473,18 @@ async function verifyRealRuntimeExecutionMetrics(app, capturesRoot) {
   const setup = await createConfiguredCampAndSend(request, {
     commandId: crypto.randomUUID(), name: `原生执行指标 ${runtimeKind} 验收`, workspace,
     memberAgentIds: [agentId], defaultLeadAgentId: agentId,
-    body: await readFile(process.env.ROVAI_METRICS_PROMPT_FILE
+    body: await readFile(process.env.COAXI_METRICS_PROMPT_FILE
       ?? join(root, 'scripts', 'fixtures', 'native-execution-metrics-task.txt'), 'utf8'),
     purpose: 'Native Usage and Context through packaged Renderer'
   })
   assert(setup.status === 'accepted' && setup.payload?.threadId && setup.payload?.threadMessageId,
     'Real Runtime acceptance was not accepted with Thread/message identities')
   const liveCampId = setup.payload.threadId
-  const roundCount = process.env.ROVAI_METRICS_VERIFY_WINDOW_REUSE === '1' ? 2 : 1
+  const roundCount = process.env.COAXI_METRICS_VERIFY_WINDOW_REUSE === '1' ? 2 : 1
   const reports = []
   await evaluate(app.cdp, `(() => {
     window.__contextAcceptanceCommits = []
-    window.__contextAcceptanceOff = window.rovai.onEvent(event => {
+    window.__contextAcceptanceOff = window.coaxi.onEvent(event => {
       if (event.method === 'monitoring.changed') window.__contextAcceptanceCommits.push({ at: new Date().toISOString(), params: event.params })
       if (window.__contextAcceptanceCommits.length > 500) window.__contextAcceptanceCommits.shift()
     })
@@ -1495,7 +1495,7 @@ async function verifyRealRuntimeExecutionMetrics(app, capturesRoot) {
     const sent = await request('thread.messages.send', {
       commandId: crypto.randomUUID(), threadId: liveCampId,
       content: composerDocumentForAddress({ mode: 'explicit', agentIds: [agentId] },
-        await readFile(process.env.ROVAI_METRICS_PROMPT_FILE
+        await readFile(process.env.COAXI_METRICS_PROMPT_FILE
           ?? join(root, 'scripts', 'fixtures', 'native-live-context-task.txt'), 'utf8')),
       sourceAttachments: [], quotes: [], replyToThreadMessageId: null,
       execution: { taskId: null, purpose: 'Verify confirmed window reuse during the next Run', completionRole: 'required' }
@@ -1583,7 +1583,7 @@ async function verifyRealRuntimeExecutionMetrics(app, capturesRoot) {
         console.log(JSON.stringify({ stage: 'native-live-context-verified', runtimeKind, ...liveContextWitness }))
       }
       await app.cdp.send('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Escape', code: 'Escape' })
-      if (liveContextWitness && process.env.ROVAI_METRICS_VERIFY_VISIBILITY === '1') {
+      if (liveContextWitness && process.env.COAXI_METRICS_VERIFY_VISIBILITY === '1') {
         await evaluate(app.cdp, `document.querySelector('.camp-detail-entry[data-detail="execution"]')?.click()`)
         await waitForExpression(app.cdp, `![...document.querySelectorAll('.execution-context-trigger')].some(node => node.getClientRects().length)`)
         const hiddenAt = new Date().toISOString()
@@ -1626,7 +1626,7 @@ async function verifyRealRuntimeExecutionMetrics(app, capturesRoot) {
     `Real Runtime did not reach a terminal within the 480s acceptance window; partial observations are retained`)
   assert(!liveContextMode || liveContextWitness,
     'No matching persisted and rendered Context was observed while this fresh Run was still running')
-  if (process.env.ROVAI_METRICS_VERIFY_USAGE === '1') {
+  if (process.env.COAXI_METRICS_VERIFY_USAGE === '1') {
     assert(availability.runTotal, 'Real Runtime did not persist a usable native Run total')
     await evaluate(app.cdp, `(() => {
       const history = ${drawerExpression}?.querySelector('.execution-history-toggle')
@@ -1646,7 +1646,7 @@ async function verifyRealRuntimeExecutionMetrics(app, capturesRoot) {
   }
   const usageRows = await evaluate(app.cdp, `[...document.querySelectorAll('.execution-metric-popover dl > div')]
     .map(row => [row.querySelector('dt')?.textContent, row.querySelector('dd')?.textContent])`)
-  if (process.env.ROVAI_METRICS_VERIFY_USAGE === '1') {
+  if (process.env.COAXI_METRICS_VERIFY_USAGE === '1') {
     assert(JSON.stringify(usageRows.slice(0, 4)) === JSON.stringify([
       ['Input Token', metricK(usage.promptInputTotalTokens)], ['Output Token', metricK(usage.outputTokens)],
       ['Cache Read', metricK(usage.cacheReadTokens)], ['Cache Write', metricK(usage.cacheWriteTokens)]
@@ -1656,7 +1656,7 @@ async function verifyRealRuntimeExecutionMetrics(app, capturesRoot) {
   }
   const contextLabel = await evaluate(app.cdp,
     `${drawerExpression}?.querySelector('.execution-drawer-header .execution-context-trigger')?.getAttribute('aria-label') ?? null`)
-  if (process.env.ROVAI_METRICS_VERIFY_CONTEXT === '1') {
+  if (process.env.COAXI_METRICS_VERIFY_CONTEXT === '1') {
     assert(availability.contextRatio, 'Real Runtime did not provide a usable Context ratio; used alone is incomplete')
     assert(context
       && contextLabel?.includes(metricK(context.usedTokens)) && contextLabel?.includes(metricK(context.windowTokens)),
@@ -1678,9 +1678,9 @@ async function verifyRealRuntimeExecutionMetrics(app, capturesRoot) {
   const liveUpdates = samples.filter(sample => sample.status === 'running' && sample.delivery?.contextSourceRun === runId
     && sample.context?.usedTokens != null && sample.ui.contextLabel?.includes(`${metricK(sample.context.usedTokens)} / ${metricK(sample.context.windowTokens)}`))
   const distinctLiveValues = [...new Set(liveUpdates.map(sample => sample.context.usedTokens))]
-  if (process.env.ROVAI_METRICS_MIN_LIVE_UPDATES) assert(distinctLiveValues.length >= Number(process.env.ROVAI_METRICS_MIN_LIVE_UPDATES),
+  if (process.env.COAXI_METRICS_MIN_LIVE_UPDATES) assert(distinctLiveValues.length >= Number(process.env.COAXI_METRICS_MIN_LIVE_UPDATES),
     `Expected multiple distinct persisted + rendered Context values before terminal; got ${distinctLiveValues.length}`)
-  if (process.env.ROVAI_METRICS_HELD_FINAL === '1') {
+  if (process.env.COAXI_METRICS_HELD_FINAL === '1') {
     assert(liveUpdates.some(sample => sample.delivery.status === 'prepared'), 'Context did not render before input acceptance')
     assert(liveUpdates.some(sample => sample.context.usedTokens === 15000 && sample.context.windowTokens === 200000), 'ACP used-only lost its confirmed window')
     assert(liveUpdates.some(sample => sample.context.usedTokens === 8000), 'Compaction decrease was not rendered')
@@ -1700,7 +1700,7 @@ async function verifyRealRuntimeExecutionMetrics(app, capturesRoot) {
     assert(label === contextLabel, 'Opening a historical Run changed current Session Context')
     historicalCardCheck = { openedRunId: priorRun, currentSessionLabel: label }
   }
-  const report = { runtimeKind, sampleSource: process.env.ROVAI_METRICS_HELD_FINAL === '1' ? 'controlled-acp' : 'installed-runtime',
+  const report = { runtimeKind, sampleSource: process.env.COAXI_METRICS_HELD_FINAL === '1' ? 'controlled-acp' : 'installed-runtime',
     round, distinctLiveValues, commitNotifications, scalarTrace: app.contextTrace, visibilityCheck, historicalCardCheck,
     version: installation.snapshot?.reportedVersion, campId: liveCampId,
     runId, status, projection, availability, usageRows, contextLabel, liveContextWitness, samples }
@@ -1906,9 +1906,9 @@ async function seedFixture() {
   const messageRows = runtimes.map((entry, index) => {
     const sequence = index < recoveryInputRuntimeIndex ? index + 1 : index + 2
     const body = entry.runLevelOnly
-      ? 'Run-level：Runtime 未报告内部工具；Rovai 未生成命令、文件或工具调用卡片。'
+      ? 'Run-level：Runtime 未报告内部工具；Coaxi 未生成命令、文件或工具调用卡片。'
       : entry.sourceAuthority === 'core'
-        ? 'Core Built-in CLI：名称必须通过 Rovai Tool Catalog 验证。'
+        ? 'Core Built-in CLI：名称必须通过 Coaxi Tool Catalog 验证。'
         : '结构化 Runtime Activity：标题来自 Runtime 报告的工具名称。'
     const addressedAgentIds = entry.key === 'antigravity'
       ? [runtimes[0].agentId, runtimes[1].agentId]
@@ -2195,7 +2195,7 @@ async function seedFixture() {
           created_at, updated_at
         ) VALUES (
           NEW.id, 'ready', 1, 'camps/' || NEW.id || '/attachments',
-          rovai_runtime_camp_files_root_identity_digest(),
+          coaxi_runtime_camp_files_root_identity_digest(),
           0, 0,
           ${sqlLiteral(emptyCatalogDigest)},
           NULL, NULL, datetime('now'), datetime('now')
@@ -2949,7 +2949,7 @@ function boundedEvidencePreview(value) {
   if (value !== null && typeof value === 'object') {
     return {
       ...Object.fromEntries(Object.entries(value).slice(0, 24).map(([key, child]) => [key, boundedEvidencePreview(child)])),
-      _rovaiTruncated: true
+      _coaxiTruncated: true
     }
   }
   return value
@@ -3338,7 +3338,7 @@ async function verifyConversationDropZone(cdp, sourceDirectory, capturesDirector
       && !card?.textContent?.includes('只读快照')
   })()`, 30_000)
   const draft = await evaluate(cdp,
-    `window.rovai.request('camp.composerDraft.get', { threadId: ${JSON.stringify(threadId)} })`,
+    `window.coaxi.request('camp.composerDraft.get', { threadId: ${JSON.stringify(threadId)} })`,
     true)
   const directoryAttachment = draft?.attachments?.find((attachment) =>
     attachment.displayName === '项目资料')
@@ -3643,7 +3643,7 @@ async function verifyCompleteToolOutput(cdp) {
       persistedOutputBytes: new TextEncoder().encode(text.slice(${JSON.stringify(`$ ${codexExpectedCommand}\n`)}.length)).byteLength,
       truncationNotice: detail?.querySelector('.tool-result-truncation-note')?.textContent?.trim() ?? null,
       hasCutNotice: text.includes('…（后续内容未显示）'),
-      leakedEnvelope: text.startsWith('{') || text.includes('"_rovaiTruncated"'),
+      leakedEnvelope: text.startsWith('{') || text.includes('"_coaxiTruncated"'),
       copyButtonCount: detail?.querySelectorAll('.tool-output-copy-button').length ?? 0,
       legacyCompleteControlCount: detail?.parentElement?.querySelectorAll('.complete-evidence-control').length ?? 0,
       role: result?.getAttribute('role') ?? null,
@@ -3728,8 +3728,8 @@ async function verifyCompleteToolOutput(cdp) {
     body.scrollTop = Math.round(Math.max(0, body.scrollHeight - body.clientHeight) * .37)
     body.dispatchEvent(new Event('scroll', { bubbles: true }))
     result.scrollTop = Math.round(Math.max(0, result.scrollHeight - result.clientHeight) * .53)
-    window.__rovaiExecutionDrawerIdentity = drawer
-    window.__rovaiToolResultIdentity = result
+    window.__coaxiExecutionDrawerIdentity = drawer
+    window.__coaxiToolResultIdentity = result
     return {
       outerRatio: ratio(body),
       resultRatio: ratio(result),
@@ -3750,8 +3750,8 @@ async function verifyCompleteToolOutput(cdp) {
       return maximum > 0 ? element.scrollTop / maximum : 0
     }
     return drawer?.dataset.placement === 'inspector'
-      && drawer === window.__rovaiExecutionDrawerIdentity
-      && result === window.__rovaiToolResultIdentity
+      && drawer === window.__coaxiExecutionDrawerIdentity
+      && result === window.__coaxiToolResultIdentity
       && result?.closest('details.tool-call-disclosure')?.open
       && result?.closest('details.tool-activity-group')?.open
       && (body.scrollHeight - body.clientHeight <= 32
@@ -3776,8 +3776,8 @@ async function verifyCompleteToolOutput(cdp) {
       }
       return {
         placement: drawer?.dataset.placement ?? null,
-        sameDrawer: drawer === window.__rovaiExecutionDrawerIdentity,
-        sameResult: result === window.__rovaiToolResultIdentity,
+        sameDrawer: drawer === window.__coaxiExecutionDrawerIdentity,
+        sameResult: result === window.__coaxiToolResultIdentity,
         open: result?.closest('details.tool-call-disclosure')?.open ?? false,
         groupOpen: result?.closest('details.tool-activity-group')?.open ?? false,
         outer: body ? reading(body) : null,
@@ -3797,8 +3797,8 @@ async function verifyCompleteToolOutput(cdp) {
       return maximum > 0 ? element.scrollTop / maximum : 0
     }
     return {
-      sameDrawer: drawer === window.__rovaiExecutionDrawerIdentity,
-      sameResult: result === window.__rovaiToolResultIdentity,
+      sameDrawer: drawer === window.__coaxiExecutionDrawerIdentity,
+      sameResult: result === window.__coaxiToolResultIdentity,
       outerRatio: ratio(body),
       resultRatio: ratio(result),
       open: result?.closest('details.tool-call-disclosure')?.open ?? false,
@@ -3830,8 +3830,8 @@ async function verifyCompleteToolOutput(cdp) {
       }
       return {
         placement: drawer?.dataset.placement ?? null,
-        sameDrawer: drawer === window.__rovaiExecutionDrawerIdentity,
-        sameResult: result === window.__rovaiToolResultIdentity,
+        sameDrawer: drawer === window.__coaxiExecutionDrawerIdentity,
+        sameResult: result === window.__coaxiToolResultIdentity,
         open: result?.closest('details.tool-call-disclosure')?.open ?? false,
         groupOpen: result?.closest('details.tool-activity-group')?.open ?? false,
         outer: body ? reading(body) : null,
@@ -3870,8 +3870,8 @@ async function verifyCompleteToolOutput(cdp) {
       return maximum > 0 ? element.scrollTop / maximum : 0
     }
     return drawer?.dataset.placement === 'bottom'
-      && drawer === window.__rovaiExecutionDrawerIdentity
-      && result === window.__rovaiToolResultIdentity
+      && drawer === window.__coaxiExecutionDrawerIdentity
+      && result === window.__coaxiToolResultIdentity
       && result?.closest('details.tool-call-disclosure')?.open
       && result?.closest('details.tool-activity-group')?.open
       && (body.scrollHeight - body.clientHeight <= 32
@@ -3896,8 +3896,8 @@ async function verifyCompleteToolOutput(cdp) {
       }
       return {
         placement: drawer?.dataset.placement ?? null,
-        sameDrawer: drawer === window.__rovaiExecutionDrawerIdentity,
-        sameResult: result === window.__rovaiToolResultIdentity,
+        sameDrawer: drawer === window.__coaxiExecutionDrawerIdentity,
+        sameResult: result === window.__coaxiToolResultIdentity,
         open: result?.closest('details.tool-call-disclosure')?.open ?? false,
         groupOpen: result?.closest('details.tool-activity-group')?.open ?? false,
         outer: body ? reading(body) : null,
@@ -3919,15 +3919,15 @@ async function verifyCompleteToolOutput(cdp) {
       return maximum > 0 ? element.scrollTop / maximum : 0
     }
     const value = {
-      sameDrawer: drawer === window.__rovaiExecutionDrawerIdentity,
-      sameResult: result === window.__rovaiToolResultIdentity,
+      sameDrawer: drawer === window.__coaxiExecutionDrawerIdentity,
+      sameResult: result === window.__coaxiToolResultIdentity,
       outerRatio: ratio(body),
       resultRatio: ratio(result),
       open: result?.closest('details.tool-call-disclosure')?.open ?? false,
       groupOpen: result?.closest('details.tool-activity-group')?.open ?? false
     }
-    delete window.__rovaiExecutionDrawerIdentity
-    delete window.__rovaiToolResultIdentity
+    delete window.__coaxiExecutionDrawerIdentity
+    delete window.__coaxiToolResultIdentity
     return value
   })()`)
   assert(readingStart.disclosureOpen
@@ -4058,7 +4058,7 @@ async function verifyClaudeCommandDisclosure(cdp) {
     return disclosure?.open === true
       && disclosure.querySelector(':scope > summary')?.getAttribute('aria-expanded') === 'true'
   })()`)
-  await waitForExpression(cdp, `document.querySelector('.execution-drawer .tool-call-detail pre')?.textContent?.includes('ROVAI_CLAUDE_EMPTY_OUTPUT_OK') === true`, 30_000)
+  await waitForExpression(cdp, `document.querySelector('.execution-drawer .tool-call-detail pre')?.textContent?.includes('COAXI_CLAUDE_EMPTY_OUTPUT_OK') === true`, 30_000)
   const presentation = await evaluate(cdp, `(() => {
     const disclosure = [...document.querySelectorAll('.execution-drawer details.tool-call-disclosure')]
       .find((candidate) => candidate.querySelector('.tool-call-title')?.textContent?.trim()
@@ -4075,7 +4075,7 @@ async function verifyClaudeCommandDisclosure(cdp) {
   assert(presentation.found
     && presentation.groupOpen
     && presentation.open
-    && presentation.detail.includes('ROVAI_CLAUDE_EMPTY_OUTPUT_OK')
+    && presentation.detail.includes('COAXI_CLAUDE_EMPTY_OUTPUT_OK')
     && presentation.staticCount === 0,
   `Claude Bash command without output was not expandable: ${JSON.stringify(presentation)}`)
   return presentation
@@ -4179,7 +4179,7 @@ async function verifyExecutionDrawerResizeControl(cdp) {
       max: Number(handle.getAttribute('aria-valuemax')),
       now: Number(handle.getAttribute('aria-valuenow')),
       userSized: drawer.dataset.userSized === 'true',
-      storedHeight: sessionStorage.getItem('rovai.execution-drawer-height.v1'),
+      storedHeight: sessionStorage.getItem('coaxi.execution-drawer-height.v1'),
       selectedAgentId: document.querySelector('.run-pulse-chip.is-selected')?.dataset.agentId ?? null,
       focusedRunId: focused?.dataset.agentRunId ?? null,
       followingLatest: body.dataset.followingLatest === 'true',
@@ -4234,7 +4234,7 @@ async function verifyExecutionDrawerResizeControl(cdp) {
   await waitForExpression(cdp, `(() => {
     const drawer = document.querySelector('.execution-drawer')
     const handle = drawer?.querySelector('.execution-drawer-resize-handle')
-    const stored = Number(sessionStorage.getItem('rovai.execution-drawer-height.v1'))
+    const stored = Number(sessionStorage.getItem('coaxi.execution-drawer-height.v1'))
     return Boolean(handle)
       && drawer?.dataset.userSized === 'true'
       && Number.isFinite(stored)
@@ -4252,7 +4252,7 @@ async function verifyExecutionDrawerResizeControl(cdp) {
   await focusExecutionDrawerResizeHandle(cdp)
   await pressKey(cdp, ' ', 'Space', 32)
   await waitForExpression(cdp, `document.querySelector('.execution-drawer')?.dataset.userSized === 'false'
-    && sessionStorage.getItem('rovai.execution-drawer-height.v1') === null`)
+    && sessionStorage.getItem('coaxi.execution-drawer-height.v1') === null`)
   await wait(100)
   const reset = await geometry()
   assert(reset && !reset.userSized && reset.storedHeight === null,
@@ -4695,7 +4695,7 @@ async function verifyCampWorldMap(cdp, capturesDirectory) {
     && staticPresentation.documentOverflow <= 1,
   `World map or floating controls escaped the conversation surface: ${JSON.stringify(staticPresentation)}`)
   assert(staticPresentation.realSpeechText.includes('执行 · 正在运行')
-    && staticPresentation.realSpeechText.includes('rovai camp read'),
+    && staticPresentation.realSpeechText.includes('coaxi camp read'),
   `World map did not use the real AgentRun activity summary: ${JSON.stringify(staticPresentation)}`)
 
   const routeToggleClicked = await evaluate(cdp, `(() => {
@@ -5209,7 +5209,7 @@ async function verifyExecutionBackgrounds(cdp) {
 
 async function setTheme(cdp, preference) {
   await evaluate(cdp,
-    `window.rovai.appearance.setPreference(${JSON.stringify(preference)})`, true)
+    `window.coaxi.appearance.setPreference(${JSON.stringify(preference)})`, true)
   const expectedTheme = preference === 'night' ? 'night' : 'day'
   await waitForExpression(cdp,
     `document.documentElement.dataset.theme === ${JSON.stringify(expectedTheme)}`)
@@ -5219,7 +5219,7 @@ async function setTheme(cdp, preference) {
 }
 
 async function verifyGlobalExecutionPlacement(cdp) {
-  const authority = await evaluate(cdp, 'window.rovai.generalPreferences.get()', true)
+  const authority = await evaluate(cdp, 'window.coaxi.generalPreferences.get()', true)
   assert(authority.executionConsolePlacement === 'inspector',
     `Moving right did not commit the authoritative preference: ${JSON.stringify(authority)}`)
 
@@ -5231,7 +5231,7 @@ async function verifyGlobalExecutionPlacement(cdp) {
     executionTabCount: [...document.querySelectorAll('.camp-detail-entry')]
       .filter((tab) => tab.textContent?.includes('执行')).length
   }))()`)
-  const acrossCampAuthority = await evaluate(cdp, 'window.rovai.generalPreferences.get()', true)
+  const acrossCampAuthority = await evaluate(cdp, 'window.coaxi.generalPreferences.get()', true)
   assert(acrossCamp.bottomDockCount === 0
     && acrossCampAuthority.executionConsolePlacement === 'inspector',
   `A second Camp did not inherit Inspector placement: ${JSON.stringify({ acrossCamp, acrossCampAuthority })}`)
@@ -5246,7 +5246,7 @@ async function verifyGlobalExecutionPlacement(cdp) {
     executionTabCount: [...document.querySelectorAll('.camp-detail-entry')]
       .filter((tab) => tab.textContent?.includes('执行')).length
   }))()`)
-  const acrossPageAuthority = await evaluate(cdp, 'window.rovai.generalPreferences.get()', true)
+  const acrossPageAuthority = await evaluate(cdp, 'window.coaxi.generalPreferences.get()', true)
   assert(acrossPage.bottomDockCount === 0
     && acrossPageAuthority.executionConsolePlacement === 'inspector',
   `Returning from another primary page lost Inspector placement: ${JSON.stringify({ acrossPage, acrossPageAuthority })}`)
@@ -5353,7 +5353,7 @@ async function verifyRightExecutionPlacement(cdp) {
         previewCamp: drawer.closest('.file-preview-retained-host')?.dataset.previewCamp ?? null
       }))
     }))()`)
-    const preferences = await evaluate(cdp, 'window.rovai.generalPreferences.get()', true)
+    const preferences = await evaluate(cdp, 'window.coaxi.generalPreferences.get()', true)
     throw new Error(`Right-side Execution did not settle: ${JSON.stringify({ state, preferences })}`, { cause: error })
   }
   const presentation = await evaluate(cdp, `(() => {
@@ -5403,7 +5403,7 @@ async function verifyExecutionPlacementAcrossRestart(currentApp) {
   await waitForExpression(currentApp.cdp, `Boolean(document.querySelector('.run-pulse-inspector'))`)
   const beforeRestart = await evaluate(
     currentApp.cdp,
-    'window.rovai.generalPreferences.get()',
+    'window.coaxi.generalPreferences.get()',
     true
   )
   assert(beforeRestart.executionConsolePlacement === 'inspector',
@@ -5421,7 +5421,7 @@ async function verifyExecutionPlacementAcrossRestart(currentApp) {
       })()`, 30_000)
     const afterRestart = await evaluate(
       relaunchedApp.cdp,
-      'window.rovai.generalPreferences.get()',
+      'window.coaxi.generalPreferences.get()',
       true
     )
     const firstCampPaint = await evaluate(relaunchedApp.cdp, `(() => ({
@@ -5454,7 +5454,7 @@ async function verifyExecutionPlacementAcrossRestart(currentApp) {
       `Boolean(document.querySelector('.timeline-pane > .run-pulse-bottom'))`)
     const returnedToBottom = await evaluate(
       relaunchedApp.cdp,
-      'window.rovai.generalPreferences.get()',
+      'window.coaxi.generalPreferences.get()',
       true
     )
     assert(returnedToBottom.executionConsolePlacement === 'bottom',
@@ -5479,7 +5479,7 @@ async function verifyExecutionPlacementWriteFailure(cdp) {
     await chooseExecutionPlacement(cdp, 'bottom', false)
     await waitForExpression(cdp,
       `Boolean(document.querySelector('.run-pulse-inspector .execution-placement-feedback[role="alert"]'))`)
-    const authority = await evaluate(cdp, 'window.rovai.generalPreferences.get()', true)
+    const authority = await evaluate(cdp, 'window.coaxi.generalPreferences.get()', true)
     const temporaryFiles = (await readdir(dataDir)).filter((name) => name.endsWith('.tmp'))
     failedState = await evaluate(cdp, `(() => ({
       inspectorDockCount: document.querySelectorAll('.run-pulse-inspector').length,
@@ -5518,16 +5518,16 @@ async function verifyExecutionPlacementWriteFailure(cdp) {
         label: button.getAttribute('aria-label')
       }))
     }))()`)
-    const authority = await evaluate(cdp, 'window.rovai.generalPreferences.get()', true)
+    const authority = await evaluate(cdp, 'window.coaxi.generalPreferences.get()', true)
     throw new Error(`Placement retry did not update the rendered surface: ${JSON.stringify({ retryState, authority })}`, { cause: error })
   }
-  const retriedAuthority = await evaluate(cdp, 'window.rovai.generalPreferences.get()', true)
+  const retriedAuthority = await evaluate(cdp, 'window.coaxi.generalPreferences.get()', true)
   assert(retriedAuthority.executionConsolePlacement === 'bottom',
     `Placement retry did not commit bottom authority: ${JSON.stringify(retriedAuthority)}`)
 
   await chooseExecutionPlacement(cdp, 'inspector')
   await waitForExpression(cdp, `Boolean(document.querySelector('.run-pulse-inspector'))`)
-  const restoredAuthority = await evaluate(cdp, 'window.rovai.generalPreferences.get()', true)
+  const restoredAuthority = await evaluate(cdp, 'window.coaxi.generalPreferences.get()', true)
   assert(restoredAuthority.executionConsolePlacement === 'inspector',
     `Failure acceptance did not restore Inspector setup: ${JSON.stringify(restoredAuthority)}`)
 
@@ -5540,7 +5540,7 @@ async function launchApp(port, width, height) {
   const contextTrace = []
   let traceLine = ''
   const child = spawn(executable, [
-    ...(process.env.ROVAI_RUNTIME_ACTIVITY_ACCEPT_DISABLE_SANDBOX === '1'
+    ...(process.env.COAXI_RUNTIME_ACTIVITY_ACCEPT_DISABLE_SANDBOX === '1'
       ? ['--no-sandbox']
       : []),
     `--remote-debugging-port=${port}`,
@@ -5548,7 +5548,7 @@ async function launchApp(port, width, height) {
   ], {
     cwd: root,
     stdio: ['ignore', 'ignore', 'pipe'],
-    env: { ...process.env, ROVAI_ALLOW_ISOLATED_INSTANCE: '1', TMPDIR: runtimeTempDir }
+    env: { ...process.env, COAXI_ALLOW_ISOLATED_INSTANCE: '1', TMPDIR: runtimeTempDir }
   })
   child.stderr.on('data', (chunk) => {
     stderr.push(String(chunk))
@@ -5556,7 +5556,7 @@ async function launchApp(port, width, height) {
     const lines = traceLine.split('\n')
     traceLine = lines.pop().slice(-65536)
     for (const line of lines) {
-      const marker = 'ROVAI_CONTEXT_ACCEPTANCE '
+      const marker = 'COAXI_CONTEXT_ACCEPTANCE '
       const offset = line.indexOf(marker)
       if (offset < 0) continue
       try { contextTrace.push(JSON.parse(line.slice(offset + marker.length))) } catch { /* partial diagnostic */ }
@@ -5577,11 +5577,11 @@ async function launchApp(port, width, height) {
       features: [{ name: 'prefers-reduced-motion', value: 'reduce' }]
     })
     await waitForExpression(cdp,
-      `Boolean(window.rovai && document.querySelector('.app-shell'))`, 45_000)
+      `Boolean(window.coaxi && document.querySelector('.app-shell'))`, 45_000)
     // The bootstrap shell renders before authoritative Core requests are admitted.
-    await waitForExpression(cdp, `window.rovai.supervisor.getSnapshot()
+    await waitForExpression(cdp, `window.coaxi.supervisor.getSnapshot()
       .then(snapshot => snapshot.fullCoreState === 'ready')`, 45_000)
-    const health = await evaluate(cdp, `window.rovai.request('health.check', {})`, true)
+    const health = await evaluate(cdp, `window.coaxi.request('health.check', {})`, true)
     assert(await realpath(health.database.path) === await realpath(databasePath),
       `Isolated App opened the wrong database: ${JSON.stringify(health.database.path)}`)
     return { cdp, port, child, contextTrace }
@@ -5590,7 +5590,7 @@ async function launchApp(port, width, height) {
     if (cdp) {
       try {
         supervisor = await evaluate(cdp,
-          `window.rovai?.supervisor?.getSnapshot?.().catch((error) => ({ diagnosticError: String(error) }))`,
+          `window.coaxi?.supervisor?.getSnapshot?.().catch((error) => ({ diagnosticError: String(error) }))`,
           true)
       } catch {
         // The window may already be gone; stderr still provides launch evidence.
@@ -5617,7 +5617,7 @@ async function closeApp(app) {
 }
 
 async function waitForCoreProcessExit(coreDataDir, timeoutMs = 15_000) {
-  const lockPath = join(coreDataDir, '.rovai-core-instance.lock')
+  const lockPath = join(coreDataDir, '.coaxi-core-instance.lock')
   const startedAt = Date.now()
   while (Date.now() - startedAt < timeoutMs) {
     try {
@@ -5628,7 +5628,7 @@ async function waitForCoreProcessExit(coreDataDir, timeoutMs = 15_000) {
     }
     await wait(100)
   }
-  throw new Error(`Isolated rovai-core did not exit for ${coreDataDir}`)
+  throw new Error(`Isolated coaxi-core did not exit for ${coreDataDir}`)
 }
 
 function processIsAlive(processId) {
@@ -5681,7 +5681,7 @@ async function focusExecutionDrawerResizeHandle(cdp) {
 }
 
 async function chooseExecutionPlacement(cdp, target, waitForCommit = true) {
-  const current = await evaluate(cdp, 'window.rovai.generalPreferences.get()', true)
+  const current = await evaluate(cdp, 'window.coaxi.generalPreferences.get()', true)
   if (current.executionConsolePlacement === target) return
 
   const triggerAvailable = await evaluate(cdp, `(() => {
@@ -5699,7 +5699,7 @@ async function chooseExecutionPlacement(cdp, target, waitForCommit = true) {
   await mouseClickSelector(cdp, optionSelector)
   if (waitForCommit) {
     await waitForExpression(cdp,
-      `window.rovai.generalPreferences.get().then((preferences) => preferences.executionConsolePlacement === ${JSON.stringify(target)})`)
+      `window.coaxi.generalPreferences.get().then((preferences) => preferences.executionConsolePlacement === ${JSON.stringify(target)})`)
   }
 }
 
@@ -5821,7 +5821,7 @@ async function connectCdp(url) {
 }
 
 function startCore(dataDirectory) {
-  const child = spawn(join(appPath, 'Contents', 'Resources', 'bin', 'rovai-core'), [
+  const child = spawn(join(appPath, 'Contents', 'Resources', 'bin', 'coaxi-core'), [
     ...coreDataDirectoryArguments(dataDirectory),
     '--skill-library-root', join(dataDirectory, 'managed-skill-library'),
     '--mcp-config-path', join(dataDirectory, 'mcp.json')

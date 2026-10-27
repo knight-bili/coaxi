@@ -5,7 +5,7 @@
   "status": "core_installation_lifecycle_and_production_settings_UI_verified_member_delivery_pending",
   "source": {
     "parent": "e2963ef0d59989d16d32fffc03d19925dd75de85",
-    "codeg": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
+    "coaxi": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
     "implementationFiles": [
       {
         "file": "apps/desktop/src/renderer/src/CapabilityDeleteDialog.tsx",
@@ -28,37 +28,37 @@
         "gitBlob": "07064069d99cc170995de46b30e8db2cd192b376"
       },
       {
-        "file": "crates/rovai-core/src/application.rs",
+        "file": "crates/coaxi-core/src/application.rs",
         "sha256": "0ffd528f26b65ff7dc533cb74355c5da497fcdf088ee54dd15c9bca9258f0ab7",
         "gitBlob": "14604a4a297d2505b2352a10e103e2a7483a02dc"
       },
       {
-        "file": "crates/rovai-core/src/codeg_skill_catalog.rs",
+        "file": "crates/coaxi-core/src/coaxi_skill_catalog.rs",
         "sha256": "03c19088a6f3bb4dd852e6870b775d7bf4a19dd4165c4fdd264af361dc189fe1",
         "gitBlob": "5fe29a6a12b4e3d676af523698ef0aa40846b160"
       },
       {
-        "file": "crates/rovai-core/src/db.rs",
+        "file": "crates/coaxi-core/src/db.rs",
         "sha256": "2a19c7be63a7c8abc9eae60e9b90c51992b359f40246ab901245b67786735ecc",
         "gitBlob": "3ba93df3a0bea1c6ebdb25df0a47d72707baf135"
       },
       {
-        "file": "crates/rovai-core/src/db_simplification.rs",
+        "file": "crates/coaxi-core/src/db_simplification.rs",
         "sha256": "769f14417405c45a5533e81a28e6d7c6e6c54e5a2be8d423b829847fd14696d0",
         "gitBlob": "dd9f9de28fe6961b4948c516cfefe5dc922b0927"
       },
       {
-        "file": "crates/rovai-core/src/lib.rs",
+        "file": "crates/coaxi-core/src/lib.rs",
         "sha256": "e434d96e2fc02247b0393ab256ca4eca1f67ed396ae8e12ca7f216656a175b7b",
         "gitBlob": "c0004ae1aa2e1ca70b86e382f4e4683a7ac5a65c"
       },
       {
-        "file": "crates/rovai-core/src/skill.rs",
+        "file": "crates/coaxi-core/src/skill.rs",
         "sha256": "64c314e4550884047b291e43d881c72ab2c0c5493416213f30b39f8a2f9175d3",
         "gitBlob": "5db71bc813471e451228250b04b07da5988c4281"
       },
       {
-        "file": "crates/rovai-web/src/operations.rs",
+        "file": "crates/coaxi-web/src/operations.rs",
         "sha256": "c27bd68633cd3b87867ec5e8e7d49c76e8d80699cdd58f0daf54e738f0072c03",
         "gitBlob": "98ef23c25077272e3ff45db0485ad2538d47fcc3"
       },
@@ -73,7 +73,7 @@
         "gitBlob": "1ecd7b72f5eb5659bbb157b78e454c52d95e596c"
       },
       {
-        "file": "docs/contracts/codeg-skill-packs-v1.md",
+        "file": "docs/contracts/coaxi-skill-packs-v1.md",
         "sha256": "1f23f12c941a797ff12f91dd511e44a39658e3c6c0724f1abb60d4f99bc00a0e",
         "gitBlob": "ca5aae3b336dd28cf5a20b341be986a6e65c465e"
       },
@@ -108,7 +108,7 @@
         "gitBlob": "d8d188dd8b11bdba5611e28fd3a61989a7adebc1"
       },
       {
-        "file": "crates/rovai-core/src/skill_pack_installation.rs",
+        "file": "crates/coaxi-core/src/skill_pack_installation.rs",
         "sha256": "a5d4fb3ead8d0213303ce26fc0f75119b596978f1cbaf8a671fa6e981f1ec8a9",
         "gitBlob": "3275af66514d21b1fa9c63bac50d9f4504849c11"
       },
@@ -130,7 +130,7 @@
     ]
   },
   "implementation": {
-    "databaseAuthority": "Rovai Core SQLite",
+    "databaseAuthority": "Coaxi Core SQLite",
     "schema": 150,
     "migration": 200,
     "installedSourceCount": 28,
@@ -251,7 +251,7 @@
   },
   "artifact": {
     "sha256": "6dec380fb94450d7fefe31c887074adb46e59465a852071cbd003d2814f0cd93",
-    "binary": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i02\\native-artifacts\\core150-skill-install-6dec380fb944\\rovai-host.exe",
+    "binary": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i02\\native-artifacts\\core150-skill-install-6dec380fb944\\coaxi-host.exe",
     "schema": 150
   },
   "limitations": [

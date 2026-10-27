@@ -1,4 +1,4 @@
-# Replace with a domain you control. Keep Rovai on 127.0.0.1:8767.
+# Replace with a domain you control. Keep Coaxi on 127.0.0.1:8767.
 # Start Server with --public-origin https://agent.example.com.
 agent.example.com {
     reverse_proxy 127.0.0.1:8767 {

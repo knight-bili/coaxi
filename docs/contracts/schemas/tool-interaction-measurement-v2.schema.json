@@ -1,18 +1,18 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schemas.rovai.invalid/contracts/tool-interaction-measurement-v2.schema.json",
-  "title": "Rovai Tool Interaction Measurement v2",
+  "$id": "https://schemas.coaxi.invalid/contracts/tool-interaction-measurement-v2.schema.json",
+  "title": "Coaxi Tool Interaction Measurement v2",
   "type": "object",
   "additionalProperties": false,
   "required": ["artifactId", "schemaId", "schemaVersion", "producer", "binding", "sourceBoundaries", "payloadDigest", "payload"],
   "properties": {
-    "artifactId": { "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/stableId" },
-    "schemaId": { "const": "rovai.qualification.tool-interaction-measurement" },
+    "artifactId": { "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/stableId" },
+    "schemaId": { "const": "coaxi.qualification.tool-interaction-measurement" },
     "schemaVersion": { "const": "2.0.0" },
-    "producer": { "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/producer" },
-    "binding": { "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/binding" },
-    "sourceBoundaries": { "type": "array", "minItems": 1, "items": { "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/sourceBoundary" } },
-    "payloadDigest": { "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/digest" },
+    "producer": { "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/producer" },
+    "binding": { "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/binding" },
+    "sourceBoundaries": { "type": "array", "minItems": 1, "items": { "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/sourceBoundary" } },
+    "payloadDigest": { "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/digest" },
     "payload": {
       "type": "object",
       "additionalProperties": false,
@@ -25,13 +25,13 @@
           "required": ["specificationId", "specificationDigest", "runtimeCompatibility", "opportunityCount"],
           "properties": {
             "specificationId": { "type": "string" },
-            "specificationDigest": { "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/digest" },
+            "specificationDigest": { "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/digest" },
             "runtimeCompatibility": {
               "type": "object",
               "additionalProperties": false,
               "required": ["builtinToolContractVersion", "builtinToolIpcProtocolVersion", "operationProjectionSchemaVersion"],
               "properties": {
-                "builtinToolCatalogDigest": { "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/digest" },
+                "builtinToolCatalogDigest": { "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/digest" },
                 "builtinToolContractVersion": { "type": "integer", "minimum": 1 },
                 "builtinToolIpcProtocolVersion": { "type": "integer", "minimum": 1 },
                 "operationProjectionSchemaVersion": { "type": "integer", "minimum": 1 }
@@ -86,7 +86,7 @@
         "opportunityId": { "type": "string" },
         "adapter": { "enum": ["camp_history", "memory_retrieval", "memory_mutation", "camp_message_send", "task_coordination"] },
         "mode": { "enum": ["forced_use", "natural_use", "non_use_control"] },
-        "oracleDigest": { "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/digest" },
+        "oracleDigest": { "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/digest" },
         "status": { "enum": ["pass", "fail", "indeterminate"] },
         "deterministicAssessment": { "type": "object" },
         "evidenceReferences": { "type": "array" }

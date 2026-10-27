@@ -4,9 +4,9 @@ import { Plus, Settings2, Trash2 } from 'lucide-react'
 import type { BrowserPreferences, BrowserWorkspaceApi } from '@contracts'
 import { AppDialogContent, AppDialogHeader, AppDialogBody, AppDialogFooter } from './AppDialog'
 import { useUiText } from './interface-language'
-import { parseHostRulePattern } from '../../shared/codeg-browser-host-rules'
+import { parseHostRulePattern } from '../../shared/coaxi-browser-host-rules'
 
-/** Codeg BrowserSettings: setting rows, explicit site rules and native data ownership. */
+/** Coaxi BrowserSettings: setting rows, explicit site rules and native data ownership. */
 export function BrowserSettingsDialog({api, onChanged}: {api: BrowserWorkspaceApi; onChanged: (value: BrowserPreferences) => void}): React.JSX.Element {
   const t = useUiText()
   const [open, setOpen] = useState(false), [busy, setBusy] = useState(false)

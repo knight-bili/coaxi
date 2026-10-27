@@ -98,7 +98,7 @@ app.whenReady().then(async () => {
     await waitFor("document.querySelector('.navigation-shell')?.clientWidth >= 2500", 'Wide Mission fixture did not resize')
     await waitFor("!!document.querySelector('.mission-board-card')", 'Wide Mission board did not load')
     await window.webContents.executeJavaScript(`(() => {
-      localStorage.setItem('rovai.mission-drawer-width', '1906')
+      localStorage.setItem('coaxi.mission-drawer-width', '1906')
       document.querySelector('.mission-board-card').click()
     })()`, true)
     await waitFor("!!document.querySelector('.mission-drawer .mission-drawer-resize-handle')", 'Wide Mission drawer did not open')
@@ -205,7 +205,7 @@ app.whenReady().then(async () => {
   report.layouts = narrowLayout
   stage = 'drawer reopen'
   await window.webContents.executeJavaScript(`(() => {
-    localStorage.setItem('rovai.mission-drawer-width', '1040')
+    localStorage.setItem('coaxi.mission-drawer-width', '1040')
     document.querySelector('.mission-board-card')?.click()
   })()`, true)
   await waitFor("!!document.querySelector('.mission-drawer .mission-drawer-resize-handle') && !!document.querySelector('.file-preview-retained-host:not([hidden])')", 'Mission drawer did not reopen for pointer acceptance')

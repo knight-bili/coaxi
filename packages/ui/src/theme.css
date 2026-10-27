@@ -1,6 +1,6 @@
 /* Shared Porcelain Day / Steel Night tokens; owned by the existing Desktop theme contract. */
 :root {
-  /* Codeg neutral canvas palette; scoped by canvas.css, without replacing the App theme. */
+  /* Coaxi neutral canvas palette; scoped by canvas.css, without replacing the App theme. */
   --canvas-board-background: #ffffff;
   --canvas-board-card: #ffffff;
   --canvas-board-input: #fafafa;

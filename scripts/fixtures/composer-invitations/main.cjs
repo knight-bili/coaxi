@@ -95,7 +95,7 @@ app.whenReady().then(async () => {
     await wait('invitationTest.state().clipboardWrites.length === 1')
     state = await evaluate('invitationTest.state()')
     assert.equal(state.clipboardWrites[0].text, '@爱丽丝 ')
-    const encodedContent = state.clipboardWrites[0].html.match(/data-rovai-structured-camp-message-v1="([^"]+)"/)[1]
+    const encodedContent = state.clipboardWrites[0].html.match(/data-coaxi-structured-camp-message-v1="([^"]+)"/)[1]
     assert.equal(JSON.parse(Buffer.from(encodedContent, 'base64').toString('utf8')).content[0].agentId, 'outside')
     assert.equal(state.stored, acceptedDraft)
     for (const theme of ['day', 'night']) {

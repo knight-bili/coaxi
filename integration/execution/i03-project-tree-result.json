@@ -60,7 +60,7 @@
       "sha256": "87c6f728a6aa9ff4c9685aa91ff00137fe17243722d8894cc91c26c615d85c9f"
     },
     {
-      "path": "crates/rovai-core/src/git/worktrees.rs",
+      "path": "crates/coaxi-core/src/git/worktrees.rs",
       "sha256": "30cee13957c48d4163f5518b75f1eb40212a47ac4177da509c89e66c60dd33bc"
     },
     {

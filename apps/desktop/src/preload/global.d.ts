@@ -1,8 +1,8 @@
-import type { RovaiApi } from '@contracts'
+import type { CoaxiApi } from '@contracts'
 
 declare global {
   interface Window {
-    rovai: RovaiApi
+    coaxi: CoaxiApi
   }
 }
 

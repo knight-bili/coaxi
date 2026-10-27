@@ -25,8 +25,8 @@ import './fixture.css'
 
 declare const __SOURCE_COMMIT__: string
 document.documentElement.dataset.platform = 'darwin'
-document.documentElement.dataset.rovaiPlatform = 'darwin'
-document.documentElement.dataset.rovaiSurface = 'desktop'
+document.documentElement.dataset.coaxiPlatform = 'darwin'
+document.documentElement.dataset.coaxiSurface = 'desktop'
 const params = new URLSearchParams(location.search)
 const completeCoverage = { loadedCount: 0, totalCount: 0, omittedCount: 0, complete: true }
 const openCoverage = { tasks: completeCoverage, messageDeliveries: completeCoverage, turns: completeCoverage,
@@ -92,7 +92,7 @@ function Workbench() {
     addEventListener('keydown', key); return () => removeEventListener('keydown', key)
   }, [])
   useEffect(() => { if (!state.note) return; const id = setTimeout(() => model.note(''), 3500); return () => clearTimeout(id) }, [state.note])
-  const current = { id: state.snapshot.thread.id, title: state.snapshot.thread.title, projectPath: '/prototype/rovai-ai',
+  const current = { id: state.snapshot.thread.id, title: state.snapshot.thread.title, projectPath: '/prototype/coaxi',
     projectBindingKind: 'directory', activationState: 'active', defaultLead: { agentId: profiles[0].agentId, displayName: profiles[0].displayName },
     marker: state.snapshot.agentRuns.some((r: any) => r.status === 'running') ? 'loading' : 'none', lastActivityAt: new Date().toISOString(),
     lastActivityGlobalSequence: 10, latestCompletionGlobalSequence: 0, version: 1 }
@@ -100,7 +100,7 @@ function Workbench() {
     quickChat: { totalCount: 2, recentThreads: [
       { ...current, id: 'demo-quick-1', title: '整理本周的想法', marker: 'none', projectBindingKind: 'quick_chat', projectPath: '' },
       { ...current, id: 'demo-quick-2', title: '试试新的交互', marker: 'none', projectBindingKind: 'quick_chat', projectPath: '' }] },
-    projects: [{ projectKey: 'presence-project', name: 'rovai-ai', projectPath: '/prototype/rovai-ai', lastActivityAt: current.lastActivityAt,
+    projects: [{ projectKey: 'presence-project', name: 'coaxi', projectPath: '/prototype/coaxi', lastActivityAt: current.lastActivityAt,
       lastActivityGlobalSequence: 10, totalCount: 4, recentThreads: [current,
         ...['消息投递与恢复', '会话工作区优化', '发布前检查'].map((title, i) => ({ ...current, id: `demo-thread-${i}`, title, marker: 'none' }))] }] }
   useEffect(() => {
@@ -127,7 +127,7 @@ function Workbench() {
           identityMatchesRun: rows.every((e, i) => Boolean(e.querySelector('.member-avatar')) === !slots[i].continuation),
           slots: slots.length, messages: s.messages.length, viewport: [innerWidth, innerHeight],
           overflow: document.documentElement.scrollWidth > innerWidth,
-          sourceCommit: __SOURCE_COMMIT__, nativeBridge: typeof (window as any).rovai }
+          sourceCommit: __SOURCE_COMMIT__, nativeBridge: typeof (window as any).coaxi }
       } } })
   }, [])
   return <MobileLayoutProvider value={false}><ThreadClientProvider client={model.client as any}>
@@ -145,13 +145,13 @@ function Workbench() {
           onThread={thread => { setInspector(null); setOtherThread(thread.id === current.id ? null : { id: thread.id, title: thread.title }) }}
           onRemoveProject={async () => unsupported('移除项目')} onDelete={async () => unsupported('删除对话')}
           onRename={async (_, title) => model.rename(title)} onError={error => model.note(String(error))} />
-        {!settings && <AppHeader threadTitle={visibleSnapshot.thread.title} contextLabel="rovai-ai" thread={visibleSnapshot} detailEntryHostRef={setDetailHost} onFocusApprovals={() => {}} />}
+        {!settings && <AppHeader threadTitle={visibleSnapshot.thread.title} contextLabel="coaxi" thread={visibleSnapshot} detailEntryHostRef={setDetailHost} onFocusApprovals={() => {}} />}
         {settings && <div className="window-drag-strip window-drag-strip-settings" aria-hidden="true" />}
         <main className="content task-content camp-content" style={settings ? { display: 'none' } : undefined} aria-hidden={settings || undefined}>
           <ThreadWorkspace key={`${state.generation}:${visibleSnapshot.thread.id}`} snapshot={params.has('windowed') ? { ...visibleSnapshot, executionEvidence: [] } : visibleSnapshot}
             liveRuntimeEvents={model.controls.liveEvidence ? visibleSnapshot.executionEvidence.map(liveRuntimeEventFromExecutionEvidence) : undefined}
             workspaceEntrySnapshotReady={!model.controls.holdEntrySnapshot}
-            openCoverage={params.has('windowed') ? openCoverage : null} projectName="rovai-ai" agents={profiles as any}
+            openCoverage={params.has('windowed') ? openCoverage : null} projectName="coaxi" agents={profiles as any}
             installations={installations as any} initialComposerDraft={state.draft} busy={state.busy}
             onSend={model.send} onChangeLead={model.changeLead} onTasksChanged={async () => {}}
             onResolveApproval={() => {}} stopping={false} onCancelAgentRun={model.cancel}

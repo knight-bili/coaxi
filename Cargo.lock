@@ -419,6 +419,151 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c8d4a3bb8b1e0c1050499d1815f5ab16d04f0959b233085fb31653fbfc9d98f9"
 
 [[package]]
+name = "coaxi-channels"
+version = "0.4.8"
+dependencies = [
+ "async-trait",
+ "base64",
+ "image",
+ "qrcode",
+ "rand 0.8.8",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.18",
+ "tokio",
+ "tracing",
+ "uuid",
+]
+
+[[package]]
+name = "coaxi-computer"
+version = "0.4.8"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "base64",
+ "chrono",
+ "core-foundation",
+ "core-foundation-sys",
+ "dirs",
+ "flate2",
+ "image",
+ "libc",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "sha2",
+ "tar",
+ "thiserror 2.0.18",
+ "tokio",
+ "tracing",
+ "tracing-subscriber",
+ "uuid",
+ "windows-sys 0.59.0",
+ "x11rb",
+ "zip",
+]
+
+[[package]]
+name = "coaxi-core"
+version = "0.4.8"
+dependencies = [
+ "aes-gcm",
+ "anyhow",
+ "argon2",
+ "base64",
+ "chrono",
+ "chrono-tz",
+ "coaxi-channels",
+ "coaxi-computer",
+ "comrak",
+ "croner",
+ "dirs",
+ "dunce",
+ "flate2",
+ "getrandom 0.3.4",
+ "iana-time-zone",
+ "image",
+ "json5",
+ "libc",
+ "percent-encoding",
+ "plist",
+ "portable-pty",
+ "rand 0.8.8",
+ "regex",
+ "reqwest",
+ "ring",
+ "rusqlite",
+ "semver",
+ "serde",
+ "serde_json",
+ "serde_yaml",
+ "sha2",
+ "subtle",
+ "tar",
+ "thiserror 2.0.18",
+ "tokio",
+ "tokio-util",
+ "toml",
+ "toml_edit",
+ "tracing",
+ "unicode-normalization",
+ "url",
+ "uuid",
+ "windows-sys 0.61.2",
+ "zip",
+]
+
+[[package]]
+name = "coaxi-host"
+version = "0.4.8"
+dependencies = [
+ "anyhow",
+ "chrono",
+ "clap",
+ "coaxi-channels",
+ "coaxi-core",
+ "coaxi-web",
+ "dirs",
+ "libc",
+ "os_pipe",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "sha2",
+ "tokio",
+ "tokio-util",
+ "tracing",
+ "tracing-subscriber",
+ "windows-sys 0.61.2",
+]
+
+[[package]]
+name = "coaxi-web"
+version = "0.4.8"
+dependencies = [
+ "anyhow",
+ "async-stream",
+ "axum",
+ "base64",
+ "coaxi-core",
+ "futures-util",
+ "getrandom 0.3.4",
+ "if-addrs",
+ "memchr",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "sha2",
+ "subtle",
+ "tokio",
+ "tower",
+ "url",
+ "urlencoding",
+]
+
+[[package]]
 name = "colorchoice"
 version = "1.0.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2001,151 +2146,6 @@ dependencies = [
  "libc",
  "untrusted",
  "windows-sys 0.52.0",
-]
-
-[[package]]
-name = "rovai-channels"
-version = "0.4.8"
-dependencies = [
- "async-trait",
- "base64",
- "image",
- "qrcode",
- "rand 0.8.8",
- "reqwest",
- "serde",
- "serde_json",
- "thiserror 2.0.18",
- "tokio",
- "tracing",
- "uuid",
-]
-
-[[package]]
-name = "rovai-computer"
-version = "0.4.8"
-dependencies = [
- "anyhow",
- "async-trait",
- "base64",
- "chrono",
- "core-foundation",
- "core-foundation-sys",
- "dirs",
- "flate2",
- "image",
- "libc",
- "reqwest",
- "serde",
- "serde_json",
- "sha2",
- "tar",
- "thiserror 2.0.18",
- "tokio",
- "tracing",
- "tracing-subscriber",
- "uuid",
- "windows-sys 0.59.0",
- "x11rb",
- "zip",
-]
-
-[[package]]
-name = "rovai-core"
-version = "0.4.8"
-dependencies = [
- "aes-gcm",
- "anyhow",
- "argon2",
- "base64",
- "chrono",
- "chrono-tz",
- "comrak",
- "croner",
- "dirs",
- "dunce",
- "flate2",
- "getrandom 0.3.4",
- "iana-time-zone",
- "image",
- "json5",
- "libc",
- "percent-encoding",
- "plist",
- "portable-pty",
- "rand 0.8.8",
- "regex",
- "reqwest",
- "ring",
- "rovai-channels",
- "rovai-computer",
- "rusqlite",
- "semver",
- "serde",
- "serde_json",
- "serde_yaml",
- "sha2",
- "subtle",
- "tar",
- "thiserror 2.0.18",
- "tokio",
- "tokio-util",
- "toml",
- "toml_edit",
- "tracing",
- "unicode-normalization",
- "url",
- "uuid",
- "windows-sys 0.61.2",
- "zip",
-]
-
-[[package]]
-name = "rovai-host"
-version = "0.4.8"
-dependencies = [
- "anyhow",
- "chrono",
- "clap",
- "dirs",
- "libc",
- "os_pipe",
- "reqwest",
- "rovai-channels",
- "rovai-core",
- "rovai-web",
- "serde",
- "serde_json",
- "sha2",
- "tokio",
- "tokio-util",
- "tracing",
- "tracing-subscriber",
- "windows-sys 0.61.2",
-]
-
-[[package]]
-name = "rovai-web"
-version = "0.4.8"
-dependencies = [
- "anyhow",
- "async-stream",
- "axum",
- "base64",
- "futures-util",
- "getrandom 0.3.4",
- "if-addrs",
- "memchr",
- "reqwest",
- "rovai-core",
- "serde",
- "serde_json",
- "sha2",
- "subtle",
- "tokio",
- "tower",
- "url",
- "urlencoding",
 ]
 
 [[package]]

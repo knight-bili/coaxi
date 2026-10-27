@@ -29,9 +29,9 @@ Keep unanswered questions, numbers and existing advice unchanged. Add no new que
 
 ## Messages and completion
 
-- Partner request: `rovai send --to <partner-agent-id> --body <questions>`.
-- Partner response: `rovai send --to <requester-agent-id> --body <advice>`.
-- User questions or final confirmation: `rovai send --public-only --to-user --body <questions-or-summary>`.
+- Partner request: `coaxi send --to <partner-agent-id> --body <questions>`.
+- Partner response: `coaxi send --to <requester-agent-id> --body <advice>`.
+- User questions or final confirmation: `coaxi send --public-only --to-user --body <questions-or-summary>`.
 
 After dispatch, finish other current inputs and end while waiting for the reply. Follow CLI recovery on failure; do not blindly resend.
 

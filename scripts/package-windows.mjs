@@ -15,7 +15,7 @@ const root = resolve(import.meta.dirname, '..')
 const cli = resolve(root, 'node_modules', 'electron-builder', 'out', 'cli', 'cli.js')
 if (!existsSync(cli)) throw new Error('electron-builder is not installed')
 
-const releaseSigning = process.env.ROVAI_WINDOWS_RELEASE_SIGNING === '1'
+const releaseSigning = process.env.COAXI_WINDOWS_RELEASE_SIGNING === '1'
 if (releaseSigning && !process.env.CSC_LINK) {
   throw new Error('CSC_LINK is required for a signed Windows release')
 }

@@ -8,7 +8,7 @@ const overlaySelector = '[role="dialog"],[role="menu"],[data-radix-popper-conten
 export function browserOverlayIntersects(page: DOMRect, overlay: DOMRect): boolean {
   return overlay.width > 0 && overlay.height > 0 && overlay.left < page.right && overlay.right > page.left && overlay.top < page.bottom && overlay.bottom > page.top
 }
-/** Codeg NativeSurfaceHost: paint a decoded still before hiding a native page under DOM overlays. */
+/** Coaxi NativeSurfaceHost: paint a decoded still before hiding a native page under DOM overlays. */
 export function NativeBrowserStage({ api, id, active = true }: { api: Pick<BrowserWorkspaceApi,'present'|'inspect'>; id: string; active?: boolean }): React.JSX.Element {
   const root = useRef<HTMLDivElement>(null), t = useUiText()
   const text = useRef(t); text.current = t

@@ -43,11 +43,11 @@ test('native full output requires an exact original Core digest and unchanged wr
 })
 
 test('only a proven final readonly help suffix can leave the verification prefix', () => {
-  const output='extra edge checks passed\nrovai send\nUsage: help\n'
-  const good=nativeOutputProjection('node checks.mjs\nrovai send --help',output,output)
+  const output='extra edge checks passed\ncoaxi send\nUsage: help\n'
+  const good=nativeOutputProjection('node checks.mjs\ncoaxi send --help',output,output)
   assert.equal(good.command,'node checks.mjs');assert.equal(good.output,'extra edge checks passed\n')
-  assert.equal(nativeOutputProjection('node checks.mjs\nrovai send --help',output,'different help'),null)
-  assert.equal(nativeOutputProjection('node checks.mjs\nrovai send --to member',output,output),null)
+  assert.equal(nativeOutputProjection('node checks.mjs\ncoaxi send --help',output,'different help'),null)
+  assert.equal(nativeOutputProjection('node checks.mjs\ncoaxi send --to member',output,output),null)
   assert.equal(nativeOutputProjection('node checks.mjs','review-duo confidential', 'review-duo confidential'),null)
 })
 

@@ -12,13 +12,13 @@ import { removeEphemeralRuntimeCampFilesRoot } from './lib/runtime-camp-files-ro
 // Explicit real-model acceptance. The caller supplies an isolated HOME with
 // official account-login or BYOK configuration, never a production Core root.
 const repo = resolve(import.meta.dirname, '..')
-const root = await realpath(process.env.ROVAI_ZCODE_IMAGE_SMOKE_ROOT ?? await mkdtemp(join(tmpdir(), 'rvzi-')))
+const root = await realpath(process.env.COAXI_ZCODE_IMAGE_SMOKE_ROOT ?? await mkdtemp(join(tmpdir(), 'rvzi-')))
 const data = join(root, 'data'), project = join(root, 'project')
 const events = [], trace = join(root, 'methods.jsonl'), hook = join(root, 'trace.cjs')
 let core, passed = false
 await mkdir(project)
 await writeFile(join(project, 'README.md'), '# Isolated image input acceptance\n')
-for (const args of [['init', '-b', 'main'], ['add', '.'], ['-c', 'user.name=Smoke', '-c', 'user.email=smoke@rovai.local', 'commit', '-m', 'fixture']]) execFileSync('git', args, { cwd: project, stdio: 'ignore' })
+for (const args of [['init', '-b', 'main'], ['add', '.'], ['-c', 'user.name=Smoke', '-c', 'user.email=smoke@coaxi.local', 'commit', '-m', 'fixture']]) execFileSync('git', args, { cwd: project, stdio: 'ignore' })
 await writeFile(hook, `if(process.argv.some(a=>a.endsWith('/zcode.cjs'))&&process.argv.includes('app-server')){
 const fs=require('node:fs');const record=v=>fs.appendFileSync(${JSON.stringify(trace)},JSON.stringify(v)+'\\n',{mode:0o600});
 const emit=process.stdin.emit;let input='';process.stdin.emit=function(name,...args){if(name==='data'){input+=args[0].toString();let n;while((n=input.indexOf('\\n'))>=0){const line=input.slice(0,n);input=input.slice(n+1);try{const v=JSON.parse(line);if(v.method)record({method:v.method,command:v.params?.type,images:v.params?.payload?.attachments?.length});}catch{}}}return Reflect.apply(emit,this,[name,...args])};
@@ -26,7 +26,7 @@ const write=process.stdout.write;let output='';process.stdout.write=function(chu
 `)
 process.env.NODE_OPTIONS = `${process.env.NODE_OPTIONS ?? ''} --require=${hook}`.trim()
 console.log(JSON.stringify({ stage: 'fixture', dataDirectory: data, skillLibrary: join(data, 'managed-skill-library'), nativeHome: process.env.HOME }))
-const start = () => startQualificationCore({ coreExecutable: join(repo, 'target/debug/rovai-core'), dataDirectory: data, workingDirectory: repo, runtimeCacheDirectory: join(root, 'cache'), mcpConfigPath: join(data, 'mcp.json'), onNotification: event => events.push(event) })
+const start = () => startQualificationCore({ coreExecutable: join(repo, 'target/debug/coaxi-core'), dataDirectory: data, workingDirectory: repo, runtimeCacheDirectory: join(root, 'cache'), mcpConfigPath: join(data, 'mcp.json'), onNotification: event => events.push(event) })
 try {
   core = start()
   const workspace = await core.request('workspaces.inspect', { path: project })

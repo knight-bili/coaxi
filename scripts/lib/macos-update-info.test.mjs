@@ -7,8 +7,8 @@ const SHA_X64 = 'x'.repeat(88)
 const SHA_ARM64 = 'a'.repeat(88)
 
 function updateInfo(architecture, overrides = {}) {
-  const zip = `Rovai-AI-0.0.2-${architecture}.zip`
-  const dmg = `Rovai-AI-0.0.2-${architecture}.dmg`
+  const zip = `Coaxi-AI-0.0.2-${architecture}.zip`
+  const dmg = `Coaxi-AI-0.0.2-${architecture}.dmg`
   const sha512 = architecture === 'x64' ? SHA_X64 : SHA_ARM64
   return {
     version: '0.0.2',
@@ -31,12 +31,12 @@ test('merges both macOS architectures with deterministic ZIP-first ordering', ()
 
   assert.equal(merged.version, '0.0.2')
   assert.deepEqual(merged.files.map((file) => file.url), [
-    'Rovai-AI-0.0.2-x64.zip',
-    'Rovai-AI-0.0.2-arm64.zip',
-    'Rovai-AI-0.0.2-x64.dmg',
-    'Rovai-AI-0.0.2-arm64.dmg'
+    'Coaxi-AI-0.0.2-x64.zip',
+    'Coaxi-AI-0.0.2-arm64.zip',
+    'Coaxi-AI-0.0.2-x64.dmg',
+    'Coaxi-AI-0.0.2-arm64.dmg'
   ])
-  assert.equal(merged.path, 'Rovai-AI-0.0.2-x64.zip')
+  assert.equal(merged.path, 'Coaxi-AI-0.0.2-x64.zip')
   assert.equal(merged.sha512, SHA_X64)
   assert.equal(merged.releaseDate, '2026-08-24T12:01:00.000Z')
   assert.equal(merged.releaseNotes, '# Coaxi v0.0.2\n\n- Reliable updates\n')

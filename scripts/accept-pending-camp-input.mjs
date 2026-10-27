@@ -18,11 +18,11 @@ const { values } = parseArgs({ options: {
   'runtime-config': { type: 'string' }
 } })
 const repository = resolve(import.meta.dirname, '..')
-const executable = resolve(values.core ?? join(repository, 'target/debug/rovai-core'))
+const executable = resolve(values.core ?? join(repository, 'target/debug/coaxi-core'))
 const runtimeConfig = values['runtime-config']
   ? JSON.parse(await readFile(resolve(values['runtime-config']), 'utf8'))
   : { adapterKind: 'claude-code-cli' }
-const fixtureRoot = await realpath(await mkdtemp(join(tmpdir(), 'rovai-pending-input-acceptance-')))
+const fixtureRoot = await realpath(await mkdtemp(join(tmpdir(), 'coaxi-pending-input-acceptance-')))
 const dataDir = assertUserDataIsIsolated(join(fixtureRoot, 'user-data'))
 const projectPath = join(fixtureRoot, 'project')
 await mkdir(dataDir)

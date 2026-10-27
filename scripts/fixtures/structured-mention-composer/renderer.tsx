@@ -9,7 +9,7 @@ import {
   type StructuredMentionMember
 } from '../../../apps/desktop/src/renderer/src/StructuredMentionComposer'
 import {
-  ROVAI_COMPOSER_CLIPBOARD_MIME,
+  COAXI_COMPOSER_CLIPBOARD_MIME,
   cloneComposerDocument,
   composerDocumentFromText
 } from '../../../apps/desktop/src/renderer/src/composer-document'
@@ -154,7 +154,7 @@ function Harness() {
         paste(text: string, structured = '', html = '') {
           const clipboardData = new DataTransfer()
           clipboardData.setData('text/plain', text)
-          if (structured) clipboardData.setData(ROVAI_COMPOSER_CLIPBOARD_MIME, structured)
+          if (structured) clipboardData.setData(COAXI_COMPOSER_CLIPBOARD_MIME, structured)
           if (html) clipboardData.setData('text/html', html)
           editor().dispatchEvent(new ClipboardEvent('paste', {
             bubbles: true,
@@ -182,7 +182,7 @@ function Harness() {
           }))
           return {
             plain: clipboardData.getData('text/plain'),
-            structured: clipboardData.getData(ROVAI_COMPOSER_CLIPBOARD_MIME),
+            structured: clipboardData.getData(COAXI_COMPOSER_CLIPBOARD_MIME),
             html: clipboardData.getData('text/html')
           }
         },

@@ -13,7 +13,7 @@ it('permits normal navigation only in an admitted preview subtree and revokes it
   expect(gate.allows(origin+'/entry',frame,main,frames)).toBe(true)
   expect(gate.allows('https://example.test/page',child,main,frames)).toBe(true)
   expect(gate.allows('about:blank',child,main,frames)).toBe(true)
-  for (const url of [main.url,'file:///tmp/test.html','javascript:alert(1)','rovai-preview://asset/x','about:config']) expect(gate.allows(url,child,main,frames)).toBe(false)
+  for (const url of [main.url,'file:///tmp/test.html','javascript:alert(1)','coaxi-preview://asset/x','about:config']) expect(gate.allows(url,child,main,frames)).toBe(false)
   expect(gate.allows('https://example.test',outsider,main,frames)).toBe(false)
   expect(gate.allows(origin,main,main,frames)).toBe(false)
   frame.url = 'https://example.test'

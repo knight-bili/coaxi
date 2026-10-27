@@ -12,7 +12,7 @@ import {
 } from './lib/runtime-camp-files-root.mjs'
 
 const root = resolve(import.meta.dirname, '..')
-const selectedAdapters = (process.env.ROVAI_MEMORY_RUNTIME_ADAPTERS
+const selectedAdapters = (process.env.COAXI_MEMORY_RUNTIME_ADAPTERS
   ?? 'codex-cli,claude-code-cli')
   .split(',')
   .map((value) => value.trim())
@@ -22,7 +22,7 @@ const results = []
 
 for (const adapterKind of selectedAdapters) {
   if (!supportedAdapters.has(adapterKind)) {
-    throw new Error(`Unsupported ROVAI_MEMORY_RUNTIME_ADAPTERS value: ${adapterKind}`)
+    throw new Error(`Unsupported COAXI_MEMORY_RUNTIME_ADAPTERS value: ${adapterKind}`)
   }
   results.push(await runAdapterSmoke(adapterKind))
 }
@@ -30,13 +30,13 @@ for (const adapterKind of selectedAdapters) {
 console.log(JSON.stringify({ ok: true, results }, null, 2))
 
 async function runAdapterSmoke(adapterKind) {
-  const fixtureRoot = await mkdtemp(join(tmpdir(), `rovai-memory-runtime-${adapterKind}-`))
+  const fixtureRoot = await mkdtemp(join(tmpdir(), `coaxi-memory-runtime-${adapterKind}-`))
   const dataDir = join(fixtureRoot, 'data')
   const lessonBody = `Runtime 验收 ${adapterKind}：长期经验应先核对工具回执再宣称生效。`
   let core = null
   try {
     core = startCore(dataDir, adapterKind === 'claude-code-cli'
-      ? { ANTHROPIC_MODEL: process.env.ROVAI_MEMORY_CLAUDE_MODEL ?? 'haiku' }
+      ? { ANTHROPIC_MODEL: process.env.COAXI_MEMORY_CLAUDE_MODEL ?? 'haiku' }
       : {})
     const health = await core.request('health.check')
     const runtimeVersion = adapterKind === 'codex-cli'
@@ -48,7 +48,7 @@ async function runAdapterSmoke(adapterKind) {
       workspace: null,
       body: [
         '执行一次 bounded Memory 自动形成验收。',
-        '必须且只能通过 bash 调用一次 `rovai memory write --input-file request.json`，参数如下：',
+        '必须且只能通过 bash 调用一次 `coaxi memory write --input-file request.json`，参数如下：',
         `action=add, scope=companion, kind=lesson, body=${lessonBody}, retrievalKeys=["运行时验收","工具回执"]`,
         '检查结构化回执。只有当 effective=true，且 memoryId/revisionId 均存在时，才只回复 MEMORY_WRITE_OK。'
       ].join('\n'),
@@ -88,7 +88,7 @@ async function runAdapterSmoke(adapterKind) {
 
     await core.stop()
     core = startCore(dataDir, adapterKind === 'claude-code-cli'
-      ? { ANTHROPIC_MODEL: process.env.ROVAI_MEMORY_CLAUDE_MODEL ?? 'haiku' }
+      ? { ANTHROPIC_MODEL: process.env.COAXI_MEMORY_CLAUDE_MODEL ?? 'haiku' }
       : {})
     const restoredMemory = await core.request('memory.get', { memoryId: accepted.memory.id })
     if (restoredMemory?.creationOrigin !== 'agent'
@@ -131,7 +131,7 @@ async function configureClaude(request, _health) {
 }
 
 function startCore(dataDirectory, environment = {}) {
-  const child = spawn(join(root, 'target', 'debug', 'rovai-core'), [
+  const child = spawn(join(root, 'target', 'debug', 'coaxi-core'), [
     ...coreDataDirectoryArguments(dataDirectory),
     '--skill-library-root', join(dataDirectory, 'managed-skill-library')
   ], {
@@ -153,7 +153,7 @@ function startCore(dataDirectory, environment = {}) {
   child.once('error', rejectPending)
   child.once('close', (code, signal) => {
     if (!stopped) {
-      rejectPending(new Error(`rovai-core exited early (code=${code}, signal=${signal})`))
+      rejectPending(new Error(`coaxi-core exited early (code=${code}, signal=${signal})`))
     }
   })
   createInterface({ input: child.stdout }).on('line', (line) => {

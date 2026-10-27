@@ -15,7 +15,7 @@ it('uses fixed Windows channels and removes listeners on unmount', async () => {
   const ipc = Object.assign(new EventEmitter(), { invoke: vi.fn() })
   const api = createWindowCloseApi(ipc as never, 'win32')!
   await api.setBehavior('ask')
-  expect(ipc.invoke).toHaveBeenCalledWith('rovai:window-close', 'set', 'ask')
+  expect(ipc.invoke).toHaveBeenCalledWith('coaxi:window-close', 'set', 'ask')
   const listener = vi.fn(); const unsubscribe = api.onChanged(listener)
   ipc.emit(WINDOW_CLOSE_CHANGED, {}, { revision: 1 }); expect(listener).toHaveBeenCalledOnce()
   unsubscribe(); ipc.emit(WINDOW_CLOSE_CHANGED, {}, { revision: 2 }); expect(listener).toHaveBeenCalledOnce()

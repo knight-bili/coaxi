@@ -1,6 +1,6 @@
 {
   "kind":"design_fixture_not_a_production_migration",
-  "source":"codeg",
+  "source":"coaxi",
   "sourceHost":"isolated-fixture-host",
   "sourceRecord":{"folderId":1,"conversationId":7,"agentType":"codex","clientMessageId":"fixture-message-1"},
   "intendedMapping":{"publicThreadRef":"rvcamp_01h47kvsy5fk1shh6w1g60eecf","idAllocation":"仅为合法格式的设计示例；生产导入使用Core创建命令返回的threadId，不复用此示例","scopeKeys":["sourceHost","agentType","conversationId"],"nativeSessionRef":"Runtime内部记录，不冒充公共Thread","worktreeCreatedAutomatically":false},

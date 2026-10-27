@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schemas.rovai.invalid/v0.36/diagnostic-portfolio-ledger-event.schema.json",
-  "title": "Rovai v0.36 Diagnostic Portfolio Ledger Event",
+  "$id": "https://schemas.coaxi.invalid/v0.36/diagnostic-portfolio-ledger-event.schema.json",
+  "title": "Coaxi v0.36 Diagnostic Portfolio Ledger Event",
   "type": "object",
   "additionalProperties": false,
   "required": [

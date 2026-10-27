@@ -11,11 +11,11 @@ import electron from 'electron'
 import { launchAcceptanceBrowser, pause } from './host-web-browser.mjs'
 import { exerciseBrowserManagement } from './host-web-management-ui.mjs'
 const root = resolve(import.meta.dirname, '../..')
-const chrome = process.env.ROVAI_REVIEW_CHROME ?? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+const chrome = process.env.COAXI_REVIEW_CHROME ?? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
 
 test('actual browser Core switch isolates a committed private upload whose HTTP reply is delayed', { timeout: 180_000 }, async t => {
   if (process.platform !== 'win32') { t.skip('This two-Core protected-directory browser owner qualifies Windows only.'); return }
-  const binary = process.env.ROVAI_HOST_BIN, uiDirectory = process.env.ROVAI_WEB_UI, output = process.env.ROVAI_CROSS_CORE_UPLOAD_OUTPUT
+  const binary = process.env.COAXI_HOST_BIN, uiDirectory = process.env.COAXI_WEB_UI, output = process.env.COAXI_CROSS_CORE_UPLOAD_OUTPUT
   assert.ok(binary && uiDirectory && output, 'Use an explicitly frozen Host, Web artifact and unique evidence directory')
   await access(chrome)
   const { qualifyCrossCoreUpload } = await import('../fixtures/canvas-cross-core-upload.mjs')
@@ -29,8 +29,8 @@ test('actual Desktop and browser share Camp geometry while three drafts and reau
   if (process.platform !== 'darwin') { t.skip('This native Desktop acceptance currently requires macOS; no other platform qualification claimed.'); return }
   try { await access(chrome) } catch { t.skip('A local Chrome binary is required for actual browser acceptance.'); return }
   if (!admitElectronIntegrationTest(t)) return
-  const fixture = await realpath(await mkdtemp(join(tmpdir(), 'rovai-real-desktop-web-')))
-  const output = process.env.ROVAI_HOST_WEB_LIVE_OUTPUT ?? fixture
+  const fixture = await realpath(await mkdtemp(join(tmpdir(), 'coaxi-real-desktop-web-')))
+  const output = process.env.COAXI_HOST_WEB_LIVE_OUTPUT ?? fixture
   await mkdir(output, { recursive: true })
   const userData = join(fixture, 'user-data'); await mkdir(userData, { mode: 0o700 })
   console.log(JSON.stringify({ channel: 'automatic_acceptance', fixture, userData, skills: join(userData, 'managed-skill-library') }))
@@ -38,20 +38,20 @@ test('actual Desktop and browser share Camp geometry while three drafts and reau
   let stage = 'native startup'
   try {
     desktop = await launchBrowser('desktop', userData)
-    await desktop.wait(`Boolean(window.rovai?.request)`)
+    await desktop.wait(`Boolean(window.coaxi?.request)`)
     // Fresh Debug authority initialization was still progressing at the old
     // generic 12s UI deadline on CI. Keep the ready predicate, but give this
     // startup boundary its own bounded observation window.
-    await desktop.wait(`window.rovai.supervisor.getSnapshot().then(s=>s.fullCoreState==='ready')`, 60_000)
-    const request = (method, params = {}) => desktop.evaluate(`window.rovai.request(${JSON.stringify(method)},${JSON.stringify(params)})`)
+    await desktop.wait(`window.coaxi.supervisor.getSnapshot().then(s=>s.fullCoreState==='ready')`, 60_000)
+    const request = (method, params = {}) => desktop.evaluate(`window.coaxi.request(${JSON.stringify(method)},${JSON.stringify(params)})`)
     const info = await request('app.info'); assert.ok(info.dataDir.startsWith(userData)); console.log(JSON.stringify({ stage: 'desktop-ready', data: info.dataDir }))
     stage = 'native onboarding'
-    await desktop.evaluate(`(async()=>{const api=window.rovai.onboarding;let s=await api.get();if(s.status==='uninitialized')s=await api.showWelcome();if(s.status==='in_progress'&&s.step==='welcome')s=await api.completeWelcome();if(s.status==='in_progress'&&s.step==='member'){await api.selectMember('luoke');s=await api.completeMemberSelection()}if(s.status==='in_progress'&&s.step==='runtime')s=await api.deferRuntimeSetup();return s.status})()`)
+    await desktop.evaluate(`(async()=>{const api=window.coaxi.onboarding;let s=await api.get();if(s.status==='uninitialized')s=await api.showWelcome();if(s.status==='in_progress'&&s.step==='welcome')s=await api.completeWelcome();if(s.status==='in_progress'&&s.step==='member'){await api.selectMember('luoke');s=await api.completeMemberSelection()}if(s.status==='in_progress'&&s.step==='runtime')s=await api.deferRuntimeSetup();return s.status})()`)
     await desktop.evaluate(`window.__beforeAcceptanceReload=true`)
     await desktop.reload()
     await desktop.wait(`window.__beforeAcceptanceReload!==true && document.querySelector('.unified-sidebar')!==null`)
     stage = 'seed shared Camp'
-    await desktop.evaluate(`window.rovai.appearance.setPreference('day')`)
+    await desktop.evaluate(`window.coaxi.appearance.setPreference('day')`)
     const profiles = await request('members.list')
     const projectPath = join(fixture, 'owner-project'); await mkdir(projectPath)
     await writeFile(join(projectPath, 'guide.md'), '# Images\n\n![Inline fixture](./inline.png)\n\n[Child guide](./child.md#details)')
@@ -60,7 +60,7 @@ test('actual Desktop and browser share Camp geometry while three drafts and reau
     const projectWorkspace = await request('workspaces.inspect', { path: projectPath })
     // Core creation does not add a directory to the Desktop sidebar. Use the
     // same Main-owned registration as opening a project, before seeding its Camp.
-    const navigation = await desktop.evaluate(`window.rovai.navigationPreferences.registerProjects([${JSON.stringify(projectWorkspace.projectPath)}])`)
+    const navigation = await desktop.evaluate(`window.coaxi.navigationPreferences.registerProjects([${JSON.stringify(projectWorkspace.projectPath)}])`)
     assert.ok(navigation.registeredProjects.includes(projectWorkspace.projectPath))
     const created = await request('threads.create', { commandId: crypto.randomUUID(), name: 'Desktop and Web live parity', workspace: { projectPath: projectWorkspace.projectPath }, memberAgentIds: [profiles[0].agentId], defaultLeadAgentId: profiles[0].agentId, collaborationMode: 'peer' })
     assert.equal(created.status, 'applied', JSON.stringify(created)); const threadId = created.payload.threadId
@@ -93,13 +93,13 @@ test('actual Desktop and browser share Camp geometry while three drafts and reau
     await desktop.click(`document.querySelector('#remote-port')`); await desktop.evaluate(`document.querySelector('#remote-port').select()`); await desktop.send('Input.insertText', { text: String(port) })
     await desktop.click(`document.querySelector('[aria-label="远程访问"]')`)
     await desktop.wait(`document.querySelector('#remote-enabled').checked && !document.querySelector('#remote-enabled').disabled`)
-    let started = { ...await desktop.evaluate(`window.rovai.hostWeb.status()`), ...await desktop.evaluate(`window.rovai.hostWeb.token()`) }
+    let started = { ...await desktop.evaluate(`window.coaxi.hostWeb.status()`), ...await desktop.evaluate(`window.coaxi.hostWeb.token()`) }
     assert.equal(started.administratorToken, initialToken)
     assert.equal(await desktop.evaluate(`document.querySelectorAll('.remote-token-actions button').length`), 2)
     const nextProbe = createServer(); await new Promise(resolve => nextProbe.listen(0, '127.0.0.1', resolve)); const nextPort = nextProbe.address().port; await new Promise(resolve => nextProbe.close(resolve))
     await desktop.click(`document.querySelector('#remote-port')`); await desktop.evaluate(`document.querySelector('#remote-port').select()`); await desktop.send('Input.insertText', { text: String(nextPort) })
-    assert.equal((await desktop.evaluate(`window.rovai.hostWeb.status()`)).listen, started.listen, 'editing the port must not restart the listener')
-    assert.equal((await desktop.evaluate(`window.rovai.hostWeb.token()`)).administratorToken, started.administratorToken)
+    assert.equal((await desktop.evaluate(`window.coaxi.hostWeb.status()`)).listen, started.listen, 'editing the port must not restart the listener')
+    assert.equal((await desktop.evaluate(`window.coaxi.hostWeb.token()`)).administratorToken, started.administratorToken)
     await desktop.click(`document.querySelector('#remote-enabled')`)
     assert.equal(await desktop.evaluate(`document.querySelector('[role=dialog]')===null`), true)
     await desktop.wait(`!document.querySelector('#remote-enabled').checked && !document.querySelector('#remote-enabled').disabled`)
@@ -110,7 +110,7 @@ test('actual Desktop and browser share Camp geometry while three drafts and reau
     assert.ok((await request('app.info')).dataDir)
     await desktop.click(`document.querySelector('#remote-enabled')`)
     await desktop.wait(`document.querySelector('#remote-enabled').checked && !document.querySelector('#remote-enabled').disabled`)
-    started = { ...await desktop.evaluate(`window.rovai.hostWeb.status()`), ...await desktop.evaluate(`window.rovai.hostWeb.token()`) }
+    started = { ...await desktop.evaluate(`window.coaxi.hostWeb.status()`), ...await desktop.evaluate(`window.coaxi.hostWeb.token()`) }
     assert.equal(started.administratorToken, initialToken)
     assert.equal(started.listen, `0.0.0.0:${nextPort}`)
     assert.equal(await desktop.evaluate(`document.querySelector('#remote-port').value`), String(nextPort))
@@ -143,17 +143,17 @@ test('actual Desktop and browser share Camp geometry while three drafts and reau
     const geometry = async browser => browser.evaluate(`({viewport:[innerWidth,innerHeight],sidebar:document.querySelector('.unified-sidebar').getBoundingClientRect().width,header:document.querySelector('.camp-topbar')?.getBoundingClientRect().height,composer:document.querySelector('[contenteditable=true]').getBoundingClientRect().width})`)
     assert.deepEqual(await geometry(desktop), await geometry(web)); assert.equal((await geometry(web)).sidebar, 270); assert.equal((await geometry(web)).header, 38)
     await desktop.capture(join(output, 'desktop-day.png')); await web.capture(join(output, 'web-day.png'))
-    await desktop.evaluate(`window.rovai.appearance.setPreference('night')`); await web.send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-color-scheme', value: 'dark' }] }); await pause(400)
+    await desktop.evaluate(`window.coaxi.appearance.setPreference('night')`); await web.send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-color-scheme', value: 'dark' }] }); await pause(400)
     await desktop.capture(join(output, 'desktop-night.png')); await web.capture(join(output, 'web-night.png'))
     // The main merge must reach the actual browser, including native capability
-    // differences. This path catches accidental window.rovai access in settings.
+    // differences. This path catches accidental window.coaxi access in settings.
     await web.click(`document.querySelector('.sidebar-settings-main')`)
     await web.wait(`document.querySelector('[aria-label="启用世界地图"]:not(:disabled)') !== null`)
     assert.equal(await web.evaluate(`document.querySelector('#general-window-heading') === null`), true)
     assert.equal(await web.evaluate(`document.querySelector('#host-web-heading') === null`), true)
     await web.click(`document.querySelector('[aria-label="启用世界地图"]')`)
     await web.wait(`document.querySelector('[aria-label="启用世界地图"]').checked && !document.querySelector('[aria-label="启用世界地图"]').disabled`)
-    assert.equal(await desktop.evaluate(`window.rovai.generalPreferences.get().then(s=>s.worldMapEnabled)`), false, 'browser preference does not modify Desktop')
+    assert.equal(await desktop.evaluate(`window.coaxi.generalPreferences.get().then(s=>s.worldMapEnabled)`), false, 'browser preference does not modify Desktop')
     await web.capture(join(output, 'web-general-night.png'))
     await web.click(`[...document.querySelectorAll('.settings-sidebar-menu button')].find(e=>e.textContent.trim()==='外观')`)
     await web.wait(`document.querySelector('.appearance-settings-page') !== null`)
@@ -181,15 +181,15 @@ test('actual Desktop and browser share Camp geometry while three drafts and reau
     await web.wait(`document.querySelector('.diagnostics-notice')?.textContent.includes('诊断 JSON 已导出')`)
     assert.equal(await web.evaluate(`document.querySelector('.diagnostics-notice button.quiet-button')===null`), true, 'browser export has no native file manager control')
     await web.capture(join(output, 'web-diagnostics-night.png'))
-    for (const file of ['rovai-diagnostics.json', 'rovai-runtime-monitoring.json']) {
+    for (const file of ['coaxi-diagnostics.json', 'coaxi-runtime-monitoring.json']) {
       for (let attempt = 0; attempt < 50; attempt++) { try { await access(join(downloadDirectory, file)); break } catch { await pause(100) } }
       const downloaded = JSON.parse(await readFile(join(downloadDirectory, file), 'utf8'))
-      if (file === 'rovai-diagnostics.json') assert.equal(downloaded.format, 'rovai-diagnostics-v5')
+      if (file === 'coaxi-diagnostics.json') assert.equal(downloaded.format, 'coaxi-diagnostics-v5')
       else assert.ok(downloaded.exportedAt)
     }
     await settings('渠道')
-    await web.wait(`document.querySelector('.channel-settings')?.textContent.includes('渠道由运行此服务的 Rovai Desktop 管理')`)
-    assert.equal(await web.evaluate(`window.rovai===undefined`), true)
+    await web.wait(`document.querySelector('.channel-settings')?.textContent.includes('渠道由运行此服务的 Coaxi Desktop 管理')`)
+    assert.equal(await web.evaluate(`window.coaxi===undefined`), true)
     await web.click(`document.querySelector('.settings-sidebar-back')`)
     stage = 'shared Memory Automation MCP and Skill management'
     await exerciseBrowserManagement({ web, read: request, fixture, threadId, openCamp: () => choose(web), capture: name => web.capture(join(output, name)) })
@@ -238,7 +238,7 @@ test('actual Desktop and browser share Camp geometry while three drafts and reau
     second = await launchBrowser('web', join(fixture, 'chrome-b')); await second.send('Page.navigate', { url: started.origin }); await login(second, started.administratorToken); await choose(second)
     assert.equal(await second.evaluate(`document.querySelector('[contenteditable=true]').textContent`), '')
     await type(second, 'Browser B independent draft.')
-    const readDraft = browser => browser.evaluate(`(()=>{const key='rovai.camp-composer-draft.v1:'+${JSON.stringify(threadId)};if(window.rovai)return {store:'desktop_local',scope:'desktop',value:localStorage.getItem(key)};const copies=Object.keys(localStorage).filter(key=>key.startsWith('rovai.web.thread-drafts.v1:')).map(key=>JSON.parse(localStorage.getItem(key))).filter(copy=>copy.entries[key]);if(copies.length!==1)throw Error('Expected one verified browser body store');return {store:'web_editor_snapshot',scope:copies[0].scope,value:copies[0].entries[key].value}})()`)
+    const readDraft = browser => browser.evaluate(`(()=>{const key='coaxi.camp-composer-draft.v1:'+${JSON.stringify(threadId)};if(window.coaxi)return {store:'desktop_local',scope:'desktop',value:localStorage.getItem(key)};const copies=Object.keys(localStorage).filter(key=>key.startsWith('coaxi.web.thread-drafts.v1:')).map(key=>JSON.parse(localStorage.getItem(key))).filter(copy=>copy.entries[key]);if(copies.length!==1)throw Error('Expected one verified browser body store');return {store:'web_editor_snapshot',scope:copies[0].scope,value:copies[0].entries[key].value}})()`)
     const editors = [desktop, web, second]
     const texts = ['Desktop draft remains independent.', 'Browser A draft survives reauthentication.', 'Browser B independent draft.']
     for (let index = 0; index < editors.length; index++) await editors[index].wait(`document.querySelector('[contenteditable=true]').textContent===${JSON.stringify(texts[index])}`)
@@ -283,7 +283,7 @@ test('actual Desktop and browser share Camp geometry while three drafts and reau
     await web.evaluate(`window.__privateComposer=document.querySelector('.single-chat-composer textarea'); true`)
     await web.capture(join(output, 'web-private-editor.png'))
     stage = 'token rotation and reauthentication'
-    const rotated = await desktop.evaluate(`window.rovai.hostWeb.rotate()`); await login(web, rotated.administratorToken)
+    const rotated = await desktop.evaluate(`window.coaxi.hostWeb.rotate()`); await login(web, rotated.administratorToken)
     assert.equal(await web.evaluate(`window.__privateComposer===document.querySelector('.single-chat-composer textarea')`), true)
     assert.equal(await web.evaluate(`document.querySelector('.single-chat-composer textarea').value`), 'Browser A private unsent text.')
     await web.wait(`document.querySelector('.single-chat-composer .attachment-open:not(:disabled)')!==null`)
@@ -294,16 +294,16 @@ test('actual Desktop and browser share Camp geometry while three drafts and reau
     await second.click(`document.querySelector('[aria-label="收起单聊"]')`)
     assert.equal(await web.evaluate(`window.__acceptedComposer===document.querySelector('[contenteditable=true]')`), true)
     assert.equal(await web.evaluate(`document.querySelector('[contenteditable=true]').textContent`), texts[1])
-    assert.equal(await web.evaluate('typeof window.rovai'), 'undefined')
+    assert.equal(await web.evaluate('typeof window.coaxi'), 'undefined')
     assert.deepEqual(desktop.errors, []); assert.deepEqual(web.errors, []); assert.deepEqual(second.errors, [])
     await web.capture(join(output, 'web-after-reauth.png'))
     const evidence = { stage: 'managed-desktop-web-passed', simulation: false, realRuntime: false, desktopFocusEmulated: true, threadId, geometry: await geometry(web), draftOwners: localDrafts.map(draft => draft.store), sameComposerAfterReauth: true, nativeBridgeInBrowser: false,
       ownerModel: { desktopSettingsStart: true, pendingPortAppliesOnlyOnNextStart: true, stopWithoutConfirmation: true, copiedAddressAndToken: true, copyIconFeedbackWithoutPageNotice: true, tokenReadableBeforeStartAndAfterStop: true, tokenPreservedOnRestart: true, actualInterfaceAddress: true, nonLoopbackOrigin: !started.origin.includes('127.0.0.1'), directoryPickerWithoutPreauthorization: true, sameMachineBrowsers: true, secondPhysicalDevice: false },
       management: { notificationPreferenceSavedThroughUi: true, monitoringReadAndDownload: true, relativeMarkdownImageAndChild: true, diagnosticsReadAndDownload: true, channelNativeCapabilityExplicit: true, memoryCreateReviseRetire: true, automationCreateClose: true, mcpCreate: true, skillDirectoryImport: true, builtinPortraitAndManagedAvatarUpload: true, taskCreateUpdateCancel: true, privateDraftAndAttachmentIsolation: true, privateReauthenticationPreservesEditor: true },
       mainSync: { browserGeneralPreferences: true, nativeWindowControlsAbsent: true, browserZoomExplicit: true, previewSelectAllScoped: true, finalLineQuoteAccepted: true, recordOnlyHasNoWithdrawal: true, allClientDraftBytesPreserved: true, attachmentAddedToIndependentInput: true, waitingDeliveryWithdrawal: 'not_run_requires_controlled_Runtime', fixture: 'legal records and local drafts; no direct Core writes' } }
-    await desktop.evaluate(`window.rovai.hostWeb.stop()`)
+    await desktop.evaluate(`window.coaxi.hostWeb.stop()`)
     assert.ok((await request('app.info')).dataDir)
-    const db = new DatabaseSync(join(info.dataDir, 'rovai.sqlite'), { readOnly: true })
+    const db = new DatabaseSync(join(info.dataDir, 'coaxi.sqlite'), { readOnly: true })
     try { assert.equal(db.prepare('select count(*) n from agent_run').get().n, 0); assert.equal(Object.values(db.prepare('pragma integrity_check').get())[0], 'ok') }
     finally { db.close() }
     await writeFile(join(output, 'desktop-web-live.json'), JSON.stringify({ ...evidence, coreAliveAfterWebStop: true }, null, 2))
@@ -317,11 +317,11 @@ test('actual Desktop and browser share Camp geometry while three drafts and reau
         .then(() => browser.capture(join(output, `${surface}-failure.png`))).catch(() => undefined)
     }
     if (desktop) {
-      const navigation = await desktop.evaluate(`window.rovai.navigationPreferences.get().then(s=>({schemaVersion:s.schemaVersion,legacyProjectsSynced:s.legacyProjectsSynced,registeredProjectCount:s.registeredProjects.length,readError:Boolean(s.readError)}))`).catch(() => null)
+      const navigation = await desktop.evaluate(`window.coaxi.navigationPreferences.get().then(s=>({schemaVersion:s.schemaVersion,legacyProjectsSynced:s.legacyProjectsSynced,registeredProjectCount:s.registeredProjects.length,readError:Boolean(s.readError)}))`).catch(() => null)
       await writeFile(join(output, 'desktop-failure-state.json'), JSON.stringify({ stage, navigation }, null, 2))
     }
     if (desktop && stage === 'native startup') {
-      const startup = await desktop.evaluate(`window.rovai.supervisor.getSnapshot().then(s=>({schemaVersion:s.schemaVersion,runtimeMode:s.runtimeMode,fullCoreState:s.fullCoreState,authorityKind:s.authorityState.kind,startupPhase:s.startupPhase,lastErrorCode:s.lastError?.code??null,subsystems:s.coreSubsystems.map(item=>({id:item.id,state:item.state,errorCode:item.error?.code??null}))}))`).catch(() => null)
+      const startup = await desktop.evaluate(`window.coaxi.supervisor.getSnapshot().then(s=>({schemaVersion:s.schemaVersion,runtimeMode:s.runtimeMode,fullCoreState:s.fullCoreState,authorityKind:s.authorityState.kind,startupPhase:s.startupPhase,lastErrorCode:s.lastError?.code??null,subsystems:s.coreSubsystems.map(item=>({id:item.id,state:item.state,errorCode:item.error?.code??null}))}))`).catch(() => null)
       await writeFile(join(output, 'desktop-startup-state.json'), JSON.stringify({ stage, snapshot: startup }, null, 2))
       await desktop.capture(join(output, 'desktop-startup-failure.png')).catch(() => undefined)
       console.log(JSON.stringify({ stage, startup }))
@@ -329,14 +329,14 @@ test('actual Desktop and browser share Camp geometry while three drafts and reau
     throw new Error(`Live acceptance at ${stage}: ${error.message}`, { cause: error })
   } finally {
     if (second) await second.close(); if (web) await web.close(); if (desktop) await desktop.close()
-    if (process.env.ROVAI_KEEP_HOST_WEB_LIVE_FIXTURE !== '1') {
+    if (process.env.COAXI_KEEP_HOST_WEB_LIVE_FIXTURE !== '1') {
       await removeEphemeralRuntimeCampFilesRoot(userData, { temporaryDirectory: fixture })
       await rm(fixture, { recursive: true, force: true })
     }
   }
 })
 async function launchBrowser(surface, profile) {
-  const env = { ...process.env, ROVAI_ALLOW_ISOLATED_INSTANCE: '1', ROVAI_HOST_BIN: process.env.ROVAI_HOST_BIN ?? join(root, 'target/debug/rovai-host') }
+  const env = { ...process.env, COAXI_ALLOW_ISOLATED_INSTANCE: '1', COAXI_HOST_BIN: process.env.COAXI_HOST_BIN ?? join(root, 'target/debug/coaxi-host') }
   delete env.ELECTRON_RUN_AS_NODE
   const args = surface === 'web'
     ? ['--headless=new', '--no-first-run', '--no-default-browser-check', '--disable-background-networking', '--remote-debugging-port=0', `--user-data-dir=${profile}`, 'about:blank']

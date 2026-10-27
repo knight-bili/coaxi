@@ -1,0 +1,19 @@
+# Customize the user, paths, Agent PATH, and connection flags before installing.
+[Unit]
+Description=Coaxi Server
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User=coaxi
+WorkingDirectory=/home/coaxi
+Environment=HOME=/home/coaxi
+Environment=PATH=/home/coaxi/.local/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=/home/coaxi/.local/share/coaxi-server/current/coaxi-server --data-dir /home/coaxi/.coaxi-server --listen 127.0.0.1:8767
+KillMode=control-group
+TimeoutStopSec=90
+Restart=no
+
+[Install]
+WantedBy=multi-user.target

@@ -8,7 +8,7 @@
     "required": ["refresh"],
     "properties": {"refresh": {"type": "boolean"}}
   },
-  "sourceRepository": "codeg",
+  "sourceRepository": "coaxi",
   "sourceCommit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
   "sourceFile": "src-tauri/src/acp/remote_registry.rs",
   "url": "https://cdn.agentclientprotocol.com/registry/v1/latest/registry.json",

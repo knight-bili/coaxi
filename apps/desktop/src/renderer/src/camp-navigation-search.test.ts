@@ -13,7 +13,7 @@ const target: NavigationThreadTarget = {
   projectBindingKind: 'directory',
   projectPath: '/repo'
 }
-const projects = new Map([['/repo', 'Rovai']])
+const projects = new Map([['/repo', 'Coaxi']])
 
 afterEach(() => vi.useRealTimers())
 
@@ -34,7 +34,7 @@ describe('navigation search routing', () => {
   })
 
   it('preserves case-insensitive title/project search and the twelve-result limit', () => {
-    for (const query of ['EARLIER', '  roVAI  ']) {
+    for (const query of ['EARLIER', '  coAXI  ']) {
       expect(navigationThreadSearch(query, [target], projects)).toEqual({ kind: 'text', threads: [target] })
     }
     expect(navigationThreadSearch('unmatched', [target], projects)).toEqual({ kind: 'text', threads: [] })

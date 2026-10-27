@@ -128,9 +128,9 @@
     "inferredFromModelName": false
   },
   "packagedBinarySha256": {
-    "rovai-core": "5747d206ed7e099fbca859fe7b8071c86895a075a020b348e5a245907b5b2338",
-    "rovai": "9ed745d1cbdf33d73701c59f9c22af466ba68929ecc524c417ba0a9334adffaf",
-    "rovai-host": "f5e64c0a091edd9ca2cf214fdeb46f92f23fe71dd024a013251f000d6ef5eba7"
+    "coaxi-core": "5747d206ed7e099fbca859fe7b8071c86895a075a020b348e5a245907b5b2338",
+    "coaxi": "9ed745d1cbdf33d73701c59f9c22af466ba68929ecc524c417ba0a9334adffaf",
+    "coaxi-host": "f5e64c0a091edd9ca2cf214fdeb46f92f23fe71dd024a013251f000d6ef5eba7"
   },
   "packagedAsarSha256": "2d5f11c17ebdf550d965871c8dd0387cce170b1d535aeb09dfa7e76b8a3d7837",
   "followupDate": "2026-10-05",

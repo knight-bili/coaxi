@@ -24,7 +24,7 @@
     "work/i03/c06/fusion-i03-rc.10/native-visual-r2/02-empty-board.png": "0b41e408601ed6caa62dbaea4d916a1cca2e7d404c644300ff5a905c4e5f5c8d",
     "work/i03/c06/fusion-i03-rc.10/native-files-r1/01-text-and-interactive-html.png": "1a4a551535a11ac84878826b0a6a3b2b471e5e512bf68f391a37f906c83f7a34",
     "work/i03/c06/fusion-i03-rc.10/native-private-ui-r3/01-private-attachment-preview.png": "b62546b3827177389d9101fce5f59c8041239a493c2e561ff56d1a178f453b89",
-    "work/i03/codeg-ui-reference/06-fusion-container-before.png": "72004d3da6c53e5f64f8cf1ba72d462245f950476bc02bd6213d2f012bbcd201"
+    "work/i03/coaxi-ui-reference/06-fusion-container-before.png": "72004d3da6c53e5f64f8cf1ba72d462245f950476bc02bd6213d2f012bbcd201"
   },
   "checks": {
     "types_exit": 0,
@@ -37,7 +37,7 @@
         "revision": "r2",
         "status": "passed",
         "checks_passed": 4,
-        "scope": "production Main/preload/Core; Codeg canvas creation and rendered visual states; no model",
+        "scope": "production Main/preload/Core; Coaxi canvas creation and rendered visual states; no model",
         "controlled_shutdown": "completed",
         "deadline_expired": false,
         "forced_signal": null
@@ -129,7 +129,7 @@
   "remaining": [
     "私聊卡片重复标题与内容容器贴合需继续整改",
     "附件预览截图仍停留单聊加载状态，当前DOM及授权读取通过不等同完整视觉资格",
-    "Codeg列表真实预览/节点数量尚未接入，禁止假缩略图",
+    "Coaxi列表真实预览/节点数量尚未接入，禁止假缩略图",
     "双主题、完整八类创建路径、键盘/错误状态、冷恢复及规模仍按I03有限清单补证",
     "Diff准备好Git工作区的真实路径尚未取得本批资格；本批只验证诚实不可用分支",
     "Mac/移动真机与适用跨平台验证待环境资源，最终MVP不豁免"

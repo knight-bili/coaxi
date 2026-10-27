@@ -6,7 +6,7 @@ const MINIMUM_UPLOAD_EDGE = 240
 const MAXIMUM_UPLOAD_BYTES = 2 * 1024 * 1024
 
 /** Produce a DingTalk-only upload rendition in memory; never rewrite the member icon.
- * The console rejects Rovai's 192px icons with 66003. Invalid/undecodable images
+ * The console rejects Coaxi's 192px icons with 66003. Invalid/undecodable images
  * return null so the gateway can fail locally without uploading a fallback avatar.
  */
 export function prepareDingTalkAvatarPng(bytes: Uint8Array): Uint8Array | null {

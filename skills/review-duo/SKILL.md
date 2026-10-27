@@ -24,10 +24,10 @@ The request contains no initiator conclusions. Finish and publish Spec before in
 
 ## Four messages
 
-1. Initiator sends the fixed scope, sources, limits and Standards assignment to the partner with `rovai send --to <partner-agent-id> --body <request>`, then independently reviews Spec in the same Run.
-2. Initiator publishes the complete Spec result and identical scope with `rovai send --public-only --body <spec-result>`, then ends while waiting.
-3. Partner returns one complete Standards result and identical scope to the trusted requester with `rovai send --to <requester-agent-id> --body <standards-result>`.
-4. Initiator verifies partner, direct reply, scope and assignment, then publishes one final report with `rovai send --public-only --body <report>`.
+1. Initiator sends the fixed scope, sources, limits and Standards assignment to the partner with `coaxi send --to <partner-agent-id> --body <request>`, then independently reviews Spec in the same Run.
+2. Initiator publishes the complete Spec result and identical scope with `coaxi send --public-only --body <spec-result>`, then ends while waiting.
+3. Partner returns one complete Standards result and identical scope to the trusted requester with `coaxi send --to <requester-agent-id> --body <standards-result>`.
+4. Initiator verifies partner, direct reply, scope and assignment, then publishes one final report with `coaxi send --public-only --body <report>`.
 
 Inspect actual recipients. Escape or fence literal `@` code/quotes. Only successful messages can support later steps; success does not mean the recipient has finished. Process other current batch inputs normally.
 

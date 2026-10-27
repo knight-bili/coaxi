@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schemas.rovai.invalid/contracts/collaboration-ledger-v1.1.schema.json",
-  "title": "Rovai v0.34 Collaboration Ledger",
+  "$id": "https://schemas.coaxi.invalid/contracts/collaboration-ledger-v1.1.schema.json",
+  "title": "Coaxi v0.34 Collaboration Ledger",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -15,17 +15,17 @@
     "payload"
   ],
   "properties": {
-    "artifactId": { "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/stableId" },
-    "schemaId": { "const": "rovai.qualification.collaboration-ledger" },
+    "artifactId": { "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/stableId" },
+    "schemaId": { "const": "coaxi.qualification.collaboration-ledger" },
     "schemaVersion": { "const": "1.1.0" },
-    "producer": { "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/producer" },
-    "binding": { "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/binding" },
+    "producer": { "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/producer" },
+    "binding": { "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/binding" },
     "sourceBoundaries": {
       "type": "array",
       "minItems": 1,
-      "items": { "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/sourceBoundary" }
+      "items": { "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/sourceBoundary" }
     },
-    "payloadDigest": { "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/digest" },
+    "payloadDigest": { "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/digest" },
     "payload": {
       "type": "object",
       "additionalProperties": false,
@@ -55,38 +55,38 @@
               "evidenceReferences"
             ],
             "properties": {
-              "callId": { "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/stableId" },
-              "acceptanceReceiptId": { "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/stableId" },
-              "senderMemberId": { "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/stableId" },
-              "recipientMemberId": { "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/stableId" },
-              "contentEvidenceReference": { "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/evidenceRef" },
+              "callId": { "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/stableId" },
+              "acceptanceReceiptId": { "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/stableId" },
+              "senderMemberId": { "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/stableId" },
+              "recipientMemberId": { "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/stableId" },
+              "contentEvidenceReference": { "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/evidenceRef" },
               "taskId": {
                 "anyOf": [
-                  { "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/stableId" },
+                  { "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/stableId" },
                   { "type": "null" }
                 ]
               },
               "slot": { "type": "integer", "minimum": 1 },
               "depth": { "type": "integer", "minimum": 0 },
               "edgeKind": { "enum": ["forward", "return", "unknown"] },
-              "acceptedAt": { "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/timestamp" },
+              "acceptedAt": { "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/timestamp" },
               "input": {
                 "type": "object",
                 "additionalProperties": false,
                 "required": ["inputId", "state", "persistedAt", "terminalAt", "reason"],
                 "properties": {
-                  "inputId": { "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/stableId" },
+                  "inputId": { "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/stableId" },
                   "state": { "enum": ["pending", "materialized", "failed", "cancelled"] },
-                  "persistedAt": { "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/timestamp" },
+                  "persistedAt": { "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/timestamp" },
                   "terminalAt": {
                     "anyOf": [
-                      { "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/timestamp" },
+                      { "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/timestamp" },
                       { "type": "null" }
                     ]
                   },
                   "reason": {
                     "anyOf": [
-                      { "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/typedReason" },
+                      { "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/typedReason" },
                       { "type": "null" }
                     ]
                   }
@@ -99,7 +99,7 @@
                 "properties": {
                   "runId": {
                     "anyOf": [
-                      { "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/stableId" },
+                      { "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/stableId" },
                       { "type": "null" }
                     ]
                   },
@@ -116,25 +116,25 @@
                   },
                   "materializedAt": {
                     "anyOf": [
-                      { "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/timestamp" },
+                      { "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/timestamp" },
                       { "type": "null" }
                     ]
                   },
                   "startedAt": {
                     "anyOf": [
-                      { "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/timestamp" },
+                      { "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/timestamp" },
                       { "type": "null" }
                     ]
                   },
                   "terminalAt": {
                     "anyOf": [
-                      { "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/timestamp" },
+                      { "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/timestamp" },
                       { "type": "null" }
                     ]
                   },
                   "reason": {
                     "anyOf": [
-                      { "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/typedReason" },
+                      { "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/typedReason" },
                       { "type": "null" }
                     ]
                   }
@@ -148,7 +148,7 @@
                   "state": { "enum": ["settled", "unsettled", "indeterminate"] },
                   "reason": {
                     "anyOf": [
-                      { "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/typedReason" },
+                      { "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/typedReason" },
                       { "type": "null" }
                     ]
                   }
@@ -175,7 +175,7 @@
                     "clockDomain": { "type": ["string", "null"], "maxLength": 160 },
                     "reason": {
                       "anyOf": [
-                        { "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/typedReason" },
+                        { "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/typedReason" },
                         { "type": "null" }
                       ]
                     }
@@ -185,7 +185,7 @@
               "evidenceReferences": {
                 "type": "array",
                 "minItems": 1,
-                "items": { "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/evidenceRef" }
+                "items": { "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/evidenceRef" }
               }
             }
           }
@@ -197,19 +197,19 @@
             "additionalProperties": false,
             "required": ["routeFactId", "kind", "callIds", "evidenceReferences"],
             "properties": {
-              "routeFactId": { "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/stableId" },
+              "routeFactId": { "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/stableId" },
               "kind": {
                 "enum": ["exact_duplicate_acceptance", "forward_cycle", "repeated_route"]
               },
               "callIds": {
                 "type": "array",
                 "minItems": 1,
-                "items": { "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/stableId" }
+                "items": { "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/stableId" }
               },
               "evidenceReferences": {
                 "type": "array",
                 "minItems": 1,
-                "items": { "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/evidenceRef" }
+                "items": { "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/evidenceRef" }
               }
             }
           }
@@ -219,7 +219,7 @@
           "additionalProperties": false,
           "required": ["coverage", "acceptedCalls", "settledCalls", "maximumDepth"],
           "properties": {
-            "coverage": { "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/coverage" },
+            "coverage": { "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/coverage" },
             "acceptedCalls": { "type": ["integer", "null"], "minimum": 0 },
             "settledCalls": { "type": ["integer", "null"], "minimum": 0 },
             "maximumDepth": { "type": ["integer", "null"], "minimum": 0 }

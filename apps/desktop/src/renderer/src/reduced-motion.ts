@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from 'react'
 
-export const APPEARANCE_READING_CHANGED = 'rovai:appearance-reading-changed'
+export const APPEARANCE_READING_CHANGED = 'coaxi:appearance-reading-changed'
 
 export function prefersReducedMotion(): boolean {
   return typeof document !== 'undefined' && (

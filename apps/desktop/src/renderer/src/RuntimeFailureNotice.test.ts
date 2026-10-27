@@ -15,7 +15,7 @@ describe('RuntimeFailureNotice', () => {
     ['environment', 'Claude Code 的本机运行环境不可用'],
     ['unknown', 'Claude Code 未能完成运行']
   ] satisfies Array<[RuntimeFailureOrigin, string]>)(
-    'attributes Claude Code %s failures without calling them Rovai internal errors',
+    'attributes Claude Code %s failures without calling them Coaxi internal errors',
     (origin, title) => {
       const failure = runtimeFailure(origin)
       expect(runtimeFailureTitle(failure)).toBe(title)
@@ -33,15 +33,15 @@ describe('RuntimeFailureNotice', () => {
     expect(markup).toContain('请检查 Provider 额度后重试。')
   })
 
-  it('uses Rovai internal error only when Core explicitly attributes the origin to Rovai', () => {
-    const failure = runtimeFailure('rovai')
+  it('uses Coaxi internal error only when Core explicitly attributes the origin to Coaxi', () => {
+    const failure = runtimeFailure('coaxi')
     expect(runtimeFailureTitle(failure)).toBe('Coaxi 内部错误')
     failure.phase = 'model_catalog'
     failure.code = 'runtime_probe_frame_capacity_exceeded'
-    failure.summary = 'Rovai 探测读取容量不足'
+    failure.summary = 'Coaxi 探测读取容量不足'
     expect(runtimeFailureTitle(failure)).toBe('Claude Code 模型目录暂时不可用')
     const markup = renderToStaticMarkup(createElement(RuntimeFailureNotice, { failure }))
-    expect(markup).toContain('Rovai 探测读取容量不足')
+    expect(markup).toContain('Coaxi 探测读取容量不足')
     expect(markup).not.toContain('Claude Code 返回错误')
   })
 

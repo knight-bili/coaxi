@@ -35,7 +35,7 @@ test('Evidence Bundle Manifest publishes one explicit state for every frozen art
 })
 
 test('Evidence Bundle completion marker binds immutable manifest bytes with private permissions', async () => {
-  const root = await mkdtemp(join(tmpdir(), 'rovai-evidence-bundle-'))
+  const root = await mkdtemp(join(tmpdir(), 'coaxi-evidence-bundle-'))
   const artifact = buildEvidenceBundleManifest({
     result: acceptedResult(),
     resultDigest: 'a'.repeat(64),
@@ -136,7 +136,7 @@ test('Pre-dispatch invalid attempt records unavailable roles instead of fabricat
 function acceptedResult() {
   const pointer = (name, version = '1.0.0') => ({
     artifactId: `${name}:one`,
-    schemaId: `rovai.qualification.${name}`,
+    schemaId: `coaxi.qualification.${name}`,
     schemaVersion: version,
     payloadDigest: `sha256:${'c'.repeat(64)}`,
     locator: `private/${name}.json`
@@ -186,7 +186,7 @@ function caseRecordFixture() {
 function publicReportReference() {
   return {
     artifactId: 'public-benchmark-report:one',
-    schemaId: 'rovai.qualification.public-benchmark-report',
+    schemaId: 'coaxi.qualification.public-benchmark-report',
     schemaVersion: '1.0.0',
     payloadDigest: `sha256:${'2'.repeat(64)}`,
     locator: 'private/public-report.json'

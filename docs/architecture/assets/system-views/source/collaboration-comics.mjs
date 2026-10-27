@@ -14,7 +14,7 @@ export const T = {
 const edgeInk = '#666050';
 
 export function sketch() {
-  const requireTool = createRequire(path.join(path.resolve(process.env.ROVAI_DIAGRAM_TOOLS), 'package.json'));
+  const requireTool = createRequire(path.join(path.resolve(process.env.COAXI_DIAGRAM_TOOLS), 'package.json'));
   const generator = requireTool('roughjs').generator();
   let seed = 40905;
   const draw = (type, values, color = edgeInk, fill = 'none', more = {}) => generator.toPaths(generator[type](...values, {

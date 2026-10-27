@@ -35,7 +35,7 @@ export async function withChannelInboundFiles<T>(
   if (pending.resources.some(resource => ['sticker', 'folder'].includes(resource.kind))) {
     throw new Error('channel.attachments.unsupported')
   }
-  const directory = await mkdtemp(join(tmpdir(), 'rovai-channel-inbound-'))
+  const directory = await mkdtemp(join(tmpdir(), 'coaxi-channel-inbound-'))
   const controller = new AbortController()
   const abort = (): void => controller.abort()
   signal?.addEventListener('abort', abort, { once: true })

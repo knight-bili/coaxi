@@ -8,7 +8,7 @@ mkdirSync(userData, { recursive: true })
 app.setPath('userData', userData)
 app.setPath('sessionData', join(userData, 'session'))
 app.whenReady().then(async () => {
-  const window = new BrowserWindow({ show: true, title: 'Rovai quote interaction test', width: 1040, height: 700, useContentSize: true,
+  const window = new BrowserWindow({ show: true, title: 'Coaxi quote interaction test', width: 1040, height: 700, useContentSize: true,
     webPreferences: { contextIsolation: true, sandbox: true, nodeIntegration: false, backgroundThrottling: false } })
   window.webContents.on('console-message', event => console.error(event.message))
   try {

@@ -55,6 +55,6 @@ jobs:
           DIFF_BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
         run: |
           if ! [[ "$DIFF_BASE" =~ ^[0-9a-f]{40}$ ]] || [[ "$DIFF_BASE" == 0000000000000000000000000000000000000000 ]]; then
-            DIFF_BASE=$(node -e "const s=require('./integration/sources.lock.json'); console.log(s.sources.find(x=>x.id==='rovai-ai').commit)")
+            DIFF_BASE=$(node -e "const s=require('./integration/sources.lock.json'); console.log(s.sources.find(x=>x.id==='coaxi').commit)")
           fi
           git diff --check "$DIFF_BASE" HEAD

@@ -5,7 +5,7 @@ import { isAbsolute, join, resolve } from 'node:path'
 
 export async function prepareIsolatedPiAgentDir(fixtureRoot) {
   const source = resolve(
-    process.env.ROVAI_PI_CONFIG_SOURCE ?? join(homedir(), '.pi', 'agent')
+    process.env.COAXI_PI_CONFIG_SOURCE ?? join(homedir(), '.pi', 'agent')
   )
   const destination = join(fixtureRoot, 'pi-agent')
   if (!isAbsolute(source) || !isAbsolute(destination)) {

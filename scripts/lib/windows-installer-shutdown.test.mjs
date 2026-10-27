@@ -18,32 +18,32 @@ test('Windows installer grants Planned Shutdown its full budget before bounded f
     readFile(acceptancePath, 'utf8'),
     readFile(installationAcceptancePath, 'utf8')
   ])
-  const pollMs = nsisDefineNumber(installerInclude, 'ROVAI_SHUTDOWN_POLL_MS')
-  const gracefulMs = nsisDefineNumber(installerInclude, 'ROVAI_GRACEFUL_SHUTDOWN_MS')
-  const forceMs = nsisDefineNumber(installerInclude, 'ROVAI_FORCE_SHUTDOWN_MS')
-  const gracefulTicks = nsisDefineNumber(installerInclude, 'ROVAI_GRACEFUL_SHUTDOWN_TICKS')
-  const forceTicks = nsisDefineNumber(installerInclude, 'ROVAI_FORCE_SHUTDOWN_TICKS')
+  const pollMs = nsisDefineNumber(installerInclude, 'COAXI_SHUTDOWN_POLL_MS')
+  const gracefulMs = nsisDefineNumber(installerInclude, 'COAXI_GRACEFUL_SHUTDOWN_MS')
+  const forceMs = nsisDefineNumber(installerInclude, 'COAXI_FORCE_SHUTDOWN_MS')
+  const gracefulTicks = nsisDefineNumber(installerInclude, 'COAXI_GRACEFUL_SHUTDOWN_TICKS')
+  const forceTicks = nsisDefineNumber(installerInclude, 'COAXI_FORCE_SHUTDOWN_TICKS')
 
   assert.equal(gracefulMs, 20_000)
   assert.equal(forceMs, 5_000)
   assert.equal(pollMs * gracefulTicks, 20_000)
   assert.equal(pollMs * forceTicks, 5_000)
   assert.match(installerInclude, /!macro customCheckAppRunning/u)
-  assert.match(installerInclude, /ROVAI_REQUEST_GRACEFUL_CLOSE/u)
-  assert.match(installerInclude, /ROVAI_WAIT_FOR_QUIESCENCE \$\{ROVAI_GRACEFUL_SHUTDOWN_MS\} \$\{ROVAI_GRACEFUL_SHUTDOWN_TICKS\}/u)
+  assert.match(installerInclude, /COAXI_REQUEST_GRACEFUL_CLOSE/u)
+  assert.match(installerInclude, /COAXI_WAIT_FOR_QUIESCENCE \$\{COAXI_GRACEFUL_SHUTDOWN_MS\} \$\{COAXI_GRACEFUL_SHUTDOWN_TICKS\}/u)
   assert.match(
     installerInclude,
-    /\$rovaiShutdownTicks >= \$\{TICKS\}[\s\S]+Sleep \$\{ROVAI_SHUTDOWN_POLL_MS\}[\s\S]+IntOp \$rovaiShutdownTicks \$rovaiShutdownTicks \+ 1/u
+    /\$coaxiShutdownTicks >= \$\{TICKS\}[\s\S]+Sleep \$\{COAXI_SHUTDOWN_POLL_MS\}[\s\S]+IntOp \$coaxiShutdownTicks \$coaxiShutdownTicks \+ 1/u
   )
-  assert.match(installerInclude, /ROVAI_FORCE_CLOSE/u)
+  assert.match(installerInclude, /COAXI_FORCE_CLOSE/u)
   assert.match(installerInclude, /!macro customUnInstallCheck/u)
   assert.match(installerInclude, /previous uninstaller may have failed/u)
   assert.match(installerInclude, /Refusing to force-close a process whose installation path could not be verified/u)
   assert.doesNotMatch(installerInclude, /!insertmacro KILL_PROCESS/u)
 
   assert.match(coordinator, /\[ValidateSet\('Status', 'RequestClose', 'WaitForExit', 'ForceClose'\)\]/u)
-  assert.match(installerInclude, /FIND_PROCESS "rovai-host\.exe"/u)
-  assert.match(coordinator, /'rovai-host\.exe'/u)
+  assert.match(installerInclude, /FIND_PROCESS "coaxi-host\.exe"/u)
+  assert.match(coordinator, /'coaxi-host\.exe'/u)
   assert.match(coordinator, /System\.Diagnostics\.Stopwatch/u)
   assert.match(coordinator, /\.CloseMainWindow\(\)/u)
   assert.match(coordinator, /Stop-Process -Id \$processId -Force/u)
@@ -57,7 +57,7 @@ test('Windows installer grants Planned Shutdown its full budget before bounded f
   assert.match(acceptance, /shutdown\?\.report\?\.status !== 'completed'/u)
   assert.match(acceptance, /runCoordinator\('WaitForExit', 20_000\)/u)
 
-  assert.match(installationAcceptance, /ROVAI_WINDOWS_UPGRADE_BASE_INSTALLER/u)
+  assert.match(installationAcceptance, /COAXI_WINDOWS_UPGRADE_BASE_INSTALLER/u)
   assert.match(installationAcceptance, /compareReleaseVersions\(baselineVersion, packageMetadata\.version\) >= 0/u)
   assert.match(installationAcceptance, /running-App upgrade did not observe a natural Planned Shutdown/u)
 })
@@ -65,7 +65,7 @@ test('Windows installer grants Planned Shutdown its full budget before bounded f
 test('Windows installer coordinator targets an exact installation tree', {
   skip: process.platform !== 'win32'
 }, async (context) => {
-  const fixtureRoot = await mkdtemp(join(tmpdir(), 'rovai-installer-process-'))
+  const fixtureRoot = await mkdtemp(join(tmpdir(), 'coaxi-installer-process-'))
   const installDirectory = join(fixtureRoot, 'Coaxi')
   const siblingDirectory = join(fixtureRoot, 'Coaxi-old')
   await Promise.all([
@@ -74,9 +74,9 @@ test('Windows installer coordinator targets an exact installation tree', {
   ])
 
   const systemPing = join(process.env.SystemRoot ?? 'C:\\Windows', 'System32', 'ping.exe')
-  const installedExecutable = join(installDirectory, 'Codeg Rovai Workbench.exe')
+  const installedExecutable = join(installDirectory, 'Coaxi.exe')
   const unrelatedExecutable = join(installDirectory, 'unrelated.exe')
-  const siblingExecutable = join(siblingDirectory, 'Codeg Rovai Workbench.exe')
+  const siblingExecutable = join(siblingDirectory, 'Coaxi.exe')
   await Promise.all([
     copyFile(systemPing, installedExecutable),
     copyFile(systemPing, unrelatedExecutable),

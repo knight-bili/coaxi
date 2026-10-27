@@ -39,7 +39,7 @@ export class BrowserProfiles {
     return this.exclusive(async () => {
       const id = profileId ?? 'temporary'
       if (id !== 'temporary' && !this.catalog.profiles.some(row => row.id === id)) throw new Error('browser.profile_not_found')
-      const value = session.fromPartition(id === 'temporary' ? `browser-${tabId}` : `persist:codeg-rovai-browser-${id}`)
+      const value = session.fromPartition(id === 'temporary' ? `browser-${tabId}` : `persist:coaxi-browser-${id}`)
       this.occupancy.set(id, (this.occupancy.get(id) ?? 0) + 1)
       let released = false
       return { profileId: id, session: value, release: () => { if (!released) { released = true; this.occupancy.set(id, Math.max(0, (this.occupancy.get(id) ?? 1) - 1)) } } }
@@ -61,7 +61,7 @@ export class BrowserProfiles {
           row.name = input.name.trim()
         } else if (input.action === 'clear' || input.action === 'remove') {
           if (!input.confirmed || input.action === 'remove' && row.id === 'default') throw new Error('browser.profile_confirmation_required')
-          const value = session.fromPartition(`persist:codeg-rovai-browser-${row.id}`)
+          const value = session.fromPartition(`persist:coaxi-browser-${row.id}`)
           if ((this.occupancy.get(row.id) ?? 0) > 0 || this.hasDownloads(value)) throw new Error('browser.profile_in_use_close_pages_and_downloads_first')
           await value.closeAllConnections(); await value.clearAuthCache(); await value.clearStorageData(); await value.clearCache()
           if (input.action === 'remove') profiles.splice(profiles.indexOf(row), 1)

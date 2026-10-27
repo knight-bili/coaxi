@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schemas.rovai.invalid/contracts/public-benchmark-report-v2.schema.json",
-  "title": "Rovai Public Benchmark Report v2",
+  "$id": "https://schemas.coaxi.invalid/contracts/public-benchmark-report-v2.schema.json",
+  "title": "Coaxi Public Benchmark Report v2",
   "$defs": {
     "publicReviewItem": {
       "type": "object",
@@ -16,7 +16,7 @@
       ],
       "properties": {
         "checklistItem": {
-          "$ref": "https://schemas.rovai.invalid/v0.34/semantic-judge-configuration.schema.json#/$defs/checklistItemId"
+          "$ref": "https://schemas.coaxi.invalid/v0.34/semantic-judge-configuration.schema.json#/$defs/checklistItemId"
         },
         "state": {
           "enum": [
@@ -28,7 +28,7 @@
         "verdict": {
           "anyOf": [
             {
-              "$ref": "https://schemas.rovai.invalid/v0.34/judge-replica-result.schema.json#/$defs/verdict"
+              "$ref": "https://schemas.coaxi.invalid/v0.34/judge-replica-result.schema.json#/$defs/verdict"
             },
             {
               "type": "null"
@@ -40,13 +40,13 @@
           "minItems": 2,
           "maxItems": 2,
           "items": {
-            "$ref": "https://schemas.rovai.invalid/v0.34/judge-replica-result.schema.json#/$defs/verdict"
+            "$ref": "https://schemas.coaxi.invalid/v0.34/judge-replica-result.schema.json#/$defs/verdict"
           }
         },
         "evidenceReferences": {
           "type": "array",
           "items": {
-            "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/evidenceRef"
+            "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/evidenceRef"
           }
         },
         "reason": {
@@ -73,7 +73,7 @@
           "then": {
             "properties": {
               "verdict": {
-                "$ref": "https://schemas.rovai.invalid/v0.34/judge-replica-result.schema.json#/$defs/verdict"
+                "$ref": "https://schemas.coaxi.invalid/v0.34/judge-replica-result.schema.json#/$defs/verdict"
               }
             }
           },
@@ -244,29 +244,29 @@
   ],
   "properties": {
     "artifactId": {
-      "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/stableId"
+      "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/stableId"
     },
     "schemaId": {
-      "const": "rovai.qualification.public-benchmark-report"
+      "const": "coaxi.qualification.public-benchmark-report"
     },
     "schemaVersion": {
       "const": "2.0.0"
     },
     "producer": {
-      "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/producer"
+      "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/producer"
     },
     "binding": {
-      "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/binding"
+      "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/binding"
     },
     "sourceBoundaries": {
       "type": "array",
       "minItems": 1,
       "items": {
-        "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/sourceBoundary"
+        "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/sourceBoundary"
       }
     },
     "payloadDigest": {
-      "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/digest"
+      "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/digest"
     },
     "payload": {
       "type": "object",
@@ -285,7 +285,7 @@
       ],
       "properties": {
         "reportId": {
-          "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/stableId"
+          "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/stableId"
         },
         "reportClass": {
           "enum": [
@@ -295,7 +295,7 @@
           ]
         },
         "generatedAt": {
-          "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/timestamp"
+          "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/timestamp"
         },
         "case": {
           "type": "object",
@@ -307,7 +307,7 @@
           ],
           "properties": {
             "caseId": {
-              "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/stableId"
+              "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/stableId"
             },
             "caseVersion": {
               "type": "string",
@@ -514,7 +514,7 @@
           ],
           "properties": {
             "coverage": {
-              "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/coverage"
+              "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/coverage"
             },
             "requirements": {
               "type": "array",
@@ -528,7 +528,7 @@
                 ],
                 "properties": {
                   "requirementId": {
-                    "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/stableId"
+                    "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/stableId"
                   },
                   "criticality": {
                     "enum": [
@@ -557,7 +557,7 @@
                 ],
                 "properties": {
                   "categoryId": {
-                    "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/stableId"
+                    "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/stableId"
                   },
                   "status": {
                     "enum": [
@@ -590,18 +590,18 @@
                 ],
                 "properties": {
                   "failureFactId": {
-                    "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/stableId"
+                    "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/stableId"
                   },
                   "stage": {
-                    "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/stableId"
+                    "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/stableId"
                   },
                   "classification": {
-                    "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/stableId"
+                    "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/stableId"
                   },
                   "evidenceReferences": {
                     "type": "array",
                     "items": {
-                      "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/evidenceRef"
+                      "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/evidenceRef"
                     }
                   }
                 }
@@ -650,7 +650,7 @@
             "finalResponseEvidence": {
               "type": "array",
               "items": {
-                "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/evidenceRef"
+                "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/evidenceRef"
               }
             }
           }
@@ -668,7 +668,7 @@
           ],
           "properties": {
             "coverage": {
-              "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/coverage"
+              "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/coverage"
             },
             "runGraph": {
               "type": "object",
@@ -778,7 +778,7 @@
                 ],
                 "properties": {
                   "memberPseudonym": {
-                    "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/stableId"
+                    "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/stableId"
                   },
                   "declaredRole": {
                     "type": [
@@ -797,13 +797,13 @@
             "feedbackCandidates": {
               "type": "array",
               "items": {
-                "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/evidenceRef"
+                "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/evidenceRef"
               }
             },
             "fileOverlapFacts": {
               "type": "array",
               "items": {
-                "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/evidenceRef"
+                "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/evidenceRef"
               }
             }
           }
@@ -826,7 +826,7 @@
           ],
           "properties": {
             "coverage": {
-              "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/coverage"
+              "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/coverage"
             },
             "toolCalls": {
               "type": [
@@ -878,7 +878,7 @@
               "minimum": 0
             },
             "latencyCoverage": {
-              "$ref": "https://schemas.rovai.invalid/v0.34/artifact-envelope.schema.json#/$defs/coverage"
+              "$ref": "https://schemas.coaxi.invalid/v0.34/artifact-envelope.schema.json#/$defs/coverage"
             },
             "mutationVerification": {
               "enum": [

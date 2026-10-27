@@ -29,7 +29,7 @@ last_updated: 2026-10-01
 没有发布过的 `rovai conversation`／公开 `conversationId` 提案不新增兼容别名。
 
 另修正一处事实：`automation.run` 当前返回的 `campId` 与 `conversationId` **都来自 `self.camp_id`**，见
-[`ClaimedOccurrence::payload`](../../../crates/rovai-core/src/automation.rs)。它们是同一公开 ID 的重复字段，不能把后者解释成私有会话 ID；新结果只保留 `threadId`。
+[`ClaimedOccurrence::payload`](../../../crates/coaxi-core/src/automation.rs)。它们是同一公开 ID 的重复字段，不能把后者解释成私有会话 ID；新结果只保留 `threadId`。
 
 ## 具体场景
 
@@ -65,7 +65,7 @@ last_updated: 2026-10-01
 
 当前实现分三层：Camp 是公开共享对话，Conversation 是队员私有逻辑连续性，Native Session 是外部 Runtime 句柄。
 `camp.read` 的 `thread` 参数表示消息回复链，其结果为 `mode: "thread"`，根消息字段为 `threadRootMessageId`。
-这些含义见[领域模型](../../../CONTEXT.md)、[历史读取代码](../../../crates/rovai-core/src/camp_history.rs)和[工具目录](../../../crates/rovai-core/src/team_tool_catalog.rs)。
+这些含义见[领域模型](../../../CONTEXT.md)、[历史读取代码](../../../crates/coaxi-core/src/camp_history.rs)和[工具目录](../../../crates/coaxi-core/src/team_tool_catalog.rs)。
 
 现行提示中公开范围叫 Camp；`SHARED_CONVERSATION` 是公开参考消息段，并非队员私有 Conversation 的模型。
 Single Chat 的 `conversationMode` 表示单聊行为约束，不要求 Agent 管理私有会话 ID。
@@ -245,7 +245,7 @@ type SingleChatFact = {
 ```
 
 `singleChat` 仍只在单聊提供；行为约束保留，不再叫内部 conversationMode 或新增 agentSessionMode。
-公开批次 historyHint 必有，普通投影保持原来可选性；只改称谓。其余子类型沿用[当前实现](../../../crates/rovai-core/src/context.rs)，
+公开批次 historyHint 必有，普通投影保持原来可选性；只改称谓。其余子类型沿用[当前实现](../../../crates/coaxi-core/src/context.rs)，
 gather／delegation 不恢复已退役功能。
 
 A2A 的模型形状仍是 `{"instructions": string[]}`，return 五条、forward 四条，条件和顺序不变。

@@ -9,7 +9,7 @@ import { dirname, extname, join, resolve } from 'node:path'
 import { createHash } from 'node:crypto'
 import { prepareDshSmokeHome } from './lib/dsh-smoke-home.mjs'
 
-const configuredExecutable = process.env.ROVAI_DEEPSEEK_HARNESS_BIN?.trim()
+const configuredExecutable = process.env.COAXI_DEEPSEEK_HARNESS_BIN?.trim()
 let executable = configuredExecutable || 'dsh'
 let executablePrefix = []
 if (process.platform === 'win32' && extname(executable).toLowerCase() !== '.exe') {
@@ -18,8 +18,8 @@ if (process.platform === 'win32' && extname(executable).toLowerCase() !== '.exe'
   executable = process.execPath
   executablePrefix = [join(dirname(shim), 'node_modules', '@deepseek-ai', 'dsh', 'lib', 'bin.js')]
 }
-const root = await mkdtemp(join(tmpdir(), 'rovai-dsh-native-parity-'))
-const outsideRoot = await mkdtemp(join(homedir(), '.rovai-dsh-native-parity-'))
+const root = await mkdtemp(join(tmpdir(), 'coaxi-dsh-native-parity-'))
+const outsideRoot = await mkdtemp(join(homedir(), '.coaxi-dsh-native-parity-'))
 const project = join(root, 'project')
 await mkdir(project)
 await prepareDshSmokeHome(join(root, 'home'))
@@ -35,13 +35,13 @@ const deniedWriteCommand = process.platform === 'win32'
   ? `Set-Content -LiteralPath '${deniedWritePath.replaceAll("'", "''")}' -Value 'SHOULD_NOT_EXIST'`
   : `printf 'SHOULD_NOT_EXIST\\n' > '${deniedWritePath.replaceAll("'", "'\\''")}'`
 const mcpServers = [{ name: 'parity', command: process.execPath,
-  args: [resolve(import.meta.dirname, '../crates/rovai-core/tests/fixtures/mcp-smoke-server.mjs')],
-  env: [{ name: 'ROVAI_MCP_SMOKE_SOURCE', value: 'native-parity' },
-    { name: 'ROVAI_MCP_SMOKE_CALL_MARKER', value: mcpCalls }] }]
+  args: [resolve(import.meta.dirname, '../crates/coaxi-core/tests/fixtures/mcp-smoke-server.mjs')],
+  env: [{ name: 'COAXI_MCP_SMOKE_SOURCE', value: 'native-parity' },
+    { name: 'COAXI_MCP_SMOKE_CALL_MARKER', value: mcpCalls }] }]
 const callCount = async () => (await readFile(mcpCalls, 'utf8').catch(error => {
   if (error.code === 'ENOENT') return ''; throw error
 })).split('\n').filter(Boolean).length
-const plugin = resolve(import.meta.dirname, '../crates/rovai-core/src/dsh/bootstrap.mjs')
+const plugin = resolve(import.meta.dirname, '../crates/coaxi-core/src/dsh/bootstrap.mjs')
 const controlPlugin = join(root, 'compact-control.mjs')
 await writeFile(controlPlugin, `
 import { existsSync, readFileSync, writeFileSync, unlinkSync } from 'node:fs'
@@ -120,7 +120,7 @@ async function startHost(automatic = false) {
     { id:'approval', config:{ policy:'never' } },
     { id:'permission', disabled:true },
     { id:'compaction-basic', config:{ retainTokens:0, thresholdRatio:0.12, compactionRetries:0, maxTokens:4096, auto:automatic } },
-    { insert:[{ id:'rovai-bootstrap', name:plugin, config:{bindingRoot,observationRoot,approvalPolicy:'ask'} },
+    { insert:[{ id:'coaxi-bootstrap', name:plugin, config:{bindingRoot,observationRoot,approvalPolicy:'ask'} },
       { id:'parity-compact-control', name:controlPlugin, config:{request,response} }] }
   ]), { mode:0o600 })
   const child = spawn(executable, [...executablePrefix, '--profile','acp','--patch',patch], {
@@ -169,7 +169,7 @@ async function startHost(automatic = false) {
     async stop() {child.stdin.end();const stop=setTimeout(()=>{try{process.platform==='win32'?child.kill('SIGTERM'):process.kill(-child.pid,'SIGTERM')}catch{}},3000);const kill=setTimeout(()=>{try{process.platform==='win32'?child.kill('SIGKILL'):process.kill(-child.pid,'SIGKILL')}catch{}},7000);await closed;clearTimeout(stop);clearTimeout(kill);await writeFile(join(privateRoot,'stderr.log'),log,{mode:0o600})}
   }
   try {
-    const initialize = await rpc('initialize',{protocolVersion:1,clientCapabilities:{fs:{readTextFile:false,writeTextFile:false},terminal:false},clientInfo:{name:'rovai-dsh-parity',version:'1'}})
+    const initialize = await rpc('initialize',{protocolVersion:1,clientCapabilities:{fs:{readTextFile:false,writeTextFile:false},terminal:false},clientInfo:{name:'coaxi-dsh-parity',version:'1'}})
     assert(initialize.agentCapabilities.sessionCapabilities.resume)
   } catch (error) { await result.stop(); throw error }
   return result

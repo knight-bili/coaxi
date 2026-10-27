@@ -1,8 +1,8 @@
 import {useMemo} from 'react'
-import type {PortableSyncRequest,RovaiApi} from '@contracts'
+import type {PortableSyncRequest,CoaxiApi} from '@contracts'
 import {useThreadClient} from './camp-client'
 
-type Workspace=NonNullable<RovaiApi['webdavWorkspace']>
+type Workspace=NonNullable<CoaxiApi['webdavWorkspace']>
 type Input=Parameters<Workspace['request']>[0]
 
 /** 同一设置页使用原 Main 所有者或认证后的私有输入；不向网络开放主机路径。 */

@@ -8,14 +8,14 @@ import { coreDataDirectoryArguments } from './lib/runtime-camp-files-root.mjs'
 
 const root = resolve(import.meta.dirname, '..')
 const appPath = resolve(process.argv[2] ?? join(root, 'dist', 'mac-arm64', 'Coaxi.app'))
-const fixtureRoot = process.env.ROVAI_NOTIFICATION_ACCEPT_FIXTURE_ROOT
-  ?? await mkdtemp(join(tmpdir(), 'rovai-notification-ui-accept-'))
+const fixtureRoot = process.env.COAXI_NOTIFICATION_ACCEPT_FIXTURE_ROOT
+  ?? await mkdtemp(join(tmpdir(), 'coaxi-notification-ui-accept-'))
 const dataDir = join(fixtureRoot, 'user-data')
 const workspaceDir = join(fixtureRoot, 'workspace')
-const outputDir = process.env.ROVAI_NOTIFICATION_ACCEPT_OUTPUT_DIR
-  ?? await mkdtemp(join(tmpdir(), 'rovai-notification-ui-captures-'))
-const databasePath = join(dataDir, 'rovai.sqlite')
-const firstPort = Number(process.env.ROVAI_NOTIFICATION_ACCEPT_DEBUG_PORT ?? 9471)
+const outputDir = process.env.COAXI_NOTIFICATION_ACCEPT_OUTPUT_DIR
+  ?? await mkdtemp(join(tmpdir(), 'coaxi-notification-ui-captures-'))
+const databasePath = join(dataDir, 'coaxi.sqlite')
+const firstPort = Number(process.env.COAXI_NOTIFICATION_ACCEPT_DEBUG_PORT ?? 9471)
 
 await mkdir(dataDir, { recursive: true })
 await mkdir(workspaceDir, { recursive: true })
@@ -183,7 +183,7 @@ try {
   await waitForUnreadCount(compactApp.cdp, 1)
   await wait(800)
   assert(!(await evaluate(compactApp.cdp, `Boolean(document.querySelector('.notification-heads-up:not([hidden])'))`)),
-    'A reminder became visible while Rovai AI was not attentive')
+    'A reminder became visible while Coaxi AI was not attentive')
   await simulateWindowAttention(compactApp.cdp, true)
   await waitForSelector(compactApp.cdp, '.notification-heads-up:not([hidden])', 15_000)
   assert(await evaluate(compactApp.cdp, `(() => {
@@ -458,7 +458,7 @@ async function markAllNotificationsRead(cdp) {
 
 async function waitForUnreadCount(cdp, expected, timeout = 15_000) {
   await waitForExpression(cdp, `
-    window.rovai.request('notifications.inbox', { filter: 'all', limit: 1 })
+    window.coaxi.request('notifications.inbox', { filter: 'all', limit: 1 })
       .then((inbox) => inbox.unreadCount === ${JSON.stringify(expected)})
   `, timeout, true)
 }
@@ -543,7 +543,7 @@ async function setPrimaryHeadsUpPreference(cdp, enabled) {
       `document.querySelector('.notification-switch input[role="switch"]')?.click()`)
   }
   await waitForExpression(cdp,
-    `window.rovai.request('notifications.preference.get')
+    `window.coaxi.request('notifications.preference.get')
       .then((value) => value.headsUpEnabled === ${JSON.stringify(enabled)})`,
   15_000, true)
   await waitForExpression(cdp,
@@ -622,7 +622,7 @@ async function assertNotificationPreferenceRecovery(cdp) {
   await clickFirstButton(cdp, '.notification-settings-error button')
   await waitForExpression(cdp, `!document.querySelector('.notification-settings-error')`)
   await waitForExpression(cdp,
-    `window.rovai.request('notifications.preference.get')
+    `window.coaxi.request('notifications.preference.get')
       .then((value) => value.approvalHeadsUpEnabled === false)`,
   15_000, true)
   const retried = await evaluate(cdp, `(() => {
@@ -642,7 +642,7 @@ async function assertNotificationPreferenceRecovery(cdp) {
     '[data-notification-preference="approvalHeadsUpEnabled"]'
   )?.click()`)
   await waitForExpression(cdp,
-    `window.rovai.request('notifications.preference.get')
+    `window.coaxi.request('notifications.preference.get')
       .then((value) => value.approvalHeadsUpEnabled === true)`,
   15_000, true)
 }
@@ -668,11 +668,11 @@ async function clickFirstButton(cdp, selector) {
 
 async function request(cdp, method, params = {}) {
   return evaluate(cdp,
-    `window.rovai.request(${JSON.stringify(method)}, ${JSON.stringify(params)})`, true)
+    `window.coaxi.request(${JSON.stringify(method)}, ${JSON.stringify(params)})`, true)
 }
 
 async function setTheme(cdp, preference) {
-  await evaluate(cdp, `window.rovai.appearance.setPreference(${JSON.stringify(preference)})`, true)
+  await evaluate(cdp, `window.coaxi.appearance.setPreference(${JSON.stringify(preference)})`, true)
   const expectedTheme = preference === 'night' ? 'night' : 'day'
   await waitForExpression(cdp,
     `document.documentElement.dataset.theme === ${JSON.stringify(expectedTheme)}`)
@@ -705,7 +705,7 @@ async function launchApp(port, width, height, reducedMotion) {
   ], {
     cwd: root,
     stdio: ['ignore', 'ignore', 'pipe'],
-    env: { ...process.env, ROVAI_ALLOW_ISOLATED_INSTANCE: '1' }
+    env: { ...process.env, COAXI_ALLOW_ISOLATED_INSTANCE: '1' }
   })
   child.stderr.on('data', (chunk) => stderr.push(String(chunk)))
   let cdp = null
@@ -728,7 +728,7 @@ async function launchApp(port, width, height, reducedMotion) {
       }]
     })
     await waitForExpression(cdp,
-      `Boolean(window.rovai && document.querySelector('.app-shell'))`, 45_000)
+      `Boolean(window.coaxi && document.querySelector('.app-shell'))`, 45_000)
     await waitForExpression(cdp,
       `Boolean(document.querySelector('.unified-sidebar'))`, 45_000)
     const health = await request(cdp, 'health.check')
@@ -867,7 +867,7 @@ async function connectCdp(url) {
 }
 
 function startCore(dataDirectory) {
-  const child = spawn(stagedSidecarPath(root, 'rovai-core'), [
+  const child = spawn(stagedSidecarPath(root, 'coaxi-core'), [
     ...coreDataDirectoryArguments(dataDirectory),
     '--skill-library-root',
     join(dataDirectory, 'managed-skill-library')

@@ -1,6 +1,6 @@
 # Read, decide and write once
 
-Read exact help for each needed `rovai memory view|search|read|write` operation.
+Read exact help for each needed `coaxi memory view|search|read|write` operation.
 
 ## Capture: complete View before mutation
 

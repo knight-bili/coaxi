@@ -6,19 +6,19 @@ import { seedCompletedOnboardingForAcceptance } from './lib/dev-desktop.mjs'
 
 const root = resolve(import.meta.dirname, '..')
 const appPath = resolve(process.argv[2] ?? join(root, 'dist', 'mac-arm64', 'Coaxi.app'))
-const acceptanceScope = process.env.ROVAI_SIDEBAR_ACCEPT_SCOPE ?? 'all'
+const acceptanceScope = process.env.COAXI_SIDEBAR_ACCEPT_SCOPE ?? 'all'
 if (!['all', 'navigation-windows', 'deletion-latency'].includes(acceptanceScope)) throw new Error('Unknown sidebar acceptance scope')
-const fixtureRoot = process.env.ROVAI_SIDEBAR_ACCEPT_FIXTURE_ROOT
-  ?? await mkdtemp(join(tmpdir(), 'rovai-sidebar-ui-accept-'))
+const fixtureRoot = process.env.COAXI_SIDEBAR_ACCEPT_FIXTURE_ROOT
+  ?? await mkdtemp(join(tmpdir(), 'coaxi-sidebar-ui-accept-'))
 const dataDir = join(fixtureRoot, 'user-data')
 const workspaceDir = join(fixtureRoot, 'workspace')
 // The Core owns Unix sockets below TMPDIR; keep this path short enough for SUN_LEN.
-const runtimeTempDir = process.env.ROVAI_SIDEBAR_ACCEPT_RUNTIME_TMP
+const runtimeTempDir = process.env.COAXI_SIDEBAR_ACCEPT_RUNTIME_TMP
   ?? await mkdtemp('/tmp/rv-side-')
-const outputDir = process.env.ROVAI_SIDEBAR_ACCEPT_OUTPUT_DIR
-  ?? await mkdtemp(join(tmpdir(), 'rovai-sidebar-ui-captures-'))
-const databasePath = join(dataDir, 'rovai.sqlite')
-const firstPort = Number(process.env.ROVAI_SIDEBAR_ACCEPT_DEBUG_PORT ?? 9491)
+const outputDir = process.env.COAXI_SIDEBAR_ACCEPT_OUTPUT_DIR
+  ?? await mkdtemp(join(tmpdir(), 'coaxi-sidebar-ui-captures-'))
+const databasePath = join(dataDir, 'coaxi.sqlite')
+const firstPort = Number(process.env.COAXI_SIDEBAR_ACCEPT_DEBUG_PORT ?? 9491)
 const renamedTitle = '侧栏操作验收已重命名'
 const deletionAcceptanceP95LimitMs = 250
 
@@ -195,7 +195,7 @@ try {
 
     const persistedPins = await evaluate(
       compactApp.cdp,
-      'window.rovai.navigationPreferences.get()',
+      'window.coaxi.navigationPreferences.get()',
       true
     )
     assert(persistedPins.pins.length === 0,
@@ -1060,13 +1060,13 @@ async function assertCampIdCopy(cdp, target, expectedCampId) {
   const installed = await evaluate(cdp, `(() => {
     const clipboard = navigator.clipboard
     if (!clipboard || typeof clipboard.writeText !== 'function') return false
-    window.__rovaiSidebarClipboardHadOwnWriteText = Object.prototype.hasOwnProperty.call(clipboard, 'writeText')
-    window.__rovaiSidebarClipboardWriteTextDescriptor = Object.getOwnPropertyDescriptor(clipboard, 'writeText')
-    window.__rovaiSidebarCopiedText = null
+    window.__coaxiSidebarClipboardHadOwnWriteText = Object.prototype.hasOwnProperty.call(clipboard, 'writeText')
+    window.__coaxiSidebarClipboardWriteTextDescriptor = Object.getOwnPropertyDescriptor(clipboard, 'writeText')
+    window.__coaxiSidebarCopiedText = null
     try {
       Object.defineProperty(clipboard, 'writeText', {
         configurable: true,
-        value: async (text) => { window.__rovaiSidebarCopiedText = text }
+        value: async (text) => { window.__coaxiSidebarCopiedText = text }
       })
       return true
     } catch {
@@ -1086,7 +1086,7 @@ async function assertCampIdCopy(cdp, target, expectedCampId) {
     await waitForExpression(cdp, `document.querySelector('.app-toast')?.textContent?.includes('已复制会话 ID') === true`)
     await assertNoTargetRefocus(cdp, target)
     const state = await evaluate(cdp, `({
-      copiedText: window.__rovaiSidebarCopiedText,
+      copiedText: window.__coaxiSidebarCopiedText,
       menuOpen: Boolean(document.querySelector('.sidebar-action-menu[data-state="open"]')),
       toast: document.querySelector('.app-toast')?.textContent?.trim() ?? null
     })`)
@@ -1096,15 +1096,15 @@ async function assertCampIdCopy(cdp, target, expectedCampId) {
   } finally {
     await evaluate(cdp, `(() => {
       const clipboard = navigator.clipboard
-      const hadOwn = window.__rovaiSidebarClipboardHadOwnWriteText
-      const descriptor = window.__rovaiSidebarClipboardWriteTextDescriptor
+      const hadOwn = window.__coaxiSidebarClipboardHadOwnWriteText
+      const descriptor = window.__coaxiSidebarClipboardWriteTextDescriptor
       if (clipboard) {
         if (hadOwn && descriptor) Object.defineProperty(clipboard, 'writeText', descriptor)
         else delete clipboard.writeText
       }
-      delete window.__rovaiSidebarClipboardHadOwnWriteText
-      delete window.__rovaiSidebarClipboardWriteTextDescriptor
-      delete window.__rovaiSidebarCopiedText
+      delete window.__coaxiSidebarClipboardHadOwnWriteText
+      delete window.__coaxiSidebarClipboardWriteTextDescriptor
+      delete window.__coaxiSidebarCopiedText
     })()`)
   }
 }
@@ -1266,7 +1266,7 @@ async function removeAndRestoreProject(cdp, projectTarget, campTarget) {
   await wait(350)
   assert(await evaluate(cdp, `document.activeElement?.dataset.sidebarFocusTarget !== 'project-row:quick-chat'`), 'Project removal must not refocus the Quick Chat entry')
 
-  const afterPreferences = await evaluate(cdp, 'window.rovai.navigationPreferences.get()', true)
+  const afterPreferences = await evaluate(cdp, 'window.coaxi.navigationPreferences.get()', true)
   assert(afterPreferences.removedProjects.some((project) => project.targetKey === targetKey),
     `Project removal was not persisted: ${JSON.stringify(afterPreferences)}`)
   assert(!afterPreferences.pins.some((pin) => (
@@ -1292,8 +1292,8 @@ async function removeAndRestoreProject(cdp, projectTarget, campTarget) {
 async function assertRemovedProjectPersists(cdp, projectTarget) {
   const targetKey = projectTarget.slice('project:'.length)
   const state = await evaluate(cdp, `(async () => ({
-    preferences: await window.rovai.navigationPreferences.get(),
-    startup: await window.rovai.desktopSession.getStartupSnapshot(),
+    preferences: await window.coaxi.navigationPreferences.get(),
+    startup: await window.coaxi.desktopSession.getStartupSnapshot(),
     visible: [...document.querySelectorAll('[data-sidebar-menu-target]')]
       .some((element) => element.dataset.sidebarMenuTarget === ${JSON.stringify(projectTarget)}),
     quickChatCurrent: document.querySelector('[data-sidebar-focus-target="project-row:quick-chat"]')
@@ -1309,13 +1309,13 @@ async function assertRemovedProjectPersists(cdp, projectTarget) {
 async function restoreRemovedProject(cdp, projectTarget) {
   const targetKey = projectTarget.slice('project:'.length)
   const restored = await evaluate(cdp,
-    `window.rovai.navigationPreferences.restoreProject(${JSON.stringify(targetKey)})`,
+    `window.coaxi.navigationPreferences.restoreProject(${JSON.stringify(targetKey)})`,
     true)
   assert(!restored.removedProjects.some((project) => project.targetKey === targetKey),
     `Project restore left a hidden-project record: ${JSON.stringify(restored)}`)
   await cdp.send('Page.reload', { ignoreCache: true })
   await waitForExpression(cdp,
-    `Boolean(window.rovai && document.querySelector('.app-shell'))`, 45_000)
+    `Boolean(window.coaxi && document.querySelector('.app-shell'))`, 45_000)
 }
 
 async function assertCompactPointerAndMotion(cdp) {
@@ -1423,11 +1423,11 @@ async function forcePseudoState(cdp, selector, forcedPseudoClasses) {
 
 async function request(cdp, method, params = {}) {
   return evaluate(cdp,
-    `window.rovai.request(${JSON.stringify(method)}, ${JSON.stringify(params)})`, true)
+    `window.coaxi.request(${JSON.stringify(method)}, ${JSON.stringify(params)})`, true)
 }
 
 async function setTheme(cdp, preference) {
-  await evaluate(cdp, `window.rovai.appearance.setPreference(${JSON.stringify(preference)})`, true)
+  await evaluate(cdp, `window.coaxi.appearance.setPreference(${JSON.stringify(preference)})`, true)
   const expectedTheme = preference === 'night' ? 'night' : 'day'
   await waitForExpression(cdp,
     `document.documentElement.dataset.theme === ${JSON.stringify(expectedTheme)}`)
@@ -1445,7 +1445,7 @@ async function launchApp(port, width, height, reducedMotion) {
     env: {
       ...process.env,
       TMPDIR: runtimeTempDir,
-      ROVAI_ALLOW_ISOLATED_INSTANCE: '1'
+      COAXI_ALLOW_ISOLATED_INSTANCE: '1'
     }
   })
   child.stderr.on('data', (chunk) => stderr.push(String(chunk)))
@@ -1469,11 +1469,11 @@ async function launchApp(port, width, height, reducedMotion) {
       }]
     })
     await waitForExpression(cdp,
-      `Boolean(window.rovai && document.querySelector('.app-shell'))`, 45_000)
+      `Boolean(window.coaxi && document.querySelector('.app-shell'))`, 45_000)
     // The first app-shell is intentionally visible before authoritative Core admission.
     // Do not issue fixture RPCs against the bootstrap-only shell.
     await waitForExpression(cdp,
-      `window.rovai.supervisor.getSnapshot().then(snapshot => snapshot.fullCoreState === 'ready')`,
+      `window.coaxi.supervisor.getSnapshot().then(snapshot => snapshot.fullCoreState === 'ready')`,
       45_000, true)
     await evaluate(cdp, `(() => {
       const style = document.createElement('style')

@@ -21,14 +21,14 @@ import {
 import { prepareIsolatedPiAgentDir } from './lib/pi-smoke-config.mjs'
 
 const root = resolve(import.meta.dirname, '..')
-const fixtureRoot = await realpath(await mkdtemp(join(tmpdir(), 'rovai-skills-smoke-')))
+const fixtureRoot = await realpath(await mkdtemp(join(tmpdir(), 'coaxi-skills-smoke-')))
 const projectRoot = join(fixtureRoot, 'project')
 const sourceRoot = join(fixtureRoot, 'imports')
-const sourceSkill = join(sourceRoot, 'rovai-skill-smoke')
+const sourceSkill = join(sourceRoot, 'coaxi-skill-smoke')
 const dataDir = join(fixtureRoot, 'data')
-const libraryRoot = join(fixtureRoot, 'rovai-library')
-const adapterSelection = process.env.ROVAI_SKILL_SMOKE_ADAPTERS ?? 'codex-cli'
-const explicitModelId = process.env.ROVAI_SKILL_SMOKE_MODEL?.trim() || null
+const libraryRoot = join(fixtureRoot, 'coaxi-library')
+const adapterSelection = process.env.COAXI_SKILL_SMOKE_ADAPTERS ?? 'codex-cli'
+const explicitModelId = process.env.COAXI_SKILL_SMOKE_MODEL?.trim() || null
 const requestedAdapters = adapterSelection === 'all'
   ? [
       'codex-cli',
@@ -91,7 +91,7 @@ let zcodeSkillLifecycle = null
 
 try {
   if (explicitModelId && requestedAdapters.length !== 1) {
-    throw new Error('ROVAI_SKILL_SMOKE_MODEL requires exactly one selected Runtime Adapter')
+    throw new Error('COAXI_SKILL_SMOKE_MODEL requires exactly one selected Runtime Adapter')
   }
   for (const adapterKind of requestedAdapters) {
     if (!supportedAdapters.has(adapterKind)) throw new Error(`Unknown Skill smoke Adapter: ${adapterKind}`)
@@ -102,11 +102,11 @@ try {
   await mkdir(projectRoot)
   await mkdir(sourceRoot)
   const originalGitignore = '# User-owned ignore rules stay byte-for-byte stable.\n*.local\n'
-  await writeFile(join(projectRoot, 'README.md'), '# Rovai-ai Skill Smoke\n')
+  await writeFile(join(projectRoot, 'README.md'), '# Coaxi Skill Smoke\n')
   await writeFile(join(projectRoot, '.gitignore'), originalGitignore)
   await run('git', ['init', '-b', 'main'], projectRoot)
-  await run('git', ['config', 'user.name', 'Rovai-ai Skill Smoke'], projectRoot)
-  await run('git', ['config', 'user.email', 'skill-smoke@rovai.local'], projectRoot)
+  await run('git', ['config', 'user.name', 'Coaxi Skill Smoke'], projectRoot)
+  await run('git', ['config', 'user.email', 'skill-smoke@coaxi.local'], projectRoot)
   await run('git', ['add', 'README.md', '.gitignore'], projectRoot)
   await run('git', ['commit', '-m', 'fixture'], projectRoot)
 
@@ -182,7 +182,7 @@ try {
   assert(firstCandidate.importAction === 'create', `First import was not a create: ${JSON.stringify(firstCandidate)}`)
   const imported = await commitCandidate(firstInspection, firstCandidate, false)
   assert(imported.status === 'applied' && imported.code === 'skill_imported', `Import failed: ${JSON.stringify(imported)}`)
-  let importedSkill = (await core.request('skills.list')).find((skill) => skill.name === 'rovai-skill-smoke')
+  let importedSkill = (await core.request('skills.list')).find((skill) => skill.name === 'coaxi-skill-smoke')
   assert(
     importedSkill?.enabled
       && JSON.stringify(importedSkill.groupAssignments.map((assignment) => assignment.groupKey).sort())
@@ -238,7 +238,7 @@ try {
       marker
     )
     const frozenSkill = result.exposure?.skills.find((skill) =>
-      skill.name === 'rovai-skill-smoke'
+      skill.name === 'coaxi-skill-smoke'
         && skill.groupKey === groupKey
         && skill.status === 'ready'
         && skill.revisionId === importedSkill.currentRevision.id
@@ -299,7 +299,7 @@ try {
       updatedMarker
     )
     const updatedExposure = updatedResult.exposure?.skills.find((skill) =>
-      skill.name === 'rovai-skill-smoke'
+      skill.name === 'coaxi-skill-smoke'
         && skill.groupKey === lifecycleGroup
         && skill.status === 'ready'
     )
@@ -344,7 +344,7 @@ try {
     )
     assert(
       reenabledResult.exposure?.skills.some((skill) =>
-        skill.name === 'rovai-skill-smoke'
+        skill.name === 'coaxi-skill-smoke'
           && skill.revisionId === importedSkill.currentRevision.id
           && skill.status === 'ready'
       ),
@@ -395,8 +395,8 @@ try {
 
   if (requestedAdapters.length > 0) {
     const exclude = await readFile(await gitPath(projectRoot, 'info/exclude'), 'utf8')
-    assert(exclude.includes('BEGIN ROVAI MANAGED SKILL PROJECTIONS'), 'Git info/exclude has no Rovai-ai managed block')
-    assert(exclude.includes('rovai-skill-smoke'), 'Git info/exclude omits the imported Skill projection')
+    assert(exclude.includes('BEGIN COAXI MANAGED SKILL PROJECTIONS'), 'Git info/exclude has no Coaxi managed block')
+    assert(exclude.includes('coaxi-skill-smoke'), 'Git info/exclude omits the imported Skill projection')
     assert(await readFile(join(projectRoot, '.gitignore'), 'utf8') === originalGitignore, '.gitignore was modified')
     assert((await run('git', ['status', '--porcelain'], projectRoot)).trim() === '', 'Skill projections dirtied the Git worktree')
   }
@@ -427,7 +427,7 @@ try {
     await mkdir(entry, { recursive: true })
     await writeFile(
       join(entry, 'SKILL.md'),
-      '---\nname: rovai-skill-smoke\ndescription: Project-owned conflict\n---\n\nProject content wins.\n'
+      '---\nname: coaxi-skill-smoke\ndescription: Project-owned conflict\n---\n\nProject content wins.\n'
     )
     await applyCommand('skills.reconcile', {})
     const issues = await core.request('skills.projections.listIssues')
@@ -492,11 +492,11 @@ async function writeSmokeSkill(marker) {
   await mkdir(sourceSkill, { recursive: true })
   await writeFile(join(sourceSkill, 'SKILL.md'), [
     '---',
-    'name: rovai-skill-smoke',
-    'description: Return the private verification value when explicitly asked to validate Rovai-ai native Skill discovery.',
+    'name: coaxi-skill-smoke',
+    'description: Return the private verification value when explicitly asked to validate Coaxi native Skill discovery.',
     '---',
     '',
-    '# Rovai-ai native Skill discovery smoke',
+    '# Coaxi native Skill discovery smoke',
     '',
     'When the user explicitly asks to validate this Skill, include the private verification value below exactly once in the response.',
     'The rest of the response may follow the user request and other explicitly named Skills.',
@@ -555,12 +555,12 @@ async function configureRuntime(request, _health, agentId, adapterKind, modelId)
 
 async function runNativeDiscovery(request, workspace, adapterKind, marker) {
   const prompt = [
-    'Use both project Skills `rovai-skill-smoke` and `cli-operations`.',
-    'Include the private verification value from `rovai-skill-smoke` exactly once; it is intentionally absent from this request.',
+    'Use both project Skills `coaxi-skill-smoke` and `cli-operations`.',
+    'Include the private verification value from `coaxi-skill-smoke` exactly once; it is intentionally absent from this request.',
     'Then advise only; do not execute any mutation.',
     'Choose the minimal operation order for this scenario: create a responsibility already assigned to the target Agent so it survives the current AgentRun and can be independently accepted; afterward, publish that internal handoff to the same single Agent.',
     'That handoff creates no new unresolved user decision, answer, or action, and the user did not request an important result notification. Decide from the current teaching whether the handoff should use user attention.',
-    'Before answering, use the injected Rovai CLI to run the read-only exact help for only the operations you selected.',
+    'Before answering, use the injected Coaxi CLI to run the read-only exact help for only the operations you selected.',
     'Copy the current user-attention flag exactly from that help when you state the decision. Do not infer, translate, or rename any field or flag.',
     'In the answer, echo each complete shell command you actually ran, including the literal `--help` suffix; an operation name without `--help` is not an exact help path.',
     'Use this compact shape: marker, then `taskHelp=<full command>`, `sendHelp=<full command>`, `attention=omit <exact flag>`. Keep the answer under eight lines.'
@@ -626,8 +626,8 @@ async function runNativeDiscovery(request, workspace, adapterKind, marker) {
   if (!containsOnlyExpectedPrivateMarker(output, marker)) {
     throw new Error(`${adapterKind} did not return only the expected private Skill marker: ${JSON.stringify({ marker, output, lastState })}`)
   }
-  const taskHelpIndex = output.indexOf('rovai task create --help')
-  const sendHelpIndex = output.indexOf('rovai send --help')
+  const taskHelpIndex = output.indexOf('coaxi task create --help')
+  const sendHelpIndex = output.indexOf('coaxi send --help')
   const markdownNormalizedOutput = output.replaceAll('`', '')
   const inventedSendSyntax = [
     '--request-user-attention',
@@ -642,7 +642,7 @@ async function runNativeDiscovery(request, workspace, adapterKind, marker) {
       || sendHelpIndex < 0
       || taskHelpIndex >= sendHelpIndex
       || !markdownNormalizedOutput.includes('attention=omit --to-principal')
-      || output.includes('rovai task update --help')
+      || output.includes('coaxi task update --help')
       || inventedSendSyntax
       || mentionsCurrentUser) {
     throw new Error(`${adapterKind} did not apply message-local user attention teaching to the internal handoff: ${JSON.stringify({ output, mentionsCurrentUser, lastState })}`)
@@ -687,7 +687,7 @@ async function runSkillAbsenceProbe(request, workspace, forbiddenMarkers) {
     commandId: crypto.randomUUID(),
     workspace,
     body: [
-      'Briefly report whether the project Skill named `rovai-skill-smoke` appears in the Skills catalog supplied for this new Session.',
+      'Briefly report whether the project Skill named `coaxi-skill-smoke` appears in the Skills catalog supplied for this new Session.',
       'Do not use facts from another conversation and do not modify the workspace.'
     ].join(' '),
     address: { mode: 'explicit', agentIds: ['agent_1'] },
@@ -750,7 +750,7 @@ async function runSkillAbsenceProbe(request, workspace, forbiddenMarkers) {
 
 function assertSkillAbsent(result, state) {
   assert(
-    !result.exposure?.skills.some((skill) => skill.name === 'rovai-skill-smoke'),
+    !result.exposure?.skills.some((skill) => skill.name === 'coaxi-skill-smoke'),
     `Pi ${state} Skill remained in the next ContextManifest: ${JSON.stringify(result)}`
   )
   assert(
@@ -782,9 +782,9 @@ async function assertManagedProjection(adapterKind, label, entryPath, managedPat
 }
 
 function startCore() {
-  const coreExecutable = process.env.ROVAI_CORE_EXECUTABLE
-    ? resolve(process.env.ROVAI_CORE_EXECUTABLE)
-    : join(root, 'target', 'debug', 'rovai-core')
+  const coreExecutable = process.env.COAXI_CORE_EXECUTABLE
+    ? resolve(process.env.COAXI_CORE_EXECUTABLE)
+    : join(root, 'target', 'debug', 'coaxi-core')
   const child = spawn(coreExecutable, [
     ...coreDataDirectoryArguments(dataDir),
     '--skill-library-root',
@@ -880,7 +880,7 @@ function deliveryGroup(adapterKind) {
 }
 
 function markerFor(adapterKind) {
-  return `ROVAI_NATIVE_SKILL_${adapterKind.replaceAll('-', '_').toUpperCase()}_${crypto.randomUUID().slice(0, 8).toUpperCase()}`
+  return `COAXI_NATIVE_SKILL_${adapterKind.replaceAll('-', '_').toUpperCase()}_${crypto.randomUUID().slice(0, 8).toUpperCase()}`
 }
 
 function containsOnlyExpectedPrivateMarker(output, marker) {
@@ -889,7 +889,7 @@ function containsOnlyExpectedPrivateMarker(output, marker) {
   // the private nonce's presence, while any different private marker still fails.
   const normalized = output.trim()
   const privateNonce = marker.split('_').at(-1)
-  const observedMarkers = normalized.match(/ROVAI_NATIVE_SKILL_[A-Z0-9_]+/g) ?? []
+  const observedMarkers = normalized.match(/COAXI_NATIVE_SKILL_[A-Z0-9_]+/g) ?? []
   const nonceMatches = normalized.match(new RegExp(`\\b${privateNonce}\\b`, 'g')) ?? []
   return observedMarkers.length > 0
     ? observedMarkers.every((observed) => observed === marker)

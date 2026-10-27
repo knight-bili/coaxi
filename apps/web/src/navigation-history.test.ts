@@ -45,7 +45,7 @@ describe('browser navigation adapter', () => {
     navigation.reset(target)
     const restored = createBrowserNavigationHistory('project', host)
     expect(restored.initial).toEqual({ entries: [target], index: 0 })
-    const key = 'rovai.web.history.v1:project'
+    const key = 'coaxi.web.history.v1:project'
     const stored = JSON.parse(host.sessionStorage.getItem(key)!)
     stored.snapshot.entries[0].projectPath = '../other-project'
     host.sessionStorage.setItem(key, JSON.stringify(stored))
@@ -63,7 +63,7 @@ describe('browser navigation adapter', () => {
     await navigation.push(detail)
     expect(navigation.getSnapshot().entries).toEqual([overview, detail])
     host.history.go(-1); await settle()
-    expect(host.history.state.rovai.target).toEqual(overview)
+    expect(host.history.state.coaxi.target).toEqual(overview)
     stop()
     const contexts: Array<{ preserveUnreadReminder: boolean } | undefined> = []
     const restored = createDesktopNavigation<{ preserveUnreadReminder: boolean }>(async (_target, tx, context) => { contexts.push(context); tx.commit() }, createBrowserNavigationHistory('phone', host))
@@ -73,7 +73,7 @@ describe('browser navigation adapter', () => {
     expect(restored.getSnapshot()).toEqual({ entries: [overview, detail], index: 0 })
     expect(await restored.forward()).toBe(true)
     expect(contexts.at(-1)).toBeUndefined()
-    expect(host.history.state.rovai.target).toEqual(detail)
+    expect(host.history.state.coaxi.target).toEqual(detail)
     disconnect()
   })
   it('repairs the displayed page during native Back without cancelling the newer destination', async () => {
@@ -90,11 +90,11 @@ describe('browser navigation adapter', () => {
     hold = true
     const back = navigation.back(); await settle()
     expect(displayed.update({ kind: 'quick_chat' })).toBe(true)
-    expect(host.history.state.rovai.target).toEqual(thread('A'))
+    expect(host.history.state.coaxi.target).toEqual(thread('A'))
     hold = false; release!()
     expect(await back).toBe(true)
     expect(await navigation.forward()).toBe(true)
-    expect(host.history.state.rovai.target).toEqual({ kind: 'quick_chat' })
+    expect(host.history.state.coaxi.target).toEqual({ kind: 'quick_chat' })
     stop()
     const restored = createDesktopNavigation(async (_target, tx) => { tx.commit() }, createBrowserNavigationHistory('scope', host))
     expect(await restored.restore()).toBe(true)
@@ -102,8 +102,8 @@ describe('browser navigation adapter', () => {
   })
   it('restores legacy Camp history without changing its IDs', () => {
     const host = browser()
-    host.sessionStorage.setItem('rovai.web.history.v1:scope', JSON.stringify({ snapshot: { entries: [{ kind: 'camp', campId: 'A' }], index: 0 }, ids: ['old'] }))
-    host.history.replaceState({ rovai: { scope: 'scope', id: 'old', target: { kind: 'camp', campId: 'A' } } }, '')
+    host.sessionStorage.setItem('coaxi.web.history.v1:scope', JSON.stringify({ snapshot: { entries: [{ kind: 'camp', campId: 'A' }], index: 0 }, ids: ['old'] }))
+    host.history.replaceState({ coaxi: { scope: 'scope', id: 'old', target: { kind: 'camp', campId: 'A' } } }, '')
     expect(createBrowserNavigationHistory('scope', host).initial).toEqual({ entries: [thread('A')], index: 0 })
   })
   it('commits preview and full projection into one native history entry', async () => {
@@ -112,7 +112,7 @@ describe('browser navigation adapter', () => {
     const stop = navigation.connect()
     navigation.reset(thread('A')); await navigation.push(thread('B'))
     expect(await navigation.back()).toBe(true)
-    expect(host.history.state.rovai.target).toEqual(thread('A'))
+    expect(host.history.state.coaxi.target).toEqual(thread('A'))
     expect(await navigation.back()).toBe(false)
     stop()
   })
@@ -131,7 +131,7 @@ describe('browser navigation adapter', () => {
     allow = false
     expect(await navigation.back()).toBe(false)
     expect(navigation.getSnapshot().index).toBe(1)
-    expect(host.history.state.rovai.target).toEqual(thread('B'))
+    expect(host.history.state.coaxi.target).toEqual(thread('B'))
     disconnect()
     const restored = createDesktopNavigation(async (_target, tx) => { tx.commit() }, createBrowserNavigationHistory('scope', host))
     const stop = restored.connect()
@@ -149,10 +149,10 @@ describe('browser navigation adapter', () => {
     for (let i = 1; i <= 55; i++) await navigation.push(thread(String(i)))
     await navigation.back(); await navigation.back()
     expect(navigation.getSnapshot().entries[navigation.getSnapshot().index]).toEqual(thread('53'))
-    expect(host.history.state.rovai.target).toEqual(thread('53'))
+    expect(host.history.state.coaxi.target).toEqual(thread('53'))
     expect(navigation.getSnapshot().entries).toHaveLength(56)
     for (let i = 0; i < 53; i++) await navigation.back()
-    expect(host.history.state.rovai.target).toEqual(thread('0'))
+    expect(host.history.state.coaxi.target).toEqual(thread('0'))
     expect(await navigation.forward()).toBe(true)
     stop()
   })

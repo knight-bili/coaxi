@@ -13,7 +13,7 @@ type Original={schemaVersion:1;commandId:string;previewId:string;previewDigest:s
 type Saved={schemaVersion:1;request:Original;preview:NativeContinuationPreview}
 export const nativeContinuationStatus:Record<NativeContinuationReceipt['state'],string>={prepared:'已登记，正在准备原生会话',starting:'原程序正在恢复或分叉',binding_recorded:'原生会话已记录，可在新会话发送第一条消息',failed:'未完成创建，原导入快照保留',unknown:'创建结果待核对，不会重复创建'}
 
-// Codeg 的原助手文字指纹和重复序号；Core 会用只读快照重新计算，前端结果不授予权限。
+// Coaxi 的原助手文字指纹和重复序号；Core 会用只读快照重新计算，前端结果不授予权限。
 function forkPoint(provider:string,data:NativeTranscript,selected:string):NativeForkPoint{
   const index=data.turns.findIndex(turn=>turn.id===selected&&turn.role==='assistant')
   if(index<0)throw new Error('请重新选择原助手回答。')

@@ -8,7 +8,7 @@ type Settings={level:string;targets:Array<{target:string;level:string}>}
 type View={settings:Settings;digest:string;writable?:boolean;scope?:'structuredHost'}
 const options=[['off','关闭'],['error','错误'],['warn','警告'],['info','信息'],['debug','调试'],['trace','追踪']]
 
-/** 参考 Codeg LogsSettings 的级别选择和按目标覆盖，放在原 Rovai 诊断容器。 */
+/** 参考 Coaxi LogsSettings 的级别选择和按目标覆盖，放在原 Coaxi 诊断容器。 */
 export function LocalLoggingSettings():React.JSX.Element|null{
   const client=useThreadClient(),api=client.portableConfiguration?.logging,t=useUiText(),generation=useRef(0)
   const [saved,setSaved]=useState<View|null>(null),[draft,setDraft]=useState<Settings>({level:'trace',targets:[]}),[busy,setBusy]=useState(false),[error,setError]=useState('')

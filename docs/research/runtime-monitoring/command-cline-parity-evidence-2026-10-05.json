@@ -132,7 +132,7 @@
       "status": "succeeded",
       "publicReplyCount": 1,
       "publicReplies": [
-        "ADJACENT40_DONE。当前可用工具中没有 `cline_parity40` 的 MCP `echo`，因此未调用，也未模拟。指定的 `apply_patch` 尝试了一次，因找不到目标行而失败；未修复或重试。最后的 `sh -c 'exit 0'` 执行成功，输出为空。未调用 `rovai send`。"
+        "ADJACENT40_DONE。当前可用工具中没有 `cline_parity40` 的 MCP `echo`，因此未调用，也未模拟。指定的 `apply_patch` 尝试了一次，因找不到目标行而失败；未修复或重试。最后的 `sh -c 'exit 0'` 执行成功，输出为空。未调用 `coaxi send`。"
       ],
       "usageRows": [
         {
@@ -515,33 +515,33 @@
     "contextWindowObserved": false
   },
   "liveRunBuildSha256": {
-    "Resources/bin/rovai-core": "967013c676602974f1e25f91ce4e6ec40f4704e98148df5194fc5e95133f1383",
-    "Resources/bin/rovai-host": "6a3b2c659be15dbcabec3ff60430469b1fe3b01c538e6df65779d5ca829041b7",
+    "Resources/bin/coaxi-core": "967013c676602974f1e25f91ce4e6ec40f4704e98148df5194fc5e95133f1383",
+    "Resources/bin/coaxi-host": "6a3b2c659be15dbcabec3ff60430469b1fe3b01c538e6df65779d5ca829041b7",
     "Resources/app.asar": "839197ec9410312fe1f45e5a46d0cbdec77cd03d0a213e363f697b4d3efa6db1"
   },
   "liveRunSourceSha256": {
-    "crates/rovai-core/src/cline.rs": "14e0ace51c9c2bc8df4ec80ecb9f0af008c4c79a74affcd4d8acbd837d581c7a",
-    "crates/rovai-core/src/application.rs": "2cada2e1243dba40904ab5af1cf7ce1e17ccef56f09c76847fa5e1fae0c9f079",
-    "crates/rovai-core/src/runtime_diff.rs": "2df976229fa32d96cd7e06ab913adc35b26bd530b32b8347425bb656810c0405",
-    "crates/rovai-core/src/command_code_activity.rs": "e1b36045344649afa3488538065a427e36c8faaa0b16467dae9560d2e015fbf1",
-    "crates/rovai-core/src/agent_run_file_change.rs": "bdbd8cbc9e530607f6a7cba0aa8c716ea157814a1a8c136a57255d02322870c9",
+    "crates/coaxi-core/src/cline.rs": "14e0ace51c9c2bc8df4ec80ecb9f0af008c4c79a74affcd4d8acbd837d581c7a",
+    "crates/coaxi-core/src/application.rs": "2cada2e1243dba40904ab5af1cf7ce1e17ccef56f09c76847fa5e1fae0c9f079",
+    "crates/coaxi-core/src/runtime_diff.rs": "2df976229fa32d96cd7e06ab913adc35b26bd530b32b8347425bb656810c0405",
+    "crates/coaxi-core/src/command_code_activity.rs": "e1b36045344649afa3488538065a427e36c8faaa0b16467dae9560d2e015fbf1",
+    "crates/coaxi-core/src/agent_run_file_change.rs": "bdbd8cbc9e530607f6a7cba0aa8c716ea157814a1a8c136a57255d02322870c9",
     "apps/desktop/src/renderer/src/ExecutionToolGroup.tsx": "1b18f8a394b57403d8f41bb4f16c1f76e6c914f014f7c50917feda4d9bed7d91",
     "apps/desktop/src/renderer/src/FileChangesPreview.tsx": "1326f02697d7fe420ce1005e919684c8935fc070fce68c206584f7f34d35bf4b",
     "packages/contracts/src/index.ts": "53c07e2e0f1b5fbfc5dfc2546aca4cd6e20993bebe6b21281577a6225c06f810"
   },
   "retainedSourceSha256": {
-    "crates/rovai-core/src/cline.rs": "14e0ace51c9c2bc8df4ec80ecb9f0af008c4c79a74affcd4d8acbd837d581c7a",
-    "crates/rovai-core/src/application.rs": "2cada2e1243dba40904ab5af1cf7ce1e17ccef56f09c76847fa5e1fae0c9f079",
-    "crates/rovai-core/src/runtime_diff.rs": "86ad4d3c4ff07bb04dc28c89046bbdacb484855fabafb4275c45cf6226d206fa",
-    "crates/rovai-core/src/command_code_activity.rs": "e1b36045344649afa3488538065a427e36c8faaa0b16467dae9560d2e015fbf1",
-    "crates/rovai-core/src/agent_run_file_change.rs": "bdbd8cbc9e530607f6a7cba0aa8c716ea157814a1a8c136a57255d02322870c9",
+    "crates/coaxi-core/src/cline.rs": "14e0ace51c9c2bc8df4ec80ecb9f0af008c4c79a74affcd4d8acbd837d581c7a",
+    "crates/coaxi-core/src/application.rs": "2cada2e1243dba40904ab5af1cf7ce1e17ccef56f09c76847fa5e1fae0c9f079",
+    "crates/coaxi-core/src/runtime_diff.rs": "86ad4d3c4ff07bb04dc28c89046bbdacb484855fabafb4275c45cf6226d206fa",
+    "crates/coaxi-core/src/command_code_activity.rs": "e1b36045344649afa3488538065a427e36c8faaa0b16467dae9560d2e015fbf1",
+    "crates/coaxi-core/src/agent_run_file_change.rs": "bdbd8cbc9e530607f6a7cba0aa8c716ea157814a1a8c136a57255d02322870c9",
     "apps/desktop/src/renderer/src/ExecutionToolGroup.tsx": "1b18f8a394b57403d8f41bb4f16c1f76e6c914f014f7c50917feda4d9bed7d91",
     "apps/desktop/src/renderer/src/FileChangesPreview.tsx": "1326f02697d7fe420ce1005e919684c8935fc070fce68c206584f7f34d35bf4b",
     "packages/contracts/src/index.ts": "53c07e2e0f1b5fbfc5dfc2546aca4cd6e20993bebe6b21281577a6225c06f810"
   },
   "retainedBuildSha256": {
-    "Resources/bin/rovai-core": "ff6a08f1f905b43a332debfcfe32de153d5f2d52ac5e9a53ad4c65cb57af0c7c",
-    "Resources/bin/rovai-host": "974651595f3e2f4ed069a79251a0c6dd2b78bd91df19ea6fed8dd3624b192053",
+    "Resources/bin/coaxi-core": "ff6a08f1f905b43a332debfcfe32de153d5f2d52ac5e9a53ad4c65cb57af0c7c",
+    "Resources/bin/coaxi-host": "974651595f3e2f4ed069a79251a0c6dd2b78bd91df19ea6fed8dd3624b192053",
     "Resources/app.asar": "b143a62345e75ff9b8e187712a2c98350621b82a47b9f610ca7d52929e9217bc"
   },
   "retainedBuildReadback": {

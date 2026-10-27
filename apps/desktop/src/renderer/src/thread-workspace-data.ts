@@ -1,5 +1,5 @@
-// Shared Rovai workspace projection and send formatting, moved without body changes from BusinessApp.
-import type { RovaiApi, ThreadSnapshot, ThreadOpenProjection, ThreadMessageView, ThreadComposerDraftView, StoredCommandResult } from '@contracts'
+// Shared Coaxi workspace projection and send formatting, moved without body changes from BusinessApp.
+import type { CoaxiApi, ThreadSnapshot, ThreadOpenProjection, ThreadMessageView, ThreadComposerDraftView, StoredCommandResult } from '@contracts'
 import { THREAD_SNAPSHOT_SCHEMA_VERSION } from '@contracts'
 import type { ThreadRuntimeRecovery } from './ThreadWorkspace'
 import { composerDocumentToStructuredContent } from './composer-document'
@@ -8,7 +8,7 @@ import { readErrorMessage } from './error-message'
 import { localizeExecutionEngineTerms } from './product-copy'
 
 export function requestAuthoritativeThreadOpenProjection(
-  api: Pick<RovaiApi, 'request'>,
+  api: Pick<CoaxiApi, 'request'>,
   threadId: string,
   traceId: string
 ): Promise<ThreadOpenProjection> {

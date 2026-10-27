@@ -30,7 +30,7 @@ const root = resolve(import.meta.dirname, '..')
 const dist = join(root, 'dist')
 const packageMetadata = JSON.parse(await readFile(join(root, 'package.json'), 'utf8'))
 const builtinTransportSource = await readFile(
-  join(root, 'crates', 'rovai-core', 'src', 'builtin_tool_transport.rs'),
+  join(root, 'crates', 'coaxi-core', 'src', 'builtin_tool_transport.rs'),
   'utf8'
 )
 const builtinToolContractVersion = Number(builtinTransportSource.match(
@@ -48,10 +48,10 @@ const unpackedOnly = process.argv.includes('--unpacked-only')
 const appDirectory = join(dist, 'win-unpacked')
 const executableName = packageMetadata.build.win.executableName ?? packageMetadata.build.productName
 const appExecutable = join(appDirectory, `${executableName}.exe`)
-const hostExecutable = join(appDirectory, 'resources', 'bin', 'rovai-host.exe')
-const coreExecutable = join(appDirectory, 'resources', 'bin', 'rovai-core.exe')
-const cliExecutable = join(appDirectory, 'resources', 'bin', 'rovai.exe')
-const computerHelperExecutable = join(appDirectory, 'resources', 'bin', 'rovai-computer-helper.exe')
+const hostExecutable = join(appDirectory, 'resources', 'bin', 'coaxi-host.exe')
+const coreExecutable = join(appDirectory, 'resources', 'bin', 'coaxi-core.exe')
+const cliExecutable = join(appDirectory, 'resources', 'bin', 'coaxi.exe')
+const computerHelperExecutable = join(appDirectory, 'resources', 'bin', 'coaxi-computer-helper.exe')
 const installer = join(
   dist,
   artifactName('exe')
@@ -62,7 +62,7 @@ const installerIncludePath = join(root, 'build', 'installer.nsh')
 const installerCoordinatorPath = join(root, 'build', 'installer-process-coordinator.ps1')
 const reportPath = join(dist, 'windows-verification-report.txt')
 const manifestPath = join(dist, 'windows-release-manifest.json')
-const report = ['Rovai AI Windows x64 verification']
+const report = ['Coaxi AI Windows x64 verification']
 let isolatedParent = null
 let core = null
 
@@ -169,14 +169,14 @@ async function verifyUpdateArtifacts() {
 
 function authenticode(path) {
   const script = [
-    "$signature = Get-AuthenticodeSignature -LiteralPath $env:ROVAI_VERIFY_TARGET",
+    "$signature = Get-AuthenticodeSignature -LiteralPath $env:COAXI_VERIFY_TARGET",
     "$signer = if ($null -eq $signature.SignerCertificate) { $null } else { $signature.SignerCertificate.GetCertHashString('SHA256') }",
     "$timestamp = if ($null -eq $signature.TimeStamperCertificate) { $null } else { $signature.TimeStamperCertificate.GetCertHashString('SHA256') }",
     '[pscustomobject]@{ Status = [string]$signature.Status; SignerSha256 = $signer; TimestampSha256 = $timestamp } | ConvertTo-Json -Compress'
   ].join('; ')
   const output = run('powershell.exe', [
     '-NoLogo', '-NoProfile', '-NonInteractive', '-Command', script
-  ], { env: windowsPowerShellEnvironment({ ROVAI_VERIFY_TARGET: path }) })
+  ], { env: windowsPowerShellEnvironment({ COAXI_VERIFY_TARGET: path }) })
   try {
     return JSON.parse(output)
   } catch (error) {
@@ -206,13 +206,13 @@ function verifySignature(label, path) {
   if (signature.Status !== 'Valid' || !signature.SignerSha256 || !signature.TimestampSha256) {
     throw new Error(`${label} does not have a valid timestamped Authenticode signature`)
   }
-  const allowlist = (process.env.ROVAI_WINDOWS_SIGNER_SHA256 ?? '')
+  const allowlist = (process.env.COAXI_WINDOWS_SIGNER_SHA256 ?? '')
     .split(',')
     .map((value) => value.replace(/\s|:/g, '').toUpperCase())
     .filter(Boolean)
-  if (allowlist.length === 0) throw new Error('ROVAI_WINDOWS_SIGNER_SHA256 allowlist is required')
+  if (allowlist.length === 0) throw new Error('COAXI_WINDOWS_SIGNER_SHA256 allowlist is required')
   if (!allowlist.includes(signature.SignerSha256.toUpperCase())) {
-    throw new Error(`${label} signer certificate is not in ROVAI_WINDOWS_SIGNER_SHA256`)
+    throw new Error(`${label} signer certificate is not in COAXI_WINDOWS_SIGNER_SHA256`)
   }
   return signature
 }
@@ -236,11 +236,11 @@ async function verifyInstallerConfiguration() {
     readFile(installerIncludePath, 'utf8'),
     readFile(installerCoordinatorPath, 'utf8')
   ])
-  const pollMs = nsisDefineNumber(installerInclude, 'ROVAI_SHUTDOWN_POLL_MS')
-  const gracefulMs = nsisDefineNumber(installerInclude, 'ROVAI_GRACEFUL_SHUTDOWN_MS')
-  const forceMs = nsisDefineNumber(installerInclude, 'ROVAI_FORCE_SHUTDOWN_MS')
-  const gracefulTicks = nsisDefineNumber(installerInclude, 'ROVAI_GRACEFUL_SHUTDOWN_TICKS')
-  const forceTicks = nsisDefineNumber(installerInclude, 'ROVAI_FORCE_SHUTDOWN_TICKS')
+  const pollMs = nsisDefineNumber(installerInclude, 'COAXI_SHUTDOWN_POLL_MS')
+  const gracefulMs = nsisDefineNumber(installerInclude, 'COAXI_GRACEFUL_SHUTDOWN_MS')
+  const forceMs = nsisDefineNumber(installerInclude, 'COAXI_FORCE_SHUTDOWN_MS')
+  const gracefulTicks = nsisDefineNumber(installerInclude, 'COAXI_GRACEFUL_SHUTDOWN_TICKS')
+  const forceTicks = nsisDefineNumber(installerInclude, 'COAXI_FORCE_SHUTDOWN_TICKS')
   if (gracefulMs !== 20_000
       || forceMs !== 5_000
       || pollMs * gracefulTicks !== gracefulMs
@@ -249,8 +249,8 @@ async function verifyInstallerConfiguration() {
   }
   for (const required of [
     '!macro customCheckAppRunning',
-    'ROVAI_REQUEST_GRACEFUL_CLOSE',
-    'ROVAI_WAIT_FOR_QUIESCENCE ${ROVAI_GRACEFUL_SHUTDOWN_MS} ${ROVAI_GRACEFUL_SHUTDOWN_TICKS}',
+    'COAXI_REQUEST_GRACEFUL_CLOSE',
+    'COAXI_WAIT_FOR_QUIESCENCE ${COAXI_GRACEFUL_SHUTDOWN_MS} ${COAXI_GRACEFUL_SHUTDOWN_TICKS}',
     'Refusing to force-close a process whose installation path could not be verified',
     '!macro customUnInstallCheck'
   ]) {
@@ -393,10 +393,10 @@ try {
   const updaterArtifacts = await verifyUpdateArtifacts()
   const binaries = {
     app: await verifyBinary('App', appExecutable),
-    host: await verifyBinary('rovai-host', hostExecutable),
-    core: await verifyBinary('rovai-core', coreExecutable),
-    cli: await verifyBinary('rovai', cliExecutable),
-    computerHelper: await verifyBinary('rovai-computer-helper', computerHelperExecutable)
+    host: await verifyBinary('coaxi-host', hostExecutable),
+    core: await verifyBinary('coaxi-core', coreExecutable),
+    cli: await verifyBinary('coaxi', cliExecutable),
+    computerHelper: await verifyBinary('coaxi-computer-helper', computerHelperExecutable)
   }
   // Windows answers this metadata-only request without opening a permission prompt.
   const helperPermission = JSON.parse(run(computerHelperExecutable, ['--request-permission', 'accessibility'], { timeout: 10_000 }))
@@ -404,13 +404,13 @@ try {
   report.push('Computer helper: packaged executable launched and answered its Windows permission probe')
   const cliVersion = run(cliExecutable, ['--version'])
   if (!cliVersion.includes(
-    `rovai ${packageMetadata.version} contract-v${builtinToolContractVersion} ipc-v${builtinToolIpcProtocolVersion}`
+    `coaxi ${packageMetadata.version} contract-v${builtinToolContractVersion} ipc-v${builtinToolIpcProtocolVersion}`
   )) {
     throw new Error(`unexpected packaged CLI version: ${cliVersion}`)
   }
   report.push(`CLI: ${cliVersion}`)
 
-  isolatedParent = await mkdtemp(join(tmpdir(), 'rovai-windows-verifier-'))
+  isolatedParent = await mkdtemp(join(tmpdir(), 'coaxi-windows-verifier-'))
   const dataRoot = join(isolatedParent, 'data-root')
   const prepared = JSON.parse(run(hostExecutable, ['--prepare-windows-data-root', dataRoot]))
   if (resolve(prepared.root) !== resolve(dataRoot)) throw new Error('Core prepared the wrong isolated data root')

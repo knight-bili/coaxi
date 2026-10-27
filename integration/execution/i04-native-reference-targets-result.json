@@ -32,7 +32,7 @@
     "existing_platform_skipped": 1,
     "rust_resource_tests_passed": 5,
     "rust_test_binary_provenance_at_recording": {
-      "path": "D:\\soft\\codex\\build-cache\\codeg-rovai\\debug\\deps\\rovai_web-311f613b2b5f850c.exe",
+      "path": "D:\\soft\\codex\\build-cache\\coaxi-coaxi\\debug\\deps\\coaxi_web-311f613b2b5f850c.exe",
       "sha256": "35b5503fccfcd490068021ee791b087d39cb18f33cd82acc10192a8c6c291300",
       "scope": "rebuildable cache provenance, not an immutable archived artifact"
     },
@@ -51,39 +51,39 @@
       "baseline": "a274b30ad0fd32ccdfc42099747a23f8cd9cff97",
       "sourceModules": [
         {
-          "path": "apps/desktop/src/renderer/src/codeg-native-content/components/chat/composer/badges/reference-badge.tsx",
+          "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/chat/composer/badges/reference-badge.tsx",
           "sha256": "69877e0c1b395e8b74fe06ba33ef9375257cd0403bb6b5ece4d89be3413aa5d4"
         },
         {
-          "path": "apps/desktop/src/renderer/src/codeg-native-content/components/chat/composer/badges/reference-badge.test.tsx",
+          "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/chat/composer/badges/reference-badge.test.tsx",
           "sha256": "54df5dfd9232a2f957119a89574e1dfef67e2b228a852f838d228b12d14e28e1"
         },
         {
-          "path": "apps/desktop/src/renderer/src/codeg-native-content/components/chat/composer/reference-uri.test.ts",
+          "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/chat/composer/reference-uri.test.ts",
           "sha256": "13f835944ce02e252cb0a75babcff2daa39d73868b549110b639c0a7637baafe"
         },
         {
-          "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/resource-kind.ts",
+          "path": "apps/desktop/src/renderer/src/coaxi-native-content/lib/resource-kind.ts",
           "sha256": "240412e6c6c2e9754a0547f8d8b9c49ab0f1110cfab9eaaacea3db9d7044c297"
         },
         {
-          "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/resource-kind.test.ts",
+          "path": "apps/desktop/src/renderer/src/coaxi-native-content/lib/resource-kind.test.ts",
           "sha256": "070a750e6f27e4411dc2dfe706861ff1401668ab7fe0796e33b5418c00248e0e"
         },
         {
-          "path": "apps/desktop/src/renderer/src/codeg-native-content/components/ui/context-menu.tsx",
+          "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/ui/context-menu.tsx",
           "sha256": "07e0d159e6d4a26ac7454e09ac5515c0f8ab3fcea7d1c2eafda8e3130f6037f8"
         },
         {
-          "path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/file-reference-actions.tsx",
+          "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/message/file-reference-actions.tsx",
           "sha256": "41a471c566ae6a20cd92592642d922556b0058fa33f35cd6aa341a8f07e903b3"
         },
         {
-          "path": "apps/desktop/src/renderer/src/codeg-native-content/components/chat/composer/types.ts",
+          "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/chat/composer/types.ts",
           "sha256": "806ce8ca70f445fd765f639fa3f602e4e280efa6b18df9d04b6f66a84392e92c"
         },
         {
-          "path": "apps/desktop/src/renderer/src/codeg-native-content/components/chat/composer/reference-uri.ts",
+          "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/chat/composer/reference-uri.ts",
           "sha256": "e564e6ed3a27c25e2a56531c566404ff796dd9377e65647464627d5b951958a5"
         }
       ],
@@ -177,27 +177,27 @@
       "git_blob_with_filters": "169ed6da81ba9648454a0efe834a7c2439e86d0f"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/file-reference-actions.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/message/file-reference-actions.tsx",
       "sha256": "41a471c566ae6a20cd92592642d922556b0058fa33f35cd6aa341a8f07e903b3",
       "git_blob_with_filters": "57a63cdf007d2c5e956c7f139b8275b7f0c8a74a"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/native-markdown-links.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/ui/native-markdown-links.tsx",
       "sha256": "57006925f64aca70db83feb801e4a2203caa7fb328ae09b64a43f06ca78e531e",
       "git_blob_with_filters": "037fd709bd2283ae7be1bf23364274d7c0aa449f"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/native-reference-host.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/ui/native-reference-host.tsx",
       "sha256": "5cfaada42d457ffb6404d60d7b234f617423fb54637bb3df12d4261580b84bb4",
       "git_blob_with_filters": "fe5eeb896b1b809e1767d413784b93796e66f72d"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/native-reference-operations.test.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/ui/native-reference-operations.test.ts",
       "sha256": "30035c6229af95f2eda747f8e8cb6212566d40d2b167bfc7d912567c901adf27",
       "git_blob_with_filters": "ada7a728b4d12acaeb24313cad639d3f935bdb47"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/native-reference-operations.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/ui/native-reference-operations.ts",
       "sha256": "a6632858ae913c448653bf6f1ba1aa7e49a98480d90de89bbf12394c5fb51ff9",
       "git_blob_with_filters": "7a816c3df2677e1fc7c55f960e9d5a07455e3868"
     },
@@ -217,7 +217,7 @@
       "git_blob_with_filters": "227d1952c754d7ef2e1a33dd89de59729137ace3"
     },
     {
-      "path": "crates/rovai-web/src/resources.rs",
+      "path": "crates/coaxi-web/src/resources.rs",
       "sha256": "ef8bfa7a092b8265d56323e09a281136962e0d4c15b4c6236ce45e4236497496",
       "git_blob_with_filters": "9d6a1c103228579a83ae0dbbe51d85dfabafcf99"
     },
@@ -2509,7 +2509,7 @@
       "sha256": "46c4793f9a73c1d3ff3b00b6cd82ad8f016a0bf65d343af3c7078ca8540355df"
     },
     {
-      "path": "file/I04目录与系统文件操作/drafts/rust-temp/rovai-web-native-reference-0934aeff5d17a38aeb9450326b24e6501a746b09f463693ee356c05c56e0d551/archive.bin",
+      "path": "file/I04目录与系统文件操作/drafts/rust-temp/coaxi-web-native-reference-0934aeff5d17a38aeb9450326b24e6501a746b09f463693ee356c05c56e0d551/archive.bin",
       "sha256": "5bbe9c0e6e37560f220280c33bc1dc40c291f56381b5a6e16081bb9d732c6f7b"
     },
     {

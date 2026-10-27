@@ -9,7 +9,7 @@ import { setTimeout as pause } from 'node:timers/promises'
 export function installNativeLoadIpc(ipcMain) {
  const on=ipcMain.on,handle=ipcMain.handle,operations=[],domainOperations=[];let registered=false,requestRegistered=false
  ipcMain.handle=function(channel,handler){
-  if(channel!=='rovai:request')return handle.call(this,channel,handler)
+  if(channel!=='coaxi:request')return handle.call(this,channel,handler)
   requestRegistered=true
   return handle.call(this,channel,async(event,method,params)=>{
    if(method!=='canvas.boards.create')return handler(event,method,params)
@@ -18,7 +18,7 @@ export function installNativeLoadIpc(ipcMain) {
   })
  }
  ipcMain.on=function(channel,handler){
-  if(channel!=='rovai:private-input-recovery')return on.call(this,channel,handler)
+  if(channel!=='coaxi:private-input-recovery')return on.call(this,channel,handler)
   registered=true
   return on.call(this,channel,function(event,action,identity,value){
    const start=performance.now(),result=handler.call(this,event,action,identity,value)
@@ -97,7 +97,7 @@ export async function qualifyCanvasNativeLoad(window,{evaluate,wait,rpc,openCanv
   await seed(1,other)
   const mainGaps=[];let previous=performance.now();const heartbeat=setInterval(()=>{const now=performance.now();mainGaps.push(now-previous);previous=now},20)
   try {
-   await evaluate(`(()=>{window.r08Frames=[];window.r08Inputs=[];window.r08Independent=null;window.r08LastFrame=performance.now();window.r08Measure=true;const tick=now=>{if(!window.r08Measure)return;window.r08Frames.push(now-window.r08LastFrame);window.r08LastFrame=now;requestAnimationFrame(tick)};requestAnimationFrame(tick);document.addEventListener('input',event=>{if(event.target!==${input(0)})return;window.r08Inputs.push({at:performance.timeOrigin+performance.now(),trusted:event.isTrusted,length:event.target.value.length});if(event.target.value.length>${large.length}&&window.r08Inputs.filter(row=>row.length>${large.length}).length===4&&!window.r08Independent){const commandId=crypto.randomUUID(),transaction=window.r08Independent={started:Date.now(),commandId};void window.rovai.request('canvas.boards.create',{commandId,command:{name:'R08 输入期间独立事务'}}).then(value=>{transaction.status=value.status;transaction.coreRecordedAt=Date.parse(value.recordedAt);transaction.completed=Date.now();transaction.durationMs=transaction.completed-transaction.started}).catch(error=>{transaction.error=String(error)})}});return true})()`)
+   await evaluate(`(()=>{window.r08Frames=[];window.r08Inputs=[];window.r08Independent=null;window.r08LastFrame=performance.now();window.r08Measure=true;const tick=now=>{if(!window.r08Measure)return;window.r08Frames.push(now-window.r08LastFrame);window.r08LastFrame=now;requestAnimationFrame(tick)};requestAnimationFrame(tick);document.addEventListener('input',event=>{if(event.target!==${input(0)})return;window.r08Inputs.push({at:performance.timeOrigin+performance.now(),trusted:event.isTrusted,length:event.target.value.length});if(event.target.value.length>${large.length}&&window.r08Inputs.filter(row=>row.length>${large.length}).length===4&&!window.r08Independent){const commandId=crypto.randomUUID(),transaction=window.r08Independent={started:Date.now(),commandId};void window.coaxi.request('canvas.boards.create',{commandId,command:{name:'R08 输入期间独立事务'}}).then(value=>{transaction.status=value.status;transaction.coreRecordedAt=Date.parse(value.recordedAt);transaction.completed=Date.now();transaction.durationMs=transaction.completed-transaction.started}).catch(error=>{transaction.error=String(error)})}});return true})()`)
    const start=performance.now();await seed(0,large);report.large_seed_ms=performance.now()-start
    const initial=await readInput(0);assert.equal(initial.sha256,hash(large));assert.ok(initial.bytes>1024*1024)
    const sent=[]

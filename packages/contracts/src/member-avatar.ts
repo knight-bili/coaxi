@@ -35,13 +35,13 @@ export type ControlledMemberAvatarRef =
     }
 
 const BUILTIN_REF_PATTERN =
-  /^rovai:\/\/member-avatar\/builtin\/(luoke|muwa|mianzhi|qilu)\/v1$/
+  /^coaxi:\/\/member-avatar\/builtin\/(luoke|muwa|mianzhi|qilu)\/v1$/
 const CANONICAL_UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
-const MANAGED_REF_PREFIX = 'rovai://member-avatar/managed/'
+const MANAGED_REF_PREFIX = 'coaxi://member-avatar/managed/'
 
 export function builtinMemberAvatarRef(role: BuiltinMemberAvatarRole): string {
-  return `rovai://member-avatar/builtin/${role}/v1`
+  return `coaxi://member-avatar/builtin/${role}/v1`
 }
 
 export function managedMemberAvatarRef(assetId: string): string {

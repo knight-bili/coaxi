@@ -9,7 +9,7 @@ function storage() {
 it('requires a Native Core identity and never adopts a generic Host-only scope', async () => {
   const client = { presentationScope: 'native/owner', request: vi.fn().mockResolvedValue({ dataDir: '/native-core' }) } as Pick<ThreadClient, 'request' | 'presentationScope'>
   expect(await readCanvasViewScope(client)).toEqual({ host: 'native/owner', core: '/native-core' })
-  client.request = vi.fn().mockResolvedValue({ name: 'Rovai' })
+  client.request = vi.fn().mockResolvedValue({ name: 'Coaxi' })
   expect(await readCanvasViewScope(client)).toBeNull()
 })
 it('rejects a changed Host during a live Web identity read and does not fall back after an identity failure', async () => {

@@ -31,8 +31,8 @@
     "core_authority_unchanged": true
   },
   "seams": [
-    "Rovai safe Markdown; source mode/incomplete flags are display hints only",
-    "Rovai locale and original Codeg ICU catalogs",
+    "Coaxi safe Markdown; source mode/incomplete flags are display hints only",
+    "Coaxi locale and original Coaxi ICU catalogs",
     "existing Badge outline/secondary span and native Button seams; original full Badge base styles restored",
     "Core remains sole execution/DB/authorization; no donor store or Runtime imported"
   ],
@@ -128,17 +128,17 @@
       "git_blob_with_filters": "effc4ff6edbb15e74f6638aa13b5b6fd857263ff"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/source-rich.css",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/source-rich.css",
       "sha256": "44ec6444aad1da0dd6e8d772652296627c24d1a55be35b99db3bfdc949bb36d2",
       "git_blob_with_filters": "adc99d70e6c0a82bbe5ee3f5cad9fd8862824e19"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/source-copy.json",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/ui/source-copy.json",
       "sha256": "745accd9820495226fa8ba493184a35f4121c15678701669b10089b73c8fcaa2",
       "git_blob_with_filters": "378ca698da754fdc811d736e6215079ede5990d5"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/source-primitives.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/ui/source-primitives.tsx",
       "sha256": "2978a364c36e3324bb4fc50df6706b943a37edc036b08d64a8466e312905100a",
       "git_blob_with_filters": "f3b760b8ab1f9785d575cac52d8625984c5cb934"
     },
@@ -158,77 +158,77 @@
       "git_blob_with_filters": "85a1b17fe84b4f9278df3c4e99dd6cb1559273cc"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/codeg-mcp-tool-card.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/message/coaxi-mcp-tool-card.tsx",
       "sha256": "599fafcf8b314c57fffdee4a08dead7a1963b0fa497509b13a8049f62fb6ec97",
       "git_blob_with_filters": "581e0ee926ddc01199842ba9f1aeb50dbaa78184"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/context-compaction-card.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/message/context-compaction-card.tsx",
       "sha256": "e4364f1e06f519b5ea0d9e4ecaf8e0cca62fdd0688b3f12ae0e6bbd2efbc03cb",
       "git_blob_with_filters": "ee3141898669e947355f84ec37c2a8de42b37cba"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/delegation-status-badge.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/message/delegation-status-badge.tsx",
       "sha256": "951ba2613ed3e350db7b7e1e6e97671e8f2ece48b06cec8d4ae75a33421b7276",
       "git_blob_with_filters": "6e0917a14b0c4c156d7240d8d44ae138fbad4743"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/delegation-status-card.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/message/delegation-status-card.tsx",
       "sha256": "accc7a502210805ef27d6dfe15c883407f7752faff39bd143ee6e5a89967015a",
       "git_blob_with_filters": "11bf0379aecad981e1212008607c151a41132210"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/delegation-status-group-card.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/message/delegation-status-group-card.tsx",
       "sha256": "969d8faf24e95cedf4a248ce6637722268682a7ca79bbf94e3c914b5f1a318d7",
       "git_blob_with_filters": "6c57e7f88936daae988654b593a051322b545954"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/delegation-status-row.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/message/delegation-status-row.tsx",
       "sha256": "25900a5b283dffe32d53be43bdef788dea4b73d1ad511c5ac2adf6a20a1740ae",
       "git_blob_with_filters": "1a86702e31ff2a3b59668724f09eea0f64edc54c"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/feedback-check-result-card.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/components/message/feedback-check-result-card.tsx",
       "sha256": "8e82d157d29a3c5cca5dede4544b3f5b3220beb0873e46c2408fdf7b75dc18a5",
       "git_blob_with_filters": "6983319dce7891419ee2f9daceca81268bddc45c"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/codeg-mcp-tool.test.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/lib/coaxi-mcp-tool.test.ts",
       "sha256": "467fa70fb81ff9bf433b64bc14f3cae4f7027a8c228b3c93aa8d31a232a69508",
       "git_blob_with_filters": "d562dbc7738e1921f53decb303a1850027283a94"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/codeg-mcp-tool.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/lib/coaxi-mcp-tool.ts",
       "sha256": "60f122762500dd9c8780752934c23b1873b85f98b6e5306bc9b4039ff645d1f0",
       "git_blob_with_filters": "4fcfb91885bbb74b5bc62f046f2852ad4545d82a"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/delegation-status.test.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/lib/delegation-status.test.ts",
       "sha256": "6ba3af1aa4b9d96bc5cad6259deaadaa17779cff08b78b6c214c5504377d6843",
       "git_blob_with_filters": "6c4065521c4c14c1415009efa7e66c772b13a909"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/delegation-status.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/lib/delegation-status.ts",
       "sha256": "52ff33659dddea656a2dda36a6c9617e8faaf90a0ae548f983042fda3880e7b8",
       "git_blob_with_filters": "d3eefb72c21cb0b5e821e294081a576a1c200e88"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/embedded-json.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/lib/embedded-json.ts",
       "sha256": "d90a985da5a1bd213b0403201a4bb696e835bbd7c7038f918c559717e77759cc",
       "git_blob_with_filters": "9a70a4941de7ed2d655a5a8a7afdc851a410ba9f"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/feedback-check.test.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/lib/feedback-check.test.ts",
       "sha256": "431439b198e91faa2086ef3d51614851d9ec5f0c43cae08c397e36cf4fc4bb92",
       "git_blob_with_filters": "e52691f874798c905d4c1643b15588931b4fe7ee"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/mcp-result-envelope.ts",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/lib/mcp-result-envelope.ts",
       "sha256": "4b827e642c01af609ab95443e63c064d85f8c582f77905d5c64a163583093446",
       "git_blob_with_filters": "338e1e8614cbf9edf0d4630e03bcfb1163949009"
     },
     {
-      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/readonly-tool-card.tsx",
+      "path": "apps/desktop/src/renderer/src/coaxi-native-content/ui/readonly-tool-card.tsx",
       "sha256": "85f2b7a936f14db28eb4b02d35d22a5525c940fc9234fb0a44a4b0400b5798b1",
       "git_blob_with_filters": "d0c2312c18a3265c3fbb454200eb59cd3f860692"
     }

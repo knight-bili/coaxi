@@ -4,8 +4,8 @@
   "scope": "固定源码跨平台构建及可用源测试，不是融合MVP验收",
   "roles": [
     {
-      "role": "rovai-macos-arm64",
-      "sourceId": "rovai-ai",
+      "role": "coaxi-macos-arm64",
+      "sourceId": "coaxi",
       "baselineCommit": "cc465dda562536b94f23787759e3206324baa29e",
       "workflowCommit": "5b79843416f97bf040926817dade539872cfb91b",
       "runUrl": "https://github.com/knight-bili/codeg-rovai-workbench/actions/runs/38391085273",
@@ -25,7 +25,7 @@
       "githubJobConclusion": "success",
       "realDeviceAcceptance": "not_run",
       "integratedProductAcceptance": "not_run",
-      "sourceQualification": "当前Rovai阶段骨架；固定源业务代码未变，另核对Git差异",
+      "sourceQualification": "当前Coaxi阶段骨架；固定源业务代码未变，另核对Git差异",
       "electronFixtures": {
         "passed": 2,
         "failed": 0,
@@ -33,15 +33,15 @@
       },
       "artifacts": [
         {
-          "name": "rovai-preview.app.zip",
+          "name": "coaxi-preview.app.zip",
           "bytes": 183157636,
           "sha256": "4accaaa02656542eaeb92bf4d203cc0ac51fddf3e8a172acc36ab682922be4bb"
         }
       ]
     },
     {
-      "role": "rovai-macos-x64",
-      "sourceId": "rovai-ai",
+      "role": "coaxi-macos-x64",
+      "sourceId": "coaxi",
       "baselineCommit": "cc465dda562536b94f23787759e3206324baa29e",
       "workflowCommit": "5b79843416f97bf040926817dade539872cfb91b",
       "runUrl": "https://github.com/knight-bili/codeg-rovai-workbench/actions/runs/38391085273",
@@ -61,7 +61,7 @@
       "githubJobConclusion": "success",
       "realDeviceAcceptance": "not_run",
       "integratedProductAcceptance": "not_run",
-      "sourceQualification": "当前Rovai阶段骨架；固定源业务代码未变，另核对Git差异",
+      "sourceQualification": "当前Coaxi阶段骨架；固定源业务代码未变，另核对Git差异",
       "electronFixtures": {
         "passed": 2,
         "failed": 0,
@@ -69,15 +69,15 @@
       },
       "artifacts": [
         {
-          "name": "rovai-preview.app.zip",
+          "name": "coaxi-preview.app.zip",
           "bytes": 191797143,
           "sha256": "fc5e77a637f6ab6c44b44910bdab10179199775d1faabc1262786bd379c5df4b"
         }
       ]
     },
     {
-      "role": "codeg-macos-arm64",
-      "sourceId": "codeg",
+      "role": "coaxi-macos-arm64",
+      "sourceId": "coaxi",
       "baselineCommit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
       "workflowCommit": "5b79843416f97bf040926817dade539872cfb91b",
       "runUrl": "https://github.com/knight-bili/codeg-rovai-workbench/actions/runs/38391085273",
@@ -97,7 +97,7 @@
       "realDeviceAcceptance": "not_run",
       "integratedProductAcceptance": "not_run",
       "downloadSource": {
-        "sourceId": "codeg",
+        "sourceId": "coaxi",
         "repository": "https://github.com/spacering-net/codeg",
         "commit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
         "archiveSha256": "f43ef8f6de7c7ecd38c348d4bc5f734af99f858414b437e6d4ea5c7c71890f9c"
@@ -105,15 +105,15 @@
       "binaryArchitecture": "arm64",
       "artifacts": [
         {
-          "name": "codeg-preview.app.zip",
+          "name": "coaxi-preview.app.zip",
           "bytes": 114692835,
           "sha256": "ac78b29dea9e39db8326389a35d04451eff10d6f0eb70c6b5380d11926802c8a"
         }
       ]
     },
     {
-      "role": "codeg-macos-x64",
-      "sourceId": "codeg",
+      "role": "coaxi-macos-x64",
+      "sourceId": "coaxi",
       "baselineCommit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
       "workflowCommit": "5b79843416f97bf040926817dade539872cfb91b",
       "runUrl": "https://github.com/knight-bili/codeg-rovai-workbench/actions/runs/38391085273",
@@ -136,7 +136,7 @@
         "The job has exceeded the maximum execution time of 1h30m0s"
       ],
       "downloadSource": {
-        "sourceId": "codeg",
+        "sourceId": "coaxi",
         "repository": "https://github.com/spacering-net/codeg",
         "commit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
         "archiveSha256": "f43ef8f6de7c7ecd38c348d4bc5f734af99f858414b437e6d4ea5c7c71890f9c"
@@ -144,15 +144,15 @@
       "binaryArchitecture": "x86_64",
       "artifacts": [
         {
-          "name": "codeg-preview.app.zip",
+          "name": "coaxi-preview.app.zip",
           "bytes": 111703075,
           "sha256": "f39c12ac76e30efcf59192e2d7dc9a46b40424364b66fe83072a44c480978210"
         }
       ]
     },
     {
-      "role": "codeg-ios",
-      "sourceId": "codeg-ios",
+      "role": "coaxi-ios",
+      "sourceId": "coaxi-ios",
       "baselineCommit": "e2d75f918a64bc8a450216155cbc3ae4a820b0f1",
       "workflowCommit": "5b79843416f97bf040926817dade539872cfb91b",
       "runUrl": "https://github.com/knight-bili/codeg-rovai-workbench/actions/runs/38391085273",
@@ -171,17 +171,17 @@
       "realDeviceAcceptance": "not_run",
       "integratedProductAcceptance": "not_run",
       "downloadSource": {
-        "sourceId": "codeg-ios",
+        "sourceId": "coaxi-ios",
         "repository": "https://github.com/xintaofei/codeg-ios",
         "commit": "e2d75f918a64bc8a450216155cbc3ae4a820b0f1",
         "archiveSha256": "62cb2c32875c654c45fe08ba8e79d4cbfb3f774b112c1309c0b573e493b1bf54"
       },
       "sourceUnitTests": "no_test_target",
-      "visualReview": "首屏Codeg Add Your Server已核查，含系统通知；只验证初次启动",
+      "visualReview": "首屏Coaxi Add Your Server已核查，含系统通知；只验证初次启动",
       "device": "iPhone iOS26模拟器，未测试iPad",
       "artifacts": [
         {
-          "name": "codeg-simulator.app.zip",
+          "name": "coaxi-simulator.app.zip",
           "bytes": 21998777,
           "sha256": "305429a729ee443686dcb7ae512de707578e05b608828e53312e1d58f6f59cfb"
         },
@@ -193,8 +193,8 @@
       ]
     },
     {
-      "role": "codeg-android",
-      "sourceId": "codeg-android",
+      "role": "coaxi-android",
+      "sourceId": "coaxi-android",
       "baselineCommit": "33dba91b1522330fe519c27c4833066e35c9495e",
       "workflowCommit": "b0856806d0f8f9d5d59488d407c3697bca048efa",
       "runUrl": "https://github.com/knight-bili/codeg-rovai-workbench/actions/runs/38401285968",
@@ -213,7 +213,7 @@
       "realDeviceAcceptance": "not_run",
       "integratedProductAcceptance": "not_run",
       "downloadSource": {
-        "sourceId": "codeg-android",
+        "sourceId": "coaxi-android",
         "repository": "https://github.com/xintaofei/codeg-android",
         "commit": "33dba91b1522330fe519c27c4833066e35c9495e",
         "archiveSha256": "4120250815e385beba1ceffc23037ce2c2731041c232daa6295ff829f139ecde"
@@ -230,7 +230,7 @@
         "systemUiAnrObserved": false,
         "systemWaitTapped": false
       },
-      "visualReview": "startup.png和startup.xml已人工核查Codeg首配页，无系统弹窗，仅验证安装启动首屏",
+      "visualReview": "startup.png和startup.xml已人工核查Coaxi首配页，无系统弹窗，仅验证安装启动首屏",
       "artifacts": [
         {
           "name": "app-debug.apk",
@@ -253,8 +253,8 @@
     },
     {
       "runId": 38391085273,
-      "result": "overall_failure_android_failed_codeg_intel_job_cancelled",
-      "correction": "Codeg Intel构建、包、上传和收尾步骤均success，任务却cancelled；保留异常，不声称整个CI绿"
+      "result": "overall_failure_android_failed_coaxi_intel_job_cancelled",
+      "correction": "Coaxi Intel构建、包、上传和收尾步骤均success，任务却cancelled；保留异常，不声称整个CI绿"
     },
     {
       "runId": 38393571184,

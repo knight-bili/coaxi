@@ -47,7 +47,7 @@ export class ChannelSettingsCoordinator {
     const failures: unknown[] = []
     results.forEach((result, index) => {
       if (result.status === 'fulfilled') return
-      console.warn(`[rovai] ${HOST_LABELS[hosts[index]![0]]} Channel Host startup failed.`, result.reason)
+      console.warn(`[coaxi] ${HOST_LABELS[hosts[index]![0]]} Channel Host startup failed.`, result.reason)
       failures.push(result.reason)
     })
     if (failures.length === results.length) {

@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schemas.rovai.invalid/v0.34/semantic-judge-configuration.schema.json",
-  "title": "Rovai v0.34 Semantic Judge Configuration",
+  "$id": "https://schemas.coaxi.invalid/v0.34/semantic-judge-configuration.schema.json",
+  "title": "Coaxi v0.34 Semantic Judge Configuration",
   "$defs": {
     "checklistItemId": {
       "enum": [
@@ -52,7 +52,7 @@
   ],
   "properties": {
     "artifactId": { "$ref": "artifact-envelope.schema.json#/$defs/stableId" },
-    "schemaId": { "const": "rovai.qualification.semantic-judge-configuration" },
+    "schemaId": { "const": "coaxi.qualification.semantic-judge-configuration" },
     "schemaVersion": { "const": "1.0.0" },
     "producer": { "$ref": "artifact-envelope.schema.json#/$defs/producer" },
     "binding": { "$ref": "artifact-envelope.schema.json#/$defs/binding" },

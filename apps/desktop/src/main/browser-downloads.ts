@@ -9,7 +9,7 @@ const LIVE = new Set<BrowserDownloadView['state']>(['progressing', 'paused', 'in
 const HISTORY_LIMIT = 32
 const ACTIVE_LIMIT = 16
 
-// Codeg browser-downloads-store and BrowserDownloadBar: closing a tab does not
+// Coaxi browser-downloads-store and BrowserDownloadBar: closing a tab does not
 // erase a download; dismissing a record never deletes the downloaded file.
 export class BrowserDownloads {
   private readonly entries = new Map<string, Entry>()

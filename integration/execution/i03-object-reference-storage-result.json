@@ -11,17 +11,17 @@
       "apps/desktop/src/renderer/src/canvas-graph-controller.test.ts": "527a0134a4fdd7ad23d9a80e2d53a84ded7c3d2618b07765f6a69cf520fc635d",
       "apps/desktop/src/renderer/src/canvas-graph-controller.ts": "2de9ccc6798a47b94adb50135ada3ab6fe7edabc68fdba8066f23fce92e88ae6",
       "apps/desktop/src/renderer/src/locales/en.json": "5b9931ee20e98808075f7a17acafa0000d6387b2b74c9b5f69ddbd4f36df96d6",
-      "crates/rovai-core/src/canvas_node.rs": "185309d9b0c9a2f518a14623fe635d5524e66ba05777916803140f53a90f08d2",
-      "crates/rovai-core/src/db.rs": "dc4e554a0b79cb1387a6b992ef77e6ab61af31490b1cf2a072ccb1feda7dde55",
-      "crates/rovai-core/src/db_private_source_observation.rs": "74e1c4ec8aa1a42cb45441ee2e9f373086b199a9df3a68584a6341928fbead6a",
-      "crates/rovai-core/src/lib.rs": "a249bf820ca9fc198e1a56949def37ae43c49ed1b0c05a5f8246c9c3809dc089",
+      "crates/coaxi-core/src/canvas_node.rs": "185309d9b0c9a2f518a14623fe635d5524e66ba05777916803140f53a90f08d2",
+      "crates/coaxi-core/src/db.rs": "dc4e554a0b79cb1387a6b992ef77e6ab61af31490b1cf2a072ccb1feda7dde55",
+      "crates/coaxi-core/src/db_private_source_observation.rs": "74e1c4ec8aa1a42cb45441ee2e9f373086b199a9df3a68584a6341928fbead6a",
+      "crates/coaxi-core/src/lib.rs": "a249bf820ca9fc198e1a56949def37ae43c49ed1b0c05a5f8246c9c3809dc089",
       "docs/architecture/canvas.md": "c029def713100fb8a661b1b5bc32f47142e8dfd6fa8e0d5f2372dfd151f0a9b7",
       "docs/contracts/canvas-nodes-v1.md": "727372fe656fe50b9fa6a6a888ae93f5239b02bea9ed45cf48aa370ca17a64ef",
       "docs/development/testing.md": "78a644d70df35c8486854e2dcde235c0bfc321d6efc3ab18ae3b73459cbdd7c7",
       "docs/versions/v1.72/README.md": "cea8ece4b16390df062deff3a9f4d69cc9ba4f18f7595a0919cc4dd0cea2b095",
       "packages/contracts/src/index.ts": "514039dd898e1a89b4f458ef1b05d382b1ec41524d568cac1bd3e6f8b5b7022a",
-      "crates/rovai-core/src/canvas_object_reference.rs": "dd87c0707a9155428795057f490290d6fae910e326929ec52605e9d907a9625b",
-      "crates/rovai-core/src/db_canvas_objects.rs": "4bc60f795b41670cf73860eda5767cfb3918f98c7ca2a9da669896011fc945d2"
+      "crates/coaxi-core/src/canvas_object_reference.rs": "dd87c0707a9155428795057f490290d6fae910e326929ec52605e9d907a9625b",
+      "crates/coaxi-core/src/db_canvas_objects.rs": "4bc60f795b41670cf73860eda5767cfb3918f98c7ca2a9da669896011fc945d2"
     }
   },
   "implemented": [
@@ -72,10 +72,10 @@
     "Stage candidate compile/list/run current extended owners including previous private lifecycle, then qualify real Host"
   ],
   "preserved_authorities": {
-    "crates/rovai-core/src/local_attachment_source.rs": "8830581e72fc103b2f359be17a0072c5ee0cedc6eb5fe58b179ae3d255dbc1ca",
-    "crates/rovai-core/src/context.rs": "329144f38675ebedeaf5652858d457d42369455eb26c6159af61d19c02218784",
-    "crates/rovai-core/src/message_quote.rs": "efb6e962946b85c089483bb1120fe92f32458bb3b3b5e5eb668e26f8aa96481e",
-    "crates/rovai-core/src/command.rs": "22258f81dc5b76040cd0fdba20074321b5be7104e648a8278412c0736ef0d85a"
+    "crates/coaxi-core/src/local_attachment_source.rs": "8830581e72fc103b2f359be17a0072c5ee0cedc6eb5fe58b179ae3d255dbc1ca",
+    "crates/coaxi-core/src/context.rs": "329144f38675ebedeaf5652858d457d42369455eb26c6159af61d19c02218784",
+    "crates/coaxi-core/src/message_quote.rs": "efb6e962946b85c089483bb1120fe92f32458bb3b3b5e5eb668e26f8aa96481e",
+    "crates/coaxi-core/src/command.rs": "22258f81dc5b76040cd0fdba20074321b5be7104e648a8278412c0736ef0d85a"
   },
   "artifacts": {
     "i03/canvas-object-controller-01.log": "27e93db8751674c3bea2e0eea75418f20e6e9d4b4982218ea5a673b999bf9577",
@@ -106,8 +106,8 @@
     "formal324": "not_run"
   },
   "required_candidate_checks": [
-    "cargo test -p rovai-core --features extended-tests --lib canvas_node -- --list",
-    "cargo test -p rovai-core --features extended-tests --lib canvas_node -- --test-threads=1",
+    "cargo test -p coaxi-core --features extended-tests --lib canvas_node -- --list",
+    "cargo test -p coaxi-core --features extended-tests --lib canvas_node -- --test-threads=1",
     "compile and run original private composer owners plus actual authenticated Host upload lifecycle",
     "independent Mission/Task/Diff mounted renderer and actual Core integration"
   ]

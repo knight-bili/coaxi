@@ -28,7 +28,7 @@ val checkedInThirdPartyLicensesDir = rootProject.layout.projectDirectory.dir("th
 val generatedThirdPartyLicensesDir = layout.buildDirectory.dir("reports/dependency-license")
 val supplementalLicensesDir = rootProject.layout.projectDirectory.dir("config/licenses")
 
-val prepareRovaiCardPreview by tasks.registering(Exec::class) {
+val prepareCoaxiCardPreview by tasks.registering(Exec::class) {
     workingDir(rootProject.projectDir.parentFile.parentFile)
     commandLine("node", "scripts/build-mobile-cards.mjs", "--android")
     inputs.dir(rootProject.projectDir.parentFile.parentFile.resolve("apps/desktop/src/renderer/src"))
@@ -36,14 +36,14 @@ val prepareRovaiCardPreview by tasks.registering(Exec::class) {
     inputs.file(rootProject.projectDir.parentFile.parentFile.resolve("pnpm-lock.yaml"))
     outputs.dir(layout.projectDirectory.dir("src/main/assets/card-preview"))
 }
-tasks.named("preBuild").configure {dependsOn(prepareRovaiCardPreview)}
+tasks.named("preBuild").configure {dependsOn(prepareCoaxiCardPreview)}
 
 android {
-    namespace = "app.codeg.android"
+    namespace = "app.coaxi.android"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "app.rovai.workbench"
+        applicationId = "app.coaxi.workbench"
         minSdk = 31
         targetSdk = 36
         versionCode = 10000
@@ -132,7 +132,7 @@ licenseReport {
     renderers = arrayOf<ReportRenderer>(
         InventoryMarkdownReportRenderer(
             "DEPENDENCIES.md",
-            "Codeg for Android",
+            "Coaxi for Android",
             null,
             false,
             true,
@@ -188,7 +188,7 @@ tasks.named("generateLicenseReport") {
             it.relativeTo(reportDir.asFile).invariantSeparatorsPath
         }
         val bundle = buildString {
-            appendLine("Codeg for Android — Open-source notices")
+            appendLine("Coaxi for Android — Open-source notices")
             appendLine()
             appendLine("This bundle is generated from the release runtime dependency graph.")
             bundleFiles.forEach { noticeFile ->

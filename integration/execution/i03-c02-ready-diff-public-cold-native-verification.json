@@ -26,7 +26,7 @@
           "passed": true
         }
       ],
-      "error": "Error: TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:1:131\n    at <anonymous>:1:322\n    at evaluate (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/codeg-rovai-ai-rovai-core-codeg/work/integration/integration/local/i03-c06-rc14/app/c06-native-ready-diff-r1.mjs:41:23)\n    at async wait (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/codeg-rovai-ai-rovai-core-codeg/work/integration/integration/local/i03-c06-rc14/app/c06-native-ready-diff-r1.mjs:44:106)\n    at async inspect (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/codeg-rovai-ai-rovai-core-codeg/work/integration/integration/local/i03-c06-rc14/app/c06-native-ready-diff-r1.mjs:1101:3)\n    at async qualifyReadyDiff (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/codeg-rovai-ai-rovai-core-codeg/work/integration/integration/local/i03-c06-rc14/app/c06-native-ready-diff-r1.mjs:1111:2)\n    at async qualify (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/codeg-rovai-ai-rovai-core-codeg/work/integration/integration/local/i03-c06-rc14/app/c06-native-ready-diff-r1.mjs:112:4)",
+      "error": "Error: TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:1:131\n    at <anonymous>:1:322\n    at evaluate (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/coaxi-coaxi-coaxi-core-coaxi/work/integration/integration/local/i03-c06-rc14/app/c06-native-ready-diff-r1.mjs:41:23)\n    at async wait (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/coaxi-coaxi-coaxi-core-coaxi/work/integration/integration/local/i03-c06-rc14/app/c06-native-ready-diff-r1.mjs:44:106)\n    at async inspect (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/coaxi-coaxi-coaxi-core-coaxi/work/integration/integration/local/i03-c06-rc14/app/c06-native-ready-diff-r1.mjs:1101:3)\n    at async qualifyReadyDiff (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/coaxi-coaxi-coaxi-core-coaxi/work/integration/integration/local/i03-c06-rc14/app/c06-native-ready-diff-r1.mjs:1111:2)\n    at async qualify (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/coaxi-coaxi-coaxi-core-coaxi/work/integration/integration/local/i03-c06-rc14/app/c06-native-ready-diff-r1.mjs:112:4)",
       "renderer_errors": [
         "ResizeObserver loop completed with undelivered notifications."
       ],
@@ -60,7 +60,7 @@
       "revision": "r2",
       "status": "failed",
       "checks": [],
-      "error": "AssertionError [ERR_ASSERTION]: {\"code\":\"agent_profile.display_name_conflict\",\"commandId\":\"771cb5cd-7be0-4146-85d6-55766008225c\",\"commandType\":\"agent_profile.create\",\"payload\":{\"displayName\":\"C02 本地协议工作区队员\"},\"recordedAt\":\"2026-10-16T11:41:42.819619800+00:00\",\"resultEntity\":null,\"status\":\"rejected\"}\n+ actual - expected\n\n+ 'rejected'\n- 'applied'\n\n    at qualifyReadyDiff (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/codeg-rovai-ai-rovai-core-codeg/work/integration/integration/local/i03-c06-rc14/app/c06-native-ready-diff-r2.mjs:1066:9)\n    at async qualify (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/codeg-rovai-ai-rovai-core-codeg/work/integration/integration/local/i03-c06-rc14/app/c06-native-ready-diff-r2.mjs:112:4)",
+      "error": "AssertionError [ERR_ASSERTION]: {\"code\":\"agent_profile.display_name_conflict\",\"commandId\":\"771cb5cd-7be0-4146-85d6-55766008225c\",\"commandType\":\"agent_profile.create\",\"payload\":{\"displayName\":\"C02 本地协议工作区队员\"},\"recordedAt\":\"2026-10-16T11:41:42.819619800+00:00\",\"resultEntity\":null,\"status\":\"rejected\"}\n+ actual - expected\n\n+ 'rejected'\n- 'applied'\n\n    at qualifyReadyDiff (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/coaxi-coaxi-coaxi-core-coaxi/work/integration/integration/local/i03-c06-rc14/app/c06-native-ready-diff-r2.mjs:1066:9)\n    at async qualify (file:///C:/Users/JiaLe/Documents/Codex/2026-10-13/coaxi-coaxi-coaxi-core-coaxi/work/integration/integration/local/i03-c06-rc14/app/c06-native-ready-diff-r2.mjs:112:4)",
       "renderer_errors": [],
       "test_owner_revision": "31806aeb9a954fcc5f41457d3723ad99ac27daed",
       "fixture_sha256": "ddfff5bc7e31ae61b01809f83c54205a31c6ff4cfb8ae47c4198858e862d0df6",
@@ -257,7 +257,7 @@
       "missionId": "rvm_01a144898c757a00a464db3d03d05d60",
       "threadId": "rvcamp_01m528k33nf80a8s6v880yjgvn",
       "agentId": "agent_10",
-      "project": "C:\\Users\\JiaLe\\AppData\\Local\\Temp\\rovai-canvas-native-190cf86d\\ready-diff-git-r4",
+      "project": "C:\\Users\\JiaLe\\AppData\\Local\\Temp\\coaxi-canvas-native-190cf86d\\ready-diff-git-r4",
       "relativePath": "src/精确 #变更.txt",
       "otherPath": "src/另一处变更.txt",
       "newPath": "src/未跟踪.txt",
@@ -269,16 +269,16 @@
         "cleanupWorktreeRemoved": false,
         "diagnostic": null,
         "executionHostId": "cb0a339e80bf94e4aabc992b19c2ebf3",
-        "gitCommonDir": "\\\\?\\C:\\Users\\JiaLe\\AppData\\Local\\Temp\\rovai-canvas-native-190cf86d\\ready-diff-git-r4\\.git",
+        "gitCommonDir": "\\\\?\\C:\\Users\\JiaLe\\AppData\\Local\\Temp\\coaxi-canvas-native-190cf86d\\ready-diff-git-r4\\.git",
         "id": "b7265b24-13eb-40ff-bb99-e43f83559836",
-        "managedBranch": "rovai/mission/008",
+        "managedBranch": "coaxi/mission/008",
         "missionId": "rvm_01a144898c757a00a464db3d03d05d60",
-        "repositoryRoot": "\\\\?\\C:\\Users\\JiaLe\\AppData\\Local\\Temp\\rovai-canvas-native-190cf86d\\ready-diff-git-r4",
-        "sourceDirectory": "\\\\?\\C:\\Users\\JiaLe\\AppData\\Local\\Temp\\rovai-canvas-native-190cf86d\\ready-diff-git-r4",
+        "repositoryRoot": "\\\\?\\C:\\Users\\JiaLe\\AppData\\Local\\Temp\\coaxi-canvas-native-190cf86d\\ready-diff-git-r4",
+        "sourceDirectory": "\\\\?\\C:\\Users\\JiaLe\\AppData\\Local\\Temp\\coaxi-canvas-native-190cf86d\\ready-diff-git-r4",
         "state": "ready",
         "threadId": "rvcamp_01m528k33nf80a8s6v880yjgvn",
-        "workingDirectory": "\\\\?\\C:\\Users\\JiaLe\\AppData\\Local\\Temp\\rovai-canvas-native-190cf86d\\ready-diff-git-r4-mission-008\\",
-        "worktreePath": "\\\\?\\C:\\Users\\JiaLe\\AppData\\Local\\Temp\\rovai-canvas-native-190cf86d\\ready-diff-git-r4-mission-008"
+        "workingDirectory": "\\\\?\\C:\\Users\\JiaLe\\AppData\\Local\\Temp\\coaxi-canvas-native-190cf86d\\ready-diff-git-r4-mission-008\\",
+        "worktreePath": "\\\\?\\C:\\Users\\JiaLe\\AppData\\Local\\Temp\\coaxi-canvas-native-190cf86d\\ready-diff-git-r4-mission-008"
       },
       "boardId": "f727db6f-2c18-43d4-b7b7-83034c145e99",
       "nodeId": "cecfd10e-9a21-4d4f-8f0c-3170a5bd7949"
@@ -287,11 +287,11 @@
     "controlled_runtime": {
       "kind": "owned_qwen_acp_protocol_fixture",
       "launcher": {
-        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i02\\native-fixtures\\skill-recovery-launcher.exe",
+        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\i02\\native-fixtures\\skill-recovery-launcher.exe",
         "sha256": "2e3ff0a1583686f145107af9f41fe5cedc37f212107dade8c3c2dcc2fece234f"
       },
       "script": {
-        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\local\\i03-c06-rc14\\app\\c06-controlled-diff-runtime-r4.mjs",
+        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\coaxi-coaxi-coaxi-core-coaxi\\work\\integration\\integration\\local\\i03-c06-rc14\\app\\c06-controlled-diff-runtime-r4.mjs",
         "sha256": "9d724adbb896a11aefc433612e71ed995c351257cc2210861cc96babb34f4fd7"
       },
       "external_model_calls": 0,
@@ -374,12 +374,12 @@
       }
     ],
     "index_before": {
-      "path": "C:\\Users\\JiaLe\\AppData\\Local\\Temp\\rovai-canvas-native-190cf86d\\ready-diff-git-r4\\.git\\worktrees\\checkout\\index",
+      "path": "C:\\Users\\JiaLe\\AppData\\Local\\Temp\\coaxi-canvas-native-190cf86d\\ready-diff-git-r4\\.git\\worktrees\\checkout\\index",
       "sha256": "fecf4eac4d03b1d32c712eee73887397ef4688c236d88aa0ffb0dcf9bb5a2eeb",
       "mtime_ns": "1792151228170328700"
     },
     "index_after": {
-      "path": "C:\\Users\\JiaLe\\AppData\\Local\\Temp\\rovai-canvas-native-190cf86d\\ready-diff-git-r4\\.git\\worktrees\\checkout\\index",
+      "path": "C:\\Users\\JiaLe\\AppData\\Local\\Temp\\coaxi-canvas-native-190cf86d\\ready-diff-git-r4\\.git\\worktrees\\checkout\\index",
       "sha256": "fecf4eac4d03b1d32c712eee73887397ef4688c236d88aa0ffb0dcf9bb5a2eeb",
       "mtime_ns": "1792151228170328700"
     },

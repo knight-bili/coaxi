@@ -595,9 +595,9 @@
     "windowsCompile": "https://github.com/murray17/rovai-ai/actions/runs/37741195908"
   },
   "packagedBinaries": {
-    "rovai-core": "174f72db739f3572a73198be7771a5e5c5ccc698a0d17500a9c59c43c8c6ce8d",
-    "rovai-host": "9f1b634067492ae0eb7c429d4f8497b0dbd8dc2cbc420cbbb6d94e84aa15b409",
-    "rovai": "dc4eb8e698890d14cf6cd7295d2898e7c982ea9472629c3ab4974964b9c9b7c4"
+    "coaxi-core": "174f72db739f3572a73198be7771a5e5c5ccc698a0d17500a9c59c43c8c6ce8d",
+    "coaxi-host": "9f1b634067492ae0eb7c429d4f8497b0dbd8dc2cbc420cbbb6d94e84aa15b409",
+    "coaxi": "dc4eb8e698890d14cf6cd7295d2898e7c982ea9472629c3ab4974964b9c9b7c4"
   },
   "cleanup": {
     "noRemainingFixtureProcesses": true,

@@ -37,7 +37,7 @@
   },
   "directUserCurrentInputOptionalFields": {
     "skills": [{"name": "review-pr", "path": "/project/.codex/skills/review-pr/SKILL.md"}],
-    "attachments": ["/project/.rovai/camp-attachments/spec.pdf"]
+    "attachments": ["/project/.coaxi/camp-attachments/spec.pdf"]
   },
   "skillSelectionSnapshot": {
     "schemaVersion": 1,

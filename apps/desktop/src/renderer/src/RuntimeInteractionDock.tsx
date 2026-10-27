@@ -1,6 +1,6 @@
-// Adapted from Codeg aff1e6c278453ed8d0b96a5f664edcdca621aa3f:
+// Adapted from Coaxi aff1e6c278453ed8d0b96a5f664edcdca621aa3f:
 // src/components/chat/{ask-question-card,plan-approval-card}.tsx and
-// src/lib/ask-question.ts (splitRecommended). Apache-2.0: integration/licenses/codeg/LICENSE.
+// src/lib/ask-question.ts (splitRecommended). Apache-2.0: integration/licenses/component-a/LICENSE.
 import { useEffect, useId, useState, useSyncExternalStore } from 'react'
 import * as Tabs from '@radix-ui/react-tabs'
 import { Check, ChevronDown, ChevronRight, ChevronUp, ListTodo, Loader2, MessageCircleQuestionMark } from 'lucide-react'

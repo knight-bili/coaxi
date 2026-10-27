@@ -5,99 +5,99 @@
   "schemas": [
     {
       "file": "gather-completion-input-v1.schema.json",
-      "schemaUri": "https://schemas.rovai.invalid/contracts/gather-completion-input-v1.schema.json",
+      "schemaUri": "https://schemas.coaxi.invalid/contracts/gather-completion-input-v1.schema.json",
       "schemaVersion": "1.0.0",
-      "digest": "sha256:988092c66f8748bb42dc5b2b46098323eda5657a7d69f20db82b5348f4ddcd65"
+      "digest": "sha256:6c3ee2e729bfd1636324a5fb58b665f1ac32096c6c0d183b7551ba6c4f31c76c"
     },
     {
       "file": "gather-completion-input-v2.schema.json",
-      "schemaUri": "https://schemas.rovai.invalid/contracts/gather-completion-input-v2.schema.json",
+      "schemaUri": "https://schemas.coaxi.invalid/contracts/gather-completion-input-v2.schema.json",
       "schemaVersion": "2.0.0",
-      "digest": "sha256:3ed231211b92ab919ac6e91febb1dbd688d10e0d8c37158da4d02ec24162276e"
+      "digest": "sha256:4b6f7ecfbbf3cf8514c59006a2ea969c7dc4678a1893c31fea48b60d3ecd6f38"
     },
     {
       "file": "semantic-judge-view-suite-v1.schema.json",
-      "schemaUri": "https://schemas.rovai.invalid/contracts/semantic-judge-view-suite-v1.schema.json",
+      "schemaUri": "https://schemas.coaxi.invalid/contracts/semantic-judge-view-suite-v1.schema.json",
       "schemaVersion": "1.0.0",
-      "digest": "sha256:4d577791caeebd6dbeb4657e987ab11def1cb945ef1af44472190b62d2eb86a7"
+      "digest": "sha256:ef2a25b7a4a676e8cd674aa0890f0721875310b4ffa146595af5ae1be966a522"
     },
     {
       "file": "tool-interaction-measurement-v1.schema.json",
-      "schemaUri": "https://schemas.rovai.invalid/contracts/tool-interaction-measurement-v1.schema.json",
+      "schemaUri": "https://schemas.coaxi.invalid/contracts/tool-interaction-measurement-v1.schema.json",
       "schemaVersion": "1.0.0",
-      "digest": "sha256:f8d267dfd79500a2ced9904967f1704adb10e97b29ce94794e50e2b8a9dd27e3"
+      "digest": "sha256:6ec2a0d01c2cce48f7df9774a18008fd974c92282153aff9d57ecad9cc30a47f"
     },
     {
       "file": "tool-interaction-measurement-v2.schema.json",
-      "schemaUri": "https://schemas.rovai.invalid/contracts/tool-interaction-measurement-v2.schema.json",
+      "schemaUri": "https://schemas.coaxi.invalid/contracts/tool-interaction-measurement-v2.schema.json",
       "schemaVersion": "2.0.0",
-      "digest": "sha256:f5d53f4c9144e0af51fe46ca7f68a82164f360897ca3600ffa362e4260a21f7b"
+      "digest": "sha256:eb9955742a34b9bc3f4e4f38139e04268482201f01350f3b805590196ad6d695"
     },
     {
       "file": "tool-use-judge-pack-v1.schema.json",
-      "schemaUri": "https://schemas.rovai.invalid/contracts/tool-use-judge-pack-v1.schema.json",
+      "schemaUri": "https://schemas.coaxi.invalid/contracts/tool-use-judge-pack-v1.schema.json",
       "schemaVersion": "1.0.0",
-      "digest": "sha256:db3999ba739b376f7c0a951acd801a838361b9fc481e39363119283a82658074"
+      "digest": "sha256:bd7d82a79a788f6b47f8bb5413ca2681b2005f6f21b0bb5b358a83a8cf49f28a"
     },
     {
       "file": "tool-use-judge-pack-v2.schema.json",
-      "schemaUri": "https://schemas.rovai.invalid/contracts/tool-use-judge-pack-v2.schema.json",
+      "schemaUri": "https://schemas.coaxi.invalid/contracts/tool-use-judge-pack-v2.schema.json",
       "schemaVersion": "2.0.0",
-      "digest": "sha256:ba41bd544606c79e8c0fa6a8a49859d7b10785049167687d7df920d7100ad54e"
+      "digest": "sha256:86b51c0d6047c3f8623dfe447f2e25ea1d8bfb86042743df60d0895c2ec2086e"
     },
     {
       "file": "tool-use-judge-configuration-v1.schema.json",
-      "schemaUri": "https://schemas.rovai.invalid/contracts/tool-use-judge-configuration-v1.schema.json",
+      "schemaUri": "https://schemas.coaxi.invalid/contracts/tool-use-judge-configuration-v1.schema.json",
       "schemaVersion": "1.0.0",
-      "digest": "sha256:9edd1c9aea6d929eff1ae56e4f510a85501bb23700d893d99808910899f13b72"
+      "digest": "sha256:e3caa5648e9d2a7e51fdc1acf9b3e32d51d746fd985a9fb76a2288509d905cdb"
     },
     {
       "file": "tool-use-judge-replica-result-v1.schema.json",
-      "schemaUri": "https://schemas.rovai.invalid/contracts/tool-use-judge-replica-result-v1.schema.json",
+      "schemaUri": "https://schemas.coaxi.invalid/contracts/tool-use-judge-replica-result-v1.schema.json",
       "schemaVersion": "1.0.0",
-      "digest": "sha256:394df19951de3d3b889b3db75f33a905656c2195245371b45245efeac411be3f"
+      "digest": "sha256:6615b6f452cd930ebb5087d5a521b2ebee25dae2a2365675e9f023c59096d94f"
     },
     {
       "file": "tool-use-review-v1.schema.json",
-      "schemaUri": "https://schemas.rovai.invalid/contracts/tool-use-review-v1.schema.json",
+      "schemaUri": "https://schemas.coaxi.invalid/contracts/tool-use-review-v1.schema.json",
       "schemaVersion": "1.0.0",
-      "digest": "sha256:3800a3acec333b880676656e67cd34d5bf0b0f92b3ee819ca63739beabc9ea5d"
+      "digest": "sha256:10561a5a21cef01e76c012d51b77229e2f196f584ae38bfdc32e29ecb3bccc36"
     },
     {
       "file": "resource-measurement-v1.schema.json",
-      "schemaUri": "https://schemas.rovai.invalid/contracts/resource-measurement-v1.schema.json",
+      "schemaUri": "https://schemas.coaxi.invalid/contracts/resource-measurement-v1.schema.json",
       "schemaVersion": "1.0.0",
-      "digest": "sha256:909b97b780d95df284bca8dbe2664df157dbb01def77522a18b920df9209959b"
+      "digest": "sha256:50e84692c0e745c32364d7f64cf9c18df7182789d1c429afe3625d5559514ac5"
     },
     {
       "file": "paired-collaboration-experiment-v1.schema.json",
-      "schemaUri": "https://schemas.rovai.invalid/contracts/paired-collaboration-experiment-v1.schema.json",
+      "schemaUri": "https://schemas.coaxi.invalid/contracts/paired-collaboration-experiment-v1.schema.json",
       "schemaVersion": "1.0.0",
-      "digest": "sha256:3acf8b0bbad36ab74a06a9c8008552978a681357f7be48b7bc1714ab54019918"
+      "digest": "sha256:7b9dc85445f8d85ddb1aa47f8cc54b5ca71a8b2429f73b57c82d0f58df5d0d2b"
     },
     {
       "file": "collaboration-ledger-v1.1.schema.json",
-      "schemaUri": "https://schemas.rovai.invalid/contracts/collaboration-ledger-v1.1.schema.json",
+      "schemaUri": "https://schemas.coaxi.invalid/contracts/collaboration-ledger-v1.1.schema.json",
       "schemaVersion": "1.1.0",
-      "digest": "sha256:bd4dd664150c9f0a7f04509efb1a4582b0bf761b8cea1c11ce5d7307fc840d99"
+      "digest": "sha256:e2ad32f3045c82dca409f8f055c0d68faeb207b820eb83362506efb1a4b926d7"
     },
     {
       "file": "semantic-judge-configuration-v1.1.schema.json",
-      "schemaUri": "https://schemas.rovai.invalid/contracts/semantic-judge-configuration-v1.1.schema.json",
+      "schemaUri": "https://schemas.coaxi.invalid/contracts/semantic-judge-configuration-v1.1.schema.json",
       "schemaVersion": "1.1.0",
-      "digest": "sha256:678d7a763c534ad958a88c83b4428c0530972d31715c2a65cd2d84f8a6dcbf28"
+      "digest": "sha256:756f92c108779fd519e3e47d9e7e48e0b426d1fe08becc26adda629d870b9118"
     },
     {
       "file": "semantic-judge-view-suite-v2.schema.json",
-      "schemaUri": "https://schemas.rovai.invalid/contracts/semantic-judge-view-suite-v2.schema.json",
+      "schemaUri": "https://schemas.coaxi.invalid/contracts/semantic-judge-view-suite-v2.schema.json",
       "schemaVersion": "2.0.0",
-      "digest": "sha256:a83834369c6eda0e3992826f9711f64a6350f54918fe5b348a200f6a2091fdf7"
+      "digest": "sha256:7e208deb25d1c0bcdf47d09f86f89f412c4772652dbc36ccc528c4b3d97e1760"
     },
     {
       "file": "public-benchmark-report-v2.schema.json",
-      "schemaUri": "https://schemas.rovai.invalid/contracts/public-benchmark-report-v2.schema.json",
+      "schemaUri": "https://schemas.coaxi.invalid/contracts/public-benchmark-report-v2.schema.json",
       "schemaVersion": "2.0.0",
-      "digest": "sha256:bd300148169bbf683dc664cbd737b69073f1b71656e1c670d4174a4b72acb3e7"
+      "digest": "sha256:91c8d7d89a75d804e18ec9e72a09ef6fee25f6c536009643445ff1a3c9c9d1f3"
     }
   ]
 }

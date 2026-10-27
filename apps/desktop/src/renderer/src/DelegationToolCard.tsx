@@ -5,7 +5,7 @@ import { useThreadClient } from './camp-client'
 import { DelegationViewerContext } from './delegation-viewer-context'
 import { delegationChildrenController } from './delegation-children-controller'
 import { DelegationToolSourceController, type DelegationToolSourceTarget } from './delegation-tool-source-controller'
-import { CodegMcpToolCard } from './codeg-native-content/components/message/codeg-mcp-tool-card'
+import { CoaxiMcpToolCard } from './coaxi-native-content/components/message/coaxi-mcp-tool-card'
 import { useUiText } from './interface-language'
 
 type Props = { target: DelegationToolSourceTarget; revision: number; children: ReactNode }
@@ -32,7 +32,7 @@ function DelegationToolCardContent({ target, revision, children }: Props): React
   if (!host.visible) return <>{children}</>
   return <div className="delegation-tool-source" data-delegation-tool-source={target.evidenceId}>
     {view?.state === 'bound' ? <BoundToolCard view={view} /> : <>
-      {view?.state === 'refused' && (view.operation === 'delegation.resume' ? <div className="codeg-native-rich"><CodegMcpToolCard
+      {view?.state === 'refused' && (view.operation === 'delegation.resume' ? <div className="coaxi-native-rich"><CoaxiMcpToolCard
         tool="resume_delegation"
         state="output-error" errorText={t(view.code === 'delegation.cleanup_pending'
           ? '原任务还在清理，请稍后再恢复。' : view.code === 'delegation.native_session_rebuild_required'

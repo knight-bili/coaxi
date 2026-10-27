@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState, useSyncExternalStore } from 'react'
-import type { PrivateAttachmentPreparationOwner, PrivateAttachmentUploadTarget, RovaiApi } from '@contracts'
+import type { PrivateAttachmentPreparationOwner, PrivateAttachmentUploadTarget, CoaxiApi } from '@contracts'
 import { privateUploadController, privateUploadTargetKey } from './private-upload-controller'
 import { PrivateUploadRecoveryPanel, privateUploadErrorMessage } from './PrivateUploadRecoveryPanel'
 import { UiText, uiAttribute } from './interface-language'
 
-type Api = RovaiApi['singleChatAttachments']
+type Api = CoaxiApi['singleChatAttachments']
 type Entry = Awaited<ReturnType<NonNullable<Api['pendingPreparations']>>>[number]
 export function inactiveUploadTargets(entries: readonly Entry[], owner: PrivateAttachmentPreparationOwner,
   active: readonly PrivateAttachmentUploadTarget[]): PrivateAttachmentUploadTarget[] {

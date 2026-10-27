@@ -64,7 +64,7 @@ export async function preparePrivateWorkflow({ rpc, config, record }) {
 export async function beginHeldPrivateRun(rpc, context, capture) {
   const { threadId, conversationId } = context
   const snapshot = await rpc('singleChat.get', { conversationId })
-  const body = `ROVAI_SKILL_RECOVERY_HELD_INPUT R01 ${randomUUID()}`
+  const body = `COAXI_SKILL_RECOVERY_HELD_INPUT R01 ${randomUUID()}`
   const sent = await rpc('singleChat.send', { commandId: randomUUID(), command: {
     threadId, conversationId, body, draftRevision: snapshot.draft.revision } })
   assert.equal(sent.status, 'accepted', JSON.stringify(sent))
@@ -108,7 +108,7 @@ export async function qualifyCanvasPrivateWorkflow(window, { rpc, evaluate, wait
     const current = await get(scope)
     const request = { commandId: randomUUID(), threadId, expectedRevision: current.draft.revision,
       target: { kind: 'single_chat', conversationId, composerScope: scope } }
-    const added = await evaluate(`window.rovai.singleChatAttachments.prepareInput(${JSON.stringify(request)},new File([${JSON.stringify(name)}],${JSON.stringify(name)},{type:'text/plain'}))`)
+    const added = await evaluate(`window.coaxi.singleChatAttachments.prepareInput(${JSON.stringify(request)},new File([${JSON.stringify(name)}],${JSON.stringify(name)},{type:'text/plain'}))`)
     assert.equal(added.state, 'recorded'); assert.equal(added.receipt.status, 'applied')
     const startScalar = [...quoteMessage.body.slice(0, quoteMessage.body.indexOf(quoteText))].length
     assert.ok(quoteMessage.body.includes(quoteText))
@@ -211,7 +211,7 @@ export async function qualifyCanvasPrivateWorkflow(window, { rpc, evaluate, wait
       assert.deepEqual(selected[0].input.quotes.map(quote => quote.text), ['甲材料对应的问题'])
       record('actual_owned_acp_receives_selected_card_materials_in_current_input_without_other_card_or_default_files')
       const onlyFile = 'R02 仅附件发送.txt', empty = await get(scopes[0])
-      const prepared = await evaluate(`window.rovai.singleChatAttachments.prepareInput(${JSON.stringify({commandId:randomUUID(),threadId,expectedRevision:empty.draft.revision,target:{kind:'single_chat',conversationId,composerScope:scopes[0]}})},new File(['R02 attachment only'],${JSON.stringify(onlyFile)},{type:'text/plain'}))`)
+      const prepared = await evaluate(`window.coaxi.singleChatAttachments.prepareInput(${JSON.stringify({commandId:randomUUID(),threadId,expectedRevision:empty.draft.revision,target:{kind:'single_chat',conversationId,composerScope:scopes[0]}})},new File(['R02 attachment only'],${JSON.stringify(onlyFile)},{type:'text/plain'}))`)
       assert.equal(prepared.state, 'recorded'); assert.equal(prepared.receipt.status, 'applied')
       await wait(`${input(0)}.value===''`); await clickNative(send(0))
       const final = await waitPrivateSnapshot(rpc, conversationId, value => value.agentRuns.length === first.agentRuns.length + 1 && value.agentRuns.every(terminal))

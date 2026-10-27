@@ -30,7 +30,7 @@ export function markdownInlineContentPrefix(source: string): string {
   // can turn a definition or HTML region into visible text. Removing escapes
   // deliberately overestimates collisions, including across segment boundaries.
   const decoded = decodeString(source.replaceAll('\\', ''))
-  let prefix = 'ROVAICURRENTUSER'
+  let prefix = 'COAXICURRENTUSER'
   while (source.includes(prefix) || decoded.includes(prefix)) prefix += 'X'
   return prefix
 }

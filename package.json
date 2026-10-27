@@ -26,13 +26,13 @@
     "core:build:macos:x64": "node scripts/build-core.mjs --release --target-key macos-x64",
     "core:build:windows:x64": "node scripts/build-core.mjs --release --target-key windows-x64",
     "check:rust": "cargo check --workspace --all-targets",
-    "test:rust:lib": "cargo test -p rovai-core --lib",
-    "test:rust:cli": "cargo test -p rovai-core --bin rovai",
-    "test:send-input-file": "cargo build -p rovai-core --bin rovai && node --test scripts/lib/send-file-input.test.mjs",
-    "test:rust:core": "cargo test -p rovai-core --lib",
+    "test:rust:lib": "cargo test -p coaxi-core --lib",
+    "test:rust:cli": "cargo test -p coaxi-core --bin coaxi",
+    "test:send-input-file": "cargo build -p coaxi-core --bin coaxi && node --test scripts/lib/send-file-input.test.mjs",
+    "test:rust:core": "cargo test -p coaxi-core --lib",
     "test:rust:workspace-default": "cargo test --workspace",
     "test:rust:extended": "cargo test --workspace --features extended-tests",
-    "test:rust:slow": "cargo test -p rovai-core --features slow-tests --lib slow_tests::",
+    "test:rust:slow": "cargo test -p coaxi-core --features slow-tests --lib slow_tests::",
     "test:rust:pr": "cargo test --workspace",
     "test:rust:full": "cargo test --workspace --all-features",
     "test:rust:staged": "node scripts/check-rust-staged.mjs",
@@ -45,7 +45,7 @@
     "build:windows:x64": "pnpm core:build:windows:x64 && pnpm build:desktop",
     "typecheck": "tsc --noEmit",
     "test:electron-sandbox-capability": "node --test scripts/lib/electron-sandbox-capability.test.mjs",
-    "test:desktop-bridge": "node --test scripts/lib/rovai-request-context-bridge.test.mjs",
+    "test:desktop-bridge": "node --test scripts/lib/coaxi-request-context-bridge.test.mjs",
     "test:window-close": "node --test scripts/lib/window-close-guard.test.mjs",
     "test:windows-close": "node --test scripts/lib/windows-window-close.test.mjs",
     "test:feishu-login": "node --test scripts/lib/feishu-login-integration.test.mjs",
@@ -77,8 +77,8 @@
     "test:desktop:integration": "pnpm test:desktop-bridge && pnpm test:window-close && pnpm test:windows-close && pnpm test:composer-input && pnpm test:startup-presentation && pnpm test:navigation-shell && pnpm test:file-preview-layout && pnpm test:html-preview && pnpm test:file-reference-navigation && pnpm test:camp-fast-layout && pnpm test:camp-open-projection && pnpm test:single-chat-pending && pnpm test:execution-avatar-rail && pnpm test:approval-dock && pnpm test:notification-attention && pnpm test:capability-workspace && pnpm test:settings-workspace && pnpm test:release-notes-ui && pnpm test:runtime-model-picker && pnpm test:mission-board && pnpm test:message-anchors && pnpm test:member-runtime-apply && pnpm test:run-presence-ui",
     "test:zcode-owner": "node --test scripts/test-zcode-owner.mjs",
     "smoke:zcode-background": "node scripts/smoke-zcode-background.mjs",
-    "test:core-startup": "cargo build -p rovai-core --bins && node --test scripts/lib/core-startup-availability.test.mjs",
-    "test:host-startup": "cargo build -p rovai-host && node --test scripts/lib/host-lifecycle.test.mjs",
+    "test:core-startup": "cargo build -p coaxi-core --bins && node --test scripts/lib/core-startup-availability.test.mjs",
+    "test:host-startup": "cargo build -p coaxi-host && node --test scripts/lib/host-lifecycle.test.mjs",
     "test": "pnpm docs:test && pnpm docs:check && pnpm skills:test && pnpm skills:check && pnpm test:electron-sandbox-capability && vitest run && node --test scripts/lib/computer-helper-release.test.mjs scripts/test-zcode-owner.mjs scripts/lib/dsh-host.test.mjs scripts/lib/command-code-bootstrap.test.mjs scripts/lib/cline-observer.test.mjs scripts/lib/check-rust-staged.test.mjs scripts/lib/create-configured-camp.test.mjs scripts/lib/configure-product-runtime.test.mjs scripts/lib/copilot-native-turn-reconciliation-evidence.test.mjs scripts/lib/native-resume-probe-history.test.mjs scripts/lib/dev-desktop.test.mjs scripts/lib/install-macos-daily.test.mjs scripts/lib/macos-app-verification.test.mjs scripts/lib/macos-signing-policy.test.mjs scripts/lib/macos-update-info.test.mjs scripts/lib/release-notes.test.mjs scripts/lib/release-notes-localization.test.mjs scripts/lib/missing-send-recovery-protocol.test.mjs scripts/lib/planned-shutdown-app-quit.test.mjs scripts/lib/sidecar-targets.test.mjs scripts/lib/windows-installer-shutdown.test.mjs scripts/lib/qualification-acceptance-v034.test.mjs scripts/lib/qualification-acceptance-v036.test.mjs scripts/lib/qualification-artifacts.test.mjs scripts/lib/qualification-bundle.test.mjs scripts/lib/qualification-case-v3.test.mjs scripts/lib/qualification-collaboration.test.mjs scripts/lib/qualification-collaboration-ledger.test.mjs scripts/lib/qualification-core.test.mjs scripts/lib/qualification-demo-cases.test.mjs scripts/lib/qualification-diagnostic-portfolio.test.mjs scripts/lib/qualification-evaluation.test.mjs scripts/lib/qualification-evidence-index.test.mjs scripts/lib/qualification-isolation.test.mjs scripts/lib/qualification-judge-views.test.mjs scripts/lib/qualification-observation.test.mjs scripts/lib/qualification-public-report.test.mjs scripts/lib/qualification-recovery.test.mjs scripts/lib/qualification-schema-validation.test.mjs scripts/lib/qualification-semantic-evidence.test.mjs scripts/lib/qualification-semantic-judge.test.mjs scripts/lib/qualification-tool-evidence.test.mjs scripts/lib/qualification-tool-ledger.test.mjs scripts/lib/qualification-tool-use-judge.test.mjs scripts/lib/qualification-workspace-mutation-ledger.test.mjs scripts/lib/tool-interaction-measurement/index.test.mjs scripts/lib/qualification-tool-measurement-spec.test.mjs scripts/benchmark-paired-collaboration.test.mjs scripts/benchmark/*.test.mjs scripts/benchmark/**/*.test.mjs scripts/lib/context-evaluation.test.mjs scripts/lib/context-quality.test.mjs scripts/lib/context-weekly.test.mjs scripts/lib/qualification-api-judge-adapter.test.mjs scripts/lib/qualification-cli-judge-adapter.test.mjs scripts/lib/qualification-claim-audit.test.mjs scripts/lib/qualification-native-witness.test.mjs scripts/lib/qualification-resource-usage.test.mjs scripts/lib/qualification-evaluation-context.test.mjs",
     "smoke:core": "pnpm core:build:debug && node scripts/smoke-core.mjs",
     "smoke:member-config": "pnpm core:build:debug && node scripts/smoke-member-config.mjs",
@@ -86,7 +86,7 @@
     "smoke:acp-runtime": "pnpm core:build:debug && node scripts/smoke-acp-runtime.mjs",
     "smoke:trae-cold-resume": "pnpm core:build:debug && node scripts/smoke-trae-cold-resume.mjs",
     "smoke:pi-runtime": "pnpm core:build:debug && node scripts/smoke-pi-runtime.mjs",
-    "smoke:grok-cold-resume": "pnpm core:build:debug && ROVAI_COLD_RESUME_ADAPTER=grok-build node scripts/smoke-trae-cold-resume.mjs",
+    "smoke:grok-cold-resume": "pnpm core:build:debug && COAXI_COLD_RESUME_ADAPTER=grok-build node scripts/smoke-trae-cold-resume.mjs",
     "smoke:claude-runtime": "pnpm core:build:debug && node scripts/smoke-claude-runtime.mjs",
     "smoke:grok-runtime": "node scripts/probe-grok-runtime.mjs",
     "smoke:antigravity-runtime": "pnpm core:build:debug && node scripts/smoke-antigravity-runtime.mjs",
@@ -112,8 +112,8 @@
     "benchmark:check": "node --test scripts/benchmark/*.test.mjs scripts/benchmark/**/*.test.mjs",
     "smoke:action-approval": "pnpm core:build:debug && node scripts/smoke-action-approval.mjs",
     "smoke:runtime-permissions": "pnpm smoke:action-approval && pnpm smoke:multi-agent",
-    "accept:v0.16": "cargo test -p rovai-core db::tests::v27_freezes_active_runs_on_legacy_semantics_and_keeps_terminal_history && cargo test -p rovai-core team_tool::tests::call_member_persists_one_input_before_materializing_one_run && cargo test -p rovai-core action::tests::restart_fails_closed_intercepted_approvals_and_authorization_deliveries && pnpm test && pnpm smoke:runtime-permissions && pnpm smoke:acp-runtime",
-    "accept:v0.17": "cargo test -p rovai-core db::tests::v28_adds_execution_evidence_and_structured_camp_presentations && cargo test -p rovai-core execution_evidence::tests::provider_packets_are_reduced_to_public_evidence_fields && cargo test -p rovai-core execution_evidence::tests::evidence_is_durable_blob_backed_agent_inaccessible_and_cancel_fenced && cargo test -p rovai-core runtime::tests::camp_turn_cancellation_is_persisted_and_finalized_from_authoritative_state && cargo test -p rovai-core team_tool::tests::recipient_completion_without_another_call_never_contacts_the_source && cargo test -p rovai-core --lib application::tests::acp_tool_events_expose_digests_not_raw_payloads && pnpm typecheck && pnpm test",
+    "accept:v0.16": "cargo test -p coaxi-core db::tests::v27_freezes_active_runs_on_legacy_semantics_and_keeps_terminal_history && cargo test -p coaxi-core team_tool::tests::call_member_persists_one_input_before_materializing_one_run && cargo test -p coaxi-core action::tests::restart_fails_closed_intercepted_approvals_and_authorization_deliveries && pnpm test && pnpm smoke:runtime-permissions && pnpm smoke:acp-runtime",
+    "accept:v0.17": "cargo test -p coaxi-core db::tests::v28_adds_execution_evidence_and_structured_camp_presentations && cargo test -p coaxi-core execution_evidence::tests::provider_packets_are_reduced_to_public_evidence_fields && cargo test -p coaxi-core execution_evidence::tests::evidence_is_durable_blob_backed_agent_inaccessible_and_cancel_fenced && cargo test -p coaxi-core runtime::tests::camp_turn_cancellation_is_persisted_and_finalized_from_authoritative_state && cargo test -p coaxi-core team_tool::tests::recipient_completion_without_another_call_never_contacts_the_source && cargo test -p coaxi-core --lib application::tests::acp_tool_events_expose_digests_not_raw_payloads && pnpm typecheck && pnpm test",
     "smoke:multi-agent": "pnpm core:build:debug && node scripts/smoke-multi-agent.mjs",
     "smoke:attachments": "pnpm core:build:debug && node scripts/smoke-camp-attachments.mjs",
     "smoke:skills": "pnpm core:build:debug && node scripts/smoke-skills.mjs",
@@ -133,8 +133,8 @@
     "accept:structured-mentions-ui": "node scripts/accept-structured-mentions-ui.mjs",
     "accept:task-card-ui": "node scripts/accept-task-card-ui.mjs",
     "accept:runtime-activity-ui": "node scripts/accept-runtime-activity-ui.mjs",
-    "accept:world-map-ui": "ROVAI_RUNTIME_ACTIVITY_ACCEPT_WORLD_MAP_ONLY=1 node scripts/accept-runtime-activity-ui.mjs",
-    "accept:conversation-drop-zone-ui": "ROVAI_RUNTIME_ACTIVITY_ACCEPT_DROP_ZONE_ONLY=1 node scripts/accept-runtime-activity-ui.mjs",
+    "accept:world-map-ui": "COAXI_RUNTIME_ACTIVITY_ACCEPT_WORLD_MAP_ONLY=1 node scripts/accept-runtime-activity-ui.mjs",
+    "accept:conversation-drop-zone-ui": "COAXI_RUNTIME_ACTIVITY_ACCEPT_DROP_ZONE_ONLY=1 node scripts/accept-runtime-activity-ui.mjs",
     "accept:planned-shutdown": "node scripts/accept-planned-shutdown.mjs",
     "accept:network-recovery": "pnpm core:build:debug && node scripts/accept-network-interruption-recovery.mjs",
     "accept:windows:installer-shutdown": "node scripts/accept-windows-installer-shutdown.mjs",
@@ -163,7 +163,7 @@
     "eval:gate": "node scripts/eval-gate.mjs",
     "build:web": "vite build --config web.vite.config.ts",
     "build:server": "node scripts/build-server.mjs",
-    "test:server-entry": "cargo build -p rovai-host && node --test scripts/lib/server-entry.test.mjs scripts/lib/server-install.test.mjs",
+    "test:server-entry": "cargo build -p coaxi-host && node --test scripts/lib/server-entry.test.mjs scripts/lib/server-install.test.mjs",
     "test:host-web": "node --test scripts/lib/host-web.test.mjs scripts/lib/host-web-channels.test.mjs scripts/lib/host-web-sessions.test.mjs",
     "test:host-web-html": "node --test scripts/lib/host-web-html.test.mjs",
     "test:host-web-live": "node --test scripts/lib/host-web-live.test.mjs",
@@ -285,7 +285,7 @@
     "esbuild": "0.28.1"
   },
   "build": {
-    "appId": "app.codegrovai.workbench.desktop",
+    "appId": "app.coaxi.desktop",
     "productName": "Coaxi",
     "asar": true,
     "directories": {
@@ -312,16 +312,16 @@
       "icon": "build/icon.png",
       "extraResources": [
         {
-          "from": "resources/bin/macos-${arch}/rovai-core",
-          "to": "bin/rovai-core"
+          "from": "resources/bin/macos-${arch}/coaxi-core",
+          "to": "bin/coaxi-core"
         },
         {
-          "from": "resources/bin/macos-${arch}/rovai-host",
-          "to": "bin/rovai-host"
+          "from": "resources/bin/macos-${arch}/coaxi-host",
+          "to": "bin/coaxi-host"
         },
         {
-          "from": "resources/bin/macos-${arch}/rovai",
-          "to": "bin/rovai"
+          "from": "resources/bin/macos-${arch}/coaxi",
+          "to": "bin/coaxi"
         },
         {
           "from": "out/web",
@@ -332,8 +332,8 @@
           "to": "skills"
         },
         {
-          "from": "resources/bin/macos-${arch}/rovai-native-history",
-          "to": "bin/rovai-native-history"
+          "from": "resources/bin/macos-${arch}/coaxi-native-history",
+          "to": "bin/coaxi-native-history"
         },
         {
           "from": "helpers/native-history/LICENSE",
@@ -341,7 +341,7 @@
         },
         {
           "from": "LICENSE",
-          "to": "licenses/rovai-LICENSE"
+          "to": "licenses/coaxi-LICENSE"
         },
         {
           "from": "THIRD_PARTY_NOTICES.md",
@@ -365,10 +365,10 @@
         }
       ],
       "binaries": [
-        "Contents/Resources/bin/rovai-core",
-        "Contents/Resources/bin/rovai-host",
-        "Contents/Resources/bin/rovai",
-        "Contents/Resources/bin/rovai-native-history"
+        "Contents/Resources/bin/coaxi-core",
+        "Contents/Resources/bin/coaxi-host",
+        "Contents/Resources/bin/coaxi",
+        "Contents/Resources/bin/coaxi-native-history"
       ],
       "hardenedRuntime": true,
       "entitlements": "build/entitlements.mac.plist",
@@ -406,20 +406,20 @@
       },
       "extraResources": [
         {
-          "from": "resources/bin/windows-x64/rovai-core.exe",
-          "to": "bin/rovai-core.exe"
+          "from": "resources/bin/windows-x64/coaxi-core.exe",
+          "to": "bin/coaxi-core.exe"
         },
         {
-          "from": "resources/bin/windows-x64/rovai-host.exe",
-          "to": "bin/rovai-host.exe"
+          "from": "resources/bin/windows-x64/coaxi-host.exe",
+          "to": "bin/coaxi-host.exe"
         },
         {
-          "from": "resources/bin/windows-x64/rovai.exe",
-          "to": "bin/rovai.exe"
+          "from": "resources/bin/windows-x64/coaxi.exe",
+          "to": "bin/coaxi.exe"
         },
         {
-          "from": "resources/bin/windows-x64/rovai-computer-helper.exe",
-          "to": "bin/rovai-computer-helper.exe"
+          "from": "resources/bin/windows-x64/coaxi-computer-helper.exe",
+          "to": "bin/coaxi-computer-helper.exe"
         },
         {
           "from": "out/web",
@@ -430,8 +430,8 @@
           "to": "skills"
         },
         {
-          "from": "resources/bin/windows-x64/rovai-native-history.exe",
-          "to": "bin/rovai-native-history.exe"
+          "from": "resources/bin/windows-x64/coaxi-native-history.exe",
+          "to": "bin/coaxi-native-history.exe"
         },
         {
           "from": "helpers/native-history/LICENSE",
@@ -439,7 +439,7 @@
         },
         {
           "from": "LICENSE",
-          "to": "licenses/rovai-LICENSE"
+          "to": "licenses/coaxi-LICENSE"
         },
         {
           "from": "THIRD_PARTY_NOTICES.md",
@@ -504,16 +504,16 @@
       ],
       "extraResources": [
         {
-          "from": "resources/bin/linux-x64/rovai-core",
-          "to": "bin/rovai-core"
+          "from": "resources/bin/linux-x64/coaxi-core",
+          "to": "bin/coaxi-core"
         },
         {
-          "from": "resources/bin/linux-x64/rovai-host",
-          "to": "bin/rovai-host"
+          "from": "resources/bin/linux-x64/coaxi-host",
+          "to": "bin/coaxi-host"
         },
         {
-          "from": "resources/bin/linux-x64/rovai",
-          "to": "bin/rovai"
+          "from": "resources/bin/linux-x64/coaxi",
+          "to": "bin/coaxi"
         },
         {
           "from": "out/web",
@@ -524,8 +524,8 @@
           "to": "skills"
         },
         {
-          "from": "resources/bin/linux-x64/rovai-native-history",
-          "to": "bin/rovai-native-history"
+          "from": "resources/bin/linux-x64/coaxi-native-history",
+          "to": "bin/coaxi-native-history"
         },
         {
           "from": "helpers/native-history/LICENSE",
@@ -533,7 +533,7 @@
         },
         {
           "from": "LICENSE",
-          "to": "licenses/rovai-LICENSE"
+          "to": "licenses/coaxi-LICENSE"
         },
         {
           "from": "THIRD_PARTY_NOTICES.md",
@@ -562,8 +562,7 @@
       {
         "name": "Coaxi",
         "schemes": [
-          "coaxi",
-          "rovai"
+          "coaxi"
         ]
       }
     ]

@@ -11,7 +11,7 @@ import {
 import { validateQualificationArtifactSchema } from './qualification-schema-validation.mjs'
 import { isBatchTrialBoundary, trialDeliveries, trialRuns } from './qualification-trial-scope.mjs'
 
-export const EVIDENCE_INDEX_SCHEMA_ID = 'rovai.qualification.evidence-index'
+export const EVIDENCE_INDEX_SCHEMA_ID = 'coaxi.qualification.evidence-index'
 export const EVIDENCE_INDEX_SCHEMA_VERSION = '1.0.0'
 
 const COMPLETE = Object.freeze({ state: 'complete', reason: null })
@@ -678,7 +678,7 @@ export function buildEvidenceIndex({
     schemaId: EVIDENCE_INDEX_SCHEMA_ID,
     schemaVersion: EVIDENCE_INDEX_SCHEMA_VERSION,
     producer: {
-      id: 'rovai-qualification-runner',
+      id: 'coaxi-qualification-runner',
       version: QUALIFICATION_RUNNER_VERSION,
       digest: withSha256Prefix(producerDigest)
     },

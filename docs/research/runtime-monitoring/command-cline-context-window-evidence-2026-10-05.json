@@ -493,12 +493,12 @@
     ]
   },
   "sourceSha256": {
-    "crates/rovai-core/src/cline.rs": "b9197a86e93028962aaf108f9c3e3d9a206282f74a9240b5b8888ea05cbb065d",
-    "crates/rovai-core/src/cline/observer.js": "7853bd3c5f5c8db95a89fcdfadba1188ef847f3ece0d205ff4e962ae2f844346"
+    "crates/coaxi-core/src/cline.rs": "b9197a86e93028962aaf108f9c3e3d9a206282f74a9240b5b8888ea05cbb065d",
+    "crates/coaxi-core/src/cline/observer.js": "7853bd3c5f5c8db95a89fcdfadba1188ef847f3ece0d205ff4e962ae2f844346"
   },
   "buildSha256": {
-    "Resources/bin/rovai-core": "a8e740cf7dc140ff422aa382a7076518ce5abf3d950e6f275e9982b2856fe920",
-    "Resources/bin/rovai-host": "ed65102828862295d7ef313c558ba715e59e780ae9d62a2f4baca125f2e167ae",
+    "Resources/bin/coaxi-core": "a8e740cf7dc140ff422aa382a7076518ce5abf3d950e6f275e9982b2856fe920",
+    "Resources/bin/coaxi-host": "ed65102828862295d7ef313c558ba715e59e780ae9d62a2f4baca125f2e167ae",
     "Resources/app.asar": "33dd2ed032679dc4c828ce194cc73c20b83c6275109886fe51bf00b39283302f"
   }
 }

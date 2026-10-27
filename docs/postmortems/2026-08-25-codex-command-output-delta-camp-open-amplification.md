@@ -358,5 +358,5 @@ Cardinality 控制应放在能够安全分类 event、又不会阻断 control �
 - [Camp Open Projection v6](../contracts/camp-open-projection-v6.md)
 - [Run Process Detail Surface v20](../contracts/run-process-detail-surface-v20.md)
 - [Runtime Activity Mapping Registry](../runtime-activity/registry.md#command-output-durability-audit)
-- [Codex ingress 实现](../../crates/rovai-core/src/codex.rs)
-- [Camp open read-model 实现](../../crates/rovai-core/src/read_model.rs)
+- [Codex ingress 实现](../../crates/coaxi-core/src/codex.rs)
+- [Camp open read-model 实现](../../crates/coaxi-core/src/read_model.rs)

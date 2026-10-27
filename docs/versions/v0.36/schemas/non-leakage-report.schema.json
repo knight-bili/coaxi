@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schemas.rovai.invalid/v0.36/non-leakage-report.schema.json",
-  "title": "Rovai v0.36 Observable Non-Leakage Report",
+  "$id": "https://schemas.coaxi.invalid/v0.36/non-leakage-report.schema.json",
+  "title": "Coaxi v0.36 Observable Non-Leakage Report",
   "type": "object",
   "additionalProperties": false,
   "required": [

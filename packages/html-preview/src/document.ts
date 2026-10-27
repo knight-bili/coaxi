@@ -20,7 +20,7 @@ export function injectPreviewScript(html: string, scriptPath: string, baseUrl?: 
   const offset = Math.min(head ?? htmlStart ?? doctype, firstScript)
   const prefix = html.slice(0, offset)
   const base = baseUrl ? `<base href="${baseUrl.replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;')}">` : ''
-  const tag = base + `<script src="${scriptPath}" data-rovai-preview-diagnostic></script>`
+  const tag = base + `<script src="${scriptPath}" data-coaxi-preview-diagnostic></script>`
   return { html: prefix + tag + html.slice(offset), map: {
     line: prefix.split(/\r\n|\r|\n/u).length, column: (prefix.match(/[^\r\n]*$/u)?.[0].length ?? 0) + 1, length: tag.length
   } }

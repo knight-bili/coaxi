@@ -12,10 +12,10 @@ import { AppDialogContent, AppDialogHeader, AppDialogBody, AppDialogFooter } fro
 import { useThreadClient } from './camp-client'
 import { useUiText } from './interface-language'
 import { useShortcutActions } from './useShortcutActions'
-import { NUMBERED_TAB_ACTION_IDS } from '../../shared/codeg-keyboard-shortcuts'
+import { NUMBERED_TAB_ACTION_IDS } from '../../shared/coaxi-keyboard-shortcuts'
 import type { ShortcutActions } from './shortcut-action-driver'
 import { newCommandId } from '../../shared/command-id'
-import { FileTree, FileTreeFile, FileTreeFolder } from './codeg-workbench/file-tree'
+import { FileTree, FileTreeFile, FileTreeFolder } from './coaxi-workbench/file-tree'
 import {WorkspaceFileMenu,WorkspaceFileActionDialog,WorkspaceFileSearch,WorkspaceTrash,type FileAction} from './WorkspaceFileTools'
 import { WorkspaceCodeEditor } from './WorkspaceCodeEditor'
 import { SplitTabDeck } from './SplitTabDeck'
@@ -28,8 +28,8 @@ import { BrowserWorkbench } from './BrowserWorkbench'
 import { ComputerWorkbench } from './ComputerWorkbench'
 import { OfficePreviewWorkbench } from './OfficePreviewWorkbench'
 import { NativeHistoryWorkbench } from './NativeHistoryWorkbench'
-import { UnifiedDiffPreview } from './codeg-native-content/components/diff/unified-diff-preview'
-import './codeg-native-content/source-rich.css'
+import { UnifiedDiffPreview } from './coaxi-native-content/components/diff/unified-diff-preview'
+import './coaxi-native-content/source-rich.css'
 import './workspace-workbench.css'
 
 type Entry = { name: string; path: string; directory: boolean; link: boolean; managedAlias?:boolean; bytes: number }
@@ -44,7 +44,7 @@ const gitActions = {
   fetch: '获取远程更新', pull: '拉取远程更新', push: '推送', remote_add: '添加远程仓库', remote_remove: '移除远程仓库', clean: '清理指定未跟踪文件', init: '初始化 Git',
 } as const
 
-/** Codeg file-tree and Git structure, hosted in the retained workspace deck. */
+/** Coaxi file-tree and Git structure, hosted in the retained workspace deck. */
 export function WorkspaceWorkbench({ threadId, projectPath, members, bindLeaveGuard, onQuickMessage, onWorkspaceFiles, onOpenNativeConversation, initiallyOpen=false, initialTab='files', onClosed, onMaximize, maximized=false, visible=true, terminalRequest=0, terminalHost }: {
   threadId: string; projectPath:string; members:Array<{id:string;name:string}>; bindLeaveGuard(guard: (() => void) | null): void; onQuickMessage?(text:string):boolean;onWorkspaceFiles?(files:File[]):Promise<boolean>;onOpenNativeConversation?(reference:import('@contracts').CanvasConversationRef):Promise<boolean>;initiallyOpen?:boolean;initialTab?:'files'|'terminals';onClosed?():void;onMaximize?():void;maximized?:boolean;visible?:boolean;terminalRequest?:number;terminalHost?:HTMLElement|null
 }): React.JSX.Element {
@@ -250,7 +250,7 @@ export function WorkspaceWorkbench({ threadId, projectPath, members, bindLeaveGu
         {hostDraft&&<details className="workbench-draft-comparison" open><summary>{t('主机当前草稿')}</summary>{hostDraft.value?.documents.map(item=><details key={item.path}><summary>{item.path}</summary><pre>{item.text}</pre></details>)}<button className="quiet-button" type="button" disabled={busy||draftStatus.saving} onClick={()=>void editorDrafts.useHostVersion().then(value=>{acceptRestoredDraft(value);setHostDraft(null)}).catch(error=>setError(readErrorMessage(error)))}>{t('保留本机副本并使用主机草稿')}</button><button className="quiet-button" type="button" onClick={()=>setHostDraft(null)}>{t('继续保留当前输入')}</button></details>}
         {creation && <form className="workbench-toolbar" onSubmit={event => {event.preventDefault();void create()}}><input className="workspace-field" aria-label={t('相对路径')} value={name} onChange={event => setName(event.target.value)} placeholder={t('相对工程的路径')} /><button className="primary-button" type="submit" disabled={busy || !name.trim()}>{t('确认')}</button><button className="quiet-button" type="button" onClick={() => setCreation(null)}>{t('取消')}</button></form>}
         <PanelGroup direction="horizontal" className="workbench-panels">
-          {showFiles && treeShown && <Panel id="workbench-files" order={1} defaultSize={23} minSize={15}><div className="workbench-tree codeg-native-rich">{searchVisible?<WorkspaceFileSearch threadId={threadId} onOpen={(path,line)=>void openFile(path,line)}/>:<FileTree expanded={expanded} selectedPath={previewPath ?? selected ?? undefined} onSelect={path => { if (![...directories.values()].some(directory => directory.entries.some(entry => entry.path === path && (entry.directory || entry.link)))) void openFile(path) }} onExpandedChange={next => {
+          {showFiles && treeShown && <Panel id="workbench-files" order={1} defaultSize={23} minSize={15}><div className="workbench-tree coaxi-native-rich">{searchVisible?<WorkspaceFileSearch threadId={threadId} onOpen={(path,line)=>void openFile(path,line)}/>:<FileTree expanded={expanded} selectedPath={previewPath ?? selected ?? undefined} onSelect={path => { if (![...directories.values()].some(directory => directory.entries.some(entry => entry.path === path && (entry.directory || entry.link)))) void openFile(path) }} onExpandedChange={next => {
             setExpanded(next); void operation(async () => { for (const path of next) if (!directories.has(path)) await loadDirectory(path) })
           }}>{renderTree('')}</FileTree>}</div></Panel>}
           {showFiles && treeShown && <PanelResizeHandle className="workbench-resize" />}
@@ -264,7 +264,7 @@ export function WorkspaceWorkbench({ threadId, projectPath, members, bindLeaveGu
             </div></div>
             <div className="workspace-tool-page" hidden={tab!=='git'||!!merge}><div className="workbench-git">
               <div className="workbench-toolbar"><select className="workspace-field" aria-label={t('Git 视图')} value={gitView} onChange={event => {setGitView(event.target.value);void readGit(event.target.value)}}>{Object.entries({status:'变更',diff:'工作区 Diff',diff_staged:'暂存 Diff',log:'历史',branches:'分支',stash:'Stash',remotes:'远程',worktrees:'Worktree',conflicts:'冲突',tags:'标签',reflog:'引用历史'}).map(([value,label]) => <option key={value} value={value}>{t(label)}</option>)}</select><button className="quiet-button" type="button" disabled={busy} onClick={() => void readGit()}>{t('刷新')}</button></div>
-              {gitResult && (gitView==='diff'||gitView==='diff_staged') && gitResult.success ? <div className="workbench-git-output codeg-native-rich"><UnifiedDiffPreview diffText={gitResult.output} clickableFilePath={false} /></div> : gitResult?<WorkspaceGitViews key={gitVersion} threadId={threadId} view={gitView} result={gitResult} disabled={busy} onAction={prepareGitAction} onDirtyChange={setGitDirty} onOpenFile={path=>{if(!gitDirty)void openFile(path)}}/>:<div className="workbench-empty">{t('选择 Git 视图')}</div>}
+              {gitResult && (gitView==='diff'||gitView==='diff_staged') && gitResult.success ? <div className="workbench-git-output coaxi-native-rich"><UnifiedDiffPreview diffText={gitResult.output} clickableFilePath={false} /></div> : gitResult?<WorkspaceGitViews key={gitVersion} threadId={threadId} view={gitView} result={gitResult} disabled={busy} onAction={prepareGitAction} onDirtyChange={setGitDirty} onOpenFile={path=>{if(!gitDirty)void openFile(path)}}/>:<div className="workbench-empty">{t('选择 Git 视图')}</div>}
               <details className="workbench-git-advanced"><summary>{t('更多 Git 操作')}</summary><div className="workbench-git-actions"><select className="workspace-field" aria-label={t('Git 操作')} value={action} onChange={event => setAction(event.target.value as keyof typeof gitActions)}>{Object.entries(gitActions).map(([value,label]) => <option key={value} value={value}>{t(label)}</option>)}</select>
                 <input className="workspace-field" aria-label={t('目标分支、提交或 Stash')} placeholder={t('目标分支、提交或 Stash')} value={target} onChange={event => setTarget(event.target.value)} />
                 <input className="workspace-field" aria-label={t('远程名称')} value={remote} onChange={event => setRemote(event.target.value)} />

@@ -1,10 +1,10 @@
-/* Fixed Codeg subagent-session-dialog: header gap-2, 16px columns, gap-4
+/* Fixed Coaxi subagent-session-dialog: header gap-2, 16px columns, gap-4
  * transcript and muted user asides. Body is the only outer scroll container. */
 .native-session-header { display: flex; flex: none; align-items: center; gap: 8px; border-bottom: 1px solid var(--line); padding: 12px 16px; min-width: 0; }
 .native-session-header > div { display: flex; flex: 1; flex-direction: column; min-width: 0; }
 .native-session-header strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; font-weight: 500; }
 .native-session-header small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; color: var(--muted); }
-/* Codeg Drawer uses Button icon-sm (32px) with the shared pill shape. */
+/* Coaxi Drawer uses Button icon-sm (32px) with the shared pill shape. */
 .native-session-header .delegation-icon-button { width: 32px; height: 32px; border-radius: 9999px; }
 .native-session-body { flex: 1; min-width: 0; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 12px 16px; }
 .native-session-notice { flex: none; padding: 0 16px; border-bottom: 1px solid var(--line); }

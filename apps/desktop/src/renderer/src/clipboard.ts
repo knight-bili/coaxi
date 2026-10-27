@@ -23,7 +23,7 @@ function execClipboardWrite(text: string, html?: string): boolean {
 
 export async function writeClipboardText(text: string, html?: string): Promise<boolean> {
   try {
-    await window.rovai.clipboard.write({ text, html: html ?? null })
+    await window.coaxi.clipboard.write({ text, html: html ?? null })
     return true
   } catch {
     try {

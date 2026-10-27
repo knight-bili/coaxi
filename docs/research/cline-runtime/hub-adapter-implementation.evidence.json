@@ -2111,7 +2111,7 @@
       "coldCreate17MiBAfterGuard": "controlled local refusal: cline_hub_history_restore_limit_exceeded, before sending",
       "maximumIncomingFrameAndMessageBytes": 67108864,
       "maximumEncodedRequestBytes": 16777216,
-      "nativeHistoryTruncationByRovai": false,
+      "nativeHistoryTruncationByCoaxi": false,
       "paginationSupportedByInspectedNativeApi": false
     },
     "longContextReduction": {

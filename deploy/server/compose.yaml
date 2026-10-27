@@ -1,6 +1,6 @@
 services:
   workbench:
-    image: codeg-rovai-workbench:V1.0.0
+    image: coaxi:V1.0.0
     platform: linux/amd64
     build:
       context: ../..

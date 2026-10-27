@@ -9,7 +9,7 @@ import {
 } from './qualification-common.mjs'
 import { validateQualificationArtifactSchema } from './qualification-schema-validation.mjs'
 
-export const WORKSPACE_MUTATION_LEDGER_SCHEMA_ID = 'rovai.qualification.workspace-mutation-ledger'
+export const WORKSPACE_MUTATION_LEDGER_SCHEMA_ID = 'coaxi.qualification.workspace-mutation-ledger'
 export const WORKSPACE_MUTATION_LEDGER_SCHEMA_VERSION = '1.0.0'
 
 export function buildWorkspaceMutationLedger({
@@ -84,7 +84,7 @@ export function buildWorkspaceMutationLedger({
     schemaId: WORKSPACE_MUTATION_LEDGER_SCHEMA_ID,
     schemaVersion: WORKSPACE_MUTATION_LEDGER_SCHEMA_VERSION,
     producer: {
-      id: 'rovai-qualification-runner',
+      id: 'coaxi-qualification-runner',
       version: QUALIFICATION_RUNNER_VERSION,
       digest: withSha256Prefix(producerDigest)
     },

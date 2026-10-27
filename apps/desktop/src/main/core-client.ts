@@ -10,8 +10,8 @@ import type {
   CoreEvent,
   CoreMethod,
   CoreSubsystemSnapshot,
-  RovaiRequestFailure,
-  RovaiRequestFailureKind,
+  CoaxiRequestFailure,
+  CoaxiRequestFailureKind,
   StructuredError,
   SupervisorSnapshot,
   StartupPhase
@@ -42,7 +42,7 @@ type PendingRequest = {
   childToken: ChildToken
   requestId: number
   resolve(value: unknown): void
-  reject(error: RovaiRequestError): void
+  reject(error: CoaxiRequestError): void
   timer: NodeJS.Timeout
   method: CoreMethod | CoreInternalMethod | HostWebMethod
   startedAt: number
@@ -105,16 +105,16 @@ export function coreStartupRetryDelay(
   return busy || transient ? STARTUP_RETRY_DELAYS_MS[attempt] ?? null : null
 }
 
-export class RovaiRequestError extends Error implements RovaiRequestFailure {
-  readonly kind: RovaiRequestFailureKind
+export class CoaxiRequestError extends Error implements CoaxiRequestFailure {
+  readonly kind: CoaxiRequestFailureKind
   readonly code: string
   readonly retryable: boolean
   readonly generation: number
   readonly details: unknown
 
-  constructor(failure: RovaiRequestFailure) {
+  constructor(failure: CoaxiRequestFailure) {
     super(failure.message)
-    this.name = 'RovaiRequestError'
+    this.name = 'CoaxiRequestError'
     this.kind = failure.kind
     this.code = failure.code
     this.retryable = failure.retryable
@@ -122,7 +122,7 @@ export class RovaiRequestError extends Error implements RovaiRequestFailure {
     this.details = failure.details
   }
 
-  toFailure(): RovaiRequestFailure {
+  toFailure(): CoaxiRequestFailure {
     return {
       kind: this.kind,
       code: this.code,
@@ -198,12 +198,12 @@ export function runtimeThreadFilesRoot(
   if (platform === 'win32') return win32.join(dataDirectory, 'runtime-files')
   const canonicalUserData = canonicalPath(dataDirectory, platform)
   const instanceKey = `v1-${createHash('sha256')
-    .update('rovai-runtime-camp-files-instance-v1\0', 'utf8')
+    .update('coaxi-runtime-camp-files-instance-v1\0', 'utf8')
     .update(canonicalUserData, 'utf8')
     .digest('hex')}`
   return posix.join(
     canonicalPath(homeDirectory, platform),
-    '.rovai',
+    '.coaxi',
     'instances',
     instanceKey,
     'runtime-files'
@@ -296,13 +296,13 @@ function structuredError(
 }
 
 function structuredFailure(
-  kind: RovaiRequestFailureKind,
+  kind: CoaxiRequestFailureKind,
   code: string,
   message: string,
   retryable: boolean,
   generation: number,
   details: unknown
-): RovaiRequestFailure {
+): CoaxiRequestFailure {
   return { kind, code, message, retryable, generation, details }
 }
 
@@ -490,7 +490,7 @@ export class CoreClient {
     lines.on('line', (line) => this.#handleLine(generation, token, line))
     child.stderr.on('data', (chunk) => {
       const text = String(chunk).trimEnd()
-      console.error(`[rovai-core] ${text}`)
+      console.error(`[coaxi-core] ${text}`)
     })
     child.on('error', (error) => this.#handleProcessError(generation, token, error))
     // A child can exit before its last stdout frames are delivered. Keep this generation
@@ -520,7 +520,7 @@ export class CoreClient {
 
   async request<T>(method: CoreMethod | HostWebMethod, params: unknown = {}): Promise<T> {
     if (this.#stopping) {
-      throw new RovaiRequestError(structuredFailure(
+      throw new CoaxiRequestError(structuredFailure(
         'shutdown',
         'full_core_shutting_down',
         'Rust Core is shutting down',
@@ -531,7 +531,7 @@ export class CoreClient {
     }
     const active = this.#child
     if (!active?.ready || this.#snapshot.fullCoreState !== 'ready') {
-      throw new RovaiRequestError(structuredFailure(
+      throw new CoaxiRequestError(structuredFailure(
         'full_core_unavailable',
         'full_core_unavailable',
         'The authoritative workspace is unavailable while Coaxi is in bootstrap mode.',
@@ -646,7 +646,7 @@ export class CoreClient {
         if (pending?.generation === active.generation && pending.childToken === active.token) {
           this.#pending.delete(id)
         }
-        reject(new RovaiRequestError(structuredFailure(
+        reject(new CoaxiRequestError(structuredFailure(
           'infrastructure_failure',
           'core_request_timeout',
           `Rust Core request timed out: ${method}`,
@@ -673,7 +673,7 @@ export class CoreClient {
         if (pending?.generation === active.generation && pending.childToken === active.token) {
           this.#pending.delete(id)
         }
-        reject(new RovaiRequestError(structuredFailure(
+        reject(new CoaxiRequestError(structuredFailure(
           'infrastructure_failure',
           'core_request_write_failed',
           error.message,
@@ -787,7 +787,7 @@ export class CoreClient {
       )
     }
     if (response.error) {
-      pending.reject(new RovaiRequestError(structuredFailure(
+      pending.reject(new CoaxiRequestError(structuredFailure(
         response.error.kind ?? 'infrastructure_failure',
         response.error.code ?? 'core_request_failed',
         response.error.message ?? response.error.code ?? 'Core request failed',
@@ -998,12 +998,12 @@ export class CoreClient {
   #failGeneration(
     generation: number,
     childToken: ChildToken,
-    failure: RovaiRequestFailure
+    failure: CoaxiRequestFailure
   ): void {
     for (const [id, pending] of this.#pending) {
       if (pending.generation !== generation || pending.childToken !== childToken) continue
       clearTimeout(pending.timer)
-      pending.reject(new RovaiRequestError(failure))
+      pending.reject(new CoaxiRequestError(failure))
       this.#pending.delete(id)
     }
   }
@@ -1011,7 +1011,7 @@ export class CoreClient {
   #failAllForShutdown(message: string): void {
     for (const [id, pending] of this.#pending) {
       clearTimeout(pending.timer)
-      pending.reject(new RovaiRequestError(structuredFailure(
+      pending.reject(new CoaxiRequestError(structuredFailure(
         'shutdown',
         'full_core_shutting_down',
         message,
@@ -1074,7 +1074,7 @@ export function sidecarTargetKey(
   if (platform === 'darwin' && arch === 'x64') return 'macos-x64'
   if (platform === 'win32' && arch === 'x64') return 'windows-x64'
   if (platform === 'linux' && arch === 'x64') return 'linux-x64'
-  throw new Error(`Unsupported Rovai sidecar host: ${platform}-${arch}`)
+  throw new Error(`Unsupported Coaxi sidecar host: ${platform}-${arch}`)
 }
 
 export function sidecarExecutableName(
@@ -1085,19 +1085,19 @@ export function sidecarExecutableName(
 }
 
 export function resolveCoreBinary(): string {
-  return resolveBundledSidecar('rovai-host', [
-    process.env.ROVAI_HOST_BIN,
-    process.env.ROVAI_CORE_BIN,
+  return resolveBundledSidecar('coaxi-host', [
+    process.env.COAXI_HOST_BIN,
+    process.env.COAXI_CORE_BIN,
     process.env.HORIZONWARD_CORE_BIN,
     process.env.LUMEN_CORE_BIN
   ])
 }
 
 export function resolveDesktopBootstrapBinary(): string {
-  return resolveBundledSidecar('rovai')
+  return resolveBundledSidecar('coaxi')
 }
 
-function resolveBundledSidecar(binary: 'rovai-host' | 'rovai', overrides: Array<string | undefined> = []): string {
+function resolveBundledSidecar(binary: 'coaxi-host' | 'coaxi', overrides: Array<string | undefined> = []): string {
   const executable = sidecarExecutableName(binary)
   const stagedTarget = sidecarTargetKey()
   const candidates = app.isPackaged
@@ -1119,5 +1119,5 @@ function resolveBundledSidecar(binary: 'rovai-host' | 'rovai', overrides: Array<
     }
   }
 
-  throw new Error(`Coaxi ${binary === 'rovai-host' ? 'Rust Host binary' : 'Desktop bootstrap helper'} was not found. Checked: ${candidates.filter(Boolean).map((candidate) => resolve(candidate as string)).join(', ')}`)
+  throw new Error(`Coaxi ${binary === 'coaxi-host' ? 'Rust Host binary' : 'Desktop bootstrap helper'} was not found. Checked: ${candidates.filter(Boolean).map((candidate) => resolve(candidate as string)).join(', ')}`)
 }

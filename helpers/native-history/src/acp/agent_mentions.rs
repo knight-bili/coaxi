@@ -7,17 +7,18 @@ use serde::{Deserialize, Serialize};
 use crate::acp::types::PromptInputBlock;
 use crate::models::agent::{is_valid_custom_agent_id, BUILTIN_AGENT_TYPES};
 
-// Reserved at every Codeg prompt ingress before any routing frame is appended.
+// Reserved at every Coaxi prompt ingress before any routing frame is appended.
 // The parser may therefore treat a structurally valid RS-bounded frame as
-// Codeg-authored without deleting an API caller's control-character text.
+// Coaxi-authored without deleting an API caller's control-character text.
 const ROUTE_FRAME_SEPARATOR: char = '\u{001e}';
-const ROUTE_FRAME_KIND: &str = "codeg_internal_agent_routes";
+const ROUTE_FRAME_KIND: &str = "coaxi_internal_agent_routes";
 /// Opening bytes of the frame's descriptor line — the anchor used to find a
 /// frame in a transcript that no longer has the separators around it (see
 /// [`find_unseparated_frame`]). `kind` is the descriptor's first field, so this
 /// is a prefix of every rendered body; a field reorder that broke that is what
 /// `the_body_anchor_is_what_the_renderer_starts_with` guards.
-const ROUTE_FRAME_BODY_PREFIX: &str = "{\"kind\":\"codeg_internal_agent_routes\"";
+const ROUTE_FRAME_BODY_PREFIX: &str = "{\"kind\":\"coaxi_internal_agent_routes\"";
+const LEGACY_ROUTE_PREFIX: &str = "{\"kind\":\"codeg_internal_agent_routes\"";
 const ROUTE_FRAME_VERSION: u8 = 3;
 const MAX_ROUTE_FRAME_BYTES: usize = 16 * 1024;
 /// Distinct agents one frame may route, applied AFTER deduplication.
@@ -26,7 +27,7 @@ const MAX_AGENT_REFERENCE_OCCURRENCES: usize = 256;
 
 /// One routed agent inside the frame — nothing but the wire slug.
 ///
-/// The frame is derived from the prompt's own visible `codeg://agent/...`
+/// The frame is derived from the prompt's own visible `coaxi://agent/...`
 /// links, so there is no out-of-band claim to carry or verify. Serializing as
 /// `{"agentType":"..."}` is load-bearing: the frame's bytes are its identity
 /// (see [`render_internal_agent_routes`]).
@@ -51,7 +52,7 @@ fn agent_reference_regex() -> &'static Regex {
     // limited to ASCII alphanumeric, `-`, `_`, and `.`. Requiring a visible
     // label keeps this in lockstep with the frontend reference tokenizer.
     static PATTERN: LazyLock<Regex> = LazyLock::new(|| {
-        Regex::new(r"\[(?:\\.|[^\]\\\r\n])+\]\(codeg://agent/([A-Za-z0-9][A-Za-z0-9._:-]{0,127})\)")
+        Regex::new(r"\[(?:\\.|[^\]\\\r\n])+\]\(coaxi://agent/([A-Za-z0-9][A-Za-z0-9._:-]{0,127})\)")
             .expect("agent reference regex is valid")
     });
     &PATTERN
@@ -76,10 +77,10 @@ fn visible_agent_reference_types(blocks: &[PromptInputBlock]) -> Vec<String> {
 }
 
 /// Append prompt-local routing for every agent the user visibly linked, when
-/// this connection actually received the codeg-mcp companion's delegation
+/// this connection actually received the coaxi-mcp companion's delegation
 /// group.
 ///
-/// The prompt IS the input: a visible `[label](codeg://agent/<type>)` link is
+/// The prompt IS the input: a visible `[label](coaxi://agent/<type>)` link is
 /// the whole criterion. That link is text the agent reads either way, and the
 /// frame grants nothing — it only names the channel a delegation should take —
 /// so there is deliberately no out-of-band claim to authenticate. Deriving from
@@ -131,7 +132,7 @@ pub(crate) fn append_agent_routes(blocks: &mut Vec<PromptInputBlock>, delegation
 
 /// The frame's exact bytes ARE its identity: `parse_internal_agent_routes`
 /// only accepts a candidate it can re-render byte-for-byte, which is what lets
-/// the parsers strip a Codeg-authored frame without ever deleting look-alike
+/// the parsers strip a Coaxi-authored frame without ever deleting look-alike
 /// user prose.
 ///
 /// CONSEQUENCE: editing this string orphans every frame already written into an
@@ -161,7 +162,7 @@ fn render_internal_agent_routes(frame: &InternalAgentRoutes) -> String {
 ///
 /// Split out because the separators are the one part of the frame an agent may
 /// not give back. They are reserved and scrubbed at ingress, but that only
-/// guarantees codeg never *sends* a stray one — it says nothing about what the
+/// guarantees coaxi never *sends* a stray one — it says nothing about what the
 /// agent writes into its own store. Antigravity's ACP server, for one, joins
 /// the prompt's text blocks with a space and replaces each separator with one,
 /// so its trajectory holds this body and no separators at all.
@@ -169,6 +170,20 @@ fn render_internal_agent_routes(frame: &InternalAgentRoutes) -> String {
 /// Everything the identity argument needs is in here: the nonce, the routes,
 /// and the full instruction wording. See [`find_unseparated_frame`].
 fn render_internal_agent_routes_body(frame: &InternalAgentRoutes) -> String {
+    let descriptor = serde_json::to_string(frame).expect("internal route frame is serializable");
+    let routes = serde_json::to_string(&frame.routes).expect("agent routes are serializable");
+    format!(
+        "{descriptor}\n\
+Coaxi composer routing metadata (authoritative): {routes}\n\
+When you delegate any of this work, route it through the `delegate_to_agent` \
+tool from the `coaxi-mcp` server with `agent_type` taken from the matching \
+route: do not substitute your own native sub-agent, task, or spawn mechanism, \
+and do not route it through any other delegation tool.\n"
+    )
+}
+
+// 仅用于读取固定历史格式，不向新任务发出旧协议。
+fn render_legacy_agent_routes_body(frame: &InternalAgentRoutes) -> String {
     let descriptor = serde_json::to_string(frame).expect("internal route frame is serializable");
     let routes = serde_json::to_string(&frame.routes).expect("agent routes are serializable");
     format!(
@@ -211,12 +226,14 @@ fn parse_internal_agent_routes_body(candidate: &str) -> Option<InternalAgentRout
     }
     let (descriptor, remainder) = candidate.split_once('\n')?;
     let mut frame: InternalAgentRoutes = serde_json::from_str(descriptor).ok()?;
+    let legacy = frame.kind == "codeg_internal_agent_routes";
+    let metadata_prefix = if legacy { "Codeg composer routing metadata (authoritative): " } else { "Coaxi composer routing metadata (authoritative): " };
     let routes_json = remainder
         .lines()
         .next()?
-        .strip_prefix("Codeg composer routing metadata (authoritative): ")?;
+        .strip_prefix(metadata_prefix)?;
     frame.routes = serde_json::from_str(routes_json).ok()?;
-    if frame.kind != ROUTE_FRAME_KIND
+    if (!legacy && frame.kind != ROUTE_FRAME_KIND)
         || frame.version != ROUTE_FRAME_VERSION
         || uuid::Uuid::parse_str(&frame.nonce).is_err()
         || frame.routes.is_empty()
@@ -225,7 +242,7 @@ fn parse_internal_agent_routes_body(candidate: &str) -> Option<InternalAgentRout
             .routes
             .iter()
             .any(|route| !valid_agent_wire_syntax(&route.agent_type))
-        || render_internal_agent_routes_body(&frame) != candidate
+        || (if legacy { render_legacy_agent_routes_body(&frame) } else { render_internal_agent_routes_body(&frame) }) != candidate
     {
         return None;
     }
@@ -277,11 +294,11 @@ fn find_separated_frame(input: &str, from: usize) -> Option<(usize, usize)> {
 /// A frame whose separators the agent dropped or rewrote, matched on its body.
 ///
 /// WHY THIS EXISTS. Separators are the cheapest possible proof that a frame is
-/// Codeg-authored, but they only reach a transcript intact if the agent stores
+/// Coaxi-authored, but they only reach a transcript intact if the agent stores
 /// the prompt verbatim — and one does not. Antigravity's ACP server joins the
 /// prompt's text blocks with a space and replaces each separator with one, so a
 /// routed turn lands in `conversations/<id>.db` as
-/// `…（使用codeg-mcp工具）  {"kind":…delegation tool.\n ` — the same body, both
+/// `…（使用coaxi-mcp工具）  {"kind":…delegation tool.\n ` — the same body, both
 /// separators now spaces. The separated pass cannot see that, and the whole
 /// frame renders inside the user's bubble when the session is reopened.
 ///
@@ -299,7 +316,8 @@ fn find_separated_frame(input: &str, from: usize) -> Option<(usize, usize)> {
 fn find_unseparated_frame(input: &str, from: usize) -> Option<(usize, usize)> {
     let mut search_from = from;
     while search_from < input.len() {
-        let start = search_from + input[search_from..].find(ROUTE_FRAME_BODY_PREFIX)?;
+        let remaining = &input[search_from..];
+        let start = search_from + [remaining.find(ROUTE_FRAME_BODY_PREFIX), remaining.find(LEGACY_ROUTE_PREFIX)].into_iter().flatten().min()?;
         if let Some(end) = unseparated_frame_end(input, start) {
             if parse_internal_agent_routes_body(&input[start..end]).is_some() {
                 return Some((start, end));
@@ -307,7 +325,7 @@ fn find_unseparated_frame(input: &str, from: usize) -> Option<(usize, usize)> {
         }
         // Same rule as the separated scan: a look-alike opening must not hide a
         // real frame further along.
-        search_from = start + ROUTE_FRAME_BODY_PREFIX.len();
+        search_from = start + 1;
     }
     None
 }
@@ -327,7 +345,7 @@ fn unseparated_frame_end(input: &str, start: usize) -> Option<usize> {
 }
 
 /// Remove only complete frames that can be parsed and reproduced byte-for-byte.
-/// Codeg scrubs the reserved separator from every prompt at ingress, so a frame
+/// Coaxi scrubs the reserved separator from every prompt at ingress, so a frame
 /// that still round-trips can only have been appended at the final boundary —
 /// true for any agent's transcript, not just the one this was first written for.
 ///
@@ -381,7 +399,7 @@ pub(crate) fn contains_internal_agent_routes(input: &str) -> bool {
 /// Cutting at the SEPARATOR is sound because RS is reserved:
 /// `strip_route_separator_from_prompt` removes it from every prompt field at
 /// ingress, so a separator that survives into persisted history can only be one
-/// Codeg appended itself. The descriptor prefix carries no such guarantee — it
+/// Coaxi appended itself. The descriptor prefix carries no such guarantee — it
 /// is ordinary text a user could in principle type — but it is the only handle
 /// left on the agents that rewrite the separators away (Antigravity), and the
 /// blast radius of a false positive is one truncated sidebar title, against a
@@ -395,6 +413,7 @@ pub(crate) fn cut_at_route_frame_marker(text: &mut String) {
         .find(ROUTE_FRAME_SEPARATOR)
         .into_iter()
         .chain(text.find(ROUTE_FRAME_BODY_PREFIX))
+        .chain(text.find(LEGACY_ROUTE_PREFIX))
         .chain(find_halved_body_prefix(text))
         .min()
     else {
@@ -409,7 +428,7 @@ pub(crate) fn cut_at_route_frame_marker(text: &mut String) {
 /// The separator is one character and cannot be halved: either it is inside the
 /// capped window or no frame content is. The descriptor prefix is 37 bytes and
 /// very much can be, so a first prompt whose prose length falls in a 37-wide
-/// band leaves `…prose  {"kind":"codeg_int...` — a fragment [`str::find`] cannot
+/// band leaves `…prose  {"kind":"coaxi_int...` — a fragment [`str::find`] cannot
 /// see, and the leak this whole cut exists to stop.
 ///
 /// Matched at the END of the string with a trailing run of `.` discarded,
@@ -418,7 +437,7 @@ pub(crate) fn cut_at_route_frame_marker(text: &mut String) {
 ///
 /// A fragment shorter than `{"kind":"c` is deliberately left alone: what
 /// survives at that length is a generic JSON opening rather than anything that
-/// identifies codeg, and matching it would start trimming ordinary prose that
+/// identifies coaxi, and matching it would start trimming ordinary prose that
 /// happens to end in `{`.
 ///
 /// [`truncate_str`]: crate::parsers::truncate_str
@@ -449,7 +468,7 @@ pub(crate) fn contains_only_internal_agent_routes(input: &str) -> bool {
 /// message permanently unsendable with no way for the user to find the offending
 /// byte, and it also let a model echo the frame back into a `delegate_to_agent`
 /// task string and kill the child prompt. Stripping keeps the invariant that
-/// motivated the check — a byte-exact frame inside a Codeg-authored turn can
+/// motivated the check — a byte-exact frame inside a Coaxi-authored turn can
 /// only have been appended by [`append_agent_routes`] — and makes it stronger,
 /// since no user-supplied RS reaches the wire at all.
 ///
@@ -516,3 +535,23 @@ pub(crate) fn strip_route_separator_from_prompt(blocks: &mut [PromptInputBlock])
     stripped
 }
 
+
+#[cfg(test)]
+mod coaxi_history_brand_tests {
+    use super::*;
+    #[test]
+    fn legacy_frame_round_trip_is_strict_and_user_prose_is_preserved() {
+        let frame = InternalAgentRoutes {
+            kind: "codeg_internal_agent_routes".into(), version: 3,
+            nonce: "1c160a4b-8a9f-454e-9ab3-849a47fb7c33".into(),
+            routes: vec![AgentRoute { agent_type: "codex".into() }],
+        };
+        let old = render_legacy_agent_routes_body(&frame);
+        assert_eq!(strip_internal_agent_routes(&format!("用户原文\n{old}")), "用户原文");
+        assert!(contains_only_internal_agent_routes(&old));
+        let tampered = old.replace("codeg-mcp", "other-mcp");
+        assert_eq!(strip_internal_agent_routes(&tampered), tampered);
+        let mixed = old.replace("Codeg composer", "Coaxi composer");
+        assert_eq!(strip_internal_agent_routes(&mixed), mixed);
+    }
+}

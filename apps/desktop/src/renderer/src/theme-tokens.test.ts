@@ -368,7 +368,7 @@ describe('Porcelain Day + Steel Night theme tokens', () => {
   })
 
   it('highlights the active Thread while keeping its current Project heading quiet', () => {
-    expect(css).toMatch(/\.camp-nav-row\.selected\s*\{[^}]*background: var\(--surface-selected\)/)
+    expect(css).toMatch(/\.camp-nav-row\.selected\s*\{[^}]*background: color-mix\(in srgb, var\(--surface-selected\) 72%, transparent\)/)
     expect(css).toMatch(/\.project-heading-row\.current-project\s*\{[^}]*background: transparent/)
   })
 
@@ -389,7 +389,7 @@ describe('Porcelain Day + Steel Night theme tokens', () => {
     expect(gutterSize - (thumbInset * 2)).toBe(8)
     expect(css).toMatch(/\*::-webkit-scrollbar\s*\{[^}]*width: var\(--scrollbar-gutter-size\)[^}]*height: var\(--scrollbar-gutter-size\)[^}]*background: transparent/)
     expect(css).toMatch(/\*::-webkit-scrollbar-track,\s*\*::-webkit-scrollbar-corner\s*\{[^}]*background: transparent/)
-    expect(css).toMatch(/\*::-webkit-scrollbar-thumb\s*\{[^}]*border: var\(--scrollbar-thumb-inset\) solid transparent[^}]*border-radius: 999px[^}]*background: var\(--surface-selected\)/)
+    expect(css).toMatch(/\*::-webkit-scrollbar-thumb\s*\{[^}]*border: var\(--scrollbar-thumb-inset\) solid transparent[^}]*border-radius: 999px[^}]*background: color-mix\(in srgb, var\(--surface-selected\) 72%, transparent\)/)
     expect(css).not.toContain('scrollbar-width: thin')
     expect(css).toContain('.file-preview-tab-strip::-webkit-scrollbar { display: none; }')
     expect(css).toContain('.run-pulse-inspector .run-pulse-list::-webkit-scrollbar { display: none; }')
@@ -414,15 +414,15 @@ describe('Porcelain Day + Steel Night theme tokens', () => {
     expect(css).toMatch(/\.member-sidebar-actions\s*\{[^}]*position: relative[^}]*z-index: 3[^}]*-webkit-app-region: no-drag/)
     expect(css).toMatch(/\.member-detail-actions\s*\{[^}]*position: relative[^}]*z-index: 3/)
     expect(css).toMatch(/\.unified-sidebar-drag\s*\{[^}]*flex: 0 0 38px[^}]*-webkit-app-region: drag/)
-    expect(css).toMatch(/html\[data-rovai-platform="win32"\] \.unified-sidebar-drag\s*\{[^}]*flex: 0 0 8px/)
-    expect(css).not.toContain('html[data-rovai-platform="win32"] *')
+    expect(css).toMatch(/html\[data-coaxi-platform="win32"\] \.unified-sidebar-drag\s*\{[^}]*flex: 0 0 8px/)
+    expect(css).not.toContain('html[data-coaxi-platform="win32"] *')
   })
 
   it('keeps the Windows menu projection on the rail token outside page layout', () => {
-    expect(css).toMatch(/html\[data-rovai-platform="win32"\] #root\s*\{[^}]*grid-template-columns: minmax\(0, 1fr\)[^}]*grid-template-rows: env\(titlebar-area-height, 32px\) minmax\(0, 1fr\)[^}]*overflow: hidden[^}]*background: var\(--rail\)/)
-    expect(css).toMatch(/html\[data-rovai-platform="win32"\] \.windows-application-menu\s*\{[^}]*width: env\(titlebar-area-width, calc\(100% - 138px\)\)[^}]*max-width: calc\(100vw - 138px\)[^}]*background: var\(--rail\)[^}]*-webkit-app-region: drag/)
+    expect(css).toMatch(/html\[data-coaxi-platform="win32"\] #root\s*\{[^}]*grid-template-columns: minmax\(0, 1fr\)[^}]*grid-template-rows: env\(titlebar-area-height, 32px\) minmax\(0, 1fr\)[^}]*overflow: hidden[^}]*background: var\(--rail\)/)
+    expect(css).toMatch(/html\[data-coaxi-platform="win32"\] \.windows-application-menu\s*\{[^}]*width: env\(titlebar-area-width, calc\(100% - 138px\)\)[^}]*max-width: calc\(100vw - 138px\)[^}]*background: var\(--rail\)[^}]*-webkit-app-region: drag/)
     expect(css).toMatch(/\.windows-application-menu-item\s*\{[^}]*font: 400 12px\/1 "Segoe UI", sans-serif[^}]*-webkit-app-region: no-drag/)
-    expect(css).toMatch(/html\[data-rovai-platform="win32"\] \.app-shell\s*\{[^}]*grid-row: 2[^}]*width: 100%[^}]*min-width: 0[^}]*height: auto/)
+    expect(css).toMatch(/html\[data-coaxi-platform="win32"\] \.app-shell\s*\{[^}]*grid-row: 2[^}]*width: 100%[^}]*min-width: 0[^}]*height: auto/)
   })
 
   it('keeps selection and unread state visible in Windows Forced Colors', () => {

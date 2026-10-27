@@ -224,7 +224,7 @@ test('Core event evidence is paged to completion with a monotonic non-duplicatin
 })
 
 test('verifier process and schema faults remain evaluation faults', async () => {
-  const root = await mkdtemp(join(tmpdir(), 'rovai-verifier-contract-'))
+  const root = await mkdtemp(join(tmpdir(), 'coaxi-verifier-contract-'))
   const workspace = join(root, 'workspace')
   await mkdir(workspace)
   const catalog = validateEvaluationContract(caseManifest()).verificationCatalog
@@ -274,7 +274,7 @@ test('verifier process and schema faults remain evaluation faults', async () => 
 })
 
 test('Delivered Workspace Snapshot excludes Runner projections and survives live-workspace mutation', async () => {
-  const root = await mkdtemp(join(tmpdir(), 'rovai-delivered-snapshot-'))
+  const root = await mkdtemp(join(tmpdir(), 'coaxi-delivered-snapshot-'))
   const workspace = join(root, 'workspace')
   const evidence = join(root, 'evidence')
   await mkdir(join(workspace, 'src'), { recursive: true })
@@ -304,7 +304,7 @@ test('Delivered Workspace Snapshot excludes Runner projections and survives live
 })
 
 test('Delivered Workspace Snapshot rejects symlinks that escape the retained workspace', async () => {
-  const root = await mkdtemp(join(tmpdir(), 'rovai-delivered-symlink-'))
+  const root = await mkdtemp(join(tmpdir(), 'coaxi-delivered-symlink-'))
   const workspace = join(root, 'workspace')
   const evidence = join(root, 'evidence')
   await mkdir(workspace)
@@ -795,7 +795,7 @@ test('public result projection explains isolation coverage without leaking priva
     },
     evidenceIndex: {
       artifactId: 'evidence-index:public-id',
-      schemaId: 'rovai.qualification.evidence-index',
+      schemaId: 'coaxi.qualification.evidence-index',
       schemaVersion: '1.0.0',
       payloadDigest: `sha256:${'c'.repeat(64)}`,
       locator: 'private/evidence-index.json',
@@ -808,7 +808,7 @@ test('public result projection explains isolation coverage without leaking priva
     },
     collaborationLedger: {
       artifactId: 'collaboration-ledger:public-id',
-      schemaId: 'rovai.qualification.collaboration-ledger',
+      schemaId: 'coaxi.qualification.collaboration-ledger',
       schemaVersion: '1.0.0',
       payloadDigest: `sha256:${'d'.repeat(64)}`,
       locator: 'private/collaboration-ledger.json',
@@ -823,7 +823,7 @@ test('public result projection explains isolation coverage without leaking priva
     },
     toolCallLedger: {
       artifactId: 'tool-call-ledger:public-id',
-      schemaId: 'rovai.qualification.tool-call-ledger',
+      schemaId: 'coaxi.qualification.tool-call-ledger',
       schemaVersion: '1.1.0',
       payloadDigest: `sha256:${'e'.repeat(64)}`,
       locator: 'private/tool-call-ledger.json',
@@ -845,7 +845,7 @@ test('public result projection explains isolation coverage without leaking priva
     },
     workspaceMutationLedger: {
       artifactId: 'workspace-mutation-ledger:public-id',
-      schemaId: 'rovai.qualification.workspace-mutation-ledger',
+      schemaId: 'coaxi.qualification.workspace-mutation-ledger',
       schemaVersion: '1.0.0',
       payloadDigest: `sha256:${'f'.repeat(64)}`,
       locator: 'private/workspace-mutation-ledger.json',
@@ -880,7 +880,7 @@ test('public result projection explains isolation coverage without leaking priva
   })
   assert.deepEqual(redacted.evidenceIndex, {
     artifactId: 'evidence-index:public-id',
-    schemaId: 'rovai.qualification.evidence-index',
+    schemaId: 'coaxi.qualification.evidence-index',
     schemaVersion: '1.0.0',
     payloadDigest: `sha256:${'c'.repeat(64)}`,
     recordCount: 12,
@@ -892,7 +892,7 @@ test('public result projection explains isolation coverage without leaking priva
   })
   assert.deepEqual(redacted.collaborationLedger, {
     artifactId: 'collaboration-ledger:public-id',
-    schemaId: 'rovai.qualification.collaboration-ledger',
+    schemaId: 'coaxi.qualification.collaboration-ledger',
     schemaVersion: '1.0.0',
     payloadDigest: `sha256:${'d'.repeat(64)}`,
     callCount: 2,
@@ -906,7 +906,7 @@ test('public result projection explains isolation coverage without leaking priva
   })
   assert.deepEqual(redacted.toolCallLedger, {
     artifactId: 'tool-call-ledger:public-id',
-    schemaId: 'rovai.qualification.tool-call-ledger',
+    schemaId: 'coaxi.qualification.tool-call-ledger',
     schemaVersion: '1.1.0',
     payloadDigest: `sha256:${'e'.repeat(64)}`,
     recordCount: 3,
@@ -927,7 +927,7 @@ test('public result projection explains isolation coverage without leaking priva
   })
   assert.deepEqual(redacted.workspaceMutationLedger, {
     artifactId: 'workspace-mutation-ledger:public-id',
-    schemaId: 'rovai.qualification.workspace-mutation-ledger',
+    schemaId: 'coaxi.qualification.workspace-mutation-ledger',
     schemaVersion: '1.0.0',
     payloadDigest: `sha256:${'f'.repeat(64)}`,
     recordCount: 2,

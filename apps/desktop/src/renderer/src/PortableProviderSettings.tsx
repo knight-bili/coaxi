@@ -21,7 +21,7 @@ function definition(source?:PortableProviderViewV1):PortableProviderDefinitionV1
   if(!source)return {schemaVersion:1,id:newCommandId(),name:'',agentType:'claude_code',apiUrl:'',credential:null,rawAgentTypesJson:'',rawModel:null,model:emptyModel('claude_code'),enabled:true}
   const {revision:_revision,digest:_digest,createdAt:_createdAt,updatedAt:_updatedAt,...value}=source;return value
 }
-/** 布局取固定 Codeg ModelProviderSettings 的类型筛选、紧凑行和新增/编辑弹窗。 */
+/** 布局取固定 Coaxi ModelProviderSettings 的类型筛选、紧凑行和新增/编辑弹窗。 */
 export function PortableProviderSettings():React.JSX.Element{
   const client=useThreadClient(),t=useUiText(),generation=useRef(0)
   const [page,setPage]=useState<PortableProviderPage>({items:[],next:null}),[filter,setFilter]=useState(''),[busy,setBusy]=useState(false),[error,setError]=useState(''),[ready,setReady]=useState(false)

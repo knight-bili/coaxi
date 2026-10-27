@@ -48,7 +48,7 @@ app.whenReady().then(async () => {
   const closeTo = (value, expected, message) => assert.ok(Math.abs(value - expected) < 1, `${message}: ${value}, expected ${expected}`)
   const cases = []
   const check = async (name, operation) => {
-    if (process.env.ROVAI_PREVIEW_CASE && !name.includes(process.env.ROVAI_PREVIEW_CASE)) return
+    if (process.env.COAXI_PREVIEW_CASE && !name.includes(process.env.COAXI_PREVIEW_CASE)) return
     try { await operation(); cases.push(name); console.log(`PASS ${name}`) } catch (error) {
       console.error(name, error)
       console.error(await run('JSON.stringify({ state: window.previewTest.snapshot(), pointerEvents: window.previewTest.pointerEvents })'))
@@ -129,7 +129,7 @@ app.whenReady().then(async () => {
 
   const initialExecutionFixture = async (scenario = 'new', ratio = null, width = 1440, placement = 'right') => {
     await run(`localStorage.clear(); sessionStorage.clear();
-      ${ratio === null ? '' : `localStorage.setItem('rovai.file-preview.preferred-ratio', '${ratio}')`}`)
+      ${ratio === null ? '' : `localStorage.setItem('coaxi.file-preview.preferred-ratio', '${ratio}')`}`)
     await window.loadFile(renderer, { query: { 'initial-execution': scenario, 'execution-placement': placement } })
     await viewport(width)
   }
@@ -614,8 +614,8 @@ app.whenReady().then(async () => {
   await check('file paths use available width before truncating directories and preserve the filename in narrow panes', async () => {
     await run('window.previewTest.openPath(0)')
     const short = await run('window.previewTest.pathSnapshot()')
-    assert.equal(short.pathTitle, 'crates/rovai-core/src/acp.rs')
-    assert.deepEqual(short.segments.map(segment => segment.text), ['crates', 'rovai-core', 'src', 'acp.rs'])
+    assert.equal(short.pathTitle, 'crates/coaxi-core/src/acp.rs')
+    assert.deepEqual(short.segments.map(segment => segment.text), ['crates', 'coaxi-core', 'src', 'acp.rs'])
     assert.ok(short.segments.every(segment => !segment.truncated), 'The short acp.rs path fits without any ellipses')
     await capture('preview-path-acp-day')
 

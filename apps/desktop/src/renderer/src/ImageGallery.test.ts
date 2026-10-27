@@ -53,7 +53,7 @@ describe('shared image presentation', () => {
   })
 
   it('keeps all Runtime images visible, with no attachment operations', () => {
-    vi.stubGlobal('window', { rovai: { platform: 'darwin' } })
+    vi.stubGlobal('window', { coaxi: { platform: 'darwin' } })
     const html = renderToStaticMarkup(createElement(ImageGallery, {
       images: Array.from({ length: 20 }, (_, index) => ({
         kind: 'runtime' as const, threadId: 'camp', image: {
@@ -121,7 +121,7 @@ describe('shared image presentation', () => {
     let resolveRead!: (value: { mediaType: string; data: string }) => void
     const response = new Promise<{ mediaType: string; data: string }>((resolve) => { resolveRead = resolve })
     const request = vi.fn(() => response)
-    vi.stubGlobal('window', { rovai: { request } })
+    vi.stubGlobal('window', { coaxi: { request } })
     const source: GalleryImage = {
       kind: 'runtime', threadId: 'camp', image: {
         id: 'runtime-image', displayName: 'runtime-image', mediaType: 'image/png', byteSize: 999
@@ -154,7 +154,7 @@ describe('shared image presentation', () => {
 
   it('serves a completed attachment payload from cache until the tile performs its refresh', async () => {
     const preview = vi.fn()
-    vi.stubGlobal('window', { rovai: { composerAttachments: { preview } } })
+    vi.stubGlobal('window', { coaxi: { composerAttachments: { preview } } })
     const source: GalleryImage = {
       ...attachmentSource('attachment-image')
     }
@@ -171,7 +171,7 @@ describe('shared image presentation', () => {
     const request = vi.fn()
       .mockResolvedValueOnce(null)
       .mockRejectedValueOnce(new Error('core_temporarily_unavailable'))
-    vi.stubGlobal('window', { rovai: { request } })
+    vi.stubGlobal('window', { coaxi: { request } })
     const source: GalleryImage = {
       kind: 'runtime', threadId: 'camp', image: {
         id: 'runtime-image', displayName: 'runtime-image', mediaType: 'image/png', byteSize: 1

@@ -2,14 +2,14 @@
  * sessionStorage. IndexedDB transactions work on HTTP LAN origins as well as
  * HTTPS. This lease contains no credentials or editing content; it owns only
  * the tab's editor and drafts, independently from browser authentication. */
-const DATABASE = 'rovai-web-tab-owners-v1'
+const DATABASE = 'coaxi-web-tab-owners-v1'
 const LIFETIME = 30_000
-export const RECOVERY_KEY = 'rovai.web.session.v1'
+export const RECOVERY_KEY = 'coaxi.web.session.v1'
 export interface RecoveryStorage { getItem(key: string): string | null; setItem(key: string, value: string): void; removeItem(key: string): void }
 
 export async function acquireTabRecovery(storage: RecoveryStorage = sessionStorage) {
   const documentId = randomId()
-  const oldTabId = storage.getItem('rovai.web.tab.v1')
+  const oldTabId = storage.getItem('coaxi.web.tab.v1')
   let tabId = oldTabId ?? randomId()
   const database = await new Promise<IDBDatabase>((resolve, reject) => {
     const request = indexedDB.open(DATABASE, 1)
@@ -26,7 +26,7 @@ export async function acquireTabRecovery(storage: RecoveryStorage = sessionStora
     request.onsuccess = () => {
       const current = request.result as { documentId: string; until: number } | undefined
       if (release) { if (current?.documentId === documentId) store.delete(tabId); return }
-      const released = localStorage.getItem(`rovai.web.released:${tabId}`)
+      const released = localStorage.getItem(`coaxi.web.released:${tabId}`)
       if (!current || current.documentId === documentId || current.documentId === released || current.until <= Date.now()) {
         accepted = true; store.put({ documentId, until: Date.now() + LIFETIME }, tabId)
       }
@@ -41,7 +41,7 @@ export async function acquireTabRecovery(storage: RecoveryStorage = sessionStora
   if (!owned) { await new Promise(resolve => setTimeout(resolve, 150)); owned = await lease() }
   const fork = !owned
   if (fork) { tabId = randomId(); if (!await lease()) throw new Error('无法建立独立标签页。') }
-  storage.setItem('rovai.web.tab.v1', tabId)
+  storage.setItem('coaxi.web.tab.v1', tabId)
   const assert = async () => {
     if (!active || !await lease()) throw new Error('此页面的编辑归属已改变，请刷新后恢复。')
   }
@@ -50,7 +50,7 @@ export async function acquireTabRecovery(storage: RecoveryStorage = sessionStora
     active = false
     // Async IDB writes may be abandoned when a document unloads. This synchronous,
     // non-secret release marker lets the next document claim that exact lease.
-    localStorage.setItem(`rovai.web.released:${tabId}`, documentId)
+    localStorage.setItem(`coaxi.web.released:${tabId}`, documentId)
     void lease(true)
   }
   const show = () => { void lease().then(ok => { active = ok }) }

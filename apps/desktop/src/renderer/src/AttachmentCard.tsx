@@ -15,7 +15,7 @@ import { UiText, uiAttribute } from './interface-language'
 import { ImageContextMenu, type ImageAction, type ImageMenuPosition } from './ImageContextMenu'
 import { writeClipboardImage } from './clipboard'
 import { privateAttachmentOwnerKey } from '../../shared/private-attachment-locator'
-import { ReferenceBadge } from './codeg-native-content/components/chat/composer/badges/reference-badge'
+import { ReferenceBadge } from './coaxi-native-content/components/chat/composer/badges/reference-badge'
 
 type AttachmentKind = 'file' | 'directory'
 
